@@ -1,11 +1,31 @@
 {
-  "name": "preact-devtools",
-  "version": "1.0.0",
-  "description": "",
-  "main": "index.js",
-  "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1"
-  },
-  "author": "",
-  "license": "ISC"
+	"name": "preact-devtools",
+	"version": "1.0.0",
+	"description": "",
+	"main": "index.js",
+	"scripts": {
+		"dev": "webpack-dev-server --inline"
+	},
+	"author": "",
+	"license": "ISC",
+	"prettier": {
+		"useTabs": true,
+		"trailingComma": "all"
+	},
+	"devDependencies": {
+		"css-loader": "^3.2.0",
+		"html-webpack-plugin": "^3.2.0",
+		"preact": "^10.0.0-rc.1",
+		"prettier": "^1.18.2",
+		"style-loader": "^1.0.0",
+		"ts-loader": "^6.0.4",
+		"ts-node": "^8.3.0",
+		"typescript": "^3.5.3",
+		"webpack": "^4.39.2",
+		"webpack-cli": "^3.3.7",
+		"webpack-dev-server": "^3.8.0"
+	},
+	"dependencies": {
+		"s-js": "^0.4.9"
+	}
 }
