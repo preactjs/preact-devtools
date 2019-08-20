@@ -1,0 +1,19 @@
+.root {
+	width: 100%;
+	height: 100%;
+	display: flex;
+	flex-direction: row;
+}
+
+.components {
+	display: flex;
+	flex: 1 1 65%;
+	flex-direction: column;
+}
+
+.sidebar {
+	display: flex;
+	flex: 1 1 35%;
+	flex-direction: column;
+	border-left: 0.0625rem solid var(--color-border);
+}

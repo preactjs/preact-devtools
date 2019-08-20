@@ -1,0 +1,12 @@
+.btnIcon {
+	border: none;
+	background: none;
+	cursor: pointer;
+	display: inline-flex;
+	align-items: center;
+	outline: none;
+}
+
+.btnIcon[data-active] {
+	color: var(--color-button-active);
+}

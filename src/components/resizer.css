@@ -1,0 +1,32 @@
+.container {
+	display: flex;
+	width: 100%;
+	height: 100%;
+}
+
+.item {
+	display: flex;
+	flex: auto;
+}
+
+.drag {
+	background: red;
+}
+
+/* Horizontal */
+[data-direction="horizontal"].container {
+	flex-direction: row;
+}
+
+[data-direction="horizontal"] .drag {
+	cursor: ew-resize;
+}
+
+/* vertical */
+[data-direction="vertical"].container {
+	flex-direction: column;
+}
+
+[data-direction="vertical"] .drag {
+	cursor: nw-resize;
+}

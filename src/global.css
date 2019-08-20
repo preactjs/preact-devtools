@@ -1,0 +1,25 @@
+* {
+	box-sizing: border-box;
+}
+
+html,
+body {
+	margin: 0;
+	padding: 0;
+	height: 100%;
+}
+
+:root {
+	--color-selected-bg: #8058ca;
+	--color-selected-text: white;
+	--color-selected-inactive-bg: gray;
+	--color-selected-inactive-text: white;
+	--color-element-text: #673ab8;
+	--color-dim-bg: #e9e1f8;
+	--color-inactive-child-bg: #e9e1f8;
+	--color-hover: #e9e1f8;
+	--indent-depth: 2rem;
+	--color-border: #dedede;
+	--color-text-empty: #aaa;
+	--color-button-active: #7245c7;
+}

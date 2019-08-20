@@ -1,0 +1,16 @@
+.root {
+	display: flex;
+	flex-direction: column;
+	flex: auto;
+	width: 100%;
+}
+
+.title {
+	padding: 0 0.5rem;
+	color: var(--color-element-text);
+	font-family: monospace;
+}
+
+.body > * + * {
+	border-top: 0.0625rem solid var(--color-border);
+}

@@ -1,0 +1,20 @@
+.panel {
+	padding: 0.5rem;
+}
+
+.empty {
+	font-style: italic;
+	color: var(--color-text-empty);
+	font-size: 0.65rem;
+}
+
+.title {
+	font-size: 0.7rem;
+	line-height: 1.4;
+	margin: 0 0 0.1rem 0;
+	font-weight: normal;
+}
+
+.content {
+	padding-left: 0.8rem;
+}

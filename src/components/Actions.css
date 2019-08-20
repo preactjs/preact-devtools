@@ -1,0 +1,24 @@
+.actions {
+	width: 100%;
+	display: flex;
+	flex-direction: row;
+	align-items: center;
+	border-bottom: 0.0625rem solid var(--color-border);
+	height: 2.5rem;
+}
+
+.actions > * {
+	padding: 0.6rem;
+	position: relative;
+}
+
+.actions > * + *:before {
+	content: "";
+	width: 0.0625rem;
+	position: absolute;
+	left: 0;
+	top: 25%;
+	background: var(--color-border);
+	height: 50%;
+	display: flex;
+}
