@@ -28,6 +28,7 @@ export function TreeView(props: TreeProps) {
 						selected={selected === node.id}
 						dim={selectedChildren.has(node.id)}
 						onClick={() => setSelected(node.id)}
+						hideChildren={hideParents.has(node.id)}
 						onToggle={id => {
 							if (hideParents.has(id)) {
 								hideParents.delete(id);
@@ -47,6 +48,7 @@ export function TreeItem(
 	props: DevNode & {
 		key: any;
 		hasChildren: boolean;
+		hideChildren: boolean;
 		collapsed?: boolean;
 		onToggle: (id: number) => void;
 		hidden?: boolean;
@@ -61,6 +63,7 @@ export function TreeItem(
 		hidden,
 		depth,
 		hasChildren,
+		hideChildren,
 		dim,
 		name,
 		selected,
@@ -75,7 +78,11 @@ export function TreeItem(
 		>
 			<div class={`${s.itemHeader}`}>
 				{hasChildren && (
-					<button class={s.toggle} onClick={() => onToggle(id)}>
+					<button
+						class={s.toggle}
+						data-collapsed={hideChildren}
+						onClick={() => onToggle(id)}
+					>
 						<Arrow />
 					</button>
 				)}

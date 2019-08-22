@@ -53,6 +53,12 @@
 	justify-content: center;
 	align-content: center;
 	padding: 0.2em 0.13em;
+	transform: rotate(0);
+	transition: transform 0.3s;
+}
+
+[data-collapsed].toggle svg {
+	transform: rotate(-90deg);
 }
 
 [data-selected] .toggle {

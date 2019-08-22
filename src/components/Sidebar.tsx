@@ -18,7 +18,7 @@ export function Sidebar(props: Props) {
 				<SidebarPanel title="state" empty="None"></SidebarPanel>
 				<SidebarPanel title="context" empty="None"></SidebarPanel>
 				<SidebarPanel title="hooks" empty="None"></SidebarPanel>
-				<SidebarPanel title="renderedBy" empty="None"></SidebarPanel>
+				<SidebarPanel title="rendered by" empty="None"></SidebarPanel>
 			</div>
 		</aside>
 	);
