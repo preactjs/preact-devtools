@@ -1,0 +1,16 @@
+{
+	"manifest_version": 2,
+	"name": "Preact Developer Tools",
+	"description": "Adds debugging tools for Preact to Chrome",
+	"version": "0.0.1",
+	"devtools_page": "devtools.html",
+	"content_security_policy": "script-src 'self' 'unsafe-eval'; object-src 'self'",
+	"permissions": ["file:///*", "http://*/*", "https://*/*"],
+	"icons": {
+		"16": "icons/icon-16.png",
+		"32": "icons/icon-32.png",
+		"48": "icons/icon-48.png",
+		"128": "icons/icon-128.png",
+		"192": "icons/icon-192.png"
+	}
+}

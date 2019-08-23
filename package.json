@@ -4,7 +4,8 @@
 	"description": "",
 	"main": "index.js",
 	"scripts": {
-		"dev": "webpack-dev-server --inline"
+		"dev": "webpack-dev-server --inline",
+		"watch": "rollup -c -w"
 	},
 	"author": "",
 	"license": "ISC",
@@ -15,12 +16,17 @@
 	"devDependencies": {
 		"@babel/core": "^7.5.5",
 		"@babel/plugin-transform-react-jsx": "^7.3.0",
+		"@types/chrome": "^0.0.88",
 		"babel-loader": "^8.0.6",
 		"babel-plugin-transform-rename-properties": "^0.0.3",
 		"css-loader": "^3.2.0",
 		"html-webpack-plugin": "^3.2.0",
 		"preact": "^10.0.0-rc.1",
 		"prettier": "^1.18.2",
+		"rollup": "^1.20.1",
+		"rollup-plugin-copy": "^3.1.0",
+		"rollup-plugin-node-resolve": "^5.2.0",
+		"rollup-plugin-typescript2": "^0.23.0",
 		"style-loader": "^1.0.0",
 		"ts-loader": "^6.0.4",
 		"ts-node": "^8.3.0",
