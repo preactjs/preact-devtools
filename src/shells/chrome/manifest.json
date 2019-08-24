@@ -12,5 +12,26 @@
 		"48": "icons/icon-48.png",
 		"128": "icons/icon-128.png",
 		"192": "icons/icon-192.png"
-	}
+	},
+	"browser_action": {
+		"default_icon": {
+			"16": "icons/icon-16-disabled.png",
+			"32": "icons/icon-32-disabled.png",
+			"48": "icons/icon-48-disabled.png",
+			"128": "icons/icon-128-disabled.png",
+			"192": "icons/icon-192-disabled.png"
+		},
+		"default_popup": "popup/disabled.html"
+	},
+	"background": {
+		"scripts": ["background.js"],
+		"persistent": false
+	},
+	"content_scripts": [
+		{
+			"matches": ["<all_urls>"],
+			"js": ["inject.js"],
+			"run_at": "document_start"
+		}
+	]
 }

@@ -10,11 +10,20 @@ export default [
 			"src/shells/shared/devtools.html": "dist/chrome/",
 			"src/shells/shared/panel.html": "dist/chrome/",
 			"src/shells/shared/icons": "dist/chrome/",
+			"src/shells/shared/popup": "dist/chrome/",
 		},
 	},
 	{
 		dist: "dist/chrome/panel.js",
 		entry: "src/shells/shared/panel.ts",
+	},
+	{
+		dist: "dist/chrome/background.js",
+		entry: "src/shells/shared/background.ts",
+	},
+	{
+		dist: "dist/chrome/inject.js",
+		entry: "src/shells/shared/inject.ts",
 	},
 	{
 		dist: "dist/firefox/index.js",
@@ -24,11 +33,20 @@ export default [
 			"src/shells/shared/devtools.html": "dist/firefox/",
 			"src/shells/shared/panel.html": "dist/firefox/",
 			"src/shells/shared/icons": "dist/firefox/",
+			"src/shells/shared/popup": "dist/firefox/",
 		},
 	},
 	{
 		dist: "dist/firefox/panel.js",
 		entry: "src/shells/shared/panel.ts",
+	},
+	{
+		dist: "dist/firefox/background.js",
+		entry: "src/shells/shared/background.ts",
+	},
+	{
+		dist: "dist/firefox/inject.js",
+		entry: "src/shells/shared/inject.ts",
 	},
 ].map(data => ({
 	input: data.entry,

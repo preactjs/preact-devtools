@@ -10,6 +10,7 @@ body {
 }
 
 :root {
+	--color-bg: white;
 	--color-selected-bg: #8058ca;
 	--color-selected-text: white;
 	--color-selected-inactive-bg: gray;
@@ -20,6 +21,11 @@ body {
 	--color-hover: #e9e1f8;
 	--indent-depth: 2rem;
 	--color-border: #dedede;
-	--color-text-empty: #aaa;
+	--color-text-empty: #444;
 	--color-button-active: #7245c7;
+}
+
+:root .dark {
+	--color-bg: #242424;
+	--color-text: #b0b0b0;
 }
