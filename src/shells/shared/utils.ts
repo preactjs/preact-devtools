@@ -1,7 +1,16 @@
-export function inject(code: string) {
+export function inject(codeOrSrc: string, mode: "script" | "code" = "code") {
 	const s = document.createElement("script");
-	s.textContent = code;
 	// This runs before `<head>` is available
-	document.documentElement.appendChild(s);
+	const target = document.head || document.documentElement;
+	if (mode === "code") s.textContent = codeOrSrc;
+	else s.src = codeOrSrc;
+	target.appendChild(s);
 	s.remove();
+}
+
+export function injectStyles(href: string) {
+	const s = document.createElement("link");
+	s.rel = "stylesheet";
+	s.href = href;
+	document.head.appendChild(s);
 }

@@ -5,6 +5,7 @@
 	display: inline-flex;
 	align-items: center;
 	outline: none;
+	color: var(--color-text);
 }
 
 .btnIcon[data-active] {

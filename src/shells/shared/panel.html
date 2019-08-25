@@ -17,6 +17,10 @@
 				--color-text: #333;
 			}
 
+			#root {
+				height: 100vh;
+			}
+
 			#fallback {
 				position: fixed;
 				top: 0;
@@ -30,10 +34,13 @@
 				color: var(--color-text);
 			}
 		</style>
+		<link rel="stylesheet" href="./index.css" />
 	</head>
 	<body>
-		<div id="fallback">
-			Unable to find Preact on the page.
+		<div id="root">
+			<div id="fallback">
+				Unable to find Preact on the page.
+			</div>
 		</div>
 		<script src="./panel.js"></script>
 	</body>

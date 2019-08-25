@@ -4,22 +4,8 @@ import { DevTools } from "./Devtools";
 import { init } from "./adapter/setup";
 // @ts-ignore
 import { renderExample } from "./examples/preact-10";
-import { createHook } from "./adapter/hook";
-import { printCommit } from "./adapter/debug";
 // @ts-ignore
 import { options } from "./examples/preact.module.js";
-const DEBUG = true;
-
-// Init devtools
-(window as any).__PREACT_DEVTOOLS__ = createHook((ev, data) => {
-	if (DEBUG) {
-		if (ev === "operation") {
-			printCommit(data);
-		} else {
-			console.log("emit", ev, data);
-		}
-	}
-});
 
 init(options as any, (window as any).__PREACT_DEVTOOLS__);
 

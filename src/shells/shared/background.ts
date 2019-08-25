@@ -11,12 +11,22 @@ function activatePopup(tabId: number) {
 	});
 	chrome.browserAction.setPopup({
 		tabId,
-		popup: "popups/enabled.html",
+		popup: "popup/enabled.html",
 	});
 }
 
+let active = false;
+
+chrome.runtime.onConnect.addListener(ev => {
+	if (ev.sender && ev.sender.tab && ev.sender.tab.id) {
+		active = true;
+		activatePopup(ev.sender.tab.id);
+	}
+});
+
 chrome.runtime.onMessage.addListener((msg, sender) => {
-	if (sender.tab && sender.tab.id && msg.hasPreact) {
+	if (!active && sender.tab && sender.tab.id && msg.hasPreact) {
+		active = true;
 		activatePopup(sender.tab.id);
 	}
 });
