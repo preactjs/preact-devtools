@@ -1,5 +1,7 @@
 import typescript from "rollup-plugin-typescript2";
 import copy from "rollup-plugin-copy";
+import resolve from "rollup-plugin-node-resolve";
+import postcss from "rollup-plugin-postcss";
 
 export default [
 	{
@@ -22,8 +24,12 @@ export default [
 		entry: "src/shells/shared/background.ts",
 	},
 	{
-		dist: "dist/chrome/inject.js",
-		entry: "src/shells/shared/inject.ts",
+		dist: "dist/chrome/content-script.js",
+		entry: "src/shells/shared/content-script.ts",
+	},
+	{
+		dist: "dist/chrome/initClient.js",
+		entry: "src/shells/shared/initClient.ts",
 	},
 	{
 		dist: "dist/firefox/index.js",
@@ -45,8 +51,12 @@ export default [
 		entry: "src/shells/shared/background.ts",
 	},
 	{
-		dist: "dist/firefox/inject.js",
-		entry: "src/shells/shared/inject.ts",
+		dist: "dist/firefox/content-script.js",
+		entry: "src/shells/shared/content-script.ts",
+	},
+	{
+		dist: "dist/firefox/initClient.js",
+		entry: "src/shells/shared/initClient.ts",
 	},
 ].map(data => ({
 	input: data.entry,
@@ -60,6 +70,7 @@ export default [
 			cacheRoot: "./node_modules/.cache/rts2",
 			objectHashIgnoreUnknownHack: true,
 		}),
+		resolve(),
 		data.copy &&
 			copy({
 				targets: Object.keys(data.copy).map(x => ({
@@ -67,5 +78,9 @@ export default [
 					dest: data.copy[x],
 				})),
 			}),
+		postcss({
+			modules: true,
+			extract: true,
+		}),
 	].filter(Boolean),
 }));
