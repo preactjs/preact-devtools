@@ -1,4 +1,4 @@
-import { ID } from "../store";
+import { ID } from "../view/store";
 import {
 	Options as PreactOptions,
 	VNode as PreactVNode,
@@ -168,6 +168,7 @@ export function createAdapter(emit: EmitterFn, ids: IdMapper) {
 		// Send
 		onCommit(vnode) {
 			const commit = createCommit(ids, roots, vnode);
+			console.log("flush");
 			flush(emit, commit);
 		},
 		onUnmount(vnode) {

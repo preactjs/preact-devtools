@@ -9,6 +9,7 @@ window.addEventListener("message", onEvent);
 port.onMessage.addListener(onExtensionEvent);
 port.onDisconnect.addListener(() => {
 	window.removeEventListener("message", onEvent);
+	port.onMessage.removeListener(onExtensionEvent);
 });
 
 function onEvent(ev: MessageEvent) {

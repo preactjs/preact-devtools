@@ -1,6 +1,7 @@
 import { Adapter } from "./adapter";
 
-export type EmitterFn = (event: "operation" | "attach", data: number[]) => void;
+export type EventTypes = "operation" | "attach";
+export type EmitterFn = (event: EventTypes, data: number[]) => void;
 
 export interface DevtoolsHook {
 	isDisabled: boolean;

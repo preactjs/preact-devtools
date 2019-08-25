@@ -4368,6 +4368,11 @@ preact@^10.0.0-rc.1:
   resolved "https://registry.yarnpkg.com/preact/-/preact-10.0.0-rc.1.tgz#bae4419f8e289c327504d4ee6e734c377983548c"
   integrity sha512-DyG8ySCbrQZ8w4cSyxnofM6yH/hzyYLHmIrE3xL1FjSCX4DpvVmP7DTpkV535FSQX0d2zOscb7DCIY+crBtxow==
 
+preactus@^0.0.2:
+  version "0.0.2"
+  resolved "https://registry.yarnpkg.com/preactus/-/preactus-0.0.2.tgz#bd7e2c58fd89735c739db66715ffd6a9fbb62fb4"
+  integrity sha512-3QKW83y0gT/w6xNoUC0Q9NTmvxNfEquq1mHKBbqc5T/eAVlLzfdncAVjLAbc66cTQuGMoluRqfzXHGu0R+zs0Q==
+
 prettier@^1.18.2:
   version "1.18.2"
   resolved "https://registry.yarnpkg.com/prettier/-/prettier-1.18.2.tgz#6823e7c5900017b4bd3acf46fe9ac4b4d7bda9ea"

@@ -37,6 +37,7 @@
 		"webpack-dev-server": "^3.8.0"
 	},
 	"dependencies": {
+		"preactus": "^0.0.2",
 		"s-js": "^0.4.9"
 	}
 }

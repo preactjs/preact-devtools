@@ -2,7 +2,7 @@ import { VNode } from "./adapter";
 import { Commit, MsgTypes } from "./events";
 import { Fragment } from "../examples/preact.module";
 import { IdMapper } from "./IdMapper";
-import { ID } from "../store";
+import { ID } from "../view/store";
 import { StringTable, getStringId } from "./string-table";
 
 export function isRoot(vnode: VNode) {

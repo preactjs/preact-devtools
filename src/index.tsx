@@ -1,6 +1,6 @@
 import "./global.css";
 import { h, render } from "preact";
-import { DevTools } from "./Devtools";
+import { DevTools } from "./view/components/Devtools";
 import { init } from "./adapter/setup";
 // @ts-ignore
 import { renderExample } from "./examples/preact-10";
@@ -17,9 +17,3 @@ document.body.appendChild(root1);
 document.body.appendChild(root2);
 
 renderExample(root1);
-render(
-	<div style="height: 100%">
-		<DevTools></DevTools>
-	</div>,
-	root2,
-);

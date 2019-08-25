@@ -1,25 +1,55 @@
-import { DevtoolsHook } from "./hook";
+import { DevtoolsHook, EmitterFn, EventTypes } from "./hook";
 import { Options } from "preact";
 import { createAdapter, setupOptions } from "./adapter";
 import { createIdMapper } from "./IdMapper";
 
-let timeout = 0;
-export function init(options: Options, getHook: () => DevtoolsHook) {
+export async function init(options: Options, getHook: () => DevtoolsHook) {
+	console.log("init");
+	let hookEmitter: EmitterFn | null = null;
+	let buffer: Array<{ data: number[]; name: EventTypes }> = [];
+	const emit: EmitterFn = (ev, data) => {
+		if (hookEmitter !== null) {
+			hookEmitter(ev, data);
+		} else {
+			buffer.push({ data, name: ev });
+		}
+	};
+
+	const adapter = createAdapter(emit, createIdMapper());
+	setupOptions(options as any, adapter);
+
+	// Devtools can take a while to set up
+	await waitForHook(getHook);
+
+	// We're set up and now we can start processing events
 	const hook = getHook();
-	// Devtools might take a bit to load
-	if (!hook) {
-		setTimeout(() => init(options, getHook), 500);
-		return;
-	}
-
-	clearTimeout(timeout);
-
-	// TODO: Detect Preact version
 	const rendererId = hook.attach(emit => {
-		const adapter = createAdapter(emit, createIdMapper());
-		setupOptions(options as any, adapter);
+		hookEmitter = emit;
 		return adapter;
 	});
 
+	// Flush pending events
+	if (buffer.length > 0) {
+		buffer.forEach(x => hookEmitter!(x.name, x.data));
+	}
+
 	return rendererId;
+}
+
+export function waitForHook(getHook: () => DevtoolsHook) {
+	return new Promise(resolve => {
+		let interval = 0;
+		const hook = getHook();
+		// Devtools might take a bit to load
+		if (!hook) {
+			setInterval(() => {
+				if (getHook()) {
+					clearInterval(interval);
+					resolve();
+				}
+			}, 1000);
+		} else {
+			resolve();
+		}
+	});
 }

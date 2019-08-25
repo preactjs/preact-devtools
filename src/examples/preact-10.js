@@ -9,6 +9,7 @@ export function TodoList() {
 			<form
 				onSubmit={e => {
 					e.preventDefault();
+					setV("");
 					setTodos([...todos, v]);
 				}}
 			>
@@ -19,6 +20,7 @@ export function TodoList() {
 					value={v}
 				/>
 			</form>
+			<p>Tasks</p>
 			<ul>
 				{todos.map(x => {
 					return <li key={x}>{x}</li>;

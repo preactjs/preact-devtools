@@ -1,6 +1,10 @@
 import { render, h } from "preact";
-import { DevTools } from "../../Devtools";
+import { DevTools } from "../../view/components/Devtools";
 import { injectStyles } from "./utils";
+import { createStore } from "../../view/store";
+import { applyOperations } from "../../adapter/events";
+
+const store = createStore();
 
 let created = false;
 function createPanel() {
@@ -18,10 +22,24 @@ function createPanel() {
 
 			const root = doc.getElementById("root")!;
 			root.innerHTML = "";
-			render(h(DevTools, null), root);
+			render(h(DevTools, { store }), root);
 		});
 	});
 }
+
+// Listen to messages from the content-script
+const { tabId } = chrome.devtools.inspectedWindow;
+const port = chrome.runtime.connect({
+	name: "" + tabId,
+});
+
+port.onMessage.addListener(msg => {
+	const payload = msg.data.payload;
+	if (payload.name === "operation") {
+		applyOperations(store, payload.payload);
+	}
+	console.log({ msg2: msg });
+});
 
 function checkPreact() {
 	return new Promise((resolve, reject) => {
