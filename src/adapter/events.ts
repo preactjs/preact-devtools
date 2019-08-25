@@ -1,7 +1,7 @@
 import { DevtoolsHook, EmitterFn } from "./hook";
 import { flushTable, StringTable, parseTable } from "./string-table";
 import { Store, DevNode, ID } from "../view/store";
-import { batch } from "preactus";
+import { batch, signal } from "preactus";
 
 export enum MsgTypes {
 	ADD_ROOT = 1,
@@ -60,8 +60,6 @@ export function applyOperations(store: Store, data: number[]) {
 	let i = data[1] + 1;
 	const strings = parseTable(data.slice(1, i + 1));
 
-	console.log(data);
-
 	let newRoot = false;
 
 	batch(() => {
@@ -105,6 +103,7 @@ export function applyOperations(store: Store, data: number[]) {
 						parentId,
 						type,
 						key,
+						selected: signal(false),
 					});
 					store.nodes(store.nodes());
 					i += 6;

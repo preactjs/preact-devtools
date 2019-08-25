@@ -25,6 +25,7 @@ export interface DevNode {
 
 	// Display properties
 	depth: number;
+	selected: DataSignal<boolean>;
 }
 
 export type Tree = Map<ID, DevNode>;
@@ -33,18 +34,14 @@ export interface Store {
 	roots: DataSignal<ID[]>;
 	rootToChild: DataSignal<Map<number, number>>;
 	nodes: DataSignal<Tree>;
-	selection: {
-		id: DataSignal<ID>;
-		children: DataSignal<ID[]>;
-		node: DataSignal<DevNode | null>;
-		last: DataSignal<number | null>;
-	};
+	selected: DataSignal<DevNode | null>;
+	selectedRef: DataSignal<null | HTMLElement>;
 	visiblity: {
 		collapsed: DataSignal<Set<ID>>;
 		hidden: DataSignal<Set<ID>>;
 	};
 	actions: {
-		selectNode: (id: ID) => void;
+		selectNode: (id: ID, ref: HTMLElement) => void;
 		collapseNode: (id: ID) => void;
 	};
 }
@@ -55,10 +52,8 @@ export function createStore(): Store {
 	const rootToChild = signal<any>(new Map());
 
 	// Selection
-	const selected = signal(-1);
-	const selectedChildren = track(() => getAllChildren(nodes(), selected()));
-	const selectedNode = track(() => nodes().get(selected()) || null);
-	const lastInSelection = track(() => getSelecionLast(nodes(), selected()));
+	const selectedNode = signal<DevNode | null>(null);
+	const selectedRef = signal<HTMLElement | null>(null);
 
 	// Toggle
 	const collapsed = signal<Set<ID>>(new Set());
@@ -74,12 +69,8 @@ export function createStore(): Store {
 		roots,
 		rootToChild,
 		nodes,
-		selection: {
-			id: selected,
-			children: selectedChildren,
-			node: selectedNode,
-			last: lastInSelection,
-		},
+		selected: selectedNode,
+		selectedRef,
 		visiblity: {
 			collapsed,
 			hidden,
@@ -93,7 +84,18 @@ export function createStore(): Store {
 				}
 				collapsed(collapsed());
 			},
-			selectNode: id => selected(id),
+			selectNode: (id, ref) => {
+				if (selectedNode() !== null) {
+					if (selectedNode()!.id === id) return;
+
+					selectedNode()!.selected(false);
+				}
+				const node = nodes().get(id)!;
+				node.selected(true);
+
+				selectedRef(ref);
+				selectedNode(node);
+			},
 		},
 	};
 }
@@ -102,10 +104,10 @@ export function getAllChildren(tree: Tree, id: ID): ID[] {
 	const out: ID[] = [];
 	let item: ID | undefined;
 	let stack: ID[] = [id];
-	while ((item = stack.pop())) {
+	while ((item = stack.shift())) {
 		const node = tree.get(item);
 		if (node) {
-			out.push(...node.children);
+			out.push(node.id);
 			stack.push(...node.children);
 		}
 	}

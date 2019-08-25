@@ -5,7 +5,7 @@ import { Actions } from "./Actions";
 import { useStore } from "../store";
 
 export function Sidebar() {
-	const node = useStore(store => store.selection.node());
+	const node = useStore(store => store.selected());
 	return (
 		<aside class={s.root}>
 			<Actions>

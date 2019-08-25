@@ -38,7 +38,6 @@ port.onMessage.addListener(msg => {
 	if (payload.name === "operation") {
 		applyOperations(store, payload.payload);
 	}
-	console.log({ msg2: msg });
 });
 
 function checkPreact() {

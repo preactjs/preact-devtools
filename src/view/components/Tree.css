@@ -1,5 +1,8 @@
 .tree {
 	width: 100%;
+	position: relative;
+	z-index: 1;
+	user-select: none;
 }
 
 [data-depth="1"] {
@@ -24,10 +27,6 @@
 .item[data-selected] {
 	background: var(--color-selected-bg);
 	color: var(--color-selected-text);
-}
-
-.dim {
-	background: var(--color-dim-bg);
 }
 
 .item:not([data-selected]):hover {
@@ -68,4 +67,14 @@
 .noToggle {
 	width: 1.25rem;
 	height: 1.25rem;
+}
+
+.dimmer {
+	background: var(--color-dim-bg);
+	position: absolute;
+	left: 0;
+	right: 0;
+	pointer-events: none;
+	opacity: 0.5;
+	z-index: -1;
 }

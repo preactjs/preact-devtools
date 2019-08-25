@@ -1,6 +1,7 @@
 import { h } from "preact";
 import s from "./Tree.css";
 import { ID, useStore, getAllChildren } from "../store";
+import { useEffect, useState } from "preact/hooks";
 
 export interface TreeProps {
 	rootId: number;
@@ -15,9 +16,11 @@ export function TreeView(props: TreeProps) {
 	});
 	return (
 		<div class={s.tree}>
-			{nodes.map(id => (
-				<TreeItem key={id} id={id} />
-			))}
+			<div>
+				{nodes.map(id => (
+					<TreeItem key={id} id={id} />
+				))}
+			</div>
 			<HighlightPane />
 			<p>
 				root id: {props.rootId}, nodes: {nodes.length}
@@ -30,21 +33,24 @@ export function TreeItem(props: { key: any; id: ID }) {
 	const { id } = props;
 	const {
 		dim,
-		selected,
 		onSelect,
+		store,
 		collapsed,
 		onToggle,
 		node,
 		hidden,
+		selected,
 	} = useStore(store => {
+		const node = store.nodes().get(id);
 		return {
-			dim: store.selection.children().includes(id),
-			selected: store.selection.id() === id,
+			store,
+			dim: false,
+			selected: node ? node.selected() : false,
 			onSelect: store.actions.selectNode,
 			collapsed: store.visiblity.collapsed().has(id),
 			hidden: store.visiblity.hidden().has(id),
 			onToggle: store.actions.collapseNode,
-			node: store.nodes().get(id),
+			node,
 		};
 	});
 
@@ -53,7 +59,7 @@ export function TreeItem(props: { key: any; id: ID }) {
 	return (
 		<div
 			class={`${s.item} ${dim ? s.dim : ""}`}
-			onClick={() => onSelect(id)}
+			onClick={ev => onSelect(id, ev.currentTarget as any)}
 			data-selected={selected}
 			data-depth={node.depth}
 		>
@@ -88,7 +94,34 @@ export function Arrow() {
 }
 
 export function HighlightPane() {
-	const id = useStore(store => store.selection.last());
-	console.log("last", id);
-	return <div>Last {id + ""}</div>;
+	const ref = useStore(store => store.selectedRef());
+
+	let [pos, setPos] = useState({ top: 0, height: 0 });
+	useEffect(() => {
+		if (ref) {
+			const depth = ref.getAttribute("data-depth") || 0;
+			let item: HTMLElement | null = ref;
+			let last: HTMLElement | null = null;
+			while (
+				(item = item.nextSibling as any) &&
+				+(item.getAttribute("data-depth") || 0) > +depth
+			) {
+				last = item;
+			}
+
+			const rect = ref.getBoundingClientRect();
+			const top = rect.top - rect.height;
+			const height = last
+				? last.getBoundingClientRect().top - top - rect.height
+				: 0;
+			setPos({ top, height });
+		}
+	}, [ref]);
+
+	return (
+		<div
+			class={s.dimmer}
+			style={`top: ${pos.top}px; height: ${pos.height}px;`}
+		/>
+	);
 }
