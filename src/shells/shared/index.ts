@@ -36,9 +36,10 @@ async function checkPage() {
 	const hasPreact = await checkPreact();
 	if (hasPreact) {
 		createPanel();
+	} else {
+		setTimeout(checkPage, 1000);
 	}
 }
 
-checkPreact();
-
+checkPage();
 chrome.devtools.network.onNavigated.addListener(checkPage);

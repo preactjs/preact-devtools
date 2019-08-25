@@ -7,7 +7,7 @@ import { renderExample } from "./examples/preact-10";
 // @ts-ignore
 import { options } from "./examples/preact.module.js";
 
-init(options as any, (window as any).__PREACT_DEVTOOLS__);
+init(options as any, () => (window as any).__PREACT_DEVTOOLS__);
 
 const root1 = document.createElement("div");
 const root2 = document.createElement("div");

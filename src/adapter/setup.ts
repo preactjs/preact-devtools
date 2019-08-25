@@ -3,11 +3,16 @@ import { Options } from "preact";
 import { createAdapter, setupOptions } from "./adapter";
 import { createIdMapper } from "./IdMapper";
 
-// // This global variable is injected by the devtools
-// let hook = (window as any).__PREACT_DEVTOOLS__ as DevtoolsHook;
+let timeout = 0;
+export function init(options: Options, getHook: () => DevtoolsHook) {
+	const hook = getHook();
+	// Devtools might take a bit to load
+	if (!hook) {
+		setTimeout(() => init(options, getHook), 500);
+		return;
+	}
 
-export function init(options: Options, hook?: DevtoolsHook) {
-	if (!hook) return;
+	clearTimeout(timeout);
 
 	// TODO: Detect Preact version
 	const rendererId = hook.attach(emit => {
