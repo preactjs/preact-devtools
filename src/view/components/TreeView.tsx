@@ -24,9 +24,6 @@ export function TreeView(props: TreeProps) {
 				))}
 			</div>
 			<HighlightPane />
-			<p>
-				root id: {props.rootId}, nodes: {nodes.length}
-			</p>
 		</div>
 	);
 }
