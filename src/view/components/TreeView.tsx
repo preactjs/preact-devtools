@@ -62,7 +62,7 @@ export function TreeItem(props: { key: any; id: ID }) {
 
 	return (
 		<div
-			class={`${s.item} ${dim ? s.dim : ""}`}
+			class={s.item}
 			onClick={ev => onSelect(id, ev.currentTarget as any)}
 			data-selected={selected}
 			data-depth={node.depth}
@@ -100,7 +100,7 @@ export function Arrow() {
 export function HighlightPane() {
 	const store = useStore();
 	const ref = useObserver(() => store.selectedRef(), [store.selectedRef]);
-
+	console.log("selection ref", ref);
 	let [pos, setPos] = useState({ top: 0, height: 0 });
 	useEffect(() => {
 		if (ref) {
@@ -115,10 +115,12 @@ export function HighlightPane() {
 			}
 
 			const rect = ref.getBoundingClientRect();
-			const top = rect.top - rect.height;
-			const height = last
-				? last.getBoundingClientRect().top - top - rect.height
-				: 0;
+			const top = ref.offsetTop + rect.height;
+			let height = 0;
+			if (last) {
+				const lastRect = last.getBoundingClientRect();
+				height = last.offsetTop + lastRect.height - top;
+			}
 			setPos({ top, height });
 		}
 	}, [ref]);
