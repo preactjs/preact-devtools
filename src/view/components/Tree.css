@@ -3,9 +3,9 @@
 	position: relative;
 	z-index: 1;
 
-	-webkit-user-select: all;
-	-moz-user-select: all;
-	-ms-user-select: all;
+	-webkit-user-select: none;
+	-moz-user-select: none;
+	-ms-user-select: none;
 	user-select: none;
 }
 
