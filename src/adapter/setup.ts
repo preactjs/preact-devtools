@@ -4,7 +4,6 @@ import { createAdapter, setupOptions } from "./adapter";
 import { createIdMapper } from "./IdMapper";
 
 export async function init(options: Options, getHook: () => DevtoolsHook) {
-	console.log("init");
 	let hookEmitter: EmitterFn | null = null;
 	let buffer: Array<{ data: number[]; name: EventTypes }> = [];
 	const emit: EmitterFn = (ev, data) => {

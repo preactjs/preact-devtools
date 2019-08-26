@@ -3,62 +3,46 @@ import copy from "rollup-plugin-copy";
 import resolve from "rollup-plugin-node-resolve";
 import postcss from "rollup-plugin-postcss";
 
-export default [
-	{
-		dist: "dist/chrome/index.js",
-		entry: "src/shells/shared/index.ts",
-		copy: {
-			"src/shells/chrome/manifest.json": "dist/chrome/",
-			"src/shells/shared/devtools.html": "dist/chrome/",
-			"src/shells/shared/panel.html": "dist/chrome/",
-			"src/shells/shared/icons": "dist/chrome/",
-			"src/shells/shared/popup": "dist/chrome/",
+const BROWSERS = ["chrome", "firefox"];
+
+const entries = BROWSERS.map(browser => {
+	const dist = `dist/${browser}`;
+	return [
+		{
+			entry: "src/shells/shared/index.ts",
+			dist: `${dist}/index.js`,
+			copy: {
+				[`src/shells/${browser}/manifest.json`]: dist,
+				"src/shells/shared/devtools.html": dist,
+				"src/shells/shared/panel.html": dist,
+				"src/shells/shared/icons": dist,
+				"src/shells/shared/popup": dist,
+			},
 		},
-	},
-	{
-		dist: "dist/chrome/panel.js",
-		entry: "src/shells/shared/panel.ts",
-	},
-	{
-		dist: "dist/chrome/background.js",
-		entry: "src/shells/shared/background.ts",
-	},
-	{
-		dist: "dist/chrome/content-script.js",
-		entry: "src/shells/shared/content-script.ts",
-	},
-	{
-		dist: "dist/chrome/initClient.js",
-		entry: "src/shells/shared/initClient.ts",
-	},
-	{
-		dist: "dist/firefox/index.js",
-		entry: "src/shells/shared/index.ts",
-		copy: {
-			"src/shells/firefox/manifest.json": "dist/firefox/",
-			"src/shells/shared/devtools.html": "dist/firefox/",
-			"src/shells/shared/panel.html": "dist/firefox/",
-			"src/shells/shared/icons": "dist/firefox/",
-			"src/shells/shared/popup": "dist/firefox/",
+		{
+			dist: `${dist}/panel.js`,
+			entry: "src/shells/shared/panel.ts",
 		},
-	},
-	{
-		dist: "dist/firefox/panel.js",
-		entry: "src/shells/shared/panel.ts",
-	},
-	{
-		dist: "dist/firefox/background.js",
-		entry: "src/shells/shared/background.ts",
-	},
-	{
-		dist: "dist/firefox/content-script.js",
-		entry: "src/shells/shared/content-script.ts",
-	},
-	{
-		dist: "dist/firefox/initClient.js",
-		entry: "src/shells/shared/initClient.ts",
-	},
-].map(data => ({
+		{
+			dist: `${dist}/background.js`,
+			entry: "src/shells/shared/background.ts",
+		},
+		{
+			dist: `${dist}/content-script.js`,
+			entry: "src/shells/shared/content-script.ts",
+		},
+		{
+			dist: `${dist}/initClient.js`,
+			entry: "src/shells/shared/initClient.ts",
+		},
+		{
+			dist: `${dist}/installHook.js`,
+			entry: "src/shells/shared/installHook.ts",
+		},
+	];
+}).reduce((acc, item) => acc.concat(item), []);
+
+export default entries.map(data => ({
 	input: data.entry,
 	output: {
 		file: data.dist,

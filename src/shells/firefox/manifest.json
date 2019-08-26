@@ -29,9 +29,9 @@
 	"content_scripts": [
 		{
 			"matches": ["<all_urls>"],
-			"js": ["content-script.js"],
+			"js": ["initClient.js"],
 			"run_at": "document_start"
 		}
 	],
-	"web_accessible_resources": ["initClient.js"]
+	"web_accessible_resources": ["installHook.js", "panel.html", "devtools.html"]
 }

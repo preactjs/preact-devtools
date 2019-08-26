@@ -1,3 +1,79 @@
+import { inject } from "./utils";
+
+export interface Connection {
+	devtools: chrome.runtime.Port | null;
+	contentScript: chrome.runtime.Port | null;
+}
+
+const conn = new Map<number, Connection>();
+chrome.runtime.onConnect.addListener(port => {
+	console.log("CONNECTING", port.name);
+	// Ok, so this is a little weird:
+	// To be able to communicate from a content-script to the devtools panel
+	// we need to always go through the brackground script. We basically just pass
+	// the message along.
+
+	let tab: number = -1;
+	let name: keyof Connection = "contentScript";
+	// If the name is a number, than it's an event coming from the devtools panel
+	if (+port.name + "" === port.name) {
+		name = "devtools";
+		tab = +port.name;
+		installContentScript(tab);
+	} else {
+		tab = port.sender!.tab!.id!;
+		name = "contentScript";
+	}
+
+	if (!conn.has(tab)) {
+		conn.set(tab, { devtools: null, contentScript: null });
+	}
+
+	const activeConn = conn.get(tab);
+	(activeConn as any)[name] = port;
+
+	// If both the content-script and the devtools are conncted we can start
+	// setting up the message handlers
+	if (activeConn) {
+		console.log(
+			tab,
+			name,
+			activeConn.contentScript === null,
+			activeConn.devtools === null,
+		);
+	}
+	if (activeConn && activeConn.contentScript && activeConn.devtools) {
+		const { contentScript, devtools } = activeConn;
+
+		console.log("Establishing connection", devtools.name, contentScript.name);
+
+		const forwardToDevtools = (msg: any) => {
+			console.log("-> devtools ", devtools.name, msg);
+			devtools.postMessage(msg);
+		};
+		contentScript.onMessage.addListener(forwardToDevtools);
+
+		const forwardToContentScript = (msg: any) => {
+			console.log("-> content-script ", contentScript.name, msg);
+			contentScript.postMessage(msg);
+		};
+		devtools.onMessage.addListener(forwardToContentScript);
+
+		const shutdown = () => {
+			contentScript.onMessage.removeListener(forwardToDevtools);
+			devtools.onMessage.removeListener(forwardToContentScript);
+			contentScript.disconnect();
+			devtools.disconnect();
+			activeConn.contentScript = null;
+			activeConn.devtools = null;
+		};
+
+		contentScript.onDisconnect.addListener(shutdown);
+		devtools.onDisconnect.addListener(shutdown);
+	}
+});
+let active = false;
+
 function activatePopup(tabId: number) {
 	chrome.browserAction.setIcon({
 		tabId,
@@ -15,64 +91,18 @@ function activatePopup(tabId: number) {
 	});
 }
 
-export interface Connection {
-	devtools: chrome.runtime.Port | null;
-	contentScript: chrome.runtime.Port | null;
-}
-
-const conn = new Map<number, Connection>();
-chrome.runtime.onConnect.addListener(port => {
-	// Ok, so this is a little weird:
-	// To be able to communicate from a content-script to the devtools panel
-	// we need to always go through the brackground script. We basically just pass
-	// the message along.
-
-	let tab: number = -1;
-	let name: keyof Connection = "contentScript";
-	// If the name is a number, than it's an event coming from the devtools panel
-	if (+port.name + "" === port.name) {
-		name = "devtools";
-		tab = +port.name;
-	} else {
-		tab = port.sender!.tab!.id!;
-		name = "contentScript";
-	}
-
-	if (!conn.has(tab)) {
-		conn.set(tab, { devtools: null, contentScript: null });
-	}
-
-	const activeConn = conn.get(tab);
-	(activeConn as any)[name] = port;
-
-	// If both the content-script and the devtools are conncted we can start
-	// setting up the message handlers
-	if (activeConn && activeConn.contentScript && activeConn.devtools) {
-		const { contentScript, devtools } = activeConn;
-
-		const forwardToDevtools = (msg: any) => devtools.postMessage(msg);
-		contentScript.onMessage.addListener(forwardToDevtools);
-
-		const forwardToContentScript = (msg: any) => contentScript.postMessage(msg);
-		devtools.onMessage.addListener(forwardToContentScript);
-
-		const shutdown = () => {
-			contentScript.onMessage.removeListener(forwardToDevtools);
-			devtools.onMessage.removeListener(forwardToContentScript);
-			contentScript.disconnect();
-			devtools.disconnect();
-		};
-
-		contentScript.onDisconnect.addListener(shutdown);
-		devtools.onDisconnect.addListener(shutdown);
-	}
-});
-
-let active = false;
-chrome.runtime.onMessage.addListener(port => {
-	// TODO: Don't do this for every message
-	if (port.sender && port.sender.tab && port.sender.tab.id) {
+chrome.runtime.onMessage.addListener((port, sender) => {
+	console.log("MSG", port);
+	if (sender.tab && sender.tab.id) {
 		active = true;
-		activatePopup(port.sender.tab.id);
+		activatePopup(sender.tab.id);
 	}
 });
+
+function installContentScript(tabId: number) {
+	chrome.tabs.executeScript(
+		tabId,
+		{ file: "/content-script.js" },
+		function() {},
+	);
+}

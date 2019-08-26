@@ -1,25 +1,15 @@
-import { createHook } from "../../adapter/hook";
-import { DEBUG } from "../../constants";
-import { printCommit } from "../../adapter/debug";
+import { inject } from "./utils";
 
-(window as any).__PREACT_DEVTOOLS__ = createHook((ev, data) => {
-	switch (ev) {
-		case "attach":
-			break;
+window.addEventListener("message", ev => {
+	if (
+		ev.source === window &&
+		ev.data &&
+		ev.data.source === "preact-devtools-detector"
+	) {
+		chrome.runtime.sendMessage({
+			hasPreact: true,
+		});
 	}
-	if (DEBUG) {
-		if (ev === "operation") {
-			printCommit(data);
-		} else {
-			console.log("hook", ev, data);
-		}
-	}
-
-	window.postMessage(
-		{
-			source: "preact-devtools",
-			payload: { name: ev, payload: data },
-		},
-		"*",
-	);
 });
+
+inject(chrome.runtime.getURL("installHook.js"), "script");

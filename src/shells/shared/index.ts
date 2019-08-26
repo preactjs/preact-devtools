@@ -11,6 +11,8 @@ function createPanel() {
 	if (created) return;
 	created = true;
 
+	chrome.devtools.network.onNavigated.removeListener(checkPage);
+
 	chrome.devtools.panels.create("Preact", "", "panel.html", panel => {
 		panel.onShown.addListener(window => {
 			const doc = window.document;
@@ -20,6 +22,21 @@ function createPanel() {
 
 			injectStyles(chrome.runtime.getURL("./index.css"));
 
+			// Listen to messages from the content-script
+			const { tabId } = chrome.devtools.inspectedWindow;
+			const port = chrome.runtime.connect({
+				name: "" + tabId,
+			});
+
+			port.onMessage.addListener(msg => {
+				console.log("RECEIVED", msg);
+				const payload = msg.data.payload;
+				if (payload.name === "operation") {
+					applyOperations(store, payload.payload);
+					console.log(store.nodes().size);
+				}
+			});
+
 			const root = doc.getElementById("root")!;
 			root.innerHTML = "";
 			render(h(DevTools, { store }), root);
@@ -28,17 +45,17 @@ function createPanel() {
 }
 
 // Listen to messages from the content-script
-const { tabId } = chrome.devtools.inspectedWindow;
-const port = chrome.runtime.connect({
-	name: "" + tabId,
-});
+// const { tabId } = chrome.devtools.inspectedWindow;
+// const port = chrome.runtime.connect({
+// 	name: "" + tabId,
+// });
 
-port.onMessage.addListener(msg => {
-	const payload = msg.data.payload;
-	if (payload.name === "operation") {
-		applyOperations(store, payload.payload);
-	}
-});
+// port.onMessage.addListener(msg => {
+// 	const payload = msg.data.payload;
+// 	if (payload.name === "operation") {
+// 		applyOperations(store, payload.payload);
+// 	}
+// });
 
 function checkPreact() {
 	return new Promise((resolve, reject) => {
