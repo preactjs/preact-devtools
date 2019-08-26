@@ -102,16 +102,19 @@ export function createStore(): Store {
 
 export function getAllChildren(tree: Tree, id: ID): ID[] {
 	const out: ID[] = [];
+	const visited = new Set<ID>();
 	let item: ID | undefined;
 	let stack: ID[] = [id];
-	while ((item = stack.shift())) {
+	while ((item = stack.pop())) {
 		const node = tree.get(item);
 		if (node) {
-			out.push(node.id);
-			stack.push(...node.children);
+			if (!visited.has(node.id)) {
+				out.push(node.id);
+				visited.add(node.id);
+			}
+			node.children.reverse().forEach(x => stack.push(x));
 		}
 	}
-	console.log("children", out, tree.get(id));
 	return out;
 }
 
