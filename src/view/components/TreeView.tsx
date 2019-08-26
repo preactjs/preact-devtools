@@ -2,6 +2,7 @@ import { h } from "preact";
 import s from "./Tree.css";
 import { ID, useObserver, getAllChildren, useStore } from "../store";
 import { useEffect, useState } from "preact/hooks";
+import { getLastDomChild } from "./utils";
 
 export interface TreeProps {
 	rootId: number;
@@ -15,7 +16,6 @@ export function TreeView(props: TreeProps) {
 		);
 	}, [store.nodes, store.rootToChild]);
 
-	console.log("render tree", nodes.length);
 	return (
 		<div class={s.tree}>
 			<div>
@@ -32,7 +32,6 @@ export function TreeItem(props: { key: any; id: ID }) {
 	const { id } = props;
 	const store = useStore();
 	const {
-		dim,
 		onSelect,
 		collapsed,
 		onToggle,
@@ -42,8 +41,6 @@ export function TreeItem(props: { key: any; id: ID }) {
 	} = useObserver(() => {
 		const node = store.nodes().get(id);
 		return {
-			store,
-			dim: false,
 			selected: node ? node.selected() : false,
 			onSelect: store.actions.selectNode,
 			collapsed: store.visiblity.collapsed().has(id),
@@ -67,7 +64,7 @@ export function TreeItem(props: { key: any; id: ID }) {
 			data-selected={selected}
 			data-depth={node.depth}
 		>
-			<div class={`${s.itemHeader}`}>
+			<div class={s.itemHeader}>
 				{node.children.length > 0 && (
 					<button
 						class={s.toggle}
@@ -100,19 +97,11 @@ export function Arrow() {
 export function HighlightPane() {
 	const store = useStore();
 	const ref = useObserver(() => store.selectedRef(), [store.selectedRef]);
-	console.log("selection ref", ref);
+
 	let [pos, setPos] = useState({ top: 0, height: 0 });
 	useEffect(() => {
 		if (ref) {
-			const depth = ref.getAttribute("data-depth") || 0;
-			let item: HTMLElement | null = ref;
-			let last: HTMLElement | null = null;
-			while (
-				(item = item.nextSibling as any) &&
-				+(item.getAttribute("data-depth") || 0) > +depth
-			) {
-				last = item;
-			}
+			const last = getLastDomChild(ref);
 
 			const rect = ref.getBoundingClientRect();
 			const top = ref.offsetTop + rect.height;
