@@ -1,4 +1,6 @@
 .tree {
+	--indent-depth: 1.6rem;
+
 	width: 100%;
 	position: relative;
 	z-index: 1;
@@ -26,6 +28,7 @@
 	font-size: 0.9rem;
 	font-family: monospace;
 	color: var(--color-element-text);
+	height: 1.5rem;
 }
 
 .item[data-selected] {
@@ -40,9 +43,9 @@
 .itemHeader {
 	display: flex;
 	align-items: center;
+	height: 100%;
 	cursor: default;
 	padding: 0 0.25rem;
-	height: 1.25rem;
 }
 
 .toggle {
