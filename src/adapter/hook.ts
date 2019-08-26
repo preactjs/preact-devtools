@@ -4,8 +4,6 @@ export type EventTypes = "operation" | "attach";
 export type EmitterFn = (event: EventTypes, data: number[]) => void;
 
 export interface DevtoolsHook {
-	isDisabled: boolean;
-	connected: boolean;
 	renderers: Map<number, Adapter>;
 	attach(fn: (emit: EmitterFn) => Adapter): number;
 	detach(id: number): void;
@@ -20,8 +18,6 @@ export function createHook(emit: EmitterFn): DevtoolsHook {
 	let uid = 0;
 
 	return {
-		isDisabled: false,
-		connected: false,
 		renderers,
 		attach: fn => {
 			renderers.set(++uid, fn(emit));
