@@ -72,7 +72,6 @@ chrome.runtime.onConnect.addListener(port => {
 		devtools.onDisconnect.addListener(shutdown);
 	}
 });
-let active = false;
 
 function activatePopup(tabId: number) {
 	chrome.browserAction.setIcon({
@@ -92,9 +91,7 @@ function activatePopup(tabId: number) {
 }
 
 chrome.runtime.onMessage.addListener((port, sender) => {
-	console.log("MSG", port);
-	if (sender.tab && sender.tab.id) {
-		active = true;
+	if (port.hasPreact && sender.tab && sender.tab.id) {
 		activatePopup(sender.tab.id);
 	}
 });
