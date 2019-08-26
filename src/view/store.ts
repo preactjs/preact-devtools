@@ -115,29 +115,6 @@ export function getAllChildren(tree: Tree, id: ID): ID[] {
 	return out;
 }
 
-export function getSelecionLast(tree: Tree, id: ID) {
-	const node = tree.get(id);
-	console.log({ node, id });
-	if (node) {
-		const parent = tree.get(node.parentId);
-		console.log({ parent });
-		if (parent) {
-			const idx = parent.children.indexOf(id);
-			console.log({ idx });
-			if (idx > 0) {
-				if (idx + 1 < parent.children.length) {
-					return parent.children[idx + 1];
-				} else {
-					// TODO
-					return null;
-				}
-			}
-		}
-	}
-
-	return null;
-}
-
 export const AppCtx = createContext<Store>(null as any);
 
 export const useStore = () => useContext(AppCtx);
