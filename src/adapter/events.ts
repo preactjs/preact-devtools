@@ -104,7 +104,6 @@ export function applyOperations(store: Store, data: number[]) {
 					key,
 					selected: valoo<boolean>(false),
 				});
-				store.nodes(store.nodes());
 				i += 6;
 				break;
 			}
@@ -119,14 +118,10 @@ export function applyOperations(store: Store, data: number[]) {
 			}
 		}
 	}
+	store.nodes(store.nodes());
 }
 
 export function getDepth(store: Store, id: ID) {
-	let depth = 0;
-	let item: DevNode | undefined = store.nodes().get(id)!;
-	while (item && (item = store.nodes().get(item.parentId))) {
-		depth++;
-	}
-
-	return depth;
+	let parent = store.nodes().get(id)!;
+	return parent ? parent.depth + 1 : 0;
 }
