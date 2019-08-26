@@ -70,6 +70,11 @@ chrome.runtime.onConnect.addListener(port => {
 
 		contentScript.onDisconnect.addListener(shutdown);
 		devtools.onDisconnect.addListener(shutdown);
+
+		// Notify that we're ready to accept events
+		contentScript.postMessage({
+			ready: true,
+		});
 	}
 });
 

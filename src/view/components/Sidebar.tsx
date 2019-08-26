@@ -2,10 +2,11 @@ import { h } from "preact";
 import s from "./Sidebar.css";
 import { SidebarPanel } from "./SidebarPanel";
 import { Actions } from "./Actions";
-import { useStore } from "../store";
+import { useObserver, useStore } from "../store";
 
 export function Sidebar() {
-	const node = useStore(store => store.selected());
+	const store = useStore();
+	const node = useObserver(() => store.selected(), [store.selected]);
 	return (
 		<aside class={s.root}>
 			<Actions>

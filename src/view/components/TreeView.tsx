@@ -1,19 +1,21 @@
 import { h } from "preact";
 import s from "./Tree.css";
-import { ID, useStore, getAllChildren } from "../store";
+import { ID, useObserver, getAllChildren, useStore } from "../store";
 import { useEffect, useState } from "preact/hooks";
 
 export interface TreeProps {
 	rootId: number;
 }
 export function TreeView(props: TreeProps) {
-	const nodes = useStore(store => {
-		console.log("rot", props.rootId, store.nodes(), store.rootToChild());
+	const store = useStore();
+	const nodes = useObserver(() => {
 		return getAllChildren(
 			store.nodes(),
 			store.rootToChild().get(props.rootId)!,
 		);
-	});
+	}, [store.nodes, store.rootToChild]);
+
+	console.log("render tree", nodes.length);
 	return (
 		<div class={s.tree}>
 			<div>
@@ -31,16 +33,16 @@ export function TreeView(props: TreeProps) {
 
 export function TreeItem(props: { key: any; id: ID }) {
 	const { id } = props;
+	const store = useStore();
 	const {
 		dim,
 		onSelect,
-		store,
 		collapsed,
 		onToggle,
 		node,
 		hidden,
 		selected,
-	} = useStore(store => {
+	} = useObserver(() => {
 		const node = store.nodes().get(id);
 		return {
 			store,
@@ -52,7 +54,12 @@ export function TreeItem(props: { key: any; id: ID }) {
 			onToggle: store.actions.collapseNode,
 			node,
 		};
-	});
+	}, [
+		store.nodes,
+		store.nodes().get(id)!.selected,
+		store.visiblity.collapsed,
+		store.visiblity.hidden,
+	]);
 
 	if (!node || hidden) return null;
 
@@ -94,7 +101,8 @@ export function Arrow() {
 }
 
 export function HighlightPane() {
-	const ref = useStore(store => store.selectedRef());
+	const store = useStore();
+	const ref = useObserver(() => store.selectedRef(), [store.selectedRef]);
 
 	let [pos, setPos] = useState({ top: 0, height: 0 });
 	useEffect(() => {

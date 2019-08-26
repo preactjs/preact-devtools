@@ -1,7 +1,7 @@
 import { DevtoolsHook, EmitterFn } from "./hook";
 import { flushTable, StringTable, parseTable } from "./string-table";
 import { Store, DevNode, ID } from "../view/store";
-import { batch, signal } from "preactus";
+import { valoo } from "../view/valoo";
 
 export enum MsgTypes {
 	ADD_ROOT = 1,
@@ -62,65 +62,63 @@ export function applyOperations(store: Store, data: number[]) {
 
 	let newRoot = false;
 
-	batch(() => {
-		for (; i < data.length; i++) {
-			switch (data[i]) {
-				case MsgTypes.ADD_ROOT:
-					const id = data[i++];
-					newRoot = true;
-					store.roots(store.roots()).push(id);
-					break;
-				case MsgTypes.ADD_VNODE: {
-					const id = data[i + 1];
-					const type = data[i + 2];
-					const name = strings[data[i + 5] - 1];
-					const key = data[i + 6] > 0 ? ` key="${strings[i + 6 - 1]}" ` : "";
-					const parentId = data[i + 3];
+	for (; i < data.length; i++) {
+		switch (data[i]) {
+			case MsgTypes.ADD_ROOT:
+				const id = data[i++];
+				newRoot = true;
+				store.roots(store.roots()).push(id);
+				break;
+			case MsgTypes.ADD_VNODE: {
+				const id = data[i + 1];
+				const type = data[i + 2];
+				const name = strings[data[i + 5] - 1];
+				const key = data[i + 6] > 0 ? ` key="${strings[i + 6 - 1]}" ` : "";
+				const parentId = data[i + 3];
 
-					if (newRoot) {
-						newRoot = false;
-						store.rootToChild().set(rootId, id);
-						store.rootToChild(store.rootToChild());
-					}
-
-					if (store.nodes().has(id)) {
-						throw new Error(`Node ${id} already present in store.`);
-					}
-
-					if (store.roots().indexOf(parentId) === -1) {
-						const parent = store.nodes().get(parentId);
-						if (!parent) {
-							throw new Error(`Parent node ${parentId} not found in store.`);
-						}
-						parent.children.push(id);
-					}
-
-					store.nodes().set(id, {
-						children: [],
-						depth: getDepth(store, parentId),
-						id,
-						name,
-						parentId,
-						type,
-						key,
-						selected: signal(false),
-					});
-					store.nodes(store.nodes());
-					i += 6;
-					break;
+				if (newRoot) {
+					newRoot = false;
+					store.rootToChild().set(rootId, id);
+					store.rootToChild(store.rootToChild());
 				}
-				case MsgTypes.REMOVE_VNODE: {
-					const unmounts = data[i + 1];
-					i += 2;
-					const len = i + unmounts;
-					console.log(`total unmounts: ${unmounts}`);
-					for (; i < len; i++) {
-						console.log(`  Remove: %c${data[i]}`, "color: red");
+
+				if (store.nodes().has(id)) {
+					throw new Error(`Node ${id} already present in store.`);
+				}
+
+				if (store.roots().indexOf(parentId) === -1) {
+					const parent = store.nodes().get(parentId);
+					if (!parent) {
+						throw new Error(`Parent node ${parentId} not found in store.`);
 					}
+					parent.children.push(id);
+				}
+
+				store.nodes().set(id, {
+					children: [],
+					depth: getDepth(store, parentId),
+					id,
+					name,
+					parentId,
+					type,
+					key,
+					selected: valoo<boolean>(false),
+				});
+				store.nodes(store.nodes());
+				i += 6;
+				break;
+			}
+			case MsgTypes.REMOVE_VNODE: {
+				const unmounts = data[i + 1];
+				i += 2;
+				const len = i + unmounts;
+				console.log(`total unmounts: ${unmounts}`);
+				for (; i < len; i++) {
+					console.log(`  Remove: %c${data[i]}`, "color: red");
 				}
 			}
 		}
-	});
+	}
 }
 
 export function getDepth(store: Store, id: ID) {

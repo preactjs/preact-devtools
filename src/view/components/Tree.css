@@ -2,6 +2,10 @@
 	width: 100%;
 	position: relative;
 	z-index: 1;
+
+	-webkit-user-select: all;
+	-moz-user-select: all;
+	-ms-user-select: all;
 	user-select: none;
 }
 

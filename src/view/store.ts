@@ -1,6 +1,6 @@
-import { DataSignal, signal, track } from "preactus";
 import { createContext } from "preact";
-import { useContext, useState, useRef } from "preact/hooks";
+import { useContext, useState, useRef, useEffect } from "preact/hooks";
+import { valoo, Observable, track } from "./valoo";
 
 export type ID = number;
 
@@ -25,20 +25,20 @@ export interface DevNode {
 
 	// Display properties
 	depth: number;
-	selected: DataSignal<boolean>;
+	selected: Observable<boolean>;
 }
 
 export type Tree = Map<ID, DevNode>;
 
 export interface Store {
-	roots: DataSignal<ID[]>;
-	rootToChild: DataSignal<Map<number, number>>;
-	nodes: DataSignal<Tree>;
-	selected: DataSignal<DevNode | null>;
-	selectedRef: DataSignal<null | HTMLElement>;
+	roots: Observable<ID[]>;
+	rootToChild: Observable<Map<number, number>>;
+	nodes: Observable<Tree>;
+	selected: Observable<DevNode | null>;
+	selectedRef: Observable<null | HTMLElement>;
 	visiblity: {
-		collapsed: DataSignal<Set<ID>>;
-		hidden: DataSignal<Set<ID>>;
+		collapsed: Observable<Set<ID>>;
+		hidden: Observable<Set<ID>>;
 	};
 	actions: {
 		selectNode: (id: ID, ref: HTMLElement) => void;
@@ -47,23 +47,23 @@ export interface Store {
 }
 
 export function createStore(): Store {
-	const nodes = signal<Tree>(new Map());
-	const roots = signal<ID[]>([]);
-	const rootToChild = signal<any>(new Map());
+	const nodes = valoo<Tree>(new Map());
+	const roots = valoo<ID[]>([]);
+	const rootToChild = valoo<any>(new Map());
 
 	// Selection
-	const selectedNode = signal<DevNode | null>(null);
-	const selectedRef = signal<HTMLElement | null>(null);
+	const selectedNode = valoo<DevNode | null>(null);
+	const selectedRef = valoo<HTMLElement | null>(null);
 
 	// Toggle
-	const collapsed = signal<Set<ID>>(new Set());
+	const collapsed = valoo<Set<ID>>(new Set());
 	const hidden = track(() => {
 		const out = new Set<ID>();
 		collapsed().forEach(id =>
 			getAllChildren(nodes(), id).forEach(child => out.add(child)),
 		);
 		return out;
-	});
+	}, [collapsed, nodes]);
 
 	return {
 		roots,
@@ -140,26 +140,15 @@ export function getSelecionLast(tree: Tree, id: ID) {
 
 export const AppCtx = createContext<Store>(null as any);
 
-export function useStore<T>(fn: (store: Store) => T): T {
+export const useStore = () => useContext(AppCtx);
+
+export function useObserver<T>(fn: () => T, deps: Observable[]): T {
 	let [i, setI] = useState(0);
 
-	let initRef = useRef(true);
-	const store = useContext(AppCtx);
+	useEffect(() => {
+		const subs = deps.map(x => x.on(() => setI(++i)));
+		return () => subs.forEach(x => x());
+	}, []);
 
-	let valueRef = useRef<any>(null as any);
-	valueRef.current =
-		valueRef.current ||
-		track(() => {
-			const res = fn(store);
-
-			// Don't trigger update on mount
-			if (initRef.current) {
-				initRef.current = false;
-			} else {
-				setI(++i);
-			}
-			return res;
-		});
-
-	return valueRef.current();
+	return fn();
 }

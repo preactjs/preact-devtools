@@ -29,11 +29,14 @@ function createPanel() {
 			});
 
 			port.onMessage.addListener(msg => {
-				console.log("RECEIVED", msg);
+				console.log("RECEIVED", msg.data.payload);
 				const payload = msg.data.payload;
 				if (payload.name === "operation") {
 					applyOperations(store, payload.payload);
-					console.log(store.nodes().size);
+					console.log(
+						store.nodes().size,
+						Array.from(store.nodes().values()).map(x => x.name),
+					);
 				}
 			});
 
@@ -43,19 +46,6 @@ function createPanel() {
 		});
 	});
 }
-
-// Listen to messages from the content-script
-// const { tabId } = chrome.devtools.inspectedWindow;
-// const port = chrome.runtime.connect({
-// 	name: "" + tabId,
-// });
-
-// port.onMessage.addListener(msg => {
-// 	const payload = msg.data.payload;
-// 	if (payload.name === "operation") {
-// 		applyOperations(store, payload.payload);
-// 	}
-// });
 
 function checkPreact() {
 	return new Promise((resolve, reject) => {
