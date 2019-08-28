@@ -1,11 +1,10 @@
-import { Adapter } from "./adapter";
+import { Renderer } from "./renderer";
 
-export type EventTypes = "operation" | "attach";
-export type EmitterFn = (event: EventTypes, data: number[]) => void;
+export type EmitterFn = (event: string, data: any) => void;
 
 export interface DevtoolsHook {
-	renderers: Map<number, Adapter>;
-	attach(fn: (emit: EmitterFn) => Adapter): number;
+	renderers: Map<number, Renderer>;
+	attach(renderer: Renderer): number;
 	detach(id: number): void;
 }
 
@@ -13,15 +12,22 @@ export interface DevtoolsHook {
  * Create hook to which Preact will subscribe and listen to. The hook
  * is the entrypoint where everything begins.
  */
-export function createHook(emit: EmitterFn): DevtoolsHook {
+export function createHook(): DevtoolsHook {
 	const renderers = new Map();
 	let uid = 0;
 
 	return {
 		renderers,
-		attach: fn => {
-			renderers.set(++uid, fn(emit));
-			emit("attach", [uid]);
+		attach: renderer => {
+			renderers.set(++uid, renderer);
+			// Content Script is likely not ready at this point, so don't flush here
+			window.postMessage(
+				{
+					source: "preact-devtools-detector",
+					payload: [uid],
+				},
+				"*",
+			);
 			return uid;
 		},
 		detach: id => renderers.delete(id),

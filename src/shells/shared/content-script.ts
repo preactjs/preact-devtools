@@ -6,7 +6,7 @@ function onExtensionEvent(message: any) {
 	window.postMessage(
 		{
 			source: "preact-devtools-content-script",
-			payload: message,
+			...message,
 		},
 		"*",
 	);
@@ -22,12 +22,18 @@ port.onDisconnect.addListener(() => {
 });
 
 function onEvent(ev: MessageEvent) {
-	if (ev.source === window && ev.data && ev.data.source === "preact-devtools") {
-		backendInitialized = true;
-		port.postMessage({
-			name: ev.data.name,
-			data: ev.data,
-		});
+	if (ev.source === window && ev.data) {
+		if (
+			ev.data.source === "preact-devtools-content-script" &&
+			ev.data.name === "initialized"
+		) {
+			backendInitialized = true;
+		} else if (backendInitialized && ev.data.source === "preact-devtools") {
+			port.postMessage({
+				name: ev.data.name,
+				data: ev.data,
+			});
+		}
 	}
 }
 window.addEventListener("message", onEvent);
@@ -36,7 +42,10 @@ function pingBackend() {
 	window.postMessage(
 		{
 			source: "preact-devtools-content-script",
-			ping: true,
+			name: "ping-backend",
+			payload: {
+				ping: true,
+			},
 		},
 		"*",
 	);

@@ -1,20 +1,17 @@
-import { DevtoolsHook, EmitterFn, EventTypes } from "./hook";
+import { DevtoolsHook } from "./hook";
 import { Options } from "preact";
 import { createAdapter, setupOptions } from "./adapter";
 import { createIdMapper } from "./IdMapper";
+import { createBridge } from "./bridge";
+import { createRenderer } from "./renderer";
 
 export async function init(options: Options, getHook: () => DevtoolsHook) {
-	let hookEmitter: EmitterFn | null = null;
-	let buffer: Array<{ data: number[]; name: EventTypes }> = [];
-	const emit: EmitterFn = (ev, data) => {
-		if (hookEmitter !== null) {
-			hookEmitter(ev, data);
-		} else {
-			buffer.push({ data, name: ev });
-		}
-	};
+	const ids = createIdMapper();
 
-	const adapter = createAdapter(emit, createIdMapper());
+	const bridge = createBridge(window);
+	const adapter = createAdapter(bridge.send, ids, () => getHook().renderers);
+
+	// Add options as early as possible, so that we don't miss the first commit
 	setupOptions(options as any, adapter);
 
 	// Devtools can take a while to set up
@@ -22,17 +19,15 @@ export async function init(options: Options, getHook: () => DevtoolsHook) {
 
 	// We're set up and now we can start processing events
 	const hook = getHook();
-	const rendererId = hook.attach(emit => {
-		hookEmitter = emit;
-		return adapter;
-	});
 
-	// Flush pending events
-	if (buffer.length > 0) {
-		buffer.forEach(x => hookEmitter!(x.name, x.data));
-	}
+	bridge.listen("initialized", adapter.flushInitial);
+	bridge.listen("highlight", adapter.highlight);
+	bridge.listen("select", adapter.select);
+	bridge.listen("inspect", adapter.inspect);
+	bridge.listen("log", adapter.log);
+	bridge.listen("update", adapter.log);
 
-	return rendererId;
+	return hook.attach(createRenderer(ids));
 }
 
 export function waitForHook(getHook: () => DevtoolsHook) {

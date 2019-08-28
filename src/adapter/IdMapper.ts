@@ -2,6 +2,7 @@ import { VNode } from "./adapter";
 
 export interface IdMapper {
 	getVNode(id: number): VNode | null;
+	has(id: number): boolean;
 	hasId(vnode: VNode): boolean;
 	createId(vnode: VNode): number;
 	getId(vnode: VNode): number;
@@ -52,5 +53,7 @@ export function createIdMapper(): IdMapper {
 		return id;
 	};
 
-	return { getVNode, hasId, createId, getId, remove };
+	const has = (id: number) => idToVNode.has(id);
+
+	return { has, getVNode, hasId, createId, getId, remove };
 }

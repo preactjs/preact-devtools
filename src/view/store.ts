@@ -42,11 +42,12 @@ export interface Store {
 	};
 	actions: {
 		selectNode: (id: ID, ref: HTMLElement) => void;
+		highlightNode: (id: ID | null) => void;
 		collapseNode: (id: ID) => void;
 	};
 }
 
-export function createStore(): Store {
+export function createStore(notify: (name: string, data: any) => void): Store {
 	const nodes = valoo<Tree>(new Map());
 	const roots = valoo<ID[]>([]);
 	const rootToChild = valoo<any>(new Map());
@@ -95,6 +96,9 @@ export function createStore(): Store {
 
 				selectedRef(ref);
 				selectedNode(node);
+			},
+			highlightNode: id => {
+				notify("highlight", id);
 			},
 		},
 	};

@@ -1,4 +1,4 @@
-import { VNode } from "./adapter";
+import { VNode, InspectData } from "./adapter";
 import { Commit, MsgTypes } from "./events";
 import { Fragment } from "../examples/preact.module";
 import { IdMapper } from "./IdMapper";
@@ -74,6 +74,64 @@ export function getDisplayName(vnode: VNode) {
 		return vnode.type.displayName || vnode.type.name;
 	else if (typeof vnode.type === "string") return vnode.type;
 	return "#text";
+}
+
+export interface Renderer {
+	getVNodeById(id: ID): VNode | null;
+	findDomForVNode(id: ID): Array<HTMLElement | Text | null> | null;
+	has(id: ID): boolean;
+	log(id: ID): void;
+	inspect(id: ID): InspectData;
+}
+
+export function createRenderer(ids: IdMapper): Renderer {
+	return {
+		getVNodeById: id => ids.getVNode(id),
+		has: id => ids.has(id),
+		log(id) {
+			const vnode = ids.getVNode(id);
+			if (vnode == null) {
+				console.warn(`Could not find vnode with id ${id}`);
+				return;
+			}
+			logVNode(vnode, id);
+		},
+		inspect(id) {
+			return {
+				context: null,
+				hooks: null,
+				id,
+				name: "foo",
+				props: null,
+				state: null,
+				type: 2,
+			};
+		},
+		findDomForVNode(id) {
+			const vnode = ids.getVNode(id);
+			return vnode ? [vnode._dom, vnode._lastDomChild] : null;
+		},
+	};
+}
+
+/**
+ * Print an element to console
+ */
+export function logVNode(vnode: VNode, id: ID) {
+	/* eslint-disable no-console */
+	console.group(
+		`LOG %c<${getDisplayName(vnode) || "Component"} />`,
+		// CSS Variable is injected by the devtools extension
+		"color: var(--dom-tag-name-color); font-weight: normal",
+	);
+	console.log("props:", vnode.props);
+	if (vnode._component) {
+		console.log("state:", vnode._component.state);
+	}
+	console.log("vnode:", vnode);
+	console.log("devtools id:", id);
+	console.groupEnd();
+	/* eslint-enable no-console */
 }
 
 export function createCommit(

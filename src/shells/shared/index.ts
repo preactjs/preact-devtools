@@ -4,8 +4,6 @@ import { injectStyles } from "./utils";
 import { createStore } from "../../view/store";
 import { applyOperations } from "../../adapter/events";
 
-const store = createStore();
-
 let created = false;
 function createPanel() {
 	if (created) return;
@@ -26,6 +24,10 @@ function createPanel() {
 			const { tabId } = chrome.devtools.inspectedWindow;
 			const port = chrome.runtime.connect({
 				name: "" + tabId,
+			});
+
+			const store = createStore((name, data) => {
+				port.postMessage({ name, payload: data });
 			});
 
 			port.onMessage.addListener(msg => {

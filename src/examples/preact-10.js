@@ -1,5 +1,6 @@
 import { h, render } from "./preact.module";
 import { useState } from "./hooks.module";
+import { Highlighter } from "../view/components/Highlighter";
 
 export function TodoList() {
 	const [todos, setTodos] = useState([]);
@@ -26,6 +27,19 @@ export function TodoList() {
 					return <li key={x}>{x}</li>;
 				})}
 			</ul>
+
+			<h2>Styleguide</h2>
+			<h3>Highlighter</h3>
+			<Highlighter
+				top={200}
+				left={200}
+				label={"FooBarBob"}
+				height={200}
+				width={200}
+				padding={[12, 10, 20, 20]}
+				margin={[16, 16, 16, 16]}
+				border={[5, 5, 5, 5]}
+			/>
 		</div>
 	);
 }

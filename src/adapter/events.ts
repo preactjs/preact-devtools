@@ -41,7 +41,7 @@ export interface Commit {
  * Collect all relevant data from a commit and convert it to a message
  * the detools can understand
  */
-export function flush(emit: EmitterFn, commit: Commit) {
+export function flush(commit: Commit) {
 	const { rootId, unmountIds, operations, strings } = commit;
 	if (unmountIds.length === 0 && operations.length === 0) return;
 
@@ -51,7 +51,7 @@ export function flush(emit: EmitterFn, commit: Commit) {
 	}
 	msg.push(...operations);
 
-	emit("operation", msg);
+	return { name: "operation", data: msg };
 }
 
 export function applyOperations(store: Store, data: number[]) {

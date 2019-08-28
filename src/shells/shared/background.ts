@@ -1,5 +1,3 @@
-import { inject } from "./utils";
-
 export interface Connection {
 	devtools: chrome.runtime.Port | null;
 	contentScript: chrome.runtime.Port | null;
@@ -73,7 +71,10 @@ chrome.runtime.onConnect.addListener(port => {
 
 		// Notify that we're ready to accept events
 		contentScript.postMessage({
-			ready: true,
+			name: "initialized",
+			payload: {
+				ready: true,
+			},
 		});
 	}
 });

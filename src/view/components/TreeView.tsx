@@ -17,12 +17,10 @@ export function TreeView(props: TreeProps) {
 	}, [store.nodes, store.rootToChild]);
 
 	return (
-		<div class={s.tree}>
-			<div>
-				{nodes.map(id => (
-					<TreeItem key={id} id={id} />
-				))}
-			</div>
+		<div class={s.tree} onMouseLeave={() => store.actions.highlightNode(null)}>
+			{nodes.map(id => (
+				<TreeItem key={id} id={id} />
+			))}
 			<HighlightPane />
 		</div>
 	);
@@ -38,6 +36,7 @@ export function TreeItem(props: { key: any; id: ID }) {
 		node,
 		hidden,
 		selected,
+		onHover,
 	} = useObserver(() => {
 		const node = store.nodes().get(id);
 		return {
@@ -46,6 +45,7 @@ export function TreeItem(props: { key: any; id: ID }) {
 			collapsed: store.visiblity.collapsed().has(id),
 			hidden: store.visiblity.hidden().has(id),
 			onToggle: store.actions.collapseNode,
+			onHover: store.actions.highlightNode,
 			node,
 		};
 	}, [
@@ -61,6 +61,7 @@ export function TreeItem(props: { key: any; id: ID }) {
 		<div
 			class={s.item}
 			onClick={ev => onSelect(id, ev.currentTarget as any)}
+			onMouseEnter={() => onHover(id)}
 			data-selected={selected}
 			data-depth={node.depth}
 		>

@@ -3,17 +3,23 @@ import {
 	Options as PreactOptions,
 	VNode as PreactVNode,
 	Component,
+	render,
+	h,
 } from "preact";
 import { EmitterFn } from "./hook";
 import { flush } from "./events";
-import { createCommit } from "./renderer";
+import { createCommit, Renderer, getDisplayName } from "./renderer";
 import { IdMapper } from "./IdMapper";
+import { Highlighter } from "../view/components/Highlighter";
+import { measureNode, getNearestElement } from "./dom";
 
 export interface VNode extends PreactVNode {
 	old: VNode | null;
 	_parent: VNode | null;
 	_children: null | VNode[];
 	_component: Component | null;
+	_dom: HTMLElement | null;
+	_lastDomChild: HTMLElement | Text | null;
 }
 
 export interface Options extends Pick<PreactOptions, "vnode" | "unmount"> {
@@ -24,15 +30,21 @@ export interface Options extends Pick<PreactOptions, "vnode" | "unmount"> {
 
 export type Path = Array<string | number>;
 
+export interface DevtoolsEvent {
+	name: string;
+	data: any;
+}
+
 export interface Adapter {
-	findDomForVNode(id: ID): Array<HTMLElement | Text> | null;
-	inspect(id: ID): InspectData;
-	logVNode(id: ID): void;
-	updateProps(id: ID, path: Path, value: any): void;
-	selectVNode(id: ID): void;
+	highlight(id: ID | null): void;
+	inspect(id: ID): void;
+	log(id: ID): void;
+	update(id: ID, path: Path, value: any): void;
+	select(id: ID): void;
 	onCommit(vnode: VNode): void;
 	onUnmount(vnode: VNode): void;
 	connect(): void;
+	flushInitial(): void;
 }
 
 export interface InspectData {
@@ -46,10 +58,6 @@ export interface InspectData {
 }
 
 export function setupOptions(options: Options, adapter: Adapter) {
-	window.parent.postMessage({ source: "preact-devtools-detector" }, "*");
-
-	adapter.connect();
-
 	// Store (possible) previous hooks so that we don't overwrite them
 	let prevVNodeHook = options.vnode;
 	let prevCommitRoot = options._commit;
@@ -135,46 +143,110 @@ export function setupOptions(options: Options, adapter: Adapter) {
 	};
 }
 
-export function createAdapter(emit: EmitterFn, ids: IdMapper) {
+export function createAdapter(
+	emit: EmitterFn,
+	ids: IdMapper,
+	renderers: () => Map<ID, Renderer>,
+): Adapter {
 	const roots = new Set<VNode>();
 
-	const adapter: Adapter = {
+	/** Flag that signals if the devtools are connected */
+	let connected = false;
+
+	/** Queue events until the extension is connected */
+	let queue: DevtoolsEvent[] = [];
+
+	/**
+	 * Reference to the DOM element that we'll render the selection highlighter
+	 * into. We'll cache it so that we don't unnecessarily re-create it when the
+	 * hover state changes. We only destroy this elment once the user stops
+	 * hovering a node in the tree.
+	 */
+	let highlightRef: HTMLDivElement | null = null;
+
+	function destroyHighlight() {
+		document.body.removeChild(highlightRef!);
+		highlightRef = null;
+	}
+
+	return {
 		// Receive
-		findDomForVNode(id) {
-			console.log("find dom", id);
-			return null;
-		},
 		inspect(id) {
 			console.log("inspect", id);
-			return {
-				context: null,
-				hooks: null,
-				id,
-				name: "foo",
-				props: null,
-				state: null,
-				type: 2,
-			};
+			renderers().forEach(r => {
+				if (r.has(id)) {
+					const data = r.inspect(id);
+					emit("inspect-result", data);
+				}
+			});
 		},
-		logVNode(id) {
-			console.log("Log", id);
+		log(id) {
+			renderers().forEach(r => {
+				if (r.has(id)) r.log(id);
+			});
 		},
-		selectVNode(id) {
-			console.log("select", id);
+		select(id) {
+			// Unused
 		},
-		updateProps(id) {
+		highlight(id) {
+			if (id !== null) {
+				renderers().forEach(r => {
+					if (!r.has(id)) return;
+
+					const vnode = r.getVNodeById(id)!;
+					const dom = r.findDomForVNode(id);
+
+					if (dom != null) {
+						if (highlightRef == null) {
+							highlightRef = document.createElement("div");
+							highlightRef.id = "preact-devtools-highlighter";
+
+							document.body.appendChild(highlightRef);
+						}
+
+						const node = getNearestElement(dom[0]!);
+
+						render(
+							h(Highlighter, {
+								label: getDisplayName(vnode),
+								...measureNode(node),
+							}),
+							highlightRef,
+						);
+					} else {
+						destroyHighlight();
+					}
+				});
+			} else {
+				destroyHighlight();
+			}
+		},
+		update(id) {
 			console.log("update props", id);
+		},
+		flushInitial() {
+			console.log("flush buffer", queue.map(X => X.name));
+			queue.forEach(ev => emit(ev.name, ev.data));
+			connected = true;
+			queue = [];
 		},
 		// Send
 		onCommit(vnode) {
+			console.log("onCommit");
 			const commit = createCommit(ids, roots, vnode);
-			flush(emit, commit);
+			const ev = flush(commit);
+			if (!ev) return;
+
+			console.log("commit", connected, ev);
+			if (connected) {
+				emit(ev.name, ev.data);
+			} else {
+				queue.push(ev);
+			}
 		},
 		onUnmount(vnode) {
 			console.log("unmount rq", vnode);
 		},
 		connect() {},
 	};
-
-	return adapter;
 }
