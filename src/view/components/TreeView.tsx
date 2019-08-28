@@ -64,6 +64,7 @@ export function TreeItem(props: { key: any; id: ID }) {
 			onMouseEnter={() => onHover(id)}
 			data-selected={selected}
 			data-depth={node.depth}
+			style={`padding-left: calc(var(--indent-depth) * ${node.depth})`}
 		>
 			<div class={s.itemHeader}>
 				{node.children.length > 0 && (

@@ -4,24 +4,12 @@
 	width: 100%;
 	position: relative;
 	z-index: 1;
+	overflow: auto;
 
 	-webkit-user-select: none;
 	-moz-user-select: none;
 	-ms-user-select: none;
 	user-select: none;
-}
-
-[data-depth="1"] {
-	padding-left: var(--indent-depth);
-}
-[data-depth="2"] {
-	padding-left: calc(var(--indent-depth) * 2);
-}
-[data-depth="3"] {
-	padding-left: calc(var(--indent-depth) * 3);
-}
-[data-depth="4"] {
-	padding-left: calc(var(--indent-depth) * 4);
 }
 
 .item {

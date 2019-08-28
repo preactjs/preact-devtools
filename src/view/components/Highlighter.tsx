@@ -40,7 +40,7 @@ export function Highlighter(props: Props) {
 					/>
 				</div>
 			</div>
-			<span class={s.footer} style={`max-width: ${width}px`}>
+			<span class={s.footer}>
 				<span class={s.label}>{props.label}</span> |{" "}
 				<span class={s.value}>{width}px</span> ×{" "}
 				<span class={s.value}>{height}px</span>
