@@ -1,0 +1,13 @@
+.root {
+	border: none;
+	background: none;
+	cursor: pointer;
+	display: inline-flex;
+	align-items: center;
+	outline: none;
+	color: var(--color-text);
+}
+
+.root[data-active] {
+	color: var(--color-button-active);
+}

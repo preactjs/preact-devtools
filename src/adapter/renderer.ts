@@ -129,12 +129,11 @@ export function createRenderer(ids: IdMapper): Renderer {
  * Print an element to console
  */
 export function logVNode(vnode: VNode, id: ID) {
+	const display = getDisplayName(vnode);
+	const name = display === "#text" ? display : `<${display || "Component"} />`;
+
 	/* eslint-disable no-console */
-	console.group(
-		`LOG %c<${getDisplayName(vnode) || "Component"} />`,
-		// CSS Variable is injected by the devtools extension
-		"color: var(--dom-tag-name-color); font-weight: normal",
-	);
+	console.group(`LOG %c${name}`, "color: #ea88fd; font-weight: normal");
 	console.log("props:", vnode.props);
 	if (vnode._component) {
 		console.log("state:", vnode._component.state);

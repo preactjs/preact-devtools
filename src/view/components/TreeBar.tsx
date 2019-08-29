@@ -1,15 +1,14 @@
 import { h } from "preact";
 import { useState } from "preact/hooks";
-import s from "./TreeBar.css";
 import { Actions } from "./Actions";
+import { IconBtn } from "./IconBtn";
 
 export function TreeBar() {
 	const [inspect, setInspect] = useState(false);
 	const [settings, setSettings] = useState(false);
 	return (
 		<Actions>
-			<button
-				class={s.btnIcon}
+			<IconBtn
 				data-active={inspect}
 				title="Inspect Element"
 				onClick={() => setInspect(!inspect)}
@@ -39,10 +38,9 @@ export function TreeBar() {
 						<path d="M2.87 2.87L3.93 3.93" fill="none" stroke-width=".265" />
 					</g>
 				</svg>
-			</button>
+			</IconBtn>
 			<div style="width: 100%">foo</div>
-			<button
-				class={s.btnIcon}
+			<IconBtn
 				data-active={settings}
 				title="Settings"
 				onClick={() => setSettings(!settings)}
@@ -63,7 +61,7 @@ export function TreeBar() {
 						stroke-dashoffset="8.791"
 					/>
 				</svg>
-			</button>
+			</IconBtn>
 		</Actions>
 	);
 }

@@ -46,6 +46,7 @@ export interface Store {
 		selectNode: (id: ID, ref: HTMLElement) => void;
 		highlightNode: (id: ID | null) => void;
 		collapseNode: (id: ID) => void;
+		logNode: (id: ID) => void;
 	};
 }
 
@@ -111,6 +112,9 @@ export function createStore(notify: (name: string, data: any) => void): Store {
 			},
 			highlightNode: id => {
 				notify("highlight", id);
+			},
+			logNode: id => {
+				notify("log", id);
 			},
 		},
 	};
