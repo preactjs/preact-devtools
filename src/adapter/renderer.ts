@@ -1,5 +1,5 @@
 import { VNode, InspectData } from "./adapter";
-import { Commit, MsgTypes } from "./events";
+import { Commit, MsgTypes, jsonify, cleanProps } from "./events";
 import { Fragment } from "../examples/preact.module";
 import { IdMapper } from "./IdMapper";
 import { ID } from "../view/store";
@@ -81,7 +81,7 @@ export interface Renderer {
 	findDomForVNode(id: ID): Array<HTMLElement | Text | null> | null;
 	has(id: ID): boolean;
 	log(id: ID): void;
-	inspect(id: ID): InspectData;
+	inspect(id: ID): InspectData | null;
 }
 
 export function createRenderer(ids: IdMapper): Renderer {
@@ -97,13 +97,24 @@ export function createRenderer(ids: IdMapper): Renderer {
 			logVNode(vnode, id);
 		},
 		inspect(id) {
+			const vnode = ids.getVNode(id);
+			if (!vnode) return null;
+
+			const hasState =
+				typeof vnode.type === "function" && vnode.type !== Fragment;
+			const hasHooks =
+				vnode._component != null && vnode._component.__hooks != null;
+
 			return {
 				context: null,
 				hooks: null,
 				id,
-				name: "foo",
-				props: null,
-				state: null,
+				name: getDisplayName(vnode),
+				props: vnode.type !== null ? jsonify(cleanProps(vnode.props)) : null,
+				state:
+					hasState && Object.keys(vnode._component!.state).length > 0
+						? jsonify(vnode._component!.state)
+						: null,
 				type: 2,
 			};
 		},

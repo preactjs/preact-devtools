@@ -2,6 +2,8 @@ import { DevtoolsHook, EmitterFn } from "./hook";
 import { flushTable, StringTable, parseTable } from "./string-table";
 import { Store, DevNode, ID } from "../view/store";
 import { valoo } from "../view/valoo";
+import { VNode } from "preact";
+import { getDisplayName } from "./renderer";
 
 export enum MsgTypes {
 	ADD_ROOT = 1,
@@ -124,4 +126,45 @@ export function applyOperations(store: Store, data: number[]) {
 export function getDepth(store: Store, id: ID) {
 	let parent = store.nodes().get(id)!;
 	return parent ? parent.depth + 1 : 0;
+}
+
+export function jsonify(data: any) {
+	if (isVNode(data)) {
+		return {
+			type: "vnode",
+			name: getDisplayName(data as any),
+		};
+	}
+	switch (typeof data) {
+		case "string":
+			return data.length > 300 ? data.slice(300) : data;
+		case "function": {
+			return {
+				type: "function",
+				name: data.displayName || data.name,
+			};
+		}
+		case "object":
+			if (data == null) return null;
+			const out = { ...data };
+			Object.keys(out).forEach(key => {
+				out[key] = jsonify(out[key]);
+			});
+			return out;
+		default:
+			return data;
+	}
+}
+
+export function cleanProps(props: any) {
+	if (typeof props === "string" || !props) return null;
+	const out = { ...props };
+	delete out.children;
+	if (!Object.keys(out).length) return null;
+	console.log("props", out, props);
+	return out;
+}
+
+export function isVNode(x: any): x is VNode {
+	return x != null && x.type !== undefined && x._dom !== undefined;
 }

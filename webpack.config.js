@@ -81,6 +81,7 @@ module.exports = {
 											_hook: "__h",
 											_catchError: "__e",
 											_unmount: "_e",
+											__hooks: "__H",
 										},
 									},
 								],

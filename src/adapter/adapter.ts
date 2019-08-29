@@ -2,7 +2,7 @@ import { ID } from "../view/store";
 import {
 	Options as PreactOptions,
 	VNode as PreactVNode,
-	Component,
+	Component as PreactComponent,
 	render,
 	h,
 } from "preact";
@@ -12,6 +12,53 @@ import { createCommit, Renderer, getDisplayName } from "./renderer";
 import { IdMapper } from "./IdMapper";
 import { Highlighter } from "../view/components/Highlighter";
 import { measureNode, getNearestElement } from "./dom";
+
+export type Effect = () => void | Cleanup;
+export type Cleanup = () => void;
+
+export interface EffectHookState {
+	_value?: Effect;
+	_args?: any[];
+	_cleanup?: Cleanup;
+	_revision?: number;
+}
+
+export interface MemoHookState {
+	_value?: any;
+	_args?: any[];
+	_callback?: () => any;
+	_revision?: number;
+}
+
+export interface ReducerHookState {
+	_value?: any;
+	_component?: Component;
+	_revision?: number;
+}
+
+export interface ImperativeHookState {
+	_args?: any[];
+	_revision?: number;
+}
+
+export type HookState =
+	| EffectHookState
+	| MemoHookState
+	| ReducerHookState
+	| ImperativeHookState;
+
+export interface ComponentHooks {
+	/** The list of hooks a component uses */
+	_list: HookState[];
+	/** List of Effects to be invoked after the next frame is rendered */
+	_pendingEffects: EffectHookState[];
+	/** List of Effects to be invoked at the end of the current render */
+	_pendingLayoutEffects: EffectHookState[];
+}
+
+export interface Component extends PreactComponent {
+	__hooks?: ComponentHooks;
+}
 
 export interface VNode extends PreactVNode {
 	old: VNode | null;
@@ -172,11 +219,13 @@ export function createAdapter(
 	return {
 		// Receive
 		inspect(id) {
-			console.log("inspect", id);
 			renderers().forEach(r => {
 				if (r.has(id)) {
 					const data = r.inspect(id);
-					emit("inspect-result", data);
+					console.log("inspect-result", data);
+					if (data !== null) {
+						emit("inspect-result", data);
+					}
 				}
 			});
 		},

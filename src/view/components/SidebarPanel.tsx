@@ -12,7 +12,11 @@ export function SidebarPanel(props: Props) {
 		<div class={s.panel}>
 			<h3 class={s.title}>{props.title}</h3>
 			<div class={s.content}>
-				<span class={s.empty}>{props.empty}</span>
+				{props.children == null ? (
+					<span class={s.empty}>{props.empty}</span>
+				) : (
+					props.children
+				)}
 			</div>
 		</div>
 	);

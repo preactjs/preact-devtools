@@ -3,7 +3,7 @@ import { useState } from "./hooks.module";
 import { Highlighter } from "../view/components/Highlighter";
 
 export function TodoList() {
-	const [todos, setTodos] = useState([]);
+	const [todos, setTodos] = useState(["asd", "asdf"]);
 	const [v, setV] = useState("");
 	return (
 		<div style="padding: 5rem">

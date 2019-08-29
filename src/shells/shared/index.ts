@@ -39,6 +39,8 @@ function createPanel() {
 						store.nodes().size,
 						Array.from(store.nodes().values()).map(x => x.name),
 					);
+				} else if (payload.name === "inspect-result") {
+					store.inspectData(payload.payload);
 				}
 			});
 

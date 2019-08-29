@@ -1,6 +1,7 @@
 import { createContext } from "preact";
 import { useContext, useState, useRef, useEffect } from "preact/hooks";
 import { valoo, Observable, track } from "./valoo";
+import { InspectData } from "../adapter/adapter";
 
 export type ID = number;
 
@@ -31,6 +32,7 @@ export interface DevNode {
 export type Tree = Map<ID, DevNode>;
 
 export interface Store {
+	inspectData: Observable<InspectData>;
 	roots: Observable<ID[]>;
 	rootToChild: Observable<Map<number, number>>;
 	nodes: Observable<Tree>;
@@ -67,6 +69,15 @@ export function createStore(notify: (name: string, data: any) => void): Store {
 	}, [collapsed, nodes]);
 
 	return {
+		inspectData: valoo<InspectData>({
+			context: null,
+			hooks: null,
+			id: -1,
+			name: ".",
+			props: null,
+			state: null,
+			type: 2,
+		}),
 		roots,
 		rootToChild,
 		nodes,
@@ -96,6 +107,7 @@ export function createStore(notify: (name: string, data: any) => void): Store {
 
 				selectedRef(ref);
 				selectedNode(node);
+				notify("inspect", id);
 			},
 			highlightNode: id => {
 				notify("highlight", id);
