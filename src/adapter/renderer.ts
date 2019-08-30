@@ -107,10 +107,13 @@ export function createRenderer(ids: IdMapper): Renderer {
 
 			return {
 				context: null,
+				canEditHooks: hasHooks,
 				hooks: null,
 				id,
 				name: getDisplayName(vnode),
+				canEditProps: true,
 				props: vnode.type !== null ? jsonify(cleanProps(vnode.props)) : null,
+				canEditState: false,
 				state:
 					hasState && Object.keys(vnode._component!.state).length > 0
 						? jsonify(vnode._component!.state)

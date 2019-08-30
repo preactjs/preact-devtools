@@ -99,8 +99,11 @@ export interface InspectData {
 	name: string;
 	type: any;
 	context: Record<string, any> | null;
+	canEditHooks: boolean;
 	hooks: any | null;
+	canEditProps: boolean;
 	props: Record<string, any> | null;
+	canEditState: boolean;
 	state: Record<string, any> | null;
 }
 

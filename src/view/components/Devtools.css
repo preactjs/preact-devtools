@@ -21,6 +21,12 @@
 	--color-border: #dedede;
 	--color-text-empty: #444;
 	--color-button-active: #7245c7;
+
+	/* Props */
+	--color-props-input-bg: #eee;
+	--color-props-sep: #444;
+	--color-props-string: #009906;
+	--color-props-function: #ff5722;
 }
 
 :global(.dark) .root {
@@ -38,17 +44,26 @@
 	--color-text-empty: #999;
 	--color-button-active: #d2adff;
 	--color-sidebar-title: #c5c5c5;
+
+	/* Props */
+	--color-props-input-bg: #444;
+	--color-props-sep: #eee;
+	--color-props-string: #9eeca1;
+	--color-props-function: #fdca31;
 }
 
 .components {
 	display: flex;
-	flex: 1 1 65%;
+	flex: 0 0 65%;
+	width: 65%;
 	flex-direction: column;
 }
 
 .sidebar {
 	display: flex;
-	flex: 0 1 35%;
+	flex: 0 0 35%;
+	width: 35%;
+	overflow-x: hidden;
 	flex-direction: column;
 	border-left: 0.0625rem solid var(--color-border);
 }

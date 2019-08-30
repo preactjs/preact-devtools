@@ -73,6 +73,9 @@ export function createStore(notify: (name: string, data: any) => void): Store {
 		inspectData: valoo<InspectData>({
 			context: null,
 			hooks: null,
+			canEditState: false,
+			canEditHooks: false,
+			canEditProps: false,
 			id: -1,
 			name: ".",
 			props: null,

@@ -4,13 +4,13 @@ import { SidebarPanel } from "./SidebarPanel";
 import { Actions } from "./Actions";
 import { useObserver, useStore } from "../store";
 import { IconBtn } from "./IconBtn";
+import { ElementProps } from "./ElementProps";
 
 export function Sidebar() {
 	const store = useStore();
 	const node = useObserver(() => store.selected(), [store.selected]);
 	const inspect = useObserver(() => store.inspectData(), [store.inspectData]);
 
-	console.log("sidebar");
 	return (
 		<aside class={s.root}>
 			<Actions>
@@ -25,11 +25,22 @@ export function Sidebar() {
 			</Actions>
 			<div class={s.body}>
 				<SidebarPanel title="props" empty="None">
-					{inspect.props ? JSON.stringify(inspect.props) : null}
+					{inspect.props ? (
+						<ElementProps
+							data={inspect.props}
+							editable={inspect.canEditProps}
+							onInput={v => console.log(v)}
+						/>
+					) : null}
 				</SidebarPanel>
 				{inspect.state && (
 					<SidebarPanel title="state" empty="None">
-						{inspect.state ? JSON.stringify(inspect.state) : null}
+						{inspect.state ? (
+							<ElementProps
+								data={inspect.state}
+								editable={inspect.canEditState}
+							/>
+						) : null}
 					</SidebarPanel>
 				)}
 				{inspect.context && (
