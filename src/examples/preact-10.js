@@ -60,6 +60,7 @@ export function TodoList() {
 					<div style="width: 20rem; outline: 1px solid red">
 						<ElementProps
 							editable
+							path={[]}
 							data={{
 								foo: "bar",
 								longvalue: "asdji asdj asijd lksaj dlask kajdaklsj dklsabar",

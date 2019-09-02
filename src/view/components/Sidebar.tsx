@@ -27,9 +27,12 @@ export function Sidebar() {
 				<SidebarPanel title="props" empty="None">
 					{inspect.props ? (
 						<ElementProps
+							path={[]}
 							data={inspect.props}
 							editable={inspect.canEditProps}
-							onInput={v => console.log(v)}
+							onInput={(v, path) =>
+								node && store.actions.updateNode(node.id, "props", path, v)
+							}
 						/>
 					) : null}
 				</SidebarPanel>
@@ -37,8 +40,12 @@ export function Sidebar() {
 					<SidebarPanel title="state" empty="None">
 						{inspect.state ? (
 							<ElementProps
+								path={[]}
 								data={inspect.state}
 								editable={inspect.canEditState}
+								onInput={(v, path) =>
+									node && store.actions.updateNode(node.id, "state", path, v)
+								}
 							/>
 						) : null}
 					</SidebarPanel>

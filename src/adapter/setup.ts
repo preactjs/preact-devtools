@@ -22,6 +22,9 @@ export async function init(options: Options, getHook: () => DevtoolsHook) {
 
 	bridge.listen("initialized", adapter.flushInitial);
 	bridge.listen("highlight", adapter.highlight);
+	bridge.listen("update-node", ev => {
+		adapter.update(ev.id, ev.type, ev.path, ev.value);
+	});
 	bridge.listen("select", adapter.select);
 	bridge.listen("inspect", adapter.inspect);
 	bridge.listen("log", adapter.log);

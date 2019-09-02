@@ -1,7 +1,8 @@
 import { createContext } from "preact";
 import { useContext, useState, useRef, useEffect } from "preact/hooks";
 import { valoo, Observable, track } from "./valoo";
-import { InspectData } from "../adapter/adapter";
+import { InspectData, UpdateType } from "../adapter/adapter";
+import { ObjPath } from "./components/ElementProps";
 
 export type ID = number;
 
@@ -47,6 +48,7 @@ export interface Store {
 		highlightNode: (id: ID | null) => void;
 		collapseNode: (id: ID) => void;
 		logNode: (id: ID) => void;
+		updateNode: (id: ID, type: UpdateType, path: ObjPath, value: any) => void;
 	};
 }
 
@@ -118,6 +120,9 @@ export function createStore(notify: (name: string, data: any) => void): Store {
 			},
 			logNode: id => {
 				notify("log", id);
+			},
+			updateNode(id, type, path, value) {
+				notify("update-node", { id, type, path, value });
 			},
 		},
 	};

@@ -12,6 +12,7 @@ import { createCommit, Renderer, getDisplayName } from "./renderer";
 import { IdMapper } from "./IdMapper";
 import { Highlighter } from "../view/components/Highlighter";
 import { measureNode, getNearestElement } from "./dom";
+import { setIn } from "../shells/shared/utils";
 
 export type Effect = () => void | Cleanup;
 export type Cleanup = () => void;
@@ -82,11 +83,13 @@ export interface DevtoolsEvent {
 	data: any;
 }
 
+export type UpdateType = "props" | "state" | "hooks" | "context";
+
 export interface Adapter {
 	highlight(id: ID | null): void;
 	inspect(id: ID): void;
 	log(id: ID): void;
-	update(id: ID, path: Path, value: any): void;
+	update(id: ID, type: UpdateType, path: Path, value: any): void;
 	select(id: ID): void;
 	onCommit(vnode: VNode): void;
 	onUnmount(vnode: VNode): void;
@@ -273,8 +276,20 @@ export function createAdapter(
 				destroyHighlight();
 			}
 		},
-		update(id) {
-			console.log("update props", id);
+		update(id, type, path, value) {
+			const vnode = ids.getVNode(id);
+			if (vnode !== null) {
+				console.log(id, type, path, value);
+				if (type === "props") {
+					setIn((vnode.props as any) || {}, path.slice(), value);
+				}
+
+				if (typeof vnode.type === "function") {
+					vnode._component!.forceUpdate();
+				} else if (vnode._dom) {
+					// vnode._dom.setAttribute()
+				}
+			}
 		},
 		flushInitial() {
 			console.log("flush buffer", queue.map(X => X.name));
