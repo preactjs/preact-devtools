@@ -1,4 +1,5 @@
 const HtmlWebpackPlugin = require("html-webpack-plugin");
+const ForkTsCheckerWebpackPlugin = require("fork-ts-checker-webpack-plugin");
 
 module.exports = {
 	entry: {
@@ -88,7 +89,12 @@ module.exports = {
 							],
 						},
 					},
-					"ts-loader",
+					{
+						loader: "ts-loader",
+						options: {
+							transpileOnly: true,
+						},
+					},
 				],
 			},
 		],
@@ -96,5 +102,5 @@ module.exports = {
 	devServer: {
 		hot: true,
 	},
-	plugins: [new HtmlWebpackPlugin()],
+	plugins: [new HtmlWebpackPlugin(), new ForkTsCheckerWebpackPlugin()],
 };
