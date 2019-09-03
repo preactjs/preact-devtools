@@ -54,6 +54,7 @@ export function TodoList() {
 							foo: "bar",
 							bob: null,
 							bazly: 123,
+							baz: true,
 						}}
 					/>
 					<p>editable</p>

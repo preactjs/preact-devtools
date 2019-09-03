@@ -1,5 +1,6 @@
 import { h } from "preact";
 import s from "./ElementProps.css";
+// import { useState } from "preact/hooks";
 
 export type ObjPath = Array<string | number>;
 export type ChangeFn = (value: any, path: ObjPath) => void;
@@ -64,65 +65,48 @@ export function SingleItem(props: SingleProps) {
 	const update = (v: any) => {
 		onInput && onInput(v, path);
 	};
-	console.log(name, v, typeof v);
+	let typeCss = "";
 
-	switch (typeof v) {
-		case "boolean":
-			el = <DataInput value={v} onChange={update} />;
-			break;
-		case "string":
-			el = editable ? (
-				<DataInput value={v} onChange={update} />
-			) : (
-				<div class={s.string}>
+	if (v !== null && typeof v === "object") {
+		if (v === null) {
+			el = (
+				<div class={s.null}>
 					<div class={s.inputWrapper}>
-						<div class={s.mask}>{v}</div>
+						<div class={s.mask}>null</div>
 					</div>
 				</div>
 			);
-			break;
-		case "number":
-			el = editable ? (
-				<DataInput value={v} onChange={update} />
-			) : (
-				<div class={s.number}>
-					<div class={s.inputWrapper}>
-						<div class={s.mask}>{v}</div>
-					</div>
-				</div>
-			);
-			break;
-		case "object":
-			if (v === null) {
-				el = (
-					<div class={s.null}>
-						<div class={s.inputWrapper}>
-							<div class={s.mask}>null</div>
-						</div>
-					</div>
-				);
-			} else if (Array.isArray(v)) {
-				el = "ARRAY";
-			} else if (
-				v.name !== undefined &&
-				v.type === "function" &&
-				Object.keys(v).length === 2
-			) {
-				el = (
-					<div class={s.function}>
-						<div class={s.inputWrapper}>
-							<div class={s.mask}>{v.name}()</div>
-						</div>
-					</div>
-				);
-			}
-			break;
+		} else if (Array.isArray(v)) {
+			el = "ARRAY";
+		} else if (
+			v.name !== undefined &&
+			v.type === "function" &&
+			Object.keys(v).length === 2
+		) {
+			typeCss = s.function;
+			el = `${v.name}()`;
+		}
+	} else {
+		typeCss =
+			typeof v === "boolean"
+				? s.boolean
+				: typeof v === "string"
+				? s.string
+				: typeof v === "number"
+				? s.number
+				: s.null;
+
+		el = editable ? (
+			<DataInput value={v} onChange={update} />
+		) : (
+			<div class={s.mask}>{v + ""}</div>
+		);
 	}
 
 	return (
 		<div key={path.join(".")} class={s.row}>
 			<div class={s.name}>{name}</div>
-			<div class={s.property}>{el}</div>
+			<div class={`${s.property} ${typeCss}`}>{el}</div>
 		</div>
 	);
 }
@@ -133,16 +117,16 @@ export interface InputProps {
 }
 
 export function DataInput({ value, onChange }: InputProps) {
-	let typeCss = "";
+	// let [focus, setFocus] = useState(false);
+	const setFocus = (v: boolean) => null;
+
 	let inputType = "text";
 	if (typeof value === "string") {
-		typeCss = s.string;
 		inputType = "text";
+		// if (!focus) value = `"${value}"`;
 	} else if (typeof value === "number") {
-		typeCss = s.number;
 		inputType = "number";
 	} else {
-		typeCss = s.boolean;
 		inputType = "checkbox";
 	}
 
@@ -150,31 +134,27 @@ export function DataInput({ value, onChange }: InputProps) {
 		onChange(getEventValue(e));
 	};
 
-	return (
-		<div class={`${s.inputWrapper} ${typeCss}`}>
-			{inputType === "checkbox" ? (
-				<input
-					class={s.input}
-					type="checkbox"
-					checked={value as any}
-					onBlur={onCommit}
-				/>
-			) : (
-				<input
-					class={s.input}
-					type="text"
-					value={value as any}
-					onKeyUp={e => {
-						console.log(e.keyCode);
-						if (e.keyCode === 13) {
-							(e.currentTarget as any).blur();
-							onCommit(e);
-						}
-					}}
-				/>
-			)}
-			<span class={s.mask}>{value}</span>
-		</div>
+	return inputType === "checkbox" ? (
+		<input
+			class={s.input}
+			type="checkbox"
+			checked={value as any}
+			onBlur={onCommit}
+		/>
+	) : (
+		<input
+			class={s.input}
+			type={inputType}
+			onFocus={() => setFocus(true)}
+			onBlur={() => setFocus(false)}
+			value={value as any}
+			onKeyUp={e => {
+				if (e.keyCode === 13) {
+					(e.currentTarget as any).blur();
+					onCommit(e);
+				}
+			}}
+		/>
 	);
 }
 

@@ -27,6 +27,8 @@
 	--color-props-sep: #444;
 	--color-props-string: #009906;
 	--color-props-function: #ff5722;
+	--color-props-number: #03a9f4;
+	--color-props-boolean: #03a9f4;
 }
 
 :global(.dark) .root {
@@ -50,6 +52,8 @@
 	--color-props-sep: #eee;
 	--color-props-string: #9eeca1;
 	--color-props-function: #fdca31;
+	--color-props-number: #79ccf2;
+	--color-props-boolean: #79ccf2;
 }
 
 .components {
