@@ -1,7 +1,8 @@
-import { h, render } from "./preact.module";
-import { useState } from "./hooks.module";
+import { h, render } from "preact";
+import { useState } from "preact/hooks";
 import { Highlighter } from "../view/components/Highlighter";
 import { ElementProps } from "../view/components/ElementProps";
+import { Iframer } from "./Iframer";
 import d from "../view/components/Devtools.css";
 
 export function TodoList() {
@@ -37,16 +38,83 @@ export function TodoList() {
 
 					<h2>Styleguide</h2>
 					<h3>Highlighter</h3>
-					<Highlighter
-						top={200}
-						left={200}
-						label={"FooBarBob"}
-						height={200}
-						width={200}
-						padding={[12, 10, 20, 20]}
-						margin={[16, 16, 16, 16]}
-						border={[5, 5, 5, 5]}
-					/>
+					<div class="grid">
+						<div>
+							<p>center</p>
+							<Iframer height={300}>
+								<Highlighter
+									top={20}
+									left={20}
+									label={"FooBarBob"}
+									height={200}
+									width={200}
+									padding={[12, 10, 20, 20]}
+									margin={[16, 16, 16, 16]}
+									border={[5, 5, 5, 5]}
+								/>
+							</Iframer>
+						</div>
+						<div>
+							<p>left</p>
+							<Iframer height={300}>
+								<Highlighter
+									top={20}
+									left={-50}
+									label={"FooBarBob"}
+									height={200}
+									width={200}
+									padding={[12, 10, 20, 20]}
+									margin={[16, 16, 16, 16]}
+									border={[5, 5, 5, 5]}
+								/>
+							</Iframer>
+						</div>
+						<div>
+							<p>right</p>
+							<Iframer height={300}>
+								<Highlighter
+									top={20}
+									left={150}
+									label={"FooBarBob"}
+									height={200}
+									width={200}
+									padding={[12, 10, 20, 20]}
+									margin={[16, 16, 16, 16]}
+									border={[5, 5, 5, 5]}
+								/>
+							</Iframer>
+						</div>
+						<div>
+							<p>top</p>
+							<Iframer height={300}>
+								<Highlighter
+									top={-250}
+									left={20}
+									label={"FooBarBob"}
+									height={200}
+									width={200}
+									padding={[12, 10, 20, 20]}
+									margin={[16, 16, 16, 16]}
+									border={[5, 5, 5, 5]}
+								/>
+							</Iframer>
+						</div>
+						<div>
+							<p>bottom</p>
+							<Iframer height={300}>
+								<Highlighter
+									top={150}
+									left={20}
+									label={"FooBarBob"}
+									height={200}
+									width={200}
+									padding={[12, 10, 20, 20]}
+									margin={[16, 16, 16, 16]}
+									border={[5, 5, 5, 5]}
+								/>
+							</Iframer>
+						</div>
+					</div>
 					<h3>ElementProps</h3>
 					<p>non-editable</p>
 					<ElementProps

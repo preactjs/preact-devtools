@@ -33,3 +33,13 @@ body {
 	background: var(--color-bg);
 	color: var(--color-text);
 }
+
+iframe {
+	border: none;
+	background: none;
+}
+
+:global(.grid) {
+	display: grid;
+	grid-template-columns: auto auto;
+}
