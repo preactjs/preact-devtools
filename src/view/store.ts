@@ -123,6 +123,7 @@ export function createStore(notify: (name: string, data: any) => void): Store {
 			},
 			updateNode(id, type, path, value) {
 				notify("update-node", { id, type, path, value });
+				notify("inspect", id);
 			},
 		},
 	};

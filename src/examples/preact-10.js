@@ -66,6 +66,7 @@ export function TodoList() {
 								longvalue: "asdji asdj asijd lksaj dlask kajdaklsj dklsabar",
 								bob: null,
 								bazly: 123,
+								baz: true,
 								bar: {
 									type: "function",
 									name: "foobar",

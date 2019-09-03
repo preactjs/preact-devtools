@@ -27,7 +27,7 @@ export function ElementProps(props: Props) {
 						<SingleItem
 							key={path.join(".") + key}
 							name={key}
-							editable={editable}
+							editable={editable || false}
 							value={data[key]}
 							path={path.concat(key)}
 							onInput={onInput}
@@ -50,7 +50,13 @@ export interface SingleProps {
 }
 
 export function SingleItem(props: SingleProps) {
-	const { onInput, path, editable, name, depthLimit = Infinity } = props;
+	const {
+		onInput,
+		path,
+		editable = false,
+		name,
+		depthLimit = Infinity,
+	} = props;
 	if (depthLimit === 0) return <div>...</div>;
 
 	const v = props.value;
@@ -58,10 +64,12 @@ export function SingleItem(props: SingleProps) {
 	const update = (v: any) => {
 		onInput && onInput(v, path);
 	};
+	console.log(name, v, typeof v);
 
 	switch (typeof v) {
 		case "boolean":
-			return <DataInput value={v} onChange={update} />;
+			el = <DataInput value={v} onChange={update} />;
+			break;
 		case "string":
 			el = editable ? (
 				<DataInput value={v} onChange={update} />
