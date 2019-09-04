@@ -218,7 +218,9 @@ export function createAdapter(
 	let highlightRef: HTMLDivElement | null = null;
 
 	function destroyHighlight() {
-		document.body.removeChild(highlightRef!);
+		if (highlightRef) {
+			document.body.removeChild(highlightRef!);
+		}
 		highlightRef = null;
 	}
 
@@ -292,19 +294,17 @@ export function createAdapter(
 			}
 		},
 		flushInitial() {
-			console.log("flush buffer", queue.map(X => X.name));
+			console.log("flush initial buffer", queue.map(X => X.name));
 			queue.forEach(ev => emit(ev.name, ev.data));
 			connected = true;
 			queue = [];
 		},
 		// Send
 		onCommit(vnode) {
-			console.log("onCommit");
 			const commit = createCommit(ids, roots, vnode);
 			const ev = flush(commit);
 			if (!ev) return;
 
-			console.log("commit", connected, ev);
 			if (connected) {
 				emit(ev.name, ev.data);
 			} else {
@@ -312,7 +312,7 @@ export function createAdapter(
 			}
 		},
 		onUnmount(vnode) {
-			console.log("unmount rq", vnode);
+			// console.log("unmount rq", vnode);
 		},
 		connect() {},
 	};
