@@ -11,42 +11,55 @@ function createPanel() {
 
 	chrome.devtools.network.onNavigated.removeListener(checkPage);
 
+	const store = createStore();
+	let doc: Document;
+
+	function initPort() {
+		// Listen to messages from the content-script
+		const { tabId } = chrome.devtools.inspectedWindow;
+		const port = chrome.runtime.connect({
+			name: "" + tabId,
+		});
+
+		store.subscribe((name, data) => {
+			port!.postMessage({ name, payload: data });
+		});
+
+		port!.onMessage.addListener(msg => {
+			console.log("RECEIVED", msg.data.payload);
+			const payload = msg.data.payload;
+			if (payload.name === "operation") {
+				applyOperations(store, payload.payload);
+				console.log(
+					store.nodes().size,
+					Array.from(store.nodes().values()).map(x => x.name),
+				);
+			} else if (payload.name === "inspect-result") {
+				store.inspectData(payload.payload);
+			}
+		});
+
+		const root = doc.getElementById("root")!;
+		root.innerHTML = "";
+		render(h(DevTools, { store }), root);
+	}
+
 	chrome.devtools.panels.create("Preact", "", "panel.html", panel => {
 		panel.onShown.addListener(window => {
-			const doc = window.document;
+			doc = window.document;
 			doc.body.classList.add(
 				(chrome.devtools.panels as any).themeName || "light",
 			);
 
 			injectStyles(chrome.runtime.getURL("./index.css"));
 
-			// Listen to messages from the content-script
-			const { tabId } = chrome.devtools.inspectedWindow;
-			const port = chrome.runtime.connect({
-				name: "" + tabId,
-			});
+			initPort();
+		});
 
-			const store = createStore((name, data) => {
-				port.postMessage({ name, payload: data });
-			});
-
-			port.onMessage.addListener(msg => {
-				console.log("RECEIVED", msg.data.payload);
-				const payload = msg.data.payload;
-				if (payload.name === "operation") {
-					applyOperations(store, payload.payload);
-					console.log(
-						store.nodes().size,
-						Array.from(store.nodes().values()).map(x => x.name),
-					);
-				} else if (payload.name === "inspect-result") {
-					store.inspectData(payload.payload);
-				}
-			});
-
-			const root = doc.getElementById("root")!;
-			root.innerHTML = "";
-			render(h(DevTools, { store }), root);
+		// Re-initialize panel when a new page is loaded.
+		chrome.devtools.network.onNavigated.addListener(() => {
+			store.actions.clear();
+			initPort();
 		});
 	});
 }

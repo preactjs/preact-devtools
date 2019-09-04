@@ -32,6 +32,19 @@ export interface DevNode {
 
 export type Tree = Map<ID, DevNode>;
 
+const EMPTY_INSPECT: InspectData = {
+	context: null,
+	hooks: null,
+	canEditState: false,
+	canEditHooks: false,
+	canEditProps: false,
+	id: -1,
+	name: ".",
+	props: null,
+	state: null,
+	type: 2,
+};
+
 export interface Store {
 	inspectData: Observable<InspectData>;
 	roots: Observable<ID[]>;
@@ -49,13 +62,22 @@ export interface Store {
 		collapseNode: (id: ID) => void;
 		logNode: (id: ID) => void;
 		updateNode: (id: ID, type: UpdateType, path: ObjPath, value: any) => void;
+		clear(): void;
 	};
+	subscribe(fn: Listener): () => void;
 }
 
-export function createStore(notify: (name: string, data: any) => void): Store {
+export type Listener = (name: string, data: any) => void;
+
+export function createStore(): Store {
+	let listeners: Array<null | Listener> = [];
+	const notify: Listener = (name, data) => {
+		listeners.forEach(fn => fn && fn(name, data));
+	};
+
 	const nodes = valoo<Tree>(new Map());
 	const roots = valoo<ID[]>([]);
-	const rootToChild = valoo<any>(new Map());
+	const rootToChild = valoo<Map<any, any>>(new Map());
 
 	// Selection
 	const selectedNode = valoo<DevNode | null>(null);
@@ -71,19 +93,10 @@ export function createStore(notify: (name: string, data: any) => void): Store {
 		return out;
 	}, [collapsed, nodes]);
 
+	const inspectData = valoo<InspectData>(EMPTY_INSPECT);
+
 	return {
-		inspectData: valoo<InspectData>({
-			context: null,
-			hooks: null,
-			canEditState: false,
-			canEditHooks: false,
-			canEditProps: false,
-			id: -1,
-			name: ".",
-			props: null,
-			state: null,
-			type: 2,
-		}),
+		inspectData,
 		roots,
 		rootToChild,
 		nodes,
@@ -125,6 +138,20 @@ export function createStore(notify: (name: string, data: any) => void): Store {
 				notify("update-node", { id, type, path, value });
 				notify("inspect", id);
 			},
+			clear() {
+				inspectData(EMPTY_INSPECT);
+				nodes(new Map());
+				roots([]);
+				rootToChild(new Map());
+				selectedNode(null);
+				selectedRef(null);
+				collapsed(new Set());
+				listeners = [];
+			},
+		},
+		subscribe(fn) {
+			const idx = listeners.push(fn);
+			return () => (listeners[idx] = null);
 		},
 	};
 }

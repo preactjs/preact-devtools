@@ -113,6 +113,8 @@ export function HighlightPane() {
 				height = last.offsetTop + lastRect.height - top;
 			}
 			setPos({ top, height });
+		} else {
+			setPos({ top: 0, height: 0 });
 		}
 	}, [ref]);
 
