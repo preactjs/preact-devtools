@@ -1,6 +1,6 @@
 import { h } from "preact";
 import s from "./IconBtn.css";
-import { ComponentChildren } from "../../examples/preact.module";
+import { ComponentChildren } from "preact";
 
 export interface Props {
 	active?: boolean;

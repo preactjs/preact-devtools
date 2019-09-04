@@ -1,6 +1,6 @@
 import { VNode, InspectData } from "./adapter";
 import { Commit, MsgTypes, jsonify, cleanProps } from "./events";
-import { Fragment } from "../examples/preact.module";
+import { Fragment } from "preact";
 import { IdMapper } from "./IdMapper";
 import { ID } from "../view/store";
 import { StringTable, getStringId } from "./string-table";

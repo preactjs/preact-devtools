@@ -4,8 +4,7 @@ import { DevTools } from "./view/components/Devtools";
 import { init } from "./adapter/setup";
 // @ts-ignore
 import { renderExample } from "./examples/preact-10";
-// @ts-ignore
-import { options } from "./examples/preact.module.js";
+import { options } from "preact";
 
 init(options as any, () => (window as any).__PREACT_DEVTOOLS__);
 

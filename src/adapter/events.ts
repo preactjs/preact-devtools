@@ -76,7 +76,7 @@ export function applyOperations(store: Store, data: number[]) {
 				const type = data[i + 2];
 				const name = strings[data[i + 5] - 1];
 				const key = data[i + 6] > 0 ? ` key="${strings[i + 6 - 1]}" ` : "";
-				const parentId = data[i + 3];
+				let parentId = data[i + 3];
 
 				if (newRoot) {
 					newRoot = false;
@@ -91,9 +91,12 @@ export function applyOperations(store: Store, data: number[]) {
 				if (store.roots().indexOf(parentId) === -1) {
 					const parent = store.nodes().get(parentId);
 					if (!parent) {
-						throw new Error(`Parent node ${parentId} not found in store.`);
+						// throw new Error(`Parent node ${parentId} not found in store.`);
+						console.warn(`Parent node ${parentId} not found in store.`);
+						parentId = -1;
+					} else {
+						parent.children.push(id);
 					}
-					parent.children.push(id);
 				}
 
 				store.nodes().set(id, {
