@@ -39,7 +39,7 @@
 }
 
 .noCollapse {
-	padding-left: 1.5rem;
+	padding-left: 1.25rem;
 }
 
 .toggle {
@@ -48,8 +48,11 @@
 	display: flex;
 	justify-content: center;
 	align-items: center;
-	width: 1.5rem;
+	width: 1.25rem;
+	height: 1.25rem;
+	padding: 0.2em 0.13em;
 	cursor: pointer;
+	color: #aaa;
 }
 
 .input {
@@ -100,4 +103,8 @@
 
 .object {
 	color: var(--color-props-object);
+}
+
+.null {
+	color: var(--color-props-null);
 }

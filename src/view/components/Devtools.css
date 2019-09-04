@@ -26,11 +26,12 @@
 	--color-props-input-bg: #eee;
 	--color-props-sep: #444;
 	--color-props-string: #009906;
-	--color-props-function: #ff5722;
-	--color-props-number: #03a9f4;
+	--color-props-function: #1b1b1b;
+	--color-props-number: #ff5722;
 	--color-props-boolean: #03a9f4;
-	--color-props-array: #ff5722;
-	--color-props-object: #ff5722;
+	--color-props-array: #1b1b1b;
+	--color-props-object: #1b1b1b;
+	--color-props-null: #1b1b1b;
 }
 
 :global(.dark) .root {
@@ -53,11 +54,12 @@
 	--color-props-input-bg: #444;
 	--color-props-sep: #eee;
 	--color-props-string: #9eeca1;
-	--color-props-function: #fdca31;
-	--color-props-number: #79ccf2;
+	--color-props-function: #dedede;
+	--color-props-number: #fdca31;
 	--color-props-boolean: #79ccf2;
-	--color-props-array: #fdca31;
-	--color-props-object: #fdca31;
+	--color-props-array: #dedede;
+	--color-props-object: #dedede;
+	--color-props-null: #dedede;
 }
 
 .components {

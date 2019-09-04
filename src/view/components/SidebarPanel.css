@@ -6,6 +6,7 @@
 	font-style: italic;
 	color: var(--color-text-empty);
 	font-size: 0.65rem;
+	padding-left: 0.8rem;
 }
 
 .title {
@@ -17,5 +18,5 @@
 }
 
 .content {
-	padding: 0.25rem 0.8rem;
+	padding: 0.25rem 0.8rem 0.25rem 0;
 }
