@@ -1,5 +1,7 @@
 import { h } from "preact";
 import s from "./ElementProps.css";
+import { Arrow } from "./TreeView";
+import { flatten, PropDataType } from "../parseProps";
 // import { useState } from "preact/hooks";
 
 export type ObjPath = Array<string | number>;
@@ -15,6 +17,8 @@ export interface Props {
 export function ElementProps(props: Props) {
 	const { data, editable, path = [], onInput } = props;
 
+	const parsed = flatten(data, [], 7, []);
+
 	return (
 		<div class={s.root}>
 			<form
@@ -23,15 +27,18 @@ export function ElementProps(props: Props) {
 					e.preventDefault();
 				}}
 			>
-				{Object.keys(data).map(key => {
+				{parsed.map(item => {
 					return (
 						<SingleItem
-							key={path.join(".") + key}
-							name={key}
-							editable={editable || false}
-							value={data[key]}
-							path={path.concat(key)}
+							key={item.name}
+							type={item.type}
+							name={item.name}
+							collapseable={item.collapsable}
+							editable={(editable && item.editable) || false}
+							value={item.value}
+							path={item.path}
 							onInput={onInput}
+							depth={item.depth}
 						/>
 					);
 				})}
@@ -43,11 +50,13 @@ export function ElementProps(props: Props) {
 export interface SingleProps {
 	key?: string;
 	editable?: boolean;
+	type: PropDataType;
+	collapseable?: boolean;
 	path: ObjPath;
 	name: string;
 	value: any;
 	onInput?: ChangeFn;
-	depthLimit?: number;
+	depth: number;
 }
 
 export function SingleItem(props: SingleProps) {
@@ -56,57 +65,50 @@ export function SingleItem(props: SingleProps) {
 		path,
 		editable = false,
 		name,
-		depthLimit = Infinity,
+		type,
+		collapseable = false,
+		depth,
 	} = props;
-	if (depthLimit === 0) return <div>...</div>;
+
+	const css: Record<string, string> = {
+		string: s.string,
+		number: s.number,
+		function: s.function,
+		boolean: s.boolean,
+		null: s.null,
+		array: s.array,
+		object: s.object,
+	};
 
 	const v = props.value;
-	let el = null;
 	const update = (v: any) => {
 		onInput && onInput(v, path);
 	};
-	let typeCss = "";
-
-	if (v !== null && typeof v === "object") {
-		if (v === null) {
-			el = (
-				<div class={s.null}>
-					<div class={s.inputWrapper}>
-						<div class={s.mask}>null</div>
-					</div>
-				</div>
-			);
-		} else if (Array.isArray(v)) {
-			el = "ARRAY";
-		} else if (
-			v.name !== undefined &&
-			v.type === "function" &&
-			Object.keys(v).length === 2
-		) {
-			typeCss = s.function;
-			el = `${v.name}()`;
-		}
-	} else {
-		typeCss =
-			typeof v === "boolean"
-				? s.boolean
-				: typeof v === "string"
-				? s.string
-				: typeof v === "number"
-				? s.number
-				: s.null;
-
-		el = editable ? (
-			<DataInput value={v} onChange={update} />
-		) : (
-			<div class={s.mask}>{v + ""}</div>
-		);
-	}
 
 	return (
-		<div key={path.join(".")} class={s.row}>
-			<div class={s.name}>{name}</div>
-			<div class={`${s.property} ${typeCss}`}>{el}</div>
+		<div
+			key={path.join(".")}
+			class={s.row}
+			data-depth={depth}
+			style={`padding-left: calc(var(--indent-depth) * ${depth})`}
+		>
+			{collapseable && (
+				<button
+					class={s.toggle}
+					data-collapsed={false}
+					onClick={() => console.log(path)}
+				>
+					<Arrow />
+				</button>
+			)}
+			<div class={`${s.name} ${!collapseable ? s.noCollapse : ""}`}>{name}</div>
+			<div class={`${s.property} ${css[type] || ""}`}>
+				{editable ? (
+					<DataInput value={v} onChange={update} />
+				) : (
+					<div class={s.mask}>{v + ""}</div>
+				)}
+			</div>
 		</div>
 	);
 }

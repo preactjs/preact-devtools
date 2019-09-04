@@ -136,6 +136,10 @@ export function TodoList() {
 								bob: null,
 								bazly: 123,
 								baz: true,
+								arr: [1, 2, 3],
+								obj: { foo: "bar" },
+								set: new Set([1, 2, 3]),
+								map: new Map([[1, "a"], [2, "b"]]),
 								bar: {
 									type: "function",
 									name: "foobar",
