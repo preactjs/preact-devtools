@@ -1,7 +1,7 @@
 import { VNode, InspectData } from "./adapter";
 import { Commit, MsgTypes, jsonify, cleanProps } from "./events";
 import { Fragment } from "preact";
-import { IdMapper } from "./IdMapper";
+import { IdMapper, createIdMapper } from "./IdMapper";
 import { ID } from "../view/store";
 import { StringTable, getStringId } from "./string-table";
 
@@ -84,7 +84,9 @@ export interface Renderer {
 	inspect(id: ID): InspectData | null;
 }
 
-export function createRenderer(ids: IdMapper): Renderer {
+export function createRenderer(): Renderer {
+	const ids = createIdMapper();
+
 	return {
 		getVNodeById: id => ids.getVNode(id),
 		has: id => ids.has(id),

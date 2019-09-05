@@ -30,7 +30,7 @@ export async function init(options: Options, getHook: () => DevtoolsHook) {
 	bridge.listen("log", adapter.log);
 	bridge.listen("update", adapter.log);
 
-	return hook.attach(createRenderer(ids));
+	return hook.attach(createRenderer());
 }
 
 export function waitForHook(getHook: () => DevtoolsHook) {
