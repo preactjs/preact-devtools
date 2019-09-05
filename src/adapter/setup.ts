@@ -10,9 +10,10 @@ export async function init(options: Options, getHook: () => DevtoolsHook) {
 
 	const bridge = createBridge(window);
 	const adapter = createAdapter(bridge.send, ids, () => getHook().renderers);
+	const renderer = createRenderer(adapter);
 
 	// Add options as early as possible, so that we don't miss the first commit
-	setupOptions(options as any, adapter);
+	setupOptions(options as any, renderer);
 
 	// Devtools can take a while to set up
 	await waitForHook(getHook);
@@ -30,7 +31,7 @@ export async function init(options: Options, getHook: () => DevtoolsHook) {
 	bridge.listen("log", adapter.log);
 	bridge.listen("update", adapter.log);
 
-	return hook.attach(createRenderer());
+	return hook.attach(renderer);
 }
 
 export function waitForHook(getHook: () => DevtoolsHook) {

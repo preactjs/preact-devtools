@@ -1,9 +1,9 @@
-import { VNode, InspectData } from "./adapter";
+import { VNode, InspectData, Adapter } from "./adapter";
 import { Commit, MsgTypes, jsonify, cleanProps } from "./events";
 import { Fragment } from "preact";
 import { IdMapper, createIdMapper } from "./IdMapper";
 import { ID } from "../view/store";
-import { StringTable, getStringId } from "./string-table";
+import { getStringId } from "./string-table";
 
 export function isRoot(vnode: VNode) {
 	return vnode._parent == null && vnode.type === Fragment;
@@ -82,10 +82,13 @@ export interface Renderer {
 	has(id: ID): boolean;
 	log(id: ID): void;
 	inspect(id: ID): InspectData | null;
+	onCommit(vnode: VNode): void;
+	onUnmount(vnode: VNode): void;
 }
 
-export function createRenderer(): Renderer {
+export function createRenderer(adapter: Adapter): Renderer {
 	const ids = createIdMapper();
+	const roots = new Set<VNode>();
 
 	return {
 		getVNodeById: id => ids.getVNode(id),
@@ -126,6 +129,13 @@ export function createRenderer(): Renderer {
 		findDomForVNode(id) {
 			const vnode = ids.getVNode(id);
 			return vnode ? [vnode._dom, vnode._lastDomChild] : null;
+		},
+		onCommit(vnode) {
+			const commit = createCommit(ids, roots, vnode);
+			adapter.flushCommit(commit);
+		},
+		onUnmount(vnode) {
+			console.log("TODO: Unmount vnode");
 		},
 	};
 }

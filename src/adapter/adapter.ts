@@ -7,8 +7,8 @@ import {
 	h,
 } from "preact";
 import { EmitterFn } from "./hook";
-import { flush } from "./events";
-import { createCommit, Renderer, getDisplayName } from "./renderer";
+import { flush, Commit } from "./events";
+import { Renderer, getDisplayName } from "./renderer";
 import { IdMapper } from "./IdMapper";
 import { Highlighter } from "../view/components/Highlighter";
 import { measureNode, getNearestElement } from "./dom";
@@ -91,8 +91,7 @@ export interface Adapter {
 	log(id: ID): void;
 	update(id: ID, type: UpdateType, path: Path, value: any): void;
 	select(id: ID): void;
-	onCommit(vnode: VNode): void;
-	onUnmount(vnode: VNode): void;
+	flushCommit(commit: Commit): void;
 	connect(): void;
 	flushInitial(): void;
 }
@@ -110,7 +109,7 @@ export interface InspectData {
 	state: Record<string, any> | null;
 }
 
-export function setupOptions(options: Options, adapter: Adapter) {
+export function setupOptions(options: Options, renderer: Renderer) {
 	// Store (possible) previous hooks so that we don't overwrite them
 	let prevVNodeHook = options.vnode;
 	let prevCommitRoot = options._commit;
@@ -164,12 +163,12 @@ export function setupOptions(options: Options, adapter: Adapter) {
 
 		// These cases are already handled by `unmount`
 		if (vnode == null) return;
-		adapter.onCommit(vnode);
+		renderer.onCommit(vnode);
 	};
 
 	options.unmount = vnode => {
 		if (prevBeforeUnmount) prevBeforeUnmount(vnode);
-		adapter.onUnmount(vnode as any);
+		renderer.onUnmount(vnode as any);
 	};
 
 	// Inject tracking into setState
@@ -201,8 +200,6 @@ export function createAdapter(
 	ids: IdMapper,
 	renderers: () => Map<ID, Renderer>,
 ): Adapter {
-	const roots = new Set<VNode>();
-
 	/** Flag that signals if the devtools are connected */
 	let connected = false;
 
@@ -300,8 +297,7 @@ export function createAdapter(
 			queue = [];
 		},
 		// Send
-		onCommit(vnode) {
-			const commit = createCommit(ids, roots, vnode);
+		flushCommit(commit) {
 			const ev = flush(commit);
 			if (!ev) return;
 
@@ -310,9 +306,6 @@ export function createAdapter(
 			} else {
 				queue.push(ev);
 			}
-		},
-		onUnmount(vnode) {
-			// console.log("unmount rq", vnode);
 		},
 		connect() {},
 	};
