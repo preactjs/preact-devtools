@@ -6,6 +6,7 @@ describe("flatten", () => {
 		expect(flatten("foo", ["foo"], 2)).to.deep.equal([
 			{
 				collapsable: false,
+				editable: true,
 				depth: 0,
 				name: "foo",
 				path: ["foo"],
@@ -19,6 +20,7 @@ describe("flatten", () => {
 		expect(flatten(12, ["foo"], 2)).to.deep.equal([
 			{
 				collapsable: false,
+				editable: true,
 				depth: 0,
 				name: "foo",
 				path: ["foo"],
@@ -32,6 +34,7 @@ describe("flatten", () => {
 		expect(flatten(false, ["foo"], 2)).to.deep.equal([
 			{
 				collapsable: false,
+				editable: true,
 				depth: 0,
 				name: "foo",
 				path: ["foo"],
@@ -45,6 +48,7 @@ describe("flatten", () => {
 		expect(flatten(null, ["foo"], 2)).to.deep.equal([
 			{
 				collapsable: false,
+				editable: false,
 				depth: 0,
 				name: "foo",
 				path: ["foo"],
@@ -58,6 +62,7 @@ describe("flatten", () => {
 		expect(flatten(undefined, ["foo"], 2)).to.deep.equal([
 			{
 				collapsable: false,
+				editable: false,
 				depth: 0,
 				name: "foo",
 				path: ["foo"],
@@ -75,6 +80,7 @@ describe("flatten", () => {
 		expect(flatten(fn, ["foo"], 2)).to.deep.equal([
 			{
 				collapsable: false,
+				editable: false,
 				depth: 0,
 				name: "foo",
 				path: ["foo"],
@@ -88,6 +94,7 @@ describe("flatten", () => {
 		expect(flatten([1, 2], ["foo"], 2)).to.deep.equal([
 			{
 				collapsable: true,
+				editable: false,
 				depth: 0,
 				name: "foo",
 				path: ["foo"],
@@ -96,6 +103,7 @@ describe("flatten", () => {
 			},
 			{
 				collapsable: false,
+				editable: true,
 				depth: 1,
 				name: "0",
 				path: ["foo", 0],
@@ -104,6 +112,7 @@ describe("flatten", () => {
 			},
 			{
 				collapsable: false,
+				editable: true,
 				depth: 1,
 				name: "1",
 				path: ["foo", 1],
@@ -117,6 +126,7 @@ describe("flatten", () => {
 		expect(flatten({ foo: 123, bar: "abc" }, [""], 2)).to.deep.equal([
 			{
 				collapsable: true,
+				editable: false,
 				depth: 0,
 				name: "",
 				path: [""],
@@ -125,6 +135,7 @@ describe("flatten", () => {
 			},
 			{
 				collapsable: false,
+				editable: true,
 				depth: 1,
 				name: "foo",
 				path: ["", "foo"],
@@ -133,6 +144,7 @@ describe("flatten", () => {
 			},
 			{
 				collapsable: false,
+				editable: true,
 				depth: 1,
 				name: "bar",
 				path: ["", "bar"],
@@ -146,6 +158,7 @@ describe("flatten", () => {
 		expect(flatten({ foo: { bar: "abc" } }, ["foo"], 2)).to.deep.equal([
 			{
 				collapsable: true,
+				editable: false,
 				depth: 0,
 				name: "foo",
 				path: ["foo"],
@@ -154,6 +167,7 @@ describe("flatten", () => {
 			},
 			{
 				collapsable: true,
+				editable: false,
 				depth: 1,
 				name: "foo",
 				path: ["foo", "foo"],
@@ -162,6 +176,7 @@ describe("flatten", () => {
 			},
 			{
 				collapsable: false,
+				editable: true,
 				depth: 2,
 				name: "bar",
 				path: ["foo", "foo", "bar"],
@@ -175,6 +190,7 @@ describe("flatten", () => {
 		expect(flatten(new Set([1, 2, 3]), [], 2)).to.deep.equal([
 			{
 				collapsable: false,
+				editable: false,
 				depth: 0,
 				name: "",
 				path: [],
