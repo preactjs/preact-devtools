@@ -2,6 +2,7 @@
 	"compilerOptions": {
 		"module": "es2015",
 		"moduleResolution": "node",
+		"target": "es2019",
 		"strict": true,
 		"jsx": "react",
 		"jsxFactory": "h"
