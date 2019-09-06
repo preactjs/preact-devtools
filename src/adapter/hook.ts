@@ -34,14 +34,9 @@ export function createHook(): DevtoolsHook {
 		},
 		attach: renderer => {
 			renderers.set(++uid, renderer);
-			// Content Script is likely not ready at this point, so don't flush here
-			window.postMessage(
-				{
-					source: "preact-devtools-detector",
-					payload: [uid],
-				},
-				"*",
-			);
+			// Content Script is likely not ready at this point, so don't
+			// flush any events here and politely request it to initialize
+			bridge.send("attach", uid);
 			return uid;
 		},
 		detach: id => renderers.delete(id),
