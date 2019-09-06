@@ -1,4 +1,4 @@
-import { VNode } from "./adapter";
+import { VNode } from "../adapter";
 
 export interface IdMapper {
 	getVNode(id: number): VNode | null;

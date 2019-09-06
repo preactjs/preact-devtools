@@ -6,10 +6,8 @@ import {
 	render,
 	h,
 } from "preact";
-import { EmitterFn } from "./hook";
-import { flush, Commit } from "./events";
+import { DevtoolsHook } from "./hook";
 import { Renderer, getDisplayName } from "./renderer";
-import { IdMapper } from "./IdMapper";
 import { Highlighter } from "../view/components/Highlighter";
 import { measureNode, getNearestElement } from "./dom";
 import { setIn } from "../shells/shared/utils";
@@ -91,9 +89,6 @@ export interface Adapter {
 	log(id: ID): void;
 	update(id: ID, type: UpdateType, path: Path, value: any): void;
 	select(id: ID): void;
-	flushCommit(commit: Commit): void;
-	connect(): void;
-	flushInitial(): void;
 }
 
 export interface InspectData {
@@ -195,17 +190,7 @@ export function setupOptions(options: Options, renderer: Renderer) {
 	};
 }
 
-export function createAdapter(
-	emit: EmitterFn,
-	ids: IdMapper,
-	renderers: () => Map<ID, Renderer>,
-): Adapter {
-	/** Flag that signals if the devtools are connected */
-	let connected = false;
-
-	/** Queue events until the extension is connected */
-	let queue: DevtoolsEvent[] = [];
-
+export function createAdapter(hook: DevtoolsHook, renderer: Renderer): Adapter {
 	/**
 	 * Reference to the DOM element that we'll render the selection highlighter
 	 * into. We'll cache it so that we don't unnecessarily re-create it when the
@@ -222,61 +207,51 @@ export function createAdapter(
 	}
 
 	return {
-		// Receive
 		inspect(id) {
-			renderers().forEach(r => {
-				if (r.has(id)) {
-					const data = r.inspect(id);
-					console.log("inspect-result", data);
-					if (data !== null) {
-						emit("inspect-result", data);
-					}
+			if (renderer.has(id)) {
+				const data = renderer.inspect(id);
+				console.log("inspect-result", data);
+				if (data !== null) {
+					hook.emit("inspect-result", data);
 				}
-			});
+			}
 		},
 		log(id) {
-			renderers().forEach(r => {
-				if (r.has(id)) r.log(id);
-			});
+			if (renderer.has(id)) renderer.log(id);
 		},
 		select(id) {
 			// Unused
 		},
 		highlight(id) {
 			if (id !== null) {
-				renderers().forEach(r => {
-					if (!r.has(id)) return;
+				const vnode = renderer.getVNodeById(id);
+				if (!vnode) return destroyHighlight();
+				const dom = renderer.findDomForVNode(id);
 
-					const vnode = r.getVNodeById(id)!;
-					const dom = r.findDomForVNode(id);
+				if (dom != null) {
+					if (highlightRef == null) {
+						highlightRef = document.createElement("div");
+						highlightRef.id = "preact-devtools-highlighter";
 
-					if (dom != null) {
-						if (highlightRef == null) {
-							highlightRef = document.createElement("div");
-							highlightRef.id = "preact-devtools-highlighter";
-
-							document.body.appendChild(highlightRef);
-						}
-
-						const node = getNearestElement(dom[0]!);
-
-						render(
-							h(Highlighter, {
-								label: getDisplayName(vnode),
-								...measureNode(node),
-							}),
-							highlightRef,
-						);
-					} else {
-						destroyHighlight();
+						document.body.appendChild(highlightRef);
 					}
-				});
-			} else {
-				destroyHighlight();
+
+					const node = getNearestElement(dom[0]!);
+
+					render(
+						h(Highlighter, {
+							label: getDisplayName(vnode),
+							...measureNode(node),
+						}),
+						highlightRef,
+					);
+				} else {
+					destroyHighlight();
+				}
 			}
 		},
 		update(id, type, path, value) {
-			const vnode = ids.getVNode(id);
+			const vnode = renderer.getVNodeById(id);
 			if (vnode !== null) {
 				console.log(id, type, path, value);
 				if (type === "props") {
@@ -290,23 +265,5 @@ export function createAdapter(
 				}
 			}
 		},
-		flushInitial() {
-			console.log("flush initial buffer", queue.map(X => X.name));
-			queue.forEach(ev => emit(ev.name, ev.data));
-			connected = true;
-			queue = [];
-		},
-		// Send
-		flushCommit(commit) {
-			const ev = flush(commit);
-			if (!ev) return;
-
-			if (connected) {
-				emit(ev.name, ev.data);
-			} else {
-				queue.push(ev);
-			}
-		},
-		connect() {},
 	};
 }

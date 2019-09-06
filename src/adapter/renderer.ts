@@ -1,9 +1,10 @@
-import { VNode, InspectData, Adapter } from "./adapter";
-import { Commit, MsgTypes, jsonify, cleanProps } from "./events";
+import { VNode, InspectData, Adapter, DevtoolsEvent } from "./adapter";
+import { Commit, MsgTypes, jsonify, cleanProps, flush } from "./events";
 import { Fragment } from "preact";
-import { IdMapper, createIdMapper } from "./IdMapper";
+import { IdMapper, createIdMapper } from "./10/IdMapper";
 import { ID } from "../view/store";
 import { getStringId } from "./string-table";
+import { DevtoolsHook } from "./hook";
 
 export function isRoot(vnode: VNode) {
 	return vnode._parent == null && vnode.type === Fragment;
@@ -84,11 +85,15 @@ export interface Renderer {
 	inspect(id: ID): InspectData | null;
 	onCommit(vnode: VNode): void;
 	onUnmount(vnode: VNode): void;
+	flushInitial(): void;
 }
 
-export function createRenderer(adapter: Adapter): Renderer {
+export function createRenderer(hook: DevtoolsHook): Renderer {
 	const ids = createIdMapper();
 	const roots = new Set<VNode>();
+
+	/** Queue events until the extension is connected */
+	let queue: DevtoolsEvent[] = [];
 
 	return {
 		getVNodeById: id => ids.getVNode(id),
@@ -130,9 +135,21 @@ export function createRenderer(adapter: Adapter): Renderer {
 			const vnode = ids.getVNode(id);
 			return vnode ? [vnode._dom, vnode._lastDomChild] : null;
 		},
+		flushInitial() {
+			queue.forEach(ev => hook.emit(ev.name, ev.data));
+			hook.connected = true;
+			queue = [];
+		},
 		onCommit(vnode) {
 			const commit = createCommit(ids, roots, vnode);
-			adapter.flushCommit(commit);
+			const ev = flush(commit);
+			if (!ev) return;
+
+			if (hook.connected) {
+				hook.emit(ev.name, ev.data);
+			} else {
+				queue.push(ev);
+			}
 		},
 		onUnmount(vnode) {
 			console.log("TODO: Unmount vnode");
