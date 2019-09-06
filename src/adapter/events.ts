@@ -1,9 +1,8 @@
-import { DevtoolsHook, EmitterFn } from "./hook";
 import { flushTable, StringTable, parseTable } from "./string-table";
-import { Store, DevNode, ID } from "../view/store";
+import { Store, ID } from "../view/store";
 import { valoo } from "../view/valoo";
 import { VNode } from "preact";
-import { getDisplayName } from "./renderer";
+import { getDisplayName } from "./10/vnode";
 
 export enum MsgTypes {
 	ADD_ROOT = 1,

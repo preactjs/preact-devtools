@@ -1,16 +1,17 @@
 import { ID } from "../view/store";
 import {
-	Options as PreactOptions,
-	VNode as PreactVNode,
 	Component as PreactComponent,
 	render,
 	h,
+	Options,
+	VNode,
 } from "preact";
 import { DevtoolsHook } from "./hook";
-import { Renderer, getDisplayName } from "./renderer";
+import { Renderer } from "./renderer";
 import { Highlighter } from "../view/components/Highlighter";
 import { measureNode, getNearestElement } from "./dom";
 import { setIn } from "../shells/shared/utils";
+import { getComponent, getDom, getDisplayName } from "./10/vnode";
 
 export type Effect = () => void | Cleanup;
 export type Cleanup = () => void;
@@ -59,21 +60,6 @@ export interface Component extends PreactComponent {
 	__hooks?: ComponentHooks;
 }
 
-export interface VNode extends PreactVNode {
-	old: VNode | null;
-	_parent: VNode | null;
-	_children: null | VNode[];
-	_component: Component | null;
-	_dom: HTMLElement | null;
-	_lastDomChild: HTMLElement | Text | null;
-}
-
-export interface Options extends Pick<PreactOptions, "vnode" | "unmount"> {
-	_commit: (vnode: VNode) => void;
-	_diff: (vnode: VNode) => void;
-	diffed: (vnode: VNode, oldVNode: VNode) => void;
-}
-
 export type Path = Array<string | number>;
 
 export interface DevtoolsEvent {
@@ -105,11 +91,13 @@ export interface InspectData {
 }
 
 export function setupOptions(options: Options, renderer: Renderer) {
+	const o = options as any;
+
 	// Store (possible) previous hooks so that we don't overwrite them
 	let prevVNodeHook = options.vnode;
-	let prevCommitRoot = options._commit;
+	let prevCommitRoot = o._commit || o.__c;
 	let prevBeforeUnmount = options.unmount;
-	let prevBeforeDiff = options._diff;
+	let prevBeforeDiff = o._diff || o.__b;
 	let prevAfterDiff = options.diffed;
 
 	options.vnode = vnode => {
@@ -127,12 +115,12 @@ export function setupOptions(options: Options, renderer: Renderer) {
 		(vnode as any).old = null;
 	};
 
-	options._diff = vnode => {
+	o._diff = o.__b = (vnode: VNode) => {
 		vnode.startTime = performance.now();
 		if (prevBeforeDiff != null) prevBeforeDiff(vnode);
 	};
 
-	options.diffed = (vnode, oldVNode) => {
+	options.diffed = vnode => {
 		vnode.endTime = performance.now();
 		// let c;
 		// if (vnode != null && (c = vnode._component) != null) {
@@ -150,10 +138,10 @@ export function setupOptions(options: Options, renderer: Renderer) {
 		// 		);
 		// 	}
 		// }
-		if (prevAfterDiff) prevAfterDiff(vnode, oldVNode);
+		if (prevAfterDiff) prevAfterDiff(vnode);
 	};
 
-	options._commit = vnode => {
+	o._commit = o.__c = (vnode: VNode | null) => {
 		if (prevCommitRoot) prevCommitRoot(vnode);
 
 		// These cases are already handled by `unmount`
@@ -183,9 +171,9 @@ export function setupOptions(options: Options, renderer: Renderer) {
 	// Teardown devtools options. Mainly used for testing
 	return () => {
 		options.unmount = prevBeforeUnmount;
-		options._commit = prevCommitRoot;
+		o._commit = o.__c = prevCommitRoot;
 		options.diffed = prevAfterDiff;
-		options._diff = prevBeforeDiff;
+		o._diff = o.__b = prevBeforeDiff;
 		options.vnode = prevVNodeHook;
 	};
 }
@@ -258,10 +246,12 @@ export function createAdapter(hook: DevtoolsHook, renderer: Renderer): Adapter {
 					setIn((vnode.props as any) || {}, path.slice(), value);
 				}
 
+				const dom = getDom(vnode);
 				if (typeof vnode.type === "function") {
-					vnode._component!.forceUpdate();
-				} else if (vnode._dom) {
-					// vnode._dom.setAttribute()
+					const c = getComponent(vnode);
+					if (c) c.forceUpdate();
+				} else if (dom) {
+					// dom.setAttribute()
 				}
 			}
 		},

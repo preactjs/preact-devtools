@@ -1,40 +1,22 @@
-import { VNode, InspectData, DevtoolsEvent } from "./adapter";
+import { InspectData, DevtoolsEvent } from "./adapter";
 import { Commit, MsgTypes, jsonify, cleanProps, flush } from "./events";
-import { Fragment } from "preact";
+import { Fragment, VNode } from "preact";
 import { IdMapper, createIdMapper } from "./10/IdMapper";
 import { ID } from "../view/store";
 import { getStringId } from "./string-table";
 import { DevtoolsHook } from "./hook";
-
-export function isRoot(vnode: VNode) {
-	return vnode._parent == null && vnode.type === Fragment;
-}
-
-/**
- * Get the root of a vnode
- */
-export function findRoot(vnode: VNode): VNode {
-	let next: VNode | null = vnode;
-	while ((next = next._parent)) {
-		if (isRoot(next)) {
-			return next;
-		}
-	}
-
-	return vnode;
-}
-
-/**
- * Get the ancestor component that rendered the current vnode
- */
-export function getAncestor(vnode: VNode) {
-	let next: VNode | null = vnode;
-	while ((next = next._parent)) {
-		return next;
-	}
-
-	return null;
-}
+import {
+	isRoot,
+	findRoot,
+	getAncestor,
+	isSuspenseVNode,
+	getDisplayName,
+	getComponent,
+	getComponentHooks,
+	getDom,
+	getLastDomChild,
+	getActualChildren,
+} from "./10/vnode";
 
 export enum Elements {
 	HTML_ELEMENT = 1,
@@ -56,25 +38,14 @@ export function getDevtoolsType(vnode: VNode): Elements {
 		const name = vnode.type.displayName || "";
 		if (memoReg.test(name)) return Elements.MEMO;
 		if (forwardRefReg.test(name)) return Elements.FORWARD_REF;
-		if (vnode._component && (vnode._component as any)._childDidSuspend)
-			return Elements.SUSPENSE;
+		if (isSuspenseVNode(vnode)) return Elements.SUSPENSE;
+
 		// TODO: Provider and Consumer
 		return vnode.type.prototype && vnode.type.prototype.render
 			? Elements.CLASS_COMPONENT
 			: Elements.FUNCTION_COMPONENT;
 	}
 	return Elements.HTML_ELEMENT;
-}
-
-/**
- * Get human readable name of the component/dom element
- */
-export function getDisplayName(vnode: VNode) {
-	if (vnode.type === Fragment) return "Fragment";
-	else if (typeof vnode.type === "function")
-		return vnode.type.displayName || vnode.type.name;
-	else if (typeof vnode.type === "string") return vnode.type;
-	return "#text";
 }
 
 export interface Renderer {
@@ -112,8 +83,8 @@ export function createRenderer(hook: DevtoolsHook): Renderer {
 
 			const hasState =
 				typeof vnode.type === "function" && vnode.type !== Fragment;
-			const hasHooks =
-				vnode._component != null && vnode._component.__hooks != null;
+			const c = getComponent(vnode);
+			const hasHooks = c != null && getComponentHooks(c) != null;
 
 			return {
 				context: null,
@@ -125,15 +96,15 @@ export function createRenderer(hook: DevtoolsHook): Renderer {
 				props: vnode.type !== null ? jsonify(cleanProps(vnode.props)) : null,
 				canEditState: false,
 				state:
-					hasState && Object.keys(vnode._component!.state).length > 0
-						? jsonify(vnode._component!.state)
+					hasState && Object.keys(c!.state).length > 0
+						? jsonify(c!.state)
 						: null,
 				type: 2,
 			};
 		},
 		findDomForVNode(id) {
 			const vnode = ids.getVNode(id);
-			return vnode ? [vnode._dom, vnode._lastDomChild] : null;
+			return vnode ? [getDom(vnode), getLastDomChild(vnode)] : null;
 		},
 		flushInitial() {
 			queue.forEach(ev => hook.emit(ev.name, ev.data));
@@ -167,8 +138,9 @@ export function logVNode(vnode: VNode, id: ID) {
 	/* eslint-disable no-console */
 	console.group(`LOG %c${name}`, "color: #ea88fd; font-weight: normal");
 	console.log("props:", vnode.props);
-	if (vnode._component) {
-		console.log("state:", vnode._component.state);
+	const c = getComponent(vnode);
+	if (c != null) {
+		console.log("state:", c.state);
 	}
 	console.log("vnode:", vnode);
 	console.log("devtools id:", id);
@@ -232,7 +204,7 @@ export function mount(
 		vnode.key ? getStringId(commit.strings, vnode.key) : 0,
 	);
 
-	const children = vnode._children || [];
+	const children = getActualChildren(vnode);
 	for (let i = 0; i < children.length; i++) {
 		if (children[i] !== null) {
 			mount(ids, commit, children[i], id);
