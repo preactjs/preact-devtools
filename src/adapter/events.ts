@@ -125,6 +125,15 @@ export function applyOperations(store: Store, data: number[]) {
 	store.nodes(store.nodes());
 }
 
+export function applyEvent(store: Store, name: string, data: any) {
+	switch (name) {
+		case "operation":
+			return applyOperations(store, data);
+		case "inspect-result":
+			return store.inspectData(data);
+	}
+}
+
 export function getDepth(store: Store, id: ID) {
 	let parent = store.nodes().get(id)!;
 	return parent ? parent.depth + 1 : 0;
