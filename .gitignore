@@ -70,3 +70,4 @@ typings/
 .cache
 
 dist/
+.rts*

@@ -1,12 +1,13 @@
 {
 	"name": "preact-devtools",
-	"version": "1.0.0",
-	"description": "Preact Devtools extensions",
+	"version": "0.0.1",
+	"description": "Preact Devtools Extension",
 	"main": "dist/preact-devtools.js",
 	"module": "dist/preact-devtools.module.js",
-	"soruce": "src/shells/inline/index.ts",
+	"source": "src/shells/inline/index.ts",
+	"types": "dist/index.d.ts",
 	"scripts": {
-		"build": "echo 'todo'",
+		"build": "microbundle build",
 		"test": "TS_NODE_PROJECT=tsconfig.test.json mocha -r ts-node/register --watch-extensions=ts,tsx src/**/*.test.ts",
 		"dev": "webpack-dev-server --inline",
 		"watch": "rollup -c -w"
@@ -29,6 +30,7 @@
 		"css-loader": "^3.2.0",
 		"fork-ts-checker-webpack-plugin": "^1.5.0",
 		"html-webpack-plugin": "^3.2.0",
+		"microbundle": "^0.11.0",
 		"mocha": "^6.2.0",
 		"preact": "^10.0.0-rc.1",
 		"prettier": "^1.18.2",
