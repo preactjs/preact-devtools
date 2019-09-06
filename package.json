@@ -1,15 +1,18 @@
 {
 	"name": "preact-devtools",
 	"version": "1.0.0",
-	"description": "",
-	"main": "index.js",
+	"description": "Preact Devtools extensions",
+	"main": "dist/preact-devtools.js",
+	"module": "dist/preact-devtools.module.js",
+	"soruce": "src/shells/inline/index.ts",
 	"scripts": {
+		"build": "echo 'todo'",
 		"test": "TS_NODE_PROJECT=tsconfig.test.json mocha -r ts-node/register --watch-extensions=ts,tsx src/**/*.test.ts",
 		"dev": "webpack-dev-server --inline",
 		"watch": "rollup -c -w"
 	},
-	"author": "",
-	"license": "ISC",
+	"author": "Marvin Hagemeister <hello@marvinh.dev>",
+	"license": "MIT",
 	"prettier": {
 		"useTabs": true,
 		"trailingComma": "all"
