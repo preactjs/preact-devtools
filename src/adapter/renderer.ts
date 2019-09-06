@@ -1,4 +1,4 @@
-import { VNode, InspectData, Adapter, DevtoolsEvent } from "./adapter";
+import { VNode, InspectData, DevtoolsEvent } from "./adapter";
 import { Commit, MsgTypes, jsonify, cleanProps, flush } from "./events";
 import { Fragment } from "preact";
 import { IdMapper, createIdMapper } from "./10/IdMapper";
