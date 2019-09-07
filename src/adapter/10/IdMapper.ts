@@ -1,4 +1,4 @@
-import { VNode } from "./adapter";
+import { VNode } from "preact";
 
 export interface IdMapper {
 	getVNode(id: number): VNode | null;
@@ -24,18 +24,18 @@ export function createIdMapper(): IdMapper {
 	const hasId = (vnode: VNode) => {
 		if (vnode != null) {
 			if (vnodeToId.has(vnode)) return true;
-			if (vnode.old != null) return vnodeToId.has(vnode.old);
+			// if (vnode.old != null) return vnodeToId.has(vnode.old);
 		}
 		return false;
 	};
 	const getId = (vnode: VNode) => {
 		let id = -1;
 		if (!vnodeToId.has(vnode)) {
-			if (vnode.old != null && vnodeToId.has(vnode.old)) {
-				id = vnodeToId.get(vnode.old)!;
-				vnodeToId.set(vnode, id);
-				idToVNode.set(id, vnode);
-			}
+			// if (vnode.old != null && vnodeToId.has(vnode.old)) {
+			// 	id = vnodeToId.get(vnode.old)!;
+			// 	vnodeToId.set(vnode, id);
+			// 	idToVNode.set(id, vnode);
+			// }
 		}
 		return id;
 	};

@@ -1,26 +1,25 @@
 import { DevtoolsHook } from "./hook";
 import { Options } from "preact";
 import { createAdapter, setupOptions } from "./adapter";
-import { createIdMapper } from "./IdMapper";
 import { createBridge } from "./bridge";
 import { createRenderer } from "./renderer";
 
 export async function init(options: Options, getHook: () => DevtoolsHook) {
-	const ids = createIdMapper();
-
 	const bridge = createBridge(window);
-	const adapter = createAdapter(bridge.send, ids, () => getHook().renderers);
+	const hook = getHook();
+	const renderer = createRenderer(hook);
+	const adapter = createAdapter(hook, renderer);
 
 	// Add options as early as possible, so that we don't miss the first commit
-	setupOptions(options as any, adapter);
+	setupOptions(options as any, renderer);
 
 	// Devtools can take a while to set up
 	await waitForHook(getHook);
 
 	// We're set up and now we can start processing events
-	const hook = getHook();
+	// const hook = getHook();
 
-	bridge.listen("initialized", adapter.flushInitial);
+	bridge.listen("initialized", renderer.flushInitial);
 	bridge.listen("highlight", adapter.highlight);
 	bridge.listen("update-node", ev => {
 		adapter.update(ev.id, ev.type, ev.path, ev.value);
@@ -30,7 +29,7 @@ export async function init(options: Options, getHook: () => DevtoolsHook) {
 	bridge.listen("log", adapter.log);
 	bridge.listen("update", adapter.log);
 
-	return hook.attach(createRenderer(ids));
+	return hook.attach(renderer);
 }
 
 export function waitForHook(getHook: () => DevtoolsHook) {

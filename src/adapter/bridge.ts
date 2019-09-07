@@ -28,6 +28,7 @@ export function createBridge(target: Window) {
 				target.postMessage(
 					{
 						source: "preact-devtools-detector",
+						payload: data,
 					},
 					"*",
 				);

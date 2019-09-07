@@ -2,7 +2,7 @@ import { render, h } from "preact";
 import { DevTools } from "../../view/components/Devtools";
 import { injectStyles } from "./utils";
 import { createStore } from "../../view/store";
-import { applyOperations } from "../../adapter/events";
+import { applyOperations, applyEvent } from "../../adapter/events";
 
 let created = false;
 function createPanel() {
@@ -28,15 +28,7 @@ function createPanel() {
 		port!.onMessage.addListener(msg => {
 			console.log("RECEIVED", msg.data.payload);
 			const payload = msg.data.payload;
-			if (payload.name === "operation") {
-				applyOperations(store, payload.payload);
-				console.log(
-					store.nodes().size,
-					Array.from(store.nodes().values()).map(x => x.name),
-				);
-			} else if (payload.name === "inspect-result") {
-				store.inspectData(payload.payload);
-			}
+			applyEvent(store, payload.name, payload.payload);
 		});
 
 		const root = doc.getElementById("root")!;

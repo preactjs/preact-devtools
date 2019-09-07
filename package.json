@@ -1,19 +1,22 @@
 {
 	"name": "preact-devtools",
-	"version": "1.0.0",
-	"description": "",
-	"main": "index.js",
+	"version": "0.0.1",
+	"description": "Preact Devtools Extension",
+	"main": "dist/preact-devtools.js",
+	"module": "dist/preact-devtools.module.js",
+	"types": "types/devtools.d.ts",
 	"scripts": {
+		"build": "rm -rf dist/ && rollup -c && node tools/build-inline.js && cp dist/inline/setup.css dist/preact-devtools.css && rm -rf dist/inline",
 		"test": "TS_NODE_PROJECT=tsconfig.test.json mocha -r ts-node/register --watch-extensions=ts,tsx src/**/*.test.ts",
 		"dev": "webpack-dev-server --inline",
 		"watch": "rollup -c -w"
 	},
-	"author": "",
-	"license": "ISC",
-	"prettier": {
-		"useTabs": true,
-		"trailingComma": "all"
+	"repository": {
+		"type": "git",
+		"url": "https://github.com/marvinhagemeister/preact-devtools.git"
 	},
+	"author": "Marvin Hagemeister <hello@marvinh.dev>",
+	"license": "MIT",
 	"devDependencies": {
 		"@babel/core": "^7.5.5",
 		"@babel/plugin-transform-react-jsx": "^7.3.0",
@@ -42,8 +45,18 @@
 		"webpack-cli": "^3.3.7",
 		"webpack-dev-server": "^3.8.0"
 	},
-	"dependencies": {
-		"preactus": "^0.0.2",
-		"s-js": "^0.4.9"
+	"dependencies": {},
+	"peerDependency": {
+		"preact": "10.x"
+	},
+	"files": [
+		"types/",
+		"dist/preact*",
+		"README.md",
+		"LICENSE"
+	],
+	"prettier": {
+		"useTabs": true,
+		"trailingComma": "all"
 	}
 }

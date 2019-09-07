@@ -1,9 +1,8 @@
-import { DevtoolsHook, EmitterFn } from "./hook";
 import { flushTable, StringTable, parseTable } from "./string-table";
-import { Store, DevNode, ID } from "../view/store";
+import { Store, ID } from "../view/store";
 import { valoo } from "../view/valoo";
 import { VNode } from "preact";
-import { getDisplayName } from "./renderer";
+import { getDisplayName } from "./10/vnode";
 
 export enum MsgTypes {
 	ADD_ROOT = 1,
@@ -124,6 +123,15 @@ export function applyOperations(store: Store, data: number[]) {
 		}
 	}
 	store.nodes(store.nodes());
+}
+
+export function applyEvent(store: Store, name: string, data: any) {
+	switch (name) {
+		case "operation":
+			return applyOperations(store, data);
+		case "inspect-result":
+			return store.inspectData(data);
+	}
 }
 
 export function getDepth(store: Store, id: ID) {

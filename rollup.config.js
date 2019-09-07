@@ -42,6 +42,19 @@ const entries = BROWSERS.map(browser => {
 	];
 }).reduce((acc, item) => acc.concat(item), []);
 
+// Inline devtools
+entries.push(
+	{
+		entry: "src/shells/inline/index.ts",
+		dist: "dist/inline/setup.js",
+	},
+	{
+		entry: "src/shells/inline/renderer.ts",
+		dist: "dist/inline/renderer.js",
+		external: ["preact"],
+	},
+);
+
 export default entries.map(data => ({
 	input: data.entry,
 	output: {
@@ -49,6 +62,7 @@ export default entries.map(data => ({
 		name: "index.js",
 		format: "esm",
 	},
+	external: data.external || [],
 	plugins: [
 		typescript({
 			cacheRoot: "./node_modules/.cache/rts2",
