@@ -11,6 +11,10 @@
 		"dev": "webpack-dev-server --inline",
 		"watch": "rollup -c -w"
 	},
+	"repository": {
+		"type": "git",
+		"url": "https://github.com/marvinhagemeister/preact-devtools.git"
+	},
 	"author": "Marvin Hagemeister <hello@marvinh.dev>",
 	"license": "MIT",
 	"devDependencies": {
@@ -47,9 +51,9 @@
 	},
 	"files": [
 		"types/",
-		"dist/",
+		"dist/preact*",
 		"README.md",
-		"LICENSE.md"
+		"LICENSE"
 	],
 	"prettier": {
 		"useTabs": true,
