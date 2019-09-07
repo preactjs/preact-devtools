@@ -165,7 +165,7 @@ export function createCommit(
 	const isNew = !ids.hasId(vnode);
 
 	if (isRoot(vnode)) {
-		const rootId = ids.hasId(vnode) ? ids.getId(vnode) : ids.createId(vnode);
+		const rootId = !isNew ? ids.getId(vnode) : ids.createId(vnode);
 		parentId = commit.rootId = rootId;
 		roots.add(vnode);
 	} else {
@@ -177,7 +177,7 @@ export function createCommit(
 	if (isNew) {
 		mount(ids, commit, vnode, parentId);
 	} else {
-		console.log("UPDATE", ids.getId(vnode));
+		update(ids, commit, vnode, parentId);
 	}
 
 	return commit;
@@ -189,7 +189,7 @@ export function mount(
 	vnode: VNode,
 	ancestorId: ID,
 ) {
-	const id = ids.createId(vnode);
+	const id = ids.hasId(vnode) ? ids.getId(vnode) : ids.createId(vnode);
 	if (isRoot(vnode)) {
 		commit.operations.push(MsgTypes.ADD_ROOT, id);
 	}
@@ -210,4 +210,19 @@ export function mount(
 			mount(ids, commit, children[i], id);
 		}
 	}
+}
+
+export function update(
+	ids: IdMapper,
+	commit: Commit,
+	vnode: VNode,
+	ancestorId: ID,
+) {
+	const id = ids.getId(vnode);
+	commit.operations.push(
+		MsgTypes.UPDATE_VNODE_TIMINGS,
+		id,
+		(vnode.endTime || 0) - (vnode.startTime || 0),
+	);
+	return commit;
 }
