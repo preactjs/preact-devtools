@@ -7,7 +7,7 @@
 	"types": "types/devtools.d.ts",
 	"scripts": {
 		"build": "rm -rf dist/ && rollup -c && node tools/build-inline.js && cp dist/inline/setup.css dist/preact-devtools.css && rm -rf dist/inline",
-		"test": "TS_NODE_PROJECT=tsconfig.test.json mocha -r ts-node/register --watch-extensions=ts,tsx src/**/*.test.ts",
+		"test": "mochette -c tsconfig.json src/**/*.test.{ts,tsx}",
 		"dev": "webpack-dev-server --inline",
 		"watch": "rollup -c -w"
 	},
@@ -20,16 +20,13 @@
 	"devDependencies": {
 		"@babel/core": "^7.5.5",
 		"@babel/plugin-transform-react-jsx": "^7.3.0",
-		"@types/chai": "^4.2.1",
 		"@types/chrome": "^0.0.88",
-		"@types/mocha": "^5.2.7",
 		"babel-loader": "^8.0.6",
 		"babel-plugin-transform-rename-properties": "^0.0.3",
-		"chai": "^4.2.0",
 		"css-loader": "^3.2.0",
 		"fork-ts-checker-webpack-plugin": "^1.5.0",
 		"html-webpack-plugin": "^3.2.0",
-		"mocha": "^6.2.0",
+		"mochette": "^0.0.5",
 		"preact": "^10.0.0-rc.1",
 		"prettier": "^1.18.2",
 		"rollup": "^1.20.1",
