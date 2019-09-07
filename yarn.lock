@@ -5627,11 +5627,6 @@ preact@^10.0.0-rc.1:
   resolved "https://registry.yarnpkg.com/preact/-/preact-10.0.0-rc.1.tgz#bae4419f8e289c327504d4ee6e734c377983548c"
   integrity sha512-DyG8ySCbrQZ8w4cSyxnofM6yH/hzyYLHmIrE3xL1FjSCX4DpvVmP7DTpkV535FSQX0d2zOscb7DCIY+crBtxow==
 
-preactus@^0.0.2:
-  version "0.0.2"
-  resolved "https://registry.yarnpkg.com/preactus/-/preactus-0.0.2.tgz#bd7e2c58fd89735c739db66715ffd6a9fbb62fb4"
-  integrity sha512-3QKW83y0gT/w6xNoUC0Q9NTmvxNfEquq1mHKBbqc5T/eAVlLzfdncAVjLAbc66cTQuGMoluRqfzXHGu0R+zs0Q==
-
 prebuild-install@^5.3.0:
   version "5.3.0"
   resolved "https://registry.yarnpkg.com/prebuild-install/-/prebuild-install-5.3.0.tgz#58b4d8344e03590990931ee088dd5401b03004c8"
@@ -6369,11 +6364,6 @@ run-queue@^1.0.0, run-queue@^1.0.3:
   integrity sha1-6Eg5bwV9Ij8kOGkkYY4laUFh7Ec=
   dependencies:
     aproba "^1.1.1"
-
-s-js@^0.4.9:
-  version "0.4.9"
-  resolved "https://registry.yarnpkg.com/s-js/-/s-js-0.4.9.tgz#ecb12a53072174d1ac58f2eaad529c7e2950cef2"
-  integrity sha512-RtpOm+cM6O0sHg6IA70wH+UC3FZcND+rccBZpBAHzlUgNO2Bm5BN+FnM8+OBxzXdwpKWFwX11JGF0MFRkhSoIQ==
 
 sade@^1.4.0:
   version "1.6.1"
