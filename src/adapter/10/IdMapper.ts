@@ -1,4 +1,5 @@
 import { VNode } from "preact";
+import { getComponent, getDom } from "./vnode";
 
 export interface IdMapper {
 	getVNode(id: number): VNode | null;
@@ -14,46 +15,52 @@ export interface IdMapper {
  * this function to keep track of existing id's and create new ones if needed.
  */
 export function createIdMapper(): IdMapper {
-	const vnodeToId = new WeakMap<VNode, number>();
+	const instToId = new WeakMap<any, number>();
 	const idToVNode = new Map<number, VNode>();
-	// Must never be 0, otherwise an infinite loop will be trigger inside
-	// the devtools extension ¯\_(ツ)_/¯
+	const idToInst = new Map<number, any>();
+
 	let uuid = 1;
 
 	const getVNode = (id: number) => idToVNode.get(id) || null;
 	const hasId = (vnode: VNode) => {
 		if (vnode != null) {
-			if (vnodeToId.has(vnode)) return true;
-			// if (vnode.old != null) return vnodeToId.has(vnode.old);
+			return instToId.has(getInstance(vnode));
 		}
 		return false;
 	};
 	const getId = (vnode: VNode) => {
-		let id = -1;
-		if (!vnodeToId.has(vnode)) {
-			// if (vnode.old != null && vnodeToId.has(vnode.old)) {
-			// 	id = vnodeToId.get(vnode.old)!;
-			// 	vnodeToId.set(vnode, id);
-			// 	idToVNode.set(id, vnode);
-			// }
-		}
+		if (vnode == null) return -1;
+		const inst = getInstance(vnode);
+		const id = instToId.get(inst) || -1;
+		if (id > -1) idToVNode.set(id, vnode);
 		return id;
 	};
 	const remove = (vnode: VNode) => {
 		if (hasId(vnode)) {
 			const id = getId(vnode);
-			idToVNode.delete(id);
+			idToInst.delete(id);
 		}
-		vnodeToId.delete(vnode);
+		instToId.delete(vnode);
 	};
 	const createId = (vnode: VNode) => {
 		const id = uuid++;
-		vnodeToId.set(vnode, id);
+		instToId.set(getInstance(vnode), id);
+		idToInst.set(id, getInstance(vnode));
 		idToVNode.set(id, vnode);
 		return id;
 	};
 
-	const has = (id: number) => idToVNode.has(id);
+	const has = (id: number) => idToInst.has(id);
 
 	return { has, getVNode, hasId, createId, getId, remove };
+}
+
+export function getInstance(vnode: VNode): any {
+	// For components we use the instance to check refs, otherwise
+	// we'll use a dom node
+	if (typeof vnode.type === "function") {
+		return getComponent(vnode);
+	}
+
+	return getDom(vnode);
 }
