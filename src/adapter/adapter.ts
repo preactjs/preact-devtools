@@ -7,7 +7,7 @@ import {
 	VNode,
 } from "preact";
 import { DevtoolsHook } from "./hook";
-import { Renderer } from "./renderer";
+import { Renderer } from "./10/renderer";
 import { Highlighter } from "../view/components/Highlighter";
 import { measureNode, getNearestElement } from "./dom";
 import { setIn } from "../shells/shared/utils";

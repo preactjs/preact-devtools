@@ -2,7 +2,7 @@ import { DevtoolsHook } from "./hook";
 import { Options } from "preact";
 import { createAdapter, setupOptions } from "./adapter";
 import { createBridge } from "./bridge";
-import { createRenderer } from "./renderer";
+import { createRenderer } from "./10/renderer";
 
 export async function init(options: Options, getHook: () => DevtoolsHook) {
 	const bridge = createBridge(window);

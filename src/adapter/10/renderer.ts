@@ -1,10 +1,10 @@
-import { InspectData, DevtoolsEvent } from "./adapter";
-import { Commit, MsgTypes, jsonify, cleanProps, flush } from "./events";
+import { InspectData, DevtoolsEvent } from "../adapter";
+import { Commit, MsgTypes, jsonify, cleanProps, flush } from "../events";
 import { Fragment, VNode } from "preact";
-import { IdMapper, createIdMapper } from "./10/IdMapper";
-import { ID } from "../view/store";
-import { getStringId } from "./string-table";
-import { DevtoolsHook } from "./hook";
+import { IdMapper, createIdMapper } from "./IdMapper";
+import { ID } from "../../view/store";
+import { getStringId } from "../string-table";
+import { DevtoolsHook } from "../hook";
 import {
 	isRoot,
 	findRoot,
@@ -16,7 +16,7 @@ import {
 	getDom,
 	getLastDomChild,
 	getActualChildren,
-} from "./10/vnode";
+} from "./vnode";
 
 export enum Elements {
 	HTML_ELEMENT = 1,
