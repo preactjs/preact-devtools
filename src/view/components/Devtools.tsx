@@ -11,7 +11,7 @@ export function DevTools(props: { store: Store }) {
 			<div class={s.root}>
 				<div class={s.components}>
 					<TreeBar />
-					<TreeView rootId={1} />
+					<TreeView />
 				</div>
 				<div class={s.sidebar}>
 					<Sidebar title="Hydrator" />

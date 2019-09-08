@@ -17,6 +17,8 @@ import {
 	getLastDomChild,
 	getActualChildren,
 } from "./vnode";
+import { DevTools } from "../../view/components/Devtools";
+import { Highlighter } from "../../view/components/Highlighter";
 
 export enum Elements {
 	HTML_ELEMENT = 1,
@@ -107,6 +109,7 @@ export function createRenderer(hook: DevtoolsHook): Renderer {
 			return vnode ? [getDom(vnode), getLastDomChild(vnode)] : null;
 		},
 		flushInitial() {
+			console.log(queue);
 			queue.forEach(ev => hook.emit(ev.name, ev.data));
 			hook.connected = true;
 			queue = [];
@@ -177,7 +180,7 @@ export function createCommit(
 	if (isNew) {
 		mount(ids, commit, vnode, parentId);
 	} else {
-		update(ids, commit, vnode, parentId);
+		update(ids, commit, vnode);
 	}
 
 	return commit;
@@ -212,17 +215,21 @@ export function mount(
 	}
 }
 
-export function update(
-	ids: IdMapper,
-	commit: Commit,
-	vnode: VNode,
-	ancestorId: ID,
-) {
+export function update(ids: IdMapper, commit: Commit, vnode: VNode) {
 	const id = ids.getId(vnode);
 	commit.operations.push(
 		MsgTypes.UPDATE_VNODE_TIMINGS,
 		id,
 		(vnode.endTime || 0) - (vnode.startTime || 0),
 	);
+
+	const children = getActualChildren(vnode);
+	for (let i = 0; i < children; i++) {
+		if (ids.hasId(vnode)) {
+			update(ids, commit, vnode);
+		} else {
+			mount(ids, commit, vnode, id);
+		}
+	}
 	return commit;
 }

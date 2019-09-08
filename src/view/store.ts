@@ -25,6 +25,9 @@ export interface DevNode {
 	parentId: ID;
 	children: ID[];
 
+	// Profiling
+	duration: Observable<number>;
+
 	// Display properties
 	depth: number;
 	selected: Observable<boolean>;

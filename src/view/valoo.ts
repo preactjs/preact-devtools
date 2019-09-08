@@ -11,10 +11,12 @@ type Disposer = () => void;
 export function valoo<T>(v: T): Observable<T> {
 	const cb: Array<Fn<T> | null> = [];
 	function value(c: T) {
-		if (arguments.length)
+		if (arguments.length) {
+			v = c;
 			cb.map(f => {
-				f && f((v = c));
+				f && f(v);
 			});
+		}
 		return v;
 	}
 	value.on = (c: Fn<T>) => {

@@ -1,8 +1,9 @@
 import { DevtoolsHook } from "./hook";
 import { Options } from "preact";
-import { createAdapter, setupOptions } from "./adapter";
+import { createAdapter } from "./adapter";
 import { createBridge } from "./bridge";
 import { createRenderer } from "./10/renderer";
+import { setupOptions } from "./10/options";
 
 export async function init(options: Options, getHook: () => DevtoolsHook) {
 	const bridge = createBridge(window);
@@ -19,7 +20,10 @@ export async function init(options: Options, getHook: () => DevtoolsHook) {
 	// We're set up and now we can start processing events
 	// const hook = getHook();
 
-	bridge.listen("initialized", renderer.flushInitial);
+	bridge.listen("initialized", () => {
+		console.log("FLUSH INITIAL");
+		renderer.flushInitial();
+	});
 	bridge.listen("highlight", adapter.highlight);
 	bridge.listen("update-node", ev => {
 		adapter.update(ev.id, ev.type, ev.path, ev.value);

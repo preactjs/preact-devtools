@@ -1,9 +1,10 @@
 import { h, render, Options, options } from "preact";
 import * as sinon from "sinon";
 import { createRenderer } from "./renderer";
-import { setupOptions } from "../adapter";
+import { setupOptions } from "../10/options";
 import { DevtoolsHook } from "../hook";
 import { expect } from "chai";
+import { toSnapshot } from "../debug";
 
 export function setupScratch() {
 	const div = document.createElement("div");
@@ -48,9 +49,35 @@ describe("Renderer 10", () => {
 
 	it("should detect root nodes", () => {
 		render(<div />, scratch);
-		expect(spy.args[0][1][0]).to.equal(1);
+		expect(toSnapshot(spy.args[0][1])).to.deep.equal([
+			"rootId: 1",
+			"Add 1 <Fragment> to parent 1",
+			"Add 2 <div> to parent 1",
+		]);
 
 		render(<div />, scratch);
-		expect(spy.args[1][1][0]).to.equal(1);
+		expect(toSnapshot(spy.args[1][1])).to.deep.equal([
+			"rootId: 1",
+			"Update timings 1",
+		]);
+	});
+
+	it("should mount children", () => {
+		render(
+			<div>
+				<span>foo</span>
+				<span>bar</span>
+			</div>,
+			scratch,
+		);
+		expect(toSnapshot(spy.args[0][1])).to.deep.equal([
+			"rootId: 1",
+			"Add 1 <Fragment> to parent 1",
+			"Add 2 <div> to parent 1",
+			"Add 3 <span> to parent 2",
+			"Add 4 <#text> to parent 3",
+			"Add 5 <span> to parent 2",
+			"Add 6 <#text> to parent 5",
+		]);
 	});
 });

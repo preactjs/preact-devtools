@@ -1,10 +1,11 @@
 import { createStore, Store } from "../../view/store";
 import { render, h, Options } from "preact";
 import { DevTools } from "../../view/components/Devtools";
-import { setupOptions, createAdapter } from "../../adapter/adapter";
+import { createAdapter } from "../../adapter/adapter";
 import { Renderer } from "../../adapter/10/renderer";
 import { DevtoolsHook } from "../../adapter/hook";
 import { applyEvent } from "../../adapter/events";
+import { setupOptions } from "../../adapter/10/options";
 
 export function attach(
 	options: Options,

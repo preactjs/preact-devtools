@@ -4,16 +4,10 @@ import { ID, useObserver, getAllChildren, useStore } from "../store";
 import { useEffect, useState } from "preact/hooks";
 import { getLastDomChild } from "./utils";
 
-export interface TreeProps {
-	rootId: number;
-}
-export function TreeView(props: TreeProps) {
+export function TreeView() {
 	const store = useStore();
 	const nodes = useObserver(() => {
-		return getAllChildren(
-			store.nodes(),
-			store.rootToChild().get(props.rootId)!,
-		);
+		return getAllChildren(store.nodes(), store.rootToChild().get(1)!);
 	}, [store.nodes, store.rootToChild]);
 
 	return (
