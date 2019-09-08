@@ -49,3 +49,24 @@
 	left: 50%;
 	transform: translateX(-50%);
 }
+
+.fixed {
+	position: fixed;
+}
+
+.fixed.fixedLeft {
+	left: 1.5em;
+	transform: translateX(0);
+}
+
+.fixed.fixedTop {
+	top: 1.5em;
+}
+
+.fixed.fixedRight {
+	right: 1.5em;
+}
+
+.fixed.fixedBottom {
+	bottom: 1.5em;
+}
