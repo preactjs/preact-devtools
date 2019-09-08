@@ -1,4 +1,4 @@
-import { Renderer } from "./renderer";
+import { Renderer } from "./10/renderer";
 import { createBridge } from "./bridge";
 
 export type EmitterFn = (event: string, data: any) => void;

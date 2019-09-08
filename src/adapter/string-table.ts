@@ -43,15 +43,19 @@ export function parseTable(data: number[]) {
 	const len = data[0];
 	const strings = [];
 	if (len > 0) {
-		for (let i = 1; i < len + 1; i++) {
+		for (let i = 1; i < len; i++) {
 			const strLen = data[i];
-			const start = i + 1;
+			let start = i + 1;
 			const end = i + strLen + 1;
-			const str = String.fromCodePoint(...data.slice(start, end));
+			let str = "";
+			for (; start < end; start++) {
+				str += String.fromCodePoint(data[start]);
+			}
 			strings.push(str);
 			i += strLen;
 		}
 	}
+
 	return strings;
 }
 

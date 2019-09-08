@@ -7,7 +7,10 @@ export interface Props extends Measurements {
 }
 
 export function Highlighter(props: Props) {
-	let { width, height, top, left } = props;
+	let { width, height, top, left, bounds } = props;
+
+	const isOutOfBounds =
+		bounds.bottom || bounds.left || bounds.right || bounds.top;
 
 	return (
 		<div class={s.root} style={`top: ${top}px; left: ${left}px;`}>
@@ -40,7 +43,13 @@ export function Highlighter(props: Props) {
 					/>
 				</div>
 			</div>
-			<span class={s.footer}>
+			<span
+				class={`${s.footer} ${isOutOfBounds ? s.fixed : ""} ${
+					bounds.left && !bounds.right ? s.fixedLeft : ""
+				} ${bounds.right ? s.fixedRight : ""} ${
+					bounds.top && !bounds.bottom ? s.fixedTop : ""
+				}  ${bounds.bottom ? s.fixedBottom : ""}`}
+			>
 				<span class={s.label}>{props.label}</span> |{" "}
 				<span class={s.value}>{width}px</span> ×{" "}
 				<span class={s.value}>{height}px</span>

@@ -15,11 +15,17 @@
 }
 
 .name {
-	color: var(--color-element-text);
 	padding: 0.25rem 0;
+	color: var(--color-element-non-interactive);
 	line-height: 1;
 	white-space: nowrap;
 	flex: 0 0 auto;
+}
+
+.name[data-type="number"],
+.name[data-type="boolean"],
+.name[data-type="string"] {
+	color: var(--color-element-text);
 }
 
 .name::after {
@@ -75,14 +81,6 @@
 
 .string {
 	color: var(--color-props-string);
-}
-
-.string::before {
-	content: '"';
-}
-
-.string::after {
-	content: '"';
 }
 
 .function {

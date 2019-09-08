@@ -7,58 +7,11 @@ import {
 	VNode,
 } from "preact";
 import { DevtoolsHook } from "./hook";
-import { Renderer } from "./renderer";
+import { Renderer } from "./10/renderer";
 import { Highlighter } from "../view/components/Highlighter";
 import { measureNode, getNearestElement } from "./dom";
 import { setIn } from "../shells/shared/utils";
 import { getComponent, getDom, getDisplayName } from "./10/vnode";
-
-export type Effect = () => void | Cleanup;
-export type Cleanup = () => void;
-
-export interface EffectHookState {
-	_value?: Effect;
-	_args?: any[];
-	_cleanup?: Cleanup;
-	_revision?: number;
-}
-
-export interface MemoHookState {
-	_value?: any;
-	_args?: any[];
-	_callback?: () => any;
-	_revision?: number;
-}
-
-export interface ReducerHookState {
-	_value?: any;
-	_component?: Component;
-	_revision?: number;
-}
-
-export interface ImperativeHookState {
-	_args?: any[];
-	_revision?: number;
-}
-
-export type HookState =
-	| EffectHookState
-	| MemoHookState
-	| ReducerHookState
-	| ImperativeHookState;
-
-export interface ComponentHooks {
-	/** The list of hooks a component uses */
-	_list: HookState[];
-	/** List of Effects to be invoked after the next frame is rendered */
-	_pendingEffects: EffectHookState[];
-	/** List of Effects to be invoked at the end of the current render */
-	_pendingLayoutEffects: EffectHookState[];
-}
-
-export interface Component extends PreactComponent {
-	__hooks?: ComponentHooks;
-}
 
 export type Path = Array<string | number>;
 
@@ -90,94 +43,6 @@ export interface InspectData {
 	state: Record<string, any> | null;
 }
 
-export function setupOptions(options: Options, renderer: Renderer) {
-	const o = options as any;
-
-	// Store (possible) previous hooks so that we don't overwrite them
-	let prevVNodeHook = options.vnode;
-	let prevCommitRoot = o._commit || o.__c;
-	let prevBeforeUnmount = options.unmount;
-	let prevBeforeDiff = o._diff || o.__b;
-	let prevAfterDiff = options.diffed;
-
-	options.vnode = vnode => {
-		// Tiny performance improvement by initializing fields as doubles
-		// from the start. `performance.now()` will always return a double.
-		// See https://github.com/facebook/react/issues/14365
-		// and https://slidr.io/bmeurer/javascript-engine-fundamentals-the-good-the-bad-and-the-ugly
-		vnode.startTime = NaN;
-		vnode.endTime = NaN;
-
-		vnode.startTime = 0;
-		vnode.endTime = -1;
-		if (prevVNodeHook) prevVNodeHook(vnode);
-
-		(vnode as any).old = null;
-	};
-
-	o._diff = o.__b = (vnode: VNode) => {
-		vnode.startTime = performance.now();
-		if (prevBeforeDiff != null) prevBeforeDiff(vnode);
-	};
-
-	options.diffed = vnode => {
-		vnode.endTime = performance.now();
-		// let c;
-		// if (vnode != null && (c = vnode._component) != null) {
-		// 	c._prevProps = oldVNode != null ? oldVNode.props : null;
-		// 	c._prevContext =
-		// 		oldVNode != null && oldVNode._component != null
-		// 			? oldVNode._component._context
-		// 			: null;
-
-		// 	if (c.__hooks != null) {
-		// 		c._prevHooksRevision = c._currentHooksRevision;
-		// 		c._currentHooksRevision = c.__hooks._list.reduce(
-		// 			(acc, x) => acc + x._revision,
-		// 			0,
-		// 		);
-		// 	}
-		// }
-		if (prevAfterDiff) prevAfterDiff(vnode);
-	};
-
-	o._commit = o.__c = (vnode: VNode | null) => {
-		if (prevCommitRoot) prevCommitRoot(vnode);
-
-		// These cases are already handled by `unmount`
-		if (vnode == null) return;
-		renderer.onCommit(vnode);
-	};
-
-	options.unmount = vnode => {
-		if (prevBeforeUnmount) prevBeforeUnmount(vnode);
-		renderer.onUnmount(vnode as any);
-	};
-
-	// Inject tracking into setState
-	// const setState = Component.prototype.setState;
-	// Component.prototype.setState = function(update, callback) {
-	// 	// Duplicated in setState() but doesn't matter due to the guard.
-	// 	let s =
-	// 		(this._nextState !== this.state && this._nextState) ||
-	// 		(this._nextState = Object.assign({}, this.state));
-
-	// 	// Needed in order to check if state has changed after the tree has been committed:
-	// 	this._prevState = Object.assign({}, s);
-
-	// 	return setState.call(this, update, callback);
-	// };
-
-	// Teardown devtools options. Mainly used for testing
-	return () => {
-		options.unmount = prevBeforeUnmount;
-		o._commit = o.__c = prevCommitRoot;
-		options.diffed = prevAfterDiff;
-		o._diff = o.__b = prevBeforeDiff;
-		options.vnode = prevVNodeHook;
-	};
-}
-
 export function createAdapter(hook: DevtoolsHook, renderer: Renderer): Adapter {
 	/**
 	 * Reference to the DOM element that we'll render the selection highlighter
@@ -198,7 +63,6 @@ export function createAdapter(hook: DevtoolsHook, renderer: Renderer): Adapter {
 		inspect(id) {
 			if (renderer.has(id)) {
 				const data = renderer.inspect(id);
-				console.log("inspect-result", data);
 				if (data !== null) {
 					hook.emit("inspect-result", data);
 				}
@@ -233,15 +97,14 @@ export function createAdapter(hook: DevtoolsHook, renderer: Renderer): Adapter {
 						}),
 						highlightRef,
 					);
-				} else {
-					destroyHighlight();
+					return;
 				}
 			}
+			destroyHighlight();
 		},
 		update(id, type, path, value) {
 			const vnode = renderer.getVNodeById(id);
 			if (vnode !== null) {
-				console.log(id, type, path, value);
 				if (type === "props") {
 					setIn((vnode.props as any) || {}, path.slice(), value);
 				}

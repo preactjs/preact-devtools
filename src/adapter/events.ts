@@ -66,9 +66,11 @@ export function applyOperations(store: Store, data: number[]) {
 	for (; i < data.length; i++) {
 		switch (data[i]) {
 			case MsgTypes.ADD_ROOT:
-				const id = data[i++];
+				const id = data[i + 1];
 				newRoot = true;
-				store.roots(store.roots()).push(id);
+				store.roots().push(id);
+				store.roots(store.roots());
+				i += 1;
 				break;
 			case MsgTypes.ADD_VNODE: {
 				const id = data[i + 1];
@@ -87,7 +89,8 @@ export function applyOperations(store: Store, data: number[]) {
 					throw new Error(`Node ${id} already present in store.`);
 				}
 
-				if (store.roots().indexOf(parentId) === -1) {
+				// Roots have their own id as parentId
+				if (id !== parentId) {
 					const parent = store.nodes().get(parentId);
 					if (!parent) {
 						// throw new Error(`Parent node ${parentId} not found in store.`);
@@ -106,22 +109,37 @@ export function applyOperations(store: Store, data: number[]) {
 					parentId,
 					type,
 					key,
+					duration: valoo<number>(0),
 					selected: valoo<boolean>(false),
 				});
 				i += 6;
+				break;
+			}
+			case MsgTypes.UPDATE_VNODE_TIMINGS: {
+				const id = data[i + 1];
+				const duration = data[i + 2];
+
+				if (!store.nodes().has(id)) {
+					throw new Error(`Node ${id} already present in store.`);
+				}
+
+				const node = store.nodes().get(id)!;
+				node.duration(duration);
+
+				i += 3;
 				break;
 			}
 			case MsgTypes.REMOVE_VNODE: {
 				const unmounts = data[i + 1];
 				i += 2;
 				const len = i + unmounts;
-				console.log(`total unmounts: ${unmounts}`);
 				for (; i < len; i++) {
 					console.log(`  Remove: %c${data[i]}`, "color: red");
 				}
 			}
 		}
 	}
+
 	store.nodes(store.nodes());
 }
 
@@ -172,7 +190,6 @@ export function cleanProps(props: any) {
 	const out = { ...props };
 	delete out.children;
 	if (!Object.keys(out).length) return null;
-	console.log("props", out, props);
 	return out;
 }
 

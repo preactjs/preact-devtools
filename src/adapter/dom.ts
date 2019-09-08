@@ -19,6 +19,12 @@ export interface Measurements {
 	paddingRight: number;
 	paddingBottom: number;
 	paddingLeft: number;
+	bounds: {
+		top: boolean;
+		left: boolean;
+		bottom: boolean;
+		right: boolean;
+	};
 }
 
 export function measureNode(dom: Element): Measurements {
@@ -27,9 +33,17 @@ export function measureNode(dom: Element): Measurements {
 	const s = window.getComputedStyle(dom);
 	const r = dom.getBoundingClientRect();
 
+	const bounds = {
+		top: r.top < window.scrollY,
+		bottom: r.top + r.height > window.innerHeight + scrollY,
+		left: r.left < window.scrollX,
+		right: r.left + r.width > window.scrollX + window.innerWidth,
+	};
+
 	return {
 		top: r.top,
 		left: r.left,
+		bounds,
 
 		// Round to at most 2 decimals. This is not 100% accurate,
 		// but good enough for our use case

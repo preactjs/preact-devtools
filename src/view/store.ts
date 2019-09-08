@@ -25,6 +25,9 @@ export interface DevNode {
 	parentId: ID;
 	children: ID[];
 
+	// Profiling
+	duration: Observable<number>;
+
 	// Display properties
 	depth: number;
 	selected: Observable<boolean>;
@@ -165,7 +168,7 @@ export function getAllChildren(tree: Tree, id: ID): ID[] {
 		const node = tree.get(item);
 		if (node) {
 			if (!visited.has(node.id)) {
-				out.push(node.id);
+				if (node.id !== id) out.push(node.id);
 				visited.add(node.id);
 			}
 			node.children.reverse().forEach(x => stack.push(x));

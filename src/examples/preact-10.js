@@ -43,6 +43,7 @@ export function TodoList() {
 							<p>center</p>
 							<Iframer height={300}>
 								<Highlighter
+									bounds={{}}
 									top={20}
 									left={20}
 									label={"FooBarBob"}
@@ -58,6 +59,9 @@ export function TodoList() {
 							<p>left</p>
 							<Iframer height={300}>
 								<Highlighter
+									bounds={{
+										left: true,
+									}}
 									top={20}
 									left={-50}
 									label={"FooBarBob"}
@@ -73,6 +77,9 @@ export function TodoList() {
 							<p>right</p>
 							<Iframer height={300}>
 								<Highlighter
+									bounds={{
+										right: true,
+									}}
 									top={20}
 									left={150}
 									label={"FooBarBob"}
@@ -88,6 +95,9 @@ export function TodoList() {
 							<p>top</p>
 							<Iframer height={300}>
 								<Highlighter
+									bounds={{
+										top: true,
+									}}
 									top={-250}
 									left={20}
 									label={"FooBarBob"}
@@ -103,6 +113,9 @@ export function TodoList() {
 							<p>bottom</p>
 							<Iframer height={300}>
 								<Highlighter
+									bounds={{
+										bottom: true,
+									}}
 									top={150}
 									left={20}
 									label={"FooBarBob"}

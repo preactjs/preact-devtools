@@ -1,10 +1,10 @@
-import { InspectData, DevtoolsEvent } from "./adapter";
-import { Commit, MsgTypes, jsonify, cleanProps, flush } from "./events";
+import { InspectData, DevtoolsEvent } from "../adapter";
+import { Commit, MsgTypes, jsonify, cleanProps, flush } from "../events";
 import { Fragment, VNode } from "preact";
-import { IdMapper, createIdMapper } from "./10/IdMapper";
-import { ID } from "../view/store";
-import { getStringId } from "./string-table";
-import { DevtoolsHook } from "./hook";
+import { IdMapper, createIdMapper } from "./IdMapper";
+import { ID } from "../../view/store";
+import { getStringId } from "../string-table";
+import { DevtoolsHook } from "../hook";
 import {
 	isRoot,
 	findRoot,
@@ -16,7 +16,9 @@ import {
 	getDom,
 	getLastDomChild,
 	getActualChildren,
-} from "./10/vnode";
+} from "./vnode";
+import { DevTools } from "../../view/components/Devtools";
+import { Highlighter } from "../../view/components/Highlighter";
 
 export enum Elements {
 	HTML_ELEMENT = 1,
@@ -107,6 +109,7 @@ export function createRenderer(hook: DevtoolsHook): Renderer {
 			return vnode ? [getDom(vnode), getLastDomChild(vnode)] : null;
 		},
 		flushInitial() {
+			console.log(queue);
 			queue.forEach(ev => hook.emit(ev.name, ev.data));
 			hook.connected = true;
 			queue = [];
@@ -165,7 +168,7 @@ export function createCommit(
 	const isNew = !ids.hasId(vnode);
 
 	if (isRoot(vnode)) {
-		const rootId = ids.hasId(vnode) ? ids.getId(vnode) : ids.createId(vnode);
+		const rootId = !isNew ? ids.getId(vnode) : ids.createId(vnode);
 		parentId = commit.rootId = rootId;
 		roots.add(vnode);
 	} else {
@@ -177,7 +180,7 @@ export function createCommit(
 	if (isNew) {
 		mount(ids, commit, vnode, parentId);
 	} else {
-		console.log("UPDATE", ids.getId(vnode));
+		update(ids, commit, vnode);
 	}
 
 	return commit;
@@ -189,7 +192,7 @@ export function mount(
 	vnode: VNode,
 	ancestorId: ID,
 ) {
-	const id = ids.createId(vnode);
+	const id = ids.hasId(vnode) ? ids.getId(vnode) : ids.createId(vnode);
 	if (isRoot(vnode)) {
 		commit.operations.push(MsgTypes.ADD_ROOT, id);
 	}
@@ -210,4 +213,23 @@ export function mount(
 			mount(ids, commit, children[i], id);
 		}
 	}
+}
+
+export function update(ids: IdMapper, commit: Commit, vnode: VNode) {
+	const id = ids.getId(vnode);
+	commit.operations.push(
+		MsgTypes.UPDATE_VNODE_TIMINGS,
+		id,
+		(vnode.endTime || 0) - (vnode.startTime || 0),
+	);
+
+	const children = getActualChildren(vnode);
+	for (let i = 0; i < children; i++) {
+		if (ids.hasId(vnode)) {
+			update(ids, commit, vnode);
+		} else {
+			mount(ids, commit, vnode, id);
+		}
+	}
+	return commit;
 }
