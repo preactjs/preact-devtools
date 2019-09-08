@@ -5,7 +5,6 @@ export interface Connection {
 
 const conn = new Map<number, Connection>();
 chrome.runtime.onConnect.addListener(port => {
-	console.log("CONNECTING", port.name);
 	// Ok, so this is a little weird:
 	// To be able to communicate from a content-script to the devtools panel
 	// we need to always go through the brackground script. We basically just pass

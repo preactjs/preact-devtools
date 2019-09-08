@@ -63,7 +63,6 @@ export function createAdapter(hook: DevtoolsHook, renderer: Renderer): Adapter {
 		inspect(id) {
 			if (renderer.has(id)) {
 				const data = renderer.inspect(id);
-				console.log("inspect-result", data);
 				if (data !== null) {
 					hook.emit("inspect-result", data);
 				}
@@ -106,7 +105,6 @@ export function createAdapter(hook: DevtoolsHook, renderer: Renderer): Adapter {
 		update(id, type, path, value) {
 			const vnode = renderer.getVNodeById(id);
 			if (vnode !== null) {
-				console.log(id, type, path, value);
 				if (type === "props") {
 					setIn((vnode.props as any) || {}, path.slice(), value);
 				}

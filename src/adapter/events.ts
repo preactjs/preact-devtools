@@ -190,7 +190,6 @@ export function cleanProps(props: any) {
 	const out = { ...props };
 	delete out.children;
 	if (!Object.keys(out).length) return null;
-	console.log("props", out, props);
 	return out;
 }
 
