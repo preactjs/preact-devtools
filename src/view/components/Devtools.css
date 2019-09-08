@@ -15,6 +15,7 @@
 	--color-selected-inactive-bg: gray;
 	--color-selected-inactive-text: white;
 	--color-element-text: #673ab8;
+	--color-element-non-interactive: #1b1b1b;
 	--color-dim-bg: #e9e1f8;
 	--color-inactive-child-bg: #e9e1f8;
 	--color-hover: #e9e1f8;
@@ -42,6 +43,7 @@
 	--color-selected-inactive-bg: gray;
 	--color-selected-inactive-text: white;
 	--color-element-text: #d2adff;
+	--color-element-non-interactive: #dedede;
 	--color-dim-bg: #3a3a3a;
 	--color-inactive-child-bg: #e9e1f8;
 	--color-hover: #3a3a3a;

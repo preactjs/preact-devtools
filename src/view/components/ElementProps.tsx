@@ -2,7 +2,7 @@ import { h } from "preact";
 import s from "./ElementProps.css";
 import { Arrow } from "./TreeView";
 import { flatten, PropDataType } from "../parseProps";
-// import { useState } from "preact/hooks";
+import { useState } from "preact/hooks";
 
 export type ObjPath = Array<string | number>;
 export type ChangeFn = (value: any, path: ObjPath) => void;
@@ -101,7 +101,12 @@ export function SingleItem(props: SingleProps) {
 					<Arrow />
 				</button>
 			)}
-			<div class={`${s.name} ${!collapseable ? s.noCollapse : ""}`}>{name}</div>
+			<div
+				class={`${s.name} ${!collapseable ? s.noCollapse : ""}`}
+				data-type={type}
+			>
+				{name}
+			</div>
 			<div class={`${s.property} ${css[type] || ""}`}>
 				{editable ? (
 					<DataInput value={v} onChange={update} />
@@ -119,13 +124,12 @@ export interface InputProps {
 }
 
 export function DataInput({ value, onChange }: InputProps) {
-	// let [focus, setFocus] = useState(false);
-	const setFocus = (v: boolean) => null;
+	let [focus, setFocus] = useState(false);
 
 	let inputType = "text";
 	if (typeof value === "string") {
 		inputType = "text";
-		// if (!focus) value = `"${value}"`;
+		if (!focus) value = `"${value}"`;
 	} else if (typeof value === "number") {
 		inputType = "number";
 	} else {
