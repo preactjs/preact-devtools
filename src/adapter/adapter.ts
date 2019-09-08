@@ -97,10 +97,10 @@ export function createAdapter(hook: DevtoolsHook, renderer: Renderer): Adapter {
 						}),
 						highlightRef,
 					);
-				} else {
-					destroyHighlight();
+					return;
 				}
 			}
+			destroyHighlight();
 		},
 		update(id, type, path, value) {
 			const vnode = renderer.getVNodeById(id);

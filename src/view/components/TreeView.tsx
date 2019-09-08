@@ -56,7 +56,6 @@ export function TreeItem(props: { key: any; id: ID }) {
 			class={s.item}
 			onClick={ev => onSelect(id, ev.currentTarget as any)}
 			onMouseEnter={() => onHover(id)}
-			onMouseLeave={() => onHover(null)}
 			data-selected={selected}
 			data-depth={node.depth}
 			style={`padding-left: calc(var(--indent-depth) * ${node.depth})`}
