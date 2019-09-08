@@ -93,10 +93,14 @@ export function Arrow() {
 export function HighlightPane() {
 	const store = useStore();
 	const ref = useObserver(() => store.selectedRef(), [store.selectedRef]);
+	const selected = useObserver(() => store.selected(), [store.selected]);
+	const collapsed = useObserver(() => store.visiblity.collapsed(), [
+		store.visiblity.collapsed,
+	]);
 
 	let [pos, setPos] = useState({ top: 0, height: 0 });
 	useEffect(() => {
-		if (ref) {
+		if (ref && selected && !collapsed.has(selected.id)) {
 			const last = getLastDomChild(ref);
 
 			const rect = ref.getBoundingClientRect();
@@ -110,7 +114,7 @@ export function HighlightPane() {
 		} else {
 			setPos({ top: 0, height: 0 });
 		}
-	}, [ref]);
+	}, [ref, selected && selected.id, collapsed.size]);
 
 	return (
 		<div

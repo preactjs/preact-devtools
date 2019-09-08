@@ -1,4 +1,4 @@
-import { createStore } from "../view/store";
+import { createStore, getAllChildren } from "../view/store";
 import { applyOperations } from "./events";
 import { expect } from "chai";
 import { fromSnapshot } from "./debug";
@@ -44,5 +44,19 @@ describe("Store", () => {
 				.get(1)!
 				.duration(),
 		).to.equal(12);
+	});
+
+	it("should collapse nodes", () => {
+		const store = createStore();
+		const event = fromSnapshot([
+			"rootId: 1",
+			"Add 1 <Fragment> to parent 1",
+			"Add 2 <div> to parent 1",
+			"Add 3 <span> to parent 2",
+		]);
+		applyOperations(store, event);
+
+		store.actions.collapseNode(2);
+		expect(store.visiblity.hidden()).to.deep.equal(new Set([3]));
 	});
 });
