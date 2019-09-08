@@ -4,7 +4,8 @@
 	flex-direction: row;
 	align-items: center;
 	border-bottom: 0.0625rem solid var(--color-border);
-	height: 2.5rem;
+	height: 2.25rem;
+	flex: 0 0 auto;
 }
 
 .actions > * {
