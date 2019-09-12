@@ -137,6 +137,7 @@
 	opacity: 0;
 	transition: all 0.2s;
 	visibility: hidden;
+	color: var(--color-text);
 }
 
 .showUndoBtn {

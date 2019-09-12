@@ -1,6 +1,6 @@
 import { h } from "preact";
 import { useState } from "preact/hooks";
-import { Actions } from "./Actions";
+import { Actions, ActionSeparator } from "./Actions";
 import { IconBtn } from "./IconBtn";
 import { SettingsIcon } from "./icons";
 
@@ -40,7 +40,9 @@ export function TreeBar() {
 					</g>
 				</svg>
 			</IconBtn>
+			<ActionSeparator />
 			<div style="width: 100%">foo</div>
+			<ActionSeparator />
 			<IconBtn
 				data-active={settings}
 				title="Settings"

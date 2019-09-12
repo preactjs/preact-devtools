@@ -1,4 +1,4 @@
-import { h, Fragment } from "preact";
+import { h } from "preact";
 import s from "./Sidebar.css";
 import { SidebarPanel } from "./SidebarPanel";
 import { Actions } from "./Actions";
@@ -14,15 +14,16 @@ export function Sidebar() {
 
 	return (
 		<aside class={s.root}>
-			<Actions>
+			<Actions class={s.actions}>
 				<span class={s.title}>{node ? node.name : "-"}</span>
-				{node && (
-					<Fragment>
+
+				<div class={s.iconActions}>
+					{node && (
 						<IconBtn onClick={() => store.actions.logNode(node.id)}>
 							<BugIcon />
 						</IconBtn>
-					</Fragment>
-				)}
+					)}
+				</div>
 			</Actions>
 			<div class={s.body}>
 				<SidebarPanel title="props" empty="None">

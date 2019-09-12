@@ -2,6 +2,7 @@
 	display: flex;
 	flex-direction: column;
 	width: 100%;
+	height: 100%;
 }
 
 .title {
@@ -17,4 +18,13 @@
 
 .body > * + * {
 	border-top: 0.0625rem solid var(--color-border);
+}
+
+.actions {
+	justify-content: space-between;
+}
+
+.iconActions {
+	display: flex;
+	align-items: center;
 }
