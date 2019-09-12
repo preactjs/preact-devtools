@@ -13,7 +13,6 @@ const sizerStyle = {
 	left: 0,
 	visibility: "hidden",
 	height: 0,
-	overflow: "scroll",
 	whiteSpace: "pre",
 };
 
@@ -42,7 +41,10 @@ export function AutoSizeInput(props: Props) {
 			sizer.style.fontWeight = inputStyle.fontWeight;
 			sizer.style.fontStyle = inputStyle.fontStyle;
 			sizer.style.letterSpacing = inputStyle.letterSpacing;
-			sizer.style.padding = inputStyle.padding;
+			sizer.style.paddingTop = inputStyle.paddingTop;
+			sizer.style.paddingBottom = inputStyle.paddingBottom;
+			sizer.style.paddingLeft = inputStyle.paddingLeft;
+			sizer.style.paddingRight = inputStyle.paddingRight;
 		}
 	}, []);
 
