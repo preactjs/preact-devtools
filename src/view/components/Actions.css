@@ -13,13 +13,10 @@
 	position: relative;
 }
 
-.actions > * + *:before {
-	content: "";
+.sep {
 	width: 0.0625rem;
-	position: absolute;
-	left: 0;
-	top: 25%;
 	background: var(--color-border);
 	height: 50%;
 	display: flex;
+	padding: 0;
 }

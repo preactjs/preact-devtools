@@ -2,7 +2,9 @@ import { h } from "preact";
 import s from "./ElementProps.css";
 import { Arrow } from "./TreeView";
 import { flatten, PropDataType } from "../parseProps";
-import { useState } from "preact/hooks";
+import { useState, useCallback, useRef, useMemo } from "preact/hooks";
+import { AutoSizeInput } from "./AutoSizeInput";
+import { Undo } from "./icons";
 
 export type ObjPath = Array<string | number>;
 export type ChangeFn = (value: any, path: ObjPath) => void;
@@ -10,14 +12,56 @@ export type ChangeFn = (value: any, path: ObjPath) => void;
 export interface Props {
 	editable?: boolean;
 	data: any;
-	path: ObjPath;
-	onInput?: ChangeFn;
+	onChange?: ChangeFn;
+	onRename?: ChangeFn;
 }
 
 export function ElementProps(props: Props) {
-	const { data, editable, path = [], onInput } = props;
+	const { data, editable, onChange, onRename } = props;
 
-	const parsed = flatten(data, [], 7, []);
+	const parsed = useMemo(() => flatten(data, [], 7, []), [data]);
+	// const state = useMemo(() => {
+	// 	const vis = new Map<string, string[]>();
+
+	// 	parsed.forEach(v => {
+	// 		const key = v.path.join(".");
+	// 		let idx = -1;
+	// 		let tmp = key;
+	// 		while ((idx = tmp.lastIndexOf(".")) > -1) {
+	// 			tmp = tmp.slice(0, idx);
+	// 			console.log(tmp);
+	// 			if (vis.has(tmp)) {
+	// 				vis.get(tmp)!.push(key);
+	// 			}
+	// 		}
+
+	// 		vis.set(key, []);
+	// 	});
+	// }, [parsed]);
+	const [collapsed, setCollapsed] = useState(new Set<string>());
+	const [hidden, sethidden] = useState(new Set<string>());
+
+	const hide = useCallback(
+		(raw: ObjPath) => {
+			const path = raw.join(".");
+			const shouldHide = !collapsed.has(path);
+
+			if (shouldHide) collapsed.add(path);
+			else collapsed.delete(path);
+
+			parsed.forEach(x => {
+				const child = x.path.join(".");
+				if (child !== path && child.startsWith(path)) {
+					if (shouldHide) hidden.add(child);
+					else hidden.delete(child);
+				}
+			});
+
+			setCollapsed(new Set(collapsed));
+			sethidden(new Set(hidden));
+		},
+		[parsed],
+	);
 
 	return (
 		<div class={s.root}>
@@ -28,16 +72,22 @@ export function ElementProps(props: Props) {
 				}}
 			>
 				{parsed.map(item => {
+					const key = item.path.join(".");
+					if (hidden.has(key)) return null;
+
 					return (
 						<SingleItem
-							key={item.name}
+							key={key}
 							type={item.type}
 							name={item.name}
 							collapseable={item.collapsable}
-							editable={(editable && item.editable) || false}
+							collapsed={collapsed.has(key)}
+							onCollapse={hide}
+							editable={editable}
 							value={item.value}
 							path={item.path}
-							onInput={onInput}
+							onChange={onChange}
+							onRename={onRename}
 							depth={item.depth}
 						/>
 					);
@@ -52,22 +102,28 @@ export interface SingleProps {
 	editable?: boolean;
 	type: PropDataType;
 	collapseable?: boolean;
+	collapsed?: boolean;
 	path: ObjPath;
 	name: string;
 	value: any;
-	onInput?: ChangeFn;
+	onChange?: ChangeFn;
+	onRename?: ChangeFn;
+	onCollapse?: (path: ObjPath) => void;
 	depth: number;
 }
 
 export function SingleItem(props: SingleProps) {
 	const {
-		onInput,
+		onChange,
 		path,
 		editable = false,
 		name,
 		type,
 		collapseable = false,
+		collapsed = false,
 		depth,
+		onRename,
+		onCollapse,
 	} = props;
 
 	const css: Record<string, string> = {
@@ -82,7 +138,12 @@ export function SingleItem(props: SingleProps) {
 
 	const v = props.value;
 	const update = (v: any) => {
-		onInput && onInput(v, path);
+		onChange && onChange(v, path);
+	};
+	const rename = (v: string) => {
+		if (onRename && path[path.length - 1] !== v) {
+			onRename(v, path);
+		}
 	};
 
 	return (
@@ -95,8 +156,8 @@ export function SingleItem(props: SingleProps) {
 			{collapseable && (
 				<button
 					class={s.toggle}
-					data-collapsed={false}
-					onClick={() => console.log(path)}
+					data-collapsed={collapsed}
+					onClick={() => onCollapse && onCollapse(path)}
 				>
 					<Arrow />
 				</button>
@@ -105,7 +166,11 @@ export function SingleItem(props: SingleProps) {
 				class={`${s.name} ${!collapseable ? s.noCollapse : ""}`}
 				data-type={type}
 			>
-				{name}
+				{editable ? (
+					<AutoSizeInput class={s.nameInput} value={name} onChange={rename} />
+				) : (
+					<span class={s.nameStatic}>{name}</span>
+				)}
 			</div>
 			<div class={`${s.property} ${css[type] || ""}`}>
 				{editable ? (
@@ -124,43 +189,73 @@ export interface InputProps {
 }
 
 export function DataInput({ value, onChange }: InputProps) {
-	let [focus, setFocus] = useState(false);
+	const hasCheck = typeof value === "boolean";
 
-	let inputType = "text";
-	if (typeof value === "string") {
-		inputType = "text";
-		if (!focus) value = `"${value}"`;
-	} else if (typeof value === "number") {
-		inputType = "number";
-	} else {
-		inputType = "checkbox";
-	}
-
-	const onCommit = (e: Event) => {
+	const onCommit = useCallback((e: Event) => {
 		onChange(getEventValue(e));
-	};
+	}, []);
 
-	return inputType === "checkbox" ? (
-		<input
-			class={s.input}
-			type="checkbox"
-			checked={value as any}
-			onBlur={onCommit}
-		/>
-	) : (
-		<input
-			class={s.input}
-			type={inputType}
-			onFocus={() => setFocus(true)}
-			onBlur={() => setFocus(false)}
-			value={value as any}
-			onKeyUp={e => {
-				if (e.keyCode === 13) {
-					(e.currentTarget as any).blur();
-					onCommit(e);
+	const onKeyUp = useCallback((e: KeyboardEvent) => {
+		console.log(typeof value, e.key);
+		switch (e.key) {
+			case "Enter":
+			case "Tab":
+				// (e.currentTarget as any).blur();
+				onCommit(e);
+				break;
+			case "Up":
+			case "ArrowUp":
+				if (typeof value === "number") {
+					onChange(value + 1);
 				}
-			}}
-		/>
+				break;
+			case "Down":
+			case "ArrowDown":
+				if (typeof value === "number") {
+					onChange(value - 1);
+				}
+				break;
+		}
+	}, []);
+
+	const [focus, setFocus] = useState(false);
+	const [initialValue] = useState(value);
+	const [v, set] = useState(value);
+	const ref = useRef<HTMLInputElement>();
+
+	return (
+		<div class={s.valueWrapper}>
+			{hasCheck && !focus && (
+				<input
+					class={s.check}
+					type="checkbox"
+					checked={value as any}
+					onBlur={onCommit}
+				/>
+			)}
+			<div class={`${s.innerWrapper} ${hasCheck ? s.withCheck : ""}`}>
+				<input
+					type="text"
+					ref={ref}
+					class={`${s.nameInput} ${s.valueInput} ${focus ? s.focus : ""}`}
+					value={"" + v}
+					onFocus={() => setFocus(true)}
+					onBlur={() => setFocus(false)}
+					onInput={e => set((e.target as any).value)}
+				/>
+				<button
+					class={`${s.undoBtn} ${v !== initialValue ? s.showUndoBtn : ""}`}
+					onClick={() => {
+						setFocus(true);
+						if (ref.current) ref.current.focus();
+						set(initialValue);
+						onChange(initialValue);
+					}}
+				>
+					<Undo size="s" />
+				</button>
+			</div>
+		</div>
 	);
 }
 

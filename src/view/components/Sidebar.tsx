@@ -1,10 +1,11 @@
-import { h, Fragment } from "preact";
+import { h } from "preact";
 import s from "./Sidebar.css";
 import { SidebarPanel } from "./SidebarPanel";
 import { Actions } from "./Actions";
 import { useObserver, useStore } from "../store";
 import { IconBtn } from "./IconBtn";
 import { ElementProps } from "./ElementProps";
+import { BugIcon } from "./icons";
 
 export function Sidebar() {
 	const store = useStore();
@@ -13,26 +14,29 @@ export function Sidebar() {
 
 	return (
 		<aside class={s.root}>
-			<Actions>
+			<Actions class={s.actions}>
 				<span class={s.title}>{node ? node.name : "-"}</span>
-				{node && (
-					<Fragment>
+
+				<div class={s.iconActions}>
+					{node && (
 						<IconBtn onClick={() => store.actions.logNode(node.id)}>
-							Log
+							<BugIcon />
 						</IconBtn>
-					</Fragment>
-				)}
+					)}
+				</div>
 			</Actions>
 			<div class={s.body}>
 				<SidebarPanel title="props" empty="None">
-					{inspect.props ? (
+					{inspect.props != null && node != null ? (
 						<ElementProps
-							path={[]}
 							data={inspect.props}
 							editable={inspect.canEditProps}
-							onInput={(v, path) =>
-								node && store.actions.updateNode(node.id, "props", path, v)
+							onChange={(v, path) =>
+								store.actions.updateNode(node.id, "props", path, v)
 							}
+							onRename={(v, path) => {
+								store.actions.updatePropertyName(node.id, "props", path, v);
+							}}
 						/>
 					) : null}
 				</SidebarPanel>
@@ -40,10 +44,9 @@ export function Sidebar() {
 					<SidebarPanel title="state" empty="None">
 						{inspect.state ? (
 							<ElementProps
-								path={[]}
 								data={inspect.state}
 								editable={inspect.canEditState}
-								onInput={(v, path) =>
+								onChange={(v, path) =>
 									node && store.actions.updateNode(node.id, "state", path, v)
 								}
 							/>

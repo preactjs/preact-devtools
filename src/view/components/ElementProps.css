@@ -11,26 +11,38 @@
 	width: 100%;
 	display: flex;
 	flex-direction: row;
+	align-items: center;
 	--indent-depth: 0.5rem;
 }
 
 .name {
-	padding: 0.25rem 0;
-	color: var(--color-element-non-interactive);
+	color: var(--color-element-text);
 	line-height: 1;
 	white-space: nowrap;
 	flex: 0 0 auto;
 }
 
-.name[data-type="number"],
-.name[data-type="boolean"],
-.name[data-type="string"] {
-	color: var(--color-element-text);
-}
-
 .name::after {
 	content: ":";
 	color: var(--color-props-sep);
+}
+
+.nameStatic {
+	padding: 0.2em 0 0.2em 0.2em;
+	display: inline-block;
+	line-height: 1.4;
+}
+
+.nameInput {
+	border: none;
+	background: transparent;
+	padding: 0.2em 0 0.2em 0.2em;
+	outline: none;
+	color: inherit;
+}
+
+.nameInput:focus {
+	background: var(--color-props-input-bg);
 }
 
 .property {
@@ -39,7 +51,7 @@
 	text-overflow: ellipsis;
 	display: flex;
 	align-items: center;
-	padding: 0 0.5rem;
+	padding-left: 0.25rem;
 	width: 100%;
 	position: relative;
 }
@@ -55,24 +67,90 @@
 	justify-content: center;
 	align-items: center;
 	width: 1.25rem;
-	height: 1.25rem;
+	height: 100%;
 	padding: 0.2em 0.13em;
 	cursor: pointer;
 	color: #aaa;
 }
 
-.input {
+.toggle svg {
+	transition: transform 0.2s;
+}
+
+.toggle[data-collapsed="true"] svg {
+	transform: rotate(-90deg);
+}
+
+.valueWrapper {
+	display: flex;
+	justify-content: flex-end;
+	min-width: 100%;
+}
+
+.check {
+	cursor: pointer;
+}
+
+.withCheck .valueInput {
+	color: transparent;
+}
+
+.withCheck:focus-within .valueInput {
+	color: inherit;
+}
+
+.valueInput {
 	font-family: monospace;
 	background: none;
 	border: none;
 	line-height: 1;
 	z-index: 20;
 	color: inherit;
+	flex: 1;
+	padding-right: 0.2em;
+	min-width: 0;
 }
 
-.input:focus {
+.innerWrapper {
+	min-width: 0;
+	flex: 1;
+	display: flex;
+}
+
+.innerWrapper:focus-within .valueInput {
 	background: var(--color-props-input-bg);
 	outline: none;
+}
+
+.innerWrapper:focus-within .undoBtn {
+	display: block;
+}
+
+.undoBtn {
+	display: none;
+	background: none;
+	border: none;
+	background: none;
+	cursor: pointer;
+	outline: none;
+	padding: 0 0.75rem;
+	opacity: 0;
+	transition: all 0.2s;
+	visibility: hidden;
+	color: var(--color-text);
+}
+
+.showUndoBtn {
+	visibility: visible;
+	opacity: 1;
+}
+
+.undoBtn:hover {
+	color: var(--color-button-active);
+}
+
+.undoBtn:focus {
+	color: var(--color-button-active);
 }
 
 .mask {
