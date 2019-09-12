@@ -5,6 +5,7 @@ import { Actions } from "./Actions";
 import { useObserver, useStore } from "../store";
 import { IconBtn } from "./IconBtn";
 import { ElementProps } from "./ElementProps";
+import { BugIcon } from "./icons";
 
 export function Sidebar() {
 	const store = useStore();
@@ -18,7 +19,7 @@ export function Sidebar() {
 				{node && (
 					<Fragment>
 						<IconBtn onClick={() => store.actions.logNode(node.id)}>
-							Log
+							<BugIcon />
 						</IconBtn>
 					</Fragment>
 				)}
