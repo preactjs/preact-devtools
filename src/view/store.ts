@@ -65,6 +65,12 @@ export interface Store {
 		collapseNode: (id: ID) => void;
 		logNode: (id: ID) => void;
 		updateNode: (id: ID, type: UpdateType, path: ObjPath, value: any) => void;
+		updatePropertyName: (
+			id: ID,
+			type: UpdateType,
+			path: ObjPath,
+			value: any,
+		) => void;
 		clear(): void;
 	};
 	subscribe(fn: Listener): () => void;
@@ -139,6 +145,11 @@ export function createStore(): Store {
 			},
 			updateNode(id, type, path, value) {
 				notify("update-node", { id, type, path, value });
+				notify("inspect", id);
+			},
+			updatePropertyName(id, type, path, value) {
+				console.log("TODO", path, value);
+				// notify("update-node", { id, type, path, value });
 				notify("inspect", id);
 			},
 			clear() {

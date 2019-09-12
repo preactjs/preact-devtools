@@ -16,16 +16,10 @@
 }
 
 .name {
-	color: var(--color-element-non-interactive);
+	color: var(--color-element-text);
 	line-height: 1;
 	white-space: nowrap;
 	flex: 0 0 auto;
-}
-
-.name[data-type="number"],
-.name[data-type="boolean"],
-.name[data-type="string"] {
-	color: var(--color-element-text);
 }
 
 .name::after {
@@ -44,6 +38,7 @@
 	background: transparent;
 	padding: 0.2em 0 0.2em 0.2em;
 	outline: none;
+	color: inherit;
 }
 
 .nameInput:focus {

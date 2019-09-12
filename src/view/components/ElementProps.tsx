@@ -11,12 +11,12 @@ export type ChangeFn = (value: any, path: ObjPath) => void;
 export interface Props {
 	editable?: boolean;
 	data: any;
-	path: ObjPath;
-	onInput?: ChangeFn;
+	onChange?: ChangeFn;
+	onRename?: ChangeFn;
 }
 
 export function ElementProps(props: Props) {
-	const { data, editable, path = [], onInput } = props;
+	const { data, editable, onChange, onRename } = props;
 
 	const parsed = flatten(data, [], 7, []);
 
@@ -35,10 +35,11 @@ export function ElementProps(props: Props) {
 							type={item.type}
 							name={item.name}
 							collapseable={item.collapsable}
-							editable={(editable && item.editable) || false}
+							editable={editable}
 							value={item.value}
 							path={item.path}
-							onInput={onInput}
+							onChange={onChange}
+							onRename={onRename}
 							depth={item.depth}
 						/>
 					);
@@ -56,19 +57,21 @@ export interface SingleProps {
 	path: ObjPath;
 	name: string;
 	value: any;
-	onInput?: ChangeFn;
+	onChange?: ChangeFn;
+	onRename?: ChangeFn;
 	depth: number;
 }
 
 export function SingleItem(props: SingleProps) {
 	const {
-		onInput,
+		onChange,
 		path,
 		editable = false,
 		name,
 		type,
 		collapseable = false,
 		depth,
+		onRename,
 	} = props;
 
 	const css: Record<string, string> = {
@@ -83,7 +86,12 @@ export function SingleItem(props: SingleProps) {
 
 	const v = props.value;
 	const update = (v: any) => {
-		onInput && onInput(v, path);
+		onChange && onChange(v, path);
+	};
+	const rename = (v: string) => {
+		if (onRename && path[path.length - 1] !== v) {
+			onRename(v, path);
+		}
 	};
 
 	return (
@@ -107,11 +115,7 @@ export function SingleItem(props: SingleProps) {
 				data-type={type}
 			>
 				{editable ? (
-					<AutoSizeInput
-						class={s.nameInput}
-						value={name}
-						onChange={v => console.log("new value", v)}
-					/>
+					<AutoSizeInput class={s.nameInput} value={name} onChange={rename} />
 				) : (
 					<span class={s.nameStatic}>{name}</span>
 				)}
@@ -133,14 +137,11 @@ export interface InputProps {
 }
 
 export function DataInput({ value, onChange }: InputProps) {
-	let [focus, setFocus] = useState(false);
-
 	let inputType;
 	if (typeof value === "boolean") {
 		inputType = "checkbox";
 	} else {
 		inputType = "text";
-		if (!focus) value = JSON.stringify(value);
 	}
 
 	const onCommit = useCallback((e: Event) => {
@@ -152,7 +153,7 @@ export function DataInput({ value, onChange }: InputProps) {
 		switch (e.key) {
 			case "Enter":
 			case "Tab":
-				(e.currentTarget as any).blur();
+				// (e.currentTarget as any).blur();
 				onCommit(e);
 				break;
 			case "Up":
@@ -170,22 +171,18 @@ export function DataInput({ value, onChange }: InputProps) {
 		}
 	}, []);
 
-	return inputType === "checkbox" ? (
-		<input
-			class={s.input}
-			type="checkbox"
-			checked={value as any}
-			onBlur={onCommit}
-		/>
-	) : (
-		<input
-			class={s.input}
-			type={inputType}
-			onFocus={() => setFocus(true)}
-			onBlur={() => setFocus(false)}
-			value={value as any}
-			onKeyUp={onKeyUp}
-		/>
+	return (
+		<div>
+			{inputType === "checkbox" && (
+				<input
+					class={s.input}
+					type="checkbox"
+					checked={value as any}
+					onBlur={onCommit}
+				/>
+			)}
+			<input type="text" class={s.nameInput} value={"" + value} />
+		</div>
 	);
 }
 

@@ -25,14 +25,16 @@ export function Sidebar() {
 			</Actions>
 			<div class={s.body}>
 				<SidebarPanel title="props" empty="None">
-					{inspect.props ? (
+					{inspect.props != null && node != null ? (
 						<ElementProps
-							path={[]}
 							data={inspect.props}
 							editable={inspect.canEditProps}
-							onInput={(v, path) =>
-								node && store.actions.updateNode(node.id, "props", path, v)
+							onChange={(v, path) =>
+								store.actions.updateNode(node.id, "props", path, v)
 							}
+							onRename={(v, path) => {
+								store.actions.updatePropertyName(node.id, "props", path, v);
+							}}
 						/>
 					) : null}
 				</SidebarPanel>
@@ -40,10 +42,9 @@ export function Sidebar() {
 					<SidebarPanel title="state" empty="None">
 						{inspect.state ? (
 							<ElementProps
-								path={[]}
 								data={inspect.state}
 								editable={inspect.canEditState}
-								onInput={(v, path) =>
+								onChange={(v, path) =>
 									node && store.actions.updateNode(node.id, "state", path, v)
 								}
 							/>
