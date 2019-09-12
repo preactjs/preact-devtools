@@ -15,7 +15,6 @@
 }
 
 .name {
-	padding: 0.25rem 0;
 	color: var(--color-element-non-interactive);
 	line-height: 1;
 	white-space: nowrap;
@@ -31,6 +30,24 @@
 .name::after {
 	content: ":";
 	color: var(--color-props-sep);
+}
+
+.nameStatic {
+	padding: 0.2em 0.3em;
+	display: inline-block;
+	line-height: 1.4;
+}
+
+.nameInput {
+	border: none;
+	background: transparent;
+	padding: 0.2em 0.3em;
+	outline: none;
+	padding: 0.2em 0.3em;
+}
+
+.nameInput:focus {
+	background: var(--color-props-input-bg);
 }
 
 .property {

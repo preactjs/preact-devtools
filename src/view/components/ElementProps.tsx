@@ -2,7 +2,8 @@ import { h } from "preact";
 import s from "./ElementProps.css";
 import { Arrow } from "./TreeView";
 import { flatten, PropDataType } from "../parseProps";
-import { useState } from "preact/hooks";
+import { useState, useCallback } from "preact/hooks";
+import { AutoSizeInput } from "./AutoSizeInput";
 
 export type ObjPath = Array<string | number>;
 export type ChangeFn = (value: any, path: ObjPath) => void;
@@ -30,7 +31,7 @@ export function ElementProps(props: Props) {
 				{parsed.map(item => {
 					return (
 						<SingleItem
-							key={item.name}
+							key={item.path.join(".")}
 							type={item.type}
 							name={item.name}
 							collapseable={item.collapsable}
@@ -105,7 +106,15 @@ export function SingleItem(props: SingleProps) {
 				class={`${s.name} ${!collapseable ? s.noCollapse : ""}`}
 				data-type={type}
 			>
-				{name}
+				{editable ? (
+					<AutoSizeInput
+						class={s.nameInput}
+						value={name}
+						onChange={v => console.log("new value", v)}
+					/>
+				) : (
+					<span class={s.nameStatic}>{name}</span>
+				)}
 			</div>
 			<div class={`${s.property} ${css[type] || ""}`}>
 				{editable ? (
@@ -126,19 +135,40 @@ export interface InputProps {
 export function DataInput({ value, onChange }: InputProps) {
 	let [focus, setFocus] = useState(false);
 
-	let inputType = "text";
-	if (typeof value === "string") {
-		inputType = "text";
-		if (!focus) value = `"${value}"`;
-	} else if (typeof value === "number") {
-		inputType = "number";
-	} else {
+	let inputType;
+	if (typeof value === "boolean") {
 		inputType = "checkbox";
+	} else {
+		inputType = "text";
+		if (!focus) value = JSON.stringify(value);
 	}
 
-	const onCommit = (e: Event) => {
+	const onCommit = useCallback((e: Event) => {
 		onChange(getEventValue(e));
-	};
+	}, []);
+
+	const onKeyUp = useCallback((e: KeyboardEvent) => {
+		console.log(typeof value, e.key);
+		switch (e.key) {
+			case "Enter":
+			case "Tab":
+				(e.currentTarget as any).blur();
+				onCommit(e);
+				break;
+			case "Up":
+			case "ArrowUp":
+				if (typeof value === "number") {
+					onChange(value + 1);
+				}
+				break;
+			case "Down":
+			case "ArrowDown":
+				if (typeof value === "number") {
+					onChange(value - 1);
+				}
+				break;
+		}
+	}, []);
 
 	return inputType === "checkbox" ? (
 		<input
@@ -154,12 +184,7 @@ export function DataInput({ value, onChange }: InputProps) {
 			onFocus={() => setFocus(true)}
 			onBlur={() => setFocus(false)}
 			value={value as any}
-			onKeyUp={e => {
-				if (e.keyCode === 13) {
-					(e.currentTarget as any).blur();
-					onCommit(e);
-				}
-			}}
+			onKeyUp={onKeyUp}
 		/>
 	);
 }
