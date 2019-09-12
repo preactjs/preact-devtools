@@ -51,7 +51,7 @@
 	text-overflow: ellipsis;
 	display: flex;
 	align-items: center;
-	padding: 0 0.5rem;
+	padding-left: 0.25rem;
 	width: 100%;
 	position: relative;
 }
@@ -73,18 +73,75 @@
 	color: #aaa;
 }
 
-.input {
+.valueWrapper {
+	display: flex;
+	justify-content: flex-end;
+	min-width: 100%;
+}
+
+.check {
+	cursor: pointer;
+}
+
+.withCheck .valueInput {
+	color: transparent;
+}
+
+.withCheck:focus-within .valueInput {
+	color: inherit;
+}
+
+.valueInput {
 	font-family: monospace;
 	background: none;
 	border: none;
 	line-height: 1;
 	z-index: 20;
 	color: inherit;
+	flex: 1;
+	padding-right: 0.2em;
+	min-width: 0;
 }
 
-.input:focus {
+.innerWrapper {
+	min-width: 0;
+	flex: 1;
+	display: flex;
+}
+
+.innerWrapper:focus-within .valueInput {
 	background: var(--color-props-input-bg);
 	outline: none;
+}
+
+.innerWrapper:focus-within .undoBtn {
+	display: block;
+}
+
+.undoBtn {
+	display: none;
+	background: none;
+	border: none;
+	background: none;
+	cursor: pointer;
+	outline: none;
+	padding: 0 0.75rem;
+	opacity: 0;
+	transition: all 0.2s;
+	visibility: hidden;
+}
+
+.showUndoBtn {
+	visibility: visible;
+	opacity: 1;
+}
+
+.undoBtn:hover {
+	color: var(--color-button-active);
+}
+
+.undoBtn:focus {
+	color: var(--color-button-active);
 }
 
 .mask {

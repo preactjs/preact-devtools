@@ -2,8 +2,9 @@ import { h } from "preact";
 import s from "./ElementProps.css";
 import { Arrow } from "./TreeView";
 import { flatten, PropDataType } from "../parseProps";
-import { useState, useCallback } from "preact/hooks";
+import { useState, useCallback, useRef } from "preact/hooks";
 import { AutoSizeInput } from "./AutoSizeInput";
+import { Undo } from "./icons";
 
 export type ObjPath = Array<string | number>;
 export type ChangeFn = (value: any, path: ObjPath) => void;
@@ -137,12 +138,7 @@ export interface InputProps {
 }
 
 export function DataInput({ value, onChange }: InputProps) {
-	let inputType;
-	if (typeof value === "boolean") {
-		inputType = "checkbox";
-	} else {
-		inputType = "text";
-	}
+	const hasCheck = typeof value === "boolean";
 
 	const onCommit = useCallback((e: Event) => {
 		onChange(getEventValue(e));
@@ -171,17 +167,43 @@ export function DataInput({ value, onChange }: InputProps) {
 		}
 	}, []);
 
+	const [focus, setFocus] = useState(false);
+	const [initialValue] = useState(value);
+	const [v, set] = useState(value);
+	const ref = useRef<HTMLInputElement>();
+
 	return (
-		<div>
-			{inputType === "checkbox" && (
+		<div class={s.valueWrapper}>
+			{hasCheck && !focus && (
 				<input
-					class={s.input}
+					class={s.check}
 					type="checkbox"
 					checked={value as any}
 					onBlur={onCommit}
 				/>
 			)}
-			<input type="text" class={s.nameInput} value={"" + value} />
+			<div class={`${s.innerWrapper} ${hasCheck ? s.withCheck : ""}`}>
+				<input
+					type="text"
+					ref={ref}
+					class={`${s.nameInput} ${s.valueInput} ${focus ? s.focus : ""}`}
+					value={"" + v}
+					onFocus={() => setFocus(true)}
+					onBlur={() => setFocus(false)}
+					onInput={e => set((e.target as any).value)}
+				/>
+				<button
+					class={`${s.undoBtn} ${v !== initialValue ? s.showUndoBtn : ""}`}
+					onClick={() => {
+						setFocus(true);
+						if (ref.current) ref.current.focus();
+						set(initialValue);
+						onChange(initialValue);
+					}}
+				>
+					<Undo size="s" />
+				</button>
+			</div>
 		</div>
 	);
 }
