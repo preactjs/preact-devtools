@@ -2,7 +2,7 @@ import { h } from "preact";
 import s from "./ElementProps.css";
 import { Arrow } from "./TreeView";
 import { flatten, PropDataType } from "../parseProps";
-import { useState, useCallback, useRef } from "preact/hooks";
+import { useState, useCallback, useRef, useMemo } from "preact/hooks";
 import { AutoSizeInput } from "./AutoSizeInput";
 import { Undo } from "./icons";
 
@@ -19,7 +19,49 @@ export interface Props {
 export function ElementProps(props: Props) {
 	const { data, editable, onChange, onRename } = props;
 
-	const parsed = flatten(data, [], 7, []);
+	const parsed = useMemo(() => flatten(data, [], 7, []), [data]);
+	// const state = useMemo(() => {
+	// 	const vis = new Map<string, string[]>();
+
+	// 	parsed.forEach(v => {
+	// 		const key = v.path.join(".");
+	// 		let idx = -1;
+	// 		let tmp = key;
+	// 		while ((idx = tmp.lastIndexOf(".")) > -1) {
+	// 			tmp = tmp.slice(0, idx);
+	// 			console.log(tmp);
+	// 			if (vis.has(tmp)) {
+	// 				vis.get(tmp)!.push(key);
+	// 			}
+	// 		}
+
+	// 		vis.set(key, []);
+	// 	});
+	// }, [parsed]);
+	const [collapsed, setCollapsed] = useState(new Set<string>());
+	const [hidden, sethidden] = useState(new Set<string>());
+
+	const hide = useCallback(
+		(raw: ObjPath) => {
+			const path = raw.join(".");
+			const shouldHide = !collapsed.has(path);
+
+			if (shouldHide) collapsed.add(path);
+			else collapsed.delete(path);
+
+			parsed.forEach(x => {
+				const child = x.path.join(".");
+				if (child !== path && child.startsWith(path)) {
+					if (shouldHide) hidden.add(child);
+					else hidden.delete(child);
+				}
+			});
+
+			setCollapsed(new Set(collapsed));
+			sethidden(new Set(hidden));
+		},
+		[parsed],
+	);
 
 	return (
 		<div class={s.root}>
@@ -30,12 +72,17 @@ export function ElementProps(props: Props) {
 				}}
 			>
 				{parsed.map(item => {
+					const key = item.path.join(".");
+					if (hidden.has(key)) return null;
+
 					return (
 						<SingleItem
-							key={item.path.join(".")}
+							key={key}
 							type={item.type}
 							name={item.name}
 							collapseable={item.collapsable}
+							collapsed={collapsed.has(key)}
+							onCollapse={hide}
 							editable={editable}
 							value={item.value}
 							path={item.path}
@@ -55,11 +102,13 @@ export interface SingleProps {
 	editable?: boolean;
 	type: PropDataType;
 	collapseable?: boolean;
+	collapsed?: boolean;
 	path: ObjPath;
 	name: string;
 	value: any;
 	onChange?: ChangeFn;
 	onRename?: ChangeFn;
+	onCollapse?: (path: ObjPath) => void;
 	depth: number;
 }
 
@@ -71,8 +120,10 @@ export function SingleItem(props: SingleProps) {
 		name,
 		type,
 		collapseable = false,
+		collapsed = false,
 		depth,
 		onRename,
+		onCollapse,
 	} = props;
 
 	const css: Record<string, string> = {
@@ -105,8 +156,8 @@ export function SingleItem(props: SingleProps) {
 			{collapseable && (
 				<button
 					class={s.toggle}
-					data-collapsed={false}
-					onClick={() => console.log(path)}
+					data-collapsed={collapsed}
+					onClick={() => onCollapse && onCollapse(path)}
 				>
 					<Arrow />
 				</button>

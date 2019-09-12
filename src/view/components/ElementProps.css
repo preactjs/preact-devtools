@@ -73,6 +73,14 @@
 	color: #aaa;
 }
 
+.toggle svg {
+	transition: transform 0.2s;
+}
+
+.toggle[data-collapsed="true"] svg {
+	transform: rotate(-90deg);
+}
+
 .valueWrapper {
 	display: flex;
 	justify-content: flex-end;
