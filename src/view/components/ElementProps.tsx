@@ -20,26 +20,26 @@ export function ElementProps(props: Props) {
 	const { data, editable, onChange, onRename } = props;
 
 	const parsed = useMemo(() => flatten(data, [], 7, []), [data]);
-	// const state = useMemo(() => {
-	// 	const vis = new Map<string, string[]>();
 
-	// 	parsed.forEach(v => {
-	// 		const key = v.path.join(".");
-	// 		let idx = -1;
-	// 		let tmp = key;
-	// 		while ((idx = tmp.lastIndexOf(".")) > -1) {
-	// 			tmp = tmp.slice(0, idx);
-	// 			console.log(tmp);
-	// 			if (vis.has(tmp)) {
-	// 				vis.get(tmp)!.push(key);
-	// 			}
-	// 		}
-
-	// 		vis.set(key, []);
-	// 	});
-	// }, [parsed]);
-	const [collapsed, setCollapsed] = useState(new Set<string>());
-	const [hidden, sethidden] = useState(new Set<string>());
+	// Items should be collapsed on init
+	const [collapsed, setCollapsed] = useState(
+		new Set<string>(
+			parsed.filter(x => x.collapsable).map(x => x.path.join(".")),
+		),
+	);
+	const [hidden, sethidden] = useState(
+		new Set<string>(
+			Array.from(collapsed).reduce<string[]>((acc, key) => {
+				parsed.forEach(x => {
+					const child = x.path.join(".");
+					if (child !== key && child.startsWith(key)) {
+						acc.push(child);
+					}
+				});
+				return acc;
+			}, []),
+		),
+	);
 
 	const hide = useCallback(
 		(raw: ObjPath) => {
