@@ -49,6 +49,7 @@ const EMPTY_INSPECT: InspectData = {
 };
 
 export interface Store {
+	isPicking: Observable<boolean>;
 	inspectData: Observable<InspectData>;
 	roots: Observable<ID[]>;
 	rootToChild: Observable<Map<number, number>>;
@@ -60,7 +61,7 @@ export interface Store {
 		hidden: Observable<Set<ID>>;
 	};
 	actions: {
-		selectNode: (id: ID, ref: HTMLElement) => void;
+		selectNode: (id: ID, ref: HTMLElement | null) => void;
 		highlightNode: (id: ID | null) => void;
 		collapseNode: (id: ID) => void;
 		logNode: (id: ID) => void;
@@ -72,6 +73,8 @@ export interface Store {
 			value: any,
 		) => void;
 		clear(): void;
+		startPickElement(): void;
+		stopPickElement(): void;
 	};
 	subscribe(fn: Listener): () => void;
 }
@@ -104,7 +107,10 @@ export function createStore(): Store {
 
 	const inspectData = valoo<InspectData>(EMPTY_INSPECT);
 
+	const isPicking = valoo<boolean>(false);
+
 	return {
+		isPicking,
 		inspectData,
 		roots,
 		rootToChild,
@@ -133,7 +139,10 @@ export function createStore(): Store {
 				const node = nodes().get(id)!;
 				node.selected(true);
 
-				selectedRef(ref);
+				// TODO
+				if (ref != null) {
+					selectedRef(ref);
+				}
 				selectedNode(node);
 				notify("inspect", id);
 			},
@@ -161,6 +170,14 @@ export function createStore(): Store {
 				selectedRef(null);
 				collapsed(new Set());
 				listeners = [];
+			},
+			startPickElement() {
+				isPicking(true);
+				notify("start-picker", null);
+			},
+			stopPickElement() {
+				isPicking(false);
+				notify("stop-picker", null);
 			},
 		},
 		subscribe(fn) {

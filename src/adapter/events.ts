@@ -149,6 +149,10 @@ export function applyEvent(store: Store, name: string, data: any) {
 			return applyOperations(store, data);
 		case "inspect-result":
 			return store.inspectData(data);
+		case "select-node":
+			return store.actions.selectNode(data, null);
+		case "stop-picker":
+			return store.actions.stopPickElement();
 	}
 }
 

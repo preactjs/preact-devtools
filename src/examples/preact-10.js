@@ -4,6 +4,8 @@ import { Highlighter } from "../view/components/Highlighter";
 import { ElementProps } from "../view/components/ElementProps";
 import { Iframer } from "./Iframer";
 import d from "../view/components/Devtools.css";
+import { IconBtn } from "../view/components/IconBtn";
+import { Picker } from "../view/components/icons";
 
 export function TodoList() {
 	const [todos, setTodos] = useState(["asd", "asdf"]);
@@ -159,6 +161,10 @@ export function TodoList() {
 							}}
 						/>
 					</div>
+					<h2>Icon Btns</h2>
+					<IconBtn onClick={() => console.log("click")}>
+						<Picker />
+					</IconBtn>
 				</div>
 			</div>
 		</div>

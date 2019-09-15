@@ -53,6 +53,7 @@ export function getDevtoolsType(vnode: VNode): Elements {
 export interface Renderer {
 	getVNodeById(id: ID): VNode | null;
 	findDomForVNode(id: ID): Array<HTMLElement | Text | null> | null;
+	findVNodeIdForDom(node: HTMLElement | Text): number;
 	has(id: ID): boolean;
 	log(id: ID): void;
 	inspect(id: ID): InspectData | null;
@@ -107,6 +108,9 @@ export function createRenderer(hook: DevtoolsHook): Renderer {
 		findDomForVNode(id) {
 			const vnode = ids.getVNode(id);
 			return vnode ? [getDom(vnode), getLastDomChild(vnode)] : null;
+		},
+		findVNodeIdForDom(node) {
+			return ids.getByDom(node) || -1;
 		},
 		flushInitial() {
 			console.log(queue);
