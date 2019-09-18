@@ -123,7 +123,6 @@ export function createRenderer(hook: DevtoolsHook): Renderer {
 			filters.type = nextFilters.type;
 		},
 		flushInitial() {
-			console.log(queue);
 			queue.forEach(ev => hook.emit(ev.name, ev.data));
 			hook.connected = true;
 			queue = [];

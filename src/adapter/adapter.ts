@@ -1,11 +1,5 @@
 import { ID } from "../view/store";
-import {
-	Component as PreactComponent,
-	render,
-	h,
-	Options,
-	VNode,
-} from "preact";
+import { render, h } from "preact";
 import { DevtoolsHook } from "./hook";
 import { Renderer } from "./10/renderer";
 import { Highlighter } from "../view/components/Highlighter";
