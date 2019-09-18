@@ -11,8 +11,6 @@ export function createBridge(target: Window) {
 			const { name } = ev.data;
 			if (listeners.has(name)) {
 				listeners.get(name)!.forEach(cb => cb(ev.data.payload));
-			} else {
-				console.warn(`No listener for event "${name}" found.`);
 			}
 		}
 	});
