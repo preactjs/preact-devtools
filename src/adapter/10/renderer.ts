@@ -17,8 +17,6 @@ import {
 	getLastDomChild,
 	getActualChildren,
 } from "./vnode";
-import { DevTools } from "../../view/components/Devtools";
-import { Highlighter } from "../../view/components/Highlighter";
 
 export enum Elements {
 	HTML_ELEMENT = 1,
