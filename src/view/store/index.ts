@@ -202,7 +202,10 @@ export function getAllChildren(tree: Tree, id: ID): ID[] {
 				if (node.id !== id) out.push(node.id);
 				visited.add(node.id);
 			}
-			node.children.reverse().forEach(x => stack.push(x));
+
+			for (let i = node.children.length; i--; ) {
+				stack.push(node.children[i]);
+			}
 		}
 	}
 	return out;
