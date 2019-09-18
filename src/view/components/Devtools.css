@@ -26,6 +26,7 @@
 	--color-border: #dedede;
 	--color-text-empty: #444;
 	--color-button-active: #7245c7;
+	--color-highlight-bd: #444;
 
 	/* Props */
 	--color-props-input-bg: #f0f0f0;
@@ -55,6 +56,7 @@
 	--color-text-empty: #999;
 	--color-button-active: #d2adff;
 	--color-sidebar-title: #c5c5c5;
+	--color-highlight-bd: #7a7a7a;
 
 	/* Props */
 	--color-props-input-bg: #444;
