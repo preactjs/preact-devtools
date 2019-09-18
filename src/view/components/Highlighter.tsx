@@ -65,9 +65,9 @@ export function css2Border(
 	left: number,
 ) {
 	return `
-		border-top-width: ${top};
-		border-right-width: ${right};
-		border-bottom-width: ${bottom};
-		border-left-width: ${left};
+		border-top-width: ${top}px;
+		border-right-width: ${right}px;
+		border-bottom-width: ${bottom}px;
+		border-left-width: ${left}px;
 	`;
 }
