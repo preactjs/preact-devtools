@@ -8,15 +8,9 @@
 	flex: 0 0 auto;
 }
 
-.actions > * {
-	padding: 0.6rem;
-	position: relative;
-}
-
 .sep {
 	width: 0.0625rem;
 	background: var(--color-border);
 	height: 50%;
 	display: flex;
-	padding: 0;
 }

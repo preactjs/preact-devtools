@@ -6,17 +6,26 @@ import { Iframer } from "./Iframer";
 import d from "../view/components/Devtools.css";
 import { IconBtn } from "../view/components/IconBtn";
 import { Picker } from "../view/components/icons";
+import { TreeBar } from "../view/components/TreeBar";
+import { AppCtx, createStore } from "../view/store";
 
 export function TodoList() {
 	const [todos, setTodos] = useState(["asd", "asdf"]);
-	const [dark, setDark] = useState(false);
+	const [dark, setDark] = useState(localStorage.getItem("theme") === "dark");
 	const [v, setV] = useState("");
 
 	return (
 		<div class={dark ? "dark" : "light"}>
 			<div style="padding: 5rem" class={d.root}>
 				<div style="display: flex; flex-direction: column;">
-					<button onClick={() => setDark(!dark)}>Toggle Theme</button>
+					<button
+						onClick={() => {
+							localStorage.setItem("theme", !dark ? "dark" : "light");
+							setDark(!dark);
+						}}
+					>
+						Toggle Theme
+					</button>
 					<form
 						onSubmit={e => {
 							e.preventDefault();
@@ -165,6 +174,12 @@ export function TodoList() {
 					<IconBtn onClick={() => console.log("click")}>
 						<Picker />
 					</IconBtn>
+					<h2>TreeBar</h2>
+					<div style="border: 1px solid #555">
+						<AppCtx.Provider value={createStore()}>
+							<TreeBar />
+						</AppCtx.Provider>
+					</div>
 				</div>
 			</div>
 		</div>

@@ -2,13 +2,26 @@ import { h } from "preact";
 import { useState } from "preact/hooks";
 import { Actions, ActionSeparator } from "./Actions";
 import { IconBtn } from "./IconBtn";
-import { SettingsIcon, Picker } from "./icons";
+import {
+	SettingsIcon,
+	Picker,
+	KeyboardDown,
+	KeyboardUp,
+	Close,
+	Search,
+} from "./icons";
 import { useStore, useObserver } from "../store";
+import s from "./TreeBar.css";
 
 export function TreeBar() {
 	const [settings, setSettings] = useState(false);
 	const store = useStore();
 	const isPicking = useObserver(() => store.isPicking(), [store.isPicking]);
+	const value = useObserver(() => store.search.value, [store.search.value]);
+	const count = useObserver(() => store.search.count, [store.search.count]);
+	const selected = useObserver(() => store.search.selected, [
+		store.search.selected,
+	]);
 	return (
 		<Actions>
 			<IconBtn
@@ -22,7 +35,31 @@ export function TreeBar() {
 				<Picker />
 			</IconBtn>
 			<ActionSeparator />
-			<div style="width: 100%">foo</div>
+			<div class={s.searchContainer}>
+				<Search size="xs" />
+				<input
+					class={s.search}
+					type="text"
+					placeholder="Search"
+					value={value()}
+					onInput={e => store.search.onChange((e.target as any).value)}
+				/>
+				{value() !== "" && (
+					<div class={s.searchCounter}>
+						{count() > 0 ? selected() + 1 : 0} | {count()}
+					</div>
+				)}
+			</div>
+			<ActionSeparator />
+			<IconBtn onClick={store.search.selectNext}>
+				<KeyboardDown />
+			</IconBtn>
+			<IconBtn onClick={store.search.selectPrev}>
+				<KeyboardUp />
+			</IconBtn>
+			<IconBtn onClick={store.search.reset}>
+				<Close />
+			</IconBtn>
 			<ActionSeparator />
 			<IconBtn
 				active={settings}

@@ -1,8 +1,9 @@
 import { createContext } from "preact";
 import { useContext, useState, useRef, useEffect } from "preact/hooks";
-import { valoo, Observable, track } from "./valoo";
-import { InspectData, UpdateType } from "../adapter/adapter";
-import { ObjPath } from "./components/ElementProps";
+import { valoo, Observable, track } from "../valoo";
+import { InspectData, UpdateType } from "../../adapter/adapter";
+import { ObjPath } from "../components/ElementProps";
+import { createSearchStore } from "./search";
 
 export type ID = number;
 
@@ -60,6 +61,7 @@ export interface Store {
 		collapsed: Observable<Set<ID>>;
 		hidden: Observable<Set<ID>>;
 	};
+	search: ReturnType<typeof createSearchStore>;
 	actions: {
 		selectNode: (id: ID, ref: HTMLElement | null) => void;
 		highlightNode: (id: ID | null) => void;
@@ -121,6 +123,7 @@ export function createStore(): Store {
 			collapsed,
 			hidden,
 		},
+		search: createSearchStore(nodes),
 		actions: {
 			collapseNode: id => {
 				if (!collapsed().has(id)) {
