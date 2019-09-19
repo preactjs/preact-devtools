@@ -51,19 +51,23 @@ export function SettingsModal(props: SettingsModalProps) {
 					{filters.length === 0 && (
 						<p class={s.empty}>No filters have been added.</p>
 					)}
-					{filters.map(f => {
-						return (
-							<FilterRow
-								type={f.type}
-								value={f.value}
-								enabled={f.enabled}
-								setType={v => store.filter.setType(f, v as any)}
-								setValue={v => store.filter.setValue(f, v)}
-								setEnabled={v => store.filter.setEnabled(f, v)}
-								onRemove={() => store.filter.remove(f)}
-							/>
-						);
-					})}
+					<table>
+						<tbody>
+							{filters.map(f => {
+								return (
+									<FilterRow
+										type={f.type}
+										value={f.value}
+										enabled={f.enabled}
+										setType={v => store.filter.setType(f, v as any)}
+										setValue={v => store.filter.setValue(f, v)}
+										setEnabled={v => store.filter.setEnabled(f, v)}
+										onRemove={() => store.filter.remove(f)}
+									/>
+								);
+							})}
+						</tbody>
+					</table>
 					<button class={s.addFilter} type="button" onClick={store.filter.add}>
 						Add filter
 					</button>
@@ -93,49 +97,59 @@ export function FilterRow({
 	onRemove,
 }: FilterRowProps) {
 	return (
-		<div class={s.filterRow}>
-			<input
-				type="checkbox"
-				class={s.check}
-				checked={enabled}
-				onInput={e => setEnabled((e.target as any).checked)}
-			/>
-			<select
-				name="type"
-				value={type}
-				onInput={e => setType((e.target as any).value)}
-			>
-				<option value="type">Type</option>
-				<option value="name">Name</option>
-			</select>
-			<span class={s.operator}>{type === "type" ? "equals" : "matches"}</span>
-			<div class={s.valueWrapper}>
-				{type === "type" && (
-					<select
-						name="filtertype"
-						value={value}
-						onInput={e => setValue((e.target as any).value)}
-					>
-						<option value="dom">DOM</option>
-						<option value="fragment">Fragment</option>
-					</select>
-				)}
-				{type === "name" && (
-					<input
-						type="text"
-						value={value}
-						onInput={e => setValue((e.target as any).value)}
-						class={s.regInput}
-						placeholder="Regular Expression"
-					/>
-				)}
-			</div>
-			<div class={s.filterRemove}>
-				<IconBtn onClick={onRemove}>
-					<Close />
-				</IconBtn>
-			</div>
-		</div>
+		<tr class={s.filterRow}>
+			<td>
+				<input
+					type="checkbox"
+					class={s.check}
+					checked={enabled}
+					onInput={e => setEnabled((e.target as any).checked)}
+				/>
+			</td>
+			<td>
+				<select
+					name="type"
+					value={type}
+					onInput={e => setType((e.target as any).value)}
+				>
+					<option value="type">Type</option>
+					<option value="name">Name</option>
+				</select>
+			</td>
+			<td>
+				<span class={s.operator}>{type === "type" ? "equals" : "matches"}</span>
+			</td>
+			<td>
+				<div class={s.valueWrapper}>
+					{type === "type" && (
+						<select
+							name="filtertype"
+							value={value}
+							onInput={e => setValue((e.target as any).value)}
+						>
+							<option value="dom">DOM</option>
+							<option value="fragment">Fragment</option>
+						</select>
+					)}
+					{type === "name" && (
+						<input
+							type="text"
+							value={value}
+							onInput={e => setValue((e.target as any).value)}
+							class={s.regInput}
+							placeholder="Regular Expression"
+						/>
+					)}
+				</div>
+			</td>
+			<td>
+				<div class={s.filterRemove}>
+					<IconBtn onClick={onRemove}>
+						<Close />
+					</IconBtn>
+				</div>
+			</td>
+		</tr>
 	);
 }
 

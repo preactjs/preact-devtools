@@ -16,8 +16,8 @@
 
 .closeBtn {
 	position: absolute;
-	right: 0.5rem;
-	top: 0.5rem;
+	right: 1rem;
+	top: 1 rem;
 }
 
 .backdrop {
@@ -38,12 +38,6 @@
 }
 
 /* Settings Modal */
-.filterRow {
-	display: flex;
-	align-items: center;
-	justify-content: flex-start;
-}
-
 .filterRow + .filterRow {
 	margin-top: 0.5rem;
 }
