@@ -22,6 +22,9 @@ export function TreeBar() {
 	const selected = useObserver(() => store.search.selected, [
 		store.search.selected,
 	]);
+	const activeModal = useObserver(() => store.modal.active(), [
+		store.modal.active,
+	]);
 	return (
 		<Actions>
 			<IconBtn
@@ -62,9 +65,9 @@ export function TreeBar() {
 			</IconBtn>
 			<ActionSeparator />
 			<IconBtn
-				active={settings}
+				active={activeModal === "settings"}
 				title="Settings"
-				onClick={() => setSettings(!settings)}
+				onClick={() => store.modal.open("settings")}
 			>
 				<SettingsIcon size="s" />
 			</IconBtn>

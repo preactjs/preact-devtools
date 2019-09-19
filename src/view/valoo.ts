@@ -3,6 +3,7 @@ export type Observable<T = any> = {
 	(): T;
 	(v: T): T;
 	on(fn: (value: T) => void): Disposer;
+	update(fn?: (value: T) => T | void): T;
 };
 type Disposer = () => void;
 
@@ -24,6 +25,10 @@ export function valoo<T>(v: T): Observable<T> {
 		return () => {
 			cb[i] = 0 as any;
 		};
+	};
+	value.update = (fn?: (v: T) => T | void) => {
+		const res = fn ? fn(v) : undefined;
+		value(res !== undefined ? res : v);
 	};
 	return value as any;
 }

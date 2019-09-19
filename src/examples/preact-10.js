@@ -7,12 +7,18 @@ import d from "../view/components/Devtools.css";
 import { IconBtn } from "../view/components/IconBtn";
 import { Picker } from "../view/components/icons";
 import { TreeBar } from "../view/components/TreeBar";
+import { ModalBackdrop, SettingsModal } from "../view/components/Modals";
 import { AppCtx, createStore } from "../view/store";
 
 export function TodoList() {
 	const [todos, setTodos] = useState(["asd", "asdf"]);
 	const [dark, setDark] = useState(localStorage.getItem("theme") === "dark");
 	const [v, setV] = useState("");
+	const [showModal, setShowModal] = useState(
+		!!localStorage.getItem("show-modal"),
+	);
+
+	const [store] = useState(createStore());
 
 	return (
 		<div class={dark ? "dark" : "light"}>
@@ -176,10 +182,37 @@ export function TodoList() {
 					</IconBtn>
 					<h2>TreeBar</h2>
 					<div style="border: 1px solid #555">
-						<AppCtx.Provider value={createStore()}>
+						<AppCtx.Provider value={store}>
 							<TreeBar />
 						</AppCtx.Provider>
 					</div>
+					<h2>Modals</h2>
+					<button
+						onClick={() => {
+							const next = !showModal;
+							setShowModal(next);
+							localStorage.setItem("show-modal", next + "");
+						}}
+					>
+						show modal
+					</button>
+					<AppCtx.Provider value={store}>
+						{showModal && (
+							<SettingsModal
+								onClose={() => {
+									setShowModal(false);
+									localStorage.removeItem("show-modal");
+								}}
+							/>
+						)}
+					</AppCtx.Provider>
+					<ModalBackdrop
+						active={showModal}
+						onClick={() => {
+							setShowModal(false);
+							localStorage.removeItem("show-modal");
+						}}
+					/>
 				</div>
 			</div>
 		</div>

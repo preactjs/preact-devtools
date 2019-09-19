@@ -4,6 +4,8 @@ import { valoo, Observable, track } from "../valoo";
 import { InspectData, UpdateType } from "../../adapter/adapter";
 import { ObjPath } from "../components/ElementProps";
 import { createSearchStore } from "./search";
+import { createModalState } from "../components/Modals";
+import { createFilterStore } from "./filter";
 
 export type ID = number;
 
@@ -62,6 +64,8 @@ export interface Store {
 		hidden: Observable<Set<ID>>;
 	};
 	search: ReturnType<typeof createSearchStore>;
+	modal: ReturnType<typeof createModalState>;
+	filter: ReturnType<typeof createFilterStore>;
 	actions: {
 		selectNode: (id: ID, ref: HTMLElement | null) => void;
 		highlightNode: (id: ID | null) => void;
@@ -124,6 +128,8 @@ export function createStore(): Store {
 			hidden,
 		},
 		search: createSearchStore(nodes),
+		modal: createModalState(),
+		filter: createFilterStore(),
 		actions: {
 			collapseNode: id => {
 				if (!collapsed().has(id)) {

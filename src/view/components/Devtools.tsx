@@ -4,6 +4,7 @@ import { Sidebar } from "./Sidebar";
 import s from "./Devtools.css";
 import { TreeBar } from "./TreeBar";
 import { AppCtx, Store } from "../store";
+import { ModalRenderer } from "./Modals";
 
 export function DevTools(props: { store: Store }) {
 	return (
@@ -16,6 +17,7 @@ export function DevTools(props: { store: Store }) {
 				<div class={s.sidebar}>
 					<Sidebar title="Hydrator" />
 				</div>
+				<ModalRenderer />
 			</div>
 		</AppCtx.Provider>
 	);
