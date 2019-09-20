@@ -1,5 +1,4 @@
 import { h, ComponentChildren, Fragment } from "preact";
-import { useState } from "preact/hooks";
 import s from "./Modal.css";
 import { useStore, useObserver } from "../store";
 import { IconBtn } from "./IconBtn";
@@ -45,7 +44,12 @@ export function SettingsModal(props: SettingsModalProps) {
 
 	return (
 		<div>
-			<Modal onClose={props.onClose}>
+			<Modal
+				onClose={() => {
+					store.filter.submit();
+					props.onClose();
+				}}
+			>
 				<form>
 					<p>Hide components where...</p>
 					{filters.length === 0 && (

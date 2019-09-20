@@ -72,7 +72,7 @@ export function createRenderer(hook: DevtoolsHook): Renderer {
 	/** Currently active filters */
 	let filters: FilterState = {
 		regex: [],
-		type: new Set(),
+		type: new Set(["dom"]),
 	};
 
 	return {
@@ -119,6 +119,7 @@ export function createRenderer(hook: DevtoolsHook): Renderer {
 			return ids.getByDom(node) || -1;
 		},
 		applyFilters(nextFilters) {
+			console.log("apply filter");
 			filters.regex = nextFilters.regex;
 			filters.type = nextFilters.type;
 		},

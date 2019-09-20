@@ -129,7 +129,7 @@ export function createStore(): Store {
 		},
 		search: createSearchStore(nodes),
 		modal: createModalState(),
-		filter: createFilterStore(),
+		filter: createFilterStore(notify),
 		actions: {
 			collapseNode: id => {
 				if (!collapsed().has(id)) {
