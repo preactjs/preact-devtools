@@ -28,8 +28,6 @@ export interface Measurements {
 }
 
 export function measureNode(dom: Element): Measurements {
-	const isBoxSizing =
-		window.getComputedStyle(dom)["box-sizing" as any] === "box-sizing";
 	const s = window.getComputedStyle(dom);
 	const r = dom.getBoundingClientRect();
 
