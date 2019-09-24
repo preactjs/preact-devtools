@@ -6,7 +6,9 @@ import { init } from "./adapter/setup";
 import { renderExample } from "./examples/preact-10";
 import { options } from "preact";
 
-init(options as any, () => (window as any).__PREACT_DEVTOOLS__);
+if ((window as any).__PREACT_DEVTOOLS__) {
+	init(options as any, () => (window as any).__PREACT_DEVTOOLS__);
+}
 
 const root1 = document.createElement("div");
 const root2 = document.createElement("div");
