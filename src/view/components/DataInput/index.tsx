@@ -54,6 +54,28 @@ export function DataInput({ value, onChange }: InputProps) {
 		type = "function";
 	}
 
+	const onKeyDown = useCallback(
+		(e: KeyboardEvent) => {
+			if (typeof parseValue(v) === "number") {
+				let next;
+				switch (e.key) {
+					case "ArrowUp":
+						next = "" + (+v + 1);
+						break;
+					case "ArrowDown":
+						next = "" + (+v - 1);
+						break;
+				}
+
+				if (next !== undefined) {
+					set(next);
+					onCommit(next);
+				}
+			}
+		},
+		[type, v],
+	);
+
 	return (
 		<div class={s.valueWrapper}>
 			{hasCheck && !focus && (
@@ -76,6 +98,7 @@ export function DataInput({ value, onChange }: InputProps) {
 					value={inputVal}
 					onFocus={() => setFocus(true)}
 					onBlur={() => setFocus(false)}
+					onKeyDown={onKeyDown}
 					onInput={e => {
 						const next = (e.target as any).value;
 						set(next);
