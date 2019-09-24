@@ -2,6 +2,7 @@ import typescript from "rollup-plugin-typescript2";
 import copy from "rollup-plugin-copy";
 import resolve from "rollup-plugin-node-resolve";
 import postcss from "rollup-plugin-postcss";
+import commonjs from "rollup-plugin-commonjs";
 
 const BROWSERS = ["chrome", "firefox"];
 
@@ -69,6 +70,7 @@ export default entries.map(data => ({
 			objectHashIgnoreUnknownHack: true,
 		}),
 		resolve(),
+		commonjs(),
 		data.copy &&
 			copy({
 				targets: Object.keys(data.copy).map(x => ({
