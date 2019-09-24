@@ -16,15 +16,11 @@ import s from "./TreeBar.css";
 export function TreeBar() {
 	const [settings, setSettings] = useState(false);
 	const store = useStore();
-	const isPicking = useObserver(() => store.isPicking(), [store.isPicking]);
-	const value = useObserver(() => store.search.value, [store.search.value]);
-	const count = useObserver(() => store.search.count, [store.search.count]);
-	const selected = useObserver(() => store.search.selected, [
-		store.search.selected,
-	]);
-	const activeModal = useObserver(() => store.modal.active(), [
-		store.modal.active,
-	]);
+	const isPicking = useObserver(() => store.isPicking.$);
+	const value = useObserver(() => store.search.value.$);
+	const count = useObserver(() => store.search.count.$);
+	const selected = useObserver(() => store.search.selected.$);
+	const activeModal = useObserver(() => store.modal.active.$);
 	return (
 		<Actions>
 			<IconBtn
@@ -44,12 +40,12 @@ export function TreeBar() {
 					class={s.search}
 					type="text"
 					placeholder="Search"
-					value={value()}
+					value={value}
 					onInput={e => store.search.onChange((e.target as any).value)}
 				/>
-				{value() !== "" && (
+				{value !== "" && (
 					<div class={s.searchCounter}>
-						{count() > 0 ? selected() + 1 : 0} | {count()}
+						{count > 0 ? selected + 1 : 0} | {count}
 					</div>
 				)}
 			</div>

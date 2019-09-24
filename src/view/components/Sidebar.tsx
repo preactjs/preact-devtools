@@ -9,8 +9,8 @@ import { BugIcon } from "./icons";
 
 export function Sidebar() {
 	const store = useStore();
-	const node = useObserver(() => store.selected(), [store.selected]);
-	const inspect = useObserver(() => store.inspectData(), [store.inspectData]);
+	const node = useObserver(() => store.selected.$);
+	const inspect = useObserver(() => store.inspectData.$);
 
 	return (
 		<aside class={s.root}>

@@ -1,6 +1,6 @@
 import { createContext } from "preact";
-import { useContext, useState, useRef, useEffect } from "preact/hooks";
-import { valoo, Observable, track } from "../valoo";
+import { useContext, useState, useEffect } from "preact/hooks";
+import { valoo, Observable, watch } from "../valoo";
 import { InspectData, UpdateType } from "../../adapter/adapter";
 import { ObjPath } from "../components/ElementProps";
 import { createSearchStore } from "./search";
@@ -57,6 +57,7 @@ export interface Store {
 	roots: Observable<ID[]>;
 	rootToChild: Observable<Map<number, number>>;
 	nodes: Observable<Tree>;
+	nodeList: Observable<ID[]>;
 	selected: Observable<DevNode | null>;
 	selectedRef: Observable<null | HTMLElement>;
 	visiblity: {
@@ -67,7 +68,7 @@ export interface Store {
 	modal: ReturnType<typeof createModalState>;
 	filter: ReturnType<typeof createFilterStore>;
 	actions: {
-		selectNode: (id: ID, ref: HTMLElement | null) => void;
+		selectNode: (id: ID) => void;
 		highlightNode: (id: ID | null) => void;
 		collapseNode: (id: ID) => void;
 		logNode: (id: ID) => void;
@@ -96,6 +97,11 @@ export function createStore(): Store {
 	const nodes = valoo<Tree>(new Map());
 	const roots = valoo<ID[]>([]);
 	const rootToChild = valoo<Map<any, any>>(new Map());
+	const nodeList = valoo<ID[]>([]);
+
+	nodes.on(v => {
+		nodeList.$ = getAllChildren(v, rootToChild.$.get(1)!);
+	});
 
 	// Selection
 	const selectedNode = valoo<DevNode | null>(null);
@@ -103,19 +109,20 @@ export function createStore(): Store {
 
 	// Toggle
 	const collapsed = valoo<Set<ID>>(new Set());
-	const hidden = track(() => {
+	const hidden = watch(() => {
 		const out = new Set<ID>();
-		collapsed().forEach(id =>
-			getAllChildren(nodes(), id).forEach(child => out.add(child)),
+		collapsed.$.forEach(id =>
+			getAllChildren(nodes.$, id).forEach(child => out.add(child)),
 		);
 		return out;
-	}, [collapsed, nodes]);
+	});
 
 	const inspectData = valoo<InspectData>(EMPTY_INSPECT);
 
 	const isPicking = valoo<boolean>(false);
 
 	return {
+		nodeList,
 		isPicking,
 		inspectData,
 		roots,
@@ -132,27 +139,22 @@ export function createStore(): Store {
 		filter: createFilterStore(notify),
 		actions: {
 			collapseNode: id => {
-				if (!collapsed().has(id)) {
-					collapsed().add(id);
+				if (!collapsed.$.has(id)) {
+					collapsed.$.add(id);
 				} else {
-					collapsed().delete(id);
+					collapsed.$.delete(id);
 				}
-				collapsed(collapsed());
+				collapsed.$ = collapsed.$;
 			},
-			selectNode: (id, ref) => {
-				if (selectedNode() !== null) {
-					if (selectedNode()!.id === id) return;
+			selectNode: id => {
+				if (selectedNode.$ !== null) {
+					if (selectedNode.$.id === id) return;
 
-					selectedNode()!.selected(false);
+					selectedNode.$.selected.$ = false;
 				}
-				const node = nodes().get(id)!;
-				node.selected(true);
-
-				// TODO
-				if (ref != null) {
-					selectedRef(ref);
-				}
-				selectedNode(node);
+				const node = nodes.$.get(id)!;
+				node.selected.$ = true;
+				selectedNode.$ = node;
 				notify("inspect", id);
 			},
 			highlightNode: id => {
@@ -171,21 +173,21 @@ export function createStore(): Store {
 				notify("inspect", id);
 			},
 			clear() {
-				inspectData(EMPTY_INSPECT);
-				nodes(new Map());
-				roots([]);
-				rootToChild(new Map());
-				selectedNode(null);
-				selectedRef(null);
-				collapsed(new Set());
+				inspectData.$ = EMPTY_INSPECT;
+				nodes.$ = new Map();
+				roots.$ = [];
+				rootToChild.$ = new Map();
+				selectedNode.$ = null;
+				selectedRef.$ = null;
+				collapsed.$ = new Set();
 				listeners = [];
 			},
 			startPickElement() {
-				isPicking(true);
+				isPicking.$ = true;
 				notify("start-picker", null);
 			},
 			stopPickElement() {
-				isPicking(false);
+				isPicking.$ = false;
 				notify("stop-picker", null);
 			},
 		},
@@ -221,13 +223,14 @@ export const AppCtx = createContext<Store>(null as any);
 
 export const useStore = () => useContext(AppCtx);
 
-export function useObserver<T>(fn: () => T, deps: Observable[]): T {
-	let [i, setI] = useState(0);
+export function useObserver<T>(fn: () => T): T {
+	let [i, set] = useState(0);
 
+	let v = watch(fn);
 	useEffect(() => {
-		const subs = deps.map(x => x.on(() => setI(++i)));
-		return () => subs.forEach(x => x());
-	}, []);
+		set(i + 1);
+		return () => v._disposers.forEach(disp => disp());
+	}, [v.$]);
 
-	return fn();
+	return v.$;
 }

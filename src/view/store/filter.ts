@@ -25,16 +25,14 @@ export function createFilterStore(
 				regex: [],
 				type: new Set(),
 			};
-			filters()
-				.filter(x => x.enabled)
-				.forEach(x => {
-					if (x.type === "type") {
-						s.type.add(x.value as any);
-					} else {
-						// TODO: Escape
-						s.regex.push(new RegExp(x.value, "ig"));
-					}
-				});
+			filters.$.filter(x => x.enabled).forEach(x => {
+				if (x.type === "type") {
+					s.type.add(x.value as any);
+				} else {
+					// TODO: Escape
+					s.regex.push(new RegExp(x.value, "ig"));
+				}
+			});
 			onSubmit("update-filter", s);
 		},
 		setEnabled(filter: RawFilter, v: boolean) {
@@ -62,7 +60,7 @@ export function createFilterStore(
 			});
 		},
 		remove(filter: RawFilter) {
-			const idx = filters().indexOf(filter);
+			const idx = filters.$.indexOf(filter);
 			if (idx > -1) {
 				filters.update(v => {
 					v.splice(idx, 1);

@@ -10,8 +10,8 @@ export function createModalState() {
 
 	return {
 		active,
-		open: (modal: string) => active(modal),
-		close: () => active(""),
+		open: (modal: string) => (active.$ = modal),
+		close: () => (active.$ = ""),
 	};
 }
 
@@ -38,9 +38,7 @@ export interface SettingsModalProps {
 
 export function SettingsModal(props: SettingsModalProps) {
 	const store = useStore();
-	const filters = useObserver(() => store.filter.filters(), [
-		store.filter.filters,
-	]);
+	const filters = useObserver(() => store.filter.filters.$);
 
 	return (
 		<div>
@@ -173,7 +171,7 @@ export function ModalBackdrop(props: BackdropProps) {
 
 export function ModalRenderer() {
 	const store = useStore();
-	const active = useObserver(() => store.modal.active(), [store.modal.active]);
+	const active = useObserver(() => store.modal.active.$);
 	return (
 		<Fragment>
 			{active === "settings" && <SettingsModal onClose={store.modal.close} />}
