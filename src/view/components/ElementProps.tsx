@@ -152,6 +152,7 @@ export function SingleItem(props: SingleProps) {
 			{collapseable && (
 				<button
 					class={s.toggle}
+					type="button"
 					data-collapsed={collapsed}
 					onClick={() => onCollapse && onCollapse(path)}
 				>

@@ -85,6 +85,7 @@ export function DataInput({ value, onChange }: InputProps) {
 				/>
 				<button
 					class={`${s.undoBtn} ${v !== initial ? s.showUndoBtn : ""}`}
+					type="button"
 					onClick={() => {
 						setFocus(true);
 						if (ref.current) ref.current.focus();
