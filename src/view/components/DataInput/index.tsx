@@ -41,8 +41,8 @@ export function DataInput({ value, onChange }: InputProps) {
 	let inputVal = "" + v;
 	if (!focus) {
 		if (typeof value === "object" && value !== null) {
-			inputVal = "Object";
-		} else if (Array.isArray(value)) inputVal = "Array";
+			inputVal = Array.isArray(value) ? "Array" : "Object";
+		}
 	}
 
 	let type: string = typeof value;
