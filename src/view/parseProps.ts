@@ -12,6 +12,7 @@ export type PropDataType =
 	| "undefined"
 	| "function"
 	| "bigint"
+	| "vnode"
 	| "symbol";
 
 export interface PropData {
@@ -41,7 +42,7 @@ export function flatten(
 			collapsable: true,
 			editable: false,
 			path,
-			value: "Array",
+			value: data,
 		});
 		data.forEach((item, i) => flatten(item, path.concat(i), limit, out));
 	} else if (data instanceof Set) {
@@ -81,6 +82,21 @@ export function flatten(
 					path,
 					value: data.name + "()",
 				});
+			} else if (
+				// Same for vnodes
+				Object.keys(data).length === 2 &&
+				typeof data.name === "string" &&
+				data.type === "vnode"
+			) {
+				out.push({
+					depth,
+					name,
+					type: "vnode",
+					collapsable: false,
+					editable: false,
+					path,
+					value: `<${data.name} />`,
+				});
 			} else {
 				// Filter out initial object
 				if (path.length > 0) {
@@ -91,7 +107,7 @@ export function flatten(
 						collapsable: Object.keys(data).length > 0,
 						editable: false,
 						path,
-						value: "Object",
+						value: data,
 					});
 				}
 

@@ -1,4 +1,4 @@
-import * as json5 from "json5";
+import json5 from "json5";
 
 export function parseValue(v: string) {
 	v = v.trim();
@@ -35,6 +35,23 @@ export function parseValue(v: string) {
 }
 
 export function valueToHuman(v: any): string {
-	if (typeof v === "string") return `"${v}"`;
-	return "" + v;
+	switch (typeof v) {
+		case "string":
+			if (isStringifiedVNode(v) || v.endsWith("()")) {
+				return v;
+			}
+			return v[0] !== '"' || v[v.length - 1] !== '"' ? `"${v}"` : v;
+		case "number":
+		case "boolean":
+		case "undefined":
+			return "" + v;
+	}
+
+	if (v === null) return "" + v;
+
+	return json5.stringify(v);
+}
+
+export function isStringifiedVNode(v: string) {
+	return v.startsWith("<") && v.endsWith("/>");
 }

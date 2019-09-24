@@ -174,11 +174,11 @@ export function jsonify(data: any) {
 		case "function": {
 			return {
 				type: "function",
-				name: data.displayName || data.name,
+				name: data.displayName || data.name || "anonymous",
 			};
 		}
 		case "object":
-			if (data == null) return null;
+			if (data === null) return null;
 			const out = { ...data };
 			Object.keys(out).forEach(key => {
 				out[key] = jsonify(out[key]);
@@ -192,7 +192,6 @@ export function jsonify(data: any) {
 export function cleanProps(props: any) {
 	if (typeof props === "string" || !props) return null;
 	const out = { ...props };
-	delete out.children;
 	if (!Object.keys(out).length) return null;
 	return out;
 }

@@ -10,6 +10,10 @@ import { TreeBar } from "../view/components/TreeBar";
 import { ModalBackdrop, SettingsModal } from "../view/components/Modals";
 import { AppCtx, createStore } from "../view/store";
 
+function Headline(props) {
+	return <h3>{props.title}</h3>;
+}
+
 export function TodoList() {
 	const [todos, setTodos] = useState(["asd", "asdf"]);
 	const [dark, setDark] = useState(localStorage.getItem("theme") === "dark");
@@ -169,6 +173,10 @@ export function TodoList() {
 								obj: { foo: "bar" },
 								set: new Set([1, 2, 3]),
 								map: new Map([[1, "a"], [2, "b"]]),
+								children: {
+									type: "vnode",
+									name: "span",
+								},
 								bar: {
 									type: "function",
 									name: "foobar",
@@ -213,6 +221,7 @@ export function TodoList() {
 							localStorage.removeItem("show-modal");
 						}}
 					/>
+					<Headline title="foobar" />
 				</div>
 			</div>
 		</div>

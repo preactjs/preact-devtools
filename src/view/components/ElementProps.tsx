@@ -2,9 +2,9 @@ import { h } from "preact";
 import s from "./ElementProps.css";
 import { Arrow } from "./TreeView";
 import { flatten, PropDataType } from "../parseProps";
-import { useState, useCallback, useRef, useMemo } from "preact/hooks";
+import { useState, useCallback, useMemo } from "preact/hooks";
 import { AutoSizeInput } from "./AutoSizeInput";
-import { Undo } from "./icons";
+import { DataInput } from "./DataInput";
 
 export type ObjPath = Array<string | number>;
 export type ChangeFn = (value: any, path: ObjPath) => void;
@@ -19,7 +19,13 @@ export interface Props {
 export function ElementProps(props: Props) {
 	const { data, editable, onChange, onRename } = props;
 
-	const parsed = useMemo(() => flatten(data, [], 7, []), [data]);
+	const parsed = useMemo(
+		() =>
+			flatten(data, [], 7, []).sort((a, b) =>
+				a.path.join(".").localeCompare(b.path.join(".")),
+			),
+		[data],
+	);
 
 	// Items should be collapsed on init
 	const [collapsed, setCollapsed] = useState(
@@ -126,16 +132,6 @@ export function SingleItem(props: SingleProps) {
 		onCollapse,
 	} = props;
 
-	const css: Record<string, string> = {
-		string: s.string,
-		number: s.number,
-		function: s.function,
-		boolean: s.boolean,
-		null: s.null,
-		array: s.array,
-		object: s.object,
-	};
-
 	const v = props.value;
 	const update = (v: any) => {
 		onChange && onChange(v, path);
@@ -172,7 +168,7 @@ export function SingleItem(props: SingleProps) {
 					<span class={s.nameStatic}>{name}</span>
 				)}
 			</div>
-			<div class={`${s.property} ${css[type] || ""}`}>
+			<div class={s.property}>
 				{editable ? (
 					<DataInput value={v} onChange={update} />
 				) : (
@@ -181,84 +177,4 @@ export function SingleItem(props: SingleProps) {
 			</div>
 		</div>
 	);
-}
-
-export interface InputProps {
-	value: string | number | boolean;
-	onChange: (value: any) => void;
-}
-
-export function DataInput({ value, onChange }: InputProps) {
-	const hasCheck = typeof value === "boolean";
-
-	const onCommit = useCallback((e: Event) => {
-		onChange(getEventValue(e));
-	}, []);
-
-	const onKeyUp = useCallback((e: KeyboardEvent) => {
-		console.log(typeof value, e.key);
-		switch (e.key) {
-			case "Enter":
-			case "Tab":
-				// (e.currentTarget as any).blur();
-				onCommit(e);
-				break;
-			case "Up":
-			case "ArrowUp":
-				if (typeof value === "number") {
-					onChange(value + 1);
-				}
-				break;
-			case "Down":
-			case "ArrowDown":
-				if (typeof value === "number") {
-					onChange(value - 1);
-				}
-				break;
-		}
-	}, []);
-
-	const [focus, setFocus] = useState(false);
-	const [initialValue] = useState(value);
-	const [v, set] = useState(value);
-	const ref = useRef<HTMLInputElement>();
-
-	return (
-		<div class={s.valueWrapper}>
-			{hasCheck && !focus && (
-				<input
-					class={s.check}
-					type="checkbox"
-					checked={value as any}
-					onBlur={onCommit}
-				/>
-			)}
-			<div class={`${s.innerWrapper} ${hasCheck ? s.withCheck : ""}`}>
-				<input
-					type="text"
-					ref={ref}
-					class={`${s.nameInput} ${s.valueInput} ${focus ? s.focus : ""}`}
-					value={"" + v}
-					onFocus={() => setFocus(true)}
-					onBlur={() => setFocus(false)}
-					onInput={e => set((e.target as any).value)}
-				/>
-				<button
-					class={`${s.undoBtn} ${v !== initialValue ? s.showUndoBtn : ""}`}
-					onClick={() => {
-						setFocus(true);
-						if (ref.current) ref.current.focus();
-						set(initialValue);
-						onChange(initialValue);
-					}}
-				>
-					<Undo size="s" />
-				</button>
-			</div>
-		</div>
-	);
-}
-
-export function getEventValue(ev: any) {
-	return ev.currentTarget!.checked || ev.currentTarget.value;
 }

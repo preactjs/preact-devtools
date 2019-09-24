@@ -15,7 +15,7 @@ export function DevTools(props: { store: Store }) {
 					<TreeView />
 				</div>
 				<div class={s.sidebar}>
-					<Sidebar title="Hydrator" />
+					<Sidebar />
 				</div>
 				<ModalRenderer />
 			</div>

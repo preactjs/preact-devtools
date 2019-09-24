@@ -40,6 +40,7 @@
 	--color-props-array: #1b1b1b;
 	--color-props-object: #1b1b1b;
 	--color-props-null: #1b1b1b;
+	--color-props-vnode: #1b1b1b;
 }
 
 :global(.dark) .root {
@@ -72,6 +73,7 @@
 	--color-props-array: #dedede;
 	--color-props-object: #dedede;
 	--color-props-null: #dedede;
+	--color-props-vnode: #dedede;
 }
 
 .components {
