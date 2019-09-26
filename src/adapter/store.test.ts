@@ -1,4 +1,4 @@
-import { createStore, getAllChildren } from "../view/store";
+import { createStore } from "../view/store";
 import { applyOperations } from "./events";
 import { expect } from "chai";
 import { fromSnapshot } from "./debug";

@@ -1,11 +1,12 @@
 import { createContext } from "preact";
-import { useContext, useState, useEffect } from "preact/hooks";
+import { useContext, useState, useEffect, useRef } from "preact/hooks";
 import { valoo, Observable, watch } from "../valoo";
 import { InspectData, UpdateType } from "../../adapter/adapter";
 import { ObjPath } from "../components/ElementProps";
 import { createSearchStore } from "./search";
 import { createModalState } from "../components/Modals";
 import { createFilterStore } from "./filter";
+import { flattenChildren } from "../components/tree/windowing";
 
 export type ID = number;
 
@@ -100,7 +101,7 @@ export function createStore(): Store {
 	const nodeList = valoo<ID[]>([]);
 
 	nodes.on(v => {
-		nodeList.$ = getAllChildren(v, rootToChild.$.get(1)!);
+		nodeList.$ = flattenChildren(v, rootToChild.$.get(1)!);
 	});
 
 	// Selection
@@ -112,7 +113,7 @@ export function createStore(): Store {
 	const hidden = watch(() => {
 		const out = new Set<ID>();
 		collapsed.$.forEach(id =>
-			getAllChildren(nodes.$, id).forEach(child => out.add(child)),
+			flattenChildren(nodes.$, id).forEach(child => out.add(child)),
 		);
 		return out;
 	});
@@ -196,27 +197,6 @@ export function createStore(): Store {
 			return () => (listeners[idx] = null);
 		},
 	};
-}
-
-export function getAllChildren(tree: Tree, id: ID): ID[] {
-	const out: ID[] = [];
-	const visited = new Set<ID>();
-	let item: ID | undefined;
-	let stack: ID[] = [id];
-	while ((item = stack.pop())) {
-		const node = tree.get(item);
-		if (node) {
-			if (!visited.has(node.id)) {
-				if (node.id !== id) out.push(node.id);
-				visited.add(node.id);
-			}
-
-			for (let i = node.children.length; i--; ) {
-				stack.push(node.children[i]);
-			}
-		}
-	}
-	return out;
 }
 
 export const AppCtx = createContext<Store>(null as any);

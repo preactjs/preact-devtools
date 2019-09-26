@@ -1,8 +1,9 @@
 import { h } from "preact";
 import s from "./Tree.css";
-import { ID, useObserver, getAllChildren, useStore } from "../store";
+import { ID, useObserver, useStore } from "../store";
 import { useEffect, useState, useCallback, useRef } from "preact/hooks";
 import { getLastDomChild } from "./utils";
+import { getRelativeId } from "./tree/windowing";
 
 export function TreeView() {
 	const store = useStore();
@@ -12,21 +13,29 @@ export function TreeView() {
 		(e: KeyboardEvent) => {
 			const selected = store.selected.$;
 			const idx = selected ? nodes.findIndex(x => x === selected.id) : 0;
-			let next = idx;
-			console.log(e);
+			let nextId = idx;
+			const sel = store.selected.$;
+			const id = sel ? sel.id : -1;
 			switch (e.key) {
+				case "ArrowLeft":
+					if (sel && !store.visiblity.collapsed.$.has(id)) {
+						store.actions.collapseNode(id);
+						break;
+					}
+				case "ArrowUp":
+					e.preventDefault();
+					nextId = getRelativeId(nodes, id, -1);
+					store.actions.selectNode(nextId);
+					break;
 				case "ArrowRight":
-					if (
-						store.selected.$ &&
-						store.visiblity.hidden.$.has(store.selected.$.id)
-					) {
-						store.actions.collapseNode(store.selected.$.id);
+					if (sel && store.visiblity.collapsed.$.has(id)) {
+						store.actions.collapseNode(id);
 						break;
 					}
 				case "ArrowDown":
 					e.preventDefault();
-					next = Math.max(0, Math.min(idx + 1, nodes.length - 1));
-					store.actions.selectNode(nodes[next]);
+					nextId = getRelativeId(nodes, id, 1);
+					store.actions.selectNode(nextId);
 					break;
 			}
 		},
