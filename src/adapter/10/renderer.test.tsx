@@ -22,7 +22,7 @@ export function setupMockHook(options: Options) {
 		emit: spy,
 		renderers: new Map(),
 	};
-	const renderer = createRenderer(fakeHook);
+	const renderer = createRenderer(fakeHook, { type: new Set(), regex: [] });
 	const destroy = setupOptions(options, renderer);
 	return {
 		renderer,

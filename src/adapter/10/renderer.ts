@@ -62,7 +62,15 @@ export interface Renderer {
 	flushInitial(): void;
 }
 
-export function createRenderer(hook: DevtoolsHook): Renderer {
+let DEFAULT_FIlTERS: FilterState = {
+	regex: [],
+	type: new Set(["dom"]),
+};
+
+export function createRenderer(
+	hook: DevtoolsHook,
+	filters: FilterState = DEFAULT_FIlTERS,
+): Renderer {
 	const ids = createIdMapper();
 	const roots = new Set<VNode>();
 
