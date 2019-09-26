@@ -142,7 +142,7 @@ export function applyOperations(store: Store, data: number[]) {
 		}
 	}
 
-	store.nodes.$ = store.nodes.$;
+	store.nodes.update();
 }
 
 export function applyEvent(store: Store, name: string, data: any) {

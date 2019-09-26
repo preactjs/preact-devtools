@@ -224,13 +224,14 @@ export const AppCtx = createContext<Store>(null as any);
 export const useStore = () => useContext(AppCtx);
 
 export function useObserver<T>(fn: () => T): T {
-	let [i, set] = useState(0);
+	let ref = useRef<T>();
+	let [value, set] = useState<T>(ref.current || ((ref as any).current = fn()));
 
-	let v = watch(fn);
 	useEffect(() => {
-		set(i + 1);
+		let v = watch(fn);
+		v.on(next => set(next));
 		return () => v._disposers.forEach(disp => disp());
-	}, [v.$]);
+	}, []);
 
-	return v.$;
+	return value;
 }
