@@ -1,4 +1,4 @@
-import json5 from "json5";
+import * as json5 from "json5-es";
 
 export function parseValue(v: string) {
 	v = v.trim();
