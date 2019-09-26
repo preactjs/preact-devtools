@@ -77,11 +77,7 @@ export function createRenderer(
 	/** Queue events until the extension is connected */
 	let queue: DevtoolsEvent[] = [];
 
-	/** Currently active filters */
-	let filters: FilterState = {
-		regex: [],
-		type: new Set(["dom"]),
-	};
+	let currentUnmounts: number[] = [];
 
 	return {
 		getVNodeById: id => ids.getVNode(id),

@@ -99,7 +99,7 @@ describe("flatten", () => {
 				name: "foo",
 				path: ["foo"],
 				type: "array",
-				value: "Array",
+				value: [1, 2],
 			},
 			{
 				collapsable: false,
@@ -131,7 +131,10 @@ describe("flatten", () => {
 				name: "",
 				path: [""],
 				type: "object",
-				value: "Object",
+				value: {
+					foo: 123,
+					bar: "abc",
+				},
 			},
 			{
 				collapsable: false,
@@ -163,7 +166,11 @@ describe("flatten", () => {
 				name: "foo",
 				path: ["foo"],
 				type: "object",
-				value: "Object",
+				value: {
+					foo: {
+						bar: "abc",
+					},
+				},
 			},
 			{
 				collapsable: true,
@@ -172,7 +179,9 @@ describe("flatten", () => {
 				name: "foo",
 				path: ["foo", "foo"],
 				type: "object",
-				value: "Object",
+				value: {
+					bar: "abc",
+				},
 			},
 			{
 				collapsable: false,
