@@ -6,11 +6,9 @@ import { ObjPath } from "../components/ElementProps";
 import { createSearchStore } from "./search";
 import { createModalState } from "../components/Modals";
 import { createFilterStore } from "./filter";
-import {
-	flattenChildren,
-	filterCollapsed,
-	clamp,
-} from "../components/tree/windowing";
+import { flattenChildren } from "../components/tree/windowing";
+import { createSelectionStore } from "./selection";
+import { createCollapser } from "./collapser";
 
 export type ID = number;
 
@@ -62,19 +60,13 @@ export interface Store {
 	rootToChild: Observable<Map<number, number>>;
 	nodes: Observable<Tree>;
 	nodeList: Observable<ID[]>;
-	selected: Observable<ID>;
-	selectedIdx: Observable<number>;
-	visiblity: {
-		collapsed: Observable<Set<ID>>;
-	};
 	search: ReturnType<typeof createSearchStore>;
 	modal: ReturnType<typeof createModalState>;
 	filter: ReturnType<typeof createFilterStore>;
+	selection: ReturnType<typeof createSelectionStore>;
+	collapser: ReturnType<typeof createCollapser>;
 	actions: {
-		selectNode: (id: ID) => void;
-		selectNodeByIndex: (n: number) => void;
 		highlightNode: (id: ID | null) => void;
-		collapseNode: (id: ID, open: boolean) => void;
 		logNode: (id: ID) => void;
 		updateNode: (id: ID, type: UpdateType, path: ObjPath, value: any) => void;
 		updatePropertyName: (
@@ -103,29 +95,16 @@ export function createStore(): Store {
 	const rootToChild = valoo<Map<any, any>>(new Map());
 
 	// Toggle
-	const collapsed = valoo<Set<ID>>(new Set());
 	const inspectData = valoo<InspectData>(EMPTY_INSPECT);
 	const isPicking = valoo<boolean>(false);
 
 	// List
-	const rawList = watch(() => flattenChildren(nodes.$, rootToChild.$.get(1)!));
-	const nodeList = watch(() => {
-		return filterCollapsed(nodes.$, rawList.$, collapsed.$);
-	});
+	const collapser = createCollapser();
+	const nodeList = watch(() =>
+		flattenChildren(nodes.$, rootToChild.$.get(1)!, collapser.collapsed.$),
+	);
 
-	// Selection
-	const selected = valoo<ID>(nodeList.$.length > 0 ? nodeList.$[0] : -1);
-	const selectedIdx = valoo<number>(0);
-
-	const selectNodeByIndex = (n: number) => {
-		n = clamp(n, nodeList.$.length - 1);
-		const id = nodeList.$[n];
-		selected.$ = id;
-		selectedIdx.$ = n;
-	};
-
-	watch(() => notify("inspect", selected.$));
-
+	const selection = createSelectionStore(nodeList, notify);
 	return {
 		nodeList,
 		isPicking,
@@ -133,25 +112,12 @@ export function createStore(): Store {
 		roots,
 		rootToChild,
 		nodes,
-		selected,
-		selectedIdx,
-		visiblity: {
-			collapsed,
-		},
+		collapser,
 		search: createSearchStore(nodes),
 		modal: createModalState(),
 		filter: createFilterStore(notify),
+		selection,
 		actions: {
-			collapseNode: (id, collapse) => {
-				collapsed.update(s => {
-					collapse ? s.add(id) : s.delete(id);
-				});
-			},
-			selectNode: id => {
-				const idx = nodeList.$.findIndex(x => x === id);
-				selectNodeByIndex(idx);
-			},
-			selectNodeByIndex,
 			highlightNode: id => {
 				notify("highlight", id);
 			},
@@ -172,8 +138,8 @@ export function createStore(): Store {
 				nodes.$ = new Map();
 				roots.$ = [];
 				rootToChild.$ = new Map();
-				selected.$ = -1;
-				collapsed.$ = new Set();
+				selection.selected.$ = -1;
+				collapser.collapsed.$ = new Set();
 				listeners = [];
 			},
 			startPickElement() {

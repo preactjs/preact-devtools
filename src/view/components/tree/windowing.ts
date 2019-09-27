@@ -1,9 +1,9 @@
 import { ID } from "../../store";
-import { valoo } from "../../valoo";
 
 export function flattenChildren<T extends { id: ID; children: ID[] }>(
 	tree: Map<ID, T>,
 	id: ID,
+	collapsed: Set<ID>,
 ): ID[] {
 	const out: ID[] = [];
 	const visited = new Set<ID>();
@@ -18,8 +18,10 @@ export function flattenChildren<T extends { id: ID; children: ID[] }>(
 			out.push(node.id);
 			visited.add(node.id);
 
-			for (let i = node.children.length; i--; ) {
-				stack.push(node.children[i]);
+			if (!collapsed.has(node.id)) {
+				for (let i = node.children.length; i--; ) {
+					stack.push(node.children[i]);
+				}
 			}
 		}
 	}
@@ -50,56 +52,4 @@ export function getLastChild(nodes: Map<ID, Traversable>, id: ID): ID {
 	}
 
 	return last;
-}
-
-/**
- * Filter out collapsed nodes from the flattened node tree.
- */
-export function filterCollapsed<T extends { depth: number }>(
-	nodes: Map<ID, T>,
-	list: ID[],
-	collapsed: Set<ID>,
-) {
-	let out: ID[] = [];
-
-	let max = Number.MAX_SAFE_INTEGER;
-	let depth = max;
-	for (let i = 0; i < list.length; i++) {
-		let id = list[i];
-		let node = nodes.get(id);
-		if (node) {
-			if (collapsed.has(id)) {
-				depth = node.depth;
-				out.push(id);
-			} else if (node.depth <= depth) {
-				if (node.depth === depth) {
-					depth = max;
-				}
-				out.push(id);
-			}
-		}
-	}
-
-	return out;
-}
-
-/**
- * The Collapser deals with hiding sections in a tree view
- */
-export function createCollapser() {
-	let collapsed = valoo(new Set<ID>());
-
-	let collapse = (id: ID, shouldCollapse: boolean) => {
-		collapsed.update(s => {
-			shouldCollapse ? s.delete(id) : s.add(id);
-		});
-	};
-
-	let toggle = (id: ID) => collapse(id, !collapsed.$.has(id));
-
-	return {
-		collapsed,
-		collapse,
-		toggle,
-	};
 }

@@ -2,33 +2,27 @@ import { h } from "preact";
 import s from "./Tree.css";
 import { ID, useObserver, useStore } from "../store";
 import { useEffect, useState, useRef, useCallback } from "preact/hooks";
-import { getLastChild, clamp } from "./tree/windowing";
+import { getLastChild } from "./tree/windowing";
 import { useKeyListNav } from "./tree/keyboard";
+import { useSelection } from "../store/selection";
+import { useCollapser } from "../store/collapser";
 
 export function TreeView() {
 	const store = useStore();
 	const nodeList = useObserver(() => store.nodeList.$);
-	const selected = useObserver(() => store.selected.$);
-	const selectedIdx = useObserver(() => store.selectedIdx.$);
+	const { collapseNode, collapsed } = useCollapser();
+	const { selected, selectNext, selectPrev } = useSelection();
 
 	const onKeyDown = useKeyListNav({
 		selected,
-		onCollapse: store.actions.collapseNode,
+		onCollapse: collapseNode,
 		canCollapse: id => {
 			const node = store.nodes.$.get(id);
 			return node ? node.children.length > 0 : false;
 		},
-		checkCollapssed: id => store.visiblity.collapsed.$.has(id),
-		onNext: () => {
-			store.actions.selectNodeByIndex(
-				clamp(selectedIdx + 1, nodeList.length - 1),
-			);
-		},
-		onPrev: () => {
-			store.actions.selectNodeByIndex(
-				clamp(selectedIdx - 1, nodeList.length - 1),
-			);
-		},
+		checkCollapsed: id => collapsed.has(id),
+		onNext: selectNext,
+		onPrev: selectPrev,
 	});
 
 	const onMouseLeave = useCallback(() => store.actions.highlightNode(null), []);
@@ -52,21 +46,19 @@ export function TreeView() {
 export function TreeItem(props: { key: any; id: ID }) {
 	const { id } = props;
 	const store = useStore();
-	const collapsed = useObserver(() => store.visiblity.collapsed.$.has(id));
+	const sel = useSelection();
+	const { collapsed, toggle } = useCollapser();
 	const node = useObserver(() => store.nodes.$.get(id) || null);
-	const selected = useObserver(() => store.selected.$ === id);
-	const onToggle = () => {
-		store.actions.collapseNode(id, store.visiblity.collapsed.$.has(id));
-	};
+	const onToggle = () => toggle(id);
 
 	if (!node) return null;
 
 	return (
 		<div
 			class={s.item}
-			onClick={() => store.actions.selectNode(id)}
+			onClick={() => sel.selectById(id)}
 			onMouseEnter={() => store.actions.highlightNode(id)}
-			data-selected={selected}
+			data-selected={sel.selected === id}
 			data-id={id}
 			data-depth={node.depth}
 			style={`padding-left: calc(var(--indent-depth) * ${node.depth - 1})`}
@@ -75,7 +67,7 @@ export function TreeItem(props: { key: any; id: ID }) {
 				{node.children.length > 0 && (
 					<button
 						class={s.toggle}
-						data-collapsed={collapsed}
+						data-collapsed={collapsed.has(id)}
 						onClick={onToggle}
 					>
 						<Arrow />
@@ -104,8 +96,8 @@ export function Arrow() {
 export function HighlightPane(props: { treeDom: HTMLDivElement | null }) {
 	const store = useStore();
 	const nodes = useObserver(() => store.nodes.$);
-	const selected = useObserver(() => store.selected.$);
-	const collapsed = useObserver(() => store.visiblity.collapsed.$);
+	const { selected } = useSelection();
+	const { collapsed } = useCollapser();
 
 	let [pos, setPos] = useState({ top: 0, height: 0 });
 	useEffect(() => {

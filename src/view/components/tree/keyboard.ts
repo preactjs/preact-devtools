@@ -4,7 +4,7 @@ import { ID } from "../../store";
 export interface ListAdapter {
 	selected: ID;
 	canCollapse: (id: ID) => boolean;
-	checkCollapssed: (id: ID) => boolean;
+	checkCollapsed: (id: ID) => boolean;
 	onPrev: (current: ID) => void;
 	onNext: (current: ID) => void;
 	onCollapse: (id: ID, open: boolean) => void;
@@ -16,7 +16,13 @@ export function useKeyListNav(opts: ListAdapter) {
 			if (/^Arrow/.test(e.key)) e.preventDefault();
 
 			const sel = opts.selected;
-			const { onCollapse, canCollapse, checkCollapssed, onPrev, onNext } = opts;
+			const {
+				onCollapse,
+				canCollapse,
+				checkCollapsed: checkCollapssed,
+				onPrev,
+				onNext,
+			} = opts;
 			if (e.key === "ArrowLeft") {
 				if (canCollapse(sel) && !checkCollapssed(sel)) {
 					return onCollapse(sel, true);

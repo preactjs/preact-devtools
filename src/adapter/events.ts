@@ -151,7 +151,7 @@ export function applyEvent(store: Store, name: string, data: any) {
 		case "inspect-result":
 			return (store.inspectData.$ = data);
 		case "select-node":
-			return store.actions.selectNode(data);
+			return store.selection.selectById(data);
 		case "stop-picker":
 			return store.actions.stopPickElement();
 	}
