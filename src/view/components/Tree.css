@@ -5,6 +5,7 @@
 	position: relative;
 	z-index: 1;
 	overflow: auto;
+	outline: none;
 
 	-webkit-user-select: none;
 	-moz-user-select: none;
@@ -19,9 +20,14 @@
 	height: 1.5rem;
 }
 
-.item[data-selected] {
+.tree:focus-within .item[data-selected] {
 	background: var(--color-selected-bg);
 	color: var(--color-selected-text);
+}
+
+.item[data-selected] {
+	background: var(--color-selected-inactive-bg);
+	color: var(--color-selected-inactive-text);
 }
 
 .item:not([data-selected]):hover {
