@@ -6,6 +6,7 @@ import { getLastChild } from "./tree/windowing";
 import { useKeyListNav } from "./tree/keyboard";
 import { useSelection } from "../store/selection";
 import { useCollapser } from "../store/collapser";
+import { BackgroundLogo } from "./tree/background-logo";
 
 export function TreeView() {
 	const store = useStore();
@@ -35,6 +36,14 @@ export function TreeView() {
 			onKeyDown={onKeyDown}
 			onMouseLeave={onMouseLeave}
 		>
+			{nodeList.length === 0 && (
+				<div class={s.empty}>
+					<BackgroundLogo class={s.bgLogo} />
+					<p>
+						<b>Connected</b>, waiting for nodes to load...
+					</p>
+				</div>
+			)}
 			{nodeList.map(id => (
 				<TreeItem key={id} id={id} />
 			))}

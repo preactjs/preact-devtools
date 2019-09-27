@@ -11,6 +11,27 @@
 	-moz-user-select: none;
 	-ms-user-select: none;
 	user-select: none;
+	min-height: 15rem;
+}
+
+.empty {
+	display: flex;
+	flex: 1;
+	justify-content: center;
+	align-items: center;
+	height: 100%;
+}
+
+.bgLogo {
+	color: #555;
+	position: absolute;
+	top: 50%;
+	left: 50%;
+	width: 12rem;
+	height: 12rem;
+	transform: translate3d(-50%, -50%, 0);
+	z-index: -1;
+	opacity: 0.4;
 }
 
 .item {

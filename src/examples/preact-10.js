@@ -230,6 +230,10 @@ export function TodoList() {
 					<AppCtx.Provider value={tstore}>
 						<TreeView />
 					</AppCtx.Provider>
+					<p>Empty tree view</p>
+					<AppCtx.Provider value={store}>
+						<TreeView />
+					</AppCtx.Provider>
 				</div>
 			</div>
 		</div>
