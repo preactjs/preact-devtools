@@ -43,6 +43,7 @@
 	border: none;
 	outline: none;
 	color: #aaa;
+	z-index: 100;
 	display: inline-flex;
 	justify-content: center;
 	align-content: center;

@@ -9,7 +9,7 @@ import { BugIcon } from "./icons";
 
 export function Sidebar() {
 	const store = useStore();
-	const node = useObserver(() => store.selected.$);
+	const node = useObserver(() => store.nodes.$.get(store.selected.$) || null);
 	const inspect = useObserver(() => store.inspectData.$);
 
 	return (

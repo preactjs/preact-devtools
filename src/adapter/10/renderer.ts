@@ -123,9 +123,34 @@ export function createRenderer(
 			return ids.getByDom(node) || -1;
 		},
 		applyFilters(nextFilters) {
-			console.log("apply filter");
+			roots.forEach(root => this.onUnmount(root));
+			// Unmount
+			const commit: Commit = {
+				operations: [],
+				rootId: -1,
+				strings: new Map(),
+				unmountIds: currentUnmounts,
+			};
+
+			const unmounts = flush(commit);
+			if (unmounts) {
+				currentUnmounts = [];
+				queue.push(unmounts);
+			}
+
 			filters.regex = nextFilters.regex;
 			filters.type = nextFilters.type;
+
+			roots.forEach(root => {
+				const commit = createCommit(ids, roots, root, filters);
+				const ev = flush(commit);
+				if (!ev) return;
+				queue.push(ev);
+			});
+
+			if (hook.connected) {
+				this.flushInitial();
+			}
 		},
 		flushInitial() {
 			queue.forEach(ev => hook.emit(ev.name, ev.data));
@@ -134,6 +159,8 @@ export function createRenderer(
 		},
 		onCommit(vnode) {
 			const commit = createCommit(ids, roots, vnode, filters);
+			commit.unmountIds.push(...currentUnmounts);
+			currentUnmounts = [];
 			const ev = flush(commit);
 			if (!ev) return;
 
@@ -144,7 +171,10 @@ export function createRenderer(
 			}
 		},
 		onUnmount(vnode) {
-			console.log("TODO: Unmount vnode");
+			const id = ids.getId(vnode);
+			if (id > 0) {
+				currentUnmounts.push(id);
+			}
 		},
 	};
 }

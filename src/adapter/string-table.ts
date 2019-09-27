@@ -14,7 +14,7 @@ export function getStringId(table: StringTable, input: string): number {
 	if (input === null) return 0;
 
 	if (!table.has(input)) {
-		table.set(input, table.size + 1);
+		table.set("" + input, table.size + 1);
 	}
 
 	return table.get(input)!;

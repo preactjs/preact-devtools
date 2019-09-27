@@ -6,7 +6,11 @@ import { ObjPath } from "../components/ElementProps";
 import { createSearchStore } from "./search";
 import { createModalState } from "../components/Modals";
 import { createFilterStore } from "./filter";
-import { flattenChildren } from "../components/tree/windowing";
+import {
+	flattenChildren,
+	filterCollapsed,
+	clamp,
+} from "../components/tree/windowing";
 
 export type ID = number;
 
@@ -26,7 +30,7 @@ export interface DevNode {
 	type: DevNodeType;
 	name: string;
 	key: string;
-	parentId: ID;
+	parent: ID;
 	children: ID[];
 
 	// Profiling
@@ -34,7 +38,6 @@ export interface DevNode {
 
 	// Display properties
 	depth: number;
-	selected: Observable<boolean>;
 }
 
 export type Tree = Map<ID, DevNode>;
@@ -59,19 +62,19 @@ export interface Store {
 	rootToChild: Observable<Map<number, number>>;
 	nodes: Observable<Tree>;
 	nodeList: Observable<ID[]>;
-	selected: Observable<DevNode | null>;
-	selectedRef: Observable<null | HTMLElement>;
+	selected: Observable<ID>;
+	selectedIdx: Observable<number>;
 	visiblity: {
 		collapsed: Observable<Set<ID>>;
-		hidden: Observable<Set<ID>>;
 	};
 	search: ReturnType<typeof createSearchStore>;
 	modal: ReturnType<typeof createModalState>;
 	filter: ReturnType<typeof createFilterStore>;
 	actions: {
 		selectNode: (id: ID) => void;
+		selectNodeByIndex: (n: number) => void;
 		highlightNode: (id: ID | null) => void;
-		collapseNode: (id: ID) => void;
+		collapseNode: (id: ID, open: boolean) => void;
 		logNode: (id: ID) => void;
 		updateNode: (id: ID, type: UpdateType, path: ObjPath, value: any) => void;
 		updatePropertyName: (
@@ -98,29 +101,30 @@ export function createStore(): Store {
 	const nodes = valoo<Tree>(new Map());
 	const roots = valoo<ID[]>([]);
 	const rootToChild = valoo<Map<any, any>>(new Map());
-	const nodeList = valoo<ID[]>([]);
-
-	nodes.on(v => {
-		nodeList.$ = flattenChildren(v, rootToChild.$.get(1)!);
-	});
-
-	// Selection
-	const selectedNode = valoo<DevNode | null>(null);
-	const selectedRef = valoo<HTMLElement | null>(null);
 
 	// Toggle
 	const collapsed = valoo<Set<ID>>(new Set());
-	const hidden = watch(() => {
-		const out = new Set<ID>();
-		collapsed.$.forEach(id =>
-			flattenChildren(nodes.$, id).forEach(child => out.add(child)),
-		);
-		return out;
+	const inspectData = valoo<InspectData>(EMPTY_INSPECT);
+	const isPicking = valoo<boolean>(false);
+
+	// List
+	const rawList = watch(() => flattenChildren(nodes.$, rootToChild.$.get(1)!));
+	const nodeList = watch(() => {
+		return filterCollapsed(nodes.$, rawList.$, collapsed.$);
 	});
 
-	const inspectData = valoo<InspectData>(EMPTY_INSPECT);
+	// Selection
+	const selected = valoo<ID>(nodeList.$.length > 0 ? nodeList.$[0] : -1);
+	const selectedIdx = valoo<number>(0);
 
-	const isPicking = valoo<boolean>(false);
+	const selectNodeByIndex = (n: number) => {
+		n = clamp(n, nodeList.$.length - 1);
+		const id = nodeList.$[n];
+		selected.$ = id;
+		selectedIdx.$ = n;
+	};
+
+	watch(() => notify("inspect", selected.$));
 
 	return {
 		nodeList,
@@ -129,35 +133,25 @@ export function createStore(): Store {
 		roots,
 		rootToChild,
 		nodes,
-		selected: selectedNode,
-		selectedRef,
+		selected,
+		selectedIdx,
 		visiblity: {
 			collapsed,
-			hidden,
 		},
 		search: createSearchStore(nodes),
 		modal: createModalState(),
 		filter: createFilterStore(notify),
 		actions: {
-			collapseNode: id => {
-				if (!collapsed.$.has(id)) {
-					collapsed.$.add(id);
-				} else {
-					collapsed.$.delete(id);
-				}
-				collapsed.$ = collapsed.$;
+			collapseNode: (id, collapse) => {
+				collapsed.update(s => {
+					collapse ? s.add(id) : s.delete(id);
+				});
 			},
 			selectNode: id => {
-				if (selectedNode.$ !== null) {
-					if (selectedNode.$.id === id) return;
-
-					selectedNode.$.selected.$ = false;
-				}
-				const node = nodes.$.get(id)!;
-				node.selected.$ = true;
-				selectedNode.$ = node;
-				notify("inspect", id);
+				const idx = nodeList.$.findIndex(x => x === id);
+				selectNodeByIndex(idx);
 			},
+			selectNodeByIndex,
 			highlightNode: id => {
 				notify("highlight", id);
 			},
@@ -178,8 +172,7 @@ export function createStore(): Store {
 				nodes.$ = new Map();
 				roots.$ = [];
 				rootToChild.$ = new Map();
-				selectedNode.$ = null;
-				selectedRef.$ = null;
+				selected.$ = -1;
 				collapsed.$ = new Set();
 				listeners = [];
 			},

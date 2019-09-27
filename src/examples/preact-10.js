@@ -9,10 +9,14 @@ import { Picker } from "../view/components/icons";
 import { TreeBar } from "../view/components/TreeBar";
 import { ModalBackdrop, SettingsModal } from "../view/components/Modals";
 import { AppCtx, createStore } from "../view/store";
+import { TreeView } from "../view/components/TreeView";
+import { treeStore } from "./treeStore";
 
 function Headline(props) {
 	return <h3>{props.title}</h3>;
 }
+
+const tstore = treeStore();
 
 export function TodoList() {
 	const [todos, setTodos] = useState(["asd", "asdf"]);
@@ -222,6 +226,10 @@ export function TodoList() {
 						}}
 					/>
 					<Headline title="foobar" />
+					<h2>TreeView</h2>
+					<AppCtx.Provider value={tstore}>
+						<TreeView />
+					</AppCtx.Provider>
 				</div>
 			</div>
 		</div>

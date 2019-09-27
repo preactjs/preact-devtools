@@ -108,11 +108,10 @@ export function applyOperations(store: Store, data: number[]) {
 					depth: getDepth(store, parentId),
 					id,
 					name,
-					parentId,
+					parent: parentId,
 					type,
 					key,
 					duration: valoo<number>(0),
-					selected: valoo<boolean>(false),
 				});
 				i += 6;
 				break;
@@ -160,7 +159,7 @@ export function applyEvent(store: Store, name: string, data: any) {
 
 export function getDepth(store: Store, id: ID) {
 	let parent = store.nodes.$.get(id)!;
-	return parent ? parent.depth + 1 : 0;
+	return parent ? parent.depth + 1 : 1;
 }
 
 export function jsonify(data: any) {
