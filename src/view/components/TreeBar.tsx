@@ -12,15 +12,25 @@ import {
 } from "./icons";
 import { useStore, useObserver } from "../store";
 import s from "./TreeBar.css";
+import { useSearch } from "../store/search";
 
 export function TreeBar() {
-	const [settings, setSettings] = useState(false);
 	const store = useStore();
 	const isPicking = useObserver(() => store.isPicking.$);
-	const value = useObserver(() => store.search.value.$);
-	const count = useObserver(() => store.search.count.$);
-	const selected = useObserver(() => store.search.selected.$);
+	const { value, count, selected, goPrev, goNext } = useSearch();
 	const activeModal = useObserver(() => store.modal.active.$);
+
+	const onKeyDown = (e: KeyboardEvent) => {
+		if (e.key === "Enter") {
+			e.preventDefault();
+			if (e.shiftKey) {
+				goPrev();
+			} else {
+				goNext();
+			}
+		}
+	};
+
 	return (
 		<Actions>
 			<IconBtn
@@ -41,6 +51,7 @@ export function TreeBar() {
 					type="text"
 					placeholder="Search (text or /regex/)"
 					value={value}
+					onKeyDown={onKeyDown}
 					onInput={e => store.search.onChange((e.target as any).value)}
 				/>
 				{value !== "" && (

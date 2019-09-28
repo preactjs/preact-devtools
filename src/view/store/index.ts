@@ -113,7 +113,7 @@ export function createStore(): Store {
 		rootToChild,
 		nodes,
 		collapser,
-		search: createSearchStore(nodes),
+		search: createSearchStore(nodes, nodeList),
 		modal: createModalState(),
 		filter: createFilterStore(notify),
 		selection,
