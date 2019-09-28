@@ -7,6 +7,8 @@ import { useKeyListNav } from "./tree/keyboard";
 import { useSelection } from "../store/selection";
 import { useCollapser } from "../store/collapser";
 import { BackgroundLogo } from "./tree/background-logo";
+import { useSearch } from "../store/search";
+import { scrollIntoView } from "./utils";
 
 export function TreeView() {
 	const store = useStore();
@@ -34,6 +36,7 @@ export function TreeView() {
 			tabIndex={0}
 			class={s.tree}
 			onKeyDown={onKeyDown}
+			data-tree={true}
 			onMouseLeave={onMouseLeave}
 		>
 			{nodeList.length === 0 && (
@@ -52,6 +55,36 @@ export function TreeView() {
 	);
 }
 
+export function MarkResult(props: { text: string; id: ID }) {
+	const { regex, selectedId } = useSearch();
+	let { text, id } = props;
+	let isActive = id === selectedId;
+
+	let ref = useRef<HTMLSpanElement>();
+	useEffect(() => {
+		if (ref.current && isActive) {
+			scrollIntoView(ref.current);
+		}
+	}, [ref.current, selectedId, id]);
+
+	if (regex != null && regex.test(text)) {
+		let m = text.match(regex)!;
+		let idx = m.index || 0;
+		let start = idx > 0 ? text.slice(0, idx) : "";
+		let end = idx < text.length ? text.slice(idx + m[0].length) : "";
+		return (
+			<span ref={ref}>
+				{start}
+				<mark class={`${s.mark} ${isActive ? s.markSelected : ""}`}>
+					{m[0]}
+				</mark>
+				{end}
+			</span>
+		);
+	}
+	return <span>{text}</span>;
+}
+
 export function TreeItem(props: { key: any; id: ID }) {
 	const { id } = props;
 	const store = useStore();
@@ -59,15 +92,24 @@ export function TreeItem(props: { key: any; id: ID }) {
 	const { collapsed, toggle } = useCollapser();
 	const node = useObserver(() => store.nodes.$.get(id) || null);
 	const onToggle = () => toggle(id);
+	const ref = useRef<HTMLDivElement>();
+
+	let isSelected = sel.selected === id;
+	useEffect(() => {
+		if (ref.current && isSelected) {
+			scrollIntoView(ref.current);
+		}
+	}, [ref.current, sel.selected, id]);
 
 	if (!node) return null;
 
 	return (
 		<div
+			ref={ref}
 			class={s.item}
 			onClick={() => sel.selectById(id)}
 			onMouseEnter={() => store.actions.highlightNode(id)}
-			data-selected={sel.selected === id}
+			data-selected={isSelected}
 			data-id={id}
 			data-depth={node.depth}
 			style={`padding-left: calc(var(--indent-depth) * ${node.depth - 1})`}
@@ -83,7 +125,9 @@ export function TreeItem(props: { key: any; id: ID }) {
 					</button>
 				)}
 				{node.children.length === 0 && <div class={s.noToggle} />}
-				<span class={s.name}>{node.name}</span>
+				<span class={s.name}>
+					<MarkResult text={node.name} id={id} />
+				</span>
 			</div>
 		</div>
 	);

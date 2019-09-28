@@ -1,5 +1,6 @@
 import { Observable, valoo } from "../valoo";
-import { DevNode } from ".";
+import { DevNode, useStore, useObserver } from ".";
+import escapeRegex from "escape-string-regexp";
 
 export function createSearchStore(items: Observable<Map<number, DevNode>>) {
 	const value = valoo("");
@@ -49,6 +50,7 @@ export function createSearchStore(items: Observable<Map<number, DevNode>>) {
 
 	return {
 		selected,
+		regex,
 		count,
 		value,
 		match,
@@ -61,8 +63,33 @@ export function createSearchStore(items: Observable<Map<number, DevNode>>) {
 
 export function createRegex(s: string): RegExp {
 	if (s[0] === "/") {
-		throw new Error("Regex not supported yet");
+		s = s.slice(1);
+		if (s[s.length - 1] === "/") {
+			s = s.slice(0, -1);
+		}
+		try {
+			return new RegExp(s, "i");
+		} catch (err) {
+			return new RegExp("");
+		}
 	}
-	// TODO: Escaping
-	return new RegExp(s, "i");
+	return new RegExp(`(${escapeRegex(s)})`, "i");
+}
+
+export function useSearch() {
+	let { search: s } = useStore();
+	let match = useObserver(() => s.match.$);
+	let value = useObserver(() => s.value.$);
+	let marked = useObserver(() => s.selected.$);
+	let regex = useObserver(() => s.regex.$);
+	let selectedId = useObserver(() => s.match.$[s.selected.$]);
+	return {
+		selectedId,
+		marked,
+		regex,
+		match,
+		goNext: s.selectNext,
+		goPrev: s.selectPrev,
+		value,
+	};
 }

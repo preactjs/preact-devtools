@@ -29,6 +29,8 @@
 	--color-highlight-bd: #444;
 	--color-modal-backdrop: rgba(197, 197, 197, 0.8);
 	--color-modal-border: #4d4d4d;
+	--color-marker: yellow;
+	--color-marker-selected: orange;
 
 	/* Props */
 	--color-props-input-bg: #f0f0f0;
@@ -62,6 +64,8 @@
 	--color-highlight-bd: #7a7a7a;
 	--color-modal-backdrop: rgba(50, 50, 50, 0.8);
 	--color-modal-border: #4d4d4d;
+	--color-marker: yellow;
+	--color-marker-selected: orange;
 
 	/* Props */
 	--color-props-input-bg: #444;

@@ -45,6 +45,7 @@
 		"webpack-dev-server": "^3.8.1"
 	},
 	"dependencies": {
+		"escape-string-regexp": "^2.0.0",
 		"json5": "^2.1.0",
 		"json5-es": "^2.1.1"
 	},

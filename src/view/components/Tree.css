@@ -101,3 +101,11 @@
 	opacity: 0.5;
 	z-index: -1;
 }
+
+/* Marker */
+.mark {
+	background: var(--color-marker);
+}
+.markSelected {
+	background: var(--color-marker-selected);
+}

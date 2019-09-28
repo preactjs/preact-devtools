@@ -192,12 +192,6 @@ export function TodoList() {
 					<IconBtn onClick={() => console.log("click")}>
 						<Picker />
 					</IconBtn>
-					<h2>TreeBar</h2>
-					<div style="border: 1px solid #555">
-						<AppCtx.Provider value={store}>
-							<TreeBar />
-						</AppCtx.Provider>
-					</div>
 					<h2>Modals</h2>
 					<button
 						onClick={() => {
@@ -226,10 +220,18 @@ export function TodoList() {
 						}}
 					/>
 					<Headline title="foobar" />
+					<h2>TreeBar</h2>
+					<div style="border: 1px solid #555">
+						<AppCtx.Provider value={tstore}>
+							<TreeBar />
+						</AppCtx.Provider>
+					</div>
 					<h2>TreeView</h2>
-					<AppCtx.Provider value={tstore}>
-						<TreeView />
-					</AppCtx.Provider>
+					<div style="height: 20rem; overflow: auto;">
+						<AppCtx.Provider value={tstore}>
+							<TreeView />
+						</AppCtx.Provider>
+					</div>
 					<p>Empty tree view</p>
 					<AppCtx.Provider value={store}>
 						<TreeView />

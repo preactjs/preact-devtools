@@ -39,6 +39,14 @@ export const treeStore = () => {
 	addNode(7);
 	addNode(2);
 	addNode(1);
+	addNode(6);
+	addNode(7);
+	addNode(2);
+	addNode(1);
+	addNode(6);
+	addNode(7);
+	addNode(2);
+	addNode(1);
 
 	return store;
 };

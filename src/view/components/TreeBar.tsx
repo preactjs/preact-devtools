@@ -39,7 +39,7 @@ export function TreeBar() {
 				<input
 					class={s.search}
 					type="text"
-					placeholder="Search"
+					placeholder="Search (text or /regex/)"
 					value={value}
 					onInput={e => store.search.onChange((e.target as any).value)}
 				/>
