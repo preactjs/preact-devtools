@@ -1,5 +1,5 @@
 import { expect } from "chai";
-import { flatten, parseInput } from "./parseProps";
+import { flatten } from "./parseProps";
 
 describe("flatten", () => {
 	it("should flatten strings", () => {
@@ -99,7 +99,7 @@ describe("flatten", () => {
 				name: "foo",
 				path: ["foo"],
 				type: "array",
-				value: "Array",
+				value: [1, 2],
 			},
 			{
 				collapsable: false,
@@ -131,7 +131,10 @@ describe("flatten", () => {
 				name: "",
 				path: [""],
 				type: "object",
-				value: "Object",
+				value: {
+					foo: 123,
+					bar: "abc",
+				},
 			},
 			{
 				collapsable: false,
@@ -163,7 +166,11 @@ describe("flatten", () => {
 				name: "foo",
 				path: ["foo"],
 				type: "object",
-				value: "Object",
+				value: {
+					foo: {
+						bar: "abc",
+					},
+				},
 			},
 			{
 				collapsable: true,
@@ -172,7 +179,9 @@ describe("flatten", () => {
 				name: "foo",
 				path: ["foo", "foo"],
 				type: "object",
-				value: "Object",
+				value: {
+					bar: "abc",
+				},
 			},
 			{
 				collapsable: false,
@@ -198,51 +207,5 @@ describe("flatten", () => {
 				value: "Set",
 			},
 		]);
-	});
-});
-
-describe("parseInput", () => {
-	it("should parse booleans", () => {
-		expect(parseInput("true")).to.equal(true);
-		expect(parseInput("false")).to.equal(false);
-	});
-
-	it("should parse null/undefined", () => {
-		expect(parseInput("null")).to.equal(null);
-		expect(parseInput("undefined")).to.equal(undefined);
-	});
-
-	it("should parse numbers", () => {
-		expect(parseInput("123")).to.equal(123);
-		expect(parseInput("-123")).to.equal(-123);
-		expect(parseInput("+123")).to.equal(123);
-		expect(parseInput("-123.23")).to.equal(-123.23);
-		expect(parseInput("+123.23")).to.equal(123.23);
-		expect(parseInput(".1")).to.equal(0.1);
-		expect(parseInput("+.1")).to.equal(0.1);
-		expect(parseInput("123.23")).to.equal(123.23);
-		expect(parseInput("Infinity")).to.equal(Infinity);
-		expect(parseInput("+Infinity")).to.equal(Infinity);
-		expect(parseInput("-Infinity")).to.equal(-Infinity);
-		expect(isNaN(parseInput("NaN") as any)).to.equal(true);
-	});
-
-	it("should parse strings", () => {
-		expect(parseInput("'abc'")).to.equal("abc");
-		expect(parseInput('"abc"')).to.equal("abc");
-		expect(parseInput('"123"')).to.equal("123");
-		expect(parseInput("''")).to.equal("");
-	});
-
-	it("should parse arrays", () => {
-		expect(parseInput("[1,2,3]")).to.deep.equal([1, 2, 3]);
-	});
-
-	it.skip("should parse objects", () => {
-		expect(parseInput("{a:1,b:2,c:3}")).to.deep.equal({ a: 1, b: 2, c: 3 });
-	});
-
-	it("should not throw on invalid data", () => {
-		expect(parseInput("[1,2,3")).to.equal("[1,2,3");
 	});
 });

@@ -28,21 +28,22 @@ export interface Measurements {
 }
 
 export function measureNode(dom: Element): Measurements {
-	const isBoxSizing =
-		window.getComputedStyle(dom)["box-sizing" as any] === "box-sizing";
 	const s = window.getComputedStyle(dom);
 	const r = dom.getBoundingClientRect();
 
+	const top = r.top + window.pageYOffset;
+	const left = r.left + window.pageXOffset;
+
 	const bounds = {
-		top: r.top < window.scrollY,
+		top: top < window.scrollY,
 		bottom: r.top + r.height > window.innerHeight + scrollY,
-		left: r.left < window.scrollX,
+		left: left < window.scrollX,
 		right: r.left + r.width > window.scrollX + window.innerWidth,
 	};
 
 	return {
-		top: r.top,
-		left: r.left,
+		top,
+		left,
 		bounds,
 
 		// Round to at most 2 decimals. This is not 100% accurate,

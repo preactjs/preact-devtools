@@ -1,8 +1,14 @@
 import { createContext } from "preact";
-import { useContext, useState, useRef, useEffect } from "preact/hooks";
-import { valoo, Observable, track } from "./valoo";
-import { InspectData, UpdateType } from "../adapter/adapter";
-import { ObjPath } from "./components/ElementProps";
+import { useContext, useState, useEffect, useRef } from "preact/hooks";
+import { valoo, Observable, watch } from "../valoo";
+import { InspectData, UpdateType } from "../../adapter/adapter";
+import { ObjPath } from "../components/ElementProps";
+import { createSearchStore } from "./search";
+import { createModalState } from "../components/Modals";
+import { createFilterStore } from "./filter";
+import { flattenChildren } from "../components/tree/windowing";
+import { createSelectionStore } from "./selection";
+import { createCollapser } from "./collapser";
 
 export type ID = number;
 
@@ -22,7 +28,7 @@ export interface DevNode {
 	type: DevNodeType;
 	name: string;
 	key: string;
-	parentId: ID;
+	parent: ID;
 	children: ID[];
 
 	// Profiling
@@ -30,7 +36,6 @@ export interface DevNode {
 
 	// Display properties
 	depth: number;
-	selected: Observable<boolean>;
 }
 
 export type Tree = Map<ID, DevNode>;
@@ -49,20 +54,19 @@ const EMPTY_INSPECT: InspectData = {
 };
 
 export interface Store {
+	isPicking: Observable<boolean>;
 	inspectData: Observable<InspectData>;
 	roots: Observable<ID[]>;
 	rootToChild: Observable<Map<number, number>>;
 	nodes: Observable<Tree>;
-	selected: Observable<DevNode | null>;
-	selectedRef: Observable<null | HTMLElement>;
-	visiblity: {
-		collapsed: Observable<Set<ID>>;
-		hidden: Observable<Set<ID>>;
-	};
+	nodeList: Observable<ID[]>;
+	search: ReturnType<typeof createSearchStore>;
+	modal: ReturnType<typeof createModalState>;
+	filter: ReturnType<typeof createFilterStore>;
+	selection: ReturnType<typeof createSelectionStore>;
+	collapser: ReturnType<typeof createCollapser>;
 	actions: {
-		selectNode: (id: ID, ref: HTMLElement) => void;
 		highlightNode: (id: ID | null) => void;
-		collapseNode: (id: ID) => void;
 		logNode: (id: ID) => void;
 		updateNode: (id: ID, type: UpdateType, path: ObjPath, value: any) => void;
 		updatePropertyName: (
@@ -72,6 +76,8 @@ export interface Store {
 			value: any,
 		) => void;
 		clear(): void;
+		startPickElement(): void;
+		stopPickElement(): void;
 	};
 	subscribe(fn: Listener): () => void;
 }
@@ -88,55 +94,30 @@ export function createStore(): Store {
 	const roots = valoo<ID[]>([]);
 	const rootToChild = valoo<Map<any, any>>(new Map());
 
-	// Selection
-	const selectedNode = valoo<DevNode | null>(null);
-	const selectedRef = valoo<HTMLElement | null>(null);
-
 	// Toggle
-	const collapsed = valoo<Set<ID>>(new Set());
-	const hidden = track(() => {
-		const out = new Set<ID>();
-		collapsed().forEach(id =>
-			getAllChildren(nodes(), id).forEach(child => out.add(child)),
-		);
-		return out;
-	}, [collapsed, nodes]);
-
 	const inspectData = valoo<InspectData>(EMPTY_INSPECT);
+	const isPicking = valoo<boolean>(false);
 
+	// List
+	const collapser = createCollapser();
+	const nodeList = watch(() =>
+		flattenChildren(nodes.$, rootToChild.$.get(1)!, collapser.collapsed.$),
+	);
+
+	const selection = createSelectionStore(nodeList, notify);
 	return {
+		nodeList,
+		isPicking,
 		inspectData,
 		roots,
 		rootToChild,
 		nodes,
-		selected: selectedNode,
-		selectedRef,
-		visiblity: {
-			collapsed,
-			hidden,
-		},
+		collapser,
+		search: createSearchStore(nodes),
+		modal: createModalState(),
+		filter: createFilterStore(notify),
+		selection,
 		actions: {
-			collapseNode: id => {
-				if (!collapsed().has(id)) {
-					collapsed().add(id);
-				} else {
-					collapsed().delete(id);
-				}
-				collapsed(collapsed());
-			},
-			selectNode: (id, ref) => {
-				if (selectedNode() !== null) {
-					if (selectedNode()!.id === id) return;
-
-					selectedNode()!.selected(false);
-				}
-				const node = nodes().get(id)!;
-				node.selected(true);
-
-				selectedRef(ref);
-				selectedNode(node);
-				notify("inspect", id);
-			},
 			highlightNode: id => {
 				notify("highlight", id);
 			},
@@ -153,14 +134,21 @@ export function createStore(): Store {
 				notify("inspect", id);
 			},
 			clear() {
-				inspectData(EMPTY_INSPECT);
-				nodes(new Map());
-				roots([]);
-				rootToChild(new Map());
-				selectedNode(null);
-				selectedRef(null);
-				collapsed(new Set());
+				inspectData.$ = EMPTY_INSPECT;
+				nodes.$ = new Map();
+				roots.$ = [];
+				rootToChild.$ = new Map();
+				selection.selected.$ = -1;
+				collapser.collapsed.$ = new Set();
 				listeners = [];
+			},
+			startPickElement() {
+				isPicking.$ = true;
+				notify("start-picker", null);
+			},
+			stopPickElement() {
+				isPicking.$ = false;
+				notify("stop-picker", null);
 			},
 		},
 		subscribe(fn) {
@@ -170,35 +158,19 @@ export function createStore(): Store {
 	};
 }
 
-export function getAllChildren(tree: Tree, id: ID): ID[] {
-	const out: ID[] = [];
-	const visited = new Set<ID>();
-	let item: ID | undefined;
-	let stack: ID[] = [id];
-	while ((item = stack.pop())) {
-		const node = tree.get(item);
-		if (node) {
-			if (!visited.has(node.id)) {
-				if (node.id !== id) out.push(node.id);
-				visited.add(node.id);
-			}
-			node.children.reverse().forEach(x => stack.push(x));
-		}
-	}
-	return out;
-}
-
 export const AppCtx = createContext<Store>(null as any);
 
 export const useStore = () => useContext(AppCtx);
 
-export function useObserver<T>(fn: () => T, deps: Observable[]): T {
-	let [i, setI] = useState(0);
+export function useObserver<T>(fn: () => T): T {
+	let ref = useRef<T>();
+	let [value, set] = useState<T>(ref.current || ((ref as any).current = fn()));
 
 	useEffect(() => {
-		const subs = deps.map(x => x.on(() => setI(++i)));
-		return () => subs.forEach(x => x());
+		let v = watch(fn);
+		v.on(next => set(next));
+		return () => v._disposers.forEach(disp => disp());
 	}, []);
 
-	return fn();
+	return value;
 }

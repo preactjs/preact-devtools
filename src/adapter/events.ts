@@ -68,8 +68,9 @@ export function applyOperations(store: Store, data: number[]) {
 			case MsgTypes.ADD_ROOT:
 				const id = data[i + 1];
 				newRoot = true;
-				store.roots().push(id);
-				store.roots(store.roots());
+				store.roots.update(s => {
+					s.push(id);
+				});
 				i += 1;
 				break;
 			case MsgTypes.ADD_VNODE: {
@@ -81,17 +82,18 @@ export function applyOperations(store: Store, data: number[]) {
 
 				if (newRoot) {
 					newRoot = false;
-					store.rootToChild().set(rootId, id);
-					store.rootToChild(store.rootToChild());
+					store.rootToChild.update(s => {
+						s.set(rootId, id);
+					});
 				}
 
-				if (store.nodes().has(id)) {
+				if (store.nodes.$.has(id)) {
 					throw new Error(`Node ${id} already present in store.`);
 				}
 
 				// Roots have their own id as parentId
 				if (id !== parentId) {
-					const parent = store.nodes().get(parentId);
+					const parent = store.nodes.$.get(parentId);
 					if (!parent) {
 						// throw new Error(`Parent node ${parentId} not found in store.`);
 						console.warn(`Parent node ${parentId} not found in store.`);
@@ -101,16 +103,15 @@ export function applyOperations(store: Store, data: number[]) {
 					}
 				}
 
-				store.nodes().set(id, {
+				store.nodes.$.set(id, {
 					children: [],
 					depth: getDepth(store, parentId),
 					id,
 					name,
-					parentId,
+					parent: parentId,
 					type,
 					key,
 					duration: valoo<number>(0),
-					selected: valoo<boolean>(false),
 				});
 				i += 6;
 				break;
@@ -119,12 +120,12 @@ export function applyOperations(store: Store, data: number[]) {
 				const id = data[i + 1];
 				const duration = data[i + 2];
 
-				if (!store.nodes().has(id)) {
+				if (!store.nodes.$.has(id)) {
 					throw new Error(`Node ${id} already present in store.`);
 				}
 
-				const node = store.nodes().get(id)!;
-				node.duration(duration);
+				const node = store.nodes.$.get(id)!;
+				node.duration.$ = duration;
 
 				i += 3;
 				break;
@@ -140,7 +141,7 @@ export function applyOperations(store: Store, data: number[]) {
 		}
 	}
 
-	store.nodes(store.nodes());
+	store.nodes.update();
 }
 
 export function applyEvent(store: Store, name: string, data: any) {
@@ -148,13 +149,17 @@ export function applyEvent(store: Store, name: string, data: any) {
 		case "operation":
 			return applyOperations(store, data);
 		case "inspect-result":
-			return store.inspectData(data);
+			return (store.inspectData.$ = data);
+		case "select-node":
+			return store.selection.selectById(data);
+		case "stop-picker":
+			return store.actions.stopPickElement();
 	}
 }
 
 export function getDepth(store: Store, id: ID) {
-	let parent = store.nodes().get(id)!;
-	return parent ? parent.depth + 1 : 0;
+	let parent = store.nodes.$.get(id)!;
+	return parent ? parent.depth + 1 : 1;
 }
 
 export function jsonify(data: any) {
@@ -170,11 +175,11 @@ export function jsonify(data: any) {
 		case "function": {
 			return {
 				type: "function",
-				name: data.displayName || data.name,
+				name: data.displayName || data.name || "anonymous",
 			};
 		}
 		case "object":
-			if (data == null) return null;
+			if (data === null) return null;
 			const out = { ...data };
 			Object.keys(out).forEach(key => {
 				out[key] = jsonify(out[key]);
@@ -188,7 +193,6 @@ export function jsonify(data: any) {
 export function cleanProps(props: any) {
 	if (typeof props === "string" || !props) return null;
 	const out = { ...props };
-	delete out.children;
 	if (!Object.keys(out).length) return null;
 	return out;
 }

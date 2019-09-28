@@ -12,6 +12,7 @@ export type PropDataType =
 	| "undefined"
 	| "function"
 	| "bigint"
+	| "vnode"
 	| "symbol";
 
 export interface PropData {
@@ -41,7 +42,7 @@ export function flatten(
 			collapsable: true,
 			editable: false,
 			path,
-			value: "Array",
+			value: data,
 		});
 		data.forEach((item, i) => flatten(item, path.concat(i), limit, out));
 	} else if (data instanceof Set) {
@@ -81,6 +82,21 @@ export function flatten(
 					path,
 					value: data.name + "()",
 				});
+			} else if (
+				// Same for vnodes
+				Object.keys(data).length === 2 &&
+				typeof data.name === "string" &&
+				data.type === "vnode"
+			) {
+				out.push({
+					depth,
+					name,
+					type: "vnode",
+					collapsable: false,
+					editable: false,
+					path,
+					value: `<${data.name} />`,
+				});
 			} else {
 				// Filter out initial object
 				if (path.length > 0) {
@@ -91,7 +107,7 @@ export function flatten(
 						collapsable: Object.keys(data).length > 0,
 						editable: false,
 						path,
-						value: "Object",
+						value: data,
 					});
 				}
 
@@ -114,46 +130,4 @@ export function flatten(
 	}
 
 	return out;
-}
-
-/**
- * Parse a user entered value.
- */
-export function parseInput(v: string) {
-	v = v.trim();
-
-	switch (v) {
-		case "true":
-		case "false":
-			return v === "true";
-		case "null":
-			return null;
-		case "undefined":
-			return undefined;
-		case "NaN":
-			return NaN;
-		case "Infinity":
-		case "+Infinity":
-			return Infinity;
-		case "-Infinity":
-			return -Infinity;
-	}
-
-	if (/^[-+.]?\d*(?:[.]?\d*)$/.test(v)) {
-		return Number(v);
-	}
-
-	if (v.length) {
-		if (v[0] === "'" || v[0] === '"') {
-			return v.slice(1, v.length - 1);
-		} else {
-			try {
-				return JSON.parse(v);
-			} catch (err) {
-				return v;
-			}
-		}
-	}
-
-	return undefined;
 }

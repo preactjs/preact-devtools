@@ -8,6 +8,7 @@ export interface IdMapper {
 	createId(vnode: VNode): number;
 	getId(vnode: VNode): number;
 	remove(vnode: VNode): void;
+	getByDom(node: HTMLElement | Text): number;
 }
 
 /**
@@ -18,6 +19,7 @@ export function createIdMapper(): IdMapper {
 	const instToId = new WeakMap<any, number>();
 	const idToVNode = new Map<number, VNode>();
 	const idToInst = new Map<number, any>();
+	const domToId = new WeakMap<HTMLElement | Text, number>();
 
 	let uuid = 1;
 
@@ -41,18 +43,30 @@ export function createIdMapper(): IdMapper {
 			idToInst.delete(id);
 		}
 		instToId.delete(vnode);
+		const dom = getDom(vnode);
+		if (typeof vnode.type !== "function" && dom != null) {
+			domToId.delete(dom);
+		}
 	};
 	const createId = (vnode: VNode) => {
 		const id = uuid++;
 		instToId.set(getInstance(vnode), id);
 		idToInst.set(id, getInstance(vnode));
 		idToVNode.set(id, vnode);
+		const dom = getDom(vnode);
+		if (typeof vnode.type !== "function" && dom != null) {
+			domToId.set(dom, id);
+		}
 		return id;
 	};
 
 	const has = (id: number) => idToInst.has(id);
 
-	return { has, getVNode, hasId, createId, getId, remove };
+	const getByDom = (node: HTMLElement | Text) => {
+		return domToId.get(node) || -1;
+	};
+
+	return { has, getVNode, hasId, createId, getId, remove, getByDom };
 }
 
 export function getInstance(vnode: VNode): any {

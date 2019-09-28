@@ -5,11 +5,33 @@
 	position: relative;
 	z-index: 1;
 	overflow: auto;
+	outline: none;
 
 	-webkit-user-select: none;
 	-moz-user-select: none;
 	-ms-user-select: none;
 	user-select: none;
+	min-height: 15rem;
+}
+
+.empty {
+	display: flex;
+	flex: 1;
+	justify-content: center;
+	align-items: center;
+	height: 100%;
+}
+
+.bgLogo {
+	color: #555;
+	position: absolute;
+	top: 50%;
+	left: 50%;
+	width: 12rem;
+	height: 12rem;
+	transform: translate3d(-50%, -50%, 0);
+	z-index: -1;
+	opacity: 0.4;
 }
 
 .item {
@@ -19,9 +41,14 @@
 	height: 1.5rem;
 }
 
-.item[data-selected] {
+.tree:focus-within .item[data-selected] {
 	background: var(--color-selected-bg);
 	color: var(--color-selected-text);
+}
+
+.item[data-selected] {
+	background: var(--color-selected-inactive-bg);
+	color: var(--color-selected-inactive-text);
 }
 
 .item:not([data-selected]):hover {
@@ -43,6 +70,7 @@
 	border: none;
 	outline: none;
 	color: #aaa;
+	z-index: 100;
 	display: inline-flex;
 	justify-content: center;
 	align-content: center;
@@ -72,4 +100,12 @@
 	pointer-events: none;
 	opacity: 0.5;
 	z-index: -1;
+}
+
+/* Marker */
+.mark {
+	background: var(--color-marker);
+}
+.markSelected {
+	background: var(--color-marker-selected);
 }

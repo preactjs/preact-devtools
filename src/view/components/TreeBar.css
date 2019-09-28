@@ -10,4 +10,27 @@
 
 .btnIcon[data-active] {
 	color: var(--color-button-active);
+	color: var(--color-button-active);
+}
+
+.searchContainer {
+	align-items: center;
+	flex: 1 1 auto;
+	display: flex;
+	margin-left: 0.5rem;
+	margin-right: 0.5rem;
+}
+
+.search {
+	flex: 1 1 auto;
+	border: none;
+	background: none;
+	color: var(--color-text);
+	margin-left: 0.25rem;
+}
+
+.searchCounter {
+	display: inline-flex;
+	font-size: 0.8rem;
+	color: var(--color-text-empty);
 }

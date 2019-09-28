@@ -14,3 +14,26 @@ export function getLastDomChild(dom: HTMLElement) {
 	}
 	return last;
 }
+
+export function scrollIntoView(el: Element) {
+	// Find closest scrollable parent
+	let parent: Element | null = el;
+	while ((parent = parent.parentNode as any)) {
+		if (parent.scrollHeight > parent.clientHeight) {
+			break;
+		}
+	}
+
+	if (parent) {
+		let rect = el.getBoundingClientRect();
+		let cRect = parent.getBoundingClientRect();
+		let top = rect.top;
+		let visible = top >= cRect.top && rect.bottom <= cRect.height;
+		if (!visible) {
+			parent.scrollTo({
+				top: top - rect.height,
+				behavior: "smooth",
+			});
+		}
+	}
+}

@@ -1,0 +1,76 @@
+.modal {
+	background: var(--color-bg);
+	padding: 2rem;
+	position: fixed;
+	top: 50%;
+	left: 50%;
+	transform: translate3d(-50%, -50%, 0);
+	z-index: 999991;
+	min-width: 30rem;
+	border: 0.0625rem solid var(--color-modal-border);
+}
+
+.modal p {
+	margin-top: 0;
+}
+
+.closeBtn {
+	position: absolute;
+	right: 1rem;
+	top: 1 rem;
+}
+
+.backdrop {
+	position: fixed;
+	top: 0;
+	right: 0;
+	bottom: 0;
+	left: 0;
+	background: var(--color-modal-backdrop);
+	z-index: 99999;
+	opacity: 0;
+	visibility: hidden;
+}
+
+.backdropActive {
+	opacity: 1;
+	visibility: visible;
+}
+
+/* Settings Modal */
+.filterRow + .filterRow {
+	margin-top: 0.5rem;
+}
+
+.empty {
+	padding: 0;
+	margin: 0 0 0.5rem 0;
+	color: var(--color-text-empty);
+	font-size: 0.9rem;
+}
+
+.check {
+	margin-right: 0.5rem;
+}
+
+.operator {
+	display: inline-block;
+	padding: 0 0.5rem;
+}
+
+.valueWrapper {
+	flex: 1 1 auto;
+}
+
+.regInput {
+	width: 10rem;
+}
+
+.filterRemove {
+	align-self: flex-end;
+}
+
+.addFilter {
+	margin-top: 1rem;
+	display: inline-block;
+}

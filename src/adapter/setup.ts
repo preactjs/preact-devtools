@@ -17,18 +17,18 @@ export async function init(options: Options, getHook: () => DevtoolsHook) {
 	// Devtools can take a while to set up
 	await waitForHook(getHook);
 
-	// We're set up and now we can start processing events
-	// const hook = getHook();
-
 	bridge.listen("initialized", renderer.flushInitial);
 	bridge.listen("highlight", adapter.highlight);
 	bridge.listen("update-node", ev => {
 		adapter.update(ev.id, ev.type, ev.path, ev.value);
 	});
+	bridge.listen("update-filter", ev => renderer.applyFilters(ev));
 	bridge.listen("select", adapter.select);
 	bridge.listen("inspect", adapter.inspect);
 	bridge.listen("log", adapter.log);
 	bridge.listen("update", adapter.log);
+	bridge.listen("start-picker", adapter.startPickElement);
+	bridge.listen("stop-picker", adapter.stopPickElement);
 
 	return hook.attach(renderer);
 }

@@ -5,11 +5,12 @@
 	text-align: center;
 	position: absolute;
 	pointer-events: none;
+	z-index: 999999;
 }
 
 .content {
 	background: rgba(136, 194, 232, 0.75);
-	border-color: rgba(171, 233, 188, 0.75);
+	border-color: rgba(5, 150, 45, 0.5);
 	border-style: solid;
 	width: 100%;
 	height: 100%;
@@ -48,6 +49,7 @@
 	position: absolute;
 	left: 50%;
 	transform: translateX(-50%);
+	border: 0.0625rem solid var(--color-highlight-bd);
 }
 
 .fixed {

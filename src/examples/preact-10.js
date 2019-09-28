@@ -4,17 +4,42 @@ import { Highlighter } from "../view/components/Highlighter";
 import { ElementProps } from "../view/components/ElementProps";
 import { Iframer } from "./Iframer";
 import d from "../view/components/Devtools.css";
+import { IconBtn } from "../view/components/IconBtn";
+import { Picker } from "../view/components/icons";
+import { TreeBar } from "../view/components/TreeBar";
+import { ModalBackdrop, SettingsModal } from "../view/components/Modals";
+import { AppCtx, createStore } from "../view/store";
+import { TreeView } from "../view/components/TreeView";
+import { treeStore } from "./treeStore";
+
+function Headline(props) {
+	return <h3>{props.title}</h3>;
+}
+
+const tstore = treeStore();
 
 export function TodoList() {
 	const [todos, setTodos] = useState(["asd", "asdf"]);
-	const [dark, setDark] = useState(false);
+	const [dark, setDark] = useState(localStorage.getItem("theme") === "dark");
 	const [v, setV] = useState("");
+	const [showModal, setShowModal] = useState(
+		!!localStorage.getItem("show-modal"),
+	);
+
+	const [store] = useState(createStore());
 
 	return (
 		<div class={dark ? "dark" : "light"}>
 			<div style="padding: 5rem" class={d.root}>
 				<div style="display: flex; flex-direction: column;">
-					<button onClick={() => setDark(!dark)}>Toggle Theme</button>
+					<button
+						onClick={() => {
+							localStorage.setItem("theme", !dark ? "dark" : "light");
+							setDark(!dark);
+						}}
+					>
+						Toggle Theme
+					</button>
 					<form
 						onSubmit={e => {
 							e.preventDefault();
@@ -152,6 +177,10 @@ export function TodoList() {
 								obj: { foo: "bar" },
 								set: new Set([1, 2, 3]),
 								map: new Map([[1, "a"], [2, "b"]]),
+								children: {
+									type: "vnode",
+									name: "span",
+								},
 								bar: {
 									type: "function",
 									name: "foobar",
@@ -159,6 +188,54 @@ export function TodoList() {
 							}}
 						/>
 					</div>
+					<h2>Icon Btns</h2>
+					<IconBtn onClick={() => console.log("click")}>
+						<Picker />
+					</IconBtn>
+					<h2>Modals</h2>
+					<button
+						onClick={() => {
+							const next = !showModal;
+							setShowModal(next);
+							localStorage.setItem("show-modal", next + "");
+						}}
+					>
+						show modal
+					</button>
+					<AppCtx.Provider value={store}>
+						{showModal && (
+							<SettingsModal
+								onClose={() => {
+									setShowModal(false);
+									localStorage.removeItem("show-modal");
+								}}
+							/>
+						)}
+					</AppCtx.Provider>
+					<ModalBackdrop
+						active={showModal}
+						onClick={() => {
+							setShowModal(false);
+							localStorage.removeItem("show-modal");
+						}}
+					/>
+					<Headline title="foobar" />
+					<h2>TreeBar</h2>
+					<div style="border: 1px solid #555">
+						<AppCtx.Provider value={tstore}>
+							<TreeBar />
+						</AppCtx.Provider>
+					</div>
+					<h2>TreeView</h2>
+					<div style="height: 20rem; overflow: auto;">
+						<AppCtx.Provider value={tstore}>
+							<TreeView />
+						</AppCtx.Provider>
+					</div>
+					<p>Empty tree view</p>
+					<AppCtx.Provider value={store}>
+						<TreeView />
+					</AppCtx.Provider>
 				</div>
 			</div>
 		</div>

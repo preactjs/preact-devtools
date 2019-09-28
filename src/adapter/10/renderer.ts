@@ -17,8 +17,7 @@ import {
 	getLastDomChild,
 	getActualChildren,
 } from "./vnode";
-import { DevTools } from "../../view/components/Devtools";
-import { Highlighter } from "../../view/components/Highlighter";
+import { FilterState, shouldFilter } from "./filter";
 
 export enum Elements {
 	HTML_ELEMENT = 1,
@@ -53,6 +52,8 @@ export function getDevtoolsType(vnode: VNode): Elements {
 export interface Renderer {
 	getVNodeById(id: ID): VNode | null;
 	findDomForVNode(id: ID): Array<HTMLElement | Text | null> | null;
+	findVNodeIdForDom(node: HTMLElement | Text): number;
+	applyFilters(filters: FilterState): void;
 	has(id: ID): boolean;
 	log(id: ID): void;
 	inspect(id: ID): InspectData | null;
@@ -61,12 +62,22 @@ export interface Renderer {
 	flushInitial(): void;
 }
 
-export function createRenderer(hook: DevtoolsHook): Renderer {
+let DEFAULT_FIlTERS: FilterState = {
+	regex: [],
+	type: new Set(["dom"]),
+};
+
+export function createRenderer(
+	hook: DevtoolsHook,
+	filters: FilterState = DEFAULT_FIlTERS,
+): Renderer {
 	const ids = createIdMapper();
 	const roots = new Set<VNode>();
 
 	/** Queue events until the extension is connected */
 	let queue: DevtoolsEvent[] = [];
+
+	let currentUnmounts: number[] = [];
 
 	return {
 		getVNodeById: id => ids.getVNode(id),
@@ -108,14 +119,48 @@ export function createRenderer(hook: DevtoolsHook): Renderer {
 			const vnode = ids.getVNode(id);
 			return vnode ? [getDom(vnode), getLastDomChild(vnode)] : null;
 		},
+		findVNodeIdForDom(node) {
+			return ids.getByDom(node) || -1;
+		},
+		applyFilters(nextFilters) {
+			roots.forEach(root => this.onUnmount(root));
+			// Unmount
+			const commit: Commit = {
+				operations: [],
+				rootId: -1,
+				strings: new Map(),
+				unmountIds: currentUnmounts,
+			};
+
+			const unmounts = flush(commit);
+			if (unmounts) {
+				currentUnmounts = [];
+				queue.push(unmounts);
+			}
+
+			filters.regex = nextFilters.regex;
+			filters.type = nextFilters.type;
+
+			roots.forEach(root => {
+				const commit = createCommit(ids, roots, root, filters);
+				const ev = flush(commit);
+				if (!ev) return;
+				queue.push(ev);
+			});
+
+			if (hook.connected) {
+				this.flushInitial();
+			}
+		},
 		flushInitial() {
-			console.log(queue);
 			queue.forEach(ev => hook.emit(ev.name, ev.data));
 			hook.connected = true;
 			queue = [];
 		},
 		onCommit(vnode) {
-			const commit = createCommit(ids, roots, vnode);
+			const commit = createCommit(ids, roots, vnode, filters);
+			commit.unmountIds.push(...currentUnmounts);
+			currentUnmounts = [];
 			const ev = flush(commit);
 			if (!ev) return;
 
@@ -126,7 +171,10 @@ export function createRenderer(hook: DevtoolsHook): Renderer {
 			}
 		},
 		onUnmount(vnode) {
-			console.log("TODO: Unmount vnode");
+			const id = ids.getId(vnode);
+			if (id > 0) {
+				currentUnmounts.push(id);
+			}
 		},
 	};
 }
@@ -155,6 +203,7 @@ export function createCommit(
 	ids: IdMapper,
 	roots: Set<VNode>,
 	vnode: VNode,
+	filters: FilterState,
 ): Commit {
 	const commit = {
 		operations: [],
@@ -178,9 +227,9 @@ export function createCommit(
 	}
 
 	if (isNew) {
-		mount(ids, commit, vnode, parentId);
+		mount(ids, commit, vnode, parentId, filters);
 	} else {
-		update(ids, commit, vnode);
+		update(ids, commit, vnode, filters);
 	}
 
 	return commit;
@@ -191,31 +240,42 @@ export function mount(
 	commit: Commit,
 	vnode: VNode,
 	ancestorId: ID,
+	filters: FilterState,
 ) {
-	const id = ids.hasId(vnode) ? ids.getId(vnode) : ids.createId(vnode);
-	if (isRoot(vnode)) {
-		commit.operations.push(MsgTypes.ADD_ROOT, id);
-	}
+	const root = isRoot(vnode);
 
-	commit.operations.push(
-		MsgTypes.ADD_VNODE,
-		id,
-		getDevtoolsType(vnode), // Type
-		ancestorId,
-		9999, // owner
-		getStringId(commit.strings, getDisplayName(vnode)),
-		vnode.key ? getStringId(commit.strings, vnode.key) : 0,
-	);
+	if (root || !shouldFilter(vnode, filters)) {
+		const id = ids.hasId(vnode) ? ids.getId(vnode) : ids.createId(vnode);
+		if (isRoot(vnode)) {
+			commit.operations.push(MsgTypes.ADD_ROOT, id);
+		}
+
+		commit.operations.push(
+			MsgTypes.ADD_VNODE,
+			id,
+			getDevtoolsType(vnode), // Type
+			ancestorId,
+			9999, // owner
+			getStringId(commit.strings, getDisplayName(vnode)),
+			vnode.key ? getStringId(commit.strings, vnode.key) : 0,
+		);
+		ancestorId = id;
+	}
 
 	const children = getActualChildren(vnode);
 	for (let i = 0; i < children.length; i++) {
 		if (children[i] !== null) {
-			mount(ids, commit, children[i], id);
+			mount(ids, commit, children[i], ancestorId, filters);
 		}
 	}
 }
 
-export function update(ids: IdMapper, commit: Commit, vnode: VNode) {
+export function update(
+	ids: IdMapper,
+	commit: Commit,
+	vnode: VNode,
+	filters: FilterState,
+) {
 	const id = ids.getId(vnode);
 	commit.operations.push(
 		MsgTypes.UPDATE_VNODE_TIMINGS,
@@ -226,9 +286,9 @@ export function update(ids: IdMapper, commit: Commit, vnode: VNode) {
 	const children = getActualChildren(vnode);
 	for (let i = 0; i < children; i++) {
 		if (ids.hasId(vnode)) {
-			update(ids, commit, vnode);
+			update(ids, commit, vnode, filters);
 		} else {
-			mount(ids, commit, vnode, id);
+			mount(ids, commit, vnode, id, filters);
 		}
 	}
 	return commit;

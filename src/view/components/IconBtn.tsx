@@ -12,6 +12,7 @@ export interface Props {
 export function IconBtn(props: Props) {
 	return (
 		<button
+			type="button"
 			class={s.root}
 			data-active={props.active}
 			title={props.title}
