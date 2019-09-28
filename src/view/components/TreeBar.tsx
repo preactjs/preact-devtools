@@ -61,13 +61,13 @@ export function TreeBar() {
 				)}
 			</div>
 			<ActionSeparator />
-			<IconBtn onClick={store.search.selectNext}>
+			<IconBtn onClick={store.search.selectNext} title="Select next result">
 				<KeyboardDown />
 			</IconBtn>
-			<IconBtn onClick={store.search.selectPrev}>
+			<IconBtn onClick={store.search.selectPrev} title="Select previous result">
 				<KeyboardUp />
 			</IconBtn>
-			<IconBtn onClick={store.search.reset}>
+			<IconBtn onClick={store.search.reset} title="Clear search input">
 				<Close />
 			</IconBtn>
 			<ActionSeparator />
