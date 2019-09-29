@@ -36,6 +36,7 @@
 	--color-marker: yellow;
 	--color-marker-selected: orange;
 	--color-input-border: #4d4d4d;
+	--color-empty-logo: #dadada;
 
 	/* Props */
 	--color-props-input-bg: #f0f0f0;
@@ -72,6 +73,7 @@
 	--color-marker: yellow;
 	--color-marker-selected: orange;
 	--color-input-border: #666;
+	--color-empty-logo: #555;
 
 	/* Props */
 	--color-props-input-bg: #444;

@@ -35,7 +35,7 @@
 	border: none;
 	background: none;
 	color: var(--color-text);
-	margin-left: 0.25rem;
+	margin-left: 0.25rem !important;
 }
 
 .searchCounter {

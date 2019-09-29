@@ -23,7 +23,7 @@
 }
 
 .bgLogo {
-	color: #555;
+	color: var(--color-empty-logo);
 	position: absolute;
 	top: 50%;
 	left: 50%;
