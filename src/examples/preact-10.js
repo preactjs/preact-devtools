@@ -18,7 +18,7 @@ function Headline(props) {
 
 const tstore = treeStore();
 
-export function TodoList() {
+export function StyleGuide() {
 	const [todos, setTodos] = useState(["asd", "asdf"]);
 	const [dark, setDark] = useState(localStorage.getItem("theme") === "dark");
 	const [v, setV] = useState("");
@@ -243,5 +243,5 @@ export function TodoList() {
 }
 
 export function renderExample(dom) {
-	render(<TodoList />, dom);
+	render(<StyleGuide />, dom);
 }
