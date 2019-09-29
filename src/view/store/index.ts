@@ -98,11 +98,23 @@ export function createStore(): Store {
 	const inspectData = valoo<InspectData>(EMPTY_INSPECT);
 	const isPicking = valoo<boolean>(false);
 
+	const filterState = createFilterStore(notify);
+
 	// List
 	const collapser = createCollapser();
-	const nodeList = watch(() =>
-		flattenChildren(nodes.$, rootToChild.$.get(1)!, collapser.collapsed.$),
-	);
+	const nodeList = watch(() => {
+		const list = flattenChildren(
+			nodes.$,
+			rootToChild.$.get(1)!,
+			collapser.collapsed.$,
+		);
+
+		if (filterState.filterFragment.$) {
+			return list.slice(1);
+		}
+
+		return list;
+	});
 
 	const selection = createSelectionStore(nodeList, notify);
 	return {
@@ -115,7 +127,7 @@ export function createStore(): Store {
 		collapser,
 		search: createSearchStore(nodes, nodeList),
 		modal: createModalState(),
-		filter: createFilterStore(notify),
+		filter: filterState,
 		selection,
 		actions: {
 			highlightNode: id => {

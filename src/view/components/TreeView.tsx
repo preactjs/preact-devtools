@@ -90,6 +90,7 @@ export function TreeItem(props: { key: any; id: ID }) {
 	const store = useStore();
 	const sel = useSelection();
 	const { collapsed, toggle } = useCollapser();
+	const filterFragments = useObserver(() => store.filter.filterFragment.$);
 	const node = useObserver(() => store.nodes.$.get(id) || null);
 	const onToggle = () => toggle(id);
 	const ref = useRef<HTMLDivElement>();
@@ -112,7 +113,8 @@ export function TreeItem(props: { key: any; id: ID }) {
 			data-selected={isSelected}
 			data-id={id}
 			data-depth={node.depth}
-			style={`padding-left: calc(var(--indent-depth) * ${node.depth - 1})`}
+			style={`padding-left: calc(var(--indent-depth) * ${node.depth -
+				(filterFragments ? 2 : 1)})`}
 		>
 			<div class={s.itemHeader}>
 				{node.children.length > 0 && (
