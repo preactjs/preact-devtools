@@ -26,7 +26,11 @@ export function createSelectionStore(list: Observable<ID[]>, notify: Listener) {
 
 	// Whenever the selection changes we need to fire a request to
 	// load the prop data for the sidebar
-	watch(() => notify("inspect", selected.$));
+	watch(() => {
+		if (selected.$ > -1) {
+			notify("inspect", selected.$);
+		}
+	});
 
 	return {
 		selected,
