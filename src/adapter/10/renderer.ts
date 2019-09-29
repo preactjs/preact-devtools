@@ -64,7 +64,7 @@ export interface Renderer {
 
 let DEFAULT_FIlTERS: FilterState = {
 	regex: [],
-	type: new Set(["dom"]),
+	type: new Set(["dom", "fragment"]),
 };
 
 export function createRenderer(

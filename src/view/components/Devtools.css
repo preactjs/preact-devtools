@@ -11,6 +11,10 @@
 	border: none;
 }
 
+.root input {
+	margin: 0;
+}
+
 :global(.light) .root {
 	--color-bg: white;
 	--color-text: #333;
@@ -28,9 +32,10 @@
 	--color-button-active: #7245c7;
 	--color-highlight-bd: #444;
 	--color-modal-backdrop: rgba(197, 197, 197, 0.8);
-	--color-modal-border: #4d4d4d;
+	--color-modal-border: #bbb;
 	--color-marker: yellow;
 	--color-marker-selected: orange;
+	--color-input-border: #4d4d4d;
 
 	/* Props */
 	--color-props-input-bg: #f0f0f0;
@@ -66,6 +71,7 @@
 	--color-modal-border: #4d4d4d;
 	--color-marker: yellow;
 	--color-marker-selected: orange;
+	--color-input-border: #666;
 
 	/* Props */
 	--color-props-input-bg: #444;

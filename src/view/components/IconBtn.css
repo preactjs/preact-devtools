@@ -1,10 +1,12 @@
 .root {
+	position: relative;
 	border: none;
 	background: none;
 	cursor: pointer;
 	display: inline-flex;
 	align-items: center;
 	outline: none;
+	padding: 0;
 	color: var(--color-text);
 }
 

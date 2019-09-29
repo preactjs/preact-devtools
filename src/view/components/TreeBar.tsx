@@ -1,5 +1,5 @@
 import { h } from "preact";
-import { useState } from "preact/hooks";
+import { useState, useEffect } from "preact/hooks";
 import { Actions, ActionSeparator } from "./Actions";
 import { IconBtn } from "./IconBtn";
 import {
@@ -9,16 +9,21 @@ import {
 	KeyboardUp,
 	Close,
 	Search,
+	Eye,
+	Remove,
+	AddCircle,
 } from "./icons";
 import { useStore, useObserver } from "../store";
 import s from "./TreeBar.css";
 import { useSearch } from "../store/search";
+import { OutsideClick } from "./OutsideClick";
 
 export function TreeBar() {
 	const store = useStore();
 	const isPicking = useObserver(() => store.isPicking.$);
 	const { value, count, selected, goPrev, goNext } = useSearch();
-	const activeModal = useObserver(() => store.modal.active.$);
+
+	const [filterVisible, setFilterVisible] = useState(false);
 
 	const onKeyDown = (e: KeyboardEvent) => {
 		if (e.key === "Enter") {
@@ -33,16 +38,18 @@ export function TreeBar() {
 
 	return (
 		<Actions>
-			<IconBtn
-				active={isPicking}
-				title="Pick a Component from the page"
-				onClick={() => {
-					if (!isPicking) store.actions.startPickElement();
-					else store.actions.stopPickElement();
-				}}
-			>
-				<Picker />
-			</IconBtn>
+			<div class={s.btnWrapper}>
+				<IconBtn
+					active={isPicking}
+					title="Pick a Component from the page"
+					onClick={() => {
+						if (!isPicking) store.actions.startPickElement();
+						else store.actions.stopPickElement();
+					}}
+				>
+					<Picker />
+				</IconBtn>
+			</div>
 			<ActionSeparator />
 			<div class={s.searchContainer}>
 				<Search size="xs" />
@@ -61,23 +68,128 @@ export function TreeBar() {
 				)}
 			</div>
 			<ActionSeparator />
-			<IconBtn onClick={store.search.selectNext} title="Select next result">
-				<KeyboardDown />
-			</IconBtn>
-			<IconBtn onClick={store.search.selectPrev} title="Select previous result">
-				<KeyboardUp />
-			</IconBtn>
-			<IconBtn onClick={store.search.reset} title="Clear search input">
-				<Close />
-			</IconBtn>
+			<div class={s.btnWrapper}>
+				<IconBtn onClick={store.search.selectNext} title="Select next result">
+					<KeyboardDown />
+				</IconBtn>
+			</div>
+			<div class={s.btnWrapper}>
+				<IconBtn
+					onClick={store.search.selectPrev}
+					title="Select previous result"
+				>
+					<KeyboardUp />
+				</IconBtn>
+			</div>
+			<div class={s.btnWrapper}>
+				<IconBtn onClick={store.search.reset} title="Clear search input">
+					<Close />
+				</IconBtn>
+			</div>
 			<ActionSeparator />
-			<IconBtn
+			<div class={s.btnWrapper}>
+				<OutsideClick
+					onClick={() => setFilterVisible(false)}
+					class={s.filterBtnWrapper}
+				>
+					<IconBtn
+						title="Filter Components"
+						onClick={() => setFilterVisible(!filterVisible)}
+					>
+						<Eye />
+					</IconBtn>
+					{filterVisible && <FilterPopup />}
+				</OutsideClick>
+			</div>
+			{/* <IconBtn
 				active={activeModal === "settings"}
 				title="Settings"
 				onClick={() => store.modal.open("settings")}
 			>
 				<SettingsIcon size="s" />
-			</IconBtn>
+			</IconBtn> */}
 		</Actions>
+	);
+}
+
+export function FilterPopup() {
+	const store = useStore();
+	const filters = useObserver(() => store.filter.filters.$);
+	const filterDom = useObserver(() => store.filter.filterDom.$);
+	const filterFragment = useObserver(() => store.filter.filterFragment.$);
+
+	return (
+		<div class={s.filter}>
+			<div class={s.arrowFix} />
+			<form onSubmit={e => e.preventDefault()}>
+				{/* Native filters */}
+				<label class={s.filterRow}>
+					<span class={s.filterCheck}>
+						<input
+							type="checkbox"
+							checked={filterFragment}
+							onInput={e =>
+								store.filter.setEnabled("fragment", (e.target as any).checked)
+							}
+						/>
+					</span>
+					<span class={s.filterValue}>Fragments</span>
+				</label>
+				<label class={s.filterRow}>
+					<span class={s.filterCheck}>
+						<input
+							type="checkbox"
+							checked={filterDom}
+							onInput={e =>
+								store.filter.setEnabled("dom", (e.target as any).checked)
+							}
+						/>
+					</span>
+					<span class={s.filterValue}>DOM nodes</span>
+				</label>
+				{/* Custom user filters */}
+				{filters.map((x, i) => {
+					return (
+						<div key={i} class={s.filterRow}>
+							<span class={s.filterCheck}>
+								<input
+									type="checkbox"
+									checked={x.enabled}
+									onInput={e =>
+										store.filter.setEnabled(x, (e.target as any).checked)
+									}
+								/>
+							</span>
+							<span class={s.filterValue}>
+								<input
+									className={s.filterName}
+									type="text"
+									placeholder="MyComponent"
+									value={x.value}
+									onInput={e =>
+										store.filter.setValue(x, (e.target as any).value)
+									}
+								/>
+							</span>
+							<span class={s.removeWrapper}>
+								<IconBtn
+									title="Remove filter"
+									onClick={() => store.filter.remove(x)}
+								>
+									<Remove />
+								</IconBtn>
+							</span>
+						</div>
+					);
+				})}
+				<div class={s.vSep} />
+				<IconBtn title="Add new filter" onClick={() => store.filter.add()}>
+					<span class={s.filterCheck}>
+						<AddCircle />
+					</span>
+					Add filter
+				</IconBtn>
+			</form>
+		</div>
 	);
 }

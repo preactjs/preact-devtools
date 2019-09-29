@@ -152,6 +152,10 @@ export function HighlightPane(props: { treeDom: HTMLDivElement | null }) {
 	const { selected } = useSelection();
 	const { collapsed } = useCollapser();
 
+	// Subscribe to nodeList so that we rerender whenever nodes
+	// are collapsed
+	const list = useObserver(() => store.nodeList.$);
+
 	let [pos, setPos] = useState({ top: 0, height: 0 });
 	useEffect(() => {
 		if (selected > -1 && !collapsed.has(selected)) {
@@ -176,8 +180,10 @@ export function HighlightPane(props: { treeDom: HTMLDivElement | null }) {
 			} else {
 				setPos({ top: 0, height: 0 });
 			}
+		} else {
+			setPos({ top: 0, height: 0 });
 		}
-	}, [selected]);
+	}, [selected, list]);
 
 	return (
 		<div

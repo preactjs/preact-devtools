@@ -16,7 +16,10 @@ export function IconBtn(props: Props) {
 			class={s.root}
 			data-active={props.active}
 			title={props.title}
-			onClick={props.onClick}
+			onClick={e => {
+				e.stopPropagation();
+				if (props.onClick) props.onClick();
+			}}
 		>
 			{props.children}
 		</button>

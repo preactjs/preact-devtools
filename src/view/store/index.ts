@@ -163,14 +163,16 @@ export const AppCtx = createContext<Store>(null as any);
 export const useStore = () => useContext(AppCtx);
 
 export function useObserver<T>(fn: () => T): T {
-	let ref = useRef<T>();
-	let [value, set] = useState<T>(ref.current || ((ref as any).current = fn()));
+	let [i, setI] = useState(0);
 
 	useEffect(() => {
 		let v = watch(fn);
-		v.on(next => set(next));
-		return () => v._disposers.forEach(disp => disp());
-	}, []);
+		let disp = v.on(() => setI(i + 1));
+		return () => {
+			disp();
+			v._disposers.forEach(disp => disp());
+		};
+	}, [fn]);
 
-	return value;
+	return fn();
 }
