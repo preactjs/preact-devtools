@@ -24,11 +24,6 @@ export function ElementProps(props: Props) {
 	const store = useStore();
 	const collapsed = useObserver(() => store.propsCollapser.collapsed.$);
 
-	// Reset collapsed state when a new element is selected
-	useEffect(() => {
-		store.propsCollapser.resetAll();
-	}, [props.nodeId]);
-
 	const parsed = useMemo(
 		() =>
 			flatten(data, [], Array.from(collapsed), 7, []).sort((a, b) =>
@@ -36,6 +31,15 @@ export function ElementProps(props: Props) {
 			),
 		[data, collapsed.size],
 	);
+
+	// Reset collapsed state when a new element is selected
+	useEffect(() => {
+		store.propsCollapser.resetAll();
+
+		parsed.forEach(d =>
+			store.propsCollapser.collapseNode(d.path.join("."), true),
+		);
+	}, [props.nodeId]);
 
 	return (
 		<div class={s.root}>
