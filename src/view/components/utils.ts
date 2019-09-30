@@ -29,3 +29,12 @@ export function scrollIntoView(el: HTMLElement) {
 		});
 	}
 }
+
+export function getRootDomNode(el: HTMLElement): HTMLElement {
+	let item = el;
+	while (item.parentNode != null) {
+		item = item.parentNode as any;
+	}
+
+	return item;
+}
