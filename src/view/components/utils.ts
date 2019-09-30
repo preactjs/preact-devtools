@@ -1,3 +1,5 @@
+const OFFSET = 16;
+
 export function scrollIntoView(el: HTMLElement) {
 	// Find closest scrollable parent
 	let parent: HTMLElement | null = el;
@@ -9,15 +11,21 @@ export function scrollIntoView(el: HTMLElement) {
 
 	if (parent) {
 		let rect = el.getBoundingClientRect();
-		let top = rect.top;
-		let visible =
-			el.offsetTop >= parent.scrollTop &&
-			rect.bottom <= parent.scrollTop + parent.clientHeight;
-		if (!visible) {
-			parent.scrollTo({
-				top: el.offsetTop - rect.height,
-				behavior: "smooth",
-			});
+		let top = parent.scrollTop;
+
+		if (el.offsetTop <= parent.scrollTop) {
+			top = el.offsetTop - OFFSET;
+		} else if (
+			el.offsetTop + rect.height >
+			parent.scrollTop + parent.clientHeight
+		) {
+			top = el.offsetTop - parent.clientHeight + rect.height + OFFSET;
+		} else {
+			return;
 		}
+		parent.scrollTo({
+			top,
+			behavior: "smooth",
+		});
 	}
 }
