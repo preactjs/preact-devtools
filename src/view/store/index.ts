@@ -8,7 +8,7 @@ import { createModalState } from "../components/Modals";
 import { createFilterStore } from "./filter";
 import { flattenChildren } from "../components/tree/windowing";
 import { createSelectionStore } from "./selection";
-import { createCollapser } from "./collapser";
+import { createCollapser, Collapser } from "./collapser";
 
 export type ID = number;
 
@@ -64,7 +64,8 @@ export interface Store {
 	modal: ReturnType<typeof createModalState>;
 	filter: ReturnType<typeof createFilterStore>;
 	selection: ReturnType<typeof createSelectionStore>;
-	collapser: ReturnType<typeof createCollapser>;
+	collapser: Collapser<ID>;
+	propsCollapser: Collapser<string>;
 	actions: {
 		highlightNode: (id: ID | null) => void;
 		logNode: (id: ID) => void;
@@ -101,7 +102,7 @@ export function createStore(): Store {
 	const filterState = createFilterStore(notify);
 
 	// List
-	const collapser = createCollapser();
+	const collapser = createCollapser<ID>();
 	const nodeList = watch(() => {
 		const list = flattenChildren(
 			nodes.$,
@@ -117,6 +118,10 @@ export function createStore(): Store {
 	});
 
 	const selection = createSelectionStore(nodeList, notify);
+
+	// Props panel
+	const propsCollapser = createCollapser<string>();
+
 	return {
 		nodeList,
 		isPicking,
@@ -125,6 +130,7 @@ export function createStore(): Store {
 		rootToChild,
 		nodes,
 		collapser,
+		propsCollapser,
 		search: createSearchStore(nodes, nodeList),
 		modal: createModalState(),
 		filter: filterState,

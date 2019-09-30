@@ -22,6 +22,7 @@ export function TreeBar() {
 	const store = useStore();
 	const isPicking = useObserver(() => store.isPicking.$);
 	const { value, count, selected, goPrev, goNext } = useSearch();
+	const activeModal = useObserver(() => store.modal.active.$);
 
 	const [filterVisible, setFilterVisible] = useState(false);
 
@@ -101,13 +102,15 @@ export function TreeBar() {
 					{filterVisible && <FilterPopup />}
 				</OutsideClick>
 			</div>
-			{/* <IconBtn
-				active={activeModal === "settings"}
-				title="Settings"
-				onClick={() => store.modal.open("settings")}
-			>
-				<SettingsIcon size="s" />
-			</IconBtn> */}
+			<div class={s.btnWrapper}>
+				<IconBtn
+					active={activeModal === "settings"}
+					title="Settings"
+					onClick={() => store.modal.open("settings")}
+				>
+					<SettingsIcon size="s" />
+				</IconBtn>
+			</div>
 		</Actions>
 	);
 }

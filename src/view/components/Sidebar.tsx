@@ -31,6 +31,7 @@ export function Sidebar() {
 				<SidebarPanel title="props" empty="None">
 					{inspect.props != null && node != null ? (
 						<ElementProps
+							nodeId={inspect.id}
 							data={inspect.props}
 							editable={inspect.canEditProps}
 							onChange={(v, path) =>
@@ -46,6 +47,7 @@ export function Sidebar() {
 					<SidebarPanel title="state" empty="None">
 						{inspect.state ? (
 							<ElementProps
+								nodeId={inspect.id}
 								data={inspect.state}
 								editable={inspect.canEditState}
 								onChange={(v, path) =>

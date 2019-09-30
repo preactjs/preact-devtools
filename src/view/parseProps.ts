@@ -28,11 +28,20 @@ export interface PropData {
 export function flatten(
 	data: any,
 	path: ObjPath,
+	collapsed: string[],
 	limit: number,
-	out: PropData[] = [],
+	out: PropData[],
 ): PropData[] {
 	let depth = path.length > 0 ? path.length - 1 : 0;
 	const name = path.length > 0 ? path[depth] + "" : "";
+
+	// TODO: This could/should be optimized
+	const pathStr = path.join(".");
+	for (let i = 0; i < collapsed.length; i++) {
+		if (pathStr !== collapsed[i] && pathStr.startsWith(collapsed[i])) {
+			return out;
+		}
+	}
 
 	if (Array.isArray(data)) {
 		out.push({
@@ -44,7 +53,9 @@ export function flatten(
 			path,
 			value: data,
 		});
-		data.forEach((item, i) => flatten(item, path.concat(i), limit, out));
+		data.forEach((item, i) =>
+			flatten(item, path.concat(i), collapsed, limit, out),
+		);
 	} else if (data instanceof Set) {
 		out.push({
 			depth,
@@ -112,7 +123,7 @@ export function flatten(
 				}
 
 				Object.keys(data).forEach(key =>
-					flatten(data[key], path.concat(key), limit, out),
+					flatten(data[key], path.concat(key), collapsed, limit, out),
 				);
 			}
 		}

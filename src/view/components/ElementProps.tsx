@@ -2,14 +2,16 @@ import { h } from "preact";
 import s from "./ElementProps.css";
 import { Arrow } from "./TreeView";
 import { flatten, PropDataType } from "../parseProps";
-import { useState, useCallback, useMemo } from "preact/hooks";
+import { useMemo, useEffect } from "preact/hooks";
 import { AutoSizeInput } from "./AutoSizeInput";
 import { DataInput } from "./DataInput";
+import { useStore, useObserver, ID } from "../store";
 
 export type ObjPath = Array<string | number>;
 export type ChangeFn = (value: any, path: ObjPath) => void;
 
 export interface Props {
+	nodeId: ID;
 	editable?: boolean;
 	data: any;
 	onChange?: ChangeFn;
@@ -19,54 +21,20 @@ export interface Props {
 export function ElementProps(props: Props) {
 	const { data, editable, onChange, onRename } = props;
 
+	const store = useStore();
+	const collapsed = useObserver(() => store.propsCollapser.collapsed.$);
+
+	// Reset collapsed state when a new element is selected
+	useEffect(() => {
+		store.propsCollapser.resetAll();
+	}, [props.nodeId]);
+
 	const parsed = useMemo(
 		() =>
-			flatten(data, [], 7, []).sort((a, b) =>
+			flatten(data, [], Array.from(collapsed), 7, []).sort((a, b) =>
 				a.path.join(".").localeCompare(b.path.join(".")),
 			),
-		[data],
-	);
-
-	// Items should be collapsed on init
-	const [collapsed, setCollapsed] = useState(
-		new Set<string>(
-			parsed.filter(x => x.collapsable).map(x => x.path.join(".")),
-		),
-	);
-	const [hidden, sethidden] = useState(
-		new Set<string>(
-			Array.from(collapsed).reduce<string[]>((acc, key) => {
-				parsed.forEach(x => {
-					const child = x.path.join(".");
-					if (child !== key && child.startsWith(key)) {
-						acc.push(child);
-					}
-				});
-				return acc;
-			}, []),
-		),
-	);
-
-	const hide = useCallback(
-		(raw: ObjPath) => {
-			const path = raw.join(".");
-			const shouldHide = !collapsed.has(path);
-
-			if (shouldHide) collapsed.add(path);
-			else collapsed.delete(path);
-
-			parsed.forEach(x => {
-				const child = x.path.join(".");
-				if (child !== path && child.startsWith(path)) {
-					if (shouldHide) hidden.add(child);
-					else hidden.delete(child);
-				}
-			});
-
-			setCollapsed(new Set(collapsed));
-			sethidden(new Set(hidden));
-		},
-		[parsed],
+		[data, collapsed.size],
 	);
 
 	return (
@@ -79,7 +47,6 @@ export function ElementProps(props: Props) {
 			>
 				{parsed.map(item => {
 					const key = item.path.join(".");
-					if (hidden.has(key)) return null;
 
 					return (
 						<SingleItem
@@ -88,7 +55,7 @@ export function ElementProps(props: Props) {
 							name={item.name}
 							collapseable={item.collapsable}
 							collapsed={collapsed.has(key)}
-							onCollapse={hide}
+							onCollapse={() => store.propsCollapser.toggle(key)}
 							editable={editable}
 							value={item.value}
 							path={item.path}

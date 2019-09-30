@@ -3,7 +3,7 @@ import { flatten } from "./parseProps";
 
 describe("flatten", () => {
 	it("should flatten strings", () => {
-		expect(flatten("foo", ["foo"], 2)).to.deep.equal([
+		expect(flatten("foo", ["foo"], [], 2, [])).to.deep.equal([
 			{
 				collapsable: false,
 				editable: true,
@@ -17,7 +17,7 @@ describe("flatten", () => {
 	});
 
 	it("should flatten numbers", () => {
-		expect(flatten(12, ["foo"], 2)).to.deep.equal([
+		expect(flatten(12, ["foo"], [], 2, [])).to.deep.equal([
 			{
 				collapsable: false,
 				editable: true,
@@ -31,7 +31,7 @@ describe("flatten", () => {
 	});
 
 	it("should flatten booleans", () => {
-		expect(flatten(false, ["foo"], 2)).to.deep.equal([
+		expect(flatten(false, ["foo"], [], 2, [])).to.deep.equal([
 			{
 				collapsable: false,
 				editable: true,
@@ -45,7 +45,7 @@ describe("flatten", () => {
 	});
 
 	it("should flatten null", () => {
-		expect(flatten(null, ["foo"], 2)).to.deep.equal([
+		expect(flatten(null, ["foo"], [], 2, [])).to.deep.equal([
 			{
 				collapsable: false,
 				editable: false,
@@ -59,7 +59,7 @@ describe("flatten", () => {
 	});
 
 	it("should flatten undefined", () => {
-		expect(flatten(undefined, ["foo"], 2)).to.deep.equal([
+		expect(flatten(undefined, ["foo"], [], 2, [])).to.deep.equal([
 			{
 				collapsable: false,
 				editable: false,
@@ -77,7 +77,7 @@ describe("flatten", () => {
 			type: "function",
 			name: "fooBar",
 		};
-		expect(flatten(fn, ["foo"], 2)).to.deep.equal([
+		expect(flatten(fn, ["foo"], [], 2, [])).to.deep.equal([
 			{
 				collapsable: false,
 				editable: false,
@@ -91,7 +91,7 @@ describe("flatten", () => {
 	});
 
 	it("should flatten arrays", () => {
-		expect(flatten([1, 2], ["foo"], 2)).to.deep.equal([
+		expect(flatten([1, 2], ["foo"], [], 2, [])).to.deep.equal([
 			{
 				collapsable: true,
 				editable: false,
@@ -123,7 +123,7 @@ describe("flatten", () => {
 	});
 
 	it("should flatten objects", () => {
-		expect(flatten({ foo: 123, bar: "abc" }, [""], 2)).to.deep.equal([
+		expect(flatten({ foo: 123, bar: "abc" }, [""], [], 2, [])).to.deep.equal([
 			{
 				collapsable: true,
 				editable: false,
@@ -158,7 +158,7 @@ describe("flatten", () => {
 	});
 
 	it("should flatten nested objects", () => {
-		expect(flatten({ foo: { bar: "abc" } }, ["foo"], 2)).to.deep.equal([
+		expect(flatten({ foo: { bar: "abc" } }, ["foo"], [], 2, [])).to.deep.equal([
 			{
 				collapsable: true,
 				editable: false,
@@ -196,7 +196,7 @@ describe("flatten", () => {
 	});
 
 	it("should flatten set", () => {
-		expect(flatten(new Set([1, 2, 3]), [], 2)).to.deep.equal([
+		expect(flatten(new Set([1, 2, 3]), [], [], 2, [])).to.deep.equal([
 			{
 				collapsable: false,
 				editable: false,

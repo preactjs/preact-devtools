@@ -155,38 +155,42 @@ export function StyleGuide() {
 					</div>
 					<h3>ElementProps</h3>
 					<p>non-editable</p>
-					<ElementProps
-						data={{
-							foo: "bar",
-							bob: null,
-							bazly: 123,
-							baz: true,
-						}}
-					/>
-					<p>editable</p>
-					<div style="width: 20rem; outline: 1px solid red">
+					<AppCtx.Provider value={store}>
 						<ElementProps
-							editable
 							data={{
 								foo: "bar",
-								longvalue: "asdji asdj asijd lksaj dlask kajdaklsj dklsabar",
 								bob: null,
 								bazly: 123,
 								baz: true,
-								arr: [1, 2, 3],
-								obj: { foo: "bar" },
-								set: new Set([1, 2, 3]),
-								map: new Map([[1, "a"], [2, "b"]]),
-								children: {
-									type: "vnode",
-									name: "span",
-								},
-								bar: {
-									type: "function",
-									name: "foobar",
-								},
 							}}
 						/>
+					</AppCtx.Provider>
+					<p>editable</p>
+					<div style="width: 20rem; outline: 1px solid red">
+						<AppCtx.Provider value={store}>
+							<ElementProps
+								editable
+								data={{
+									foo: "bar",
+									longvalue: "asdji asdj asijd lksaj dlask kajdaklsj dklsabar",
+									bob: null,
+									bazly: 123,
+									baz: true,
+									arr: [1, 2, 3],
+									obj: { foo: "bar" },
+									set: new Set([1, 2, 3]),
+									map: new Map([[1, "a"], [2, "b"]]),
+									children: {
+										type: "vnode",
+										name: "span",
+									},
+									bar: {
+										type: "function",
+										name: "foobar",
+									},
+								}}
+							/>
+						</AppCtx.Provider>
 					</div>
 					<h2>Icon Btns</h2>
 					<IconBtn onClick={() => console.log("click")}>
