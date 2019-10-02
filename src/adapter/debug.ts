@@ -83,6 +83,7 @@ export function fromSnapshot(events: string[]): number[] {
 	const out: number[] = [];
 	let operations: number[] = [];
 	let strings: string[] = [];
+	let unmounts: number[] = [];
 
 	if (/^rootId\:/.test(events[0])) {
 		const id = +events[0].slice(events[0].indexOf(":") + 1);
@@ -120,10 +121,21 @@ export function fromSnapshot(events: string[]): number[] {
 			} else {
 				throw new Error("no match: " + ev);
 			}
+		} else if (/^Remove/.test(ev)) {
+			const m = ev.match(/Remove\s+(\d+)/);
+			if (m) {
+				const id = +m[1];
+				unmounts.push(id);
+			} else {
+				throw new Error("no match: " + ev);
+			}
 		}
 	}
 
 	out.push(...flushTable(new Map(strings.map((x, i) => [x, i]))));
+	if (unmounts.length > 0) {
+		out.push(MsgTypes.REMOVE_VNODE, unmounts.length, ...unmounts);
+	}
 	out.push(...operations);
 
 	return out;
