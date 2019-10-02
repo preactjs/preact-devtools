@@ -115,7 +115,6 @@
 	flex: 0 0 auto;
 	justify-content: flex-start;
 	align-items: center;
-	color: var(--color-selected-bg);
 }
 
 .filterCheck svg {
@@ -126,6 +125,10 @@
 	opacity: 0;
 	position: absolute;
 	left: 0;
+}
+
+.filterCheck input:checked + svg {
+	color: var(--color-selected-bg);
 }
 
 .filterValue {
