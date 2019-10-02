@@ -10,10 +10,6 @@
 	padding-right: 0.25rem;
 }
 
-.actions button {
-	height: 100%;
-}
-
 .sep {
 	width: 0.0625rem;
 	background: var(--color-border);

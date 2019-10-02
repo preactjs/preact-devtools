@@ -179,9 +179,11 @@ export function createRenderer(
 			}
 		},
 		onUnmount(vnode) {
-			const id = ids.getId(vnode);
-			if (id > 0) {
-				currentUnmounts.push(id);
+			if (!shouldFilter(vnode, filters)) {
+				const id = ids.getId(vnode);
+				if (id > 0) {
+					currentUnmounts.push(id);
+				}
 			}
 		},
 	};
@@ -291,12 +293,23 @@ export function update(
 		(vnode.endTime || 0) - (vnode.startTime || 0),
 	);
 
+	const oldVNode = ids.getVNode(id);
+	ids.update(id, vnode);
+
+	const oldChildren = oldVNode
+		? getActualChildren(oldVNode).map((v: any) => v && ids.getId(v))
+		: [];
 	const children = getActualChildren(vnode);
-	for (let i = 0; i < children; i++) {
-		if (ids.hasId(vnode)) {
-			update(ids, commit, vnode, filters);
+	for (let i = 0; i < children.length; i++) {
+		const child = children[i];
+		if (child == null) {
+			if (oldChildren[i] != null) {
+				commit.unmountIds.push(oldChildren[i]);
+			}
+		} else if (ids.hasId(child)) {
+			update(ids, commit, child, filters);
 		} else {
-			mount(ids, commit, vnode, id, filters);
+			mount(ids, commit, child, id, filters);
 		}
 	}
 	return commit;

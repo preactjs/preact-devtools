@@ -62,6 +62,7 @@ describe("Renderer 10", () => {
 		expect(toSnapshot(spy.args[1][1])).to.deep.equal([
 			"rootId: 1",
 			"Update timings 1",
+			"Update timings 2",
 		]);
 	});
 
@@ -81,6 +82,18 @@ describe("Renderer 10", () => {
 			"Add 4 <#text> to parent 3",
 			"Add 5 <span> to parent 2",
 			"Add 6 <#text> to parent 5",
+		]);
+	});
+
+	it("should update text", () => {
+		render(<div>foo</div>, scratch);
+		render(<div>bar</div>, scratch);
+
+		expect(toSnapshot(spy.args[1][1])).to.deep.equal([
+			"rootId: 1",
+			"Update timings 1",
+			"Update timings 2",
+			"Update timings 3",
 		]);
 	});
 

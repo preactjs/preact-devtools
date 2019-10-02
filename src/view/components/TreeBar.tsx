@@ -12,6 +12,8 @@ import {
 	Eye,
 	Remove,
 	AddCircle,
+	CheckboxChecked,
+	CheckboxUnChecked,
 } from "./icons";
 import { useStore, useObserver } from "../store";
 import s from "./TreeBar.css";
@@ -95,6 +97,7 @@ export function TreeBar() {
 				>
 					<IconBtn
 						title="Filter Components"
+						active={filterVisible}
 						onClick={() => setFilterVisible(!filterVisible)}
 					>
 						<Eye />
@@ -135,6 +138,7 @@ export function FilterPopup() {
 								store.filter.setEnabled("fragment", (e.target as any).checked)
 							}
 						/>
+						{filterFragment ? <CheckboxChecked /> : <CheckboxUnChecked />}
 					</span>
 					<span class={s.filterValue}>Fragments</span>
 				</label>
@@ -147,6 +151,7 @@ export function FilterPopup() {
 								store.filter.setEnabled("dom", (e.target as any).checked)
 							}
 						/>
+						{filterDom ? <CheckboxChecked /> : <CheckboxUnChecked />}
 					</span>
 					<span class={s.filterValue}>DOM nodes</span>
 				</label>

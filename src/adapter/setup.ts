@@ -4,6 +4,7 @@ import { createAdapter } from "./adapter";
 import { createBridge } from "./bridge";
 import { createRenderer } from "./10/renderer";
 import { setupOptions } from "./10/options";
+import { parseFilters } from "./10/filter";
 
 export async function init(options: Options, getHook: () => DevtoolsHook) {
 	const bridge = createBridge(window);
@@ -22,7 +23,7 @@ export async function init(options: Options, getHook: () => DevtoolsHook) {
 	bridge.listen("update-node", ev => {
 		adapter.update(ev.id, ev.type, ev.path, ev.value);
 	});
-	bridge.listen("update-filter", ev => renderer.applyFilters(ev));
+	bridge.listen("update-filter", ev => renderer.applyFilters(parseFilters(ev)));
 	bridge.listen("force-update", ev => renderer.forceUpdate(ev));
 	bridge.listen("select", adapter.select);
 	bridge.listen("inspect", adapter.inspect);

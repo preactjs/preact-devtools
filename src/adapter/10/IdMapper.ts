@@ -7,6 +7,7 @@ export interface IdMapper {
 	hasId(vnode: VNode): boolean;
 	createId(vnode: VNode): number;
 	getId(vnode: VNode): number;
+	update(id: number, vnode: VNode): void;
 	remove(vnode: VNode): void;
 	getByDom(node: HTMLElement | Text): number;
 }
@@ -33,9 +34,12 @@ export function createIdMapper(): IdMapper {
 	const getId = (vnode: VNode) => {
 		if (vnode == null) return -1;
 		const inst = getInstance(vnode);
-		const id = instToId.get(inst) || -1;
-		if (id > -1) idToVNode.set(id, vnode);
-		return id;
+		return instToId.get(inst) || -1;
+	};
+	const update = (id: number, vnode: VNode) => {
+		const inst = getInstance(vnode);
+		idToInst.set(id, inst);
+		idToVNode.set(id, vnode);
 	};
 	const remove = (vnode: VNode) => {
 		if (hasId(vnode)) {
@@ -66,7 +70,7 @@ export function createIdMapper(): IdMapper {
 		return domToId.get(node) || -1;
 	};
 
-	return { has, getVNode, hasId, createId, getId, remove, getByDom };
+	return { has, update, getVNode, hasId, createId, getId, remove, getByDom };
 }
 
 export function getInstance(vnode: VNode): any {

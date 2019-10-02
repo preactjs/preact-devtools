@@ -1,5 +1,5 @@
 import { valoo } from "../valoo";
-import { FilterState } from "../../adapter/10/filter";
+import { RawFilterState } from "../../adapter/10/filter";
 import escapeStringRegexp from "escape-string-regexp";
 
 export interface RawFilter {
@@ -8,23 +8,23 @@ export interface RawFilter {
 }
 
 export function createFilterStore(
-	onSubmit: (event: string, filters: FilterState) => void,
+	onSubmit: (event: string, filters: RawFilterState) => void,
 ) {
 	const filters = valoo<RawFilter[]>([]);
 	const filterFragment = valoo(true);
 	const filterDom = valoo(true);
 
 	const submit = () => {
-		let s: FilterState = {
+		let s: RawFilterState = {
 			regex: [],
-			type: new Set(),
+			type: {
+				fragment: filterFragment.$,
+				dom: filterDom.$,
+			},
 		};
 
-		if (filterFragment.$) s.type.add("fragment");
-		if (filterDom.$) s.type.add("dom");
-
 		filters.$.filter(x => x.enabled).forEach(x => {
-			s.regex.push(new RegExp(escapeStringRegexp(x.value), "ig"));
+			s.regex.push(escapeStringRegexp(x.value));
 		});
 		onSubmit("update-filter", s);
 	};

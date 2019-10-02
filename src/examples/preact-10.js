@@ -10,7 +10,10 @@ import { Picker } from "../view/components/icons";
 import { TreeBar } from "../view/components/TreeBar";
 import { ModalBackdrop, SettingsModal } from "../view/components/Modals";
 import { AppCtx, createStore } from "../view/store";
+import { applyOperations } from "../adapter/events";
+import { fromSnapshot } from "../adapter/debug";
 import { TreeView } from "../view/components/TreeView";
+import { TodoList } from "./TodoList";
 import { treeStore } from "./treeStore";
 
 function Headline(props) {
@@ -20,9 +23,7 @@ function Headline(props) {
 const tstore = treeStore();
 
 export function StyleGuide() {
-	const [todos, setTodos] = useState(["asd", "asdf"]);
 	const [dark, setDark] = useState(localStorage.getItem("theme") === "dark");
-	const [v, setV] = useState("");
 	const [showModal, setShowModal] = useState(
 		!!localStorage.getItem("show-modal"),
 	);
@@ -41,30 +42,11 @@ export function StyleGuide() {
 					>
 						Toggle Theme
 					</button>
-					<form
-						onSubmit={e => {
-							e.preventDefault();
-							setV("");
-							setTodos([...todos, v]);
-						}}
-					>
-						<input
-							type="text"
-							placeholder="todo item"
-							onInput={e => setV(e.target.value)}
-							value={v}
-						/>
-					</form>
-					<p>Tasks</p>
-					<ul>
-						{todos.map(x => {
-							return <li key={x}>{x}</li>;
-						})}
-					</ul>
-
+					<h2>Todo List</h2>
+					<TodoList />
 					<h2>Styleguide</h2>
 					<h3>Highlighter</h3>
-					<div class="grid">
+					{/* <div class="grid">
 						<div>
 							<p>center</p>
 							<Iframer height={300}>
@@ -153,7 +135,7 @@ export function StyleGuide() {
 								/>
 							</Iframer>
 						</div>
-					</div>
+					</div> */}
 					<h3>Sidebar</h3>
 					<AppCtx.Provider value={tstore}>
 						<Sidebar />
@@ -201,6 +183,9 @@ export function StyleGuide() {
 					<IconBtn onClick={() => console.log("click")}>
 						<Picker />
 					</IconBtn>
+					<IconBtn active>
+						<Picker />
+					</IconBtn>
 					<h2>Modals</h2>
 					<button
 						onClick={() => {
@@ -236,10 +221,21 @@ export function StyleGuide() {
 						</AppCtx.Provider>
 					</div>
 					<h2>TreeView</h2>
-					<div style="height: 20rem; overflow: auto;">
-						<AppCtx.Provider value={tstore}>
-							<TreeView />
-						</AppCtx.Provider>
+					<button
+						onClick={() => {
+							const event2 = fromSnapshot(["rootId: 1", "Remove 4"]);
+							applyOperations(tstore, event2);
+						}}
+					>
+						remove
+					</button>
+					<br />
+					<div>
+						<div style="height: 20rem; overflow: auto;">
+							<AppCtx.Provider value={tstore}>
+								<TreeView />
+							</AppCtx.Provider>
+						</div>
 					</div>
 					<p>Empty tree view</p>
 					<AppCtx.Provider value={store}>

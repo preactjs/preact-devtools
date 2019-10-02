@@ -87,32 +87,30 @@ export function applyOperations(store: Store, data: number[]) {
 					});
 				}
 
-				if (store.nodes.$.has(id)) {
-					throw new Error(`Node ${id} already present in store.`);
-				}
-
-				// Roots have their own id as parentId
-				if (id !== parentId) {
-					const parent = store.nodes.$.get(parentId);
-					if (!parent) {
-						// throw new Error(`Parent node ${parentId} not found in store.`);
-						console.warn(`Parent node ${parentId} not found in store.`);
-						parentId = -1;
-					} else {
-						parent.children.push(id);
+				if (!store.nodes.$.has(id)) {
+					// Roots have their own id as parentId
+					if (id !== parentId) {
+						const parent = store.nodes.$.get(parentId);
+						if (!parent) {
+							// throw new Error(`Parent node ${parentId} not found in store.`);
+							console.warn(`Parent node ${parentId} not found in store.`);
+							parentId = -1;
+						} else {
+							parent.children.push(id);
+						}
 					}
-				}
 
-				store.nodes.$.set(id, {
-					children: [],
-					depth: getDepth(store, parentId),
-					id,
-					name,
-					parent: parentId,
-					type,
-					key,
-					duration: valoo<number>(0),
-				});
+					store.nodes.$.set(id, {
+						children: [],
+						depth: getDepth(store, parentId),
+						id,
+						name,
+						parent: parentId,
+						type,
+						key,
+						duration: valoo<number>(0),
+					});
+				}
 				i += 6;
 				break;
 			}
@@ -120,14 +118,12 @@ export function applyOperations(store: Store, data: number[]) {
 				const id = data[i + 1];
 				const duration = data[i + 2];
 
-				if (!store.nodes.$.has(id)) {
-					throw new Error(`Node ${id} already present in store.`);
+				const node = store.nodes.$.get(id)!;
+				if (node) {
+					node.duration.$ = duration;
 				}
 
-				const node = store.nodes.$.get(id)!;
-				node.duration.$ = duration;
-
-				i += 3;
+				i += 2;
 				break;
 			}
 			case MsgTypes.REMOVE_VNODE: {
@@ -135,8 +131,26 @@ export function applyOperations(store: Store, data: number[]) {
 				i += 2;
 				const len = i + unmounts;
 				for (; i < len; i++) {
+					const nodeId = data[i];
+					const node = store.nodes.$.get(nodeId);
+					if (node) {
+						// Remove node from parent children array
+						const parentId = node.parent;
+						const parent = store.nodes.$.get(parentId);
+						if (parent) {
+							const idx = parent.children.indexOf(nodeId);
+							if (idx > -1) parent.children.splice(idx, 1);
+						}
+
+						// Remove node from store
+						store.nodes.$.delete(nodeId);
+					}
 					console.log(`  Remove: %c${data[i]}`, "color: red");
 				}
+
+				// Subtract one because of outer loop
+				if (len > 0) i--;
+				break;
 			}
 		}
 	}
