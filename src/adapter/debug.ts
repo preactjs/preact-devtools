@@ -36,7 +36,7 @@ export function parseCommitMessage(data: number[]): ParsedMsg {
 			}
 			case MsgTypes.UPDATE_VNODE_TIMINGS:
 				timings.push({ id: data[i + 1], duration: data[i + 2] });
-				i += 3;
+				i += 2;
 				break;
 			case MsgTypes.REMOVE_VNODE: {
 				const unmountLen = data[i + 1];
