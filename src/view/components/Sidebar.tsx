@@ -29,7 +29,10 @@ export function Sidebar() {
 						</IconBtn>
 					)}
 					{node && (
-						<IconBtn onClick={() => store.actions.logNode(node.id)}>
+						<IconBtn
+							title="Log internal vnode"
+							onClick={() => store.actions.logNode(node.id)}
+						>
 							<BugIcon />
 						</IconBtn>
 					)}
