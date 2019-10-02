@@ -162,12 +162,15 @@ export function getDepth(store: Store, id: ID) {
 	return parent ? parent.depth + 1 : 1;
 }
 
-export function jsonify(data: any) {
+export function jsonify(data: any): any {
 	if (isVNode(data)) {
 		return {
 			type: "vnode",
 			name: getDisplayName(data as any),
 		};
+	}
+	if (Array.isArray(data)) {
+		return data.map(jsonify);
 	}
 	switch (typeof data) {
 		case "string":
