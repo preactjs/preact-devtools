@@ -69,6 +69,7 @@ export interface Store {
 	actions: {
 		highlightNode: (id: ID | null) => void;
 		logNode: (id: ID) => void;
+		forceUpdate: (id: ID) => void;
 		updateNode: (id: ID, type: UpdateType, path: ObjPath, value: any) => void;
 		updatePropertyName: (
 			id: ID,
@@ -136,12 +137,9 @@ export function createStore(): Store {
 		filter: filterState,
 		selection,
 		actions: {
-			highlightNode: id => {
-				notify("highlight", id);
-			},
-			logNode: id => {
-				notify("log", id);
-			},
+			forceUpdate: id => notify("force-update", id),
+			highlightNode: id => notify("highlight", id),
+			logNode: id => notify("log", id),
 			updateNode(id, type, path, value) {
 				notify("update-node", { id, type, path, value });
 				notify("inspect", id);

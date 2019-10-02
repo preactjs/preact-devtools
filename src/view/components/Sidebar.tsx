@@ -5,7 +5,7 @@ import { Actions } from "./Actions";
 import { useObserver, useStore } from "../store";
 import { IconBtn } from "./IconBtn";
 import { ElementProps } from "./ElementProps";
-import { BugIcon } from "./icons";
+import { BugIcon, Refresh } from "./icons";
 
 export function Sidebar() {
 	const store = useStore();
@@ -20,6 +20,14 @@ export function Sidebar() {
 				<span class={s.title}>{node ? node.name : "-"}</span>
 
 				<div class={s.iconActions}>
+					{node && node.name[0] === node.name[0].toUpperCase() && (
+						<IconBtn
+							title="Re-render Component"
+							onClick={() => store.actions.forceUpdate(node.id)}
+						>
+							<Refresh />
+						</IconBtn>
+					)}
 					{node && (
 						<IconBtn onClick={() => store.actions.logNode(node.id)}>
 							<BugIcon />

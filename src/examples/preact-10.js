@@ -2,6 +2,7 @@ import { h, render } from "preact";
 import { useState } from "preact/hooks";
 import { Highlighter } from "../view/components/Highlighter";
 import { ElementProps } from "../view/components/ElementProps";
+import { Sidebar } from "../view/components/Sidebar";
 import { Iframer } from "./Iframer";
 import d from "../view/components/Devtools.css";
 import { IconBtn } from "../view/components/IconBtn";
@@ -153,6 +154,10 @@ export function StyleGuide() {
 							</Iframer>
 						</div>
 					</div>
+					<h3>Sidebar</h3>
+					<AppCtx.Provider value={tstore}>
+						<Sidebar />
+					</AppCtx.Provider>
 					<h3>ElementProps</h3>
 					<p>non-editable</p>
 					<AppCtx.Provider value={store}>

@@ -29,6 +29,8 @@ export const treeStore = () => {
 		});
 	};
 
+	store.selection.selected.$ = 2;
+
 	addNode(0);
 	addNode(1);
 	addNode(2);

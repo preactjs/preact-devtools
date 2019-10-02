@@ -60,6 +60,7 @@ export interface Renderer {
 	onCommit(vnode: VNode): void;
 	onUnmount(vnode: VNode): void;
 	flushInitial(): void;
+	forceUpdate(id: ID): void;
 }
 
 let DEFAULT_FIlTERS: FilterState = {
@@ -82,6 +83,13 @@ export function createRenderer(
 	return {
 		getVNodeById: id => ids.getVNode(id),
 		has: id => ids.has(id),
+		forceUpdate: id => {
+			const vnode = ids.getVNode(id);
+			if (vnode) {
+				const c = getComponent(vnode);
+				if (c) c.forceUpdate();
+			}
+		},
 		log(id) {
 			const vnode = ids.getVNode(id);
 			if (vnode == null) {
