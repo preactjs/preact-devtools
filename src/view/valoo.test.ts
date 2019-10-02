@@ -20,6 +20,19 @@ describe("valoo", () => {
 			expect(a.$).to.deep.eq([1, 2]);
 		});
 
+		it("should update mutable values without arguments to update", () => {
+			let a = valoo([1]);
+			let spy = sinon.spy();
+			a.on(spy);
+
+			a.$.push(2);
+			a.update();
+
+			expect(spy.callCount).to.eq(1);
+			expect(spy.args[0][0].length).to.eq(2);
+			expect(a.$).to.deep.eq([1, 2]);
+		});
+
 		it("should call listener", () => {
 			let a = valoo(1);
 			let spy = sinon.spy();
