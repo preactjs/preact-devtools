@@ -1,6 +1,11 @@
 export interface Connection {
 	devtools: chrome.runtime.Port | null;
 	contentScript: chrome.runtime.Port | null;
+	/**
+	 * This flag is necessary to make sure that we only attach
+	 * listeners once per tab.
+	 */
+	connected: boolean;
 }
 
 const conn = new Map<number, Connection>();
@@ -16,14 +21,15 @@ chrome.runtime.onConnect.addListener(port => {
 	if (+port.name + "" === port.name) {
 		name = "devtools";
 		tab = +port.name;
-		installContentScript(tab);
+		// Make sure to install the content script only once
+		if (!conn.has(tab)) installContentScript(tab);
 	} else {
 		tab = port.sender!.tab!.id!;
 		name = "contentScript";
 	}
 
 	if (!conn.has(tab)) {
-		conn.set(tab, { devtools: null, contentScript: null });
+		conn.set(tab, { devtools: null, contentScript: null, connected: false });
 	}
 
 	const activeConn = conn.get(tab);
@@ -31,16 +37,14 @@ chrome.runtime.onConnect.addListener(port => {
 
 	// If both the content-script and the devtools are conncted we can start
 	// setting up the message handlers
-	if (activeConn) {
-		console.log(
-			tab,
-			name,
-			activeConn.contentScript === null,
-			activeConn.devtools === null,
-		);
-	}
-	if (activeConn && activeConn.contentScript && activeConn.devtools) {
+	if (
+		activeConn &&
+		!activeConn.connected &&
+		activeConn.contentScript &&
+		activeConn.devtools
+	) {
 		const { contentScript, devtools } = activeConn;
+		activeConn.connected = true;
 
 		console.log("Establishing connection", devtools.name, contentScript.name);
 
@@ -102,6 +106,7 @@ chrome.runtime.onMessage.addListener((port, sender) => {
 });
 
 function installContentScript(tabId: number) {
+	console.log("install");
 	chrome.tabs.executeScript(
 		tabId,
 		{ file: "/content-script.js" },

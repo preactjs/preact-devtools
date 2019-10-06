@@ -2,7 +2,12 @@ import { h } from "preact";
 import s from "./DataInput.css";
 import { useCallback, useRef, useState, useEffect } from "preact/hooks";
 import { Undo } from "../icons";
-import { parseValue, valueToHuman, isStringifiedVNode } from "./parseValue";
+import {
+	parseValue,
+	valueToHuman,
+	isStringifiedVNode,
+	displayCollection,
+} from "./parseValue";
 
 export interface InputProps {
 	value: any;
@@ -40,9 +45,7 @@ export function DataInput({ value, onChange }: InputProps) {
 
 	let inputVal = "" + v;
 	if (!focus) {
-		if (typeof value === "object" && value !== null) {
-			inputVal = Array.isArray(value) ? "Array" : "Object";
-		}
+		inputVal = displayCollection(value);
 	}
 
 	let type: string = typeof value;

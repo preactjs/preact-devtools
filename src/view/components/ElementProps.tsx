@@ -1,11 +1,13 @@
 import { h } from "preact";
 import s from "./ElementProps.css";
 import { Arrow } from "./TreeView";
-import { flatten, PropDataType } from "../parseProps";
-import { useMemo, useEffect } from "preact/hooks";
+import { PropDataType, PropData } from "../parseProps";
 import { AutoSizeInput } from "./AutoSizeInput";
 import { DataInput } from "./DataInput";
-import { useStore, useObserver, ID } from "../store";
+import { useObserver, ID } from "../store";
+import { Collapser } from "../store/collapser";
+import { Observable } from "../valoo";
+import { displayCollection } from "./DataInput/parseValue";
 
 export type ObjPath = Array<string | number>;
 export type ChangeFn = (value: any, path: ObjPath) => void;
@@ -13,33 +15,18 @@ export type ChangeFn = (value: any, path: ObjPath) => void;
 export interface Props {
 	nodeId: ID;
 	editable?: boolean;
-	data: any;
 	onChange?: ChangeFn;
 	onRename?: ChangeFn;
+	collapser: Collapser<string>;
+	nodeList: Observable<string[]>;
+	tree: Observable<Map<string, PropData>>;
 }
 
 export function ElementProps(props: Props) {
-	const { data, editable, onChange, onRename } = props;
+	const { editable, onChange, onRename, collapser } = props;
 
-	const store = useStore();
-	const collapsed = useObserver(() => store.propsCollapser.collapsed.$);
-
-	const parsed = useMemo(
-		() =>
-			flatten(data, [], Array.from(collapsed), 7, []).sort((a, b) =>
-				a.path.join(".").localeCompare(b.path.join(".")),
-			),
-		[data, collapsed.size],
-	);
-
-	// Reset collapsed state when a new element is selected
-	useEffect(() => {
-		store.propsCollapser.resetAll();
-
-		parsed.forEach(d =>
-			store.propsCollapser.collapseNode(d.path.join("."), true),
-		);
-	}, [props.nodeId]);
+	const collapsed = useObserver(() => collapser.collapsed.$);
+	const list = useObserver(() => props.nodeList.$);
 
 	return (
 		<div class={s.root}>
@@ -49,17 +36,18 @@ export function ElementProps(props: Props) {
 					e.preventDefault();
 				}}
 			>
-				{parsed.map(item => {
-					const key = item.path.join(".");
+				{list.map(id => {
+					const item = props.tree.$.get(id);
+					if (!item) return null;
 
 					return (
 						<SingleItem
-							key={key}
+							key={id}
 							type={item.type}
-							name={item.name}
+							name={id.slice(id.lastIndexOf(".") + 1)}
 							collapseable={item.collapsable}
-							collapsed={collapsed.has(key)}
-							onCollapse={() => store.propsCollapser.toggle(key)}
+							collapsed={collapsed.has(id)}
+							onCollapse={() => collapser.toggle(id)}
 							editable={editable}
 							value={item.value}
 							path={item.path}
@@ -112,20 +100,21 @@ export function SingleItem(props: SingleProps) {
 			onRename(v, path);
 		}
 	};
+	const onCollapseClick = () => onCollapse && onCollapse(path);
 
 	return (
 		<div
 			key={path.join(".")}
 			class={s.row}
 			data-depth={depth}
-			style={`padding-left: calc(var(--indent-depth) * ${depth})`}
+			style={`padding-left: calc(var(--indent-depth) * ${depth - 1})`}
 		>
 			{collapseable && (
 				<button
 					class={s.toggle}
 					type="button"
 					data-collapsed={collapsed}
-					onClick={() => onCollapse && onCollapse(path)}
+					onClick={onCollapseClick}
 				>
 					<Arrow />
 				</button>
@@ -144,7 +133,7 @@ export function SingleItem(props: SingleProps) {
 				{editable ? (
 					<DataInput value={v} onChange={update} />
 				) : (
-					<div class={s.mask}>{v + ""}</div>
+					<div class={s.mask}>{displayCollection(v)}</div>
 				)}
 			</div>
 		</div>

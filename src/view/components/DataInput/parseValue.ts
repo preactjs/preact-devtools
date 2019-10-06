@@ -55,3 +55,18 @@ export function valueToHuman(v: any): string {
 export function isStringifiedVNode(v: string) {
 	return v.startsWith("<") && v.endsWith("/>");
 }
+
+export function displayCollection(v: any): string {
+	if (Array.isArray(v)) return "Array";
+	if (v !== null && typeof v === "object") {
+		if (Object.keys(v).length === 2) {
+			if (v.type === "vnode") return `<${v.name} />`;
+			if (v.type === "set") return `Set<${v.name}>`;
+			if (v.type === "map") return `Map<${v.name}>`;
+			if (v.type === "function") return v.name + "()";
+		}
+		return "Object";
+	}
+	if (typeof v === "string") return `"${v}"`;
+	return "" + v;
+}

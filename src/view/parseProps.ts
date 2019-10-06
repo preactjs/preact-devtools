@@ -16,127 +16,163 @@ export type PropDataType =
 	| "symbol";
 
 export interface PropData {
-	name: string;
+	id: string;
 	type: PropDataType;
 	value: any;
 	path: ObjPath;
 	editable: boolean;
 	collapsable: boolean;
 	depth: number;
+	children: string[];
 }
 
-export function flatten(
+export function parseProps(
 	data: any,
 	path: ObjPath,
-	collapsed: string[],
 	limit: number,
-	out: PropData[],
-): PropData[] {
+	out: Map<string, PropData>,
+): Map<string, PropData> {
 	let depth = path.length > 0 ? path.length - 1 : 0;
-	const name = path.length > 0 ? path[depth] + "" : "";
-
-	// TODO: This could/should be optimized
 	const pathStr = path.join(".");
-	for (let i = 0; i < collapsed.length; i++) {
-		if (pathStr !== collapsed[i] && pathStr.startsWith(collapsed[i])) {
-			return out;
-		}
-	}
 
 	if (Array.isArray(data)) {
-		out.push({
+		let children: string[] = [];
+		out.set(path.join("."), {
 			depth,
-			name,
+			id: pathStr,
 			type: "array",
 			collapsable: true,
 			editable: false,
 			path,
 			value: data,
+			children,
 		});
-		data.forEach((item, i) =>
-			flatten(item, path.concat(i), collapsed, limit, out),
-		);
+		data.forEach((item, i) => {
+			const childPath = path.concat(i);
+			children.push(childPath.join("."));
+			parseProps(item, childPath, limit, out);
+		});
 	} else if (data instanceof Set) {
-		out.push({
+		// TODO: We're dealing with serialized data here, not a Set object
+		out.set(pathStr, {
 			depth,
-			name,
+			id: pathStr,
 			type: "set",
 			collapsable: false,
 			editable: false,
 			path,
 			value: "Set",
+			children: [],
 		});
 	} else if (typeof data === "object") {
 		if (data === null) {
-			out.push({
+			out.set(pathStr, {
 				depth,
-				name,
+				id: pathStr,
 				type: "null",
 				collapsable: false,
 				editable: false,
 				path,
 				value: data,
+				children: [],
 			});
 		} else {
+			const maybeCustom = Object.keys(data).length === 2;
 			// Functions are encoded as objects
 			if (
-				Object.keys(data).length === 2 &&
+				maybeCustom &&
 				typeof data.name === "string" &&
 				data.type === "function"
 			) {
-				out.push({
+				out.set(pathStr, {
 					depth,
-					name,
+					id: pathStr,
 					type: "function",
 					collapsable: false,
 					editable: false,
 					path,
-					value: data.name + "()",
+					value: data,
+					children: [],
 				});
 			} else if (
 				// Same for vnodes
-				Object.keys(data).length === 2 &&
+				maybeCustom &&
 				typeof data.name === "string" &&
 				data.type === "vnode"
 			) {
-				out.push({
+				out.set(pathStr, {
 					depth,
-					name,
+					id: pathStr,
 					type: "vnode",
 					collapsable: false,
 					editable: false,
 					path,
-					value: `<${data.name} />`,
+					value: data,
+					children: [],
+				});
+			} else if (
+				// Same for Set
+				maybeCustom &&
+				typeof data.name === "string" &&
+				data.type === "set"
+			) {
+				out.set(pathStr, {
+					depth,
+					id: pathStr,
+					type: "set",
+					collapsable: false,
+					editable: false,
+					path,
+					value: data,
+					children: [],
+				});
+			} else if (
+				// Same for Map
+				maybeCustom &&
+				typeof data.name === "string" &&
+				data.type === "map"
+			) {
+				out.set(pathStr, {
+					depth,
+					id: pathStr,
+					type: "map",
+					collapsable: false,
+					editable: false,
+					path,
+					value: data,
+					children: [],
 				});
 			} else {
-				// Filter out initial object
-				if (path.length > 0) {
-					out.push({
-						depth,
-						name,
-						type: "object",
-						collapsable: Object.keys(data).length > 0,
-						editable: false,
-						path,
-						value: data,
-					});
-				}
+				const node: PropData = {
+					depth,
+					id: pathStr,
+					type: "object",
+					collapsable: Object.keys(data).length > 0,
+					editable: false,
+					path,
+					value: data,
+					children: [],
+				};
+				out.set(pathStr, node);
 
-				Object.keys(data).forEach(key =>
-					flatten(data[key], path.concat(key), collapsed, limit, out),
-				);
+				Object.keys(data).forEach(key => {
+					const nextPath = path.concat(key);
+					node.children.push(nextPath.join("."));
+					parseProps(data[key], nextPath, limit, out);
+				});
 			}
 		}
 	} else {
 		const type = typeof data;
-		out.push({
+		out.set(pathStr, {
 			depth,
-			name,
+			id: pathStr,
 			type: type as any,
 			collapsable: false,
 			editable: type !== "undefined",
 			path,
 			value: data,
+			children: [],
 		});
 	}
 

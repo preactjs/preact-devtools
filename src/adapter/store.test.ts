@@ -42,7 +42,7 @@ describe("Store", () => {
 		expect(store.nodes.$.get(1)!.duration.$).to.equal(12);
 	});
 
-	it.only("should unmount vnodes", () => {
+	it("should unmount vnodes", () => {
 		const store = createStore();
 		const event = fromSnapshot([
 			"rootId: 1",

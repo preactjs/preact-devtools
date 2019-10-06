@@ -1,9 +1,7 @@
 import { h, render } from "preact";
 import { useState } from "preact/hooks";
-import { Highlighter } from "../view/components/Highlighter";
 import { ElementProps } from "../view/components/ElementProps";
-import { Sidebar } from "../view/components/Sidebar";
-import { Iframer } from "./Iframer";
+import { Sidebar } from "../view/components/sidebar/Sidebar";
 import d from "../view/components/Devtools.css";
 import { IconBtn } from "../view/components/IconBtn";
 import { Picker } from "../view/components/icons";
@@ -142,42 +140,20 @@ export function StyleGuide() {
 					</AppCtx.Provider>
 					<h3>ElementProps</h3>
 					<p>non-editable</p>
-					<AppCtx.Provider value={store}>
-						<ElementProps
-							data={{
-								foo: "bar",
-								bob: null,
-								bazly: 123,
-								baz: true,
-							}}
-						/>
-					</AppCtx.Provider>
+					{/* <ElementProps
+						editable={false}
+						tree={tstore.props.tree}
+						collapser={tstore.props.collapser}
+						nodeList={tstore.props.list}
+					/> */}
 					<p>editable</p>
 					<div style="width: 20rem; outline: 1px solid red">
-						<AppCtx.Provider value={store}>
-							<ElementProps
-								editable
-								data={{
-									foo: "bar",
-									longvalue: "asdji asdj asijd lksaj dlask kajdaklsj dklsabar",
-									bob: null,
-									bazly: 123,
-									baz: true,
-									arr: [1, 2, 3],
-									obj: { foo: "bar" },
-									set: new Set([1, 2, 3]),
-									map: new Map([[1, "a"], [2, "b"]]),
-									children: {
-										type: "vnode",
-										name: "span",
-									},
-									bar: {
-										type: "function",
-										name: "foobar",
-									},
-								}}
-							/>
-						</AppCtx.Provider>
+						{/* <ElementProps
+							editable
+							tree={tstore.props.tree}
+							collapser={tstore.props.collapser}
+							nodeList={tstore.props.list}
+						/> */}
 					</div>
 					<h2>Icon Btns</h2>
 					<IconBtn onClick={() => console.log("click")}>

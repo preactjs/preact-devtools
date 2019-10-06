@@ -1,14 +1,14 @@
 import { createContext } from "preact";
-import { useContext, useState, useEffect, useRef } from "preact/hooks";
+import { useContext, useState, useEffect } from "preact/hooks";
 import { valoo, Observable, watch } from "../valoo";
-import { InspectData, UpdateType } from "../../adapter/adapter";
-import { ObjPath } from "../components/ElementProps";
 import { createSearchStore } from "./search";
 import { createModalState } from "../components/Modals";
 import { createFilterStore } from "./filter";
 import { flattenChildren } from "../components/tree/windowing";
 import { createSelectionStore } from "./selection";
 import { createCollapser, Collapser } from "./collapser";
+import { EmitFn } from "../../adapter/hook";
+import { InspectData } from "../../adapter/adapter";
 
 export type ID = number;
 
@@ -40,22 +40,9 @@ export interface DevNode {
 
 export type Tree = Map<ID, DevNode>;
 
-const EMPTY_INSPECT: InspectData = {
-	context: null,
-	hooks: null,
-	canEditState: false,
-	canEditHooks: false,
-	canEditProps: false,
-	id: -1,
-	name: ".",
-	props: null,
-	state: null,
-	type: 2,
-};
-
 export interface Store {
 	isPicking: Observable<boolean>;
-	inspectData: Observable<InspectData>;
+	inspectData: Observable<InspectData | null>;
 	roots: Observable<ID[]>;
 	rootToChild: Observable<Map<number, number>>;
 	nodes: Observable<Tree>;
@@ -65,22 +52,13 @@ export interface Store {
 	filter: ReturnType<typeof createFilterStore>;
 	selection: ReturnType<typeof createSelectionStore>;
 	collapser: Collapser<ID>;
-	propsCollapser: Collapser<string>;
 	actions: {
 		highlightNode: (id: ID | null) => void;
-		logNode: (id: ID) => void;
-		forceUpdate: (id: ID) => void;
-		updateNode: (id: ID, type: UpdateType, path: ObjPath, value: any) => void;
-		updatePropertyName: (
-			id: ID,
-			type: UpdateType,
-			path: ObjPath,
-			value: any,
-		) => void;
 		clear(): void;
 		startPickElement(): void;
 		stopPickElement(): void;
 	};
+	emit: EmitFn;
 	subscribe(fn: Listener): () => void;
 }
 
@@ -88,7 +66,7 @@ export type Listener = (name: string, data: any) => void;
 
 export function createStore(): Store {
 	let listeners: Array<null | Listener> = [];
-	const notify: Listener = (name, data) => {
+	const notify: EmitFn = (name, data) => {
 		listeners.forEach(fn => fn && fn(name, data));
 	};
 
@@ -97,7 +75,6 @@ export function createStore(): Store {
 	const rootToChild = valoo<Map<any, any>>(new Map());
 
 	// Toggle
-	const inspectData = valoo<InspectData>(EMPTY_INSPECT);
 	const isPicking = valoo<boolean>(false);
 
 	const filterState = createFilterStore(notify);
@@ -118,39 +95,27 @@ export function createStore(): Store {
 		return list;
 	});
 
-	const selection = createSelectionStore(nodeList, notify);
+	const inspectData = valoo(null);
 
-	// Props panel
-	const propsCollapser = createCollapser<string>();
+	const selection = createSelectionStore(nodeList);
 
 	return {
 		nodeList,
-		isPicking,
 		inspectData,
+		isPicking,
 		roots,
 		rootToChild,
 		nodes,
 		collapser,
-		propsCollapser,
 		search: createSearchStore(nodes, nodeList),
 		modal: createModalState(),
 		filter: filterState,
 		selection,
 		actions: {
-			forceUpdate: id => notify("force-update", id),
-			highlightNode: id => notify("highlight", id),
-			logNode: id => notify("log", id),
-			updateNode(id, type, path, value) {
-				notify("update-node", { id, type, path, value });
-				notify("inspect", id);
-			},
-			updatePropertyName(id, type, path, value) {
-				console.log("TODO", path, value);
-				// notify("update-node", { id, type, path, value });
-				notify("inspect", id);
+			highlightNode: id => {
+				if (id != null) notify("highlight", id);
 			},
 			clear() {
-				inspectData.$ = EMPTY_INSPECT;
 				nodes.$ = new Map();
 				roots.$ = [];
 				rootToChild.$ = new Map();
@@ -171,11 +136,14 @@ export function createStore(): Store {
 			const idx = listeners.push(fn);
 			return () => (listeners[idx] = null);
 		},
+		emit: notify,
 	};
 }
 
 export const AppCtx = createContext<Store>(null as any);
+export const EmitCtx = createContext<EmitFn>(() => null);
 
+export const useEmitter = () => useContext(EmitCtx);
 export const useStore = () => useContext(AppCtx);
 
 export function useObserver<T>(fn: () => T): T {

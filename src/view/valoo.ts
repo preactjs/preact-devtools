@@ -37,7 +37,17 @@ export function valoo<T>(v: T): Observable<T> {
 		},
 		set $(c: T) {
 			v = c;
+
+			// Be careful not to track any observables in callbacks
+			let old = tracking;
+			tracking = dummy;
+
+			// Call listeners
 			cb.forEach(f => f && f(v));
+
+			// Restore old tracking
+			tracking = old;
+			dummy.clear();
 		},
 		on(c: (v: T) => void) {
 			const i = cb.push(c) - 1;
@@ -57,6 +67,8 @@ export function valoo<T>(v: T): Observable<T> {
  * We'll use this variable to track used dependencies
  */
 let tracking = new Set<Observable>();
+
+const dummy = new Set<Observable>();
 
 /**
  * Track used observables automatically and re-execute the callback

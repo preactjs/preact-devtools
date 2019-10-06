@@ -1,3 +1,5 @@
+import { useRef } from "preact/hooks";
+
 const OFFSET = 16;
 
 export function scrollIntoView(el: HTMLElement) {
@@ -37,4 +39,9 @@ export function getRootDomNode(el: HTMLElement): HTMLElement {
 	}
 
 	return item;
+}
+
+export function useInstance<T>(fn: () => T) {
+	const ref = useRef<T>(null as any);
+	return ref.current || (ref.current = fn());
 }

@@ -90,5 +90,47 @@ describe("valoo", () => {
 			b.$ = 3;
 			expect(spy.callCount).to.eq(1);
 		});
+
+		it("should not track itself", () => {
+			let a = valoo<number[]>([]);
+			let b = valoo(1);
+			let spy = sinon.spy();
+
+			let c = watch(() => {
+				a.update(v => {
+					v.push(b.$);
+				});
+			});
+			c.on(spy);
+
+			a.update(v => {
+				v.push(3);
+			});
+			expect(spy.callCount).to.eq(1);
+		});
+
+		it("should not watch on callback", () => {
+			let a = valoo<number[]>([]);
+			let b = valoo(1);
+			let spy = sinon.spy();
+
+			a.on(() => {
+				b.$ = a.$.length + 1;
+			});
+
+			watch(() => {
+				a.update(v => {
+					v.push(1);
+				});
+
+				spy();
+			});
+
+			expect(spy.callCount).to.eq(1);
+			a.update(v => {
+				v.push(5);
+			});
+			expect(spy.callCount).to.eq(1);
+		});
 	});
 });

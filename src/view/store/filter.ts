@@ -8,7 +8,7 @@ export interface RawFilter {
 }
 
 export function createFilterStore(
-	onSubmit: (event: string, filters: RawFilterState) => void,
+	onSubmit: (event: "update-filter", filters: RawFilterState) => void,
 ) {
 	const filters = valoo<RawFilter[]>([]);
 	const filterFragment = valoo(true);
