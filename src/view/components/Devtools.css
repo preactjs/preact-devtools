@@ -36,6 +36,10 @@
 	--color-marker-selected: orange;
 	--color-input-border: #4d4d4d;
 	--color-empty-logo: #dadada;
+	--color-key-label: gray;
+	--color-key-label-selected: #dadada;
+	--color-key-value: #ff5722;
+	--color-key-value-selected: orange;
 
 	/* Props */
 	--color-props-input-bg: #f0f0f0;
@@ -72,6 +76,10 @@
 	--color-marker-selected: orange;
 	--color-input-border: #666;
 	--color-empty-logo: #555;
+	--color-key-label: gray;
+	--color-key-label-selected: #dedede;
+	--color-key-value: #ff5722;
+	--color-key-value-selected: yellow;
 
 	/* Props */
 	--color-props-input-bg: #444;

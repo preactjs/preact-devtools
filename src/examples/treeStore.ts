@@ -89,6 +89,8 @@ export const treeStore = () => {
 	addNode(2);
 	addNode(1);
 
+	store.nodes.$.get(3)!.key = "foobar";
+
 	store.subscribe(name => {
 		store.inspectData.$ = inspect;
 	});

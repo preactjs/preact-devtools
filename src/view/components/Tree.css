@@ -102,6 +102,22 @@
 	z-index: -1;
 }
 
+.keyLabel {
+	color: var(--color-key-label);
+}
+
+[data-selected] .keyLabel {
+	color: var(--color-key-label-selected);
+}
+
+.key {
+	color: var(--color-key-value);
+}
+
+[data-selected] .key {
+	color: var(--color-key-value-selected);
+}
+
 /* Marker */
 .mark {
 	background: var(--color-marker);

@@ -77,7 +77,7 @@ export function applyOperations(store: Store, data: number[]) {
 				const id = data[i + 1];
 				const type = data[i + 2];
 				const name = strings[data[i + 5] - 1];
-				const key = data[i + 6] > 0 ? ` key="${strings[i + 6 - 1]}" ` : "";
+				const key = data[i + 6] > 0 ? strings[data[i + 6] - 1] : "";
 				let parentId = data[i + 3];
 
 				if (newRoot) {

@@ -130,6 +130,14 @@ export function TreeItem(props: { key: any; id: ID }) {
 				{node.children.length === 0 && <div class={s.noToggle} />}
 				<span class={s.name}>
 					<MarkResult text={node.name} id={id} />
+					{node.key ? (
+						<span class={s.keyLabel}>
+							{" "}
+							key="<span class={s.key}>{node.key}</span>"
+						</span>
+					) : (
+						""
+					)}
 				</span>
 			</div>
 		</div>
