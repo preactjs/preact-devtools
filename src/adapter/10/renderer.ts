@@ -15,6 +15,7 @@ import {
 	getDom,
 	getLastDomChild,
 	getActualChildren,
+	getVNodeParent,
 } from "./vnode";
 import { FilterState, shouldFilter } from "./filter";
 import { ID } from "../../view/store/types";
@@ -80,6 +81,8 @@ export function createRenderer(
 
 	let currentUnmounts: number[] = [];
 
+	let domToVNode = new WeakMap<HTMLElement | Text, VNode>();
+
 	return {
 		getVNodeById: id => ids.getVNode(id),
 		has: id => ids.has(id),
@@ -128,7 +131,23 @@ export function createRenderer(
 			return vnode ? [getDom(vnode), getLastDomChild(vnode)] : null;
 		},
 		findVNodeIdForDom(node) {
-			return ids.getByDom(node) || -1;
+			const vnode = domToVNode.get(node);
+			if (vnode) {
+				if (shouldFilter(vnode, filters)) {
+					let p = vnode;
+					while ((p = getVNodeParent(p)) != null) {
+						if (!shouldFilter(p, filters)) break;
+					}
+
+					if (p != null) {
+						return ids.getId(p) || -1;
+					}
+				} else {
+					return ids.getId(vnode) || -1;
+				}
+			}
+
+			return -1;
 		},
 		applyFilters(nextFilters) {
 			roots.forEach(root => this.onUnmount(root));
@@ -150,7 +169,7 @@ export function createRenderer(
 			filters.type = nextFilters.type;
 
 			roots.forEach(root => {
-				const commit = createCommit(ids, roots, root, filters);
+				const commit = createCommit(ids, roots, root, filters, domToVNode);
 				const ev = flush(commit);
 				if (!ev) return;
 				queue.push(ev);
@@ -166,7 +185,7 @@ export function createRenderer(
 			queue = [];
 		},
 		onCommit(vnode) {
-			const commit = createCommit(ids, roots, vnode, filters);
+			const commit = createCommit(ids, roots, vnode, filters, domToVNode);
 			commit.unmountIds.push(...currentUnmounts);
 			currentUnmounts = [];
 			const ev = flush(commit);
@@ -184,6 +203,9 @@ export function createRenderer(
 				if (id > 0) {
 					currentUnmounts.push(id);
 				}
+			} else if (typeof vnode.type !== "function") {
+				const dom = getDom(vnode);
+				if (dom != null) domToVNode.delete(dom);
 			}
 		},
 	};
@@ -214,6 +236,7 @@ export function createCommit(
 	roots: Set<VNode>,
 	vnode: VNode,
 	filters: FilterState,
+	domCache: WeakMap<HTMLElement | Text, VNode>,
 ): Commit {
 	const commit = {
 		operations: [],
@@ -237,9 +260,9 @@ export function createCommit(
 	}
 
 	if (isNew) {
-		mount(ids, commit, vnode, parentId, filters);
+		mount(ids, commit, vnode, parentId, filters, domCache);
 	} else {
-		update(ids, commit, vnode, filters);
+		update(ids, commit, vnode, filters, domCache);
 	}
 
 	return commit;
@@ -251,10 +274,12 @@ export function mount(
 	vnode: VNode,
 	ancestorId: ID,
 	filters: FilterState,
+	domCache: WeakMap<HTMLElement | Text, VNode>,
 ) {
 	const root = isRoot(vnode);
 
-	if (root || !shouldFilter(vnode, filters)) {
+	const skip = shouldFilter(vnode, filters);
+	if (root || !skip) {
 		const id = ids.hasId(vnode) ? ids.getId(vnode) : ids.createId(vnode);
 		if (isRoot(vnode)) {
 			commit.operations.push(MsgTypes.ADD_ROOT, id);
@@ -272,10 +297,15 @@ export function mount(
 		ancestorId = id;
 	}
 
+	if (skip && typeof vnode.type !== "function") {
+		const dom = getDom(vnode);
+		if (dom) domCache.set(dom, vnode);
+	}
+
 	const children = getActualChildren(vnode);
 	for (let i = 0; i < children.length; i++) {
 		if (children[i] !== null) {
-			mount(ids, commit, children[i], ancestorId, filters);
+			mount(ids, commit, children[i], ancestorId, filters, domCache);
 		}
 	}
 }
@@ -285,6 +315,7 @@ export function update(
 	commit: Commit,
 	vnode: VNode,
 	filters: FilterState,
+	domCache: WeakMap<HTMLElement | Text, VNode>,
 ) {
 	const id = ids.getId(vnode);
 	commit.operations.push(
@@ -307,9 +338,9 @@ export function update(
 				commit.unmountIds.push(oldChildren[i]);
 			}
 		} else if (ids.hasId(child)) {
-			update(ids, commit, child, filters);
+			update(ids, commit, child, filters, domCache);
 		} else {
-			mount(ids, commit, child, id, filters);
+			mount(ids, commit, child, id, filters, domCache);
 		}
 	}
 	return commit;
