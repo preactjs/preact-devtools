@@ -106,7 +106,7 @@ describe("valoo", () => {
 			a.update(v => {
 				v.push(3);
 			});
-			expect(spy.callCount).to.eq(1);
+			expect(spy.callCount).to.eq(0);
 		});
 
 		it("should not watch on callback", () => {
