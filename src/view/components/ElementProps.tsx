@@ -4,9 +4,6 @@ import { Arrow } from "./TreeView";
 import { PropDataType, PropData } from "../parseProps";
 import { AutoSizeInput } from "./AutoSizeInput";
 import { DataInput } from "./DataInput";
-import { useObserver } from "../store/react-bindings";
-import { Collapser } from "../store/collapser";
-import { Observable } from "../valoo";
 import { displayCollection } from "./DataInput/parseValue";
 import { ID } from "../store/types";
 
@@ -18,16 +15,13 @@ export interface Props {
 	editable?: boolean;
 	onChange?: ChangeFn;
 	onRename?: ChangeFn;
-	collapser: Collapser<string>;
-	nodeList: Observable<string[]>;
-	tree: Observable<Map<string, PropData>>;
+	onCollapse?: (path: string) => void;
+	collapsed: Set<string>;
+	items: PropData[];
 }
 
 export function ElementProps(props: Props) {
-	const { editable, onChange, onRename, collapser } = props;
-
-	const collapsed = useObserver(() => collapser.collapsed.$);
-	const list = useObserver(() => props.nodeList.$);
+	const { editable, onChange, onRename, collapsed, items, onCollapse } = props;
 
 	return (
 		<div class={s.root}>
@@ -37,10 +31,8 @@ export function ElementProps(props: Props) {
 					e.preventDefault();
 				}}
 			>
-				{list.map(id => {
-					const item = props.tree.$.get(id);
-					if (!item) return null;
-
+				{items.map(item => {
+					const id = item.id;
 					return (
 						<SingleItem
 							key={id}
@@ -48,7 +40,7 @@ export function ElementProps(props: Props) {
 							name={id.slice(id.lastIndexOf(".") + 1)}
 							collapseable={item.collapsable}
 							collapsed={collapsed.has(id)}
-							onCollapse={() => collapser.toggle(id)}
+							onCollapse={() => onCollapse && onCollapse(id)}
 							editable={editable}
 							value={item.value}
 							path={item.path}

@@ -3,7 +3,7 @@ import { valoo } from "../view/valoo";
 import { InspectData } from "../adapter/adapter";
 import { DevNodeType, DevNode, ID } from "../view/store/types";
 
-const inspect: InspectData = {
+export const inspect: InspectData = {
 	canEditHooks: false,
 	canEditProps: true,
 	canEditState: false,
@@ -90,10 +90,9 @@ export const treeStore = () => {
 	addNode(1);
 
 	store.subscribe(name => {
-		if (name === "inspect") {
-			console.log("event inspect");
-		}
+		store.inspectData.$ = inspect;
 	});
 
+	store.inspectData.$ = inspect;
 	return store;
 };

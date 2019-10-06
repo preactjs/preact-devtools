@@ -8,12 +8,13 @@ import { Picker } from "../view/components/icons";
 import { TreeBar } from "../view/components/TreeBar";
 import { ModalBackdrop, SettingsModal } from "../view/components/Modals";
 import { createStore } from "../view/store";
-import { AppCtx } from "../view/store/react-bindings";
+import { AppCtx, useObserver } from "../view/store/react-bindings";
 import { applyOperations } from "../adapter/events";
 import { fromSnapshot } from "../adapter/debug";
 import { TreeView } from "../view/components/TreeView";
 import { TodoList } from "./TodoList";
-import { treeStore } from "./treeStore";
+import { treeStore, inspect } from "./treeStore";
+import { createPropsStore } from "../view/store/props";
 
 function Headline(props) {
 	return <h3>{props.title}</h3>;
@@ -21,11 +22,22 @@ function Headline(props) {
 
 const tstore = treeStore();
 
+const pStore = createPropsStore(
+	tstore.inspectData,
+	tstore.selection.selected,
+	() => (tstore.inspectData.$ = inspect),
+);
+
 export function StyleGuide() {
 	const [dark, setDark] = useState(localStorage.getItem("theme") === "dark");
 	const [showModal, setShowModal] = useState(
 		!!localStorage.getItem("show-modal"),
 	);
+
+	const propList = useObserver(() =>
+		pStore.list.$.map(x => pStore.tree.$.get(x)),
+	);
+	const pCollapsed = useObserver(() => pStore.collapser.collapsed.$);
 
 	const [store] = useState(createStore());
 
@@ -141,20 +153,20 @@ export function StyleGuide() {
 					</AppCtx.Provider>
 					<h3>ElementProps</h3>
 					<p>non-editable</p>
-					{/* <ElementProps
+					<ElementProps
 						editable={false}
-						tree={tstore.props.tree}
-						collapser={tstore.props.collapser}
-						nodeList={tstore.props.list}
-					/> */}
+						items={propList}
+						collapsed={pCollapsed}
+						onCollapse={pStore.collapser.toggle}
+					/>
 					<p>editable</p>
 					<div style="width: 20rem; outline: 1px solid red">
-						{/* <ElementProps
+						<ElementProps
 							editable
-							tree={tstore.props.tree}
-							collapser={tstore.props.collapser}
-							nodeList={tstore.props.list}
-						/> */}
+							items={propList}
+							collapsed={pCollapsed}
+							onCollapse={pStore.collapser.toggle}
+						/>
 					</div>
 					<h2>Icon Btns</h2>
 					<IconBtn onClick={() => console.log("click")}>

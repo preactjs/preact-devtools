@@ -13,6 +13,8 @@ export function PropsPanel() {
 		return createPropsStore(store.inspectData, store.selection.selected, emit);
 	});
 	const inspect = useObserver(() => store.inspectData.$);
+	const collapsed = useObserver(() => s.collapser.collapsed.$);
+	const items = useObserver(() => s.list.$);
 
 	const onChange = useCallback(
 		(value: any, path: ObjPath) => {
@@ -37,11 +39,11 @@ export function PropsPanel() {
 			<ElementProps
 				nodeId={inspect.id}
 				editable={inspect.canEditProps}
-				collapser={s.collapser}
-				nodeList={s.list}
-				tree={s.tree}
+				collapsed={collapsed}
+				items={items.map(x => s.tree.$.get(x)!)}
 				onChange={onChange}
 				onRename={onRename}
+				onCollapse={s.collapser.toggle}
 			/>
 		</SidebarPanel>
 	);
