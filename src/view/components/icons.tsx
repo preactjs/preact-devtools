@@ -97,29 +97,24 @@ export function Refresh({ size = "s" }: Props) {
 
 export function Picker() {
 	return (
-		<svg
-			xmlns="http://www.w3.org/2000/svg"
-			width="16"
-			height="16"
-			viewBox="0 0 4.233 4.233"
-		>
-			<g stroke="currentColor">
+		<svg width="16" height="16" xmlns="http://www.w3.org/2000/svg">
+			<g fill="none" fill-rule="evenodd">
+				<g stroke="currentColor">
+					<path
+						stroke-width=".291"
+						fill="currentColor"
+						fill-rule="nonzero"
+						stroke-linecap="round"
+						stroke-linejoin="round"
+						d="M6 6l3.014 9 2.508-3.533L15 8.791z"
+					/>
+					<path stroke-width="2" d="M10.417 10.417l2.87 2.87L15 15" />
+				</g>
 				<path
-					d="M3.969 3.292V.794a.528.528 0 0 0-.53-.53H.795a.528.528 0 0 0-.53.53V3.44c0 .293.237.529.53.529h2.532"
-					opacity=".893"
-					fill="none"
-					stroke-linejoin="round"
-					stroke-dashoffset="8.791"
-					stroke-width=".26458"
-				/>
-				<path
-					d="M1.323 1.323l.873 2.037L3.36 2.196z"
-					stroke-width=".291"
-					stroke-linecap="round"
-					stroke-linejoin="round"
+					d="M12.188 0A2.812 2.812 0 0 1 15 2.813V5h-1V2.857A1.857 1.857 0 0 0 12.143 1H2.857A1.857 1.857 0 0 0 1 2.857v9.286C1 13.169 1.831 14 2.857 14H5v1H2.812A2.812 2.812 0 0 1 0 12.187V2.813A2.812 2.812 0 0 1 2.813 0h9.374z"
 					fill="currentColor"
+					fill-rule="nonzero"
 				/>
-				<path d="M2.87 2.87L3.93 3.93" fill="none" stroke-width=".265" />
 			</g>
 		</svg>
 	);
