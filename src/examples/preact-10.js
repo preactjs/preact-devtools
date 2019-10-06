@@ -15,6 +15,8 @@ import { TreeView } from "../view/components/TreeView";
 import { TodoList } from "./TodoList";
 import { treeStore, inspect } from "./treeStore";
 import { createPropsStore } from "../view/store/props";
+import { Iframer } from "./Iframer";
+import { Highlighter } from "../view/components/Highlighter";
 
 function Headline(props) {
 	return <h3>{props.title}</h3>;
@@ -57,7 +59,7 @@ export function StyleGuide() {
 					<TodoList />
 					<h2>Styleguide</h2>
 					<h3>Highlighter</h3>
-					{/* <div class="grid">
+					<div class="grid">
 						<div>
 							<p>center</p>
 							<Iframer height={300}>
@@ -146,7 +148,7 @@ export function StyleGuide() {
 								/>
 							</Iframer>
 						</div>
-					</div> */}
+					</div>
 					<h3>Sidebar</h3>
 					<AppCtx.Provider value={tstore}>
 						<Sidebar />
