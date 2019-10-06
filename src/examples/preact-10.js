@@ -58,6 +58,90 @@ export function StyleGuide() {
 					<h2>Todo List</h2>
 					<TodoList />
 					<h2>Styleguide</h2>
+
+					<h3>Sidebar</h3>
+					<AppCtx.Provider value={tstore}>
+						<Sidebar />
+					</AppCtx.Provider>
+					<h3>ElementProps</h3>
+					<p>non-editable</p>
+					<ElementProps
+						editable={false}
+						items={propList}
+						collapsed={pCollapsed}
+						onCollapse={pStore.collapser.toggle}
+					/>
+					<p>editable</p>
+					<div style="width: 20rem; outline: 1px solid red">
+						<ElementProps
+							editable
+							items={propList}
+							collapsed={pCollapsed}
+							onCollapse={pStore.collapser.toggle}
+						/>
+					</div>
+					<h2>Icon Btns</h2>
+					<IconBtn onClick={() => console.log("click")}>
+						<Picker />
+					</IconBtn>
+					<IconBtn active>
+						<Picker />
+					</IconBtn>
+					<h2>Modals</h2>
+					<button
+						onClick={() => {
+							const next = !showModal;
+							setShowModal(next);
+							localStorage.setItem("show-modal", next + "");
+						}}
+					>
+						show modal
+					</button>
+					<AppCtx.Provider value={store}>
+						{showModal && (
+							<SettingsModal
+								onClose={() => {
+									setShowModal(false);
+									localStorage.removeItem("show-modal");
+								}}
+							/>
+						)}
+					</AppCtx.Provider>
+					<ModalBackdrop
+						active={showModal}
+						onClick={() => {
+							setShowModal(false);
+							localStorage.removeItem("show-modal");
+						}}
+					/>
+					<Headline title="foobar" />
+					<h2>TreeBar</h2>
+					<div style="border: 1px solid #555">
+						<AppCtx.Provider value={tstore}>
+							<TreeBar />
+						</AppCtx.Provider>
+					</div>
+					<h2>TreeView</h2>
+					<button
+						onClick={() => {
+							const event2 = fromSnapshot(["rootId: 1", "Remove 4"]);
+							applyOperations(tstore, event2);
+						}}
+					>
+						remove
+					</button>
+					<br />
+					<div>
+						<div style="height: 20rem; overflow: auto;">
+							<AppCtx.Provider value={tstore}>
+								<TreeView />
+							</AppCtx.Provider>
+						</div>
+					</div>
+					<p>Empty tree view</p>
+					<AppCtx.Provider value={store}>
+						<TreeView />
+					</AppCtx.Provider>
 					<h3>Highlighter</h3>
 					<div class="grid">
 						<div>
@@ -149,89 +233,6 @@ export function StyleGuide() {
 							</Iframer>
 						</div>
 					</div>
-					<h3>Sidebar</h3>
-					<AppCtx.Provider value={tstore}>
-						<Sidebar />
-					</AppCtx.Provider>
-					<h3>ElementProps</h3>
-					<p>non-editable</p>
-					<ElementProps
-						editable={false}
-						items={propList}
-						collapsed={pCollapsed}
-						onCollapse={pStore.collapser.toggle}
-					/>
-					<p>editable</p>
-					<div style="width: 20rem; outline: 1px solid red">
-						<ElementProps
-							editable
-							items={propList}
-							collapsed={pCollapsed}
-							onCollapse={pStore.collapser.toggle}
-						/>
-					</div>
-					<h2>Icon Btns</h2>
-					<IconBtn onClick={() => console.log("click")}>
-						<Picker />
-					</IconBtn>
-					<IconBtn active>
-						<Picker />
-					</IconBtn>
-					<h2>Modals</h2>
-					<button
-						onClick={() => {
-							const next = !showModal;
-							setShowModal(next);
-							localStorage.setItem("show-modal", next + "");
-						}}
-					>
-						show modal
-					</button>
-					<AppCtx.Provider value={store}>
-						{showModal && (
-							<SettingsModal
-								onClose={() => {
-									setShowModal(false);
-									localStorage.removeItem("show-modal");
-								}}
-							/>
-						)}
-					</AppCtx.Provider>
-					<ModalBackdrop
-						active={showModal}
-						onClick={() => {
-							setShowModal(false);
-							localStorage.removeItem("show-modal");
-						}}
-					/>
-					<Headline title="foobar" />
-					<h2>TreeBar</h2>
-					<div style="border: 1px solid #555">
-						<AppCtx.Provider value={tstore}>
-							<TreeBar />
-						</AppCtx.Provider>
-					</div>
-					<h2>TreeView</h2>
-					<button
-						onClick={() => {
-							const event2 = fromSnapshot(["rootId: 1", "Remove 4"]);
-							applyOperations(tstore, event2);
-						}}
-					>
-						remove
-					</button>
-					<br />
-					<div>
-						<div style="height: 20rem; overflow: auto;">
-							<AppCtx.Provider value={tstore}>
-								<TreeView />
-							</AppCtx.Provider>
-						</div>
-					</div>
-					<p>Empty tree view</p>
-					<AppCtx.Provider value={store}>
-						<TreeView />
-					</AppCtx.Provider>
 				</div>
 			</div>
 		</div>
