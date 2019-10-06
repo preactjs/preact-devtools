@@ -37,11 +37,13 @@ export function createPropsStore(
 
 		// Reset collapsed state when a new element is selected
 		if (initial && tree.$.size > 0) {
+			collapser.collapsed.$.clear();
 			tree.$.forEach((v, id) => {
 				if (id !== "root" && v.children.length > 0) {
-					collapser.collapseNode(id, true);
+					collapser.collapsed.$.add(id);
 				}
 			});
+			collapser.collapsed.update();
 			initial = false;
 		}
 
@@ -61,8 +63,8 @@ export function createPropsStore(
 		});
 
 		initial = true;
-		collapser.resetAll();
-		inspectData.$ = null;
+		// collapser.resetAll();
+		// inspectData.$ = null;
 
 		if (selected.$ > -1) {
 			notify("inspect", selected.$);
