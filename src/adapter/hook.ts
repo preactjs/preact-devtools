@@ -13,7 +13,7 @@ export interface DevtoolEvents {
 	"start-picker": null;
 	"stop-picker": null;
 	"update-filter": RawFilterState;
-	highlight: ID;
+	highlight: ID | null;
 	log: ID;
 	inspect: ID;
 }

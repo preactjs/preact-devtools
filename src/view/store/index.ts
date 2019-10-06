@@ -56,9 +56,7 @@ export function createStore(): Store {
 		filter: filterState,
 		selection,
 		actions: {
-			highlightNode: id => {
-				if (id != null) notify("highlight", id);
-			},
+			highlightNode: id => notify("highlight", id),
 			clear() {
 				nodes.$ = new Map();
 				roots.$ = [];
