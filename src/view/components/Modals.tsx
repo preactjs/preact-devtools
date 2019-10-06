@@ -1,6 +1,6 @@
 import { h, ComponentChildren, Fragment } from "preact";
 import s from "./Modal.css";
-import { useStore, useObserver } from "../store";
+import { useStore, useObserver } from "../store/react-bindings";
 import { IconBtn } from "./IconBtn";
 import { Close } from "./icons";
 import { valoo } from "../valoo";

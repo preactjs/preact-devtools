@@ -1,5 +1,5 @@
 import { h } from "preact";
-import { useState, useEffect } from "preact/hooks";
+import { useState } from "preact/hooks";
 import { Actions, ActionSeparator } from "./Actions";
 import { IconBtn } from "./IconBtn";
 import {
@@ -15,7 +15,7 @@ import {
 	CheckboxChecked,
 	CheckboxUnChecked,
 } from "./icons";
-import { useStore, useObserver } from "../store";
+import { useStore, useObserver } from "../store/react-bindings";
 import s from "./TreeBar.css";
 import { useSearch } from "../store/search";
 import { OutsideClick } from "./OutsideClick";

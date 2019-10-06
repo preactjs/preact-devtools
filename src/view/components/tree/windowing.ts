@@ -1,4 +1,4 @@
-import { ID } from "../../store";
+import { ID } from "../../store/types";
 
 export function flattenChildren<K, T extends { id: K; children: K[] }>(
 	tree: Map<K, T>,

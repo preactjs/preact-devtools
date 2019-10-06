@@ -1,10 +1,10 @@
 import { Observable, valoo, watch } from "../valoo";
-import { ID } from ".";
 import { PropData, parseProps } from "../parseProps";
 import { createCollapser } from "./collapser";
 import { InspectData } from "../../adapter/adapter";
 import { EmitFn } from "../../adapter/hook";
 import { flattenChildren } from "../components/tree/windowing";
+import { ID } from "./types";
 
 const PROPS_LIMIT = 7;
 

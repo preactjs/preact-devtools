@@ -1,6 +1,7 @@
-import { createStore, DevNode, ID, DevNodeType } from "../view/store";
+import { createStore } from "../view/store";
 import { valoo } from "../view/valoo";
 import { InspectData } from "../adapter/adapter";
+import { DevNodeType, DevNode, ID } from "../view/store/types";
 
 const inspect: InspectData = {
 	canEditHooks: false,

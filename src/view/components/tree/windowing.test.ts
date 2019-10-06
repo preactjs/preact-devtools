@@ -1,6 +1,6 @@
 import { expect } from "chai";
-import { ID } from "../../store";
 import { flattenChildren } from "./windowing";
+import { ID } from "../../store/types";
 
 describe("flattenChildren", () => {
 	it("should flatten tree", () => {

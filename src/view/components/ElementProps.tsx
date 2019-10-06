@@ -4,10 +4,11 @@ import { Arrow } from "./TreeView";
 import { PropDataType, PropData } from "../parseProps";
 import { AutoSizeInput } from "./AutoSizeInput";
 import { DataInput } from "./DataInput";
-import { useObserver, ID } from "../store";
+import { useObserver } from "../store/react-bindings";
 import { Collapser } from "../store/collapser";
 import { Observable } from "../valoo";
 import { displayCollection } from "./DataInput/parseValue";
+import { ID } from "../store/types";
 
 export type ObjPath = Array<string | number>;
 export type ChangeFn = (value: any, path: ObjPath) => void;

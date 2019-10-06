@@ -1,6 +1,7 @@
 import { Observable, valoo } from "../valoo";
-import { DevNode, useStore, useObserver, ID } from ".";
+import { useStore, useObserver } from "./react-bindings";
 import escapeRegex from "escape-string-regexp";
+import { ID, DevNode } from "./types";
 
 export function createSearchStore(
 	items: Observable<Map<ID, DevNode>>,

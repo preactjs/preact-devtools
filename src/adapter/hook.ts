@@ -1,8 +1,8 @@
 import { Renderer } from "./10/renderer";
 import { createBridge } from "./bridge";
 import { ObjPath } from "../view/components/ElementProps";
-import { ID } from "../view/store";
 import { RawFilterState } from "./10/filter";
+import { ID } from "../view/store/types";
 
 export type EmitterFn = (event: string, data: any) => void;
 

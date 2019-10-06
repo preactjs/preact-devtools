@@ -1,7 +1,7 @@
 import { h } from "preact";
 import s from "./Sidebar.css";
 import { Actions } from "../Actions";
-import { useObserver, useStore, useEmitter } from "../../store";
+import { useObserver, useStore, useEmitter } from "../../store/react-bindings";
 import { IconBtn } from "../IconBtn";
 import { BugIcon, Refresh } from "../icons";
 import { useCallback } from "preact/hooks";

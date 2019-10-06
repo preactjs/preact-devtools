@@ -1,8 +1,8 @@
 import { flushTable, StringTable, parseTable } from "./string-table";
-import { Store, ID } from "../view/store";
 import { valoo } from "../view/valoo";
 import { VNode } from "preact";
 import { getDisplayName } from "./10/vnode";
+import { ID, Store } from "../view/store/types";
 
 export enum MsgTypes {
 	ADD_ROOT = 1,

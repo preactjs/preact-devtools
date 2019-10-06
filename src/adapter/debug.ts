@@ -1,7 +1,7 @@
 import { MsgTypes } from "./events";
 import { parseTable, flushTable } from "./string-table";
-import { ID } from "../view/store";
 import { Elements } from "./10/renderer";
+import { ID } from "../view/store/types";
 
 export interface ParsedMsg {
 	rootId: number;

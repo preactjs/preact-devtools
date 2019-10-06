@@ -1,7 +1,8 @@
-import { ID, AppCtx, useObserver } from ".";
+import { AppCtx, useObserver } from "./react-bindings";
 import { valoo, Observable } from "../valoo";
 import { clamp } from "../components/tree/windowing";
 import { useContext } from "preact/hooks";
+import { ID } from "./types";
 
 /**
  * Manages selection state of the TreeView.

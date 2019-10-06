@@ -3,8 +3,9 @@ import { TreeView } from "./TreeView";
 import { Sidebar } from "./sidebar/Sidebar";
 import s from "./Devtools.css";
 import { TreeBar } from "./TreeBar";
-import { AppCtx, Store, EmitCtx } from "../store";
+import { AppCtx, EmitCtx } from "../store/react-bindings";
 import { ModalRenderer } from "./Modals";
+import { Store } from "../store/types";
 
 export function DevTools(props: { store: Store }) {
 	return (

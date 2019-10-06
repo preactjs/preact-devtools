@@ -1,4 +1,4 @@
-import { AppCtx, useObserver } from ".";
+import { AppCtx, useObserver } from "./react-bindings";
 import { valoo, Observable } from "../valoo";
 import { useContext } from "preact/hooks";
 

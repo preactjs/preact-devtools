@@ -1,4 +1,3 @@
-import { ID } from "../view/store";
 import { render, h } from "preact";
 import { DevtoolsHook } from "./hook";
 import { Renderer } from "./10/renderer";
@@ -7,6 +6,7 @@ import { measureNode, getNearestElement } from "./dom";
 import { setIn } from "../shells/shared/utils";
 import { getComponent, getDom, getDisplayName } from "./10/vnode";
 import { createPicker } from "./picker";
+import { ID } from "../view/store/types";
 
 export type Path = Array<string | number>;
 

@@ -1,6 +1,6 @@
 import { h } from "preact";
 import { ElementProps, ObjPath } from "../ElementProps";
-import { useStore, useObserver, useEmitter } from "../../store";
+import { useStore, useObserver, useEmitter } from "../../store/react-bindings";
 import { useCallback } from "preact/hooks";
 import { createPropsStore } from "../../store/props";
 import { useInstance } from "../utils";
