@@ -27,8 +27,6 @@
 	position: absolute;
 	top: 50%;
 	left: 50%;
-	width: 12rem;
-	height: 12rem;
 	transform: translate3d(-50%, -50%, 0);
 	z-index: -1;
 	opacity: 0.4;
