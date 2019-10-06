@@ -118,7 +118,6 @@ export function createAdapter(hook: DevtoolsHook, renderer: Renderer): Adapter {
 		highlight,
 		update(id, type, path, value) {
 			const vnode = renderer.getVNodeById(id);
-			console.log("update", vnode, path, value);
 			if (vnode !== null) {
 				if (type === "props") {
 					setIn((vnode.props as any) || {}, path.slice(), value);

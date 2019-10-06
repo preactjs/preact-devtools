@@ -19,7 +19,7 @@ export function StatePanel() {
 
 	const onChange = useCallback(
 		(value: any, path: ObjPath) => {
-			emit("update-prop", { id: inspect!.id, path, value });
+			emit("update-prop", { id: inspect!.id, path: path.slice(1), value });
 		},
 		[inspect],
 	);

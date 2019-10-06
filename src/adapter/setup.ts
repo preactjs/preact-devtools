@@ -21,7 +21,7 @@ export async function init(options: Options, getHook: () => DevtoolsHook) {
 	bridge.listen("initialized", renderer.flushInitial);
 	bridge.listen("highlight", adapter.highlight);
 	bridge.listen("update-prop", ev => {
-		adapter.update(ev.id, ev.type, ev.path, ev.value);
+		adapter.update(ev.id, "props", ev.path, ev.value);
 	});
 	bridge.listen("update-filter", ev => renderer.applyFilters(parseFilters(ev)));
 	bridge.listen("force-update", ev => renderer.forceUpdate(ev));
