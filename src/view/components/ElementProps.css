@@ -19,7 +19,6 @@
 	color: var(--color-element-text);
 	line-height: 1;
 	white-space: nowrap;
-	flex: 1 0 auto;
 }
 
 .name::after {

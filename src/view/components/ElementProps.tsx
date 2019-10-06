@@ -6,6 +6,7 @@ import { AutoSizeInput } from "./AutoSizeInput";
 import { DataInput } from "./DataInput";
 import { displayCollection } from "./DataInput/parseValue";
 import { ID } from "../store/types";
+import { useCallback } from "preact/hooks";
 
 export type ObjPath = Array<string | number>;
 export type ChangeFn = (value: any, path: ObjPath) => void;
@@ -85,15 +86,24 @@ export function SingleItem(props: SingleProps) {
 	} = props;
 
 	const v = props.value;
-	const update = (v: any) => {
-		onChange && onChange(v, path);
-	};
-	const rename = (v: string) => {
-		if (onRename && path[path.length - 1] !== v) {
-			onRename(v, path);
-		}
-	};
-	const onCollapseClick = () => onCollapse && onCollapse(path);
+	const update = useCallback(
+		(v: any) => {
+			onChange && onChange(v, path);
+		},
+		[onChange, path],
+	);
+	const rename = useCallback(
+		(v: string) => {
+			if (onRename && path[path.length - 1] !== v) {
+				onRename(v, path);
+			}
+		},
+		[onRename, path],
+	);
+	const onCollapseClick = useCallback(() => onCollapse && onCollapse(path), [
+		onCollapse,
+		path,
+	]);
 
 	return (
 		<div
