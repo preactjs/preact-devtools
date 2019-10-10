@@ -59,22 +59,24 @@ export function DataInput({ value, onChange }: InputProps) {
 
 	const onKeyDown = useCallback(
 		(e: KeyboardEvent) => {
-			if (typeof parseValue(v) === "number") {
-				let next;
-				switch (e.key) {
-					case "ArrowUp":
-						next = "" + (+v + 1);
-						break;
-					case "ArrowDown":
-						next = "" + (+v - 1);
-						break;
-				}
+			try {
+				if (typeof parseValue(v) === "number") {
+					let next;
+					switch (e.key) {
+						case "ArrowUp":
+							next = "" + (+v + 1);
+							break;
+						case "ArrowDown":
+							next = "" + (+v - 1);
+							break;
+					}
 
-				if (next !== undefined) {
-					set(next);
-					onCommit(next);
+					if (next !== undefined) {
+						set(next);
+						onCommit(next);
+					}
 				}
-			}
+			} catch (e) {}
 		},
 		[type, v],
 	);

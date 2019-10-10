@@ -26,6 +26,7 @@
 	flex: 1;
 	padding-right: 0.2em;
 	min-width: 0;
+	box-shadow: none;
 }
 
 .innerWrapper {
@@ -41,6 +42,11 @@
 
 .innerWrapper:focus-within .undoBtn {
 	display: block;
+}
+
+.innerWrapper:focus-within .valueInput:invalid {
+	border-bottom: 0.125rem solid var(--color-input-invalid);
+	outline: none;
 }
 
 .undoBtn {
@@ -74,34 +80,34 @@
 	position: relative;
 }
 
-.valueInput[data-type="string"] {
+.valueInput[data-type="string"]:not(:focus) {
 	color: var(--color-props-string);
 }
 
-.valueInput[data-type="function"] {
+.valueInput[data-type="function"]:not(:focus) {
 	color: var(--color-props-function);
 }
 
-.valueInput[data-type="number"] {
+.valueInput[data-type="number"]:not(:focus) {
 	color: var(--color-props-number);
 }
 
-.valueInput[data-type="boolean"] {
+.valueInput[data-type="boolean"]:not(:focus) {
 	color: var(--color-props-boolean);
 }
 
-.valueInput[data-type="array"] {
+.valueInput[data-type="array"]:not(:focus) {
 	color: var(--color-props-array);
 }
 
-.valueInput[data-type="object"] {
+.valueInput[data-type="object"]:not(:focus) {
 	color: var(--color-props-object);
 }
 
-.valueInput[data-type="null"] {
+.valueInput[data-type="null"]:not(:focus) {
 	color: var(--color-props-null);
 }
 
-.valueInput[data-type="vnode"] {
+.valueInput[data-type="vnode"]:not(:focus) {
 	color: var(--color-props-vnode);
 }
