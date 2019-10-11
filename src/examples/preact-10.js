@@ -13,9 +13,11 @@ import { applyOperations } from "../adapter/events";
 import { fromSnapshot } from "../adapter/debug";
 import { TreeView } from "../view/components/TreeView";
 import { TodoList } from "./TodoList";
-import { treeStore, inspect } from "./treeStore";
+import { treeStore } from "./treeStore";
 import { createPropsStore } from "../view/store/props";
 import { Iframer } from "./Iframer";
+import { LegacyContext } from "./legacyContext";
+import { Stateful } from "./state";
 import { Highlighter } from "../view/components/Highlighter";
 
 function Headline(props) {
@@ -27,7 +29,8 @@ const tstore = treeStore();
 const pStore = createPropsStore(
 	tstore.inspectData,
 	tstore.selection.selected,
-	() => (tstore.inspectData.$ = inspect),
+	data => data.props,
+	d => d,
 );
 
 export function StyleGuide() {
@@ -58,6 +61,10 @@ export function StyleGuide() {
 					<h2>Todo List</h2>
 					<TodoList />
 					<h2>Styleguide</h2>
+					<h3>Legacy Context</h3>
+					<LegacyContext />
+					<h3>State</h3>
+					<Stateful />
 
 					<h3>Sidebar</h3>
 					<AppCtx.Provider value={tstore}>

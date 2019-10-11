@@ -43,6 +43,15 @@ export function createStore(): Store {
 
 	const selection = createSelectionStore(nodeList);
 
+	// Update inspect data on selection
+	selection.selected.on(id => {
+		if (id > -1) {
+			notify("inspect", id);
+		} else {
+			inspectData.$ = null;
+		}
+	});
+
 	return {
 		nodeList,
 		inspectData,

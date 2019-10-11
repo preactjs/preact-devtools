@@ -9,6 +9,10 @@ export type EmitterFn = (event: string, data: any) => void;
 export interface DevtoolEvents {
 	"update-prop": { id: ID; path: ObjPath; value: any };
 	"rename-prop": { id: ID; path: ObjPath; value: string };
+	"update-state": { id: ID; path: ObjPath; value: any };
+	"rename-state": { id: ID; path: ObjPath; value: string };
+	"update-context": { id: ID; path: ObjPath; value: any };
+	"rename-context": { id: ID; path: ObjPath; value: string };
 	"force-update": ID;
 	"start-picker": null;
 	"stop-picker": null;

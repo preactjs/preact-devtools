@@ -214,6 +214,18 @@ export function cleanProps(props: any) {
 	return out;
 }
 
+let reg = /__cC\d+/;
+export function cleanContext(context: Record<string, any>) {
+	let res: Record<string, any> = {};
+	for (let key in context) {
+		if (reg.test(key)) continue;
+		res[key] = context[key];
+	}
+
+	if (Object.keys(res).length == 0) return null;
+	return res;
+}
+
 export function isVNode(x: any): x is VNode {
 	return x != null && x.type !== undefined && x._dom !== undefined;
 }

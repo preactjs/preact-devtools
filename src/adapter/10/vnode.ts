@@ -21,7 +21,7 @@ export function isRoot(vnode: VNode) {
 /**
  * Return the component instance of a `vnode`
  */
-export function getComponent(vnode: VNode) {
+export function getComponent(vnode: VNode): Component | null {
 	return (vnode as any)._component || (vnode as any).__c || null;
 }
 

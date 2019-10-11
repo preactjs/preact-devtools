@@ -119,16 +119,19 @@ export function createAdapter(hook: DevtoolsHook, renderer: Renderer): Adapter {
 		update(id, type, path, value) {
 			const vnode = renderer.getVNodeById(id);
 			if (vnode !== null) {
-				if (type === "props") {
-					setIn((vnode.props as any) || {}, path.slice(), value);
-				}
-
-				const dom = getDom(vnode);
 				if (typeof vnode.type === "function") {
 					const c = getComponent(vnode);
-					if (c) c.forceUpdate();
-				} else if (dom) {
-					// dom.setAttribute()
+					if (c) {
+						if (type === "props") {
+							setIn((vnode.props as any) || {}, path.slice(), value);
+						} else if (type === "state") {
+							setIn((c.state as any) || {}, path.slice(), value);
+						} else if (type === "context") {
+							setIn((c.context as any) || {}, path.slice(), value);
+						}
+
+						c.forceUpdate();
+					}
 				}
 			}
 		},

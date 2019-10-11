@@ -30,52 +30,66 @@ export function parseProps(
 	data: any,
 	path: ObjPath,
 	limit: number,
+	transform: (data: PropData) => PropData,
 	out: Map<string, PropData>,
 ): Map<string, PropData> {
 	let depth = path.length > 0 ? path.length - 1 : 0;
 	const pathStr = path.join(".");
 
+	if (path.length > limit) {
+		return out;
+	}
+
 	if (Array.isArray(data)) {
 		let children: string[] = [];
-		out.set(path.join("."), {
-			depth,
-			id: pathStr,
-			type: "array",
-			collapsable: true,
-			editable: false,
-			path,
-			value: data,
-			children,
-		});
-		data.forEach((item, i) => {
-			const childPath = path.concat(i);
-			children.push(childPath.join("."));
-			parseProps(item, childPath, limit, out);
-		});
-	} else if (data instanceof Set) {
-		// TODO: We're dealing with serialized data here, not a Set object
-		out.set(pathStr, {
-			depth,
-			id: pathStr,
-			type: "set",
-			collapsable: false,
-			editable: false,
-			path,
-			value: "Set",
-			children: [],
-		});
-	} else if (typeof data === "object") {
-		if (data === null) {
-			out.set(pathStr, {
+		out.set(
+			path.join("."),
+			transform({
 				depth,
 				id: pathStr,
-				type: "null",
-				collapsable: false,
+				type: "array",
+				collapsable: true,
 				editable: false,
 				path,
 				value: data,
+				children,
+			}),
+		);
+		data.forEach((item, i) => {
+			const childPath = path.concat(i);
+			children.push(childPath.join("."));
+			parseProps(item, childPath, limit, transform, out);
+		});
+	} else if (data instanceof Set) {
+		// TODO: We're dealing with serialized data here, not a Set object
+		out.set(
+			pathStr,
+			transform({
+				depth,
+				id: pathStr,
+				type: "set",
+				collapsable: false,
+				editable: false,
+				path,
+				value: "Set",
 				children: [],
-			});
+			}),
+		);
+	} else if (typeof data === "object") {
+		if (data === null) {
+			out.set(
+				pathStr,
+				transform({
+					depth,
+					id: pathStr,
+					type: "null",
+					collapsable: false,
+					editable: false,
+					path,
+					value: data,
+					children: [],
+				}),
+			);
 		} else {
 			const maybeCustom = Object.keys(data).length === 2;
 			// Functions are encoded as objects
@@ -84,64 +98,76 @@ export function parseProps(
 				typeof data.name === "string" &&
 				data.type === "function"
 			) {
-				out.set(pathStr, {
-					depth,
-					id: pathStr,
-					type: "function",
-					collapsable: false,
-					editable: false,
-					path,
-					value: data,
-					children: [],
-				});
+				out.set(
+					pathStr,
+					transform({
+						depth,
+						id: pathStr,
+						type: "function",
+						collapsable: false,
+						editable: false,
+						path,
+						value: data,
+						children: [],
+					}),
+				);
 			} else if (
 				// Same for vnodes
 				maybeCustom &&
 				typeof data.name === "string" &&
 				data.type === "vnode"
 			) {
-				out.set(pathStr, {
-					depth,
-					id: pathStr,
-					type: "vnode",
-					collapsable: false,
-					editable: false,
-					path,
-					value: data,
-					children: [],
-				});
+				out.set(
+					pathStr,
+					transform({
+						depth,
+						id: pathStr,
+						type: "vnode",
+						collapsable: false,
+						editable: false,
+						path,
+						value: data,
+						children: [],
+					}),
+				);
 			} else if (
 				// Same for Set
 				maybeCustom &&
 				typeof data.name === "string" &&
 				data.type === "set"
 			) {
-				out.set(pathStr, {
-					depth,
-					id: pathStr,
-					type: "set",
-					collapsable: false,
-					editable: false,
-					path,
-					value: data,
-					children: [],
-				});
+				out.set(
+					pathStr,
+					transform({
+						depth,
+						id: pathStr,
+						type: "set",
+						collapsable: false,
+						editable: false,
+						path,
+						value: data,
+						children: [],
+					}),
+				);
 			} else if (
 				// Same for Map
 				maybeCustom &&
 				typeof data.name === "string" &&
 				data.type === "map"
 			) {
-				out.set(pathStr, {
-					depth,
-					id: pathStr,
-					type: "map",
-					collapsable: false,
-					editable: false,
-					path,
-					value: data,
-					children: [],
-				});
+				out.set(
+					pathStr,
+					transform({
+						depth,
+						id: pathStr,
+						type: "map",
+						collapsable: false,
+						editable: false,
+						path,
+						value: data,
+						children: [],
+					}),
+				);
 			} else {
 				const node: PropData = {
 					depth,
@@ -158,22 +184,27 @@ export function parseProps(
 				Object.keys(data).forEach(key => {
 					const nextPath = path.concat(key);
 					node.children.push(nextPath.join("."));
-					parseProps(data[key], nextPath, limit, out);
+					parseProps(data[key], nextPath, limit, transform, out);
 				});
+
+				out.set(pathStr, transform(node));
 			}
 		}
 	} else {
 		const type = typeof data;
-		out.set(pathStr, {
-			depth,
-			id: pathStr,
-			type: type as any,
-			collapsable: false,
-			editable: type !== "undefined",
-			path,
-			value: data,
-			children: [],
-		});
+		out.set(
+			pathStr,
+			transform({
+				depth,
+				id: pathStr,
+				type: type as any,
+				collapsable: false,
+				editable: type !== "undefined",
+				path,
+				value: data,
+				children: [],
+			}),
+		);
 	}
 
 	return out;

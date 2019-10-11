@@ -23,6 +23,12 @@ export async function init(options: Options, getHook: () => DevtoolsHook) {
 	bridge.listen("update-prop", ev => {
 		adapter.update(ev.id, "props", ev.path, ev.value);
 	});
+	bridge.listen("update-state", ev => {
+		adapter.update(ev.id, "state", ev.path, ev.value);
+	});
+	bridge.listen("update-context", ev => {
+		adapter.update(ev.id, "context", ev.path, ev.value);
+	});
 	bridge.listen("update-filter", ev => renderer.applyFilters(parseFilters(ev)));
 	bridge.listen("force-update", ev => renderer.forceUpdate(ev));
 	bridge.listen("select", adapter.select);

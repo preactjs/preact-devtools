@@ -1,5 +1,12 @@
 import { InspectData, DevtoolsEvent } from "../adapter";
-import { Commit, MsgTypes, jsonify, cleanProps, flush } from "../events";
+import {
+	Commit,
+	MsgTypes,
+	jsonify,
+	cleanProps,
+	flush,
+	cleanContext,
+} from "../events";
 import { Fragment, VNode } from "preact";
 import { IdMapper, createIdMapper } from "./IdMapper";
 import { getStringId } from "../string-table";
@@ -105,24 +112,25 @@ export function createRenderer(
 			const vnode = ids.getVNode(id);
 			if (!vnode) return null;
 
-			const hasState =
-				typeof vnode.type === "function" && vnode.type !== Fragment;
 			const c = getComponent(vnode);
+			const hasState =
+				typeof vnode.type === "function" &&
+				c != null &&
+				Object.keys(c.state).length > 0;
+
 			const hasHooks = c != null && getComponentHooks(c) != null;
+			const context = c != null ? cleanContext(c.context) : null;
 
 			return {
-				context: null,
+				context,
 				canEditHooks: hasHooks,
 				hooks: null,
 				id,
 				name: getDisplayName(vnode),
 				canEditProps: true,
 				props: vnode.type !== null ? jsonify(cleanProps(vnode.props)) : null,
-				canEditState: false,
-				state:
-					hasState && Object.keys(c!.state).length > 0
-						? jsonify(c!.state)
-						: null,
+				canEditState: true,
+				state: hasState ? jsonify(c!.state) : null,
 				type: 2,
 			};
 		},
