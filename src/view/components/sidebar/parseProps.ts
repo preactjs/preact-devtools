@@ -1,4 +1,4 @@
-import { ObjPath } from "./components/ElementProps";
+import { ObjPath } from "./ElementProps";
 
 export type PropDataType =
 	| "boolean"

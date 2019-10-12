@@ -2,7 +2,7 @@ import { h } from "preact";
 import s from "./Sidebar.css";
 import { useEmitter } from "../../store/react-bindings";
 import { PropsPanel } from "./PropsPanel";
-import { PropData } from "../../parseProps";
+import { PropData } from "./parseProps";
 import { Collapser } from "../../store/collapser";
 import { SidebarActions } from "./SidebarActions";
 

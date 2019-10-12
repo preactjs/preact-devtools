@@ -3,10 +3,12 @@ import { parseProps } from "./parseProps";
 
 const serialize = (v: Map<any, any>) => Array.from(v.values());
 
+const noop = (v: any) => v;
+
 describe("flatten", () => {
 	it("should flatten strings", () => {
 		const tree = new Map();
-		parseProps("foo", ["foo"], 2, tree);
+		parseProps("foo", ["foo"], 2, noop, tree);
 
 		expect(serialize(tree)).to.deep.equal([
 			{
@@ -24,7 +26,7 @@ describe("flatten", () => {
 
 	it("should flatten numbers", () => {
 		const tree = new Map();
-		parseProps(12, ["foo"], 2, tree);
+		parseProps(12, ["foo"], 2, noop, tree);
 
 		expect(serialize(tree)).to.deep.equal([
 			{
@@ -42,7 +44,7 @@ describe("flatten", () => {
 
 	it("should flatten booleans", () => {
 		const tree = new Map();
-		parseProps(false, ["foo"], 2, tree);
+		parseProps(false, ["foo"], 2, noop, tree);
 
 		expect(serialize(tree)).to.deep.equal([
 			{
@@ -60,7 +62,7 @@ describe("flatten", () => {
 
 	it("should flatten null", () => {
 		const tree = new Map();
-		parseProps(null, ["foo"], 2, tree);
+		parseProps(null, ["foo"], 2, noop, tree);
 		expect(serialize(tree)).to.deep.equal([
 			{
 				collapsable: false,
@@ -77,7 +79,7 @@ describe("flatten", () => {
 
 	it("should flatten undefined", () => {
 		const tree = new Map();
-		parseProps(undefined, ["foo"], 2, tree);
+		parseProps(undefined, ["foo"], 2, noop, tree);
 		expect(serialize(tree)).to.deep.equal([
 			{
 				collapsable: false,
@@ -98,7 +100,7 @@ describe("flatten", () => {
 			type: "function",
 			name: "fooBar",
 		};
-		parseProps(fn, ["foo"], 2, tree);
+		parseProps(fn, ["foo"], 2, noop, tree);
 		expect(serialize(tree)).to.deep.equal([
 			{
 				collapsable: false,
@@ -115,7 +117,7 @@ describe("flatten", () => {
 
 	it("should flatten arrays", () => {
 		const tree = new Map();
-		parseProps([1, 2], ["foo"], 2, tree);
+		parseProps([1, 2], ["foo"], 2, noop, tree);
 		expect(serialize(tree)).to.deep.equal([
 			{
 				collapsable: true,
@@ -152,7 +154,7 @@ describe("flatten", () => {
 
 	it("should flatten objects", () => {
 		const tree = new Map();
-		parseProps({ foo: 123, bar: "abc" }, [""], 2, tree);
+		parseProps({ foo: 123, bar: "abc" }, [""], 2, noop, tree);
 		expect(serialize(tree)).to.deep.equal([
 			{
 				collapsable: true,
@@ -192,7 +194,7 @@ describe("flatten", () => {
 
 	it("should flatten nested objects", () => {
 		const tree = new Map();
-		parseProps({ foo: { bar: "abc" } }, ["foo"], 2, tree);
+		parseProps({ foo: { bar: "abc" } }, ["foo"], 4, noop, tree);
 		expect(serialize(tree)).to.deep.equal([
 			{
 				collapsable: true,
@@ -233,19 +235,35 @@ describe("flatten", () => {
 		]);
 	});
 
-	it("should flatten set", () => {
+	it("should limit depth", () => {
 		const tree = new Map();
-		parseProps(new Set([1, 2, 3]), [], 2, tree);
+		parseProps({ foo: { bar: "abc" } }, ["foo"], 2, noop, tree);
 		expect(serialize(tree)).to.deep.equal([
 			{
-				collapsable: false,
+				collapsable: true,
 				editable: false,
 				depth: 0,
-				id: "",
-				path: [],
-				type: "set",
-				value: "Set",
-				children: [],
+				id: "foo",
+				path: ["foo"],
+				type: "object",
+				value: {
+					foo: {
+						bar: "abc",
+					},
+				},
+				children: ["foo.foo"],
+			},
+			{
+				collapsable: true,
+				editable: false,
+				depth: 1,
+				id: "foo.foo",
+				path: ["foo", "foo"],
+				type: "object",
+				value: {
+					bar: "abc",
+				},
+				children: ["foo.foo.bar"],
 			},
 		]);
 	});

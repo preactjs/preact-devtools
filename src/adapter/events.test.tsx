@@ -44,8 +44,7 @@ describe("cleanContext", () => {
 		);
 
 		expect(cleanContext(contextValue)).to.deep.equal({
-			cleaned: [],
-			data: { foo: 1 },
+			foo: 1,
 		});
 	});
 

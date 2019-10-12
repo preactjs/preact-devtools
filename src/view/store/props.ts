@@ -1,5 +1,5 @@
 import { Observable, valoo, watch } from "../valoo";
-import { PropData, parseProps } from "../parseProps";
+import { PropData, parseProps } from "../components/sidebar/parseProps";
 import { createCollapser, Collapser } from "./collapser";
 import { InspectData } from "../../adapter/adapter";
 import { flattenChildren } from "../components/tree/windowing";
@@ -36,10 +36,10 @@ export function createPropsStore(
 			});
 
 			// Reset collapsed state when a new element is selected
-			const shouldReset = lastId !== selected.$ && tree.$.size > 0;
+			const shouldReset = lastId !== v.id && tree.$.size > 0;
 			if (shouldReset) {
 				collapser.collapsed.$.clear();
-				lastId = selected.$;
+				lastId = v.id;
 			}
 
 			parseProps(

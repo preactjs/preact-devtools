@@ -1,11 +1,11 @@
 import { h } from "preact";
 import s from "./ElementProps.css";
-import { Arrow } from "./TreeView";
-import { PropDataType, PropData } from "../parseProps";
-import { AutoSizeInput } from "./AutoSizeInput";
-import { DataInput } from "./DataInput";
-import { displayCollection } from "./DataInput/parseValue";
-import { ID } from "../store/types";
+import { Arrow } from "../TreeView";
+import { PropDataType, PropData } from "./parseProps";
+import { AutoSizeInput } from "../AutoSizeInput";
+import { DataInput } from "../DataInput";
+import { displayCollection } from "../DataInput/parseValue";
+import { ID } from "../../store/types";
 import { useCallback } from "preact/hooks";
 
 export type ObjPath = Array<string | number>;

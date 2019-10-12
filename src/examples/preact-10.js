@@ -1,6 +1,6 @@
 import { h, render } from "preact";
 import { useState } from "preact/hooks";
-import { ElementProps } from "../view/components/ElementProps";
+import { ElementProps } from "../view/components/sidebar/ElementProps";
 import { Sidebar } from "../view/components/sidebar/Sidebar";
 import d from "../view/components/Devtools.css";
 import { IconBtn } from "../view/components/IconBtn";

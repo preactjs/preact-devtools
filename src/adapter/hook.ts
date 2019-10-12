@@ -1,6 +1,6 @@
 import { Renderer } from "./10/renderer";
 import { createBridge } from "./bridge";
-import { ObjPath } from "../view/components/ElementProps";
+import { ObjPath } from "../view/components/sidebar/ElementProps";
 import { RawFilterState } from "./10/filter";
 import { ID } from "../view/store/types";
 

@@ -7,6 +7,7 @@ import { createSelectionStore } from "./selection";
 import { createCollapser } from "./collapser";
 import { EmitFn } from "../../adapter/hook";
 import { ID, DevNode, Store, Listener } from "./types";
+import { InspectData } from "../../adapter/adapter";
 
 export function createStore(): Store {
 	let listeners: Array<null | Listener> = [];
@@ -39,7 +40,7 @@ export function createStore(): Store {
 		return list;
 	});
 
-	const inspectData = valoo(null);
+	const inspectData = valoo<InspectData | null>(null);
 
 	const selection = createSelectionStore(nodeList);
 

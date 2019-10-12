@@ -1,4 +1,4 @@
-import { ObjPath } from "../../view/components/ElementProps";
+import { ObjPath } from "../../view/components/sidebar/ElementProps";
 
 export function inject(codeOrSrc: string, mode: "script" | "code" = "code") {
 	const s = document.createElement("script");

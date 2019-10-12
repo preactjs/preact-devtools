@@ -1,5 +1,5 @@
 import { h } from "preact";
-import { ElementProps, ObjPath } from "../ElementProps";
+import { ElementProps, ObjPath } from "./ElementProps";
 import { useStore, useObserver } from "../../store/react-bindings";
 import { useCallback } from "preact/hooks";
 import { createPropsStore } from "../../store/props";
@@ -8,7 +8,7 @@ import { SidebarPanel } from "./SidebarPanel";
 import { ID } from "../../store/types";
 import { InspectData } from "../../../adapter/adapter";
 import { Collapser } from "../../store/collapser";
-import { PropData } from "../../parseProps";
+import { PropData } from "./parseProps";
 
 export interface Props {
 	label: string;
