@@ -3,13 +3,11 @@ import { PropData, parseProps } from "../components/sidebar/parseProps";
 import { createCollapser, Collapser } from "./collapser";
 import { InspectData } from "../../adapter/adapter";
 import { flattenChildren } from "../components/tree/windowing";
-import { ID } from "./types";
 
 const PROPS_LIMIT = 7;
 
 export function createPropsStore(
 	inspectData: Observable<InspectData | null>,
-	selected: Observable<ID>,
 	getData: (data: InspectData) => any,
 	transform: (
 		data: PropData,

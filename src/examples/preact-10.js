@@ -26,12 +26,7 @@ function Headline(props) {
 
 const tstore = treeStore();
 
-const pStore = createPropsStore(
-	tstore.inspectData,
-	tstore.selection.selected,
-	data => data.props,
-	d => d,
-);
+const pStore = createPropsStore(tstore.inspectData, data => data.props, d => d);
 
 export function StyleGuide() {
 	const [dark, setDark] = useState(localStorage.getItem("theme") === "dark");

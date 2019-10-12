@@ -28,12 +28,7 @@ export function PropsPanel(props: Props) {
 	const store = useStore();
 	const s = useInstance(() => {
 		// TODO: Unmount logic
-		return createPropsStore(
-			store.inspectData,
-			store.selection.selected,
-			props.getData,
-			props.transform,
-		);
+		return createPropsStore(store.inspectData, props.getData, props.transform);
 	});
 	const inspect = useObserver(() => store.inspectData.$);
 	const collapsed = useObserver(() => s.collapser.collapsed.$);

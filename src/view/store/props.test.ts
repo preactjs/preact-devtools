@@ -5,11 +5,10 @@ import { createPropsStore } from "./props";
 import { InspectData } from "../../adapter/adapter";
 
 const createStore = () => {
-	const selected = valoo(-1);
 	const inspectData = valoo<InspectData | null>(null);
 	const spy = sinon.spy();
-	const store = createPropsStore(inspectData, selected, () => inspectData, spy);
-	return { selected, spy, store, inspectData };
+	const store = createPropsStore(inspectData, () => inspectData, spy);
+	return { spy, store, inspectData };
 };
 
 describe("Props Store", () => {
