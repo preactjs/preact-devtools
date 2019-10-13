@@ -14,6 +14,7 @@ import {
 	AddCircle,
 	CheckboxChecked,
 	CheckboxUnChecked,
+	FilterList,
 } from "./icons";
 import { useStore, useObserver } from "../store/react-bindings";
 import s from "./TreeBar.css";
@@ -100,7 +101,7 @@ export function TreeBar() {
 						active={filterVisible}
 						onClick={() => setFilterVisible(!filterVisible)}
 					>
-						<Eye />
+						<FilterList />
 					</IconBtn>
 					{filterVisible && <FilterPopup />}
 				</OutsideClick>
