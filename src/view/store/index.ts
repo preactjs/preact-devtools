@@ -8,6 +8,7 @@ import { createCollapser } from "./collapser";
 import { EmitFn } from "../../adapter/hook";
 import { ID, DevNode, Store, Listener } from "./types";
 import { InspectData } from "../../adapter/adapter";
+import { debounce } from "../../shells/shared/utils";
 
 export function createStore(): Store {
 	let listeners: Array<null | Listener> = [];
@@ -66,7 +67,7 @@ export function createStore(): Store {
 		filter: filterState,
 		selection,
 		actions: {
-			highlightNode: id => notify("highlight", id),
+			highlightNode: debounce(id => notify("highlight", id), 100),
 			clear() {
 				nodes.$ = new Map();
 				roots.$ = [];
