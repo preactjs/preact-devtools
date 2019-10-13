@@ -27,7 +27,6 @@ export interface Props {
 export function PropsPanel(props: Props) {
 	const store = useStore();
 	const s = useInstance(() => {
-		// TODO: Unmount logic
 		return createPropsStore(store.inspectData, props.getData, props.transform);
 	});
 	const inspect = useObserver(() => store.inspectData.$);

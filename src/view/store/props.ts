@@ -20,7 +20,7 @@ export function createPropsStore(
 	let lastId = -1;
 
 	// Whenever the inspection data changes, we'll update the tree
-	inspectData.on(v => {
+	const dispose = inspectData.on(v => {
 		if (v != null) {
 			tree.$.set("root", {
 				collapsable: false,
@@ -66,5 +66,5 @@ export function createPropsStore(
 		return ids.slice(1);
 	});
 
-	return { list, collapser, tree };
+	return { list, collapser, tree, destroy: () => dispose() };
 }

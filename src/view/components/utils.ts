@@ -1,4 +1,4 @@
-import { useRef } from "preact/hooks";
+import { useRef, useEffect } from "preact/hooks";
 
 const OFFSET = 16;
 
@@ -41,7 +41,18 @@ export function getRootDomNode(el: HTMLElement): HTMLElement {
 	return item;
 }
 
-export function useInstance<T>(fn: () => T) {
+export function useInstance<T extends { destroy?: () => void }>(fn: () => T) {
 	const ref = useRef<T>(null as any);
-	return ref.current || (ref.current = fn());
+	const value = ref.current || (ref.current = fn());
+
+	useEffect(
+		() => () => {
+			if (ref.current && ref.current.destroy) {
+				ref.current.destroy();
+			}
+		},
+		[],
+	);
+
+	return value;
 }
