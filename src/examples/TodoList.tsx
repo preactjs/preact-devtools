@@ -1,8 +1,32 @@
 import { h } from "preact";
 import { useState } from "preact/hooks";
 
+function shuffle<T = any>(arr: T[]): T[] {
+	let i = arr.length;
+
+	// While there remain elements to shuffle...
+	while (0 !== i) {
+		// Pick a remaining element...
+		let rand = Math.floor(Math.random() * i);
+		i -= 1;
+
+		// And swap it with the current element.
+		let tmp = arr[i];
+		arr[i] = arr[rand];
+		arr[rand] = tmp;
+	}
+
+	return arr;
+}
+
 export function TodoList() {
-	const [todos, setTodos] = useState<string[]>(["asd", "asdf"]);
+	const [todos, setTodos] = useState<string[]>([
+		"asd",
+		"asdf",
+		"foo",
+		"bob",
+		"rr",
+	]);
 	const [v, setV] = useState("");
 
 	return (
@@ -21,6 +45,7 @@ export function TodoList() {
 					value={v}
 				/>
 			</form>
+			<button onClick={() => setTodos([...shuffle(todos)])}>Randomize</button>
 			<p>Tasks</p>
 			<ul>
 				{todos.map(x => {
