@@ -36,6 +36,14 @@
 	background: none;
 	color: var(--color-text);
 	margin-left: 0.25rem !important;
+	position: relative;
+	padding: 0.25rem 0;
+	border-bottom: 0.0625rem solid transparent;
+}
+
+.search:focus {
+	outline: none;
+	border-bottom: 0.0625rem solid var(--color-selected-bg);
 }
 
 .searchCounter {

@@ -17,10 +17,12 @@
 }
 
 .root[data-active],
+.root:focus,
 .root:active {
 	color: var(--color-selected-text);
 }
 
+.root:focus::after,
 .root:active::after,
 .root[data-active]::after {
 	content: "";
