@@ -9,6 +9,7 @@ export function parseValue(v: string) {
 			return v === "true";
 		case "null":
 			return null;
+		case "":
 		case "undefined":
 			return undefined;
 		case "NaN":
@@ -43,8 +44,9 @@ export function valueToHuman(v: any): string {
 			return v[0] !== '"' || v[v.length - 1] !== '"' ? `"${v}"` : v;
 		case "number":
 		case "boolean":
-		case "undefined":
 			return "" + v;
+		case "undefined":
+			return "";
 	}
 
 	if (v === null) return "" + v;
@@ -68,5 +70,5 @@ export function displayCollection(v: any): string {
 		return "Object";
 	}
 	if (typeof v === "string") return `"${v}"`;
-	return "" + v;
+	return "" + (v === undefined ? "" : v);
 }
