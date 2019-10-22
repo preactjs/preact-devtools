@@ -1,7 +1,7 @@
 import { expect } from "chai";
 import { serializeProps } from "./serializeProps";
 
-describe.only("serializeProps", () => {
+describe("serializeProps", () => {
 	it("should serialize primitives", () => {
 		expect(serializeProps("foo")).to.equal("foo");
 		expect(serializeProps("")).to.equal("");
