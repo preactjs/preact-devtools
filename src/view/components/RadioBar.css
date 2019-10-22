@@ -25,6 +25,10 @@
 	border: 0.0625rem solid var(--color-radio);
 }
 
+.label:hover {
+	cursor: pointer;
+}
+
 .root label + label .label {
 	border-left: none;
 }
