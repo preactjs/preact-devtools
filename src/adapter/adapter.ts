@@ -3,7 +3,7 @@ import { DevtoolsHook } from "./hook";
 import { Renderer } from "./10/renderer";
 import { Highlighter } from "../view/components/Highlighter";
 import { measureNode, getNearestElement } from "./dom";
-import { setIn } from "../shells/shared/utils";
+import { setIn, copyToClipboard } from "../shells/shared/utils";
 import { getComponent, getDom, getDisplayName } from "./10/vnode";
 import { createPicker } from "./picker";
 import { ID } from "../view/store/types";
@@ -23,6 +23,7 @@ export interface Adapter {
 	startPickElement(): void;
 	stopPickElement(): void;
 	log(id: ID): void;
+	copy(value: string): void;
 	update(id: ID, type: UpdateType, path: Path, value: any): void;
 	select(id: ID): void;
 }
@@ -137,5 +138,13 @@ export function createAdapter(hook: DevtoolsHook, renderer: Renderer): Adapter {
 		},
 		startPickElement: picker.start,
 		stopPickElement: picker.stop,
+		copy(value) {
+			try {
+				const data = JSON.stringify(value, null, 2);
+				copyToClipboard(data);
+			} catch (err) {
+				console.log(err);
+			}
+		},
 	};
 }

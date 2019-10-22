@@ -9,12 +9,16 @@ import { ID } from "../../store/types";
 import { InspectData } from "../../../adapter/adapter";
 import { Collapser } from "../../store/collapser";
 import { PropData } from "./parseProps";
+import { NewProp } from "./NewProp";
+
+const noop = () => null;
 
 export interface Props {
 	label: string;
 	isOptional?: boolean;
 	checkEditable: (data: InspectData) => boolean;
 	getData(data: InspectData): any;
+	canAddNew?: boolean;
 	transform: (
 		data: PropData,
 		collapser: Collapser<string>,
@@ -22,6 +26,7 @@ export interface Props {
 	) => PropData;
 	onRename: (id: ID, path: ObjPath, value: any) => void;
 	onChange: (id: ID, path: ObjPath, value: any) => void;
+	onCopy?: (data: any) => void;
 }
 
 export function PropsPanel(props: Props) {
@@ -42,19 +47,29 @@ export function PropsPanel(props: Props) {
 
 	const onRename = useCallback(
 		(value: any, path: ObjPath) => {
-			props.onRename(inspect!.id, path, value);
+			if (inspect != null) {
+				props.onRename(inspect.id, path, value);
+			}
 		},
 		[inspect],
 	);
 
+	const onCopy = props.onCopy
+		? useCallback(() => {
+				if (inspect != null && props.onCopy != null) {
+					props.onCopy(props.getData(inspect));
+				}
+		  }, [inspect, props.onCopy])
+		: undefined;
+
 	if (inspect == null || props.getData(inspect) == null) {
 		return !props.isOptional ? (
-			<SidebarPanel title={props.label} empty="None" />
+			<SidebarPanel title={props.label} empty="None" onCopy={noop} />
 		) : null;
 	}
 
 	return (
-		<SidebarPanel title={props.label} empty="None">
+		<SidebarPanel title={props.label} empty="None" onCopy={onCopy}>
 			<ElementProps
 				nodeId={inspect.id}
 				editable={props.checkEditable(inspect)}
@@ -64,6 +79,7 @@ export function PropsPanel(props: Props) {
 				onRename={onRename}
 				onCollapse={s.collapser.toggle}
 			/>
+			{props.canAddNew && <NewProp />}
 		</SidebarPanel>
 	);
 }

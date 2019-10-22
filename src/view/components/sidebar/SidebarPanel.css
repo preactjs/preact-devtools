@@ -9,6 +9,11 @@
 	padding-left: 0.8rem;
 }
 
+.panelHeader {
+	display: flex;
+	justify-content: space-between;
+}
+
 .title {
 	font-size: 0.8rem;
 	line-height: 1.4;

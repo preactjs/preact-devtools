@@ -39,3 +39,15 @@ export function debounce<T extends any[]>(
 		timeout = setTimeout(next, wait);
 	};
 }
+
+export function copyToClipboard(text: string) {
+	const dom = document.createElement("textarea");
+	dom.textContent = text;
+	document.body.appendChild(dom);
+
+	dom.select();
+	document.execCommand("copy");
+	dom.blur();
+
+	document.body.removeChild(dom);
+}

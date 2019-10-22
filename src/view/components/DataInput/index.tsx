@@ -8,6 +8,7 @@ import {
 	isStringifiedVNode,
 	displayCollection,
 } from "./parseValue";
+import { focusNext } from "../../../adapter/dom";
 
 export interface InputProps {
 	value: any;
@@ -60,20 +61,25 @@ export function DataInput({ value, onChange }: InputProps) {
 	const onKeyDown = useCallback(
 		(e: KeyboardEvent) => {
 			try {
-				if (typeof parseValue(v) === "number") {
-					let next;
-					switch (e.key) {
-						case "ArrowUp":
-							next = "" + (+v + 1);
-							break;
-						case "ArrowDown":
-							next = "" + (+v - 1);
-							break;
-					}
+				if (e.key === "Enter" && !e.shiftKey) {
+					focusNext(e.target as any);
+					e.preventDefault();
+				} else {
+					if (typeof parseValue(v) === "number") {
+						let next;
+						switch (e.key) {
+							case "ArrowUp":
+								next = "" + (+v + 1);
+								break;
+							case "ArrowDown":
+								next = "" + (+v - 1);
+								break;
+						}
 
-					if (next !== undefined) {
-						set(next);
-						onCommit(next);
+						if (next !== undefined) {
+							set(next);
+							onCommit(next);
+						}
 					}
 				}
 			} catch (e) {}

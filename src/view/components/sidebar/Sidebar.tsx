@@ -5,6 +5,8 @@ import { PropsPanel } from "./PropsPanel";
 import { PropData } from "./parseProps";
 import { Collapser } from "../../store/collapser";
 import { SidebarActions } from "./SidebarActions";
+import { serializeProps } from "./serializeProps";
+import { useCallback } from "preact/hooks";
 
 const collapseFn = (
 	data: PropData,
@@ -23,6 +25,8 @@ const collapseFn = (
 export function Sidebar() {
 	const emit = useEmitter();
 
+	const onCopy = useCallback((v: any) => emit("copy", serializeProps(v)), []);
+
 	return (
 		<aside class={s.root}>
 			<SidebarActions />
@@ -38,6 +42,8 @@ export function Sidebar() {
 					onChange={(id, path, value) =>
 						emit("update-prop", { id, path, value })
 					}
+					onCopy={onCopy}
+					canAddNew
 				/>
 				<PropsPanel
 					label="State"
@@ -51,6 +57,7 @@ export function Sidebar() {
 					onChange={(id, path, value) =>
 						emit("update-state", { id, path, value })
 					}
+					onCopy={onCopy}
 				/>
 				<PropsPanel
 					label="Context"
@@ -64,6 +71,7 @@ export function Sidebar() {
 					onChange={(id, path, value) =>
 						emit("update-context", { id, path, value })
 					}
+					onCopy={onCopy}
 				/>
 				{/* {inspect != null && inspect.hooks && (
 					<SidebarPanel title="hooks" empty="None"></SidebarPanel>
