@@ -12,10 +12,11 @@ import { focusNext } from "../../../adapter/dom";
 
 export interface InputProps {
 	value: any;
+	class?: string;
 	onChange: (value: any) => void;
 }
 
-export function DataInput({ value, onChange }: InputProps) {
+export function DataInput({ value, onChange, ...props }: InputProps) {
 	const hasCheck = typeof value === "boolean";
 
 	const initial = valueToHuman(value);
@@ -105,7 +106,7 @@ export function DataInput({ value, onChange }: InputProps) {
 				<input
 					type="text"
 					ref={ref}
-					class={`${s.valueInput} ${focus ? s.focus : ""}`}
+					class={`${s.valueInput} ${props.class || ""} ${focus ? s.focus : ""}`}
 					value={inputVal}
 					onFocus={() => setFocus(true)}
 					onBlur={() => setFocus(false)}

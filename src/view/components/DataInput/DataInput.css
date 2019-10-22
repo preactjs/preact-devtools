@@ -1,7 +1,7 @@
 .valueWrapper {
 	display: flex;
 	justify-content: flex-end;
-	min-width: 100%;
+	max-width: 100%;
 }
 
 .check {
