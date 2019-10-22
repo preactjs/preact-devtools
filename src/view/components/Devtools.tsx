@@ -6,12 +6,14 @@ import { TreeBar } from "./TreeBar";
 import { AppCtx, EmitCtx } from "../store/react-bindings";
 import { ModalRenderer } from "./Modals";
 import { Store } from "../store/types";
+import { ThemeSwitcher } from "./ThemeSwitcher";
 
 export function DevTools(props: { store: Store }) {
 	return (
 		<EmitCtx.Provider value={props.store.emit}>
 			<AppCtx.Provider value={props.store}>
 				<div class={s.root}>
+					<ThemeSwitcher />
 					<div class={s.components}>
 						<TreeBar />
 						<TreeView />

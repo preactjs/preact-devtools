@@ -35,6 +35,8 @@ export interface DevNode {
 	depth: number;
 }
 
+export type Theme = "auto" | "light" | "dark";
+
 export interface Store {
 	isPicking: Observable<boolean>;
 	inspectData: Observable<InspectData | null>;
@@ -42,6 +44,7 @@ export interface Store {
 	rootToChild: Observable<Map<number, number>>;
 	nodes: Observable<Map<ID, DevNode>>;
 	nodeList: Observable<ID[]>;
+	theme: Observable<Theme>;
 	search: ReturnType<typeof createSearchStore>;
 	modal: ReturnType<typeof createModalState>;
 	filter: ReturnType<typeof createFilterStore>;

@@ -6,7 +6,7 @@ import { flattenChildren } from "../components/tree/windowing";
 import { createSelectionStore } from "./selection";
 import { createCollapser } from "./collapser";
 import { EmitFn } from "../../adapter/hook";
-import { ID, DevNode, Store, Listener } from "./types";
+import { ID, DevNode, Store, Listener, Theme } from "./types";
 import { InspectData } from "../../adapter/adapter";
 import { debounce } from "../../shells/shared/utils";
 
@@ -66,6 +66,7 @@ export function createStore(): Store {
 		modal: createModalState(),
 		filter: filterState,
 		selection,
+		theme: valoo<Theme>("auto"),
 		actions: {
 			highlightNode: debounce(id => notify("highlight", id), 100),
 			clear() {

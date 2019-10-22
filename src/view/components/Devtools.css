@@ -41,6 +41,7 @@
 	--color-key-label-selected: #dadada;
 	--color-key-value: #ff5722;
 	--color-key-value-selected: orange;
+	--color-radio: #7245c7;
 
 	/* Props */
 	--color-props-input-bg: #f0f0f0;
@@ -82,6 +83,7 @@
 	--color-key-label-selected: #dedede;
 	--color-key-value: #ff5722;
 	--color-key-value-selected: yellow;
+	--color-radio: #d2adff;
 
 	/* Props */
 	--color-props-input-bg: #444;

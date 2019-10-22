@@ -1,5 +1,5 @@
 import { h, render } from "preact";
-import { useState } from "preact/hooks";
+import { useState, useEffect } from "preact/hooks";
 import { ElementProps } from "../view/components/sidebar/ElementProps";
 import { Sidebar } from "../view/components/sidebar/Sidebar";
 import d from "../view/components/Devtools.css";
@@ -12,6 +12,7 @@ import { AppCtx, useObserver } from "../view/store/react-bindings";
 import { applyOperations } from "../adapter/events";
 import { fromSnapshot } from "../adapter/debug";
 import { TreeView } from "../view/components/TreeView";
+import { RadioBar } from "../view/components/RadioBar";
 import { TodoList } from "./TodoList";
 import { treeStore } from "./treeStore";
 import { createPropsStore } from "../view/store/props";
@@ -29,7 +30,6 @@ const tstore = treeStore();
 const pStore = createPropsStore(tstore.inspectData, data => data.props, d => d);
 
 export function StyleGuide() {
-	const [dark, setDark] = useState(localStorage.getItem("theme") === "dark");
 	const [showModal, setShowModal] = useState(
 		!!localStorage.getItem("show-modal"),
 	);
@@ -41,21 +41,34 @@ export function StyleGuide() {
 
 	const [store] = useState(createStore());
 
+	useEffect(() => {
+		store.theme.$ = localStorage.getItem("theme");
+	}, []);
+
+	const theme = useObserver(() => store.theme.$);
+
 	return (
-		<div class={dark ? "dark" : "light"}>
+		<div class={theme === "auto" ? "dark" : theme}>
 			<div style="padding: 5rem" class={d.root}>
 				<div style="display: flex; flex-direction: column;">
-					<button
-						onClick={() => {
-							localStorage.setItem("theme", !dark ? "dark" : "light");
-							setDark(!dark);
-						}}
-					>
-						Toggle Theme
-					</button>
 					<h2>Todo List</h2>
 					<TodoList />
 					<h2>Styleguide</h2>
+
+					<h3>RadioBar</h3>
+					<RadioBar
+						name="foo"
+						value={theme}
+						onChange={v => {
+							store.theme.$ = v;
+							localStorage.setItem("theme", v);
+						}}
+						items={[
+							{ label: "Auto", value: "auto" },
+							{ label: "Light", value: "light" },
+							{ label: "Dark", value: "dark" },
+						]}
+					/>
 					<h3>Legacy Context</h3>
 					<LegacyContext />
 					<h3>State</h3>

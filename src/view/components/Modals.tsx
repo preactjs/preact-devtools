@@ -4,6 +4,9 @@ import { useStore, useObserver } from "../store/react-bindings";
 import { IconBtn } from "./IconBtn";
 import { Close } from "./icons";
 import { valoo } from "../valoo";
+import { RadioBar } from "./RadioBar";
+import { Theme } from "../store/types";
+import { useCallback } from "preact/hooks";
 
 export function createModalState() {
 	const active = valoo<string>("");
@@ -38,27 +41,25 @@ export interface SettingsModalProps {
 
 export function SettingsModal(props: SettingsModalProps) {
 	const store = useStore();
-	const filters = useObserver(() => store.filter.filters.$);
+	const theme = useObserver(() => store.theme.$);
+
+	const setTheme = useCallback((v: Theme) => (store.theme.$ = v), []);
 
 	return (
 		<div>
-			<Modal
-				onClose={() => {
-					// store.filter.submit();
-					props.onClose();
-				}}
-			>
+			<Modal onClose={props.onClose}>
 				<form>
-					<p>Hide components where...</p>
-					{filters.length === 0 && (
-						<p class={s.empty}>No filters have been added.</p>
-					)}
-					<table>
-						<tbody></tbody>
-					</table>
-					<button class={s.addFilter} type="button" onClick={store.filter.add}>
-						Add filter
-					</button>
+					<p>Theme:</p>
+					<RadioBar
+						name="theme"
+						value={theme}
+						onChange={setTheme}
+						items={[
+							{ label: "Auto", value: "auto" },
+							{ label: "Light", value: "light" },
+							{ label: "Dark", value: "dark" },
+						]}
+					/>
 				</form>
 			</Modal>
 		</div>
