@@ -36,6 +36,7 @@ export function PropsPanel(props: Props) {
 	const inspect = useObserver(() => store.inspectData.$);
 	const collapsed = useObserver(() => s.collapser.collapsed.$);
 	const items = useObserver(() => s.list.$);
+	const initial = useObserver(() => s.initialTree.$);
 
 	const onChange = useCallback(
 		(value: any, path: ObjPath) => {
@@ -66,6 +67,7 @@ export function PropsPanel(props: Props) {
 				collapsed={collapsed}
 				items={items.map(x => s.tree.$.get(x)!)}
 				onChange={onChange}
+				initial={initial}
 				onCollapse={s.collapser.toggle}
 			/>
 			{props.canAddNew && <NewProp />}

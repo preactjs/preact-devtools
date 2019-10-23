@@ -6,6 +6,8 @@ import { DataInput } from "../DataInput";
 import { displayCollection } from "../DataInput/parseValue";
 import { ID } from "../../store/types";
 import { useCallback } from "preact/hooks";
+import { useObserver, useStore } from "../../store/react-bindings";
+import { Observable } from "../../valoo";
 
 export type ObjPath = Array<string | number>;
 export type ChangeFn = (value: any, path: ObjPath) => void;
@@ -17,6 +19,7 @@ export interface Props {
 	onCollapse?: (path: string) => void;
 	collapsed: Set<string>;
 	items: PropData[];
+	initial: Map<string, Observable<any>>;
 }
 
 export function ElementProps(props: Props) {
@@ -45,6 +48,7 @@ export function ElementProps(props: Props) {
 							path={item.path}
 							onChange={onChange}
 							depth={item.depth}
+							initial={props.initial.get(id)!}
 						/>
 					);
 				})}
@@ -65,6 +69,7 @@ export interface SingleProps {
 	onChange?: ChangeFn;
 	onCollapse?: (path: ObjPath) => void;
 	depth: number;
+	initial: Observable<any>;
 }
 
 export function SingleItem(props: SingleProps) {
@@ -78,6 +83,7 @@ export function SingleItem(props: SingleProps) {
 		collapsed = false,
 		depth,
 		onCollapse,
+		initial,
 	} = props;
 
 	const v = props.value;
@@ -92,6 +98,8 @@ export function SingleItem(props: SingleProps) {
 		onCollapse,
 		path,
 	]);
+
+	const init = useObserver(() => initial.$);
 
 	return (
 		<div
@@ -118,7 +126,7 @@ export function SingleItem(props: SingleProps) {
 			</div>
 			<div class={s.property}>
 				{editable ? (
-					<DataInput value={v} onChange={update} />
+					<DataInput value={v} onChange={update} initialValue={init} />
 				) : (
 					<div class={s.mask}>{displayCollection(v)}</div>
 				)}

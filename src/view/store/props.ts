@@ -17,6 +17,7 @@ export function createPropsStore(
 ) {
 	const collapser = createCollapser<string>();
 	const tree = valoo(new Map<string, PropData>());
+	const initialTree = valoo(new Map<string, Observable<any>>());
 	let lastId = -1;
 
 	// Whenever the inspection data changes, we'll update the tree
@@ -48,6 +49,9 @@ export function createPropsStore(
 					if (data.id !== "root") {
 						transform(data, collapser, shouldReset);
 					}
+					if (!initialTree.$.has(data.id)) {
+						initialTree.$.set(data.id, valoo(data.value));
+					}
 					return data;
 				},
 				tree.$,
@@ -66,5 +70,5 @@ export function createPropsStore(
 		return ids.slice(1);
 	});
 
-	return { list, collapser, tree, destroy: () => dispose() };
+	return { initialTree, list, collapser, tree, destroy: () => dispose() };
 }

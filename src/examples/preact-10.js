@@ -37,6 +37,7 @@ export function StyleGuide() {
 	const propList = useObserver(() =>
 		pStore.list.$.map(x => pStore.tree.$.get(x)),
 	);
+	const pInitial = useObserver(() => pStore.initialTree.$);
 	const pCollapsed = useObserver(() => pStore.collapser.collapsed.$);
 
 	const [store] = useState(createStore());
@@ -85,6 +86,7 @@ export function StyleGuide() {
 						items={propList}
 						collapsed={pCollapsed}
 						onCollapse={pStore.collapser.toggle}
+						initial={pInitial}
 					/>
 					<p>editable</p>
 					<div style="width: 20rem; outline: 1px solid red">
@@ -93,6 +95,7 @@ export function StyleGuide() {
 							items={propList}
 							collapsed={pCollapsed}
 							onCollapse={pStore.collapser.toggle}
+							initial={pInitial}
 						/>
 					</div>
 					<h2>Icon Btns</h2>

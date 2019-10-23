@@ -10,9 +10,18 @@ export function NewProp() {
 	return (
 		<div class={s.root}>
 			<div class={s2.name}>
-				<input type="text" class={`${s2.nameInput} ${s.name}`} />
+				<input
+					type="text"
+					placeholder="new prop"
+					class={`${s2.nameInput} ${s.name}`}
+				/>
 			</div>
-			<DataInput class={s.value} value={value} onChange={v => console.log(v)} />
+			<DataInput
+				class={s.value}
+				value={value}
+				onChange={v => console.log(v)}
+				initialValue={undefined}
+			/>
 		</div>
 	);
 }

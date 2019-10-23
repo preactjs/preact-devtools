@@ -40,17 +40,12 @@
 	outline: none;
 }
 
-.innerWrapper:focus-within .undoBtn {
-	display: block;
-}
-
 .innerWrapper:focus-within .valueInput:invalid {
 	border-bottom: 0.125rem solid var(--color-input-invalid);
 	outline: none;
 }
 
 .undoBtn {
-	display: none;
 	background: none;
 	border: none;
 	background: none;

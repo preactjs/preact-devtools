@@ -1,35 +1,34 @@
 import { h } from "preact";
 import s from "./DataInput.css";
-import { useCallback, useRef, useState, useEffect } from "preact/hooks";
+import { useCallback, useRef, useState } from "preact/hooks";
 import { Undo } from "../icons";
 import {
 	parseValue,
-	valueToHuman,
 	isStringifiedVNode,
 	displayCollection,
+	valueToHuman,
 } from "./parseValue";
 import { focusNext } from "../../../adapter/dom";
 
 export interface InputProps {
 	value: any;
+	initialValue: any;
 	class?: string;
 	onChange: (value: any) => void;
 }
 
-export function DataInput({ value, onChange, ...props }: InputProps) {
+export function DataInput({
+	value,
+	onChange,
+	initialValue,
+	...props
+}: InputProps) {
 	const hasCheck = typeof value === "boolean";
-
-	const initial = valueToHuman(value);
-
+	const initial = valueToHuman(initialValue);
 	const [focus, setFocus] = useState(false);
 	const [v, set] = useState(initial);
 	const [valid, setValid] = useState(true);
 	const ref = useRef<HTMLInputElement>();
-
-	// TODO: Seems wrong
-	useEffect(() => {
-		set(initial);
-	}, [value]);
 
 	if (ref.current) {
 		ref.current.setCustomValidity(valid ? "" : "Invalid input");
