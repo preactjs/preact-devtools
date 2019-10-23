@@ -2,7 +2,6 @@ import { h } from "preact";
 import s from "./ElementProps.css";
 import { Arrow } from "../TreeView";
 import { PropDataType, PropData } from "./parseProps";
-import { AutoSizeInput } from "../AutoSizeInput";
 import { DataInput } from "../DataInput";
 import { displayCollection } from "../DataInput/parseValue";
 import { ID } from "../../store/types";
@@ -15,14 +14,13 @@ export interface Props {
 	nodeId: ID;
 	editable?: boolean;
 	onChange?: ChangeFn;
-	onRename?: ChangeFn;
 	onCollapse?: (path: string) => void;
 	collapsed: Set<string>;
 	items: PropData[];
 }
 
 export function ElementProps(props: Props) {
-	const { editable, onChange, onRename, collapsed, items, onCollapse } = props;
+	const { editable, onChange, collapsed, items, onCollapse } = props;
 
 	return (
 		<div class={s.root}>
@@ -46,7 +44,6 @@ export function ElementProps(props: Props) {
 							value={item.value}
 							path={item.path}
 							onChange={onChange}
-							onRename={onRename}
 							depth={item.depth}
 						/>
 					);
@@ -66,7 +63,6 @@ export interface SingleProps {
 	name: string;
 	value: any;
 	onChange?: ChangeFn;
-	onRename?: ChangeFn;
 	onCollapse?: (path: ObjPath) => void;
 	depth: number;
 }
@@ -81,7 +77,6 @@ export function SingleItem(props: SingleProps) {
 		collapseable = false,
 		collapsed = false,
 		depth,
-		onRename,
 		onCollapse,
 	} = props;
 
@@ -92,14 +87,7 @@ export function SingleItem(props: SingleProps) {
 		},
 		[onChange, path],
 	);
-	const rename = useCallback(
-		(v: string) => {
-			if (onRename && path[path.length - 1] !== v) {
-				onRename(v, path);
-			}
-		},
-		[onRename, path],
-	);
+
 	const onCollapseClick = useCallback(() => onCollapse && onCollapse(path), [
 		onCollapse,
 		path,
@@ -126,11 +114,7 @@ export function SingleItem(props: SingleProps) {
 				class={`${s.name} ${!collapseable ? s.noCollapse : ""}`}
 				data-type={type}
 			>
-				{editable ? (
-					<AutoSizeInput class={s.nameInput} value={name} onChange={rename} />
-				) : (
-					<span class={s.nameStatic}>{name}</span>
-				)}
+				<span class={s.nameStatic}>{name}</span>
 			</div>
 			<div class={s.property}>
 				{editable ? (

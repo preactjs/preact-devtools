@@ -36,9 +36,6 @@ export function Sidebar() {
 					getData={d => d.props}
 					checkEditable={data => data.canEditProps}
 					transform={collapseFn}
-					onRename={(id, path, value) =>
-						emit("rename-prop", { id, path, value })
-					}
 					onChange={(id, path, value) =>
 						emit("update-prop", { id, path, value })
 					}
@@ -51,9 +48,6 @@ export function Sidebar() {
 					getData={d => d.state}
 					checkEditable={data => data.canEditState}
 					transform={collapseFn}
-					onRename={(id, path, value) =>
-						emit("rename-state", { id, path, value })
-					}
 					onChange={(id, path, value) =>
 						emit("update-state", { id, path, value })
 					}
@@ -65,9 +59,6 @@ export function Sidebar() {
 					getData={d => d.context}
 					checkEditable={() => true}
 					transform={collapseFn}
-					onRename={(id, path, value) =>
-						emit("rename-context", { id, path, value })
-					}
 					onChange={(id, path, value) =>
 						emit("update-context", { id, path, value })
 					}

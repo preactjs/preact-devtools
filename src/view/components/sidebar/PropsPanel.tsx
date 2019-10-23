@@ -24,7 +24,6 @@ export interface Props {
 		collapser: Collapser<string>,
 		shouldReset: boolean,
 	) => PropData;
-	onRename: (id: ID, path: ObjPath, value: any) => void;
 	onChange: (id: ID, path: ObjPath, value: any) => void;
 	onCopy?: (data: any) => void;
 }
@@ -41,15 +40,6 @@ export function PropsPanel(props: Props) {
 	const onChange = useCallback(
 		(value: any, path: ObjPath) => {
 			props.onChange(inspect!.id, path.slice(1), value);
-		},
-		[inspect],
-	);
-
-	const onRename = useCallback(
-		(value: any, path: ObjPath) => {
-			if (inspect != null) {
-				props.onRename(inspect.id, path, value);
-			}
 		},
 		[inspect],
 	);
@@ -76,7 +66,6 @@ export function PropsPanel(props: Props) {
 				collapsed={collapsed}
 				items={items.map(x => s.tree.$.get(x)!)}
 				onChange={onChange}
-				onRename={onRename}
 				onCollapse={s.collapser.toggle}
 			/>
 			{props.canAddNew && <NewProp />}
