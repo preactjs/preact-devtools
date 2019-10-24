@@ -70,7 +70,10 @@ export function createAdapter(hook: DevtoolsHook, renderer: Renderer): Adapter {
 		select(id) {
 			// Unused
 		},
-		highlight: highlight.highlight,
+		highlight: id => {
+			if (id == null) highlight.destroy();
+			else highlight.highlight(id);
+		},
 		update(id, type, path, value) {
 			const vnode = renderer.getVNodeById(id);
 			if (vnode !== null) {

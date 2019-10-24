@@ -5,6 +5,10 @@ import { getNearestElement, measureNode } from "../dom";
 import { ID } from "../../view/store/types";
 import { Highlighter } from "../../view/components/Highlighter";
 
+/**
+ * This module is responsible for displaying the transparent element overlay
+ * inside the user's web page.
+ */
 export function createHightlighter(renderer: Renderer) {
 	/**
 	 * Reference to the DOM element that we'll render the selection highlighter
@@ -21,35 +25,30 @@ export function createHightlighter(renderer: Renderer) {
 		highlightRef = null;
 	}
 
-	function highlight(id: ID | null) {
-		if (id !== null) {
-			const vnode = renderer.getVNodeById(id);
-			if (!vnode) return destroyHighlight();
-			const dom = renderer.findDomForVNode(id);
+	function highlight(id: ID) {
+		const vnode = renderer.getVNodeById(id);
+		if (!vnode) return destroyHighlight();
+		const dom = renderer.findDomForVNode(id);
 
-			if (dom != null) {
-				if (highlightRef == null) {
-					highlightRef = document.createElement("div");
-					highlightRef.id = "preact-devtools-highlighter";
+		if (dom != null) {
+			if (highlightRef == null) {
+				highlightRef = document.createElement("div");
+				highlightRef.id = "preact-devtools-highlighter";
 
-					document.body.appendChild(highlightRef);
-				}
+				document.body.appendChild(highlightRef);
+			}
 
-				const node = getNearestElement(dom[0]!);
-
-				if (node != null) {
-					render(
-						h(Highlighter, {
-							label: getDisplayName(vnode),
-							...measureNode(node),
-						}),
-						highlightRef,
-					);
-					return;
-				}
+			const node = getNearestElement(dom[0]!);
+			if (node != null) {
+				render(
+					h(Highlighter, {
+						label: getDisplayName(vnode),
+						...measureNode(node),
+					}),
+					highlightRef,
+				);
 			}
 		}
-		destroyHighlight();
 	}
 
 	return { highlight, destroy: destroyHighlight };
