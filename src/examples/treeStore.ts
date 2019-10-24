@@ -1,6 +1,6 @@
 import { createStore } from "../view/store";
 import { valoo } from "../view/valoo";
-import { InspectData } from "../adapter/adapter";
+import { InspectData } from "../adapter/adapter/adapter";
 import { DevNodeType, DevNode, ID } from "../view/store/types";
 
 export const inspect: InspectData = {

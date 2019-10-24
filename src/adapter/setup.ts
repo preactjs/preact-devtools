@@ -1,6 +1,6 @@
 import { DevtoolsHook } from "./hook";
 import { Options } from "preact";
-import { createAdapter } from "./adapter";
+import { createAdapter } from "./adapter/adapter";
 import { createBridge } from "./bridge";
 import { createRenderer } from "./10/renderer";
 import { setupOptions } from "./10/options";

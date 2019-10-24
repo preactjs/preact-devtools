@@ -2,7 +2,7 @@ import { valoo } from "../valoo";
 import * as sinon from "sinon";
 import { expect } from "chai";
 import { createPropsStore } from "./props";
-import { InspectData } from "../../adapter/adapter";
+import { InspectData } from "../../adapter/adapter/adapter";
 
 const createStore = () => {
 	const inspectData = valoo<InspectData | null>(null);

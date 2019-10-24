@@ -6,7 +6,7 @@ import { createPropsStore } from "../../store/props";
 import { useInstance } from "../utils";
 import { SidebarPanel } from "./SidebarPanel";
 import { ID } from "../../store/types";
-import { InspectData } from "../../../adapter/adapter";
+import { InspectData } from "../../../adapter/adapter/adapter";
 import { Collapser } from "../../store/collapser";
 import { PropData } from "./parseProps";
 import { NewProp } from "./NewProp";

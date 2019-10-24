@@ -1,5 +1,5 @@
 import { Observable } from "../valoo";
-import { InspectData } from "../../adapter/adapter";
+import { InspectData } from "../../adapter/adapter/adapter";
 import { createSearchStore } from "./search";
 import { createModalState } from "../components/Modals";
 import { createFilterStore } from "./filter";

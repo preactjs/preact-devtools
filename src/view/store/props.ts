@@ -1,7 +1,7 @@
 import { Observable, valoo, watch } from "../valoo";
 import { PropData, parseProps } from "../components/sidebar/parseProps";
 import { createCollapser, Collapser } from "./collapser";
-import { InspectData } from "../../adapter/adapter";
+import { InspectData } from "../../adapter/adapter/adapter";
 import { flattenChildren } from "../components/tree/windowing";
 
 const PROPS_LIMIT = 7;

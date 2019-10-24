@@ -1,4 +1,4 @@
-import { InspectData, DevtoolsEvent } from "../adapter";
+import { InspectData, DevtoolsEvent } from "../adapter/adapter";
 import {
 	Commit,
 	MsgTypes,
