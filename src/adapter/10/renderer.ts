@@ -1,12 +1,5 @@
 import { InspectData, DevtoolsEvent } from "../adapter/adapter";
-import {
-	Commit,
-	MsgTypes,
-	jsonify,
-	cleanProps,
-	flush,
-	cleanContext,
-} from "../events";
+import { Commit, MsgTypes, flush } from "../events";
 import { Fragment, VNode } from "preact";
 import { IdMapper, createIdMapper } from "./IdMapper";
 import { getStringId } from "../string-table";
@@ -26,6 +19,7 @@ import {
 } from "./vnode";
 import { FilterState, shouldFilter } from "./filter";
 import { ID } from "../../view/store/types";
+import { cleanContext, jsonify, cleanProps } from "../renderer-utils";
 
 export enum Elements {
 	HTML_ELEMENT = 1,

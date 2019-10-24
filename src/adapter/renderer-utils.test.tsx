@@ -2,7 +2,7 @@ import { h, Component, createContext, render } from "preact";
 import { teardown } from "preact/test-utils";
 import { setupScratch } from "./10/renderer.test";
 import { expect } from "chai";
-import { cleanContext } from "./events";
+import { cleanContext } from "./renderer-utils";
 
 describe("cleanContext", () => {
 	let scratch: HTMLDivElement;
