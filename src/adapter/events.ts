@@ -191,7 +191,7 @@ export function applyEvent(store: Store, name: string, data: any) {
 	}
 }
 
-export function jsonify(data: any): any {
+export function jsonify(data: any, isVNode: (x: any) => boolean): any {
 	if (isVNode(data)) {
 		return {
 			type: "vnode",
@@ -199,7 +199,7 @@ export function jsonify(data: any): any {
 		};
 	}
 	if (Array.isArray(data)) {
-		return data.map(jsonify);
+		return data.map(x => jsonify(x, isVNode));
 	}
 	switch (typeof data) {
 		case "string":
@@ -214,7 +214,7 @@ export function jsonify(data: any): any {
 			if (data === null) return null;
 			const out = { ...data };
 			Object.keys(out).forEach(key => {
-				out[key] = jsonify(out[key]);
+				out[key] = jsonify(out[key], isVNode);
 			});
 			return out;
 		default:
@@ -239,8 +239,4 @@ export function cleanContext(context: Record<string, any>) {
 
 	if (Object.keys(res).length == 0) return null;
 	return res;
-}
-
-export function isVNode(x: any): x is VNode {
-	return x != null && x.type !== undefined && x._dom !== undefined;
 }

@@ -57,6 +57,10 @@ export function getDevtoolsType(vnode: VNode): Elements {
 	return Elements.HTML_ELEMENT;
 }
 
+export function isVNode(x: any): x is VNode {
+	return x != null && x.type !== undefined && getDom(x) !== undefined;
+}
+
 export interface Renderer {
 	getVNodeById(id: ID): VNode | null;
 	findDomForVNode(id: ID): Array<HTMLElement | Text | null> | null;
@@ -128,9 +132,12 @@ export function createRenderer(
 				id,
 				name: getDisplayName(vnode),
 				canEditProps: true,
-				props: vnode.type !== null ? jsonify(cleanProps(vnode.props)) : null,
+				props:
+					vnode.type !== null
+						? jsonify(cleanProps(vnode.props), isVNode)
+						: null,
 				canEditState: true,
-				state: hasState ? jsonify(c!.state) : null,
+				state: hasState ? jsonify(c!.state, isVNode) : null,
 				type: 2,
 			};
 		},
