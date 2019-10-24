@@ -9,6 +9,7 @@ export enum MsgTypes {
 	ADD_VNODE = 2,
 	REMOVE_VNODE = 3,
 	UPDATE_VNODE_TIMINGS = 4,
+	REORDER_CHILDREN = 5,
 }
 
 // Event Examples:
@@ -30,6 +31,13 @@ export enum MsgTypes {
 // UPDATE_VNODE_TIMINGS
 //   id
 //   duration
+//
+// REORDER_CHILDREN
+//   id
+//   childrenCount
+//   childId
+//   childId
+//   ...
 
 export interface Commit {
 	rootId: number;
@@ -100,9 +108,12 @@ export function applyOperations(store: Store, data: number[]) {
 						}
 					}
 
+					let parent = store.nodes.$.get(parentId)!;
+					const depth = parent ? parent.depth + 1 : 1;
+
 					store.nodes.$.set(id, {
 						children: [],
-						depth: getDepth(store, parentId),
+						depth,
 						id,
 						name,
 						parent: parentId,
@@ -152,6 +163,15 @@ export function applyOperations(store: Store, data: number[]) {
 				if (len > 0) i--;
 				break;
 			}
+			case MsgTypes.REORDER_CHILDREN: {
+				const parentId = data[i + 1];
+				const count = data[i + 2];
+				const parent = store.nodes.$.get(parentId);
+				if (parent) {
+					parent.children = data.slice(i + 3, i + 3 + count);
+				}
+				break;
+			}
 		}
 	}
 
@@ -169,11 +189,6 @@ export function applyEvent(store: Store, name: string, data: any) {
 		case "stop-picker":
 			return store.actions.stopPickElement();
 	}
-}
-
-export function getDepth(store: Store, id: ID) {
-	let parent = store.nodes.$.get(id)!;
-	return parent ? parent.depth + 1 : 1;
 }
 
 export function jsonify(data: any): any {
