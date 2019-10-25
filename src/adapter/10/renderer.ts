@@ -326,6 +326,15 @@ export function update(
 	filters: FilterState,
 	domCache: WeakMap<HTMLElement | Text, VNode>,
 ) {
+	const skip = shouldFilter(vnode, filters);
+	if (skip) {
+		const children = getActualChildren(vnode);
+		for (let i = 0; i < children; i++) {
+			update(ids, commit, children[i], filters, domCache);
+		}
+		return;
+	}
+
 	const id = ids.getId(vnode);
 	commit.operations.push(
 		MsgTypes.UPDATE_VNODE_TIMINGS,
@@ -339,6 +348,9 @@ export function update(
 	const oldChildren = oldVNode
 		? getActualChildren(oldVNode).map((v: any) => v && ids.getId(v))
 		: [];
+
+	let shouldReorder = false;
+
 	const children = getActualChildren(vnode);
 	for (let i = 0; i < children.length; i++) {
 		const child = children[i];
@@ -346,11 +358,54 @@ export function update(
 			if (oldChildren[i] != null) {
 				commit.unmountIds.push(oldChildren[i]);
 			}
-		} else if (ids.hasId(child)) {
+		} else if (ids.hasId(child) || shouldFilter(child, filters)) {
 			update(ids, commit, child, filters, domCache);
+			// TODO: This is only sometimes necessary
+			shouldReorder = true;
 		} else {
 			mount(ids, commit, child, id, filters, domCache);
+			shouldReorder = true;
 		}
 	}
-	return commit;
+
+	if (shouldReorder) {
+		resetChildren(commit, ids, id, vnode, filters);
+	}
+}
+
+export function resetChildren(
+	commit: Commit,
+	ids: IdMapper,
+	id: ID,
+	vnode: VNode,
+	filters: FilterState,
+) {
+	let stack = getActualChildren(vnode);
+	if (!stack.length) return;
+
+	/** @type {number[]} */
+	let next = [];
+
+	stack = stack.slice();
+
+	let child;
+	while ((child = stack.pop()) != null) {
+		if (!shouldFilter(child, filters)) {
+			next.push(ids.getId(child));
+		} else {
+			const nextChildren = getActualChildren(child);
+			if (nextChildren.length > 0) {
+				stack.push(...getActualChildren(child));
+			}
+		}
+	}
+
+	if (next.length < 2) return;
+
+	commit.operations.push(
+		MsgTypes.REORDER_CHILDREN,
+		id,
+		next.length,
+		...next.reverse(),
+	);
 }

@@ -7,6 +7,7 @@ export interface ParsedMsg {
 	rootId: number;
 	mounts: Array<{ id: ID; key: string; name: string; parentId: ID }>;
 	unmounts: ID[];
+	reorders: Array<{ id: ID; children: ID[] }>;
 	timings: Array<{ id: ID; duration: number }>;
 }
 
@@ -20,8 +21,9 @@ export function parseCommitMessage(data: number[]): ParsedMsg {
 	let mounts: any[] = [];
 	let unmounts: any[] = [];
 	let timings: any[] = [];
+	let reorders: any[] = [];
 
-	i = len > 0 ? len + 3 : i;
+	i = len > 0 ? len + 2 : i;
 
 	for (; i < data.length; i++) {
 		switch (data[i]) {
@@ -45,6 +47,15 @@ export function parseCommitMessage(data: number[]): ParsedMsg {
 				for (; i < len; i++) {
 					unmounts.push(data[i]);
 				}
+				break;
+			}
+			case MsgTypes.REORDER_CHILDREN: {
+				reorders.push({
+					id: data[i + 1],
+					children: data.slice(i + 3, i + 3 + data[i + 2]),
+				});
+				i += 2 + data[i + 2];
+				break;
 			}
 		}
 	}
@@ -54,6 +65,7 @@ export function parseCommitMessage(data: number[]): ParsedMsg {
 		mounts,
 		unmounts,
 		timings,
+		reorders,
 	};
 }
 
@@ -66,6 +78,9 @@ export function formatForTest(msg: ParsedMsg) {
 	});
 	msg.timings.forEach(t => {
 		out.push(`Update timings ${t.id}`);
+	});
+	msg.reorders.forEach(r => {
+		out.push(`Reorder ${r.id} [${r.children.join(", ")}]`);
 	});
 	msg.unmounts.forEach(u => {
 		out.push(`Unmount ${u}`);
@@ -190,6 +205,10 @@ export function printCommit(data: number[]) {
 					for (; i < len; i++) {
 						console.log(`  Remove: %c${data[i]}`, "color: red");
 					}
+					break;
+				}
+				case MsgTypes.REORDER_CHILDREN: {
+					break;
 				}
 			}
 		}

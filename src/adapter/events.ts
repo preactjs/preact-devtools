@@ -61,6 +61,7 @@ export function flush(commit: Commit) {
 	return { name: "operation", data: msg };
 }
 
+// FIXME: Write tests for this function
 export function applyOperations(store: Store, data: number[]) {
 	const rootId = data[0];
 
@@ -168,6 +169,7 @@ export function applyOperations(store: Store, data: number[]) {
 				if (parent) {
 					parent.children = data.slice(i + 3, i + 3 + count);
 				}
+				i = i + 3 + count;
 				break;
 			}
 		}
