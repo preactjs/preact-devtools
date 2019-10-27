@@ -39,6 +39,7 @@
 	position: relative;
 	padding: 0.25rem 0;
 	border-bottom: 0.0625rem solid transparent;
+	border-top: 0.025rem solid transparent;
 }
 
 .search:focus {
