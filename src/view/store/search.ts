@@ -13,7 +13,7 @@ export function createSearchStore(
 	const match = valoo<number[]>([]);
 	const count = valoo(0);
 
-	const reset = () => (value.$ = "");
+	const reset = () => onChange("");
 	const onChange = (s: string) => {
 		value.$ = s;
 
