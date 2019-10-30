@@ -58,7 +58,7 @@ export function getComponentHooks(c: Component) {
 /**
  * Get teh diffed children of a `vnode`
  */
-export function getActualChildren(vnode: VNode) {
+export function getActualChildren(vnode: VNode): VNode[] {
 	return (vnode as any)._children || (vnode as any).__k || [];
 }
 
