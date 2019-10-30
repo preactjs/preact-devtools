@@ -1,5 +1,23 @@
 # Preact Devtools
 
+- Use `npm run dev` to start a demo page
+- Use `npm run watch` to rebuild all extensions on any code changes
+
+Chrome:
+
+1. Go to extensions page
+2. Enable developer mode
+3. Click "Load unpacked"
+4. Select `dist/chrome/` folder
+
+Firefox:
+
+1. Go to addons page
+2. Click the settings icon
+3. Select "Debug addons"
+4. Click "Load temporary addon"
+5. Select the `manifest.json` in `dist/firefox/`
+
 ## Embedding devtools directly into a page
 
 `preact-devtools` supports an inline build target, where the devtools
