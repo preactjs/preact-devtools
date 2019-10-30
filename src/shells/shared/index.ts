@@ -15,13 +15,18 @@ function createPanel() {
 	let doc: Document;
 
 	async function initPort() {
-		// Load theme
-		const theme = await new Promise(res => {
-			chrome.storage.sync.get(["theme"], result => res(result.theme));
-		});
+		try {
+			// Load theme
+			const theme = await new Promise(res => {
+				chrome.storage.sync.get(["theme"], result => res(result.theme));
+			});
 
-		if (theme) {
-			store.theme.$ = theme as any;
+			if (theme) {
+				store.theme.$ = theme as any;
+			}
+		} catch (e) {
+			// We don't really care if we couldn't load the theme
+			console.error(e);
 		}
 
 		// Listen to messages from the content-script
@@ -35,7 +40,13 @@ function createPanel() {
 		});
 
 		const dispose = store.theme.on(v => {
-			chrome.storage.sync.set({ theme: v });
+			try {
+				chrome.storage.sync.set({ theme: v });
+			} catch (e) {
+				// Storing the theme is not a critical operation, so we'll
+				// just log the error and continue
+				console.error(e);
+			}
 		});
 
 		port!.onDisconnect.addListener(() => {
