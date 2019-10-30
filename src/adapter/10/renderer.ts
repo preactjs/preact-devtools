@@ -330,7 +330,9 @@ export function update(
 	if (skip) {
 		const children = getActualChildren(vnode);
 		for (let i = 0; i < children.length; i++) {
-			update(ids, commit, children[i], filters, domCache);
+			if (children[i] != null) {
+				update(ids, commit, children[i], filters, domCache);
+			}
 		}
 		return;
 	}
