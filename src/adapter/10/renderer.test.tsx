@@ -5,6 +5,8 @@ import { setupOptions } from "../10/options";
 import { DevtoolsHook } from "../hook";
 import { expect } from "chai";
 import { toSnapshot } from "../debug";
+import { useState } from "preact/hooks";
+import { act } from "preact/test-utils";
 
 export function setupScratch() {
 	const div = document.createElement("div");
@@ -62,6 +64,7 @@ describe("Renderer 10", () => {
 		expect(toSnapshot(spy.args[1][1])).to.deep.equal([
 			"rootId: 1",
 			"Update timings 1",
+			"Update timings 2",
 		]);
 	});
 
@@ -81,6 +84,46 @@ describe("Renderer 10", () => {
 			"Add 4 <#text> to parent 3",
 			"Add 5 <span> to parent 2",
 			"Add 6 <#text> to parent 5",
+		]);
+	});
+
+	it("should update text", () => {
+		render(<div>foo</div>, scratch);
+		render(<div>bar</div>, scratch);
+
+		expect(toSnapshot(spy.args[1][1])).to.deep.equal([
+			"rootId: 1",
+			"Update timings 1",
+			"Update timings 2",
+			"Update timings 3",
+		]);
+	});
+
+	it("should reorder children", () => {
+		render(
+			<div>
+				<p key="A">A</p>
+				<p key="B">B</p>
+			</div>,
+			scratch,
+		);
+		render(
+			<div>
+				<p key="B">B</p>
+				<p key="A">A</p>
+			</div>,
+			scratch,
+		);
+
+		expect(toSnapshot(spy.args[1][1])).to.deep.equal([
+			"rootId: 1",
+			"Update timings 1",
+			"Update timings 2",
+			"Update timings 5",
+			"Update timings 6",
+			"Update timings 3",
+			"Update timings 4",
+			"Reorder 2 [5, 3]",
 		]);
 	});
 
@@ -193,6 +236,46 @@ describe("Renderer 10", () => {
 				"Add 4 <div> to parent 3",
 				"Add 5 <#text> to parent 4",
 				"Add 6 <#text> to parent 2",
+			]);
+		});
+
+		it("should filter on update", () => {
+			renderer.applyFilters({
+				regex: [],
+				type: new Set(["dom"]),
+			});
+
+			let update: () => void;
+			function Parent(props: { children: any }) {
+				const [i, setI] = useState(0);
+				update = () => setI(i + 1);
+				return <div>{props.children}</div>;
+			}
+
+			const Foo = () => <div />;
+			render(
+				<Parent>
+					<div>
+						<Foo />
+					</div>
+				</Parent>,
+				scratch,
+			);
+
+			expect(toSnapshot(spy.args[0][1])).to.deep.equal([
+				"rootId: 1",
+				"Add 1 <Fragment> to parent 1",
+				"Add 2 <Parent> to parent 1",
+				"Add 3 <Foo> to parent 2",
+			]);
+
+			act(() => {
+				update();
+			});
+
+			expect(toSnapshot(spy.args[1][1])).to.deep.equal([
+				"rootId: 1",
+				"Update timings 2",
 			]);
 		});
 	});

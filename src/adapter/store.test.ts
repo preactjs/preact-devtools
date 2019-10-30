@@ -2,6 +2,7 @@ import { createStore } from "../view/store";
 import { applyOperations } from "./events";
 import { expect } from "chai";
 import { fromSnapshot } from "./debug";
+import * as sinon from "sinon";
 
 describe("Store", () => {
 	it("should apply mounts", () => {
@@ -39,5 +40,32 @@ describe("Store", () => {
 		applyOperations(store, event2);
 
 		expect(store.nodes.$.get(1)!.duration.$).to.equal(12);
+	});
+
+	it("should unmount vnodes", () => {
+		const store = createStore();
+		const event = fromSnapshot([
+			"rootId: 1",
+			"Add 1 <Fragment> to parent 1",
+			"Add 2 <div> to parent 1",
+			"Add 3 <div> to parent 2",
+		]);
+		applyOperations(store, event);
+
+		const spy = sinon.spy();
+		store.nodeList.on(spy);
+
+		// prettier-ignore
+		const event2 = fromSnapshot([
+      "rootId: 1",
+      "Remove 2",
+      "Remove 3",
+    ]);
+		applyOperations(store, event2);
+
+		expect(spy.callCount).to.eq(1);
+		expect(store.nodes.$.get(1)!.children).to.deep.equal([]);
+		expect(store.nodes.$.get(2)).to.equal(undefined);
+		expect(store.nodes.$.get(3)).to.equal(undefined);
 	});
 });

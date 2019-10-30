@@ -1,14 +1,13 @@
 import { flushTable, StringTable, parseTable } from "./string-table";
-import { Store, ID } from "../view/store";
 import { valoo } from "../view/valoo";
-import { VNode } from "preact";
-import { getDisplayName } from "./10/vnode";
+import { Store } from "../view/store/types";
 
 export enum MsgTypes {
 	ADD_ROOT = 1,
 	ADD_VNODE = 2,
 	REMOVE_VNODE = 3,
 	UPDATE_VNODE_TIMINGS = 4,
+	REORDER_CHILDREN = 5,
 }
 
 // Event Examples:
@@ -30,6 +29,13 @@ export enum MsgTypes {
 // UPDATE_VNODE_TIMINGS
 //   id
 //   duration
+//
+// REORDER_CHILDREN
+//   id
+//   childrenCount
+//   childId
+//   childId
+//   ...
 
 export interface Commit {
 	rootId: number;
@@ -55,6 +61,7 @@ export function flush(commit: Commit) {
 	return { name: "operation", data: msg };
 }
 
+// FIXME: Write tests for this function
 export function applyOperations(store: Store, data: number[]) {
 	const rootId = data[0];
 
@@ -77,7 +84,7 @@ export function applyOperations(store: Store, data: number[]) {
 				const id = data[i + 1];
 				const type = data[i + 2];
 				const name = strings[data[i + 5] - 1];
-				const key = data[i + 6] > 0 ? ` key="${strings[i + 6 - 1]}" ` : "";
+				const key = data[i + 6] > 0 ? strings[data[i + 6] - 1] : "";
 				let parentId = data[i + 3];
 
 				if (newRoot) {
@@ -87,32 +94,33 @@ export function applyOperations(store: Store, data: number[]) {
 					});
 				}
 
-				if (store.nodes.$.has(id)) {
-					throw new Error(`Node ${id} already present in store.`);
-				}
-
-				// Roots have their own id as parentId
-				if (id !== parentId) {
-					const parent = store.nodes.$.get(parentId);
-					if (!parent) {
-						// throw new Error(`Parent node ${parentId} not found in store.`);
-						console.warn(`Parent node ${parentId} not found in store.`);
-						parentId = -1;
-					} else {
-						parent.children.push(id);
+				if (!store.nodes.$.has(id)) {
+					// Roots have their own id as parentId
+					if (id !== parentId) {
+						const parent = store.nodes.$.get(parentId);
+						if (!parent) {
+							// throw new Error(`Parent node ${parentId} not found in store.`);
+							console.warn(`Parent node ${parentId} not found in store.`);
+							parentId = -1;
+						} else {
+							parent.children.push(id);
+						}
 					}
-				}
 
-				store.nodes.$.set(id, {
-					children: [],
-					depth: getDepth(store, parentId),
-					id,
-					name,
-					parent: parentId,
-					type,
-					key,
-					duration: valoo<number>(0),
-				});
+					let parent = store.nodes.$.get(parentId)!;
+					const depth = parent ? parent.depth + 1 : 1;
+
+					store.nodes.$.set(id, {
+						children: [],
+						depth,
+						id,
+						name,
+						parent: parentId,
+						type,
+						key,
+						duration: valoo<number>(0),
+					});
+				}
 				i += 6;
 				break;
 			}
@@ -120,14 +128,12 @@ export function applyOperations(store: Store, data: number[]) {
 				const id = data[i + 1];
 				const duration = data[i + 2];
 
-				if (!store.nodes.$.has(id)) {
-					throw new Error(`Node ${id} already present in store.`);
+				const node = store.nodes.$.get(id)!;
+				if (node) {
+					node.duration.$ = duration;
 				}
 
-				const node = store.nodes.$.get(id)!;
-				node.duration.$ = duration;
-
-				i += 3;
+				i += 2;
 				break;
 			}
 			case MsgTypes.REMOVE_VNODE: {
@@ -135,8 +141,36 @@ export function applyOperations(store: Store, data: number[]) {
 				i += 2;
 				const len = i + unmounts;
 				for (; i < len; i++) {
+					const nodeId = data[i];
+					const node = store.nodes.$.get(nodeId);
+					if (node) {
+						// Remove node from parent children array
+						const parentId = node.parent;
+						const parent = store.nodes.$.get(parentId);
+						if (parent) {
+							const idx = parent.children.indexOf(nodeId);
+							if (idx > -1) parent.children.splice(idx, 1);
+						}
+
+						// Remove node from store
+						store.nodes.$.delete(nodeId);
+					}
 					console.log(`  Remove: %c${data[i]}`, "color: red");
 				}
+
+				// Subtract one because of outer loop
+				if (len > 0) i--;
+				break;
+			}
+			case MsgTypes.REORDER_CHILDREN: {
+				const parentId = data[i + 1];
+				const count = data[i + 2];
+				const parent = store.nodes.$.get(parentId);
+				if (parent) {
+					parent.children = data.slice(i + 3, i + 3 + count);
+				}
+				i = i + 3 + count;
+				break;
 			}
 		}
 	}
@@ -155,48 +189,4 @@ export function applyEvent(store: Store, name: string, data: any) {
 		case "stop-picker":
 			return store.actions.stopPickElement();
 	}
-}
-
-export function getDepth(store: Store, id: ID) {
-	let parent = store.nodes.$.get(id)!;
-	return parent ? parent.depth + 1 : 1;
-}
-
-export function jsonify(data: any) {
-	if (isVNode(data)) {
-		return {
-			type: "vnode",
-			name: getDisplayName(data as any),
-		};
-	}
-	switch (typeof data) {
-		case "string":
-			return data.length > 300 ? data.slice(300) : data;
-		case "function": {
-			return {
-				type: "function",
-				name: data.displayName || data.name || "anonymous",
-			};
-		}
-		case "object":
-			if (data === null) return null;
-			const out = { ...data };
-			Object.keys(out).forEach(key => {
-				out[key] = jsonify(out[key]);
-			});
-			return out;
-		default:
-			return data;
-	}
-}
-
-export function cleanProps(props: any) {
-	if (typeof props === "string" || !props) return null;
-	const out = { ...props };
-	if (!Object.keys(out).length) return null;
-	return out;
-}
-
-export function isVNode(x: any): x is VNode {
-	return x != null && x.type !== undefined && x._dom !== undefined;
 }

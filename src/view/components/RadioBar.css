@@ -1,0 +1,34 @@
+.root label:first-of-type .label {
+	border-top-left-radius: 0.3rem;
+	border-bottom-left-radius: 0.3rem;
+}
+
+.root label:last-of-type .label {
+	border-top-right-radius: 0.3rem;
+	border-bottom-right-radius: 0.3rem;
+}
+
+.input {
+	opacity: 0;
+	position: absolute;
+}
+
+.input:focus + .label,
+.input:checked + .label {
+	background: var(--color-radio);
+	color: var(--color-bg);
+}
+
+.label {
+	padding: 0.2rem 0.6rem;
+	color: var(--color-radio);
+	border: 0.0625rem solid var(--color-radio);
+}
+
+.label:hover {
+	cursor: pointer;
+}
+
+.root label + label .label {
+	border-left: none;
+}

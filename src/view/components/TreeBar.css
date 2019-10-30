@@ -13,6 +13,15 @@
 	color: var(--color-button-active);
 }
 
+.btnWrapper {
+	display: flex;
+	justify-content: center;
+	align-items: center;
+	height: 100%;
+	padding-left: 0.25rem;
+	padding-right: 0.25rem;
+}
+
 .searchContainer {
 	align-items: center;
 	flex: 1 1 auto;
@@ -26,11 +35,133 @@
 	border: none;
 	background: none;
 	color: var(--color-text);
-	margin-left: 0.25rem;
+	margin-left: 0.25rem !important;
+	position: relative;
+	padding: 0.25rem 0;
+	border-bottom: 0.0625rem solid transparent;
+	border-top: 0.025rem solid transparent;
+}
+
+.search:focus {
+	outline: none;
+	border-bottom: 0.0625rem solid var(--color-selected-bg);
 }
 
 .searchCounter {
 	display: inline-flex;
 	font-size: 0.8rem;
 	color: var(--color-text-empty);
+}
+
+.filterBtnWrapper {
+	position: relative;
+	display: flex;
+	height: 100%;
+	align-items: center;
+}
+
+.filter {
+	position: absolute;
+	top: calc(100% + 0.9rem);
+	right: -0.5rem;
+	border: 0.0625rem solid var(--color-modal-border);
+	background: var(--color-bg);
+	width: 12rem;
+	z-index: 10;
+	padding: 0.25rem 0.5rem;
+}
+
+.filter label {
+	cursor: pointer;
+}
+
+.filterRow {
+	display: flex;
+}
+
+.filterRow + .filterRow {
+	margin-top: 0.25rem;
+}
+
+.filter::after,
+.filter::before {
+	content: "";
+	display: block;
+	position: absolute;
+	right: 0.5rem;
+	top: 0;
+	width: 0;
+	height: 0;
+	border-style: solid;
+	transform: translate3d(0, -50%, 0);
+}
+
+.filter::after {
+	top: -7px;
+	border-color: transparent transparent var(--color-bg) transparent;
+	border-width: 7px;
+}
+
+.filter::before {
+	top: -9px;
+	right: calc(0.5rem - 2px);
+	border-color: transparent transparent var(--color-modal-border) transparent;
+	border-width: 9px;
+}
+
+.arrowFix {
+	position: absolute;
+	right: 8px;
+	background: var(--color-bg);
+	height: 1px;
+	top: -1px;
+	width: 13px;
+}
+
+.filterCheck {
+	width: 1.25rem;
+	display: flex;
+	flex: 0 0 auto;
+	justify-content: flex-start;
+	align-items: center;
+}
+
+.filterCheck svg {
+	width: 1.25rem;
+}
+
+.filterCheck input {
+	opacity: 0;
+	position: absolute;
+	left: 0;
+}
+
+.filterCheck input:checked + svg {
+	color: var(--color-selected-bg);
+}
+
+.filterValue {
+	text-align: left;
+}
+
+.filterName {
+	display: flex;
+	align-items: center;
+	width: 100%;
+	background: var(--color-props-input-bg);
+	border: none;
+	color: var(--color-text);
+}
+
+.removeWrapper {
+	width: 1.5rem;
+	display: flex;
+	flex: 0 0 auto;
+	justify-content: flex-end;
+}
+
+.vSep {
+	height: 0.0625rem;
+	background: var(--color-modal-border);
+	margin: 0.4rem 0;
 }

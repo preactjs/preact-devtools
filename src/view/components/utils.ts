@@ -1,23 +1,10 @@
-/**
- * Get's the last DOM child by depth in the rendered tree list. Assumes
- * that all items have a numeric `data-depth` attribute.
- */
-export function getLastDomChild(dom: HTMLElement) {
-	const depth = dom.getAttribute("data-depth") || 0;
-	let item: HTMLElement | null = dom;
-	let last: HTMLElement | null = null;
-	while (
-		(item = item.nextSibling as any) &&
-		+(item.getAttribute("data-depth") || 0) > +depth
-	) {
-		last = item;
-	}
-	return last;
-}
+import { useRef, useEffect } from "preact/hooks";
 
-export function scrollIntoView(el: Element) {
+const OFFSET = 16;
+
+export function scrollIntoView(el: HTMLElement) {
 	// Find closest scrollable parent
-	let parent: Element | null = el;
+	let parent: HTMLElement | null = el;
 	while ((parent = parent.parentNode as any)) {
 		if (parent.scrollHeight > parent.clientHeight) {
 			break;
@@ -26,14 +13,46 @@ export function scrollIntoView(el: Element) {
 
 	if (parent) {
 		let rect = el.getBoundingClientRect();
-		let cRect = parent.getBoundingClientRect();
-		let top = rect.top;
-		let visible = top >= cRect.top && rect.bottom <= cRect.height;
-		if (!visible) {
-			parent.scrollTo({
-				top: top - rect.height,
-				behavior: "smooth",
-			});
+		let top = parent.scrollTop;
+
+		if (el.offsetTop <= parent.scrollTop) {
+			top = el.offsetTop - OFFSET;
+		} else if (
+			el.offsetTop + rect.height >
+			parent.scrollTop + parent.clientHeight
+		) {
+			top = el.offsetTop - parent.clientHeight + rect.height + OFFSET;
+		} else {
+			return;
 		}
+		parent.scrollTo({
+			top,
+			behavior: "smooth",
+		});
 	}
+}
+
+export function getRootDomNode(el: HTMLElement): HTMLElement {
+	let item = el;
+	while (item.parentNode != null) {
+		item = item.parentNode as any;
+	}
+
+	return item;
+}
+
+export function useInstance<T extends { destroy?: () => void }>(fn: () => T) {
+	const ref = useRef<T>(null as any);
+	const value = ref.current || (ref.current = fn());
+
+	useEffect(
+		() => () => {
+			if (ref.current && ref.current.destroy) {
+				ref.current.destroy();
+			}
+		},
+		[],
+	);
+
+	return value;
 }

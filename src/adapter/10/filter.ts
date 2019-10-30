@@ -19,6 +19,25 @@ export interface FilterState {
 	type: Set<TypeFilterValue>;
 }
 
+export interface RawFilterState {
+	regex: string[];
+	type: {
+		fragment: boolean;
+		dom: boolean;
+	};
+}
+
+export function parseFilters(raw: RawFilterState): FilterState {
+	const type = new Set<TypeFilterValue>();
+	if (raw.type.fragment) type.add("fragment");
+	if (raw.type.dom) type.add("dom");
+
+	return {
+		regex: [],
+		type,
+	};
+}
+
 export function shouldFilter(vnode: VNode, filters: FilterState): boolean {
 	if (typeof vnode.type === "function") {
 		if (vnode.type === Fragment && filters.type.has("fragment")) {

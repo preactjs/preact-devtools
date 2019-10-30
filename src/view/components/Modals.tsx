@@ -1,9 +1,12 @@
 import { h, ComponentChildren, Fragment } from "preact";
 import s from "./Modal.css";
-import { useStore, useObserver } from "../store";
+import { useStore, useObserver } from "../store/react-bindings";
 import { IconBtn } from "./IconBtn";
 import { Close } from "./icons";
 import { valoo } from "../valoo";
+import { RadioBar } from "./RadioBar";
+import { Theme } from "../store/types";
+import { useCallback } from "preact/hooks";
 
 export function createModalState() {
 	const active = valoo<string>("");
@@ -38,120 +41,28 @@ export interface SettingsModalProps {
 
 export function SettingsModal(props: SettingsModalProps) {
 	const store = useStore();
-	const filters = useObserver(() => store.filter.filters.$);
+	const theme = useObserver(() => store.theme.$);
+
+	const setTheme = useCallback((v: Theme) => (store.theme.$ = v), []);
 
 	return (
 		<div>
-			<Modal
-				onClose={() => {
-					store.filter.submit();
-					props.onClose();
-				}}
-			>
+			<Modal onClose={props.onClose}>
 				<form>
-					<p>Hide components where...</p>
-					{filters.length === 0 && (
-						<p class={s.empty}>No filters have been added.</p>
-					)}
-					<table>
-						<tbody>
-							{filters.map(f => {
-								return (
-									<FilterRow
-										type={f.type}
-										value={f.value}
-										enabled={f.enabled}
-										setType={v => store.filter.setType(f, v as any)}
-										setValue={v => store.filter.setValue(f, v)}
-										setEnabled={v => store.filter.setEnabled(f, v)}
-										onRemove={() => store.filter.remove(f)}
-									/>
-								);
-							})}
-						</tbody>
-					</table>
-					<button class={s.addFilter} type="button" onClick={store.filter.add}>
-						Add filter
-					</button>
+					<p>Theme:</p>
+					<RadioBar
+						name="theme"
+						value={theme}
+						onChange={setTheme}
+						items={[
+							{ label: "Auto", value: "auto" },
+							{ label: "Light", value: "light" },
+							{ label: "Dark", value: "dark" },
+						]}
+					/>
 				</form>
 			</Modal>
 		</div>
-	);
-}
-
-export interface FilterRowProps {
-	type: string;
-	value: string;
-	enabled: boolean;
-	setValue(value: string): void;
-	setType(value: string): void;
-	setEnabled(value: boolean): void;
-	onRemove(): void;
-}
-
-export function FilterRow({
-	type,
-	value,
-	enabled,
-	setType,
-	setValue,
-	setEnabled,
-	onRemove,
-}: FilterRowProps) {
-	return (
-		<tr class={s.filterRow}>
-			<td>
-				<input
-					type="checkbox"
-					class={s.check}
-					checked={enabled}
-					onInput={e => setEnabled((e.target as any).checked)}
-				/>
-			</td>
-			<td>
-				<select
-					name="type"
-					value={type}
-					onInput={e => setType((e.target as any).value)}
-				>
-					<option value="type">Type</option>
-					<option value="name">Name</option>
-				</select>
-			</td>
-			<td>
-				<span class={s.operator}>{type === "type" ? "equals" : "matches"}</span>
-			</td>
-			<td>
-				<div class={s.valueWrapper}>
-					{type === "type" && (
-						<select
-							name="filtertype"
-							value={value}
-							onInput={e => setValue((e.target as any).value)}
-						>
-							<option value="dom">DOM</option>
-							<option value="fragment">Fragment</option>
-						</select>
-					)}
-					{type === "name" && (
-						<input
-							type="text"
-							value={value}
-							onInput={e => setValue((e.target as any).value)}
-							class={s.regInput}
-							placeholder="Regular Expression"
-						/>
-					)}
-				</div>
-			</td>
-			<td>
-				<div class={s.filterRemove}>
-					<IconBtn onClick={onRemove}>
-						<Close />
-					</IconBtn>
-				</div>
-			</td>
-		</tr>
 	);
 }
 

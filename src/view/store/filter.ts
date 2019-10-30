@@ -1,60 +1,60 @@
 import { valoo } from "../valoo";
-import { FilterState } from "../../adapter/10/filter";
+import { RawFilterState } from "../../adapter/10/filter";
+import escapeStringRegexp from "escape-string-regexp";
 
 export interface RawFilter {
-	type: string;
 	value: string;
 	enabled: boolean;
 }
 
-const INITIAL_FILTERS: RawFilter = {
-	type: "type",
-	value: "dom",
-	enabled: true,
-};
-
 export function createFilterStore(
-	onSubmit: (event: string, filters: FilterState) => void,
+	onSubmit: (event: "update-filter", filters: RawFilterState) => void,
 ) {
-	const filters = valoo<RawFilter[]>([INITIAL_FILTERS]);
+	const filters = valoo<RawFilter[]>([]);
+	const filterFragment = valoo(true);
+	const filterDom = valoo(true);
+
+	const submit = () => {
+		let s: RawFilterState = {
+			regex: [],
+			type: {
+				fragment: filterFragment.$,
+				dom: filterDom.$,
+			},
+		};
+
+		filters.$.filter(x => x.enabled).forEach(x => {
+			s.regex.push(escapeStringRegexp(x.value));
+		});
+		onSubmit("update-filter", s);
+	};
 
 	return {
 		filters,
-		submit() {
-			let s: FilterState = {
-				regex: [],
-				type: new Set(),
-			};
-			filters.$.filter(x => x.enabled).forEach(x => {
-				if (x.type === "type") {
-					s.type.add(x.value as any);
-				} else {
-					// TODO: Escape
-					s.regex.push(new RegExp(x.value, "ig"));
+		filterFragment,
+		filterDom,
+		setEnabled(filter: RawFilter | string, v: boolean) {
+			if (typeof filter === "string") {
+				if (filter === "dom") {
+					filterDom.$ = v;
+				} else if (filter === "fragment") {
+					filterFragment.$ = v;
 				}
-			});
-			onSubmit("update-filter", s);
-		},
-		setEnabled(filter: RawFilter, v: boolean) {
-			filter.enabled = v;
-			filters.update();
-		},
-		setType(filter: RawFilter, type: "type" | "name") {
-			if (filter.type !== type) {
-				filter.value = type === "type" ? "dom" : "";
+			} else {
+				filter.enabled = v;
 			}
-			filter.type = type;
 			filters.update();
+			submit();
 		},
 		setValue(filter: RawFilter, value: string) {
 			filter.value = value;
 			filters.update();
+			submit();
 		},
 		add() {
 			filters.update(v => {
 				v.push({
-					type: "type",
-					value: "dom",
+					value: "",
 					enabled: false,
 				});
 			});

@@ -9,6 +9,7 @@ export function parseValue(v: string) {
 			return v === "true";
 		case "null":
 			return null;
+		case "":
 		case "undefined":
 			return undefined;
 		case "NaN":
@@ -43,8 +44,9 @@ export function valueToHuman(v: any): string {
 			return v[0] !== '"' || v[v.length - 1] !== '"' ? `"${v}"` : v;
 		case "number":
 		case "boolean":
-		case "undefined":
 			return "" + v;
+		case "undefined":
+			return "";
 	}
 
 	if (v === null) return "" + v;
@@ -54,4 +56,19 @@ export function valueToHuman(v: any): string {
 
 export function isStringifiedVNode(v: string) {
 	return v.startsWith("<") && v.endsWith("/>");
+}
+
+export function displayCollection(v: any): string {
+	if (Array.isArray(v)) return "Array";
+	if (v !== null && typeof v === "object") {
+		if (Object.keys(v).length === 2) {
+			if (v.type === "vnode") return `<${v.name} />`;
+			if (v.type === "set") return `Set<${v.name}>`;
+			if (v.type === "map") return `Map<${v.name}>`;
+			if (v.type === "function") return v.name + "()";
+		}
+		return "Object";
+	}
+	if (typeof v === "string") return `"${v}"`;
+	return "" + (v === undefined ? "" : v);
 }

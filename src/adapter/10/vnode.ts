@@ -21,7 +21,7 @@ export function isRoot(vnode: VNode) {
 /**
  * Return the component instance of a `vnode`
  */
-export function getComponent(vnode: VNode) {
+export function getComponent(vnode: VNode): Component | null {
 	return (vnode as any)._component || (vnode as any).__c || null;
 }
 
@@ -58,7 +58,7 @@ export function getComponentHooks(c: Component) {
 /**
  * Get teh diffed children of a `vnode`
  */
-export function getActualChildren(vnode: VNode) {
+export function getActualChildren(vnode: VNode): VNode[] {
 	return (vnode as any)._children || (vnode as any).__k || [];
 }
 

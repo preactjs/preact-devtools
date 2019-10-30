@@ -11,6 +11,10 @@
 	border: none;
 }
 
+.root input {
+	margin: 0;
+}
+
 :global(.light) .root {
 	--color-bg: white;
 	--color-text: #333;
@@ -26,11 +30,18 @@
 	--color-border: #dedede;
 	--color-text-empty: #444;
 	--color-button-active: #7245c7;
-	--color-highlight-bd: #444;
 	--color-modal-backdrop: rgba(197, 197, 197, 0.8);
-	--color-modal-border: #4d4d4d;
+	--color-modal-border: #bbb;
 	--color-marker: yellow;
 	--color-marker-selected: orange;
+	--color-input-border: #4d4d4d;
+	--color-input-invalid: #ff5722;
+	--color-empty-logo: #dadada;
+	--color-key-label: gray;
+	--color-key-label-selected: #dadada;
+	--color-key-value: #ff5722;
+	--color-key-value-selected: orange;
+	--color-radio: #7245c7;
 
 	/* Props */
 	--color-props-input-bg: #f0f0f0;
@@ -61,11 +72,18 @@
 	--color-text-empty: #999;
 	--color-button-active: #d2adff;
 	--color-sidebar-title: #c5c5c5;
-	--color-highlight-bd: #7a7a7a;
 	--color-modal-backdrop: rgba(50, 50, 50, 0.8);
 	--color-modal-border: #4d4d4d;
 	--color-marker: yellow;
 	--color-marker-selected: orange;
+	--color-input-border: #666;
+	--color-input-invalid: #ff5722;
+	--color-empty-logo: #555;
+	--color-key-label: gray;
+	--color-key-label-selected: #dedede;
+	--color-key-value: #ff5722;
+	--color-key-value-selected: yellow;
+	--color-radio: #d2adff;
 
 	/* Props */
 	--color-props-input-bg: #444;

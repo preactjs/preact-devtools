@@ -49,7 +49,7 @@
 	position: absolute;
 	left: 50%;
 	transform: translateX(-50%);
-	border: 0.0625rem solid var(--color-highlight-bd);
+	border: 0.0625rem solid #9a9a9a;
 }
 
 .fixed {

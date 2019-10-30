@@ -2,7 +2,7 @@
 	background: var(--color-bg);
 	padding: 2rem;
 	position: fixed;
-	top: 50%;
+	top: 20%;
 	left: 50%;
 	transform: translate3d(-50%, -50%, 0);
 	z-index: 999991;
@@ -17,7 +17,7 @@
 .closeBtn {
 	position: absolute;
 	right: 1rem;
-	top: 1 rem;
+	top: 1rem;
 }
 
 .backdrop {

@@ -1,67 +1,236 @@
 import { h, render } from "preact";
-import { useState } from "preact/hooks";
-import { Highlighter } from "../view/components/Highlighter";
-import { ElementProps } from "../view/components/ElementProps";
-import { Iframer } from "./Iframer";
+import { useState, useEffect } from "preact/hooks";
+import { ElementProps } from "../view/components/sidebar/ElementProps";
+import { Sidebar } from "../view/components/sidebar/Sidebar";
 import d from "../view/components/Devtools.css";
 import { IconBtn } from "../view/components/IconBtn";
 import { Picker } from "../view/components/icons";
 import { TreeBar } from "../view/components/TreeBar";
 import { ModalBackdrop, SettingsModal } from "../view/components/Modals";
-import { AppCtx, createStore } from "../view/store";
+import { createStore } from "../view/store";
+import { AppCtx, useObserver } from "../view/store/react-bindings";
+import { applyOperations } from "../adapter/events";
+import { fromSnapshot } from "../adapter/debug";
 import { TreeView } from "../view/components/TreeView";
+import { RadioBar } from "../view/components/RadioBar";
+import { TodoList } from "./TodoList";
 import { treeStore } from "./treeStore";
+import { createPropsStore } from "../view/store/props";
+import { Iframer } from "./Iframer";
+import { LegacyContext } from "./legacyContext";
+import { Stateful } from "./state";
+import { Highlighter } from "../view/components/Highlighter";
 
 function Headline(props) {
 	return <h3>{props.title}</h3>;
 }
 
+function DeepNest(props) {
+	return <div>{props.children}</div>;
+}
+
 const tstore = treeStore();
 
-export function TodoList() {
-	const [todos, setTodos] = useState(["asd", "asdf"]);
-	const [dark, setDark] = useState(localStorage.getItem("theme") === "dark");
-	const [v, setV] = useState("");
+const pStore = createPropsStore(tstore.inspectData, data => data.props, d => d);
+
+export function StyleGuide() {
 	const [showModal, setShowModal] = useState(
 		!!localStorage.getItem("show-modal"),
 	);
 
+	const propList = useObserver(() =>
+		pStore.list.$.map(x => pStore.tree.$.get(x)),
+	);
+	const pInitial = useObserver(() => pStore.initialTree.$);
+	const pCollapsed = useObserver(() => pStore.collapser.collapsed.$);
+
 	const [store] = useState(createStore());
 
+	useEffect(() => {
+		store.theme.$ = localStorage.getItem("theme");
+	}, []);
+
+	const theme = useObserver(() => store.theme.$);
+
 	return (
-		<div class={dark ? "dark" : "light"}>
+		<div class={theme === "auto" ? "dark" : theme}>
 			<div style="padding: 5rem" class={d.root}>
 				<div style="display: flex; flex-direction: column;">
+					<h2>Todo List</h2>
+					<TodoList />
+					<h2>Styleguide</h2>
+
+					<h3>RadioBar</h3>
+					<RadioBar
+						name="foo"
+						value={theme}
+						onChange={v => {
+							store.theme.$ = v;
+							localStorage.setItem("theme", v);
+						}}
+						items={[
+							{ label: "Auto", value: "auto" },
+							{ label: "Light", value: "light" },
+							{ label: "Dark", value: "dark" },
+						]}
+					/>
+					<h3>Legacy Context</h3>
+					<LegacyContext />
+					<h3>State</h3>
+					<Stateful />
+
+					<h3>Sidebar</h3>
+					<AppCtx.Provider value={tstore}>
+						<Sidebar />
+					</AppCtx.Provider>
+					<h3>ElementProps</h3>
+					<p>non-editable</p>
+					<ElementProps
+						editable={false}
+						items={propList}
+						collapsed={pCollapsed}
+						onCollapse={pStore.collapser.toggle}
+						initial={pInitial}
+					/>
+					<p>editable</p>
+					<div style="width: 20rem; outline: 1px solid red">
+						<ElementProps
+							editable
+							items={propList}
+							collapsed={pCollapsed}
+							onCollapse={pStore.collapser.toggle}
+							initial={pInitial}
+						/>
+					</div>
+					<h2>Icon Btns</h2>
+					<IconBtn onClick={() => console.log("click")}>
+						<Picker />
+					</IconBtn>
+					<IconBtn active>
+						<Picker />
+					</IconBtn>
+					<h2>Modals</h2>
 					<button
 						onClick={() => {
-							localStorage.setItem("theme", !dark ? "dark" : "light");
-							setDark(!dark);
+							const next = !showModal;
+							setShowModal(next);
+							localStorage.setItem("show-modal", next + "");
 						}}
 					>
-						Toggle Theme
+						show modal
 					</button>
-					<form
-						onSubmit={e => {
-							e.preventDefault();
-							setV("");
-							setTodos([...todos, v]);
+					<AppCtx.Provider value={store}>
+						{showModal && (
+							<SettingsModal
+								onClose={() => {
+									setShowModal(false);
+									localStorage.removeItem("show-modal");
+								}}
+							/>
+						)}
+					</AppCtx.Provider>
+					<ModalBackdrop
+						active={showModal}
+						onClick={() => {
+							setShowModal(false);
+							localStorage.removeItem("show-modal");
+						}}
+					/>
+					<Headline title="foobar" />
+					<h2>TreeBar</h2>
+					<div style="border: 1px solid #555">
+						<AppCtx.Provider value={tstore}>
+							<TreeBar />
+						</AppCtx.Provider>
+					</div>
+					<h2>TreeView</h2>
+					<button
+						onClick={() => {
+							const event2 = fromSnapshot(["rootId: 1", "Remove 4"]);
+							applyOperations(tstore, event2);
 						}}
 					>
-						<input
-							type="text"
-							placeholder="todo item"
-							onInput={e => setV(e.target.value)}
-							value={v}
-						/>
-					</form>
-					<p>Tasks</p>
-					<ul>
-						{todos.map(x => {
-							return <li key={x}>{x}</li>;
-						})}
-					</ul>
-
-					<h2>Styleguide</h2>
+						remove
+					</button>
+					<br />
+					<div>
+						<div style="height: 20rem; overflow: auto;">
+							<AppCtx.Provider value={tstore}>
+								<TreeView />
+							</AppCtx.Provider>
+						</div>
+					</div>
+					<br />
+					<br />
+					<div>
+						<div style="height: overflow: auto;">
+							<AppCtx.Provider value={tstore}>
+								<TreeView />
+							</AppCtx.Provider>
+						</div>
+					</div>
+					<p>Empty tree view</p>
+					<AppCtx.Provider value={store}>
+						<TreeView />
+					</AppCtx.Provider>
+					<h3>Deeply nested</h3>
+					<DeepNest>
+						<DeepNest>
+							<DeepNest>
+								<DeepNest>
+									<DeepNest>
+										<DeepNest>
+											<DeepNest>
+												<DeepNest>
+													<DeepNest>
+														<DeepNest>
+															<DeepNest>
+																<DeepNest>
+																	<DeepNest>
+																		<DeepNest>
+																			<DeepNest>
+																				<DeepNest>
+																					<DeepNest>
+																						<DeepNest>
+																							<DeepNest>
+																								<DeepNest>
+																									<DeepNest>
+																										<DeepNest>
+																											<DeepNest>
+																												<DeepNest>
+																													<DeepNest>
+																														<DeepNest>
+																															<DeepNest>
+																																<DeepNest>
+																																	deep
+																																</DeepNest>
+																															</DeepNest>
+																														</DeepNest>
+																													</DeepNest>
+																												</DeepNest>
+																											</DeepNest>
+																										</DeepNest>
+																									</DeepNest>
+																								</DeepNest>
+																							</DeepNest>
+																						</DeepNest>
+																					</DeepNest>
+																				</DeepNest>
+																			</DeepNest>
+																		</DeepNest>
+																	</DeepNest>
+																</DeepNest>
+															</DeepNest>
+														</DeepNest>
+													</DeepNest>
+												</DeepNest>
+											</DeepNest>
+										</DeepNest>
+									</DeepNest>
+								</DeepNest>
+							</DeepNest>
+						</DeepNest>
+					</DeepNest>
 					<h3>Highlighter</h3>
 					<div class="grid">
 						<div>
@@ -153,89 +322,6 @@ export function TodoList() {
 							</Iframer>
 						</div>
 					</div>
-					<h3>ElementProps</h3>
-					<p>non-editable</p>
-					<ElementProps
-						data={{
-							foo: "bar",
-							bob: null,
-							bazly: 123,
-							baz: true,
-						}}
-					/>
-					<p>editable</p>
-					<div style="width: 20rem; outline: 1px solid red">
-						<ElementProps
-							editable
-							data={{
-								foo: "bar",
-								longvalue: "asdji asdj asijd lksaj dlask kajdaklsj dklsabar",
-								bob: null,
-								bazly: 123,
-								baz: true,
-								arr: [1, 2, 3],
-								obj: { foo: "bar" },
-								set: new Set([1, 2, 3]),
-								map: new Map([[1, "a"], [2, "b"]]),
-								children: {
-									type: "vnode",
-									name: "span",
-								},
-								bar: {
-									type: "function",
-									name: "foobar",
-								},
-							}}
-						/>
-					</div>
-					<h2>Icon Btns</h2>
-					<IconBtn onClick={() => console.log("click")}>
-						<Picker />
-					</IconBtn>
-					<h2>Modals</h2>
-					<button
-						onClick={() => {
-							const next = !showModal;
-							setShowModal(next);
-							localStorage.setItem("show-modal", next + "");
-						}}
-					>
-						show modal
-					</button>
-					<AppCtx.Provider value={store}>
-						{showModal && (
-							<SettingsModal
-								onClose={() => {
-									setShowModal(false);
-									localStorage.removeItem("show-modal");
-								}}
-							/>
-						)}
-					</AppCtx.Provider>
-					<ModalBackdrop
-						active={showModal}
-						onClick={() => {
-							setShowModal(false);
-							localStorage.removeItem("show-modal");
-						}}
-					/>
-					<Headline title="foobar" />
-					<h2>TreeBar</h2>
-					<div style="border: 1px solid #555">
-						<AppCtx.Provider value={tstore}>
-							<TreeBar />
-						</AppCtx.Provider>
-					</div>
-					<h2>TreeView</h2>
-					<div style="height: 20rem; overflow: auto;">
-						<AppCtx.Provider value={tstore}>
-							<TreeView />
-						</AppCtx.Provider>
-					</div>
-					<p>Empty tree view</p>
-					<AppCtx.Provider value={store}>
-						<TreeView />
-					</AppCtx.Provider>
 				</div>
 			</div>
 		</div>
@@ -243,5 +329,5 @@ export function TodoList() {
 }
 
 export function renderExample(dom) {
-	render(<TodoList />, dom);
+	render(<StyleGuide />, dom);
 }

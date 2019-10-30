@@ -1,4 +1,4 @@
-import { ObjPath } from "../../view/components/ElementProps";
+import { ObjPath } from "../../view/components/sidebar/ElementProps";
 
 export function inject(codeOrSrc: string, mode: "script" | "code" = "code") {
 	const s = document.createElement("script");
@@ -26,4 +26,28 @@ export function setIn(obj: Record<string, any>, path: ObjPath, value: any) {
 	if (parent && last) {
 		parent[last] = value;
 	}
+}
+
+export function debounce<T extends any[]>(
+	callback: (...args: T) => void,
+	wait: number,
+) {
+	let timeout: any = null;
+	return (...args: T) => {
+		const next = () => callback(...args);
+		clearTimeout(timeout);
+		timeout = setTimeout(next, wait);
+	};
+}
+
+export function copyToClipboard(text: string) {
+	const dom = document.createElement("textarea");
+	dom.textContent = text;
+	document.body.appendChild(dom);
+
+	dom.select();
+	document.execCommand("copy");
+	dom.blur();
+
+	document.body.removeChild(dom);
 }

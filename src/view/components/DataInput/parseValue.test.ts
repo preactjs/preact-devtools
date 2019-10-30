@@ -12,6 +12,10 @@ describe("parseValue", () => {
 		expect(parseValue("undefined")).to.equal(undefined);
 	});
 
+	it("should treat empty as undefined", () => {
+		expect(parseValue("")).to.equal(undefined);
+	});
+
 	it("should parse numbers", () => {
 		expect(parseValue("123")).to.equal(123);
 		expect(parseValue("-123")).to.equal(-123);
@@ -59,7 +63,7 @@ describe("valueToHuman", () => {
 		expect(valueToHuman(-12)).to.equal("-12");
 		expect(valueToHuman(-0.3)).to.equal("-0.3");
 		expect(valueToHuman(null)).to.equal("null");
-		expect(valueToHuman(undefined)).to.equal("undefined");
+		expect(valueToHuman(undefined)).to.equal("");
 	});
 
 	it("should stringify objects", () => {

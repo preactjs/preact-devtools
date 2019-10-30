@@ -1,6 +1,6 @@
 import { h, ComponentChildren, Fragment } from "preact";
 import { createPortal } from "preact/compat";
-import { useRef, useEffect, useState } from "preact/hooks";
+import { useRef, useEffect, useState, useMemo } from "preact/hooks";
 
 export interface Props {
 	children: ComponentChildren;
@@ -25,18 +25,21 @@ export function Iframer({ children, ...rest }: Props) {
 		container.style.overflow = "hidden";
 		container.style.background = "none";
 	}
-	return (
-		<iframe ref={ref} {...rest}>
-			{container &&
-				createPortal(
-					<Fragment>
-						{styles.map(sheet => (
-							<style>{sheet}</style>
-						))}
-						{children as any}
-					</Fragment>,
-					container,
-				)}
-		</iframe>
-	);
+
+	return useMemo(() => {
+		return (
+			<iframe ref={ref} {...rest}>
+				{container &&
+					createPortal(
+						<Fragment>
+							{styles.map(sheet => (
+								<style>{sheet}</style>
+							))}
+							{children as any}
+						</Fragment>,
+						container,
+					)}
+			</iframe>
+		);
+	}, [styles]);
 }

@@ -14,7 +14,16 @@ function createPanel() {
 	const store = createStore();
 	let doc: Document;
 
-	function initPort() {
+	async function initPort() {
+		// Load theme
+		const theme = await new Promise(res => {
+			chrome.storage.sync.get(["theme"], result => res(result.theme));
+		});
+
+		if (theme) {
+			store.theme.$ = theme as any;
+		}
+
 		// Listen to messages from the content-script
 		const { tabId } = chrome.devtools.inspectedWindow;
 		const port = chrome.runtime.connect({
@@ -23,6 +32,14 @@ function createPanel() {
 
 		store.subscribe((name, data) => {
 			port!.postMessage({ name, payload: data });
+		});
+
+		const dispose = store.theme.on(v => {
+			chrome.storage.sync.set({ theme: v });
+		});
+
+		port!.onDisconnect.addListener(() => {
+			dispose();
 		});
 
 		port!.onMessage.addListener(msg => {

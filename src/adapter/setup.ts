@@ -1,9 +1,10 @@
 import { DevtoolsHook } from "./hook";
 import { Options } from "preact";
-import { createAdapter } from "./adapter";
+import { createAdapter } from "./adapter/adapter";
 import { createBridge } from "./bridge";
 import { createRenderer } from "./10/renderer";
 import { setupOptions } from "./10/options";
+import { parseFilters } from "./10/filter";
 
 export async function init(options: Options, getHook: () => DevtoolsHook) {
 	const bridge = createBridge(window);
@@ -19,11 +20,19 @@ export async function init(options: Options, getHook: () => DevtoolsHook) {
 
 	bridge.listen("initialized", renderer.flushInitial);
 	bridge.listen("highlight", adapter.highlight);
-	bridge.listen("update-node", ev => {
-		adapter.update(ev.id, ev.type, ev.path, ev.value);
+	bridge.listen("update-prop", ev => {
+		adapter.update(ev.id, "props", ev.path, ev.value);
 	});
-	bridge.listen("update-filter", ev => renderer.applyFilters(ev));
+	bridge.listen("update-state", ev => {
+		adapter.update(ev.id, "state", ev.path, ev.value);
+	});
+	bridge.listen("update-context", ev => {
+		adapter.update(ev.id, "context", ev.path, ev.value);
+	});
+	bridge.listen("update-filter", ev => renderer.applyFilters(parseFilters(ev)));
+	bridge.listen("force-update", ev => renderer.forceUpdate(ev));
 	bridge.listen("select", adapter.select);
+	bridge.listen("copy", adapter.copy);
 	bridge.listen("inspect", adapter.inspect);
 	bridge.listen("log", adapter.log);
 	bridge.listen("update", adapter.log);

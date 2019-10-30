@@ -1,28 +1,34 @@
 import { h } from "preact";
 import s from "./DataInput.css";
-import { useCallback, useRef, useState, useEffect } from "preact/hooks";
+import { useCallback, useRef, useState } from "preact/hooks";
 import { Undo } from "../icons";
-import { parseValue, valueToHuman, isStringifiedVNode } from "./parseValue";
+import {
+	parseValue,
+	isStringifiedVNode,
+	displayCollection,
+	valueToHuman,
+} from "./parseValue";
+import { focusNext } from "../../../adapter/dom";
 
 export interface InputProps {
 	value: any;
+	initialValue: any;
+	class?: string;
 	onChange: (value: any) => void;
 }
 
-export function DataInput({ value, onChange }: InputProps) {
+export function DataInput({
+	value,
+	onChange,
+	initialValue,
+	...props
+}: InputProps) {
 	const hasCheck = typeof value === "boolean";
-
-	const initial = valueToHuman(value);
-
+	const initial = valueToHuman(initialValue);
 	const [focus, setFocus] = useState(false);
 	const [v, set] = useState(initial);
 	const [valid, setValid] = useState(true);
 	const ref = useRef<HTMLInputElement>();
-
-	// TODO: Seems wrong
-	useEffect(() => {
-		set(initial);
-	}, [value]);
 
 	if (ref.current) {
 		ref.current.setCustomValidity(valid ? "" : "Invalid input");
@@ -40,9 +46,7 @@ export function DataInput({ value, onChange }: InputProps) {
 
 	let inputVal = "" + v;
 	if (!focus) {
-		if (typeof value === "object" && value !== null) {
-			inputVal = Array.isArray(value) ? "Array" : "Object";
-		}
+		inputVal = displayCollection(value);
 	}
 
 	let type: string = typeof value;
@@ -56,22 +60,29 @@ export function DataInput({ value, onChange }: InputProps) {
 
 	const onKeyDown = useCallback(
 		(e: KeyboardEvent) => {
-			if (typeof parseValue(v) === "number") {
-				let next;
-				switch (e.key) {
-					case "ArrowUp":
-						next = "" + (+v + 1);
-						break;
-					case "ArrowDown":
-						next = "" + (+v - 1);
-						break;
-				}
+			try {
+				if (e.key === "Enter" && !e.shiftKey) {
+					focusNext(e.target as any);
+					e.preventDefault();
+				} else {
+					if (typeof parseValue(v) === "number") {
+						let next;
+						switch (e.key) {
+							case "ArrowUp":
+								next = "" + (+v + 1);
+								break;
+							case "ArrowDown":
+								next = "" + (+v - 1);
+								break;
+						}
 
-				if (next !== undefined) {
-					set(next);
-					onCommit(next);
+						if (next !== undefined) {
+							set(next);
+							onCommit(next);
+						}
+					}
 				}
-			}
+			} catch (e) {}
 		},
 		[type, v],
 	);
@@ -94,7 +105,7 @@ export function DataInput({ value, onChange }: InputProps) {
 				<input
 					type="text"
 					ref={ref}
-					class={`${s.valueInput} ${focus ? s.focus : ""}`}
+					class={`${s.valueInput} ${props.class || ""} ${focus ? s.focus : ""}`}
 					value={inputVal}
 					onFocus={() => setFocus(true)}
 					onBlur={() => setFocus(false)}

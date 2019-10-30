@@ -1,14 +1,14 @@
-import { ID } from "../../store";
+import { ID } from "../../store/types";
 
-export function flattenChildren<T extends { id: ID; children: ID[] }>(
-	tree: Map<ID, T>,
-	id: ID,
-	collapsed: Set<ID>,
-): ID[] {
-	const out: ID[] = [];
-	const visited = new Set<ID>();
-	let item: ID | undefined;
-	let stack: ID[] = [id];
+export function flattenChildren<K, T extends { id: K; children: K[] }>(
+	tree: Map<K, T>,
+	id: K,
+	collapsed: Set<K>,
+): K[] {
+	const out: K[] = [];
+	const visited = new Set<K>();
+	let item: K | undefined;
+	let stack: K[] = [id];
 
 	while ((item = stack.pop())) {
 		const node = tree.get(item);

@@ -1,6 +1,6 @@
 import { h } from "preact";
 import s from "./Tree.css";
-import { ID, useObserver, useStore } from "../store";
+import { useObserver, useStore } from "../store/react-bindings";
 import { useEffect, useState, useRef, useCallback } from "preact/hooks";
 import { getLastChild } from "./tree/windowing";
 import { useKeyListNav } from "./tree/keyboard";
@@ -9,6 +9,7 @@ import { useCollapser } from "../store/collapser";
 import { BackgroundLogo } from "./tree/background-logo";
 import { useSearch } from "../store/search";
 import { scrollIntoView } from "./utils";
+import { ID } from "../store/types";
 
 export function TreeView() {
 	const store = useStore();
@@ -90,6 +91,7 @@ export function TreeItem(props: { key: any; id: ID }) {
 	const store = useStore();
 	const sel = useSelection();
 	const { collapsed, toggle } = useCollapser();
+	const filterFragments = useObserver(() => store.filter.filterFragment.$);
 	const node = useObserver(() => store.nodes.$.get(id) || null);
 	const onToggle = () => toggle(id);
 	const ref = useRef<HTMLDivElement>();
@@ -112,7 +114,8 @@ export function TreeItem(props: { key: any; id: ID }) {
 			data-selected={isSelected}
 			data-id={id}
 			data-depth={node.depth}
-			style={`padding-left: calc(var(--indent-depth) * ${node.depth - 1})`}
+			style={`padding-left: calc(var(--indent-depth) * ${node.depth -
+				(filterFragments ? 2 : 1)})`}
 		>
 			<div class={s.itemHeader}>
 				{node.children.length > 0 && (
@@ -127,6 +130,14 @@ export function TreeItem(props: { key: any; id: ID }) {
 				{node.children.length === 0 && <div class={s.noToggle} />}
 				<span class={s.name}>
 					<MarkResult text={node.name} id={id} />
+					{node.key ? (
+						<span class={s.keyLabel}>
+							{" "}
+							key="<span class={s.key}>{node.key}</span>"
+						</span>
+					) : (
+						""
+					)}
 				</span>
 			</div>
 		</div>
@@ -152,6 +163,10 @@ export function HighlightPane(props: { treeDom: HTMLDivElement | null }) {
 	const { selected } = useSelection();
 	const { collapsed } = useCollapser();
 
+	// Subscribe to nodeList so that we rerender whenever nodes
+	// are collapsed
+	const list = useObserver(() => store.nodeList.$);
+
 	let [pos, setPos] = useState({ top: 0, height: 0 });
 	useEffect(() => {
 		if (selected > -1 && !collapsed.has(selected)) {
@@ -176,8 +191,10 @@ export function HighlightPane(props: { treeDom: HTMLDivElement | null }) {
 			} else {
 				setPos({ top: 0, height: 0 });
 			}
+		} else {
+			setPos({ top: 0, height: 0 });
 		}
-	}, [selected]);
+	}, [selected, list]);
 
 	return (
 		<div

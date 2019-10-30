@@ -1,13 +1,36 @@
 .root {
+	position: relative;
 	border: none;
 	background: none;
 	cursor: pointer;
 	display: inline-flex;
+	flex: 0 0 auto;
+	padding: 0;
 	align-items: center;
 	outline: none;
 	color: var(--color-text);
 }
 
-.root[data-active] {
-	color: var(--color-button-active);
+.root svg {
+	position: relative;
+	z-index: 1;
+}
+
+.root[data-active],
+.root:focus,
+.root:active {
+	color: var(--color-selected-text);
+}
+
+.root:focus::after,
+.root:active::after,
+.root[data-active]::after {
+	content: "";
+	position: absolute;
+	left: -0.25rem;
+	top: -0.25rem;
+	right: -0.25rem;
+	bottom: -0.25rem;
+	background: var(--color-selected-bg);
+	border-radius: 0.2rem;
 }

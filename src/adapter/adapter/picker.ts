@@ -1,4 +1,4 @@
-import { Renderer } from "./10/renderer";
+import { Renderer } from "../10/renderer";
 
 export function createPicker(
 	window: Window,

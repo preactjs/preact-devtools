@@ -1,12 +1,13 @@
-import { ID, Listener, AppCtx, useObserver } from ".";
-import { valoo, Observable, watch } from "../valoo";
+import { AppCtx, useObserver } from "./react-bindings";
+import { valoo, Observable } from "../valoo";
 import { clamp } from "../components/tree/windowing";
 import { useContext } from "preact/hooks";
+import { ID } from "./types";
 
 /**
  * Manages selection state of the TreeView.
  */
-export function createSelectionStore(list: Observable<ID[]>, notify: Listener) {
+export function createSelectionStore(list: Observable<ID[]>) {
 	const selected = valoo<ID>(list.$.length > 0 ? list.$[0] : -1);
 	const selectedIdx = valoo(0);
 
@@ -23,10 +24,6 @@ export function createSelectionStore(list: Observable<ID[]>, notify: Listener) {
 		const idx = list.$.findIndex(x => x === id);
 		selectByIndex(idx);
 	};
-
-	// Whenever the selection changes we need to fire a request to
-	// load the prop data for the sidebar
-	watch(() => notify("inspect", selected.$));
 
 	return {
 		selected,

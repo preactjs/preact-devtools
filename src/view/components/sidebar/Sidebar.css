@@ -6,7 +6,6 @@
 }
 
 .title {
-	padding: 0 0.5rem;
 	color: var(--color-element-text);
 	font-family: monospace;
 	font-size: 1rem;
@@ -22,9 +21,14 @@
 
 .actions {
 	justify-content: space-between;
+	padding: 0 0.6rem !important;
 }
 
 .iconActions {
 	display: flex;
 	align-items: center;
+}
+
+.iconActions > * + * {
+	margin-left: 0.25rem;
 }

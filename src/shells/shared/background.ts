@@ -1,6 +1,7 @@
 export interface Connection {
 	devtools: chrome.runtime.Port | null;
 	contentScript: chrome.runtime.Port | null;
+	removeListeners: () => void;
 }
 
 const conn = new Map<number, Connection>();
@@ -16,6 +17,11 @@ chrome.runtime.onConnect.addListener(port => {
 	if (+port.name + "" === port.name) {
 		name = "devtools";
 		tab = +port.name;
+
+		// Make sure to install the content script only once
+		const status = conn.get(tab);
+		if (status) status.removeListeners();
+
 		installContentScript(tab);
 	} else {
 		tab = port.sender!.tab!.id!;
@@ -23,7 +29,11 @@ chrome.runtime.onConnect.addListener(port => {
 	}
 
 	if (!conn.has(tab)) {
-		conn.set(tab, { devtools: null, contentScript: null });
+		conn.set(tab, {
+			devtools: null,
+			contentScript: null,
+			removeListeners: () => null,
+		});
 	}
 
 	const activeConn = conn.get(tab);
@@ -31,14 +41,6 @@ chrome.runtime.onConnect.addListener(port => {
 
 	// If both the content-script and the devtools are conncted we can start
 	// setting up the message handlers
-	if (activeConn) {
-		console.log(
-			tab,
-			name,
-			activeConn.contentScript === null,
-			activeConn.devtools === null,
-		);
-	}
 	if (activeConn && activeConn.contentScript && activeConn.devtools) {
 		const { contentScript, devtools } = activeConn;
 
@@ -56,10 +58,16 @@ chrome.runtime.onConnect.addListener(port => {
 		};
 		devtools.onMessage.addListener(forwardToContentScript);
 
-		const shutdown = () => {
+		const removeListeners = () => {
+			contentScript.disconnect();
 			contentScript.onMessage.removeListener(forwardToDevtools);
 			devtools.onMessage.removeListener(forwardToContentScript);
-			contentScript.disconnect();
+		};
+
+		activeConn.removeListeners = removeListeners;
+
+		const shutdown = () => {
+			removeListeners();
 			devtools.disconnect();
 			activeConn.contentScript = null;
 			activeConn.devtools = null;

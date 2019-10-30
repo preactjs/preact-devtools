@@ -1,7 +1,28 @@
 import { Renderer } from "./10/renderer";
 import { createBridge } from "./bridge";
+import { ObjPath } from "../view/components/sidebar/ElementProps";
+import { RawFilterState } from "./10/filter";
+import { ID } from "../view/store/types";
 
 export type EmitterFn = (event: string, data: any) => void;
+
+export interface DevtoolEvents {
+	"update-prop": { id: ID; path: ObjPath; value: any };
+	"update-state": { id: ID; path: ObjPath; value: any };
+	"update-context": { id: ID; path: ObjPath; value: any };
+	"force-update": ID;
+	"start-picker": null;
+	"stop-picker": null;
+	"update-filter": RawFilterState;
+	copy: string;
+	highlight: ID | null;
+	log: ID;
+	inspect: ID;
+}
+export type EmitFn = <K extends keyof DevtoolEvents>(
+	name: K,
+	data: DevtoolEvents[K],
+) => void;
 
 export interface DevtoolsHook {
 	connected: boolean;

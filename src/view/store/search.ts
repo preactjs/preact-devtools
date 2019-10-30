@@ -1,15 +1,19 @@
 import { Observable, valoo } from "../valoo";
-import { DevNode, useStore, useObserver } from ".";
+import { useStore, useObserver } from "./react-bindings";
 import escapeRegex from "escape-string-regexp";
+import { ID, DevNode } from "./types";
 
-export function createSearchStore(items: Observable<Map<number, DevNode>>) {
+export function createSearchStore(
+	items: Observable<Map<ID, DevNode>>,
+	list: Observable<ID[]>,
+) {
 	const value = valoo("");
 	const selected = valoo(0);
 	const regex = valoo<RegExp | null>(null);
 	const match = valoo<number[]>([]);
 	const count = valoo(0);
 
-	const reset = () => (value.$ = "");
+	const reset = () => onChange("");
 	const onChange = (s: string) => {
 		value.$ = s;
 
@@ -26,9 +30,10 @@ export function createSearchStore(items: Observable<Map<number, DevNode>>) {
 		regex.$ = reg;
 
 		let ids: number[] = [];
-		items.$.forEach(node => {
-			if (reg.test(node.name)) {
-				ids.push(node.id);
+		list.$.forEach(id => {
+			let node = items.$.get(id);
+			if (node && reg.test(node.name)) {
+				ids.push(id);
 			}
 		});
 
@@ -82,8 +87,12 @@ export function useSearch() {
 	let value = useObserver(() => s.value.$);
 	let marked = useObserver(() => s.selected.$);
 	let regex = useObserver(() => s.regex.$);
+	let count = useObserver(() => s.count.$);
+	let selected = useObserver(() => s.selected.$);
 	let selectedId = useObserver(() => s.match.$[s.selected.$]);
 	return {
+		count,
+		selected,
 		selectedId,
 		marked,
 		regex,

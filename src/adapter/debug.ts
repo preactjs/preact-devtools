@@ -1,12 +1,13 @@
 import { MsgTypes } from "./events";
 import { parseTable, flushTable } from "./string-table";
-import { ID } from "../view/store";
 import { Elements } from "./10/renderer";
+import { ID } from "../view/store/types";
 
 export interface ParsedMsg {
 	rootId: number;
 	mounts: Array<{ id: ID; key: string; name: string; parentId: ID }>;
 	unmounts: ID[];
+	reorders: Array<{ id: ID; children: ID[] }>;
 	timings: Array<{ id: ID; duration: number }>;
 }
 
@@ -20,8 +21,9 @@ export function parseCommitMessage(data: number[]): ParsedMsg {
 	let mounts: any[] = [];
 	let unmounts: any[] = [];
 	let timings: any[] = [];
+	let reorders: any[] = [];
 
-	i = len > 0 ? len + 3 : i;
+	i = len > 0 ? len + 2 : i;
 
 	for (; i < data.length; i++) {
 		switch (data[i]) {
@@ -36,7 +38,7 @@ export function parseCommitMessage(data: number[]): ParsedMsg {
 			}
 			case MsgTypes.UPDATE_VNODE_TIMINGS:
 				timings.push({ id: data[i + 1], duration: data[i + 2] });
-				i += 3;
+				i += 2;
 				break;
 			case MsgTypes.REMOVE_VNODE: {
 				const unmountLen = data[i + 1];
@@ -45,6 +47,15 @@ export function parseCommitMessage(data: number[]): ParsedMsg {
 				for (; i < len; i++) {
 					unmounts.push(data[i]);
 				}
+				break;
+			}
+			case MsgTypes.REORDER_CHILDREN: {
+				reorders.push({
+					id: data[i + 1],
+					children: data.slice(i + 3, i + 3 + data[i + 2]),
+				});
+				i += 2 + data[i + 2];
+				break;
 			}
 		}
 	}
@@ -54,6 +65,7 @@ export function parseCommitMessage(data: number[]): ParsedMsg {
 		mounts,
 		unmounts,
 		timings,
+		reorders,
 	};
 }
 
@@ -66,6 +78,9 @@ export function formatForTest(msg: ParsedMsg) {
 	});
 	msg.timings.forEach(t => {
 		out.push(`Update timings ${t.id}`);
+	});
+	msg.reorders.forEach(r => {
+		out.push(`Reorder ${r.id} [${r.children.join(", ")}]`);
 	});
 	msg.unmounts.forEach(u => {
 		out.push(`Unmount ${u}`);
@@ -83,6 +98,7 @@ export function fromSnapshot(events: string[]): number[] {
 	const out: number[] = [];
 	let operations: number[] = [];
 	let strings: string[] = [];
+	let unmounts: number[] = [];
 
 	if (/^rootId\:/.test(events[0])) {
 		const id = +events[0].slice(events[0].indexOf(":") + 1);
@@ -120,10 +136,21 @@ export function fromSnapshot(events: string[]): number[] {
 			} else {
 				throw new Error("no match: " + ev);
 			}
+		} else if (/^Remove/.test(ev)) {
+			const m = ev.match(/Remove\s+(\d+)/);
+			if (m) {
+				const id = +m[1];
+				unmounts.push(id);
+			} else {
+				throw new Error("no match: " + ev);
+			}
 		}
 	}
 
 	out.push(...flushTable(new Map(strings.map((x, i) => [x, i]))));
+	if (unmounts.length > 0) {
+		out.push(MsgTypes.REMOVE_VNODE, unmounts.length, ...unmounts);
+	}
 	out.push(...operations);
 
 	return out;
@@ -178,6 +205,10 @@ export function printCommit(data: number[]) {
 					for (; i < len; i++) {
 						console.log(`  Remove: %c${data[i]}`, "color: red");
 					}
+					break;
+				}
+				case MsgTypes.REORDER_CHILDREN: {
+					break;
 				}
 			}
 		}

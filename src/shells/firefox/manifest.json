@@ -5,7 +5,7 @@
 	"version": "0.0.1",
 	"devtools_page": "devtools.html",
 	"content_security_policy": "script-src 'self' 'unsafe-eval'; object-src 'self'",
-	"permissions": ["file:///*", "http://*/*", "https://*/*"],
+	"permissions": ["file:///*", "http://*/*", "https://*/*", "storage"],
 	"icons": {
 		"16": "icons/icon-16.png",
 		"32": "icons/icon-32.png",

@@ -1,5 +1,5 @@
 .panel {
-	padding: 0.5rem;
+	padding: 0.6rem;
 }
 
 .empty {
@@ -7,6 +7,11 @@
 	color: var(--color-text-empty);
 	font-size: 0.65rem;
 	padding-left: 0.8rem;
+}
+
+.panelHeader {
+	display: flex;
+	justify-content: space-between;
 }
 
 .title {

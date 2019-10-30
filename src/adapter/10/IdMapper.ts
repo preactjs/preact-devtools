@@ -7,8 +7,8 @@ export interface IdMapper {
 	hasId(vnode: VNode): boolean;
 	createId(vnode: VNode): number;
 	getId(vnode: VNode): number;
+	update(id: number, vnode: VNode): void;
 	remove(vnode: VNode): void;
-	getByDom(node: HTMLElement | Text): number;
 }
 
 /**
@@ -19,7 +19,6 @@ export function createIdMapper(): IdMapper {
 	const instToId = new WeakMap<any, number>();
 	const idToVNode = new Map<number, VNode>();
 	const idToInst = new Map<number, any>();
-	const domToId = new WeakMap<HTMLElement | Text, number>();
 
 	let uuid = 1;
 
@@ -33,9 +32,12 @@ export function createIdMapper(): IdMapper {
 	const getId = (vnode: VNode) => {
 		if (vnode == null) return -1;
 		const inst = getInstance(vnode);
-		const id = instToId.get(inst) || -1;
-		if (id > -1) idToVNode.set(id, vnode);
-		return id;
+		return instToId.get(inst) || -1;
+	};
+	const update = (id: number, vnode: VNode) => {
+		const inst = getInstance(vnode);
+		idToInst.set(id, inst);
+		idToVNode.set(id, vnode);
 	};
 	const remove = (vnode: VNode) => {
 		if (hasId(vnode)) {
@@ -43,37 +45,28 @@ export function createIdMapper(): IdMapper {
 			idToInst.delete(id);
 		}
 		instToId.delete(vnode);
-		const dom = getDom(vnode);
-		if (typeof vnode.type !== "function" && dom != null) {
-			domToId.delete(dom);
-		}
 	};
 	const createId = (vnode: VNode) => {
 		const id = uuid++;
 		instToId.set(getInstance(vnode), id);
 		idToInst.set(id, getInstance(vnode));
 		idToVNode.set(id, vnode);
-		const dom = getDom(vnode);
-		if (typeof vnode.type !== "function" && dom != null) {
-			domToId.set(dom, id);
-		}
 		return id;
 	};
 
 	const has = (id: number) => idToInst.has(id);
 
-	const getByDom = (node: HTMLElement | Text) => {
-		return domToId.get(node) || -1;
-	};
-
-	return { has, getVNode, hasId, createId, getId, remove, getByDom };
+	return { has, update, getVNode, hasId, createId, getId, remove };
 }
 
+// FIXME: Preact 10 specific
 export function getInstance(vnode: VNode): any {
 	// For components we use the instance to check refs, otherwise
 	// we'll use a dom node
 	if (typeof vnode.type === "function") {
 		return getComponent(vnode);
+	} else if (vnode.type == null) {
+		return vnode.props;
 	}
 
 	return getDom(vnode);
