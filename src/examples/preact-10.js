@@ -25,6 +25,10 @@ function Headline(props) {
 	return <h3>{props.title}</h3>;
 }
 
+function DeepNest(props) {
+	return <div>{props.children}</div>;
+}
+
 const tstore = treeStore();
 
 const pStore = createPropsStore(tstore.inspectData, data => data.props, d => d);
@@ -156,10 +160,77 @@ export function StyleGuide() {
 							</AppCtx.Provider>
 						</div>
 					</div>
+					<br />
+					<br />
+					<div>
+						<div style="height: overflow: auto;">
+							<AppCtx.Provider value={tstore}>
+								<TreeView />
+							</AppCtx.Provider>
+						</div>
+					</div>
 					<p>Empty tree view</p>
 					<AppCtx.Provider value={store}>
 						<TreeView />
 					</AppCtx.Provider>
+					<h3>Deeply nested</h3>
+					<DeepNest>
+						<DeepNest>
+							<DeepNest>
+								<DeepNest>
+									<DeepNest>
+										<DeepNest>
+											<DeepNest>
+												<DeepNest>
+													<DeepNest>
+														<DeepNest>
+															<DeepNest>
+																<DeepNest>
+																	<DeepNest>
+																		<DeepNest>
+																			<DeepNest>
+																				<DeepNest>
+																					<DeepNest>
+																						<DeepNest>
+																							<DeepNest>
+																								<DeepNest>
+																									<DeepNest>
+																										<DeepNest>
+																											<DeepNest>
+																												<DeepNest>
+																													<DeepNest>
+																														<DeepNest>
+																															<DeepNest>
+																																<DeepNest>
+																																	deep
+																																</DeepNest>
+																															</DeepNest>
+																														</DeepNest>
+																													</DeepNest>
+																												</DeepNest>
+																											</DeepNest>
+																										</DeepNest>
+																									</DeepNest>
+																								</DeepNest>
+																							</DeepNest>
+																						</DeepNest>
+																					</DeepNest>
+																				</DeepNest>
+																			</DeepNest>
+																		</DeepNest>
+																	</DeepNest>
+																</DeepNest>
+															</DeepNest>
+														</DeepNest>
+													</DeepNest>
+												</DeepNest>
+											</DeepNest>
+										</DeepNest>
+									</DeepNest>
+								</DeepNest>
+							</DeepNest>
+						</DeepNest>
+					</DeepNest>
 					<h3>Highlighter</h3>
 					<div class="grid">
 						<div>
