@@ -28,7 +28,7 @@ export function createStore(): Store {
 	// List
 	const collapser = createCollapser<ID>();
 	const nodeList = watch(() => {
-		const list = flattenChildren(
+		const list = flattenChildren<ID, DevNode>(
 			nodes.$,
 			rootToChild.$.get(1)!,
 			collapser.collapsed.$,
