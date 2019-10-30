@@ -329,7 +329,7 @@ export function update(
 	const skip = shouldFilter(vnode, filters);
 	if (skip) {
 		const children = getActualChildren(vnode);
-		for (let i = 0; i < children; i++) {
+		for (let i = 0; i < children.length; i++) {
 			update(ids, commit, children[i], filters, domCache);
 		}
 		return;
