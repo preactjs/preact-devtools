@@ -59,11 +59,14 @@ export function createIdMapper(): IdMapper {
 	return { has, update, getVNode, hasId, createId, getId, remove };
 }
 
+// FIXME: Preact 10 specific
 export function getInstance(vnode: VNode): any {
 	// For components we use the instance to check refs, otherwise
 	// we'll use a dom node
 	if (typeof vnode.type === "function") {
 		return getComponent(vnode);
+	} else if (vnode.type == null) {
+		return vnode.props;
 	}
 
 	return getDom(vnode);
