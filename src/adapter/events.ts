@@ -155,7 +155,6 @@ export function applyOperations(store: Store, data: number[]) {
 						// Remove node from store
 						store.nodes.$.delete(nodeId);
 					}
-					console.log(`  Remove: %c${data[i]}`, "color: red");
 				}
 
 				// Subtract one because of outer loop
