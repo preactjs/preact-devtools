@@ -7,16 +7,22 @@ import { AppCtx, EmitCtx } from "../store/react-bindings";
 import { ModalRenderer } from "./Modals";
 import { Store } from "../store/types";
 import { ThemeSwitcher } from "./ThemeSwitcher";
+import { SidebarActions } from "./sidebar/SidebarActions";
 
 export function DevTools(props: { store: Store }) {
 	return (
 		<EmitCtx.Provider value={props.store.emit}>
 			<AppCtx.Provider value={props.store}>
-				<div class={s.root}>
+				<div class={s.root + " " + s.theme}>
 					<ThemeSwitcher />
-					<div class={s.components}>
+					<div class={s.componentActions}>
 						<TreeBar />
+					</div>
+					<div class={s.components}>
 						<TreeView />
+					</div>
+					<div class={s.sidebarActions}>
+						<SidebarActions />
 					</div>
 					<div class={s.sidebar}>
 						<Sidebar />

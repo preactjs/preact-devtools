@@ -21,5 +21,5 @@ export function ThemeSwitcher() {
 		}
 	}, [theme, ref.current]);
 
-	return <div ref={ref} />;
+	return <div ref={ref} style="display: none" />;
 }

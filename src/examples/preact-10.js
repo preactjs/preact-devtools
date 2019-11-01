@@ -54,7 +54,7 @@ export function StyleGuide() {
 
 	return (
 		<div class={theme === "auto" ? "dark" : theme}>
-			<div style="padding: 5rem" class={d.root}>
+			<div style="padding: 5rem" class={d.theme}>
 				<div style="display: flex; flex-direction: column;">
 					<h2>Todo List</h2>
 					<TodoList />

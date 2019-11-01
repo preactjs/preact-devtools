@@ -1,21 +1,27 @@
 .root {
-	min-width: 100%;
-	height: 100%;
-	display: flex;
-	flex-direction: row;
+	height: 100vh;
+	display: grid;
+	grid-template-columns: auto 35%;
+	grid-template-rows: 2.25rem 1fr;
+	grid-template-areas:
+		"treeActions sidebarActions"
+		"tree sidebar";
+}
+
+.theme {
 	background: var(--color-bg);
 	color: var(--color-text);
 }
 
-.root button::-moz-focus-inner {
+.theme button::-moz-focus-inner {
 	border: none;
 }
 
-.root input {
+.theme input {
 	margin: 0;
 }
 
-:global(.light) .root {
+:global(.light) .theme {
 	--color-bg: white;
 	--color-text: #333;
 	--color-selected-bg: #8058ca;
@@ -56,7 +62,7 @@
 	--color-props-vnode: #1b1b1b;
 }
 
-:global(.dark) .root {
+:global(.dark) .theme {
 	--color-bg: #242424;
 	--color-text: #b0b0b0;
 	--color-selected-bg: #ae80ff;
@@ -98,18 +104,22 @@
 	--color-props-vnode: #dedede;
 }
 
+.componentActions {
+	grid-area: treeActions;
+}
+
 .components {
-	display: flex;
-	flex: 0 0 65%;
-	width: 65%;
-	flex-direction: column;
+	grid-area: tree;
+	overflow: auto;
+}
+
+.sidebarActions {
+	grid-area: sidebarActions;
+	border-left: 0.0625rem solid var(--color-border);
 }
 
 .sidebar {
-	display: flex;
-	flex: 0 0 35%;
-	width: 35%;
-	overflow-x: hidden;
-	flex-direction: column;
+	grid-area: sidebar;
 	border-left: 0.0625rem solid var(--color-border);
+	overflow: auto;
 }
