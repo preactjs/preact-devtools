@@ -48,8 +48,9 @@ export function createIdMapper(): IdMapper {
 	};
 	const createId = (vnode: VNode) => {
 		const id = uuid++;
-		instToId.set(getInstance(vnode), id);
-		idToInst.set(id, getInstance(vnode));
+		const inst = getInstance(vnode);
+		instToId.set(inst, id);
+		idToInst.set(id, inst);
 		idToVNode.set(id, vnode);
 		return id;
 	};
@@ -65,8 +66,6 @@ export function getInstance(vnode: VNode): any {
 	// we'll use a dom node
 	if (typeof vnode.type === "function") {
 		return getComponent(vnode);
-	} else if (vnode.type == null) {
-		return vnode.props;
 	}
 
 	return getDom(vnode);
