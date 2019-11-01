@@ -276,6 +276,7 @@ describe("Renderer 10", () => {
 			expect(toSnapshot(spy.args[1][1])).to.deep.equal([
 				"rootId: 1",
 				"Update timings 2",
+				"Update timings 3",
 			]);
 		});
 	});
