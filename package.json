@@ -27,6 +27,8 @@
 		"css-loader": "^3.2.0",
 		"fork-ts-checker-webpack-plugin": "^1.5.0",
 		"html-webpack-plugin": "^3.2.0",
+		"husky": "^3.0.9",
+		"lint-staged": "^9.4.2",
 		"mochette": "^0.0.6",
 		"preact": "^10.0.0",
 		"prettier": "^1.18.2",
@@ -61,5 +63,16 @@
 	"prettier": {
 		"useTabs": true,
 		"trailingComma": "all"
+	},
+	"lint-staged": {
+		"**/*.{js,jsx,ts,tsx,json}": [
+			"prettier --write",
+			"git add"
+		]
+	},
+	"husky": {
+		"hooks": {
+			"pre-commit": "lint-staged"
+		}
 	}
 }
