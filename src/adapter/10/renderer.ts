@@ -61,7 +61,7 @@ export interface Renderer {
 	findVNodeIdForDom(node: HTMLElement | Text): number;
 	applyFilters(filters: FilterState): void;
 	has(id: ID): boolean;
-	log(id: ID): void;
+	log(id: ID, children: ID[]): void;
 	inspect(id: ID): InspectData | null;
 	onCommit(vnode: VNode): void;
 	onUnmount(vnode: VNode): void;
@@ -98,13 +98,13 @@ export function createRenderer(
 				if (c) c.forceUpdate();
 			}
 		},
-		log(id) {
+		log(id, children) {
 			const vnode = ids.getVNode(id);
 			if (vnode == null) {
 				console.warn(`Could not find vnode with id ${id}`);
 				return;
 			}
-			logVNode(vnode, id);
+			logVNode(vnode, id, children);
 		},
 		inspect(id) {
 			const vnode = ids.getVNode(id);
@@ -223,7 +223,7 @@ export function createRenderer(
 /**
  * Print an element to console
  */
-export function logVNode(vnode: VNode, id: ID) {
+export function logVNode(vnode: VNode, id: ID, children: ID[]) {
 	const display = getDisplayName(vnode);
 	const name = display === "#text" ? display : `<${display || "Component"} />`;
 
@@ -236,6 +236,7 @@ export function logVNode(vnode: VNode, id: ID) {
 	}
 	console.log("vnode:", vnode);
 	console.log("devtools id:", id);
+	console.log("devtools children:", children);
 	console.groupEnd();
 	/* eslint-enable no-console */
 }

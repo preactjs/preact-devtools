@@ -20,7 +20,7 @@ export interface Adapter {
 	inspect(id: ID): void;
 	startPickElement(): void;
 	stopPickElement(): void;
-	log(id: ID): void;
+	log(data: { id: ID; children: ID[] }): void;
 	copy(value: string): void;
 	update(id: ID, type: UpdateType, path: Path, value: any): void;
 	select(id: ID): void;
@@ -64,8 +64,10 @@ export function createAdapter(hook: DevtoolsHook, renderer: Renderer): Adapter {
 				}
 			}
 		},
-		log(id) {
-			if (renderer.has(id)) renderer.log(id);
+		log(data) {
+			if (renderer.has(data.id)) {
+				renderer.log(data.id, data.children);
+			}
 		},
 		select(id) {
 			// Unused

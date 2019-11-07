@@ -16,7 +16,7 @@ export function SidebarActions() {
 		if (node) emit("force-update", node.id);
 	}, [node]);
 	const log = useCallback(() => {
-		if (node) emit("log", node.id);
+		if (node) emit("log", { id: node.id, children: node.children });
 	}, [node]);
 
 	return (

@@ -3,6 +3,7 @@ import { createBridge } from "./bridge";
 import { ObjPath } from "../view/components/sidebar/ElementProps";
 import { RawFilterState } from "./10/filter";
 import { ID } from "../view/store/types";
+import { parseCommitMessage } from "./debug";
 
 export type EmitterFn = (event: string, data: any) => void;
 
@@ -16,7 +17,7 @@ export interface DevtoolEvents {
 	"update-filter": RawFilterState;
 	copy: string;
 	highlight: ID | null;
-	log: ID;
+	log: { id: ID; children: ID[] };
 	inspect: ID;
 }
 export type EmitFn = <K extends keyof DevtoolEvents>(
@@ -51,6 +52,9 @@ export function createHook(): DevtoolsHook {
 			_connected = value;
 		},
 		emit(name, data) {
+			if (name === "operation") {
+				console.log(name, parseCommitMessage(data));
+			}
 			bridge.send(name, data);
 		},
 		attach: renderer => {
