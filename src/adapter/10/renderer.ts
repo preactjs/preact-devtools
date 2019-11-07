@@ -271,7 +271,7 @@ export function createCommit(
 	if (isNew) {
 		mount(ids, commit, vnode, parentId, filters, domCache);
 	} else {
-		update(ids, commit, vnode, filters, domCache);
+		update(ids, commit, vnode, parentId, filters, domCache);
 	}
 
 	return commit;
@@ -323,6 +323,7 @@ export function update(
 	ids: IdMapper,
 	commit: Commit,
 	vnode: VNode,
+	ancestorId: number,
 	filters: FilterState,
 	domCache: WeakMap<HTMLElement | Text, VNode>,
 ) {
@@ -331,10 +332,15 @@ export function update(
 		const children = getActualChildren(vnode);
 		for (let i = 0; i < children.length; i++) {
 			if (children[i] != null) {
-				update(ids, commit, children[i], filters, domCache);
+				update(ids, commit, children[i], ancestorId, filters, domCache);
 			}
 		}
 		return;
+	}
+
+	if (!ids.hasId(vnode)) {
+		mount(ids, commit, vnode, ancestorId, filters, domCache);
+		return true;
 	}
 
 	const id = ids.getId(vnode);
@@ -361,7 +367,7 @@ export function update(
 				commit.unmountIds.push(oldChildren[i]);
 			}
 		} else if (ids.hasId(child) || shouldFilter(child, filters)) {
-			update(ids, commit, child, filters, domCache);
+			update(ids, commit, child, id, filters, domCache);
 			// TODO: This is only sometimes necessary
 			shouldReorder = true;
 		} else {

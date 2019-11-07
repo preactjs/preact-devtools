@@ -87,6 +87,55 @@ describe("Renderer 10", () => {
 		]);
 	});
 
+	it("should mount after update", () => {
+		render(<div>foo</div>, scratch);
+		render(
+			<div>
+				<span />
+			</div>,
+			scratch,
+		);
+
+		expect(toSnapshot(spy.args[1][1])).to.deep.equal([
+			"rootId: 1",
+			"Add 4 <span> to parent 2",
+			"Update timings 2",
+			"Unmount 3",
+		]);
+	});
+
+	it("should mount after filtered update", () => {
+		renderer.applyFilters({
+			regex: [],
+			type: new Set(["dom"]),
+		});
+
+		const Foo = (props: any) => <div>{props.children}</div>;
+		const Bar = (props: any) => <span>{props.children}</span>;
+
+		render(
+			<div>
+				<Foo />
+			</div>,
+			scratch,
+		);
+		render(
+			<div>
+				<Foo>
+					<Bar>bar</Bar>
+				</Foo>
+			</div>,
+			scratch,
+		);
+
+		expect(toSnapshot(spy.args[1][1])).to.deep.equal([
+			"rootId: 1",
+			"Add 3 <Bar> to parent 2",
+			"Update timings 1",
+			"Update timings 2",
+		]);
+	});
+
 	it("should update text", () => {
 		render(<div>foo</div>, scratch);
 		render(<div>bar</div>, scratch);
