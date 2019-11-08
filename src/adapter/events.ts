@@ -68,13 +68,10 @@ export function applyOperations(store: Store, data: number[]) {
 	let i = data[1] + 1;
 	const strings = parseTable(data.slice(1, i + 1));
 
-	let newRoot = false;
-
 	for (; i < data.length; i++) {
 		switch (data[i]) {
 			case MsgTypes.ADD_ROOT:
 				const id = data[i + 1];
-				newRoot = true;
 				store.roots.update(s => {
 					s.push(id);
 				});
@@ -87,8 +84,7 @@ export function applyOperations(store: Store, data: number[]) {
 				const key = data[i + 6] > 0 ? strings[data[i + 6] - 1] : "";
 				let parentId = data[i + 3];
 
-				if (newRoot) {
-					newRoot = false;
+				if (id === rootId) {
 					store.rootToChild.update(s => {
 						s.set(rootId, id);
 					});
