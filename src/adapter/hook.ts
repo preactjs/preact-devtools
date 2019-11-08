@@ -52,9 +52,6 @@ export function createHook(): DevtoolsHook {
 			_connected = value;
 		},
 		emit(name, data) {
-			if (name === "operation") {
-				console.log(name, parseCommitMessage(data));
-			}
 			bridge.send(name, data);
 		},
 		attach: renderer => {

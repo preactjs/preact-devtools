@@ -54,7 +54,7 @@ export function parseCommitMessage(data: number[]): ParsedMsg {
 					id: data[i + 1],
 					children: data.slice(i + 3, i + 3 + data[i + 2]),
 				});
-				i += 2 + data[i + 2];
+				i += 3 + data[i + 2];
 				break;
 			}
 		}

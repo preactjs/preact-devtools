@@ -389,32 +389,43 @@ export function resetChildren(
 	vnode: VNode,
 	filters: FilterState,
 ) {
-	let stack = getActualChildren(vnode);
-	if (!stack.length) return;
+	let children = getActualChildren(vnode);
+	if (!children.length) return;
 
-	/** @type {number[]} */
-	let next = [];
-
-	stack = stack.slice();
-
-	let child;
-	while ((child = stack.pop()) != null) {
-		if (!shouldFilter(child, filters)) {
-			next.push(ids.getId(child));
-		} else {
-			const nextChildren = getActualChildren(child);
-			if (nextChildren.length > 0) {
-				stack.push(...getActualChildren(child));
-			}
-		}
-	}
-
+	let next = getFilteredChildren(vnode, filters);
 	if (next.length < 2) return;
 
 	commit.operations.push(
 		MsgTypes.REORDER_CHILDREN,
 		id,
 		next.length,
-		...next.reverse(),
+		...next.map(x => ids.getId(x)),
 	);
+}
+
+export function getFilteredChildren(
+	vnode: VNode,
+	filters: FilterState,
+): VNode[] {
+	const children = getActualChildren(vnode);
+	const stack = children.slice();
+
+	const out: VNode[] = [];
+
+	let child;
+	while (stack.length) {
+		child = stack.pop();
+		if (child != null) {
+			if (!shouldFilter(child, filters)) {
+				out.push(child);
+			} else {
+				const nextChildren = getActualChildren(child);
+				if (nextChildren.length > 0) {
+					stack.push(...nextChildren.slice());
+				}
+			}
+		}
+	}
+
+	return out.reverse();
 }

@@ -1,12 +1,14 @@
-import { h, render, Options, options, Fragment } from "preact";
+import { h, render, Options, options, Fragment, createRef } from "preact";
 import * as sinon from "sinon";
-import { createRenderer, Renderer } from "./renderer";
+import { createRenderer, Renderer, getFilteredChildren } from "./renderer";
 import { setupOptions } from "../10/options";
 import { DevtoolsHook } from "../hook";
 import { expect } from "chai";
 import { toSnapshot } from "../debug";
 import { useState } from "preact/hooks";
 import { act } from "preact/test-utils";
+import { FilterState } from "./filter";
+import { getDisplayName } from "./vnode";
 
 export function setupScratch() {
 	const div = document.createElement("div");
@@ -327,6 +329,32 @@ describe("Renderer 10", () => {
 				"Update timings 2",
 				"Update timings 3",
 			]);
+		});
+	});
+
+	describe("getFilteredChildren", () => {
+		it("should get direct children", () => {
+			const Foo = () => <div>foo</div>;
+			const Bar = () => <div>bar</div>;
+
+			const vnode = (
+				<div>
+					<Foo />
+					<Bar />
+					<span />
+				</div>
+			);
+
+			render(vnode, scratch);
+
+			const filters: FilterState = {
+				regex: [],
+				type: new Set(["dom"]),
+			};
+
+			expect(
+				getFilteredChildren(vnode, filters).map(getDisplayName),
+			).to.deep.equal(["Foo", "Bar"]);
 		});
 	});
 });
