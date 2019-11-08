@@ -1,5 +1,5 @@
 import { VNode, Fragment } from "preact";
-import { getDisplayName } from "./vnode";
+import { getDisplayName, getVNodeParent } from "./vnode";
 
 export interface RegexFilter {
 	type: "name";
@@ -41,14 +41,23 @@ export function parseFilters(raw: RawFilterState): FilterState {
 export function shouldFilter(vnode: VNode, filters: FilterState): boolean {
 	if (typeof vnode.type === "function") {
 		if (vnode.type === Fragment && filters.type.has("fragment")) {
-			return true;
+			const parent = getVNodeParent(vnode);
+			// Only filter non-root nodes
+			if (parent != null) return true;
+
+			return false;
 		}
-	} else if (typeof vnode.type === "string") {
-		if (filters.type.has("dom")) return true;
-	} else if (filters.type.has("dom") && vnode.type === null) {
+	} else if (
+		(typeof vnode.type === "string" || vnode.type === null) &&
+		filters.type.has("dom")
+	) {
 		return true;
 	}
 
-	const name = getDisplayName(vnode);
-	return filters.regex.some(r => r.test(name));
+	if (filters.regex.length > 0) {
+		const name = getDisplayName(vnode);
+		return filters.regex.some(r => r.test(name));
+	}
+
+	return false;
 }

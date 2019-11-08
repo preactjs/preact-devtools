@@ -11,6 +11,17 @@ describe("applyEvent", () => {
 		expect(store.roots.$.length).to.equal(1);
 	});
 
+	it("should update roots correctly", () => {
+		const store = createStore();
+		const data = fromSnapshot([
+			"rootId: 1",
+			"Add 1 <Fragment> to parent 1",
+			"Add 2 <div> to parent 1",
+		]);
+		applyEvent(store, "operation", data);
+		expect(store.roots.$.length).to.equal(1);
+	});
+
 	it("should mount nodes", () => {
 		const store = createStore();
 		const data = fromSnapshot([
@@ -86,5 +97,37 @@ describe("applyEvent", () => {
 
 		const data2 = fromSnapshot(["rootId: 1", "Remove 99"]);
 		applyEvent(store, "operation", data2);
+	});
+
+	it("should reorder children", () => {
+		const store = createStore();
+		const data = fromSnapshot([
+			"rootId: 1",
+			"Add 1 <Fragment> to parent 1",
+			"Add 2 <div> to parent 1",
+			"Add 3 <span> to parent 1",
+		]);
+		applyEvent(store, "operation", data);
+
+		const data2 = fromSnapshot(["rootId: 1", "Reorder 1 [3, 2]"]);
+		applyEvent(store, "operation", data2);
+		expect(store.nodes.$.get(1)!.children).to.deep.equal([3, 2]);
+	});
+
+	it("should reorder children #2", () => {
+		const store = createStore();
+		const data = fromSnapshot([
+			"rootId: 1",
+			"Add 1 <Fragment> to parent 1",
+			"Add 2 <div> to parent 1",
+			"Add 3 <span> to parent 1",
+			"Add 4 <p> to parent 1",
+			"Add 5 <i> to parent 1",
+		]);
+		applyEvent(store, "operation", data);
+
+		const data2 = fromSnapshot(["rootId: 1", "Reorder 1 [4, 3, 2, 5]"]);
+		applyEvent(store, "operation", data2);
+		expect(store.nodes.$.get(1)!.children).to.deep.equal([4, 3, 2, 5]);
 	});
 });

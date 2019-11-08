@@ -20,13 +20,10 @@ import { Iframer } from "./Iframer";
 import { LegacyContext } from "./legacyContext";
 import { Stateful } from "./state";
 import { Highlighter } from "../view/components/Highlighter";
+import { DeepTree, ShallowTree } from "./DeepTree";
 
 function Headline(props) {
 	return <h3>{props.title}</h3>;
-}
-
-function DeepNest(props) {
-	return <div>{props.children}</div>;
 }
 
 const tstore = treeStore();
@@ -173,64 +170,10 @@ export function StyleGuide() {
 					<AppCtx.Provider value={store}>
 						<TreeView />
 					</AppCtx.Provider>
+					<h3>ShallowTree</h3>
+					<ShallowTree />
 					<h3>Deeply nested</h3>
-					<DeepNest>
-						<DeepNest>
-							<DeepNest>
-								<DeepNest>
-									<DeepNest>
-										<DeepNest>
-											<DeepNest>
-												<DeepNest>
-													<DeepNest>
-														<DeepNest>
-															<DeepNest>
-																<DeepNest>
-																	<DeepNest>
-																		<DeepNest>
-																			<DeepNest>
-																				<DeepNest>
-																					<DeepNest>
-																						<DeepNest>
-																							<DeepNest>
-																								<DeepNest>
-																									<DeepNest>
-																										<DeepNest>
-																											<DeepNest>
-																												<DeepNest>
-																													<DeepNest>
-																														<DeepNest>
-																															<DeepNest>
-																																<DeepNest>
-																																	deep
-																																</DeepNest>
-																															</DeepNest>
-																														</DeepNest>
-																													</DeepNest>
-																												</DeepNest>
-																											</DeepNest>
-																										</DeepNest>
-																									</DeepNest>
-																								</DeepNest>
-																							</DeepNest>
-																						</DeepNest>
-																					</DeepNest>
-																				</DeepNest>
-																			</DeepNest>
-																		</DeepNest>
-																	</DeepNest>
-																</DeepNest>
-															</DeepNest>
-														</DeepNest>
-													</DeepNest>
-												</DeepNest>
-											</DeepNest>
-										</DeepNest>
-									</DeepNest>
-								</DeepNest>
-							</DeepNest>
-						</DeepNest>
-					</DeepNest>
+					<DeepTree />
 					<h3>Highlighter</h3>
 					<div class="grid">
 						<div>

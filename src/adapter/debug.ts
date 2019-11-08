@@ -1,4 +1,4 @@
-import { MsgTypes } from "./events";
+import { MsgTypes, flush } from "./events";
 import { parseTable, flushTable } from "./string-table";
 import { Elements } from "./10/renderer";
 import { ID } from "../view/store/types";
@@ -54,7 +54,7 @@ export function parseCommitMessage(data: number[]): ParsedMsg {
 					id: data[i + 1],
 					children: data.slice(i + 3, i + 3 + data[i + 2]),
 				});
-				i += 2 + data[i + 2];
+				i += 3 + data[i + 2];
 				break;
 			}
 		}
@@ -94,6 +94,11 @@ export function toSnapshot(data: number[]) {
 	return formatForTest(parsed);
 }
 
+export function toStringTable(...strs: string[]) {
+	const init = strs.map((x, i) => [x, i]);
+	return flushTable(new Map(init as any));
+}
+
 export function fromSnapshot(events: string[]): number[] {
 	const out: number[] = [];
 	let operations: number[] = [];
@@ -122,7 +127,7 @@ export function fromSnapshot(events: string[]): number[] {
 					+m[3],
 					9999,
 					strings.push(m[2]),
-					-1,
+					0,
 				);
 			} else {
 				throw new Error("no match: " + ev);
@@ -141,6 +146,20 @@ export function fromSnapshot(events: string[]): number[] {
 			if (m) {
 				const id = +m[1];
 				unmounts.push(id);
+			} else {
+				throw new Error("no match: " + ev);
+			}
+		} else if (/^Reorder/.test(ev)) {
+			const m = ev.match(/Reorder\s+(\d+)\s+([\[].*[\]])/);
+			if (m) {
+				const id = +m[1];
+				const children = JSON.parse(m[2]);
+				operations.push(
+					MsgTypes.REORDER_CHILDREN,
+					id,
+					children.length,
+					...children,
+				);
 			} else {
 				throw new Error("no match: " + ev);
 			}
@@ -208,6 +227,9 @@ export function printCommit(data: number[]) {
 					break;
 				}
 				case MsgTypes.REORDER_CHILDREN: {
+					const id = data[i + 1];
+					const children = data.slice(i + 3, i + 3 + data[i + 2]);
+					console.log(`Reorder: ${id}, [${children.join(", ")}]`);
 					break;
 				}
 			}

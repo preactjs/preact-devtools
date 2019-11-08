@@ -1,12 +1,14 @@
-import { h, render, Options, options, Fragment } from "preact";
+import { h, render, Options, options, Fragment, createRef } from "preact";
 import * as sinon from "sinon";
-import { createRenderer, Renderer } from "./renderer";
+import { createRenderer, Renderer, getFilteredChildren } from "./renderer";
 import { setupOptions } from "../10/options";
 import { DevtoolsHook } from "../hook";
 import { expect } from "chai";
 import { toSnapshot } from "../debug";
 import { useState } from "preact/hooks";
 import { act } from "preact/test-utils";
+import { FilterState } from "./filter";
+import { getDisplayName } from "./vnode";
 
 export function setupScratch() {
 	const div = document.createElement("div");
@@ -84,6 +86,55 @@ describe("Renderer 10", () => {
 			"Add 4 <#text> to parent 3",
 			"Add 5 <span> to parent 2",
 			"Add 6 <#text> to parent 5",
+		]);
+	});
+
+	it("should mount after update", () => {
+		render(<div>foo</div>, scratch);
+		render(
+			<div>
+				<span />
+			</div>,
+			scratch,
+		);
+
+		expect(toSnapshot(spy.args[1][1])).to.deep.equal([
+			"rootId: 1",
+			"Add 4 <span> to parent 2",
+			"Update timings 2",
+			"Unmount 3",
+		]);
+	});
+
+	it("should mount after filtered update", () => {
+		renderer.applyFilters({
+			regex: [],
+			type: new Set(["dom"]),
+		});
+
+		const Foo = (props: any) => <div>{props.children}</div>;
+		const Bar = (props: any) => <span>{props.children}</span>;
+
+		render(
+			<div>
+				<Foo />
+			</div>,
+			scratch,
+		);
+		render(
+			<div>
+				<Foo>
+					<Bar>bar</Bar>
+				</Foo>
+			</div>,
+			scratch,
+		);
+
+		expect(toSnapshot(spy.args[1][1])).to.deep.equal([
+			"rootId: 1",
+			"Add 3 <Bar> to parent 2",
+			"Update timings 1",
+			"Update timings 2",
 		]);
 	});
 
@@ -278,6 +329,32 @@ describe("Renderer 10", () => {
 				"Update timings 2",
 				"Update timings 3",
 			]);
+		});
+	});
+
+	describe("getFilteredChildren", () => {
+		it("should get direct children", () => {
+			const Foo = () => <div>foo</div>;
+			const Bar = () => <div>bar</div>;
+
+			const vnode = (
+				<div>
+					<Foo />
+					<Bar />
+					<span />
+				</div>
+			);
+
+			render(vnode, scratch);
+
+			const filters: FilterState = {
+				regex: [],
+				type: new Set(["dom"]),
+			};
+
+			expect(
+				getFilteredChildren(vnode, filters).map(getDisplayName),
+			).to.deep.equal(["Foo", "Bar"]);
 		});
 	});
 });
