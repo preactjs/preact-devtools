@@ -39,6 +39,10 @@ export function parseFilters(raw: RawFilterState): FilterState {
 }
 
 export function shouldFilter(vnode: VNode, filters: FilterState): boolean {
+	// Filter text nodes by default. They are too tricky to match
+	// with the previous one...
+	if (vnode.type == null) return true;
+
 	if (typeof vnode.type === "function") {
 		if (vnode.type === Fragment && filters.type.has("fragment")) {
 			const parent = getVNodeParent(vnode);

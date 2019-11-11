@@ -43,7 +43,6 @@ export const inspect: InspectData = {
 export const treeStore = () => {
 	const store = createStore();
 
-	store.rootToChild.$.set(1, 1);
 	let i = 0;
 	const addNode = (parent: ID) => {
 		const node: DevNode = {

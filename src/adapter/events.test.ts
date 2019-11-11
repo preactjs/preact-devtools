@@ -130,4 +130,56 @@ describe("applyEvent", () => {
 		applyEvent(store, "operation", data2);
 		expect(store.nodes.$.get(1)!.children).to.deep.equal([4, 3, 2, 5]);
 	});
+
+	it("should apply after filter", () => {
+		const store = createStore();
+		const data = fromSnapshot([
+			"rootId: 1",
+			"Add 1 <Fragment> to parent 1",
+			"Add 2 <StyleGuide> to parent 1",
+			"Add 3 <TodoList> to parent 2",
+			"Add 4 <TodoItem> to parent 3",
+			"Add 5 <TodoItem> to parent 3",
+			"Add 6 <TodoItem> to parent 3",
+			"Add 7 <TodoItem> to parent 3",
+			"Add 8 <TodoItem> to parent 3",
+			"Add 9 <RadioBar> to parent 2",
+			"Add 10 <LegacyContext> to parent 2",
+			"Add 11 <Parent> to parent 10",
+			"Add 12 <Child> to parent 11",
+			"Add 13 <Stateful> to parent 2",
+			"Add 14 <ShallowTree> to parent 2",
+			"Add 15 <DeepNest> to parent 14",
+			"Add 16 <DeepNest> to parent 15",
+		]);
+
+		applyEvent(store, "operation", data);
+
+		const data2 = fromSnapshot(["rootId: 1", "Remove 2"]);
+		applyEvent(store, "operation", data2);
+
+		const data3 = fromSnapshot([
+			"rootId: 1",
+			"Add 17 <StyleGuide> to parent 1",
+			"Add 3 <TodoList> to parent 17",
+			"Add 4 <TodoItem> to parent 3",
+			"Add 5 <TodoItem> to parent 3",
+			"Add 6 <TodoItem> to parent 3",
+			"Add 7 <TodoItem> to parent 3",
+			"Add 8 <TodoItem> to parent 3",
+			"Add 9 <RadioBar> to parent 17",
+			"Add 10 <LegacyContext> to parent 17",
+			"Add 11 <Parent> to parent 10",
+			"Add 12 <Child> to parent 11",
+			"Add 13 <Stateful> to parent 17",
+			"Add 14 <ShallowTree> to parent 17",
+			"Add 15 <DeepNest> to parent 14",
+			"Add 16 <DeepNest> to parent 15",
+			"Update timings 1 duration 20",
+		]);
+		applyEvent(store, "operation", data3);
+
+		expect(store.nodes.$.has(1)).to.be.true;
+		expect(store.nodes.$.get(1)!.children).to.deep.equal([17]);
+	});
 });

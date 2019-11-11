@@ -83,9 +83,7 @@ describe("Renderer 10", () => {
 			"Add 1 <Fragment> to parent 1",
 			"Add 2 <div> to parent 1",
 			"Add 3 <span> to parent 2",
-			"Add 4 <#text> to parent 3",
-			"Add 5 <span> to parent 2",
-			"Add 6 <#text> to parent 5",
+			"Add 4 <span> to parent 2",
 		]);
 	});
 
@@ -100,9 +98,9 @@ describe("Renderer 10", () => {
 
 		expect(toSnapshot(spy.args[1][1])).to.deep.equal([
 			"rootId: 1",
-			"Add 4 <span> to parent 2",
+			"Add 3 <span> to parent 2",
+			"Update timings 1",
 			"Update timings 2",
-			"Unmount 3",
 		]);
 	});
 
@@ -138,7 +136,7 @@ describe("Renderer 10", () => {
 		]);
 	});
 
-	it("should update text", () => {
+	it("should skip text", () => {
 		render(<div>foo</div>, scratch);
 		render(<div>bar</div>, scratch);
 
@@ -146,7 +144,6 @@ describe("Renderer 10", () => {
 			"rootId: 1",
 			"Update timings 1",
 			"Update timings 2",
-			"Update timings 3",
 		]);
 	});
 
@@ -170,11 +167,9 @@ describe("Renderer 10", () => {
 			"rootId: 1",
 			"Update timings 1",
 			"Update timings 2",
-			"Update timings 5",
-			"Update timings 6",
-			"Update timings 3",
 			"Update timings 4",
-			"Reorder 2 [5, 3]",
+			"Update timings 3",
+			"Reorder 2 [4, 3]",
 		]);
 	});
 
@@ -195,8 +190,6 @@ describe("Renderer 10", () => {
 				"rootId: 1",
 				"Add 1 <Fragment> to parent 1",
 				"Add 2 <div> to parent 1",
-				"Add 3 <#text> to parent 2",
-				"Add 4 <#text> to parent 2",
 			]);
 		});
 
@@ -216,8 +209,6 @@ describe("Renderer 10", () => {
 				"rootId: 1",
 				"Add 1 <Fragment> to parent 1",
 				"Add 2 <div> to parent 1",
-				"Add 3 <#text> to parent 2",
-				"Add 4 <#text> to parent 2",
 			]);
 		});
 
@@ -285,8 +276,6 @@ describe("Renderer 10", () => {
 				"Add 2 <div> to parent 1",
 				"Add 3 <Foo> to parent 2",
 				"Add 4 <div> to parent 3",
-				"Add 5 <#text> to parent 4",
-				"Add 6 <#text> to parent 2",
 			]);
 		});
 
@@ -328,6 +317,121 @@ describe("Renderer 10", () => {
 				"rootId: 1",
 				"Update timings 2",
 				"Update timings 3",
+			]);
+		});
+
+		it("should update filters after 1st render", () => {
+			renderer.applyFilters({
+				regex: [],
+				type: new Set(["dom"]),
+			});
+
+			function Foo() {
+				return <div>foo</div>;
+			}
+			render(
+				<div>
+					<Foo />
+					<span>foo</span>
+					<span>bar</span>
+				</div>,
+				scratch,
+			);
+			expect(toSnapshot(spy.args[0][1])).to.deep.equal([
+				"rootId: 1",
+				"Add 1 <Fragment> to parent 1",
+				"Add 2 <Foo> to parent 1",
+			]);
+
+			renderer.applyFilters({
+				regex: [],
+				type: new Set(),
+			});
+
+			expect(toSnapshot(spy.args[1][1])).to.deep.equal([
+				"rootId: 1",
+				"Remove 2",
+			]);
+
+			expect(toSnapshot(spy.args[2][1])).to.deep.equal([
+				"rootId: 1",
+				"Add 3 <div> to parent 1",
+				"Add 4 <Foo> to parent 3",
+				"Add 5 <div> to parent 4",
+				"Add 6 <span> to parent 3",
+				"Add 7 <span> to parent 3",
+				"Update timings 1",
+			]);
+		});
+
+		it("should update filters after 1st render with unmounts", () => {
+			renderer.applyFilters({
+				regex: [],
+				type: new Set(["dom"]),
+			});
+
+			function Foo(props: any) {
+				return <div>{props.children}</div>;
+			}
+			render(
+				<div>
+					<Foo>
+						<h1>
+							<Foo>foo</Foo>
+						</h1>
+					</Foo>
+					<span>foo</span>
+					<span>bar</span>
+				</div>,
+				scratch,
+			);
+			expect(toSnapshot(spy.args[0][1])).to.deep.equal([
+				"rootId: 1",
+				"Add 1 <Fragment> to parent 1",
+				"Add 2 <Foo> to parent 1",
+				"Add 3 <Foo> to parent 2",
+			]);
+
+			renderer.applyFilters({
+				regex: [],
+				type: new Set(),
+			});
+
+			expect(toSnapshot(spy.args[1][1])).to.deep.equal([
+				"rootId: 1",
+				"Remove 2",
+			]);
+			expect(toSnapshot(spy.args[2][1])).to.deep.equal([
+				"rootId: 1",
+				"Add 4 <div> to parent 1",
+				"Add 5 <Foo> to parent 4",
+				"Add 6 <div> to parent 5",
+				"Add 7 <h1> to parent 6",
+				"Add 3 <Foo> to parent 7",
+				"Add 8 <div> to parent 3",
+				"Add 9 <span> to parent 4",
+				"Add 10 <span> to parent 4",
+				"Update timings 1",
+			]);
+
+			renderer.applyFilters({
+				regex: [],
+				type: new Set(["dom"]),
+			});
+
+			expect(toSnapshot(spy.args[3][1])).to.deep.equal([
+				"rootId: 1",
+				"Remove 4",
+				"Remove 5",
+				"Remove 9",
+				"Remove 10",
+			]);
+
+			expect(toSnapshot(spy.args[4][1])).to.deep.equal([
+				"rootId: 1",
+				"Add 11 <Foo> to parent 1",
+				"Add 3 <Foo> to parent 11",
+				"Update timings 1",
 			]);
 		});
 	});

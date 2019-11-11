@@ -1,4 +1,15 @@
-import { getDisplayName } from "./10/vnode";
+import { getDisplayName, getActualChildren } from "./10/vnode";
+import { VNode } from "preact";
+
+export function traverse(vnode: VNode, fn: (vnode: VNode) => void) {
+	fn(vnode);
+	const children = getActualChildren(vnode);
+	for (let i = 0; i < children.length; i++) {
+		if (children[i] != null) {
+			fn(children[i]);
+		}
+	}
+}
 
 export function jsonify(data: any, isVNode: (x: any) => boolean): any {
 	if (isVNode(data)) {

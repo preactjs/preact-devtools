@@ -1,6 +1,7 @@
 import { flushTable, StringTable, parseTable } from "./string-table";
 import { valoo } from "../view/valoo";
 import { Store } from "../view/store/types";
+import { toSnapshot, parseCommitMessage } from "./debug";
 
 export enum MsgTypes {
 	ADD_ROOT = 1,
@@ -72,9 +73,7 @@ export function applyOperations(store: Store, data: number[]) {
 		switch (data[i]) {
 			case MsgTypes.ADD_ROOT:
 				const id = data[i + 1];
-				store.roots.update(s => {
-					s.push(id);
-				});
+				store.roots.$.push(id);
 				i += 1;
 				break;
 			case MsgTypes.ADD_VNODE: {
@@ -83,12 +82,6 @@ export function applyOperations(store: Store, data: number[]) {
 				const name = strings[data[i + 5] - 1];
 				const key = data[i + 6] > 0 ? strings[data[i + 6] - 1] : "";
 				let parentId = data[i + 3];
-
-				if (id === rootId) {
-					store.rootToChild.update(s => {
-						s.set(rootId, id);
-					});
-				}
 
 				if (!store.nodes.$.has(id)) {
 					// Roots have their own id as parentId
@@ -148,6 +141,18 @@ export function applyOperations(store: Store, data: number[]) {
 							if (idx > -1) parent.children.splice(idx, 1);
 						}
 
+						const stack = node.children;
+						while (stack.length > 0) {
+							const childId = stack.pop();
+							if (childId != null) {
+								const childNode = store.nodes.$.get(childId);
+								if (childNode) {
+									stack.push(...childNode.children);
+									store.nodes.$.delete(childId);
+								}
+							}
+						}
+
 						// Remove node from store
 						store.nodes.$.delete(nodeId);
 					}
@@ -170,6 +175,8 @@ export function applyOperations(store: Store, data: number[]) {
 		}
 	}
 
+	// TODO: This triggers rendering twice :S
+	store.roots.update();
 	store.nodes.update();
 }
 

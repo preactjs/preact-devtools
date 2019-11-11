@@ -15,12 +15,14 @@ export function useObserver<T>(fn: () => T): T {
 
 	useEffect(() => {
 		let v = watch(fn);
-		let disp = v.on(() => setI(i + 1));
+		let disp = v.on(() => {
+			setI(i + 1);
+		});
 		return () => {
 			disp();
 			v._disposers.forEach(disp => disp());
 		};
-	}, [fn]);
+	}, [i, fn]);
 
 	return fn();
 }

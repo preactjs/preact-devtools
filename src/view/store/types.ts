@@ -41,7 +41,6 @@ export interface Store {
 	isPicking: Observable<boolean>;
 	inspectData: Observable<InspectData | null>;
 	roots: Observable<ID[]>;
-	rootToChild: Observable<Map<number, number>>;
 	nodes: Observable<Map<ID, DevNode>>;
 	nodeList: Observable<ID[]>;
 	theme: Observable<Theme>;
