@@ -19,7 +19,7 @@ import {
 } from "./vnode";
 import { FilterState, shouldFilter } from "./filter";
 import { ID } from "../../view/store/types";
-import { cleanContext, jsonify, cleanProps } from "../renderer-utils";
+import { cleanContext, jsonify, cleanProps, traverse } from "../renderer-utils";
 
 export enum Elements {
 	HTML_ELEMENT = 1,
@@ -159,20 +159,25 @@ export function createRenderer(
 			return -1;
 		},
 		applyFilters(nextFilters) {
-			roots.forEach(root => this.onUnmount(root));
-			// Unmount
-			const commit: Commit = {
-				operations: [],
-				rootId: -1,
-				strings: new Map(),
-				unmountIds: currentUnmounts,
-			};
+			roots.forEach(root => {
+				const children = getActualChildren(root);
+				if (children.length > 0 && children[0] != null) {
+					traverse(children[0], vnode => this.onUnmount(vnode));
+				}
 
-			const unmounts = flush(commit);
-			if (unmounts) {
-				currentUnmounts = [];
-				queue.push(unmounts);
-			}
+				const commit: Commit = {
+					operations: [],
+					rootId: ids.getId(root),
+					strings: new Map(),
+					unmountIds: currentUnmounts,
+				};
+
+				const unmounts = flush(commit);
+				if (unmounts) {
+					currentUnmounts = [];
+					queue.push(unmounts);
+				}
+			});
 
 			filters.regex = nextFilters.regex;
 			filters.type = nextFilters.type;
@@ -208,14 +213,15 @@ export function createRenderer(
 		},
 		onUnmount(vnode) {
 			if (!shouldFilter(vnode, filters)) {
-				const id = ids.getId(vnode);
-				if (id > 0) {
-					currentUnmounts.push(id);
+				if (ids.hasId(vnode)) {
+					currentUnmounts.push(ids.getId(vnode));
 				}
 			} else if (typeof vnode.type !== "function") {
 				const dom = getDom(vnode);
 				if (dom != null) domToVNode.delete(dom);
 			}
+
+			ids.remove(vnode);
 		},
 	};
 }

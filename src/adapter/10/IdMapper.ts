@@ -1,5 +1,5 @@
 import { VNode } from "preact";
-import { getComponent, getDom } from "./vnode";
+import { getComponent, getDom, getDisplayName } from "./vnode";
 
 export interface IdMapper {
 	getVNode(id: number): VNode | null;
@@ -16,7 +16,7 @@ export interface IdMapper {
  * this function to keep track of existing id's and create new ones if needed.
  */
 export function createIdMapper(): IdMapper {
-	const instToId = new WeakMap<any, number>();
+	const instToId = new Map<any, number>();
 	const idToVNode = new Map<number, VNode>();
 	const idToInst = new Map<number, any>();
 
@@ -43,8 +43,10 @@ export function createIdMapper(): IdMapper {
 		if (hasId(vnode)) {
 			const id = getId(vnode);
 			idToInst.delete(id);
+			idToVNode.delete(id);
 		}
-		instToId.delete(vnode);
+		const inst = getInstance(vnode);
+		instToId.delete(inst);
 	};
 	const createId = (vnode: VNode) => {
 		const id = uuid++;

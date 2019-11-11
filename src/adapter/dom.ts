@@ -20,10 +20,10 @@ export interface Measurements {
 	paddingBottom: number;
 	paddingLeft: number;
 	bounds: {
-		top: boolean;
-		left: boolean;
-		bottom: boolean;
-		right: boolean;
+		top?: boolean;
+		left?: boolean;
+		bottom?: boolean;
+		right?: boolean;
 	};
 }
 

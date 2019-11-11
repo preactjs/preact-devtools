@@ -7,10 +7,12 @@ export function flattenChildren<K, T extends { id: K; children: K[] }>(
 ): K[] {
 	const out: K[] = [];
 	const visited = new Set<K>();
-	let item: K | undefined;
 	let stack: K[] = [id];
 
-	while ((item = stack.pop())) {
+	while (stack.length > 0) {
+		const item = stack.pop();
+		if (item == null) continue;
+
 		const node = tree.get(item);
 		if (!node) continue;
 

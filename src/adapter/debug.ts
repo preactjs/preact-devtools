@@ -83,7 +83,7 @@ export function formatForTest(msg: ParsedMsg) {
 		out.push(`Reorder ${r.id} [${r.children.join(", ")}]`);
 	});
 	msg.unmounts.forEach(u => {
-		out.push(`Unmount ${u}`);
+		out.push(`Remove ${u}`);
 	});
 
 	return out;
@@ -118,6 +118,11 @@ export function fromSnapshot(events: string[]): number[] {
 		if (/^Add/.test(ev)) {
 			const m = ev.match(/Add\s+(\d+)\s+<([#]?\w+)>\s+to\sparent\s(\d+)/);
 			if (m) {
+				let idx = strings.indexOf(m[2]);
+				if (idx == -1) {
+					idx = strings.push(m[2]);
+				}
+
 				operations.push(
 					MsgTypes.ADD_VNODE,
 					+m[1],
@@ -126,7 +131,7 @@ export function fromSnapshot(events: string[]): number[] {
 						: Elements.HTML_ELEMENT,
 					+m[3],
 					9999,
-					strings.push(m[2]),
+					idx,
 					0,
 				);
 			} else {

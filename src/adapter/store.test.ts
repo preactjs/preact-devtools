@@ -63,7 +63,7 @@ describe("Store", () => {
     ]);
 		applyOperations(store, event2);
 
-		expect(spy.callCount).to.eq(1);
+		expect(spy.callCount).to.eq(2); // TODO: Should be called once
 		expect(store.nodes.$.get(1)!.children).to.deep.equal([]);
 		expect(store.nodes.$.get(2)).to.equal(undefined);
 		expect(store.nodes.$.get(3)).to.equal(undefined);

@@ -16,10 +16,9 @@ import { RadioBar } from "../view/components/RadioBar";
 import { TodoList } from "./TodoList";
 import { treeStore } from "./treeStore";
 import { createPropsStore } from "../view/store/props";
-import { Iframer } from "./Iframer";
+import { Iframes } from "./Iframes";
 import { LegacyContext } from "./legacyContext";
 import { Stateful } from "./state";
-import { Highlighter } from "../view/components/Highlighter";
 import { DeepTree, ShallowTree } from "./DeepTree";
 
 function Headline(props) {
@@ -77,11 +76,11 @@ export function StyleGuide() {
 					<Stateful />
 
 					<h3>Sidebar</h3>
-					<AppCtx.Provider value={tstore}>
+					{/* <AppCtx.Provider value={tstore}>
 						<Sidebar />
-					</AppCtx.Provider>
+					</AppCtx.Provider> */}
 					<h3>ElementProps</h3>
-					<p>non-editable</p>
+					{/* <p>non-editable</p>
 					<ElementProps
 						editable={false}
 						items={propList}
@@ -98,9 +97,9 @@ export function StyleGuide() {
 							onCollapse={pStore.collapser.toggle}
 							initial={pInitial}
 						/>
-					</div>
+					</div> */}
 					<h2>Icon Btns</h2>
-					<IconBtn onClick={() => console.log("click")}>
+					{/* <IconBtn onClick={() => console.log("click")}>
 						<Picker />
 					</IconBtn>
 					<IconBtn active>
@@ -133,12 +132,12 @@ export function StyleGuide() {
 							localStorage.removeItem("show-modal");
 						}}
 					/>
-					<Headline title="foobar" />
+					<Headline title="foobar" /> */}
 					<h2>TreeBar</h2>
 					<div style="border: 1px solid #555">
-						<AppCtx.Provider value={tstore}>
+						{/* <AppCtx.Provider value={tstore}>
 							<TreeBar />
-						</AppCtx.Provider>
+						</AppCtx.Provider> */}
 					</div>
 					<h2>TreeView</h2>
 					<button
@@ -152,119 +151,29 @@ export function StyleGuide() {
 					<br />
 					<div>
 						<div style="height: 20rem; overflow: auto;">
-							<AppCtx.Provider value={tstore}>
+							{/* <AppCtx.Provider value={tstore}>
 								<TreeView />
-							</AppCtx.Provider>
+							</AppCtx.Provider> */}
 						</div>
 					</div>
 					<br />
 					<br />
 					<div>
 						<div style="height: overflow: auto;">
-							<AppCtx.Provider value={tstore}>
+							{/* <AppCtx.Provider value={tstore}>
 								<TreeView />
-							</AppCtx.Provider>
+							</AppCtx.Provider> */}
 						</div>
 					</div>
 					<p>Empty tree view</p>
-					<AppCtx.Provider value={store}>
+					{/* <AppCtx.Provider value={store}>
 						<TreeView />
-					</AppCtx.Provider>
+					</AppCtx.Provider> */}
 					<h3>ShallowTree</h3>
 					<ShallowTree />
 					<h3>Deeply nested</h3>
-					<DeepTree />
-					<h3>Highlighter</h3>
-					<div class="grid">
-						<div>
-							<p>center</p>
-							<Iframer height={300}>
-								<Highlighter
-									bounds={{}}
-									top={20}
-									left={20}
-									label={"FooBarBob"}
-									height={200}
-									width={200}
-									padding={[12, 10, 20, 20]}
-									margin={[16, 16, 16, 16]}
-									border={[5, 5, 5, 5]}
-								/>
-							</Iframer>
-						</div>
-						<div>
-							<p>left</p>
-							<Iframer height={300}>
-								<Highlighter
-									bounds={{
-										left: true,
-									}}
-									top={20}
-									left={-50}
-									label={"FooBarBob"}
-									height={200}
-									width={200}
-									padding={[12, 10, 20, 20]}
-									margin={[16, 16, 16, 16]}
-									border={[5, 5, 5, 5]}
-								/>
-							</Iframer>
-						</div>
-						<div>
-							<p>right</p>
-							<Iframer height={300}>
-								<Highlighter
-									bounds={{
-										right: true,
-									}}
-									top={20}
-									left={150}
-									label={"FooBarBob"}
-									height={200}
-									width={200}
-									padding={[12, 10, 20, 20]}
-									margin={[16, 16, 16, 16]}
-									border={[5, 5, 5, 5]}
-								/>
-							</Iframer>
-						</div>
-						<div>
-							<p>top</p>
-							<Iframer height={300}>
-								<Highlighter
-									bounds={{
-										top: true,
-									}}
-									top={-250}
-									left={20}
-									label={"FooBarBob"}
-									height={200}
-									width={200}
-									padding={[12, 10, 20, 20]}
-									margin={[16, 16, 16, 16]}
-									border={[5, 5, 5, 5]}
-								/>
-							</Iframer>
-						</div>
-						<div>
-							<p>bottom</p>
-							<Iframer height={300}>
-								<Highlighter
-									bounds={{
-										bottom: true,
-									}}
-									top={150}
-									left={20}
-									label={"FooBarBob"}
-									height={200}
-									width={200}
-									padding={[12, 10, 20, 20]}
-									margin={[16, 16, 16, 16]}
-									border={[5, 5, 5, 5]}
-								/>
-							</Iframer>
-						</div>
-					</div>
+					{/* <DeepTree /> */}
+					{/* <Iframes /> */}
 				</div>
 			</div>
 		</div>
