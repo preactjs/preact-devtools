@@ -11,18 +11,18 @@ export const useEmitter = () => useContext(EmitCtx);
 export const useStore = () => useContext(AppCtx);
 
 export function useObserver<T>(fn: () => T): T {
-	let [i, setI] = useState(0);
+	let [value, setValue] = useState(fn());
 
 	useEffect(() => {
 		let v = watch(fn);
-		let disp = v.on(() => {
-			setI(i + 1);
+		let disp = v.on(next => {
+			setValue(next);
 		});
 		return () => {
 			disp();
 			v._disposers.forEach(disp => disp());
 		};
-	}, [i, fn]);
+	}, []);
 
-	return fn();
+	return value;
 }
