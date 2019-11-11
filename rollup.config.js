@@ -4,7 +4,12 @@ import resolve from "rollup-plugin-node-resolve";
 import postcss from "rollup-plugin-postcss";
 import commonjs from "rollup-plugin-commonjs";
 
-const BROWSERS = ["chrome", "firefox"];
+const BROWSERS = ["chrome", "firefox"].filter(x => {
+	if (process.env.BROWSER) {
+		return process.env.BROWSER === x;
+	}
+	return true;
+});
 
 const entries = BROWSERS.map(browser => {
 	const dist = `dist/${browser}`;
@@ -44,17 +49,19 @@ const entries = BROWSERS.map(browser => {
 }).reduce((acc, item) => acc.concat(item), []);
 
 // Inline devtools
-entries.push(
-	{
-		entry: "src/shells/inline/index.ts",
-		dist: "dist/inline/setup.js",
-	},
-	{
-		entry: "src/shells/inline/renderer.ts",
-		dist: "dist/inline/renderer.js",
-		external: ["preact"],
-	},
-);
+if (!process.env.BROWSER) {
+	entries.push(
+		{
+			entry: "src/shells/inline/index.ts",
+			dist: "dist/inline/setup.js",
+		},
+		{
+			entry: "src/shells/inline/renderer.ts",
+			dist: "dist/inline/renderer.js",
+			external: ["preact"],
+		},
+	);
+}
 
 export default entries.map(data => ({
 	input: data.entry,

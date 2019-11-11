@@ -7,6 +7,8 @@
 	"types": "types/devtools.d.ts",
 	"scripts": {
 		"build": "rm -rf dist/ && rollup -c && node tools/build-inline.js && cp dist/inline/setup.css dist/preact-devtools.css && rm -rf dist/inline",
+		"build:chrome": "rm -rf dist/ && BROWSER=chrome rollup -c",
+		"build:firefox": "rm -rf dist/ && BROWSER=firefox rollup -c",
 		"test": "mochette -c tsconfig.json 'src/**/*.test.{ts,tsx}'",
 		"dev": "webpack-dev-server --inline",
 		"watch": "rollup -c -w"
