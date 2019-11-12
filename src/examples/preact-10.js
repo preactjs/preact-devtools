@@ -76,11 +76,11 @@ export function StyleGuide() {
 					<Stateful />
 
 					<h3>Sidebar</h3>
-					{/* <AppCtx.Provider value={tstore}>
+					<AppCtx.Provider value={tstore}>
 						<Sidebar />
-					</AppCtx.Provider> */}
+					</AppCtx.Provider>
 					<h3>ElementProps</h3>
-					{/* <p>non-editable</p>
+					<p>non-editable</p>
 					<ElementProps
 						editable={false}
 						items={propList}
@@ -97,9 +97,9 @@ export function StyleGuide() {
 							onCollapse={pStore.collapser.toggle}
 							initial={pInitial}
 						/>
-					</div> */}
+					</div>
 					<h2>Icon Btns</h2>
-					{/* <IconBtn onClick={() => console.log("click")}>
+					<IconBtn onClick={() => console.log("click")}>
 						<Picker />
 					</IconBtn>
 					<IconBtn active>
@@ -132,12 +132,12 @@ export function StyleGuide() {
 							localStorage.removeItem("show-modal");
 						}}
 					/>
-					<Headline title="foobar" /> */}
+					<Headline title="foobar" />
 					<h2>TreeBar</h2>
 					<div style="border: 1px solid #555">
-						{/* <AppCtx.Provider value={tstore}>
+						<AppCtx.Provider value={tstore}>
 							<TreeBar />
-						</AppCtx.Provider> */}
+						</AppCtx.Provider>
 					</div>
 					<h2>TreeView</h2>
 					<button
@@ -151,28 +151,28 @@ export function StyleGuide() {
 					<br />
 					<div>
 						<div style="height: 20rem; overflow: auto;">
-							{/* <AppCtx.Provider value={tstore}>
+							<AppCtx.Provider value={tstore}>
 								<TreeView />
-							</AppCtx.Provider> */}
+							</AppCtx.Provider>
 						</div>
 					</div>
 					<br />
 					<br />
 					<div>
 						<div style="height: overflow: auto;">
-							{/* <AppCtx.Provider value={tstore}>
+							<AppCtx.Provider value={tstore}>
 								<TreeView />
-							</AppCtx.Provider> */}
+							</AppCtx.Provider>
 						</div>
 					</div>
 					<p>Empty tree view</p>
-					{/* <AppCtx.Provider value={store}>
+					<AppCtx.Provider value={store}>
 						<TreeView />
-					</AppCtx.Provider> */}
+					</AppCtx.Provider>
 					<h3>ShallowTree</h3>
 					<ShallowTree />
 					<h3>Deeply nested</h3>
-					{/* <DeepTree /> */}
+					<DeepTree />
 					{/* <Iframes /> */}
 				</div>
 			</div>
