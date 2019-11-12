@@ -1,4 +1,4 @@
-import { h } from "preact";
+import { h, Fragment } from "preact";
 import { useState } from "preact/hooks";
 import { Actions, ActionSeparator } from "./Actions";
 import { IconBtn } from "./IconBtn";
@@ -40,6 +40,8 @@ export function TreeBar() {
 		}
 	};
 
+	const searchActive = value !== "";
+
 	return (
 		<Actions>
 			<div class={s.btnWrapper}>
@@ -65,7 +67,7 @@ export function TreeBar() {
 					onKeyDown={onKeyDown}
 					onInput={e => store.search.onChange((e.target as any).value)}
 				/>
-				{value !== "" && (
+				{searchActive && (
 					<div class={s.searchCounter}>
 						{count > 0 ? selected + 1 : 0} | {count}
 					</div>
@@ -73,7 +75,11 @@ export function TreeBar() {
 			</div>
 			<ActionSeparator />
 			<div class={s.btnWrapper}>
-				<IconBtn onClick={store.search.selectNext} title="Select next result">
+				<IconBtn
+					onClick={store.search.selectNext}
+					title="Select next result"
+					disabled={!searchActive}
+				>
 					<KeyboardDown />
 				</IconBtn>
 			</div>
@@ -81,12 +87,17 @@ export function TreeBar() {
 				<IconBtn
 					onClick={store.search.selectPrev}
 					title="Select previous result"
+					disabled={!searchActive}
 				>
 					<KeyboardUp />
 				</IconBtn>
 			</div>
 			<div class={s.btnWrapper}>
-				<IconBtn onClick={store.search.reset} title="Clear search input">
+				<IconBtn
+					onClick={store.search.reset}
+					title="Clear search input"
+					disabled={!searchActive}
+				>
 					<Close />
 				</IconBtn>
 			</div>
