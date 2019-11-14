@@ -2,13 +2,20 @@
 	position: relative;
 	border: none;
 	background: none;
-	cursor: pointer;
 	display: inline-flex;
 	flex: 0 0 auto;
 	padding: 0;
 	align-items: center;
 	outline: none;
+}
+
+.root:not([disabled]) {
 	color: var(--color-text);
+	cursor: pointer;
+}
+
+.root[disabled] {
+	color: var(--color-disabled);
 }
 
 .root svg {
@@ -16,15 +23,15 @@
 	z-index: 1;
 }
 
-.root[data-active],
+.root:not([disabled])[data-active],
 .root:focus,
-.root:active {
+.root:not([disabled]):active {
 	color: var(--color-selected-text);
 }
 
 .root:focus::after,
-.root:active::after,
-.root[data-active]::after {
+.root:not([disabled]):active::after,
+.root:not([disabled])[data-active]::after {
 	content: "";
 	position: absolute;
 	left: -0.25rem;

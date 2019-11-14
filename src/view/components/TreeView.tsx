@@ -40,6 +40,14 @@ export function TreeView() {
 			data-tree={true}
 			onMouseLeave={onMouseLeave}
 		>
+			{nodeList.length === 0 && (
+				<div class={s.empty}>
+					<BackgroundLogo class={s.bgLogo} />
+					<p>
+						<b>Connected</b>, waiting for nodes to load...
+					</p>
+				</div>
+			)}
 			{nodeList.map(id => (
 				<TreeItem key={id} id={id} />
 			))}

@@ -24,6 +24,7 @@
 :global(.light) .theme {
 	--color-bg: white;
 	--color-text: #333;
+	--color-disabled: #dedede;
 	--color-selected-bg: #8058ca;
 	--color-selected-text: white;
 	--color-selected-inactive-bg: gray;
@@ -65,6 +66,7 @@
 :global(.dark) .theme {
 	--color-bg: #242424;
 	--color-text: #b0b0b0;
+	--color-disabled: #575757;
 	--color-selected-bg: #ae80ff;
 	--color-selected-text: white;
 	--color-selected-inactive-bg: gray;
