@@ -69,6 +69,8 @@ export function applyOperations(store: Store, data: number[]) {
 	let i = data[1] + 1;
 	const strings = parseTable(data.slice(1, i + 1));
 
+	const inspected = store.inspectData.$ != null ? store.inspectData.$.id : -2;
+
 	for (; i < data.length; i++) {
 		switch (data[i]) {
 			case MsgTypes.ADD_ROOT:
@@ -120,6 +122,10 @@ export function applyOperations(store: Store, data: number[]) {
 				const node = store.nodes.$.get(id)!;
 				if (node) {
 					node.duration.$ = duration;
+				}
+
+				if (id === inspected) {
+					store.actions.inspect(id);
 				}
 
 				i += 2;
@@ -185,6 +191,7 @@ export function applyEvent(store: Store, name: string, data: any) {
 		case "operation":
 			return applyOperations(store, data);
 		case "inspect-result":
+			console.log("res", data);
 			return (store.inspectData.$ = data);
 		case "select-node":
 			return store.selection.selectById(data);

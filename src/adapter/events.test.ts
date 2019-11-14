@@ -1,5 +1,6 @@
 import { expect } from "chai";
 import { applyEvent } from "./events";
+import * as sinon from "sinon";
 import { createStore } from "../view/store";
 import { fromSnapshot } from "./debug";
 
@@ -181,5 +182,30 @@ describe("applyEvent", () => {
 
 		expect(store.nodes.$.has(1)).to.be.true;
 		expect(store.nodes.$.get(1)!.children).to.deep.equal([17]);
+	});
+
+	it("should update inspect data when inspected node is updated", () => {
+		const spy = sinon.spy();
+		const store = createStore();
+		store.subscribe(spy);
+
+		store.inspectData.$ = {
+			id: 2,
+			canEditHooks: false,
+			canEditProps: false,
+			canEditState: false,
+			context: null,
+			hooks: null,
+			name: "Foo",
+			props: null,
+			state: null,
+			type: "asd",
+		};
+
+		const data = fromSnapshot(["rootId: 1", "Update timings 2 duration 10"]);
+		applyEvent(store, "operation", data);
+
+		expect(spy.callCount).to.equal(1);
+		expect(spy.args[0]).to.deep.equal(["inspect", 2]);
 	});
 });
