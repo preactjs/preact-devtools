@@ -1,5 +1,7 @@
 # Preact Devtools
 
+**!!! HIGHLY EXPERIMENTAL, NOT READY FOR GENERAL USE!!!**
+
 - Use `npm run dev` to start a demo page
 - Use `npm run watch` to rebuild all extensions on any code changes
 
