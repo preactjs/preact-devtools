@@ -1,5 +1,7 @@
 # Preact Devtools
 
+[![Greenkeeper badge](https://badges.greenkeeper.io/preactjs/preact-devtools.svg)](https://greenkeeper.io/)
+
 **!!! HIGHLY EXPERIMENTAL, NOT READY FOR GENERAL USE!!!**
 
 - Use `npm run dev` to start a demo page
