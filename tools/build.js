@@ -19,5 +19,5 @@ archive.on("error", err => {
 });
 
 archive.pipe(output);
-archive.directory("dist/firefox", false);
+archive.directory(`dist/${browser}`, false);
 archive.finalize();
