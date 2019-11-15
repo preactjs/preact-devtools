@@ -4,6 +4,7 @@
 
 - Use `npm run dev` to start a demo page
 - Use `npm run watch` to rebuild all extensions on any code changes
+- Use `npm run build:firefox` or `npm run build:chrome` to create a release build
 
 Chrome:
 
