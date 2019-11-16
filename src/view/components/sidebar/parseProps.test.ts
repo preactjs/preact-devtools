@@ -152,6 +152,23 @@ describe("flatten", () => {
 		]);
 	});
 
+	it("should not mark empty arrays as collabsible", () => {
+		const tree = new Map();
+		parseProps([], ["foo"], 2, noop, tree);
+		expect(serialize(tree)).to.deep.equal([
+			{
+				collapsable: false,
+				editable: false,
+				depth: 0,
+				id: "foo",
+				path: ["foo"],
+				type: "array",
+				value: [],
+				children: [],
+			},
+		]);
+	});
+
 	it("should flatten objects", () => {
 		const tree = new Map();
 		parseProps({ foo: 123, bar: "abc" }, [""], 2, noop, tree);

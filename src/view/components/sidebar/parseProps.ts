@@ -48,7 +48,7 @@ export function parseProps(
 				depth,
 				id: pathStr,
 				type: "array",
-				collapsable: true,
+				collapsable: data.length > 0,
 				editable: false,
 				path,
 				value: data,
