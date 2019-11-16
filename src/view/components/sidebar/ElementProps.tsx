@@ -116,14 +116,16 @@ export function SingleItem(props: SingleProps) {
 					onClick={onCollapseClick}
 				>
 					<Arrow />
+					<span class={s.name} data-type={type}>
+						<span class={s.nameStatic}>{name}</span>
+					</span>
 				</button>
 			)}
-			<div
-				class={`${s.name} ${!collapseable ? s.noCollapse : ""}`}
-				data-type={type}
-			>
-				<span class={s.nameStatic}>{name}</span>
-			</div>
+			{!collapseable && (
+				<span class={`${s.name} ${s.noCollapse}`} data-type={type}>
+					<span class={s.nameStatic}>{name}</span>
+				</span>
+			)}
 			<div class={s.property}>
 				{editable ? (
 					<DataInput value={v} onChange={update} initialValue={init} />

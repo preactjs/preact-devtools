@@ -16,6 +16,7 @@
 }
 
 .name {
+	display: inline-block;
 	color: var(--color-element-text);
 	line-height: 1;
 	white-space: nowrap;
@@ -65,7 +66,6 @@
 	display: flex;
 	justify-content: center;
 	align-items: center;
-	width: 1.25rem;
 	height: 100%;
 	padding: 0.2em 0.13em;
 	cursor: pointer;
