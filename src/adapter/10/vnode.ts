@@ -6,7 +6,7 @@ import { Fragment, Component, VNode } from "preact";
  * Get the direct parent of a `vnode`
  */
 export function getVNodeParent(vnode: VNode) {
-	return (vnode as any)._parent || (vnode as any).__p || null;
+	return (vnode as any)._parent || (vnode as any).__ || null;
 }
 
 /**
@@ -36,7 +36,7 @@ export function getDom(vnode: VNode) {
  * Get the last dom child of a `vnode`
  */
 export function getLastDomChild(vnode: VNode) {
-	return (vnode as any)._lastDomChild || (vnode as any).__z || null;
+	return (vnode as any)._lastDomChild || (vnode as any).__d || null;
 }
 
 /**

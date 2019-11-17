@@ -1,6 +1,5 @@
-import { Renderer } from "../10/renderer";
+import { Renderer } from "../renderer";
 import { render, h } from "preact";
-import { getDisplayName } from "../10/vnode";
 import { getNearestElement, measureNode } from "../dom";
 import { ID } from "../../view/store/types";
 import { Highlighter } from "../../view/components/Highlighter";
@@ -27,13 +26,16 @@ export function createHightlighter(renderer: Renderer) {
 
 	function highlight(id: ID) {
 		const vnode = renderer.getVNodeById(id);
-		if (!vnode) return destroyHighlight();
+		if (!vnode) {
+			return destroyHighlight();
+		}
 		const dom = renderer.findDomForVNode(id);
 
 		if (dom != null) {
 			if (highlightRef == null) {
 				highlightRef = document.createElement("div");
 				highlightRef.id = "preact-devtools-highlighter";
+				highlightRef.className = "foobar";
 
 				document.body.appendChild(highlightRef);
 			}
@@ -42,7 +44,7 @@ export function createHightlighter(renderer: Renderer) {
 			if (node != null) {
 				render(
 					h(Highlighter, {
-						label: getDisplayName(vnode),
+						label: renderer.getDisplayName(vnode),
 						...measureNode(node),
 					}),
 					highlightRef,

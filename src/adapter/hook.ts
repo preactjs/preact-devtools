@@ -1,9 +1,9 @@
-import { Renderer } from "./10/renderer";
+import { Renderer } from "./renderer";
 import { createBridge } from "./bridge";
 import { ObjPath } from "../view/components/sidebar/ElementProps";
-import { RawFilterState } from "./10/filter";
 import { ID } from "../view/store/types";
-import { parseCommitMessage } from "./debug";
+import { createAdapter } from "./adapter/adapter";
+import { RawFilterState, parseFilters } from "./adapter/filter";
 
 export type EmitterFn = (event: string, data: any) => void;
 
@@ -43,6 +43,10 @@ export function createHook(): DevtoolsHook {
 	let uid = 0;
 	let _connected = false;
 
+	const emit: EmitterFn = (name, data) => {
+		bridge.send(name, data);
+	};
+
 	return {
 		renderers,
 		get connected() {
@@ -51,11 +55,33 @@ export function createHook(): DevtoolsHook {
 		set connected(value) {
 			_connected = value;
 		},
-		emit(name, data) {
-			bridge.send(name, data);
-		},
+		emit,
 		attach: renderer => {
 			renderers.set(++uid, renderer);
+			const adapter = createAdapter(emit, renderer);
+			bridge.listen("initialized", renderer.flushInitial);
+			bridge.listen("highlight", adapter.highlight);
+			bridge.listen("update-prop", ev => {
+				adapter.update(ev.id, "props", ev.path, ev.value);
+			});
+			bridge.listen("update-state", ev => {
+				adapter.update(ev.id, "state", ev.path, ev.value);
+			});
+			bridge.listen("update-context", ev => {
+				adapter.update(ev.id, "context", ev.path, ev.value);
+			});
+			bridge.listen("update-filter", ev => {
+				renderer.applyFilters(parseFilters(ev));
+			});
+			bridge.listen("force-update", ev => renderer.forceUpdate(ev));
+			bridge.listen("select", adapter.select);
+			bridge.listen("copy", adapter.copy);
+			bridge.listen("inspect", adapter.inspect);
+			bridge.listen("log", adapter.log);
+			bridge.listen("update", adapter.log);
+			bridge.listen("start-picker", adapter.startPickElement);
+			bridge.listen("stop-picker", adapter.stopPickElement);
+
 			// Content Script is likely not ready at this point, so don't
 			// flush any events here and politely request it to initialize
 			bridge.send("attach", uid);

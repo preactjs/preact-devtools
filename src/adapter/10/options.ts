@@ -1,5 +1,5 @@
 import { Options, VNode } from "preact";
-import { Renderer } from "./renderer";
+import { Renderer } from "../renderer";
 import { isRoot, getActualChildren } from "./vnode";
 import { Highlighter } from "../../view/components/Highlighter";
 

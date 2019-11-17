@@ -1,6 +1,6 @@
-import { MsgTypes, flush } from "./events";
+import { MsgTypes } from "./events";
 import { parseTable, flushTable } from "./string-table";
-import { Elements } from "./10/renderer";
+import { Elements } from "./renderer";
 import { ID } from "../view/store/types";
 
 export interface ParsedMsg {

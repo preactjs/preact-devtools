@@ -27,7 +27,7 @@ export function AutoSizeInput(props: Props) {
 	const { onChange, ...rest } = props;
 	const [width, setWidth] = useState(1);
 	const [value, setValue] = useState(rest.value);
-	const ref = useRef<HTMLSpanElement>();
+	const ref = useRef<HTMLDivElement>();
 	const inputRef = useRef<HTMLInputElement>();
 
 	useEffect(() => {

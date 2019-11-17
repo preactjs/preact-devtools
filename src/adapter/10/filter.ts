@@ -1,5 +1,6 @@
 import { VNode, Fragment } from "preact";
 import { getDisplayName, getVNodeParent } from "./vnode";
+import { TypeFilterValue, FilterState } from "../adapter/filter";
 
 export interface RegexFilter {
 	type: "name";
@@ -11,32 +12,7 @@ export interface TypeFilter {
 	value: TypeFilterValue;
 }
 
-export type TypeFilterValue = "dom" | "fragment";
 export type Filter = RegexFilter | TypeFilter;
-
-export interface FilterState {
-	regex: RegExp[];
-	type: Set<TypeFilterValue>;
-}
-
-export interface RawFilterState {
-	regex: string[];
-	type: {
-		fragment: boolean;
-		dom: boolean;
-	};
-}
-
-export function parseFilters(raw: RawFilterState): FilterState {
-	const type = new Set<TypeFilterValue>();
-	if (raw.type.fragment) type.add("fragment");
-	if (raw.type.dom) type.add("dom");
-
-	return {
-		regex: [],
-		type,
-	};
-}
 
 export function shouldFilter(vnode: VNode, filters: FilterState): boolean {
 	// Filter text nodes by default. They are too tricky to match

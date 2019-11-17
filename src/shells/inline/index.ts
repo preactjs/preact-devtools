@@ -2,7 +2,7 @@ import { createStore } from "../../view/store";
 import { render, h, Options } from "preact";
 import { DevTools } from "../../view/components/Devtools";
 import { createAdapter } from "../../adapter/adapter/adapter";
-import { Renderer } from "../../adapter/10/renderer";
+import { Renderer } from "../../adapter/renderer";
 import { DevtoolsHook } from "../../adapter/hook";
 import { applyEvent } from "../../adapter/events";
 import { setupOptions } from "../../adapter/10/options";
@@ -26,7 +26,7 @@ export function attach(
 	const renderer = rendererFn(fakeHook);
 	const destroy = setupOptions(options as any, renderer);
 
-	createAdapter(fakeHook, renderer);
+	createAdapter(fakeHook.emit, renderer);
 
 	return {
 		store,
