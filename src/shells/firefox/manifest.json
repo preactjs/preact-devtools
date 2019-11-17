@@ -38,5 +38,10 @@
 			"run_at": "document_start"
 		}
 	],
-	"web_accessible_resources": ["installHook.js", "panel.html", "devtools.html"]
+	"web_accessible_resources": [
+		"installHook.js",
+		"installHook.css",
+		"panel.html",
+		"devtools.html"
+	]
 }

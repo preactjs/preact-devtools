@@ -1,4 +1,4 @@
-import { inject } from "./utils";
+import { inject, injectStyles } from "./utils";
 
 let lastDetection: any = null;
 
@@ -25,3 +25,4 @@ window.addEventListener("pageshow", ev => {
 });
 
 inject(chrome.runtime.getURL("installHook.js"), "script");
+injectStyles(chrome.runtime.getURL("installHook.css"));
