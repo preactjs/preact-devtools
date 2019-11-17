@@ -1,6 +1,6 @@
 import { valoo } from "../valoo";
-import { RawFilterState } from "../../adapter/10/filter";
 import escapeStringRegexp from "escape-string-regexp";
+import { RawFilterState } from "../../adapter/adapter/filter";
 
 export interface RawFilter {
 	value: string;

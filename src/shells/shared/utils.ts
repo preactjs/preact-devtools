@@ -14,18 +14,8 @@ export function injectStyles(href: string) {
 	const s = document.createElement("link");
 	s.rel = "stylesheet";
 	s.href = href;
-	document.head.appendChild(s);
-}
-
-/**
- * Deeply mutate a property by walking down an array of property keys
- */
-export function setIn(obj: Record<string, any>, path: ObjPath, value: any) {
-	let last = path.pop();
-	let parent = path.reduce((acc, attr) => (acc ? acc[attr] : null), obj);
-	if (parent && last) {
-		parent[last] = value;
-	}
+	const target = document.head || document.documentElement;
+	target.appendChild(s);
 }
 
 export function debounce<T extends any[]>(

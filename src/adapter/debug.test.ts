@@ -1,7 +1,7 @@
 import { expect } from "chai";
 import { fromSnapshot, toStringTable } from "./debug";
 import { MsgTypes } from "./events";
-import { Elements } from "./10/renderer";
+import { Elements } from "./renderer";
 
 describe("debug", () => {
 	describe("fromSnapshot", () => {

@@ -1,7 +1,6 @@
-import { DevtoolsHook } from "../hook";
-import { Renderer } from "../10/renderer";
-import { setIn, copyToClipboard } from "../../shells/shared/utils";
-import { getComponent } from "../10/vnode";
+import { EmitterFn } from "../hook";
+import { Renderer } from "../renderer";
+import { copyToClipboard } from "../../shells/shared/utils";
 import { createPicker } from "./picker";
 import { ID } from "../../view/store/types";
 import { createHightlighter } from "./highlight";
@@ -39,7 +38,7 @@ export interface InspectData {
 	state: Record<string, any> | null;
 }
 
-export function createAdapter(hook: DevtoolsHook, renderer: Renderer): Adapter {
+export function createAdapter(emit: EmitterFn, renderer: Renderer): Adapter {
 	const highlight = createHightlighter(renderer);
 
 	const picker = createPicker(
@@ -47,10 +46,10 @@ export function createAdapter(hook: DevtoolsHook, renderer: Renderer): Adapter {
 		renderer,
 		id => {
 			highlight.highlight(id);
-			hook.emit("select-node", id);
+			emit("select-node", id);
 		},
 		() => {
-			hook.emit("stop-picker", null);
+			emit("stop-picker", null);
 			highlight.destroy();
 		},
 	);
@@ -60,7 +59,7 @@ export function createAdapter(hook: DevtoolsHook, renderer: Renderer): Adapter {
 			if (renderer.has(id)) {
 				const data = renderer.inspect(id);
 				if (data !== null) {
-					hook.emit("inspect-result", data);
+					emit("inspect-result", data);
 				}
 			}
 		},
@@ -76,25 +75,7 @@ export function createAdapter(hook: DevtoolsHook, renderer: Renderer): Adapter {
 			if (id == null) highlight.destroy();
 			else highlight.highlight(id);
 		},
-		update(id, type, path, value) {
-			const vnode = renderer.getVNodeById(id);
-			if (vnode !== null) {
-				if (typeof vnode.type === "function") {
-					const c = getComponent(vnode);
-					if (c) {
-						if (type === "props") {
-							setIn((vnode.props as any) || {}, path.slice(), value);
-						} else if (type === "state") {
-							setIn((c.state as any) || {}, path.slice(), value);
-						} else if (type === "context") {
-							setIn((c.context as any) || {}, path.slice(), value);
-						}
-
-						c.forceUpdate();
-					}
-				}
-			}
-		},
+		update: renderer.update,
 		startPickElement: picker.start,
 		stopPickElement: picker.stop,
 		copy(value) {

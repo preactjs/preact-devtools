@@ -1,4 +1,4 @@
-import { InspectData, DevtoolsEvent } from "../adapter/adapter";
+import { DevtoolsEvent } from "../adapter/adapter";
 import { Commit, MsgTypes, flush } from "../events";
 import { Fragment, VNode } from "preact";
 import { IdMapper, createIdMapper } from "./IdMapper";
@@ -17,18 +17,18 @@ import {
 	getActualChildren,
 	getVNodeParent,
 } from "./vnode";
-import { FilterState, shouldFilter } from "./filter";
+import { shouldFilter } from "./filter";
 import { ID } from "../../view/store/types";
-import { cleanContext, jsonify, cleanProps, traverse } from "../renderer-utils";
-
-export enum Elements {
-	HTML_ELEMENT = 1,
-	CLASS_COMPONENT = 2,
-	FUNCTION_COMPONENT = 3,
-	FORWARD_REF = 4,
-	MEMO = 5,
-	SUSPENSE = 6,
-}
+import {
+	cleanContext,
+	jsonify,
+	cleanProps,
+	traverse,
+	setIn,
+	SerializedVNode,
+} from "./utils";
+import { FilterState } from "../adapter/filter";
+import { Renderer, Elements } from "../renderer";
 
 let memoReg = /^Memo\(/;
 let forwardRefReg = /^ForwardRef\(/;
@@ -55,18 +55,15 @@ export function isVNode(x: any): x is VNode {
 	return x != null && x.type !== undefined && getDom(x) !== undefined;
 }
 
-export interface Renderer {
-	getVNodeById(id: ID): VNode | null;
-	findDomForVNode(id: ID): Array<HTMLElement | Text | null> | null;
-	findVNodeIdForDom(node: HTMLElement | Text): number;
-	applyFilters(filters: FilterState): void;
-	has(id: ID): boolean;
-	log(id: ID, children: ID[]): void;
-	inspect(id: ID): InspectData | null;
-	onCommit(vnode: VNode): void;
-	onUnmount(vnode: VNode): void;
-	flushInitial(): void;
-	forceUpdate(id: ID): void;
+export function serializeVNode(x: any): SerializedVNode | null {
+	if (isVNode(x)) {
+		return {
+			type: "vnode",
+			name: getDisplayName(x),
+		};
+	}
+
+	return null;
 }
 
 let DEFAULT_FIlTERS: FilterState = {
@@ -87,10 +84,10 @@ export function createRenderer(
 	let currentUnmounts: number[] = [];
 
 	let domToVNode = new WeakMap<HTMLElement | Text, VNode>();
-
 	return {
 		getVNodeById: id => ids.getVNode(id),
 		has: id => ids.has(id),
+		getDisplayName,
 		forceUpdate: id => {
 			const vnode = ids.getVNode(id);
 			if (vnode) {
@@ -128,10 +125,10 @@ export function createRenderer(
 				canEditProps: true,
 				props:
 					vnode.type !== null
-						? jsonify(cleanProps(vnode.props), isVNode)
+						? jsonify(cleanProps(vnode.props), serializeVNode)
 						: null,
 				canEditState: true,
-				state: hasState ? jsonify(c!.state, isVNode) : null,
+				state: hasState ? jsonify(c!.state, serializeVNode) : null,
 				type: 2,
 			};
 		},
@@ -222,6 +219,25 @@ export function createRenderer(
 			}
 
 			ids.remove(vnode);
+		},
+		update(id, type, path, value) {
+			const vnode = ids.getVNode(id);
+			if (vnode !== null) {
+				if (typeof vnode.type === "function") {
+					const c = getComponent(vnode);
+					if (c) {
+						if (type === "props") {
+							setIn((vnode.props as any) || {}, path.slice(), value);
+						} else if (type === "state") {
+							setIn((c.state as any) || {}, path.slice(), value);
+						} else if (type === "context") {
+							setIn((c.context as any) || {}, path.slice(), value);
+						}
+
+						c.forceUpdate();
+					}
+				}
+			}
 		},
 	};
 }

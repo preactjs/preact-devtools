@@ -1,14 +1,15 @@
-import { h, render, Options, options, Fragment, createRef } from "preact";
+import { h, render, Options, options, Fragment } from "preact";
 import * as sinon from "sinon";
-import { createRenderer, Renderer, getFilteredChildren } from "./renderer";
+import { createRenderer, getFilteredChildren } from "./renderer";
 import { setupOptions } from "../10/options";
 import { DevtoolsHook } from "../hook";
 import { expect } from "chai";
 import { toSnapshot } from "../debug";
 import { useState } from "preact/hooks";
 import { act } from "preact/test-utils";
-import { FilterState } from "./filter";
 import { getDisplayName } from "./vnode";
+import { FilterState } from "../adapter/filter";
+import { Renderer } from "../renderer";
 
 export function setupScratch() {
 	const div = document.createElement("div");
@@ -276,12 +277,10 @@ describe("Renderer 10", () => {
 				"Add 2 <div> to parent 1",
 				"Add 3 <Foo> to parent 2",
 				"Add 4 <div> to parent 3",
-				"Reorder 2 [1, 2, 9999, 1, 0]", // TODO: Unnecessary
 			]);
 		});
 
-		// TODO: Bug in Preact, subtree's parent pointer is not updated
-		it.skip("should filter on update", () => {
+		it("should filter on update", () => {
 			renderer.applyFilters({
 				regex: [],
 				type: new Set(["dom"]),
