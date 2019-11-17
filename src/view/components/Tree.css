@@ -12,6 +12,7 @@
 	-ms-user-select: none;
 	user-select: none;
 	min-height: 15rem;
+	height: 100%;
 }
 
 .empty {
@@ -20,6 +21,7 @@
 	justify-content: center;
 	align-items: center;
 	height: 100%;
+	min-height: 15rem;
 }
 
 .bgLogo {
