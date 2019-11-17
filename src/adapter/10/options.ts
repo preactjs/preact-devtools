@@ -54,8 +54,8 @@ export function setupOptions(options: Options, renderer: Renderer) {
 		if (prevAfterDiff) prevAfterDiff(vnode);
 	};
 
-	o._commit = o.__c = (vnode: VNode | null) => {
-		if (prevCommitRoot) prevCommitRoot(vnode);
+	o._commit = o.__c = (vnode: VNode | null, queue: any[]) => {
+		if (prevCommitRoot) prevCommitRoot(vnode, queue);
 
 		// These cases are already handled by `unmount`
 		if (vnode == null) return;
