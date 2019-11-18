@@ -63,7 +63,11 @@ export function setupOptions(options: Options, renderer: Renderer) {
 		// Block devtools components
 		if (isRoot(vnode)) {
 			const children = getActualChildren(vnode);
-			if (children.length === 1 && children[0].type === Highlighter) {
+			if (
+				children.length === 1 &&
+				children[0] != null &&
+				children[0].type === Highlighter
+			) {
 				return;
 			}
 		}
