@@ -336,8 +336,9 @@ export function mount(
 
 	const children = getActualChildren(vnode);
 	for (let i = 0; i < children.length; i++) {
-		if (children[i] !== null) {
-			mount(ids, commit, children[i], ancestorId, filters, domCache);
+		const child = children[i];
+		if (child != null) {
+			mount(ids, commit, child, ancestorId, filters, domCache);
 		}
 	}
 }
@@ -354,8 +355,9 @@ export function update(
 	if (skip) {
 		const children = getActualChildren(vnode);
 		for (let i = 0; i < children.length; i++) {
-			if (children[i] != null) {
-				update(ids, commit, children[i], ancestorId, filters, domCache);
+			const child = children[i];
+			if (child != null) {
+				update(ids, commit, child, ancestorId, filters, domCache);
 			}
 		}
 		return;

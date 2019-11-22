@@ -1,6 +1,6 @@
 import { h } from "preact";
 import s from "./DataInput.css";
-import { useCallback, useRef, useState } from "preact/hooks";
+import { useCallback, useRef, useState, useMemo } from "preact/hooks";
 import { Undo } from "../icons";
 import {
 	parseValue,
@@ -29,6 +29,7 @@ export function DataInput({
 	const [v, set] = useState(initial);
 	const [valid, setValid] = useState(true);
 	const ref = useRef<HTMLInputElement>();
+	const lastValue = useRef<any>(undefined);
 
 	if (ref.current) {
 		ref.current.setCustomValidity(valid ? "" : "Invalid input");
@@ -44,7 +45,14 @@ export function DataInput({
 		}
 	}, []);
 
-	let inputVal = "" + v;
+	let inputVal = useMemo(() => {
+		if (value !== lastValue.current) {
+			lastValue.current = value;
+			return "" + valueToHuman(value);
+		}
+		return "" + v;
+	}, [v, value]);
+
 	if (!focus) {
 		inputVal = displayCollection(value);
 	}

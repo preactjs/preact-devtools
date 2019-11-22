@@ -74,7 +74,23 @@ describe("valueToHuman", () => {
 		expect(valueToHuman([1, 2, 3])).to.equal("[1,2,3]");
 	});
 
-	it("should parse vnodes", () => {
+	it("should parse stringified vnodes", () => {
 		expect(valueToHuman("<span />")).to.equal("<span />");
+	});
+
+	it("should parse objects to vnodes", () => {
+		expect(valueToHuman({ type: "vnode", name: "Foo" })).to.equal("<Foo />");
+	});
+
+	it("should parse objects to functions", () => {
+		expect(valueToHuman({ type: "function", name: "foobar" })).to.equal(
+			"foobar()",
+		);
+	});
+
+	it("should parse unrelated objects", () => {
+		expect(valueToHuman({ type: "foo", name: "bob" })).to.equal(
+			"{type:'foo',name:'bob'}",
+		);
 	});
 });
