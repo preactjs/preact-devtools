@@ -48,7 +48,7 @@ export function DataInput({
 	let inputVal = useMemo(() => {
 		if (value !== lastValue.current) {
 			lastValue.current = value;
-			return "" + value;
+			return "" + valueToHuman(value);
 		}
 		return "" + v;
 	}, [v, value]);
