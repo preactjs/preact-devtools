@@ -84,9 +84,9 @@ export function SingleItem(props: SingleProps) {
 		depth,
 		onCollapse,
 		initial,
+		value,
 	} = props;
 
-	const v = props.value;
 	const update = useCallback(
 		(v: any) => {
 			onChange && onChange(v, path);
@@ -128,9 +128,9 @@ export function SingleItem(props: SingleProps) {
 			)}
 			<div class={s.property}>
 				{editable ? (
-					<DataInput value={v} onChange={update} initialValue={init} />
+					<DataInput value={value} onChange={update} initialValue={init} />
 				) : (
-					<div class={s.mask}>{displayCollection(v)}</div>
+					<div class={s.mask}>{displayCollection(value)}</div>
 				)}
 			</div>
 		</div>
