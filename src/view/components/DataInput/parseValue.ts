@@ -51,6 +51,16 @@ export function valueToHuman(v: any): string {
 
 	if (v === null) return "" + v;
 
+	if (Object.keys(v).length === 2) {
+		if (typeof v.name === "string") {
+			if (v.type === "vnode") {
+				return `<${v.name} />`;
+			} else if (v.type === "function") {
+				return `${v.name}()`;
+			}
+		}
+	}
+
 	return json5.stringify(v);
 }
 
