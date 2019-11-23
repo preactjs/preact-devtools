@@ -23,7 +23,9 @@ export function IconBtn(props: Props) {
 				if (props.onClick) props.onClick();
 			}}
 		>
-			{props.children}
+			<span class={s.inner} tabIndex={-1}>
+				{props.children}
+			</span>
 		</button>
 	);
 }

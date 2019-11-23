@@ -23,15 +23,21 @@
 	z-index: 1;
 }
 
-.root:not([disabled])[data-active],
-.root:focus,
-.root:not([disabled]):active {
+.inner {
+	display: flex;
+	justify-content: center;
+	align-items: center;
+}
+
+.root:not([disabled])[data-active] .inner,
+.root:focus .inner,
+.root:not([disabled]) .inner:active {
 	color: var(--color-selected-text);
 }
 
-.root:focus::after,
-.root:not([disabled]):active::after,
-.root:not([disabled])[data-active]::after {
+.root:focus-within .inner::after,
+.root:not([disabled]):active .inner::after,
+.root:not([disabled])[data-active] .inner::after {
 	content: "";
 	position: absolute;
 	left: -0.25rem;
