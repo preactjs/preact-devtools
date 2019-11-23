@@ -53,10 +53,6 @@ export function DataInput({
 		return "" + v;
 	}, [v, value]);
 
-	if (!focus) {
-		inputVal = displayCollection(value);
-	}
-
 	let type: string = typeof value;
 	if (value === null) type = "null";
 	else if (type === "object" && Array.isArray(value)) type = "array";

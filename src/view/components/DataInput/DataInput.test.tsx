@@ -36,4 +36,23 @@ describe("DataInput", () => {
 		fireEvent.focus(input);
 		expect(input.value).to.equal('"foo"');
 	});
+
+	it("should update mask", () => {
+		const { container } = render(
+			<DataInput value="foo" onChange={noop} initialValue="asdf" />,
+		);
+
+		const input = container.querySelector("input") as HTMLInputElement;
+
+		expect(input.value).to.equal('"foo"');
+
+		fireEvent.focus(input);
+		fireEvent.input(input, {
+			target: { value: '"bar"' },
+			currentTarget: { value: '"bar"' },
+		});
+		fireEvent.blur(input);
+
+		expect(input.value).to.equal('"bar"');
+	});
 });
