@@ -35,22 +35,7 @@ export function setupOptions(options: Options, renderer: Renderer) {
 
 	options.diffed = vnode => {
 		vnode.endTime = performance.now();
-		// let c;
-		// if (vnode != null && (c = vnode._component) != null) {
-		// 	c._prevProps = oldVNode != null ? oldVNode.props : null;
-		// 	c._prevContext =
-		// 		oldVNode != null && oldVNode._component != null
-		// 			? oldVNode._component._context
-		// 			: null;
 
-		// 	if (c.__hooks != null) {
-		// 		c._prevHooksRevision = c._currentHooksRevision;
-		// 		c._currentHooksRevision = c.__hooks._list.reduce(
-		// 			(acc, x) => acc + x._revision,
-		// 			0,
-		// 		);
-		// 	}
-		// }
 		if (prevAfterDiff) prevAfterDiff(vnode);
 	};
 
@@ -78,20 +63,6 @@ export function setupOptions(options: Options, renderer: Renderer) {
 		if (prevBeforeUnmount) prevBeforeUnmount(vnode);
 		renderer.onUnmount(vnode as any);
 	};
-
-	// Inject tracking into setState
-	// const setState = Component.prototype.setState;
-	// Component.prototype.setState = function(update, callback) {
-	// 	// Duplicated in setState() but doesn't matter due to the guard.
-	// 	let s =
-	// 		(this._nextState !== this.state && this._nextState) ||
-	// 		(this._nextState = Object.assign({}, this.state));
-
-	// 	// Needed in order to check if state has changed after the tree has been committed:
-	// 	this._prevState = Object.assign({}, s);
-
-	// 	return setState.call(this, update, callback);
-	// };
 
 	// Teardown devtools options. Mainly used for testing
 	return () => {
