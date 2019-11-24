@@ -46,12 +46,14 @@ export function DataInput({
 	}, []);
 
 	let inputVal = useMemo(() => {
-		if (value !== lastValue.current) {
+		if (!focus) {
+			return "" + displayCollection(value);
+		} else if (value !== lastValue.current) {
 			lastValue.current = value;
 			return "" + valueToHuman(value);
 		}
 		return "" + v;
-	}, [v, value]);
+	}, [v, value, focus]);
 
 	let type: string = typeof value;
 	if (value === null) type = "null";
@@ -88,8 +90,11 @@ export function DataInput({
 				}
 			} catch (e) {}
 		},
-		[type, v],
+		[v],
 	);
+
+	const onFocus = useCallback(() => setFocus(true), []);
+	const onBlur = useCallback(() => setFocus(false), []);
 
 	return (
 		<div class={s.valueWrapper}>
@@ -111,8 +116,8 @@ export function DataInput({
 					ref={ref}
 					class={`${s.valueInput} ${props.class || ""} ${focus ? s.focus : ""}`}
 					value={inputVal}
-					onFocus={() => setFocus(true)}
-					onBlur={() => setFocus(false)}
+					onFocus={onFocus}
+					onBlur={onBlur}
 					onKeyDown={onKeyDown}
 					onInput={e => {
 						const next = (e.target as any).value;
