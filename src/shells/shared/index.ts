@@ -54,7 +54,6 @@ function createPanel() {
 		});
 
 		port!.onMessage.addListener(msg => {
-			console.log("RECEIVED", msg.data.payload);
 			const payload = msg.data.payload;
 			applyEvent(store, payload.name, payload.payload);
 		});

@@ -191,7 +191,6 @@ export function applyEvent(store: Store, name: string, data: any) {
 		case "operation":
 			return applyOperations(store, data);
 		case "inspect-result":
-			console.log("res", data);
 			return (store.inspectData.$ = data);
 		case "select-node":
 			return store.selection.selectById(data);
