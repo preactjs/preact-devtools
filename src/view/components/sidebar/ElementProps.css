@@ -72,6 +72,10 @@
 	color: #aaa;
 }
 
+.toggle:focus {
+	outline: none;
+}
+
 .toggle svg {
 	transition: transform 0.2s;
 }
