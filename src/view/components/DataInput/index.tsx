@@ -95,6 +95,18 @@ export function DataInput({
 
 	const onFocus = useCallback(() => setFocus(true), []);
 	const onBlur = useCallback(() => setFocus(false), []);
+	const onReset = useCallback(() => {
+		setFocus(true);
+		if (ref.current) ref.current.focus();
+		set(initial);
+		onCommit(initial);
+	}, [initial, ref]);
+
+	const onInput = useCallback((e: Event) => {
+		const next = (e.target as any).value;
+		set(next);
+		onCommit(next);
+	}, []);
 
 	return (
 		<div class={s.valueWrapper}>
@@ -119,22 +131,13 @@ export function DataInput({
 					onFocus={onFocus}
 					onBlur={onBlur}
 					onKeyDown={onKeyDown}
-					onInput={e => {
-						const next = (e.target as any).value;
-						set(next);
-						onCommit(next);
-					}}
+					onInput={onInput}
 					data-type={type}
 				/>
 				<button
 					class={`${s.undoBtn} ${v !== initial ? s.showUndoBtn : ""}`}
 					type="button"
-					onClick={() => {
-						setFocus(true);
-						if (ref.current) ref.current.focus();
-						set(initial);
-						onChange(initial);
-					}}
+					onClick={onReset}
 				>
 					<Undo size="s" />
 				</button>
