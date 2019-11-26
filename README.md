@@ -4,6 +4,11 @@
 
 Browser extension that allows you to inspect a Preact component hierarchy, including props and state.
 
+Download for:
+
+- [Firefox](https://addons.mozilla.org/en-US/firefox/addon/preact-devtools/)
+- Chrome (coming soon)
+
 ![Screenshot of Preact devtools](media/preact-chrome-light.png)
 
 - Use `npm run dev` to start a demo page
