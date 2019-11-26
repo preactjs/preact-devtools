@@ -25,7 +25,7 @@ Firefox:
 4. Click "Load temporary addon"
 5. Select the `manifest.json` in `dist/firefox/`
 
-## Embedding devtools directly into a page
+## Embedding devtools directly into a page (highly experimental)
 
 `preact-devtools` supports an inline build target, where the devtools
 can be embedded into any page without any restrictions like rendering
