@@ -117,12 +117,21 @@ h2 {
 
 main {
 	text-align: center;
-	padding: 3rem 4% 16rem;
+	padding: 3rem 4% 8%;
 }
 
 .screenshots {
 	display: flex;
+	flex-direction: column;
+	align-items: center;
 	justify-content: center;
+}
+
+@media (min-width: 60rem) {
+	.screenshots {
+		flex-direction: row;
+		align-items: flex-start;
+	}
 }
 
 .screenshots img {
