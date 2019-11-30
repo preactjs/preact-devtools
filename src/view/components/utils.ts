@@ -27,7 +27,6 @@ export function scrollIntoView(el: HTMLElement) {
 		}
 		parent.scrollTo({
 			top,
-			behavior: "smooth",
 		});
 	}
 }
