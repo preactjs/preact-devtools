@@ -69,20 +69,3 @@ export function measureNode(dom: Element): Measurements {
 export function px2Int(input: string | null) {
 	return input ? +input.replace(/px/, "") : 0;
 }
-
-export function focusNext(dom: HTMLInputElement) {
-	if (!dom.form) return;
-
-	const items = Array.from(dom.form.elements);
-	let idx = items.indexOf(dom);
-
-	if (items.length > idx + 1) {
-		let item;
-		while ((item = items[++idx])) {
-			if (item.nodeName === "INPUT") {
-				(item as any).focus();
-				break;
-			}
-		}
-	}
-}

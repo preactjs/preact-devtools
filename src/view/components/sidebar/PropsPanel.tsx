@@ -7,8 +7,6 @@ import { useInstance } from "../utils";
 import { SidebarPanel } from "./SidebarPanel";
 import { ID } from "../../store/types";
 import { InspectData } from "../../../adapter/adapter/adapter";
-import { Collapser } from "../../store/collapser";
-import { PropData } from "./parseProps";
 import { NewProp } from "./NewProp";
 
 const noop = () => null;
@@ -19,28 +17,25 @@ export interface Props {
 	checkEditable: (data: InspectData) => boolean;
 	getData(data: InspectData): any;
 	canAddNew?: boolean;
-	transform: (
-		data: PropData,
-		collapser: Collapser<string>,
-		shouldReset: boolean,
-	) => PropData;
 	onChange: (id: ID, path: ObjPath, value: any) => void;
 	onCopy?: (data: any) => void;
 }
 
 export function PropsPanel(props: Props) {
 	const store = useStore();
+
 	const s = useInstance(() => {
-		return createPropsStore(store.inspectData, props.getData, props.transform);
+		return createPropsStore(store.inspectData, props.getData);
 	});
 	const inspect = useObserver(() => store.inspectData.$);
 	const collapsed = useObserver(() => s.collapser.collapsed.$);
 	const items = useObserver(() => s.list.$);
-	const initial = useObserver(() => s.initialTree.$);
 
 	const onChange = useCallback(
 		(value: any, path: ObjPath) => {
-			props.onChange(inspect!.id, path.slice(1), value);
+			const key = path.slice(1);
+			const keyStr = key.join(".");
+			props.onChange(inspect!.id, key, value);
 		},
 		[inspect],
 	);
@@ -67,7 +62,6 @@ export function PropsPanel(props: Props) {
 				collapsed={collapsed}
 				items={items.map(x => s.tree.$.get(x)!)}
 				onChange={onChange}
-				initial={initial}
 				onCollapse={s.collapser.toggle}
 			/>
 			{props.canAddNew && <NewProp />}

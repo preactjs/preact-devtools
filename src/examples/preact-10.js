@@ -19,6 +19,7 @@ import { createPropsStore } from "../view/store/props";
 import { Iframes } from "./Iframes";
 import { LegacyContext } from "./legacyContext";
 import { Stateful } from "./state";
+import { valoo } from "../view/valoo";
 import { DeepTree, ShallowTree } from "./DeepTree";
 
 function Headline(props) {
@@ -27,7 +28,13 @@ function Headline(props) {
 
 const tstore = treeStore();
 
-const pStore = createPropsStore(tstore.inspectData, data => data.props, d => d);
+const collapsed = valoo(new Set());
+const pStore = createPropsStore(
+	tstore.inspectData,
+	data => data.props,
+	collapsed,
+);
+const initialTree = new Map();
 
 export function StyleGuide() {
 	const [showModal, setShowModal] = useState(
@@ -37,7 +44,8 @@ export function StyleGuide() {
 	const propList = useObserver(() =>
 		pStore.list.$.map(x => pStore.tree.$.get(x)),
 	);
-	const pInitial = useObserver(() => pStore.initialTree.$);
+
+	const pInitial = initialTree;
 	const pCollapsed = useObserver(() => pStore.collapser.collapsed.$);
 
 	const [store] = useState(createStore());
