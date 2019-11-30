@@ -59,8 +59,8 @@ export function createPropsStore(
 	});
 
 	const list = watch(() => {
-		const ids = flattenChildren(tree.$, "root", collapser.collapsed.$);
-		return ids.slice(1);
+		const { items } = flattenChildren(tree.$, "root", collapser.collapsed.$);
+		return items.slice(1);
 	});
 
 	return { list, collapser, tree, destroy: () => dispose() };

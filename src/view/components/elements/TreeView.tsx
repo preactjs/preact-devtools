@@ -8,12 +8,15 @@ import { useSelection } from "../../store/selection";
 import { useCollapser } from "../../store/collapser";
 import { BackgroundLogo } from "./background-logo";
 import { useSearch } from "../../store/search";
-import { scrollIntoView } from "../utils";
+import { scrollIntoView, cssToPx, useResize } from "../utils";
 import { ID } from "../../store/types";
+
+const SCROLLBAR_WIDTH = 24;
 
 export function TreeView() {
 	const store = useStore();
 	const nodeList = useObserver(() => store.nodeList.$);
+	const treeDepth = useObserver(() => store.treeDepth.$);
 	const { collapseNode, collapsed } = useCollapser();
 	const { selected, selectNext, selectPrev } = useSelection();
 
@@ -31,6 +34,38 @@ export function TreeView() {
 
 	const onMouseLeave = useCallback(() => store.actions.highlightNode(null), []);
 	const ref = useRef<HTMLDivElement | null>(null);
+	const paneRef = useRef<HTMLDivElement | null>(null);
+
+	const [updateCount, setUpdateCount] = useState(0);
+	useResize(() => setUpdateCount(updateCount + 1), [updateCount]);
+
+	const [maxIndent, setMaxIndent] = useState(0);
+
+	useEffect(() => {
+		if (ref.current && paneRef.current) {
+			const available = ref.current.offsetWidth - SCROLLBAR_WIDTH;
+			const actual = paneRef.current.offsetWidth;
+			const diff = actual - available;
+			const rawIndent = getComputedStyle(ref.current).getPropertyValue(
+				"--indent-depth",
+			);
+			if (diff !== 0 && rawIndent !== "") {
+				const current = cssToPx(rawIndent);
+				if (maxIndent === 0) {
+					setMaxIndent(current);
+				}
+
+				let indent =
+					current - Math.round((diff / (treeDepth || 1)) * 100) / 100;
+				if (maxIndent > 0) {
+					indent = Math.min(maxIndent, indent);
+				}
+
+				ref.current.style.setProperty("--indent-depth", `${indent}px`);
+			}
+		}
+	}, [nodeList, updateCount]);
+
 	return (
 		<div
 			ref={ref}
@@ -40,18 +75,20 @@ export function TreeView() {
 			data-tree={true}
 			onMouseLeave={onMouseLeave}
 		>
-			{nodeList.length === 0 && (
-				<div class={s.empty}>
-					<BackgroundLogo class={s.bgLogo} />
-					<p>
-						<b>Connected</b>, waiting for nodes to load...
-					</p>
-				</div>
-			)}
-			{nodeList.map(id => (
-				<TreeItem key={id} id={id} />
-			))}
-			<HighlightPane treeDom={ref.current} />
+			<div class={s.pane} ref={paneRef}>
+				{nodeList.length === 0 && (
+					<div class={s.empty}>
+						<BackgroundLogo class={s.bgLogo} />
+						<p>
+							<b>Connected</b>, waiting for nodes to load...
+						</p>
+					</div>
+				)}
+				{nodeList.map(id => (
+					<TreeItem key={id} id={id} />
+				))}
+				<HighlightPane treeDom={ref.current} />
+			</div>
 		</div>
 	);
 }
