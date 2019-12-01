@@ -35,12 +35,12 @@
 	display: flex;
 }
 
-.innerWrapper:focus-within .valueInput {
+.innerWrapper .valueInput:focus {
 	background: var(--color-props-input-bg);
 	outline: none;
 }
 
-.innerWrapper:focus-within .valueInput:invalid {
+.innerWrapper .valueInput:invalid {
 	border-bottom: 0.125rem solid var(--color-input-invalid);
 	outline: none;
 }

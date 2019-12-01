@@ -1,151 +1,95 @@
 import { h } from "preact";
 import s from "./DataInput.css";
-import { useCallback, useRef, useState, useMemo } from "preact/hooks";
+import { useCallback, useRef, useMemo, useEffect } from "preact/hooks";
 import { Undo } from "../icons";
-import {
-	parseValue,
-	isStringifiedVNode,
-	displayCollection,
-	valueToHuman,
-} from "./parseValue";
-import { focusNext } from "../../../adapter/dom";
+import { createInputStore } from "./inputState";
+import { valoo } from "../../valoo";
+import { useObserver } from "../../store/react-bindings";
 
 export interface InputProps {
+	name: string;
 	value: any;
-	initialValue: any;
 	class?: string;
 	onChange: (value: any) => void;
 }
 
-export function DataInput({
-	value,
-	onChange,
-	initialValue,
-	...props
-}: InputProps) {
-	const hasCheck = typeof value === "boolean";
-	const initial = valueToHuman(initialValue);
-	const [focus, setFocus] = useState(false);
-	const [v, set] = useState(initial);
-	const [valid, setValid] = useState(true);
+export function DataInput({ value, onChange, name, ...props }: InputProps) {
+	const value$ = useRef(valoo(value)).current;
+	const store = useRef(createInputStore(value$)).current;
+
+	useEffect(() => {
+		store.onReset();
+	}, [name]);
+
+	useEffect(() => {
+		if (value$.$ !== value) {
+			value$.$ = value;
+		}
+		const dispose = value$.on(v => onChange(v));
+		return () => dispose();
+	}, [value, onChange]);
+
+	const valid = useObserver(() => store.valid.$);
+	const type = useObserver(() => store.valueType.$);
+	const inputVal = useObserver(() => store.actualValue.$);
+	const focus = useObserver(() => store.focus.$);
+	const showReset = useObserver(() => store.showReset.$);
 	const ref = useRef<HTMLInputElement>();
-	const lastValue = useRef<any>(undefined);
 
-	if (ref.current) {
-		ref.current.setCustomValidity(valid ? "" : "Invalid input");
-	}
+	useMemo(() => {
+		if (ref.current) {
+			ref.current.setCustomValidity(valid ? "" : "Invalid input");
+		}
+	}, [ref.current, valid]);
 
-	const onCommit = useCallback((value: any) => {
-		try {
-			const parsed = typeof value === "string" ? parseValue(value) : value;
-			onChange(parsed);
-			setValid(true);
-		} catch (err) {
-			setValid(false);
+	const onKeyUp = useCallback((e: KeyboardEvent) => {
+		if (e.key === "Enter") {
+			store.onConfirm();
+		} else if (e.key === "ArrowUp") {
+			store.onIncrement();
+		} else if (e.key === "ArrowDown") {
+			store.onDecrement();
 		}
 	}, []);
 
-	let inputVal = useMemo(() => {
-		if (!focus) {
-			return "" + displayCollection(value);
-		} else if (value !== lastValue.current) {
-			lastValue.current = value;
-			return "" + valueToHuman(value);
-		}
-		return "" + v;
-	}, [v, value, focus]);
-
-	let type: string = typeof value;
-	if (value === null) type = "null";
-	else if (type === "object" && Array.isArray(value)) type = "array";
-	else if (isStringifiedVNode(initial)) {
-		type = "vnode";
-	} else if (initial.endsWith("()")) {
-		type = "function";
-	}
-
-	const onKeyDown = useCallback(
-		(e: KeyboardEvent) => {
-			try {
-				if (e.key === "Enter" && !e.shiftKey) {
-					focusNext(e.target as any);
-					e.preventDefault();
-				} else {
-					if (typeof parseValue(v) === "number") {
-						let next;
-						switch (e.key) {
-							case "ArrowUp":
-								next = "" + (+v + 1);
-								break;
-							case "ArrowDown":
-								next = "" + (+v - 1);
-								break;
-						}
-
-						if (next !== undefined) {
-							set(next);
-							onCommit(next);
-						}
-					}
-				}
-			} catch (e) {}
-		},
-		[v],
-	);
-
-	const onFocus = useCallback(() => setFocus(true), []);
-	const onBlur = useCallback(() => setFocus(false), []);
-	const onReset = useCallback(() => {
-		setFocus(true);
-		if (ref.current) ref.current.focus();
-		set(initial);
-		onCommit(initial);
-	}, [initial, ref]);
-
 	const onInput = useCallback((e: Event) => {
-		const next = (e.target as any).value;
-		set(next);
-		onCommit(next);
+		store.onInput((e.target as any).value);
 	}, []);
 
 	return (
 		<div class={s.valueWrapper}>
-			{hasCheck && !focus && (
+			{store.asCheckbox.$ && !focus && (
 				<input
 					class={s.check}
 					type="checkbox"
-					checked={v === "true"}
+					checked={store.actualValue.$ === "true"}
 					onInput={e => {
 						const value = "" + (e.target as any).checked;
-						set(value);
-						onCommit(value);
+						value$.$ = value;
+						onChange(value$.$);
 					}}
 				/>
 			)}
-			<div class={`${s.innerWrapper} ${hasCheck ? s.withCheck : ""}`}>
+			<div class={`${s.innerWrapper} ${store.asCheckbox.$ ? s.withCheck : ""}`}>
 				<input
 					type="text"
 					ref={ref}
 					class={`${s.valueInput} ${props.class || ""} ${focus ? s.focus : ""}`}
 					value={inputVal}
-					onFocus={onFocus}
-					onBlur={onBlur}
-					onKeyDown={onKeyDown}
+					onFocus={store.onFocus}
+					onBlur={store.onBlur}
+					onKeyUp={onKeyUp}
 					onInput={onInput}
 					data-type={type}
 				/>
 				<button
-					class={`${s.undoBtn} ${v !== initial ? s.showUndoBtn : ""}`}
+					class={`${s.undoBtn} ${showReset ? s.showUndoBtn : ""}`}
 					type="button"
-					onClick={onReset}
+					onClick={store.onReset}
 				>
 					<Undo size="s" />
 				</button>
 			</div>
 		</div>
 	);
-}
-
-export function getEventValue(ev: any) {
-	return ev.currentTarget!.checked || ev.currentTarget.value;
 }

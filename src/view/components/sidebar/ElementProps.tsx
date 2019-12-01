@@ -6,8 +6,6 @@ import { DataInput } from "../DataInput";
 import { displayCollection } from "../DataInput/parseValue";
 import { ID } from "../../store/types";
 import { useCallback } from "preact/hooks";
-import { useObserver, useStore } from "../../store/react-bindings";
-import { Observable } from "../../valoo";
 
 export type ObjPath = Array<string | number>;
 export type ChangeFn = (value: any, path: ObjPath) => void;
@@ -19,11 +17,10 @@ export interface Props {
 	onCollapse?: (path: string) => void;
 	collapsed: Set<string>;
 	items: PropData[];
-	initial: Map<string, Observable<any>>;
 }
 
 export function ElementProps(props: Props) {
-	const { editable, onChange, collapsed, items, onCollapse } = props;
+	const { editable, onChange, collapsed, items, onCollapse, nodeId } = props;
 
 	return (
 		<div class={s.root}>
@@ -37,6 +34,7 @@ export function ElementProps(props: Props) {
 					const id = item.id;
 					return (
 						<SingleItem
+							id={nodeId}
 							key={id}
 							type={item.type}
 							name={id.slice(id.lastIndexOf(".") + 1)}
@@ -48,7 +46,6 @@ export function ElementProps(props: Props) {
 							path={item.path}
 							onChange={onChange}
 							depth={item.depth}
-							initial={props.initial.get(id)!}
 						/>
 					);
 				})}
@@ -58,6 +55,7 @@ export function ElementProps(props: Props) {
 }
 
 export interface SingleProps {
+	id: ID;
 	key?: string;
 	editable?: boolean;
 	type: PropDataType;
@@ -69,11 +67,11 @@ export interface SingleProps {
 	onChange?: ChangeFn;
 	onCollapse?: (path: ObjPath) => void;
 	depth: number;
-	initial: Observable<any>;
 }
 
 export function SingleItem(props: SingleProps) {
 	const {
+		id,
 		onChange,
 		path,
 		editable = false,
@@ -83,7 +81,6 @@ export function SingleItem(props: SingleProps) {
 		collapsed = false,
 		depth,
 		onCollapse,
-		initial,
 		value,
 	} = props;
 
@@ -98,8 +95,6 @@ export function SingleItem(props: SingleProps) {
 		onCollapse,
 		path,
 	]);
-
-	const init = useObserver(() => initial.$);
 
 	return (
 		<div
@@ -128,7 +123,11 @@ export function SingleItem(props: SingleProps) {
 			)}
 			<div class={s.property}>
 				{editable ? (
-					<DataInput value={value} onChange={update} initialValue={init} />
+					<DataInput
+						value={value}
+						onChange={update}
+						name={`${id}#${path.join(".")}`}
+					/>
 				) : (
 					<div class={s.mask}>{displayCollection(value)}</div>
 				)}

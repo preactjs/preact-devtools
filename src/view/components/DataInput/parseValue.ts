@@ -26,6 +26,8 @@ export function parseValue(v: string) {
 		throw new TypeError("Invalid input");
 	} else if (/^[-+.]?\d*(?:[.]?\d*)$/.test(v)) {
 		return Number(v);
+	} else if (/\(\)$/.test(v)) {
+		return { type: "function", name: v.slice(0, -2) };
 	}
 
 	try {

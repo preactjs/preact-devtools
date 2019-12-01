@@ -20,7 +20,7 @@ export function NewProp() {
 				class={s.value}
 				value={value}
 				onChange={v => console.log(v)}
-				initialValue={undefined}
+				name="foobar"
 			/>
 		</div>
 	);

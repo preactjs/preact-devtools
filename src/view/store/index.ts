@@ -21,11 +21,11 @@ export function createStore(): Store {
 
 	// Toggle
 	const isPicking = valoo<boolean>(false);
-
 	const filterState = createFilterStore(notify);
 
 	// List
-	const collapser = createCollapser<ID>();
+	const collapsed = valoo(new Set<ID>());
+	const collapser = createCollapser<ID>(collapsed);
 	const nodeList = watch(() => {
 		return roots.$.map(root => {
 			const list = flattenChildren<ID, DevNode>(
@@ -43,7 +43,6 @@ export function createStore(): Store {
 	});
 
 	const inspectData = valoo<InspectData | null>(null);
-
 	const selection = createSelectionStore(nodeList);
 
 	// Update inspect data on selection
