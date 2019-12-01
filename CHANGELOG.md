@@ -1,5 +1,11 @@
 # Changelog
 
+## 0.0.4
+
+- Fix new value UI doing nothing (#28)
+- Fix stale value when resetting it (#27)
+- Don't animate scroll in tree view (#26)
+
 ## 0.0.3
 
 - Usability improvements + Design tweaks
