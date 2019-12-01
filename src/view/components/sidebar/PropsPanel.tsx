@@ -34,7 +34,6 @@ export function PropsPanel(props: Props) {
 	const onChange = useCallback(
 		(value: any, path: ObjPath) => {
 			const key = path.slice(1);
-			const keyStr = key.join(".");
 			props.onChange(inspect!.id, key, value);
 		},
 		[inspect],
@@ -64,7 +63,7 @@ export function PropsPanel(props: Props) {
 				onChange={onChange}
 				onCollapse={s.collapser.toggle}
 			/>
-			{props.canAddNew && <NewProp />}
+			{props.canAddNew && <NewProp onChange={onChange} />}
 		</SidebarPanel>
 	);
 }
