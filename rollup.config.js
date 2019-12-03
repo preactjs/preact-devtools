@@ -68,7 +68,7 @@ export default entries.map(data => ({
 	output: {
 		file: data.dist,
 		name: "index.js",
-		format: "esm",
+		format: "iife",
 	},
 	external: data.external || [],
 	plugins: [
