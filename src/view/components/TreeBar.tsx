@@ -104,6 +104,19 @@ export function TreeBar() {
 			</div>
 			<ActionSeparator />
 			<div class={s.btnWrapper}>
+				<IconBtn
+					active={showUpdates}
+					title="Show Updates"
+					onClick={() => {
+						const next = !showUpdates;
+						store.actions.showUpdates(next);
+						setShowUpdates(next);
+					}}
+				>
+					<ShowUpdates size="s" />
+				</IconBtn>
+			</div>
+			<div class={s.btnWrapper}>
 				<OutsideClick
 					onClick={() => setFilterVisible(false)}
 					class={s.filterBtnWrapper}
@@ -117,15 +130,6 @@ export function TreeBar() {
 					</IconBtn>
 					{filterVisible && <FilterPopup />}
 				</OutsideClick>
-			</div>
-			<div class={s.btnWrapper}>
-				<IconBtn
-					active={showUpdates}
-					title="Show Updates"
-					onClick={() => store.actions.showUpdates(!showUpdates)}
-				>
-					<ShowUpdates size="s" />
-				</IconBtn>
 			</div>
 			<div class={s.btnWrapper}>
 				<IconBtn
