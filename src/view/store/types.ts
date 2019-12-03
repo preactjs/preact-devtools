@@ -50,6 +50,7 @@ export interface Store {
 	selection: ReturnType<typeof createSelectionStore>;
 	collapser: Collapser<ID>;
 	actions: {
+		setHighlightUpdates(active: boolean): void;
 		inspect: (id: ID) => void;
 		highlightNode: (id: ID | null) => void;
 		clear(): void;

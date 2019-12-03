@@ -15,6 +15,7 @@ export interface DevtoolEvents {
 	"start-picker": null;
 	"stop-picker": null;
 	"update-filter": RawFilterState;
+	"highlight-update": boolean;
 	copy: string;
 	highlight: ID | null;
 	log: { id: ID; children: ID[] };
