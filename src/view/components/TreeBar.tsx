@@ -1,4 +1,4 @@
-import { h, Fragment } from "preact";
+import { h } from "preact";
 import { useState } from "preact/hooks";
 import { Actions, ActionSeparator } from "./Actions";
 import { IconBtn } from "./IconBtn";
@@ -9,12 +9,12 @@ import {
 	KeyboardUp,
 	Close,
 	Search,
-	Eye,
 	Remove,
 	AddCircle,
 	CheckboxChecked,
 	CheckboxUnChecked,
 	FilterList,
+	ShowUpdates,
 } from "./icons";
 import { useStore, useObserver } from "../store/react-bindings";
 import s from "./TreeBar.css";
@@ -28,6 +28,7 @@ export function TreeBar() {
 	const activeModal = useObserver(() => store.modal.active.$);
 
 	const [filterVisible, setFilterVisible] = useState(false);
+	const [showUpdates, setShowUpdates] = useState(false);
 
 	const onKeyDown = (e: KeyboardEvent) => {
 		if (e.key === "Enter") {
@@ -116,6 +117,15 @@ export function TreeBar() {
 					</IconBtn>
 					{filterVisible && <FilterPopup />}
 				</OutsideClick>
+			</div>
+			<div class={s.btnWrapper}>
+				<IconBtn
+					active={showUpdates}
+					title="Show Updates"
+					onClick={() => store.actions.showUpdates(!showUpdates)}
+				>
+					<ShowUpdates size="s" />
+				</IconBtn>
 			</div>
 			<div class={s.btnWrapper}>
 				<IconBtn

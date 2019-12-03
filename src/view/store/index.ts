@@ -67,7 +67,7 @@ export function createStore(): Store {
 		selection,
 		theme: valoo<Theme>("auto"),
 		actions: {
-			setHighlightUpdates: enable => notify("highlight-update", enable),
+			showUpdates: enable => notify("show-updates", enable),
 			inspect: id => notify("inspect", id),
 			highlightNode: debounce(id => notify("highlight", id), 100),
 			clear() {

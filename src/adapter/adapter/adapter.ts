@@ -4,6 +4,7 @@ import { copyToClipboard } from "../../shells/shared/utils";
 import { createPicker } from "./picker";
 import { ID } from "../../view/store/types";
 import { createHightlighter } from "./highlight";
+import { createUpdatePainter } from "./updates";
 
 export type Path = Array<string | number>;
 
@@ -23,6 +24,7 @@ export interface Adapter {
 	copy(value: string): void;
 	update(id: ID, type: UpdateType, path: Path, value: any): void;
 	select(id: ID): void;
+	showUpdates(active: boolean): void;
 }
 
 export interface InspectData {
@@ -53,6 +55,8 @@ export function createAdapter(emit: EmitterFn, renderer: Renderer): Adapter {
 			highlight.destroy();
 		},
 	);
+
+	const updatePainter = createUpdatePainter();
 
 	return {
 		inspect(id) {
@@ -85,6 +89,14 @@ export function createAdapter(emit: EmitterFn, renderer: Renderer): Adapter {
 			} catch (err) {
 				console.log(err);
 			}
+		},
+		showUpdates(active) {
+			if (active) {
+				updatePainter.start();
+			} else {
+				updatePainter.stop();
+			}
+			console.log("show updates", active);
 		},
 	};
 }

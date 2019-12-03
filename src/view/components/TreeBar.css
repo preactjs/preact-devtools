@@ -10,7 +10,6 @@
 
 .btnIcon[data-active] {
 	color: var(--color-button-active);
-	color: var(--color-button-active);
 }
 
 .btnWrapper {

@@ -15,7 +15,7 @@ export interface DevtoolEvents {
 	"start-picker": null;
 	"stop-picker": null;
 	"update-filter": RawFilterState;
-	"highlight-update": boolean;
+	"show-updates": boolean;
 	copy: string;
 	highlight: ID | null;
 	log: { id: ID; children: ID[] };
@@ -82,6 +82,7 @@ export function createHook(): DevtoolsHook {
 			bridge.listen("update", adapter.log);
 			bridge.listen("start-picker", adapter.startPickElement);
 			bridge.listen("stop-picker", adapter.stopPickElement);
+			bridge.listen("show-updates", adapter.showUpdates);
 
 			// Content Script is likely not ready at this point, so don't
 			// flush any events here and politely request it to initialize
