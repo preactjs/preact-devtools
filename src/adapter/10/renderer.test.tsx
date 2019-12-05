@@ -23,11 +23,17 @@ export function setupMockHook(options: Options) {
 	const fakeHook: DevtoolsHook = {
 		connected: true,
 		attach: () => 1,
+		attachRenderer: () => 1,
+		listen: () => undefined,
 		detach: () => null,
 		emit: spy,
 		renderers: new Map(),
 	};
-	const renderer = createRenderer(fakeHook, { type: new Set(), regex: [] });
+	const renderer = createRenderer(
+		fakeHook,
+		{ Fragment: Fragment as any },
+		{ type: new Set(), regex: [] },
+	);
 	const destroy = setupOptions(options, renderer);
 	return {
 		renderer,
@@ -458,7 +464,9 @@ describe("Renderer 10", () => {
 			};
 
 			expect(
-				getFilteredChildren(vnode, filters).map(getDisplayName),
+				getFilteredChildren(vnode, filters, {
+					Fragment: Fragment as any,
+				}).map(name => getDisplayName(name, { Fragment: Fragment as any })),
 			).to.deep.equal(["Foo", "Bar"]);
 		});
 	});

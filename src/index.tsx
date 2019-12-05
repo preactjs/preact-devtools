@@ -14,7 +14,7 @@ let hook: DevtoolsHook = (window as any).__PREACT_DEVTOOLS__;
 
 // Create a mock hook if none was injected
 if (hook == null) {
-	console.warn(
+	console.info(
 		`No injected hook found, using a mocked one instead.
 This happens when the "preact-devtools" extension was not found or is not active.`,
 	);

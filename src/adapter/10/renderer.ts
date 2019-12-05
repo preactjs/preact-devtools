@@ -65,7 +65,7 @@ export function serializeVNode(
 	if (isVNode(x)) {
 		return {
 			type: "vnode",
-			name: getDisplayName(x, config.Fragment),
+			name: getDisplayName(x, config),
 		};
 	}
 
