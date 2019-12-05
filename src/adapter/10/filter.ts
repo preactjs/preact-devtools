@@ -1,6 +1,7 @@
 import { VNode, Fragment } from "preact";
 import { getDisplayName, getVNodeParent } from "./vnode";
 import { TypeFilterValue, FilterState } from "../adapter/filter";
+import { RendererConfig10 } from "./renderer";
 
 export interface RegexFilter {
 	type: "name";
@@ -14,7 +15,11 @@ export interface TypeFilter {
 
 export type Filter = RegexFilter | TypeFilter;
 
-export function shouldFilter(vnode: VNode, filters: FilterState): boolean {
+export function shouldFilter(
+	vnode: VNode,
+	filters: FilterState,
+	config: RendererConfig10,
+): boolean {
 	// Filter text nodes by default. They are too tricky to match
 	// with the previous one...
 	if (vnode.type == null) return true;
@@ -35,7 +40,7 @@ export function shouldFilter(vnode: VNode, filters: FilterState): boolean {
 	}
 
 	if (filters.regex.length > 0) {
-		const name = getDisplayName(vnode);
+		const name = getDisplayName(vnode, config);
 		return filters.regex.some(r => r.test(name));
 	}
 

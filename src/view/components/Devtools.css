@@ -1,5 +1,5 @@
 .root {
-	height: 100vh;
+	height: 100%;
 	display: grid;
 	grid-template-columns: auto 35%;
 	grid-template-rows: 2.25rem 1fr;

@@ -1,4 +1,4 @@
-import { h, Fragment } from "preact";
+import { h, Fragment } from "./vendor/preact-10";
 import { Iframer } from "./Iframer";
 import { Highlighter } from "../view/components/Highlighter";
 

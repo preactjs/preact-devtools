@@ -1,5 +1,5 @@
 import { createContext } from "preact";
-import { useEffect, useContext, useState } from "preact/hooks";
+import { useEffect, useContext, useState, useMemo } from "preact/hooks";
 import { Store } from "./types";
 import { EmitFn } from "../../adapter/hook";
 import { watch } from "../valoo";
@@ -13,15 +13,17 @@ export const useStore = () => useContext(AppCtx);
 export function useObserver<T>(fn: () => T): T {
 	let [value, setValue] = useState(fn());
 
-	useEffect(() => {
+	const dispose = useMemo(() => {
 		let v = watch(fn);
-		let disp = v.on(next => {
-			setValue(next);
-		});
+		let disp = v.on(setValue);
 		return () => {
 			disp();
 			v._disposers.forEach(disp => disp());
 		};
+	}, []);
+
+	useEffect(() => {
+		return () => dispose();
 	}, []);
 
 	return value;

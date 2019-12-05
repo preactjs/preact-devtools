@@ -1,11 +1,11 @@
 import { DevtoolsHook } from "./hook";
-import { Options } from "preact";
+import { Options, Fragment } from "preact";
 import { createRenderer } from "./10/renderer";
 import { setupOptions } from "./10/options";
 
 export async function init(options: Options, getHook: () => DevtoolsHook) {
 	const hook = getHook();
-	const renderer = createRenderer(hook);
+	const renderer = createRenderer(hook, null as any);
 
 	// Add options as early as possible, so that we don't miss the first commit
 	setupOptions(options as any, renderer);
@@ -13,7 +13,9 @@ export async function init(options: Options, getHook: () => DevtoolsHook) {
 	// Devtools can take a while to set up
 	await waitForHook(getHook);
 
-	return hook.attach(renderer);
+	return hook.attach("10.0.5", options, {
+		Fragment,
+	});
 }
 
 export function waitForHook(getHook: () => DevtoolsHook) {

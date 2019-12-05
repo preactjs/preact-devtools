@@ -1,4 +1,4 @@
-import { h, Component } from "preact";
+import { h, Component } from "../vendor/preact-10";
 
 class Child extends Component {
 	render() {

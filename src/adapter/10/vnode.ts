@@ -1,4 +1,5 @@
-import { Fragment, Component, VNode } from "preact";
+import { Component, VNode } from "preact";
+import { RendererConfig10 } from "./renderer";
 
 // Mangle accessors
 
@@ -12,10 +13,8 @@ export function getVNodeParent(vnode: VNode) {
 /**
  * Check if a `vnode` is the root of a tree
  */
-export function isRoot(vnode: VNode) {
-	// TODO: This may break with bundling due to a different
-	// reference to `Fragment`
-	return getVNodeParent(vnode) == null && vnode.type === Fragment;
+export function isRoot(vnode: VNode, config: RendererConfig10) {
+	return getVNodeParent(vnode) == null && vnode.type === config.Fragment;
 }
 
 /**
@@ -69,10 +68,10 @@ export function getActualChildren(
 /**
  * Get the root of a `vnode`
  */
-export function findRoot(vnode: VNode): VNode {
+export function findRoot(vnode: VNode, config: RendererConfig10): VNode {
 	let next: VNode | null = vnode;
 	while ((next = getVNodeParent(next)) != null) {
-		if (isRoot(next)) {
+		if (isRoot(next, config)) {
 			return next;
 		}
 	}
@@ -95,8 +94,8 @@ export function getAncestor(vnode: VNode) {
 /**
  * Get human readable name of the component/dom element
  */
-export function getDisplayName(vnode: VNode) {
-	if (vnode.type === Fragment) return "Fragment";
+export function getDisplayName(vnode: VNode, config: RendererConfig10) {
+	if (vnode.type === config.Fragment) return "Fragment";
 	else if (typeof vnode.type === "function")
 		return vnode.type.displayName || vnode.type.name;
 	else if (typeof vnode.type === "string") return vnode.type;

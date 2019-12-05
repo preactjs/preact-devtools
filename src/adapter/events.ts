@@ -189,12 +189,16 @@ export function applyOperations(store: Store, data: number[]) {
 export function applyEvent(store: Store, name: string, data: any) {
 	switch (name) {
 		case "operation":
-			return applyOperations(store, data);
+			applyOperations(store, data);
+			break;
 		case "inspect-result":
-			return (store.inspectData.$ = data);
+			store.inspectData.$ = data;
+			break;
 		case "select-node":
-			return store.selection.selectById(data);
+			store.selection.selectById(data);
+			break;
 		case "stop-picker":
-			return store.actions.stopPickElement();
+			store.actions.stopPickElement();
+			break;
 	}
 }
