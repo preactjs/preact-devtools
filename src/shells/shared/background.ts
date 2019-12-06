@@ -67,7 +67,7 @@ chrome.runtime.onConnect.addListener(port => {
 		devtools.onMessage.addListener(forwardToContentScript);
 
 		/**
-		 * Disconnects the contentScript and devtools from each other.
+		 * Disconnects the contentScript from the devtools.
 		 *
 		 * Note that this only calls disconnect on the contentScript as the
 		 * devtools might be connected to another contentScript later.
