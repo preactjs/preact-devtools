@@ -12,7 +12,7 @@ chrome.runtime.onConnect.addListener(port => {
 	// the message along.
 
 	let tab: number = -1;
-	let name: keyof Connection = "contentScript";
+	let name: keyof Connection;
 	// If the name is a number, than it's an event coming from the devtools panel
 	if (+port.name + "" === port.name) {
 		name = "devtools";
