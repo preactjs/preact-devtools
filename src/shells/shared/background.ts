@@ -22,7 +22,7 @@ chrome.runtime.onConnect.addListener(port => {
 		name = "devtools";
 		tab = +port.name;
 
-		// Make sure to install the content script only once
+		// Make sure to disconnect an existing content script before injecting a new one
 		const existingConnection = connections.get(tab);
 		if (existingConnection) existingConnection.removeListeners();
 
