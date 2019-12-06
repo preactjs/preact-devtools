@@ -34,12 +34,12 @@ export interface DevtoolsHook {
 	emit: EmitterFn;
 	listen: (fn: (name: string, cb: any) => any) => void;
 	renderers: Map<number, Renderer>;
-	attach(
+	attachPreact?(
 		version: string,
 		options: Options,
 		config: { Fragment: typeof Fragment },
 	): number;
-	attachRenderer(renderer: Renderer): number;
+	attach(renderer: Renderer): number;
 	detach(id: number): void;
 }
 
@@ -117,7 +117,7 @@ export function createHook(bridge: Bridge): DevtoolsHook {
 				listeners[idx] = null;
 			};
 		},
-		attach: (version, options, config) => {
+		attachPreact: (version, options, config) => {
 			if (adapter == null) {
 				init();
 			}
@@ -144,7 +144,7 @@ export function createHook(bridge: Bridge): DevtoolsHook {
 
 			return -1;
 		},
-		attachRenderer,
+		attach: attachRenderer,
 		detach: id => renderers.delete(id),
 	};
 }

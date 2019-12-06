@@ -10,9 +10,16 @@ export function setupInlineDevtools(
 ) {
 	const store = createStore();
 
-	hook.listen((name, data) => {
-		applyEvent(store, name, data);
-	});
+	if (hook.listen == null) {
+		console.warn(
+			"Injected hook doesn't have a listen() method. " +
+				"This usually means that an old version of the 'preact-devtools' extension is running.",
+		);
+	} else {
+		hook.listen((name, data) => {
+			applyEvent(store, name, data);
+		});
+	}
 
 	store.subscribe((name, data) => {
 		hook.emit(name, data);

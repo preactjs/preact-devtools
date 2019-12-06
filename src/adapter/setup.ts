@@ -13,9 +13,16 @@ export async function init(options: Options, getHook: () => DevtoolsHook) {
 	// Devtools can take a while to set up
 	await waitForHook(getHook);
 
-	return hook.attach("10.0.5", options, {
-		Fragment,
-	});
+	if (hook.attachPreact) {
+		return hook.attachPreact("10.0.5", options, {
+			Fragment,
+		});
+	} else {
+		console.error(
+			"Devtools hook is missing attachPreact() method. " +
+				"This happens when the running 'preact-devtools' extension is too old. Please update it.",
+		);
+	}
 }
 
 export function waitForHook(getHook: () => DevtoolsHook) {

@@ -23,7 +23,7 @@ export function setupMockHook(options: Options) {
 	const fakeHook: DevtoolsHook = {
 		connected: true,
 		attach: () => 1,
-		attachRenderer: () => 1,
+		attachPreact: () => 1,
 		listen: () => undefined,
 		detach: () => null,
 		emit: spy,

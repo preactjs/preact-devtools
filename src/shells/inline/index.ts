@@ -15,7 +15,7 @@ export function attach(
 	const store = createStore();
 	const fakeHook: DevtoolsHook = {
 		attach: () => 1,
-		attachRenderer: () => 1,
+		attachPreact: () => 1,
 		listen: () => null,
 		connected: true,
 		detach: () => null,
