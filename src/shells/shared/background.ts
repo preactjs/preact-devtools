@@ -23,8 +23,8 @@ chrome.runtime.onConnect.addListener(port => {
 		tab = +port.name;
 
 		// Make sure to install the content script only once
-		const status = connections.get(tab);
-		if (status) status.removeListeners();
+		const existingConnection = connections.get(tab);
+		if (existingConnection) existingConnection.removeListeners();
 
 		installContentScript(tab);
 	} else {
@@ -55,27 +55,39 @@ chrome.runtime.onConnect.addListener(port => {
 		);
 
 		const forwardToDevtools = (msg: any) => {
-			console.log("-> devtools ", devtools.name, msg);
+			console.log("-> fwd to devtools ", devtools.name, msg);
 			devtools.postMessage(msg);
 		};
 		contentScript.onMessage.addListener(forwardToDevtools);
 
 		const forwardToContentScript = (msg: any) => {
-			console.log("-> content-script ", contentScript.name, msg);
+			console.log("-> fwd to content-script ", contentScript.name, msg);
 			contentScript.postMessage(msg);
 		};
 		devtools.onMessage.addListener(forwardToContentScript);
 
-		const removeListeners = () => {
+		/**
+		 * Disconnects the contentScript and devtools from each other.
+		 *
+		 * Note that this only calls disconnect on the contentScript as the
+		 * devtools might be connected to another contentScript later.
+		 *
+		 * This method is called when the devtools connect the second time
+		 * for a given tab and the old contentScript will be replaced by a
+		 * fresh instance OR when the contentScript and/or the devtools
+		 */
+		activeConn.removeListeners = () => {
 			contentScript.disconnect();
 			contentScript.onMessage.removeListener(forwardToDevtools);
 			devtools.onMessage.removeListener(forwardToContentScript);
 		};
 
-		activeConn.removeListeners = removeListeners;
-
+		/**
+		 * Handler to shutdown the connection between devtools and contentScript
+		 * fired when one of them was disconnected from the other end.
+		 */
 		const shutdown = () => {
-			removeListeners();
+			activeConn.removeListeners();
 			devtools.disconnect();
 			activeConn.contentScript = null;
 			activeConn.devtools = null;
