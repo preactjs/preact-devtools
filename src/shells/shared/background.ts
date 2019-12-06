@@ -41,7 +41,7 @@ chrome.runtime.onConnect.addListener(port => {
 	}
 
 	const activeConn = connections.get(tab);
-	(activeConn as any)[name] = port;
+	(activeConn as Connection)[name] = port;
 
 	// If both the content-script and the devtools are conncted we can start
 	// setting up the message handlers
@@ -123,8 +123,8 @@ function activatePopup(tabId: number) {
 	});
 }
 
-chrome.runtime.onMessage.addListener((port, sender) => {
-	if (port.hasPreact && sender.tab && sender.tab.id) {
+chrome.runtime.onMessage.addListener((message, sender) => {
+	if (message.hasPreact && sender.tab && sender.tab.id) {
 		activatePopup(sender.tab.id);
 	}
 });
