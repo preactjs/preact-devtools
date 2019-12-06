@@ -193,6 +193,9 @@ export function applyEvent(store: Store, name: string, data: any) {
 			break;
 		case "inspect-result":
 			store.inspectData.$ = data;
+			if (store.selection.selected.$ !== data.id) {
+				store.selection.selectById(data.id);
+			}
 			break;
 		case "select-node":
 			store.selection.selectById(data);

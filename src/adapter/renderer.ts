@@ -9,6 +9,7 @@ export type UpdateType = "props" | "context" | "state";
 export interface Renderer {
 	getVNodeById(id: ID): VNode | null;
 	getDisplayName(vnode: VNode): string;
+	getDisplayNameById?(id: ID): string;
 	findDomForVNode(id: ID): Array<HTMLElement | Text | null> | null;
 	findVNodeIdForDom(node: HTMLElement | Text): number;
 	applyFilters(filters: FilterState): void;

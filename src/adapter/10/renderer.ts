@@ -97,7 +97,16 @@ export function createRenderer(
 	return {
 		getVNodeById: id => ids.getVNode(id),
 		has: id => ids.has(id),
-		getDisplayName: (vnode: VNode) => getDisplayName(vnode, config),
+		getDisplayName(vnode) {
+			return getDisplayName(vnode, config);
+		},
+		getDisplayNameById: id => {
+			const vnode = ids.getVNode(id);
+			if (vnode) {
+				return getDisplayName(vnode, config);
+			}
+			return "Unknown";
+		},
 		forceUpdate: id => {
 			const vnode = ids.getVNode(id);
 			if (vnode) {

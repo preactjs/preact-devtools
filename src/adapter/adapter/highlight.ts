@@ -42,9 +42,13 @@ export function createHightlighter(renderer: Renderer) {
 
 			const node = getNearestElement(dom[0]!);
 			if (node != null) {
+				const label = renderer.getDisplayNameById
+					? renderer.getDisplayNameById(id)
+					: renderer.getDisplayName(vnode);
+
 				render(
 					h(Highlighter, {
-						label: renderer.getDisplayName(vnode),
+						label,
 						...measureNode(node),
 					}),
 					highlightRef,

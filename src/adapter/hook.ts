@@ -1,5 +1,5 @@
 import { Renderer } from "./renderer";
-import { createBridge, Bridge } from "./bridge";
+import { Bridge } from "./bridge";
 import { ObjPath } from "../view/components/sidebar/ElementProps";
 import { ID } from "../view/store/types";
 import { createAdapter, Adapter } from "./adapter/adapter";
@@ -7,6 +7,7 @@ import { RawFilterState, parseFilters } from "./adapter/filter";
 import { Options, Fragment } from "preact";
 import { createRenderer } from "./10/renderer";
 import { setupOptions } from "./10/options";
+import { createMultiRenderer } from "./MultiRenderer";
 
 export type EmitterFn = (event: string, data: any) => void;
 
@@ -50,6 +51,7 @@ export function createHook(bridge: Bridge): DevtoolsHook {
 	const renderers = new Map<number, Renderer>();
 	let uid = 0;
 	let _connected = false;
+	let adapter: null | Adapter = null;
 
 	const listeners: Array<EmitterFn | null> = [];
 
@@ -58,16 +60,20 @@ export function createHook(bridge: Bridge): DevtoolsHook {
 		listeners.forEach(l => l != null && l(name, data));
 	};
 
-	const attachAdapter = (adapter: Adapter) => {
+	// Lazily init the adapter when a renderer is attached
+	const init = () => {
+		const multi = createMultiRenderer(renderers);
+		adapter = createAdapter(emit, multi);
+
 		bridge.listen("highlight", adapter.highlight);
 		bridge.listen("update-prop", ev => {
-			adapter.update(ev.id, "props", ev.path, ev.value);
+			adapter!.update(ev.id, "props", ev.path, ev.value);
 		});
 		bridge.listen("update-state", ev => {
-			adapter.update(ev.id, "state", ev.path, ev.value);
+			adapter!.update(ev.id, "state", ev.path, ev.value);
 		});
 		bridge.listen("update-context", ev => {
-			adapter.update(ev.id, "context", ev.path, ev.value);
+			adapter!.update(ev.id, "context", ev.path, ev.value);
 		});
 		bridge.listen("select", adapter.select);
 		bridge.listen("copy", adapter.copy);
@@ -76,15 +82,19 @@ export function createHook(bridge: Bridge): DevtoolsHook {
 		bridge.listen("update", adapter.log);
 		bridge.listen("start-picker", adapter.startPickElement);
 		bridge.listen("stop-picker", adapter.stopPickElement);
+		bridge.listen("initialized", multi.flushInitial);
+		bridge.listen("update-filter", ev => {
+			multi.applyFilters(parseFilters(ev));
+		});
+		bridge.listen("force-update", ev => multi.forceUpdate(ev));
 	};
 
 	const attachRenderer = (renderer: Renderer) => {
+		if (adapter == null) {
+			init();
+		}
+
 		renderers.set(++uid, renderer);
-		bridge.listen("initialized", renderer.flushInitial);
-		bridge.listen("update-filter", ev => {
-			renderer.applyFilters(parseFilters(ev));
-		});
-		bridge.listen("force-update", ev => renderer.forceUpdate(ev));
 
 		// Content Script is likely not ready at this point, so don't
 		// flush any events here and politely request it to initialize
@@ -108,6 +118,9 @@ export function createHook(bridge: Bridge): DevtoolsHook {
 			};
 		},
 		attach: (version, options, config) => {
+			if (adapter == null) {
+				init();
+			}
 			const hookProxy = {
 				get connected() {
 					return _connected;
@@ -118,15 +131,13 @@ export function createHook(bridge: Bridge): DevtoolsHook {
 				emit,
 			};
 
-			console.log("attach", version);
+			console.log("Attach renderer:", version);
 			// TODO: Find a more robust solution
 			//   Maybe something based on semver ranges?
 			switch (version) {
 				default: {
 					const renderer = createRenderer(hookProxy, config as any);
 					setupOptions(options, renderer);
-					const adapter = createAdapter(emit, renderer);
-					attachAdapter(adapter);
 					return attachRenderer(renderer);
 				}
 			}
