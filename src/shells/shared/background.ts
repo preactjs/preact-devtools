@@ -4,7 +4,11 @@ export interface Connection {
 	removeListeners: () => void;
 }
 
+/**
+ * A map that keeps track of connections between devtools and contentScripts.
+ */
 const connections = new Map<number, Connection>();
+
 chrome.runtime.onConnect.addListener(port => {
 	// Ok, so this is a little weird:
 	// To be able to communicate from a content-script to the devtools panel
@@ -44,7 +48,11 @@ chrome.runtime.onConnect.addListener(port => {
 	if (activeConn && activeConn.contentScript && activeConn.devtools) {
 		const { contentScript, devtools } = activeConn;
 
-		console.log("Establishing connection", devtools.name, contentScript.name);
+		console.log(
+			"Establishing connection between devtools",
+			devtools.name + " and contentScript ",
+			contentScript.name,
+		);
 
 		const forwardToDevtools = (msg: any) => {
 			console.log("-> devtools ", devtools.name, msg);
