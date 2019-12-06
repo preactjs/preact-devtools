@@ -4,7 +4,7 @@ export interface Connection {
 	removeListeners: () => void;
 }
 
-const conn = new Map<number, Connection>();
+const connections = new Map<number, Connection>();
 chrome.runtime.onConnect.addListener(port => {
 	// Ok, so this is a little weird:
 	// To be able to communicate from a content-script to the devtools panel
@@ -19,7 +19,7 @@ chrome.runtime.onConnect.addListener(port => {
 		tab = +port.name;
 
 		// Make sure to install the content script only once
-		const status = conn.get(tab);
+		const status = connections.get(tab);
 		if (status) status.removeListeners();
 
 		installContentScript(tab);
@@ -28,15 +28,15 @@ chrome.runtime.onConnect.addListener(port => {
 		name = "contentScript";
 	}
 
-	if (!conn.has(tab)) {
-		conn.set(tab, {
+	if (!connections.has(tab)) {
+		connections.set(tab, {
 			devtools: null,
 			contentScript: null,
 			removeListeners: () => null,
 		});
 	}
 
-	const activeConn = conn.get(tab);
+	const activeConn = connections.get(tab);
 	(activeConn as any)[name] = port;
 
 	// If both the content-script and the devtools are conncted we can start
