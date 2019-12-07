@@ -142,7 +142,7 @@ export function createHook(bridge: Bridge): DevtoolsHook {
 			);
 
 			// check that the min required devtools version by preact is fulfilled
-			const currentDevtoolsVersion = "1.0.0"; // TODO(Sven): Determine from package.json
+			const currentDevtoolsVersion = "__PREACT_DEVTOOLS_VERSION__";
 			if (
 				minDevtoolsVersion &&
 				!checkMinDevtoolsVersion(

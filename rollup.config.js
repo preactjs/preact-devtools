@@ -3,6 +3,8 @@ import copy from "rollup-plugin-copy";
 import resolve from "rollup-plugin-node-resolve";
 import postcss from "rollup-plugin-postcss";
 import commonjs from "rollup-plugin-commonjs";
+import replace from "@rollup/plugin-replace";
+import packageJson from "./package.json";
 
 const BROWSERS = ["chrome", "firefox"].filter(x => {
 	if (process.env.BROWSER) {
@@ -89,5 +91,6 @@ export default entries.map(data => ({
 			modules: true,
 			extract: true,
 		}),
+		replace({ __PREACT_DEVTOOLS_VERSION__: packageJson.version }),
 	].filter(Boolean),
 }));
