@@ -1,4 +1,4 @@
-# Preact Devtools internals
+# Preact Devtools internals
 
 > This document aims to give a short overview to get you started quickly.
 
