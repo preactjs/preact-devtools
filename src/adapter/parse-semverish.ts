@@ -4,14 +4,7 @@ const PATCH = 3;
 const PRERELEASE = 5;
 const PRERELEASE_TAG = 5;
 const PRERELEASE_VERSION = 6;
-const PATTERN_MAJOR_MINOR_PATCH = "([0-9]+).([0-9]+).([0-9]+)";
-const REGEXP_SEMVERISH_WITH_PRERELEASE = new RegExp(
-	`^${PATTERN_MAJOR_MINOR_PATCH}(-([a-z]+)\.([0-9]+))?$`,
-	"i",
-);
-const REGEXP_SEMVERISH_WITHOUT_PRERELEASE = new RegExp(
-	`^${PATTERN_MAJOR_MINOR_PATCH}$`,
-);
+const REGEXP_SEMVERISH = /^([0-9]+).([0-9]+).([0-9]+)(-([a-z]+)\.([0-9]+))?$/i;
 
 /**
  * semver-ish parsing based on https://github.com/npm/node-semver/blob/master/semver.js
@@ -21,18 +14,13 @@ const REGEXP_SEMVERISH_WITHOUT_PRERELEASE = new RegExp(
  */
 export default function parseSemverish(
 	version: string,
-	allowPreRelease: boolean,
 ): {
 	major: number;
 	minor: number;
 	patch: number;
 	preRelease?: { tag: string; version: number };
 } | null {
-	const match = version.match(
-		allowPreRelease
-			? REGEXP_SEMVERISH_WITH_PRERELEASE
-			: REGEXP_SEMVERISH_WITHOUT_PRERELEASE,
-	);
+	const match = version.match(REGEXP_SEMVERISH);
 
 	if (match) {
 		let preRelease = undefined;

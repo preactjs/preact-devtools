@@ -9,7 +9,6 @@ import { createRenderer } from "./10/renderer";
 import { setupOptions } from "./10/options";
 import { createMultiRenderer } from "./MultiRenderer";
 import parseSemverish from "./parse-semverish";
-import checkMinDevtoolsVersion from "./check-min-devtools-version";
 
 export type EmitterFn = (event: string, data: any) => void;
 
@@ -40,7 +39,6 @@ export interface DevtoolsHook {
 		version: string,
 		options: Options,
 		config: { Fragment: typeof Fragment },
-		minDevtoolsVersion?: string, // TODO(sven): make mandatory
 	): number;
 	attach(renderer: Renderer): number;
 	detach(id: number): void;
@@ -120,7 +118,7 @@ export function createHook(bridge: Bridge): DevtoolsHook {
 				listeners[idx] = null;
 			};
 		},
-		attachPreact: (version, options, config, minDevtoolsVersion) => {
+		attachPreact: (version, options, config) => {
 			if (adapter == null) {
 				init();
 			}
@@ -135,36 +133,20 @@ export function createHook(bridge: Bridge): DevtoolsHook {
 			};
 
 			console.log(
-				"[PREACT DEVTOOLS] Attach renderer, preact version: ",
-				version,
-				" min devtools version: ",
-				minDevtoolsVersion,
+				`[PREACT DEVTOOLS] Attach renderer, preact version: ${version}`,
 			);
 
-			// check that the min required devtools version by preact is fulfilled
-			const currentDevtoolsVersion = "__PREACT_DEVTOOLS_VERSION__";
-			if (
-				minDevtoolsVersion &&
-				!checkMinDevtoolsVersion(
-					currentDevtoolsVersion,
-					minDevtoolsVersion,
-					version,
-				)
-			) {
-				return -1;
-			}
-
 			// attach the correct renderer/options hooks based on the preact version
-			const preactVersionMatch = parseSemverish(version, true);
+			const preactVersionMatch = parseSemverish(version);
 
 			if (!preactVersionMatch) {
 				console.error(
-					"[PREACT DEVTOOLS] Could not parse preact version " + version,
+					`[PREACT DEVTOOLS] Could not parse preact version ${version}`,
 				);
 				return -1;
 			}
 
-			// currently we only support preact >= 10, later we can add another if branch for major === 8
+			// currently we only support preact >= 10, later we can add another branch for major === 8
 			if (preactVersionMatch.major == 10) {
 				const renderer = createRenderer(hookProxy, config as any);
 				setupOptions(options, renderer);
