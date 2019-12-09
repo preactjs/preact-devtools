@@ -12,10 +12,10 @@
 +------+    +----------------+    +---------+---------+
 | Page +--->+ content-script +--->+ background-script |
 +------+    +----------------+    +---------+---------+
-                                            |
-                                    +-------+--------+
-                                    | devtools panel |
-                                    +----------------+
+   |                                        |
+   |          +------------+        +-------+--------+
+   |--------->+ initClient +        | devtools panel |
+              +------------+        +----------------+
 ```
 
 The entrypoint for the devtools extension is the extension manifest. The manifest for the Chrome
@@ -39,6 +39,3 @@ injects the `src/shells/shared/installHook.ts` script into each tab by creating 
 element. This script will run in the context of the tab it was injected into. There it will install
 the `window.__PREACT_DEVTOOLS__` object where preact registers itself by calling
 `window.__PREACT_DEVTOOLS__.attachPreact(...)`.
-
-TODO: Explain why `content-script.ts` and `initClient.ts` are two separate content scripts. Marvin
-can for sure name the reason :)
