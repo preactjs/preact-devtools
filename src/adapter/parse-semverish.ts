@@ -4,7 +4,7 @@ const PATCH = 3;
 const PRERELEASE = 5;
 const PRERELEASE_TAG = 5;
 const PRERELEASE_VERSION = 6;
-const REGEXP_SEMVERISH = /^([0-9]+).([0-9]+).([0-9]+)(-([a-z]+)\.([0-9]+))?$/i;
+const REGEXP_SEMVERISH = /^(\d+)\.(\d+)\.(\d+)(-(.+)\.(\d+))?$/i;
 
 /**
  * semver-ish parsing based on https://github.com/npm/node-semver/blob/master/semver.js
