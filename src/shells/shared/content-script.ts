@@ -30,36 +30,6 @@
 		// is this taken care of since the port will be destroyed later anyways?
 	});
 
-	/**
-	 * TODO(Sven): Why is this ping-ing needed? Found no handler of this event
-	 */
-	pingBackend();
-
-	// On page reload the content script may be initialized before the backend
-	if (!backendInitialized) {
-		let interval: any;
-		interval = setInterval(() => {
-			if (backendInitialized) {
-				clearInterval(interval);
-			} else {
-				pingBackend();
-			}
-		}, 500);
-	}
-
-	function pingBackend() {
-		window.postMessage(
-			{
-				source: "preact-devtools-content-script",
-				name: "ping-backend",
-				payload: {
-					ping: true,
-				},
-			},
-			"*",
-		);
-	}
-
 	function forwardWindowPostMessagesToPortMessage() {
 		function onWindowPostMessage(ev: MessageEvent) {
 			if (ev.source === window && ev.data) {
