@@ -7,7 +7,7 @@ Browser extension that allows you to inspect a Preact component hierarchy, inclu
 Download for:
 
 - [Firefox](https://addons.mozilla.org/en-US/firefox/addon/preact-devtools/)
-- Chrome (coming soon)
+- [Chrome](https://chrome.google.com/webstore/detail/preact-developer-tools/ilcajpmogmhpliinlbcdebhbcanbghmd)
 
 ![Screenshot of Preact devtools](media/preact-chrome-light.png)
 
