@@ -2,14 +2,30 @@
 
 **!!! HIGHLY EXPERIMENTAL, NOT READY FOR GENERAL USE!!!**
 
-Browser extension that allows you to inspect a Preact component hierarchy, including props and state.
+Browser extension that allows you to inspect a Preact component hierarchy,
+including props and state.
 
-Download for:
+![Screenshot of Preact devtools](media/preact-chrome-light.png)
+
+
+## Usage
+
+Firstly, we need to import `preact/debug` somewhere to initialize the connection
+to the extension. Make sure that this import is **the first** import in your
+whole app.
+
+```javascript
+// Must be the first import
+import "preact/debug";
+```
+
+Then, download the Preact Devtools extension for your browser:
 
 - [Firefox](https://addons.mozilla.org/en-US/firefox/addon/preact-devtools/)
 - [Chrome](https://chrome.google.com/webstore/detail/preact-developer-tools/ilcajpmogmhpliinlbcdebhbcanbghmd)
 
-![Screenshot of Preact devtools](media/preact-chrome-light.png)
+
+## Contributing
 
 - Use `npm run dev` to start a demo page
 - Use `npm run watch` to rebuild all extensions on any code changes
@@ -29,6 +45,7 @@ Firefox:
 3. Select "Debug addons"
 4. Click "Load temporary addon"
 5. Select the `manifest.json` in `dist/firefox/`
+
 
 ## Embedding devtools directly into a page (highly experimental)
 
