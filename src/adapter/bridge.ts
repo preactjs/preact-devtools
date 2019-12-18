@@ -1,7 +1,10 @@
+import { createSimpleBridge } from "../examples/inline-devtools/simple-bridge";
+
 export type Listener<T = any> = (data: T) => void;
 export type Unsubscribe = () => void;
 
 export interface Bridge {
+	_listeners: Map<string, Array<Listener | null>>;
 	listen: (name: string, cb: Listener) => Unsubscribe;
 	send(name: string, data: any): void;
 }
@@ -10,25 +13,18 @@ export interface Bridge {
  * The bridge basically just abstracts over the messaging protocol
  */
 export function createBridge(target: Window): Bridge {
-	const listeners = new Map<string, Listener<any>[]>();
+	const simple = createSimpleBridge();
 
 	target.addEventListener("message", ev => {
 		if (ev.data.source === "preact-devtools-content-script" && ev.data) {
 			const { name } = ev.data;
-			if (listeners.has(name)) {
-				listeners.get(name)!.forEach(cb => cb(ev.data.payload));
-			}
+			simple.send(name, ev.data.payload);
 		}
 	});
 
 	return {
-		listen(name: string, cb: Listener) {
-			if (!listeners.has(name)) {
-				listeners.set(name, []);
-			}
-			const idx = listeners.get(name)!.push(cb);
-			return () => listeners.get(name)!.splice(idx, 1);
-		},
+		_listeners: simple._listeners,
+		listen: simple.listen,
 		send(name: string, data: any) {
 			if (name === "detect" || name === "attach") {
 				target.postMessage(
@@ -47,6 +43,8 @@ export function createBridge(target: Window): Bridge {
 					"*",
 				);
 			}
+
+			simple.send(name, data);
 		},
 	};
 }

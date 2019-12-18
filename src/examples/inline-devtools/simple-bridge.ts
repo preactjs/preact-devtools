@@ -8,6 +8,7 @@ import { Bridge, Listener } from "../../adapter/bridge";
 export function createSimpleBridge(): Bridge {
 	const listeners = new Map<string, Array<Listener | null>>();
 	return {
+		_listeners: listeners,
 		listen: (name, cb) => {
 			if (!listeners.has(name)) {
 				listeners.set(name, []);
