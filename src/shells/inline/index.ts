@@ -2,15 +2,15 @@ import { createStore } from "../../view/store";
 import { render, h, Options } from "preact";
 import { DevTools } from "../../view/components/Devtools";
 import { createAdapter } from "../../adapter/adapter/adapter";
-import { Renderer } from "../../adapter/renderer";
 import { DevtoolsHook } from "../../adapter/hook";
 import { applyEvent } from "../../adapter/events";
 import { setupOptions } from "../../adapter/10/options";
 import { Store } from "../../view/store/types";
+import { Preact10Renderer } from "../../adapter/10/renderer";
 
 export function attach(
 	options: Options,
-	rendererFn: (hook: DevtoolsHook) => Renderer,
+	rendererFn: (hook: DevtoolsHook) => Preact10Renderer,
 ) {
 	const store = createStore();
 	const fakeHook: DevtoolsHook = {

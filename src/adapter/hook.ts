@@ -8,6 +8,7 @@ import { Options, Fragment } from "preact";
 import { createRenderer } from "./10/renderer";
 import { setupOptions } from "./10/options";
 import { createMultiRenderer } from "./MultiRenderer";
+import parseSemverish from "./parse-semverish";
 
 export type EmitterFn = (event: string, data: any) => void;
 
@@ -131,15 +132,25 @@ export function createHook(bridge: Bridge): DevtoolsHook {
 				emit,
 			};
 
-			console.log("Attach renderer:", version);
-			// TODO: Find a more robust solution
-			//   Maybe something based on semver ranges?
-			switch (version) {
-				default: {
-					const renderer = createRenderer(hookProxy, config as any);
-					setupOptions(options, renderer);
-					return attachRenderer(renderer);
-				}
+			console.log(
+				`[PREACT DEVTOOLS] Attach renderer, preact version: ${version}`,
+			);
+
+			// attach the correct renderer/options hooks based on the preact version
+			const preactVersionMatch = parseSemverish(version);
+
+			if (!preactVersionMatch) {
+				console.error(
+					`[PREACT DEVTOOLS] Could not parse preact version ${version}`,
+				);
+				return -1;
+			}
+
+			// currently we only support preact >= 10, later we can add another branch for major === 8
+			if (preactVersionMatch.major == 10) {
+				const renderer = createRenderer(hookProxy, config as any);
+				setupOptions(options, renderer);
+				return attachRenderer(renderer);
 			}
 
 			return -1;
