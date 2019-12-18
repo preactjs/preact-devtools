@@ -1,6 +1,6 @@
-import { h, ComponentChildren, Fragment } from "preact";
-import { createPortal } from "preact/compat";
-import { useRef, useEffect, useState, useMemo } from "preact/hooks";
+import { h, ComponentChildren, Fragment } from "./vendor/preact-10";
+import { createPortal } from "./vendor/preact-10/compat";
+import { useRef, useEffect, useState, useMemo } from "./vendor/preact-10/hooks";
 
 export interface Props {
 	children: ComponentChildren;

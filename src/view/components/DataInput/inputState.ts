@@ -26,7 +26,14 @@ export function createInputStore(value: Observable<any>) {
 	});
 
 	const actualValue = watch(() => {
-		return local.$ === undefined ? displayCollection(value.$) : local.$;
+		if (local.$ === undefined) {
+			return displayCollection(value.$);
+		}
+		if (valid.$ && !focus.$) {
+			return displayCollection(parseValue(local.$));
+		}
+
+		return local.$;
 	});
 
 	const valueType = watch(() => {

@@ -1,5 +1,5 @@
-import { h } from "preact";
-import { useState } from "preact/hooks";
+import { h } from "../vendor/preact-10";
+import { useState } from "../vendor/preact-10/hooks";
 
 function shuffle<T = any>(arr: T[]): T[] {
 	let i = arr.length;

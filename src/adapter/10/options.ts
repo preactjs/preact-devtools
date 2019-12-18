@@ -1,9 +1,7 @@
 import { Options, VNode } from "preact";
-import { Renderer } from "../renderer";
-import { isRoot, getActualChildren } from "./vnode";
-import { Highlighter } from "../../view/components/Highlighter";
+import { Preact10Renderer } from "./renderer";
 
-export function setupOptions(options: Options, renderer: Renderer) {
+export function setupOptions(options: Options, renderer: Preact10Renderer) {
 	const o = options as any;
 
 	// Store (possible) previous hooks so that we don't overwrite them
@@ -45,17 +43,6 @@ export function setupOptions(options: Options, renderer: Renderer) {
 		// These cases are already handled by `unmount`
 		if (vnode == null) return;
 
-		// Block devtools components
-		if (isRoot(vnode)) {
-			const children = getActualChildren(vnode);
-			if (
-				children.length === 1 &&
-				children[0] != null &&
-				children[0].type === Highlighter
-			) {
-				return;
-			}
-		}
 		renderer.onCommit(vnode);
 	};
 

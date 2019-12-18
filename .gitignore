@@ -69,5 +69,5 @@ typings/
 # parcel-bundler cache (https://parceljs.org/)
 .cache
 
-dist/
+/dist/
 .rts*

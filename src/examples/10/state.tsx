@@ -1,4 +1,4 @@
-import { h, Component } from "preact";
+import { h, Component } from "../vendor/preact-10";
 
 export interface State {
 	foo: number;

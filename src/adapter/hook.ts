@@ -1,9 +1,13 @@
 import { Renderer } from "./renderer";
-import { createBridge } from "./bridge";
+import { Bridge } from "./bridge";
 import { ObjPath } from "../view/components/sidebar/ElementProps";
 import { ID } from "../view/store/types";
-import { createAdapter } from "./adapter/adapter";
+import { createAdapter, Adapter } from "./adapter/adapter";
 import { RawFilterState, parseFilters } from "./adapter/filter";
+import { Options, Fragment } from "preact";
+import { createRenderer } from "./10/renderer";
+import { setupOptions } from "./10/options";
+import { createMultiRenderer } from "./MultiRenderer";
 
 export type EmitterFn = (event: string, data: any) => void;
 
@@ -28,7 +32,13 @@ export type EmitFn = <K extends keyof DevtoolEvents>(
 export interface DevtoolsHook {
 	connected: boolean;
 	emit: EmitterFn;
+	listen: (fn: (name: string, cb: any) => any) => void;
 	renderers: Map<number, Renderer>;
+	attachPreact?(
+		version: string,
+		options: Options,
+		config: { Fragment: typeof Fragment },
+	): number;
 	attach(renderer: Renderer): number;
 	detach(id: number): void;
 }
@@ -37,14 +47,59 @@ export interface DevtoolsHook {
  * Create hook to which Preact will subscribe and listen to. The hook
  * is the entrypoint where everything begins.
  */
-export function createHook(): DevtoolsHook {
-	const bridge = createBridge(window);
+export function createHook(bridge: Bridge): DevtoolsHook {
 	const renderers = new Map<number, Renderer>();
 	let uid = 0;
 	let _connected = false;
+	let adapter: null | Adapter = null;
+
+	const listeners: Array<EmitterFn | null> = [];
 
 	const emit: EmitterFn = (name, data) => {
 		bridge.send(name, data);
+		listeners.forEach(l => l != null && l(name, data));
+	};
+
+	// Lazily init the adapter when a renderer is attached
+	const init = () => {
+		const multi = createMultiRenderer(renderers);
+		adapter = createAdapter(emit, multi);
+
+		bridge.listen("highlight", adapter.highlight);
+		bridge.listen("update-prop", ev => {
+			adapter!.update(ev.id, "props", ev.path, ev.value);
+		});
+		bridge.listen("update-state", ev => {
+			adapter!.update(ev.id, "state", ev.path, ev.value);
+		});
+		bridge.listen("update-context", ev => {
+			adapter!.update(ev.id, "context", ev.path, ev.value);
+		});
+		bridge.listen("select", adapter.select);
+		bridge.listen("copy", adapter.copy);
+		bridge.listen("inspect", adapter.inspect);
+		bridge.listen("log", adapter.log);
+		bridge.listen("update", adapter.log);
+		bridge.listen("start-picker", adapter.startPickElement);
+		bridge.listen("stop-picker", adapter.stopPickElement);
+		bridge.listen("initialized", multi.flushInitial);
+		bridge.listen("update-filter", ev => {
+			multi.applyFilters(parseFilters(ev));
+		});
+		bridge.listen("force-update", ev => multi.forceUpdate(ev));
+	};
+
+	const attachRenderer = (renderer: Renderer) => {
+		if (adapter == null) {
+			init();
+		}
+
+		renderers.set(++uid, renderer);
+
+		// Content Script is likely not ready at this point, so don't
+		// flush any events here and politely request it to initialize
+		bridge.send("attach", uid);
+		return uid;
 	};
 
 	return {
@@ -56,37 +111,40 @@ export function createHook(): DevtoolsHook {
 			_connected = value;
 		},
 		emit,
-		attach: renderer => {
-			renderers.set(++uid, renderer);
-			const adapter = createAdapter(emit, renderer);
-			bridge.listen("initialized", renderer.flushInitial);
-			bridge.listen("highlight", adapter.highlight);
-			bridge.listen("update-prop", ev => {
-				adapter.update(ev.id, "props", ev.path, ev.value);
-			});
-			bridge.listen("update-state", ev => {
-				adapter.update(ev.id, "state", ev.path, ev.value);
-			});
-			bridge.listen("update-context", ev => {
-				adapter.update(ev.id, "context", ev.path, ev.value);
-			});
-			bridge.listen("update-filter", ev => {
-				renderer.applyFilters(parseFilters(ev));
-			});
-			bridge.listen("force-update", ev => renderer.forceUpdate(ev));
-			bridge.listen("select", adapter.select);
-			bridge.listen("copy", adapter.copy);
-			bridge.listen("inspect", adapter.inspect);
-			bridge.listen("log", adapter.log);
-			bridge.listen("update", adapter.log);
-			bridge.listen("start-picker", adapter.startPickElement);
-			bridge.listen("stop-picker", adapter.stopPickElement);
-
-			// Content Script is likely not ready at this point, so don't
-			// flush any events here and politely request it to initialize
-			bridge.send("attach", uid);
-			return uid;
+		listen: fn => {
+			const idx = listeners.push(fn) - 1;
+			return () => {
+				listeners[idx] = null;
+			};
 		},
+		attachPreact: (version, options, config) => {
+			if (adapter == null) {
+				init();
+			}
+			const hookProxy = {
+				get connected() {
+					return _connected;
+				},
+				set connected(value) {
+					_connected = value;
+				},
+				emit,
+			};
+
+			console.log("Attach renderer:", version);
+			// TODO: Find a more robust solution
+			//   Maybe something based on semver ranges?
+			switch (version) {
+				default: {
+					const renderer = createRenderer(hookProxy, config as any);
+					setupOptions(options, renderer);
+					return attachRenderer(renderer);
+				}
+			}
+
+			return -1;
+		},
+		attach: attachRenderer,
 		detach: id => renderers.delete(id),
 	};
 }

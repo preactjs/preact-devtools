@@ -13,27 +13,22 @@ import { applyOperations } from "../adapter/events";
 import { fromSnapshot } from "../adapter/debug";
 import { TreeView } from "../view/components/TreeView";
 import { RadioBar } from "../view/components/RadioBar";
-import { TodoList } from "./TodoList";
+import { TodoList } from "./10/TodoList";
 import { treeStore } from "./treeStore";
 import { createPropsStore } from "../view/store/props";
 import { Iframes } from "./Iframes";
-import { LegacyContext } from "./legacyContext";
-import { Stateful } from "./state";
+import { LegacyContext } from "./10/legacyContext";
+import { Stateful } from "./10/state";
 import { valoo } from "../view/valoo";
-import { DeepTree, ShallowTree } from "./DeepTree";
+import { DeepTree, ShallowTree } from "./10/DeepTree";
 
-function Headline(props) {
+function Headline(props: { title: string }) {
 	return <h3>{props.title}</h3>;
 }
 
 const tstore = treeStore();
 
-const collapsed = valoo(new Set());
-const pStore = createPropsStore(
-	tstore.inspectData,
-	data => data.props,
-	collapsed,
-);
+const pStore = createPropsStore(tstore.inspectData, data => data.props);
 const initialTree = new Map();
 
 export function StyleGuide() {
@@ -51,7 +46,7 @@ export function StyleGuide() {
 	const [store] = useState(createStore());
 
 	useEffect(() => {
-		store.theme.$ = localStorage.getItem("theme");
+		store.theme.$ = localStorage.getItem("theme") as any;
 	}, []);
 
 	const theme = useObserver(() => store.theme.$);
@@ -69,7 +64,7 @@ export function StyleGuide() {
 						name="foo"
 						value={theme}
 						onChange={v => {
-							store.theme.$ = v;
+							store.theme.$ = v as any;
 							localStorage.setItem("theme", v);
 						}}
 						items={[
@@ -90,20 +85,20 @@ export function StyleGuide() {
 					<h3>ElementProps</h3>
 					<p>non-editable</p>
 					<ElementProps
+						nodeId={6}
 						editable={false}
-						items={propList}
+						items={propList as any}
 						collapsed={pCollapsed}
 						onCollapse={pStore.collapser.toggle}
-						initial={pInitial}
 					/>
 					<p>editable</p>
 					<div style="width: 20rem; outline: 1px solid red">
 						<ElementProps
+							nodeId={6}
 							editable
-							items={propList}
+							items={propList as any}
 							collapsed={pCollapsed}
 							onCollapse={pStore.collapser.toggle}
-							initial={pInitial}
 						/>
 					</div>
 					<h2>Icon Btns</h2>
@@ -188,6 +183,6 @@ export function StyleGuide() {
 	);
 }
 
-export function renderExample(dom) {
+export function renderExample(dom: any) {
 	render(<StyleGuide />, dom);
 }

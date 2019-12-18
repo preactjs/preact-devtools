@@ -9,14 +9,13 @@ export type UpdateType = "props" | "context" | "state";
 export interface Renderer {
 	getVNodeById(id: ID): VNode | null;
 	getDisplayName(vnode: VNode): string;
+	getDisplayNameById?(id: ID): string;
 	findDomForVNode(id: ID): Array<HTMLElement | Text | null> | null;
 	findVNodeIdForDom(node: HTMLElement | Text): number;
 	applyFilters(filters: FilterState): void;
 	has(id: ID): boolean;
 	log(id: ID, children: ID[]): void;
 	inspect(id: ID): InspectData | null;
-	onCommit(vnode: VNode): void;
-	onUnmount(vnode: VNode): void;
 	flushInitial(): void;
 	forceUpdate(id: ID): void;
 	update(id: ID, type: UpdateType, path: ObjPath, value: any): void;

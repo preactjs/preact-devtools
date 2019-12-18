@@ -1,9 +1,15 @@
 export type Listener<T = any> = (data: T) => void;
+export type Unsubscribe = () => void;
+
+export interface Bridge {
+	listen: (name: string, cb: Listener) => Unsubscribe;
+	send(name: string, data: any): void;
+}
 
 /**
  * The bridge basically just abstracts over the messaging protocol
  */
-export function createBridge(target: Window) {
+export function createBridge(target: Window): Bridge {
 	const listeners = new Map<string, Listener<any>[]>();
 
 	target.addEventListener("message", ev => {

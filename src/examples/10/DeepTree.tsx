@@ -1,4 +1,4 @@
-import { h } from "preact";
+import { h } from "../vendor/preact-10";
 
 function DeepNest(props: any) {
 	return <div>{props.children}</div>;
