@@ -16,8 +16,6 @@ export interface Renderer {
 	has(id: ID): boolean;
 	log(id: ID, children: ID[]): void;
 	inspect(id: ID): InspectData | null;
-	onCommit(vnode: VNode): void;
-	onUnmount(vnode: VNode): void;
 	flushInitial(): void;
 	forceUpdate(id: ID): void;
 	update(id: ID, type: UpdateType, path: ObjPath, value: any): void;

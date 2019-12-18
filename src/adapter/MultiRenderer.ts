@@ -44,18 +44,6 @@ export function createMultiRenderer(
 				renderer.update(id, type, path, value);
 			}
 		},
-		onCommit() {
-			throw new Error(
-				"Trying to call onCommit on MultiRenderer. " +
-					"Please call onCommit on the renderer instance directly.",
-			);
-		},
-		onUnmount() {
-			throw new Error(
-				"Trying to call onUnmount on MultiRenderer. " +
-					"Please call onUnmount on the renderer instance directly.",
-			);
-		},
 		flushInitial() {
 			renderers.forEach(r => r.flushInitial());
 		},

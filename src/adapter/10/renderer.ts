@@ -77,6 +77,11 @@ let DEFAULT_FIlTERS: FilterState = {
 	type: new Set(["dom", "fragment"]),
 };
 
+export interface Preact10Renderer extends Renderer {
+	onCommit(vnode: VNode): void;
+	onUnmount(vnode: VNode): void;
+}
+
 export function createRenderer(
 	hook: {
 		connected: boolean;
@@ -84,7 +89,7 @@ export function createRenderer(
 	},
 	config: RendererConfig10,
 	filters: FilterState = DEFAULT_FIlTERS,
-): Renderer {
+): Preact10Renderer {
 	const ids = createIdMapper();
 	const roots = new Set<VNode>();
 

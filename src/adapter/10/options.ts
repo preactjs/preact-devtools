@@ -1,9 +1,7 @@
 import { Options, VNode } from "preact";
-import { Renderer } from "../renderer";
-import { isRoot, getActualChildren } from "./vnode";
-import { Highlighter } from "../../view/components/Highlighter";
+import { Preact10Renderer } from "./renderer";
 
-export function setupOptions(options: Options, renderer: Renderer) {
+export function setupOptions(options: Options, renderer: Preact10Renderer) {
 	const o = options as any;
 
 	// Store (possible) previous hooks so that we don't overwrite them
