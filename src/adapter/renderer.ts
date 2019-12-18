@@ -1,10 +1,8 @@
 import { VNode } from "preact";
 import { ID } from "../view/store/types";
 import { FilterState } from "./adapter/filter";
-import { InspectData } from "./adapter/adapter";
+import { InspectData, UpdateType } from "./adapter/adapter";
 import { ObjPath } from "../view/components/sidebar/ElementProps";
-
-export type UpdateType = "props" | "context" | "state";
 
 export interface Renderer {
 	getVNodeById(id: ID): VNode | null;
