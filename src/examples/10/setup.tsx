@@ -6,6 +6,7 @@ import { LegacyContext } from "./legacyContext";
 import { Stateful } from "./state";
 import { createRenderer } from "../../adapter/10/renderer";
 import { setupOptions } from "../../adapter/10/options";
+import { Booleans } from "./DataTypes";
 
 export function initPreact10(hook: DevtoolsHook) {
 	if (hook.attachPreact) {
@@ -32,6 +33,8 @@ export function renderExamples10(node: HTMLElement) {
 			<LegacyContext />
 			<p>Class state</p>
 			<Stateful />
+			<p>Data Types</p>
+			<Booleans value={true} />
 			<p>Deep tree</p>
 			<DeepTree />
 			<br />
