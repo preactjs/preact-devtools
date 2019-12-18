@@ -54,15 +54,17 @@ export function createAdapter(emit: EmitterFn, renderer: Renderer): Adapter {
 		},
 	);
 
-	return {
-		inspect(id) {
-			if (renderer.has(id)) {
-				const data = renderer.inspect(id);
-				if (data !== null) {
-					emit("inspect-result", data);
-				}
+	const inspect = (id: ID) => {
+		if (renderer.has(id)) {
+			const data = renderer.inspect(id);
+			if (data !== null) {
+				emit("inspect-result", data);
 			}
-		},
+		}
+	};
+
+	return {
+		inspect,
 		log(data) {
 			if (renderer.has(data.id)) {
 				renderer.log(data.id, data.children);
@@ -75,7 +77,17 @@ export function createAdapter(emit: EmitterFn, renderer: Renderer): Adapter {
 			if (id == null) highlight.destroy();
 			else highlight.highlight(id);
 		},
-		update: renderer.update,
+		update: (id, type, path, value) => {
+			renderer.update(id, type, path, value);
+
+			// Notify all frontends that something changed
+			if (renderer.has(id)) {
+				const data = renderer.inspect(id);
+				if (data !== null) {
+					emit("inspect-result", data);
+				}
+			}
+		},
 		startPickElement: picker.start,
 		stopPickElement: picker.stop,
 		copy(value) {
