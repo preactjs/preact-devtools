@@ -15,10 +15,13 @@ export interface InputProps {
 
 export function DataInput({ value, onChange, name, ...props }: InputProps) {
 	const value$ = useRef(valoo(value)).current;
-	const store = useRef(createInputStore(value$)).current;
+	const tmp = useRef(null as any);
+	const store = useRef<ReturnType<typeof createInputStore>>(
+		(tmp as any).current || (tmp.current = createInputStore(value$)),
+	).current;
 
 	useEffect(() => {
-		store.onReset();
+		store.onClear();
 	}, [name]);
 
 	useEffect(() => {
@@ -27,7 +30,7 @@ export function DataInput({ value, onChange, name, ...props }: InputProps) {
 		}
 		const dispose = value$.on(v => onChange(v));
 		return () => dispose();
-	}, [value, onChange]);
+	}, [value$, value, onChange]);
 
 	const valid = useObserver(() => store.valid.$);
 	const type = useObserver(() => store.valueType.$);

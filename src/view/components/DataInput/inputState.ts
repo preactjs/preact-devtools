@@ -85,6 +85,7 @@ export function createInputStore(value: Observable<any>) {
 
 	const onBlur = () => {
 		focus.$ = false;
+		local.$ = undefined;
 	};
 
 	const onReset = () => {
@@ -114,6 +115,10 @@ export function createInputStore(value: Observable<any>) {
 		} catch (err) {}
 	};
 
+	const onClear = () => {
+		local.$ = undefined;
+	};
+
 	return {
 		onConfirm,
 		onFocus,
@@ -121,6 +126,7 @@ export function createInputStore(value: Observable<any>) {
 		onIncrement,
 		onDecrement,
 		onReset,
+		onClear,
 		onInput,
 		asCheckbox,
 		showReset,
