@@ -9,8 +9,8 @@ import {
 	useCallback as c,
 	useContext as f,
 	useDebugValue as a
-} from 'preact/hooks';
-export * from 'preact/hooks';
+} from '../../hooks';
+export * from '../../hooks';
 import {
 	Component as l,
 	createElement as s,
@@ -24,8 +24,8 @@ import {
 	toChildArray as g,
 	createContext as x,
 	Fragment as C
-} from 'preact';
-export { createContext, createRef, Fragment, Component } from 'preact';
+} from '../../';
+export { createContext, createRef, Fragment, Component } from '../../';
 function E(n, t) {
 	for (var e in t) n[e] = t[e];
 	return n;

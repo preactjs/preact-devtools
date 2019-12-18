@@ -1,4 +1,4 @@
-import { options as n } from 'preact';
+import { options as n } from '../../../preact-10';
 var t,
 	u,
 	r,
