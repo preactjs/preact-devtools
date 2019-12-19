@@ -13,6 +13,7 @@ export function createPropsStore(
 	const collapsed = valoo(new Set<string>());
 	const collapser = createCollapser<string>(collapsed);
 	const tree = valoo(new Map<string, PropData>());
+	let lastId = inspectData.$ ? inspectData.$.id : -1;
 
 	// Whenever the inspection data changes, we'll update the tree
 	const dispose = inspectData.on(v => {
@@ -29,6 +30,13 @@ export function createPropsStore(
 			});
 
 			const collapseAll = collapsed.$.size === 0;
+
+			if (lastId !== v.id) {
+				lastId = v.id;
+				collapsed.update(n => {
+					n.clear();
+				});
+			}
 
 			parseProps(
 				getData(v),

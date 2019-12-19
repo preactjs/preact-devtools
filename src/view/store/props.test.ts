@@ -12,7 +12,7 @@ const createStore = () => {
 };
 
 describe("Props Store", () => {
-	it.skip("should reset collapse new selected", () => {
+	it("should reset collapse on element change", () => {
 		const { inspectData, store } = createStore();
 		store.collapser.collapsed.update(v => {
 			v.add("foo");
@@ -67,7 +67,7 @@ describe("Props Store", () => {
 		});
 
 		inspectData.$ = {
-			id: 42,
+			id: -1, // Use same id as default
 			name: "foo",
 			type: "string",
 			context: null,
