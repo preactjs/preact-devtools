@@ -5,6 +5,7 @@ import { Undo } from "../icons";
 import { createInputStore } from "./inputState";
 import { valoo } from "../../valoo";
 import { useObserver } from "../../store/react-bindings";
+import { parseValue } from "./parseValue";
 
 export interface InputProps {
 	name: string;
@@ -68,7 +69,7 @@ export function DataInput({ value, onChange, name, ...props }: InputProps) {
 					checked={store.actualValue.$ === "true"}
 					onInput={e => {
 						const value = "" + (e.target as any).checked;
-						value$.$ = value;
+						value$.$ = parseValue(value);
 						onChange(value$.$);
 					}}
 				/>
