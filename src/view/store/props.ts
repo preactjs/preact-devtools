@@ -28,15 +28,15 @@ export function createPropsStore(
 				value: null,
 			});
 
+			const collapseAll = collapsed.$.size === 0;
+
 			parseProps(
 				getData(v),
 				["root"],
 				PROPS_LIMIT,
 				data => {
-					if (data.id !== "root") {
-						if (data.collapsable && collapsed.$.size === 0) {
-							collapsed.$.add(data.id);
-						}
+					if (collapseAll && data.id !== "root" && data.collapsable) {
+						collapsed.$.add(data.id);
 					}
 					return data;
 				},
