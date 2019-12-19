@@ -1,8 +1,8 @@
 import { createContext } from "preact";
-import { useEffect, useContext, useState, useMemo } from "preact/hooks";
+import { useEffect, useContext, useState, useMemo, useRef } from "preact/hooks";
 import { Store } from "./types";
 import { EmitFn } from "../../adapter/hook";
-import { watch } from "../valoo";
+import { watch, Observable } from "../valoo";
 
 export const AppCtx = createContext<Store>(null as any);
 export const EmitCtx = createContext<EmitFn>(() => null);
@@ -11,14 +11,18 @@ export const useEmitter = () => useContext(EmitCtx);
 export const useStore = () => useContext(AppCtx);
 
 export function useObserver<T>(fn: () => T): T {
-	let [value, setValue] = useState(fn());
+	let [_, set] = useState(0);
+	let count = useRef(0);
+	let tmp = useRef<any>(null as any);
+	let ref = useRef<Observable<T>>(tmp.current || (tmp.current = watch(fn)));
 
 	const dispose = useMemo(() => {
-		let v = watch(fn);
-		let disp = v.on(setValue);
+		let disp = ref.current.on(() => {
+			set((count.current = count.current + 1));
+		});
 		return () => {
 			disp();
-			v._disposers.forEach(disp => disp());
+			ref.current._disposers.forEach(disp => disp());
 		};
 	}, []);
 
@@ -26,5 +30,5 @@ export function useObserver<T>(fn: () => T): T {
 		return () => dispose();
 	}, []);
 
-	return value;
+	return ref.current.$;
 }
