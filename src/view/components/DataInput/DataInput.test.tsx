@@ -1,14 +1,14 @@
 import { h, ComponentChild } from "preact";
 import { expect } from "chai";
 import * as sinon from "sinon";
-import { render as renderTest, fireEvent } from "@testing-library/preact";
+import { render, fireEvent } from "@testing-library/preact";
 import { DataInput } from ".";
 import { act } from "preact/test-utils";
 
 const noop = () => null;
 
-export function render(ui: ComponentChild) {
-	const res = renderTest(ui);
+export function renderTest(ui: ComponentChild) {
+	const res = render(ui);
 	return {
 		...res,
 		$: (sel: string) => res.container.querySelector(sel),
@@ -18,7 +18,7 @@ export function render(ui: ComponentChild) {
 
 describe("DataInput", () => {
 	it.skip("should update local value when value changes", () => {
-		const { rerender, container } = render(
+		const { rerender, container } = renderTest(
 			<DataInput value="foo" onChange={noop} name="foo" />,
 		);
 
@@ -37,7 +37,7 @@ describe("DataInput", () => {
 	});
 
 	it("should serialize value to human on focus", () => {
-		const { container } = render(
+		const { container } = renderTest(
 			<DataInput value="foo" onChange={noop} name="foo" />,
 		);
 
@@ -49,7 +49,7 @@ describe("DataInput", () => {
 	});
 
 	it.skip("should update mask", () => {
-		const { container } = render(
+		const { container } = renderTest(
 			<DataInput value="foo" onChange={noop} name="foo" />,
 		);
 
@@ -68,7 +68,7 @@ describe("DataInput", () => {
 	});
 
 	it("should have short mask when not focused", () => {
-		const { container } = render(
+		const { container } = renderTest(
 			<DataInput value={{ foo: 1 }} onChange={noop} name="foo" />,
 		);
 
@@ -78,7 +78,7 @@ describe("DataInput", () => {
 
 	// Focus handling seems to be wrong in our testing framework
 	it.skip("should not mask objects when focused", () => {
-		const { container } = render(
+		const { container } = renderTest(
 			<DataInput value={{ foo: 1 }} onChange={noop} name="foo" />,
 		);
 
@@ -91,7 +91,7 @@ describe("DataInput", () => {
 
 	describe("Checkbox", () => {
 		it("should display a checkbox for boolean values", () => {
-			const { $ } = render(
+			const { $ } = renderTest(
 				<DataInput value={true} onChange={noop} name="foo" />,
 			);
 
@@ -104,7 +104,7 @@ describe("DataInput", () => {
 
 		it("should change value on click", () => {
 			const spy = sinon.spy();
-			const { $ } = render(
+			const { $ } = renderTest(
 				<DataInput value={true} onChange={spy} name="foo" />,
 			);
 
