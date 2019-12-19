@@ -1,10 +1,20 @@
-import { h } from "preact";
+import { h, ComponentChild } from "preact";
 import { expect } from "chai";
-import { render, fireEvent } from "@testing-library/preact";
+import * as sinon from "sinon";
+import { render as renderTest, fireEvent } from "@testing-library/preact";
 import { DataInput } from ".";
 import { act } from "preact/test-utils";
 
 const noop = () => null;
+
+export function render(ui: ComponentChild) {
+	const res = renderTest(ui);
+	return {
+		...res,
+		$: (sel: string) => res.container.querySelector(sel),
+		$$: (sel: string) => res.container.querySelectorAll(sel),
+	};
+}
 
 describe("DataInput", () => {
 	it.skip("should update local value when value changes", () => {
@@ -77,5 +87,31 @@ describe("DataInput", () => {
 			fireEvent.focus(input);
 		});
 		expect(input.value).to.equal("{foo:1}");
+	});
+
+	describe("Checkbox", () => {
+		it("should display a checkbox for boolean values", () => {
+			const { $ } = render(
+				<DataInput value={true} onChange={noop} name="foo" />,
+			);
+
+			const input = $("input[type='text']") as HTMLInputElement;
+			expect(input.value).to.equal("true");
+
+			const check = $("input[type='checkbox']") as HTMLInputElement;
+			expect(check.checked).to.equal(true);
+		});
+
+		it("should change value on click", () => {
+			const spy = sinon.spy();
+			const { $ } = render(
+				<DataInput value={true} onChange={spy} name="foo" />,
+			);
+
+			const check = $("input[type='checkbox']") as HTMLInputElement;
+			fireEvent.click(check);
+			expect(spy.args[0][0]).to.equal(false);
+			expect(check.checked).to.equal(false);
+		});
 	});
 });
