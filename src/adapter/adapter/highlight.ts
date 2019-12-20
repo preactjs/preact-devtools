@@ -2,7 +2,7 @@ import { Renderer } from "../renderer";
 import { render, h } from "preact";
 import { getNearestElement, measureNode } from "../dom";
 import { ID } from "../../view/store/types";
-import { Highlighter } from "../../view/components/Highlighter";
+import { Highlighter, style } from "../../view/components/Highlighter";
 
 /**
  * This module is responsible for displaying the transparent element overlay
@@ -35,7 +35,7 @@ export function createHightlighter(renderer: Renderer) {
 			if (highlightRef == null) {
 				highlightRef = document.createElement("div");
 				highlightRef.id = "preact-devtools-highlighter";
-				highlightRef.className = "foobar";
+				highlightRef.className = style.outerContainer;
 
 				document.body.appendChild(highlightRef);
 			}
