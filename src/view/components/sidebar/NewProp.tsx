@@ -29,7 +29,7 @@ export function NewProp(props: NewPropProps) {
 
 	return (
 		<div class={s.root}>
-			<div class={s2.name}>
+			<div class={`${s2.name} ${s.nameWrapper}`}>
 				<input
 					type="text"
 					placeholder="new prop"
@@ -42,6 +42,7 @@ export function NewProp(props: NewPropProps) {
 				class={s.value}
 				value={undefined}
 				onChange={onCommit}
+				placeholder="new value"
 				name="foobar"
 			/>
 		</div>

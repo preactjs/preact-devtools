@@ -25,6 +25,7 @@ export function IconBtn(props: Props) {
 		>
 			<span class={s.inner} tabIndex={-1}>
 				{props.children}
+				<span class={s.bg} />
 			</span>
 		</button>
 	);

@@ -10,7 +10,14 @@
 	background: var(--color-props-input-bg);
 }
 
+.nameWrapper::after {
+	margin: 0 0.2rem;
+	display: inline-block;
+}
+
 .value {
 	background: var(--color-props-input-bg);
 	max-width: 5rem;
+	padding-left: 0.2rem;
+	border: 1px solid #aaa;
 }
