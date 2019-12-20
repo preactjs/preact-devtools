@@ -41,11 +41,11 @@ wrapper.style.cssText = `
 `;
 const container = div("container");
 container.style.cssText = `
-	padding: 2rem;
 	overflow: auto;
 `;
 
 const examples10 = div("preact-10");
+examples10.style.cssText = "position: relative";
 document.body.appendChild(wrapper);
 wrapper.appendChild(container);
 wrapper.appendChild(devtools);
