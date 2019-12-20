@@ -1,0 +1,16 @@
+import { h } from "preact";
+import { Store } from "../../store/types";
+import { CommitTimeline } from "./CommitTimeline";
+
+export interface Props {
+	store: Store;
+}
+
+export function Profiler(props: Props) {
+	return (
+		<div>
+			<h1>Profiler</h1>
+			<CommitTimeline />
+		</div>
+	);
+}

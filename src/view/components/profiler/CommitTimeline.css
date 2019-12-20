@@ -1,0 +1,49 @@
+.root {
+	display: flex;
+	align-items: center;
+}
+
+.items {
+	display: flex;
+	margin: 0 0rem;
+	min-height: 2rem;
+}
+
+.item {
+	position: relative;
+	min-width: 0.75rem;
+	cursor: pointer;
+}
+
+.item::-moz-focus-inner {
+	border: 0;
+}
+
+.item + .item {
+	margin-left: 0.35rem;
+}
+
+.item[data-selected]::after {
+	content: "";
+	height: 0.25rem;
+	width: 100%;
+	position: absolute;
+	top: calc(100% + 0.25rem);
+	left: 0;
+	background: red;
+}
+
+.itemInner {
+	position: absolute;
+	bottom: 0;
+	left: 0;
+	right: 0;
+	background: blue;
+}
+
+.navBtn {
+	background: none;
+	border: none;
+	padding: 0.5rem;
+	cursor: pointer;
+}
