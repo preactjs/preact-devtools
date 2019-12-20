@@ -27,17 +27,33 @@
 	display: flex;
 	justify-content: center;
 	align-items: center;
+	outline: none;
+}
+
+.root:active .inner,
+.root:focus .inner {
+	position: relative;
+	z-index: 2;
 }
 
 .root:not([disabled])[data-active] .inner,
 .root:focus .inner,
-.root:not([disabled]) .inner:active {
+.root:not([disabled]):active .inner {
 	color: var(--color-selected-text);
 }
 
-.root:focus-within .inner::after,
-.root:not([disabled]):active .inner::after,
-.root:not([disabled])[data-active] .inner::after {
+.bg {
+	display: none;
+}
+
+.root:focus .bg {
+	z-index: -1;
+}
+
+.root:focus-within .bg,
+.root:not([disabled]):active .bg,
+.root:not([disabled])[data-active] .bg {
+	display: block;
 	content: "";
 	position: absolute;
 	left: -0.25rem;
