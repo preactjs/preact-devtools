@@ -11,6 +11,7 @@ export interface InputProps {
 	name: string;
 	value: any;
 	class?: string;
+	placeholder?: string;
 	onChange: (value: any) => void;
 }
 
@@ -84,6 +85,7 @@ export function DataInput({ value, onChange, name, ...props }: InputProps) {
 					onBlur={store.onBlur}
 					onKeyUp={onKeyUp}
 					onInput={onInput}
+					placeholder={props.placeholder}
 					data-type={type}
 				/>
 				<button
