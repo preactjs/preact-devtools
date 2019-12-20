@@ -28,6 +28,8 @@
 	padding-right: 0.2em;
 	min-width: 0;
 	box-shadow: none;
+	white-space: nowrap;
+	text-overflow: ellipsis;
 }
 
 .innerWrapper {
