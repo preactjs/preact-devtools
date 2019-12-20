@@ -7,6 +7,7 @@ import { Stateful } from "./state";
 import { createRenderer } from "../../adapter/10/renderer";
 import { setupOptions } from "../../adapter/10/options";
 import { Booleans, Complex } from "./DataTypes";
+import { FullWidthHighlighter } from "./Highlighting";
 
 export function initPreact10(hook: DevtoolsHook) {
 	if (hook.attachPreact) {
@@ -27,18 +28,25 @@ export function initPreact10(hook: DevtoolsHook) {
 export function renderExamples10(node: HTMLElement) {
 	render(
 		<div>
-			<p>Todo list</p>
-			<TodoList />
-			<p>Legacy context</p>
-			<LegacyContext />
-			<p>Class state</p>
-			<Stateful />
-			<p>Data Types</p>
-			<Booleans value={true} />
-			<Complex />
-			<p>Deep tree</p>
-			<DeepTree />
-			<br />
+			{/* <FullWidthHighlighter /> */}
+			<div style="padding: 2rem">
+				<p>Highlight full width</p>
+				<small>
+					Uncomment all other components so that the vertical scrollbar is gone
+				</small>
+				<p>Todo list</p>
+				<TodoList />
+				<p>Legacy context</p>
+				<LegacyContext />
+				<p>Class state</p>
+				<Stateful />
+				<p>Data Types</p>
+				<Booleans value={true} />
+				<Complex />
+				<p>Deep tree</p>
+				<DeepTree />
+				<br />
+			</div>
 		</div>,
 		node,
 	);

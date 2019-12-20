@@ -2,6 +2,8 @@ import { h } from "preact";
 import s from "./Highlighter.css";
 import { Measurements } from "../../adapter/dom";
 
+export const style = s;
+
 export interface Props extends Measurements {
 	label: string;
 }
