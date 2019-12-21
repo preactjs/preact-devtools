@@ -10,7 +10,7 @@ export function Profiler(props: Props) {
 	return (
 		<div>
 			<h1>Profiler</h1>
-			<CommitTimeline />
+			<CommitTimeline items={[20, 80, 10, 10]} />
 		</div>
 	);
 }

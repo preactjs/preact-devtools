@@ -3,8 +3,12 @@ import { useState, useCallback } from "preact/hooks";
 import { ArrowBack, ArrowForward } from "../icons";
 import s from "./CommitTimeline.css";
 
-export function CommitTimeline() {
-	const [items] = useState([20, 80, 10, 10]);
+export interface CommitTimelineProps {
+	items: number[];
+}
+
+export function CommitTimeline(props: CommitTimelineProps) {
+	const { items } = props;
 	const [selected, setSelected] = useState(0);
 
 	const onPrev = useCallback(() => {
@@ -22,7 +26,12 @@ export function CommitTimeline() {
 	return (
 		<div class={s.root}>
 			Timeline
-			<button onClick={onPrev} disabled={selected <= 0} class={s.navBtn}>
+			<button
+				onClick={onPrev}
+				disabled={selected <= 0}
+				class={s.navBtn}
+				data-e2e="prev-commit"
+			>
 				<ArrowBack />
 			</button>
 			<div class={s.items}>
@@ -39,6 +48,7 @@ export function CommitTimeline() {
 				onClick={onNext}
 				disabled={selected >= items.length - 1}
 				class={s.navBtn}
+				data-e2e="next-commit"
 			>
 				<ArrowForward />
 			</button>
@@ -54,7 +64,12 @@ export interface CommitItem {
 
 export function CommitItem(props: CommitItem) {
 	return (
-		<div class={s.item} data-selected={props.selected} onClick={props.onClick}>
+		<div
+			data-e2e="commit-item"
+			class={s.item}
+			data-selected={props.selected}
+			onClick={props.onClick}
+		>
 			<div class={s.itemInner} style={`top: calc(100% - ${props.percent}%)`} />
 		</div>
 	);
