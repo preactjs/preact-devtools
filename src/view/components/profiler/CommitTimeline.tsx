@@ -4,19 +4,20 @@ import { ArrowBack, ArrowForward } from "../icons";
 import s from "./CommitTimeline.css";
 
 export interface CommitTimelineProps {
+	selected: number;
 	items: number[];
+	onChange: (i: number) => void;
 }
 
 export function CommitTimeline(props: CommitTimelineProps) {
-	const { items } = props;
-	const [selected, setSelected] = useState(0);
+	const { items, onChange, selected } = props;
 
 	const onPrev = useCallback(() => {
-		setSelected(Math.max(selected - 1, 0));
+		onChange(Math.max(selected - 1, 0));
 	}, [selected]);
 
 	const onNext = useCallback(() => {
-		setSelected(Math.min(selected + 1, items.length - 1));
+		onChange(Math.min(selected + 1, items.length - 1));
 	}, [selected]);
 
 	if (items.length === 0) {
@@ -40,7 +41,7 @@ export function CommitTimeline(props: CommitTimelineProps) {
 				{items.map((x, i) => (
 					<CommitItem
 						key={x}
-						onClick={() => setSelected(i)}
+						onClick={() => onChange(i)}
 						selected={i === selected}
 						percent={x}
 					/>

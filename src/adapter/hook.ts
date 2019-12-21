@@ -91,6 +91,10 @@ export function createHook(bridge: Bridge): DevtoolsHook {
 			multi.applyFilters(parseFilters(ev));
 		});
 		bridge.listen("force-update", ev => multi.forceUpdate(ev));
+
+		// Profiler
+		bridge.listen("start-profiling", multi.startProfiling);
+		bridge.listen("stop-profiling", multi.stopProfiling);
 	};
 
 	const attachRenderer = (renderer: Renderer) => {

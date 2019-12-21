@@ -6,7 +6,7 @@ import { createFilterStore } from "./filter";
 import { createSelectionStore } from "./selection";
 import { Collapser } from "./collapser";
 import { EmitFn } from "../../adapter/hook";
-import { createProfilerStore } from "../components/profiler/ProfilerStore";
+import { createProfilerStore } from "../components/profiler/data/ProfilerStore";
 
 export type ID = number;
 

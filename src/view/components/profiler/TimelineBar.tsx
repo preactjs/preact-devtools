@@ -13,10 +13,18 @@ export function TimelineBar() {
 	const commits = useObserver(() => store.profiler.commits.$);
 	const activeModal = useObserver(() => store.modal.active.$);
 	const isRecording = useObserver(() => store.profiler.isRecording.$);
+	const selectedCommit = useObserver(() => store.profiler.selected.$);
 
 	const onRecord = useCallback(() => {
 		store.profiler.isRecording.$ = !store.profiler.isRecording.$;
 	}, [store]);
+
+	const onCommitChange = useCallback(
+		(n: number) => {
+			store.profiler.selected.$ = n;
+		},
+		[store],
+	);
 
 	return (
 		<Actions>
@@ -50,7 +58,11 @@ export function TimelineBar() {
 				</IconBtn>
 			</div>
 			<ActionSeparator />
-			<CommitTimeline items={commits} />
+			<CommitTimeline
+				items={commits.map(x => 40)}
+				selected={selectedCommit}
+				onChange={onCommitChange}
+			/>
 		</Actions>
 	);
 }

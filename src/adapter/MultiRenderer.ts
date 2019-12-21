@@ -20,6 +20,12 @@ export function createMultiRenderer(
 	renderers: Map<number, Renderer>,
 ): Renderer {
 	return {
+		startProfiling() {
+			renderers.forEach(r => r.startProfiling());
+		},
+		stopProfiling() {
+			renderers.forEach(r => r.stopProfiling());
+		},
 		has(id) {
 			return getRendererByVNodeId(renderers, id) !== null;
 		},

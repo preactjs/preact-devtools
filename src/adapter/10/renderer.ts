@@ -99,7 +99,15 @@ export function createRenderer(
 	let currentUnmounts: number[] = [];
 
 	let domToVNode = new WeakMap<HTMLElement | Text, VNode>();
+
+	let isProfiling = false;
+
 	return {
+		startProfiling: () => (isProfiling = true),
+		stopProfiling: () => {
+			isProfiling = false;
+			console.log("stop profiling");
+		},
 		getVNodeById: id => ids.getVNode(id),
 		has: id => ids.has(id),
 		getDisplayName(vnode) {
