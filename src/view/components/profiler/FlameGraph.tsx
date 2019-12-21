@@ -62,13 +62,24 @@ export function FlameGraph(props: FlameGraphProps) {
 				const self = (node.selfDuration < 0.1 ? "< " : "") + node.selfDuration;
 
 				let x = 0;
-				if (current !== null && !fullWidth) {
-					// Calculate new start time by subtracting maximized node's start time
-					const newStart =
-						node.startTime - (current !== null ? current.startTime : 0);
+				if (current !== null) {
+					// Check if it's out of view
+					if (current.depth >= node.depth) {
+						if (node.startTime > current.startTime) {
+							x = width;
+						} else if (
+							node.startTime < current.startTime &&
+							node.startTime + node.duration < current.startTime
+						) {
+							x = -(node.startTime - node.duration) * step;
+						}
+					} else {
+						// Calculate new start time by subtracting maximized node's start time
+						const newStart =
+							node.startTime - (current !== null ? current.startTime : 0);
 
-					// If it's larger than the maximized node's duration, we hide it
-					x = newStart > current.duration ? width : newStart * step;
+						x = newStart * step;
+					}
 				}
 
 				const y = node.depth * (ROW_HEIGHT - 2) + node.depth;
@@ -80,7 +91,7 @@ export function FlameGraph(props: FlameGraphProps) {
 						class={s.node}
 						onClick={() => onSelect(i)}
 						style={`width: ${nodeWidth -
-							1}px; transform: translate3d(${x}px,${y}px,0)`}
+							(fullWidth ? 0 : 1)}px; transform: translate3d(${x}px,${y}px,0)`}
 					>
 						{node.name} ({self}ms of {node.duration}ms)
 					</div>
