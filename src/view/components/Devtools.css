@@ -61,6 +61,13 @@
 	--color-props-object: #1b1b1b;
 	--color-props-null: #1b1b1b;
 	--color-props-vnode: #1b1b1b;
+
+	/* Profiling */
+	--color-record-active: #ff5722;
+	--color-profiler-gradient-1: #beb2c5;
+	--color-profiler-gradient-2: #b38480;
+	--color-profiler-gradient-3: #af595a;
+	--color-profiler-gradient-4: #9c3936;
 }
 
 :global(.dark) .theme {
@@ -104,6 +111,13 @@
 	--color-props-object: #dedede;
 	--color-props-null: #dedede;
 	--color-props-vnode: #dedede;
+
+	/* Profiling */
+	--color-record-active: #ff5722;
+	--color-profiler-gradient-1: #beb2c5;
+	--color-profiler-gradient-2: #b38480;
+	--color-profiler-gradient-3: #af595a;
+	--color-profiler-gradient-4: #9c3936;
 }
 
 .componentActions {

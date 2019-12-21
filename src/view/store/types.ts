@@ -6,6 +6,7 @@ import { createFilterStore } from "./filter";
 import { createSelectionStore } from "./selection";
 import { Collapser } from "./collapser";
 import { EmitFn } from "../../adapter/hook";
+import { createProfilerStore } from "../components/profiler/ProfilerStore";
 
 export type ID = number;
 
@@ -49,6 +50,7 @@ export interface Store {
 	filter: ReturnType<typeof createFilterStore>;
 	selection: ReturnType<typeof createSelectionStore>;
 	collapser: Collapser<ID>;
+	profiler: ReturnType<typeof createProfilerStore>;
 	actions: {
 		inspect: (id: ID) => void;
 		highlightNode: (id: ID | null) => void;

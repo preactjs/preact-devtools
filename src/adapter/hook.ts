@@ -19,6 +19,9 @@ export interface DevtoolEvents {
 	"force-update": ID;
 	"start-picker": null;
 	"stop-picker": null;
+	"start-profiling": null;
+	"stop-profiling": null;
+	"clear-profiling": null;
 	"update-filter": RawFilterState;
 	copy: string;
 	highlight: ID | null;

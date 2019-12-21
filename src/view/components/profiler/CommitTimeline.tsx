@@ -25,7 +25,9 @@ export function CommitTimeline(props: CommitTimelineProps) {
 
 	return (
 		<div class={s.root}>
-			Timeline
+			<div class={s.legend}>
+				{selected + 1} / {items.length}
+			</div>
 			<button
 				onClick={onPrev}
 				disabled={selected <= 0}
@@ -63,6 +65,10 @@ export interface CommitItem {
 }
 
 export function CommitItem(props: CommitItem) {
+	const { percent } = props;
+	const weight = percent > 25 ? 2 : percent > 50 ? 3 : percent > 75 ? 4 : 1;
+	const top = Math.max(20, percent);
+
 	return (
 		<div
 			data-e2e="commit-item"
@@ -70,7 +76,11 @@ export function CommitItem(props: CommitItem) {
 			data-selected={props.selected}
 			onClick={props.onClick}
 		>
-			<div class={s.itemInner} style={`top: calc(100% - ${props.percent}%)`} />
+			<div
+				class={s.itemInner}
+				data-weight={weight}
+				style={`top: calc(100% - ${top}%)`}
+			/>
 		</div>
 	);
 }

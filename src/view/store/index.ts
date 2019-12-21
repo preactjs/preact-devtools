@@ -9,6 +9,7 @@ import { EmitFn } from "../../adapter/hook";
 import { ID, DevNode, Store, Listener, Theme } from "./types";
 import { InspectData } from "../../adapter/adapter/adapter";
 import { debounce } from "../../shells/shared/utils";
+import { createProfilerStore } from "../components/profiler/ProfilerStore";
 
 export function createStore(): Store {
 	let listeners: Array<null | Listener> = [];
@@ -90,5 +91,6 @@ export function createStore(): Store {
 			return () => (listeners[idx] = null);
 		},
 		emit: notify,
+		profiler: createProfilerStore(notify),
 	};
 }
