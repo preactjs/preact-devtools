@@ -19,6 +19,7 @@ export function CommitInfo() {
 			<dl class={s.list}>
 				<dt class={s.title}>Committed at:</dt>
 				<dd class={s.value}>{root ? formatTime(root.startTime) : "-"}</dd>
+				<br />
 				<dt class={s.title}>Render duration:</dt>
 				<dd class={s.value}>{root ? formatTime(root.duration) : "-"}</dd>
 			</dl>
