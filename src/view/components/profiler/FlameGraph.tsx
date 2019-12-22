@@ -18,9 +18,9 @@ const ROW_HEIGHT = 20;
 
 export function FlameGraph(props: FlameGraphProps) {
 	const store = useStore();
-	const nodes = useObserver(() => store.profiler.commits.$[0]);
 	const maxDepth = useObserver(() => store.profiler.maxDepth.$);
 	const selected = useObserver(() => store.profiler.selected.$);
+	const nodes = useObserver(() => store.profiler.currentCommit.$ || []);
 	const current = useObserver(() => store.profiler.selectedNodeData.$);
 	const [width, setWidth] = useState(0);
 
