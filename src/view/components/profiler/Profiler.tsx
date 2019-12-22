@@ -11,6 +11,7 @@ import { SidebarHeader } from "./SidebarHeader";
 import { RenderedAt } from "./RenderedAt";
 import { ProfilerInfo } from "./ProfilerInfo";
 import { CommitInfo } from "./CommitInfo";
+import { RenderReasons } from "./RenderReasons";
 
 export interface Props {
 	store: Store;
@@ -32,6 +33,7 @@ export function Profiler(props: Props) {
 					<SidebarHeader />
 				</div>
 				<div class={s.sidebar}>
+					<RenderReasons />
 					<RenderedAt />
 					<CommitInfo />
 				</div>
