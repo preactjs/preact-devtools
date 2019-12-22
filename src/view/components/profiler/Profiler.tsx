@@ -10,6 +10,7 @@ import { FlameGraph } from "./FlameGraph";
 import { SidebarHeader } from "./SidebarHeader";
 import { RenderedAt } from "./RenderedAt";
 import { ProfilerInfo } from "./ProfilerInfo";
+import { CommitInfo } from "./CommitInfo";
 
 export interface Props {
 	store: Store;
@@ -32,6 +33,7 @@ export function Profiler(props: Props) {
 				</div>
 				<div class={s.sidebar}>
 					<RenderedAt />
+					<CommitInfo />
 				</div>
 				<ModalRenderer />
 			</div>
