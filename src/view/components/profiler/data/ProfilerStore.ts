@@ -72,11 +72,13 @@ export function createProfilerStore(emit: EmitFn) {
 	selected.on(() => (selectedNode.$ = 0));
 
 	const isRecording = valoo(false);
+	const recordingStartTime = valoo<number>(0);
 
 	isRecording.on(v => {
 		if (v) {
 			commits.$ = [];
 			selected.$ = 0;
+			recordingStartTime.$ = performance.now();
 		}
 	});
 
@@ -100,10 +102,14 @@ export function createProfilerStore(emit: EmitFn) {
 		return Math.max(0, ...(currentCommit.$ || []).map(x => x.depth));
 	});
 
+	const slowestNode = watch(() => {
+		return Math.max(0, ...(currentCommit.$ || []).map(x => x.selfDuration));
+	});
+
 	const ranked = watch(() => {
 		return (currentCommit.$ || [])
 			.slice()
-			.sort((a, b) => b.duration - a.duration);
+			.sort((a, b) => b.selfDuration - a.selfDuration);
 	});
 
 	isRecording.on(v => emit(v ? "start-profiling" : "stop-profiling", null));
@@ -126,6 +132,7 @@ export function createProfilerStore(emit: EmitFn) {
 		commits.$ = [];
 		selected.$ = 0;
 		isRecording.$ = false;
+		recordingStartTime.$ = 0;
 		emit("clear-profiling", null);
 	};
 
@@ -136,10 +143,12 @@ export function createProfilerStore(emit: EmitFn) {
 		clear,
 		currentCommit,
 		slowestCommit,
+		slowestNode,
 		commits,
 		selected,
 		selectedNodeData,
 		selectedNode,
 		isRecording,
+		recordingStartTime,
 	};
 }

@@ -15,6 +15,7 @@ export function TimelineBar() {
 	const activeModal = useObserver(() => store.modal.active.$);
 	const isRecording = useObserver(() => store.profiler.isRecording.$);
 	const selectedCommit = useObserver(() => store.profiler.selected.$);
+	const maxDuration = useObserver(() => store.profiler.slowestCommit.$);
 
 	const onRecord = useCallback(() => {
 		store.profiler.isRecording.$ = !store.profiler.isRecording.$;
@@ -63,7 +64,13 @@ export function TimelineBar() {
 			</div>
 			{commits.length > 0 && <ActionSeparator />}
 			<CommitTimeline
-				items={commits.map(x => 40)}
+				items={commits.map(x => {
+					const percent = Math.max(
+						0,
+						(100 / maxDuration) * (x.length > 0 ? x[0].duration : 0),
+					);
+					return percent;
+				})}
 				selected={selectedCommit}
 				onChange={onCommitChange}
 			/>

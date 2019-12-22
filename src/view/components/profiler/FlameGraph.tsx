@@ -10,6 +10,7 @@ import {
 	useEffect,
 } from "preact/hooks";
 import { formatTime } from "./util";
+import { getGradient } from "./data/gradient";
 
 const ROW_HEIGHT = 20;
 
@@ -25,9 +26,15 @@ export function FlameGraph() {
 	const current = useObserver(() => store.profiler.selectedNodeData.$);
 	const currentIndex = useObserver(() => store.profiler.selectedNode.$);
 	const displayType = useObserver(() => store.profiler.displayType.$);
+	const maxDuration = useObserver(() => store.profiler.slowestNode.$);
 	const [width, setWidth] = useState(0);
 
-	const totalDuration = current !== null ? current.duration : 0;
+	const totalDuration =
+		current !== null
+			? displayType === DisplayType.FLAMEGRAPH
+				? current.duration
+				: current.selfDuration
+			: 0;
 	const step = width / (totalDuration || 1);
 
 	const ref = useRef<HTMLDivElement>();
@@ -97,15 +104,17 @@ export function FlameGraph() {
 					nodeWidth = !fullWidth ? node.duration * step - 1 : width;
 				} else if (displayType === DisplayType.RANKED) {
 					y = i * (ROW_HEIGHT - 2) + i;
-					nodeWidth = !fullWidth ? node.duration * step - 1 : width;
+					nodeWidth = !fullWidth ? node.selfDuration * step - 1 : width;
 				}
+
+				const color = getGradient(node.selfDuration / maxDuration);
 
 				return (
 					<div
 						key={node.id}
 						class={s.node}
 						onClick={() => onSelect(i)}
-						style={`width: ${nodeWidth}px; transform: translate3d(${x}px,${y}px,0)`}
+						style={`width: ${nodeWidth}px; transform: translate3d(${x}px,${y}px,0); background: ${color}`}
 					>
 						{node.name} ({formatTime(node.selfDuration)} of{" "}
 						{formatTime(node.duration)})

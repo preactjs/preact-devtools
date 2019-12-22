@@ -2,6 +2,7 @@ import { h } from "preact";
 import { useState, useCallback } from "preact/hooks";
 import { ArrowBack, ArrowForward } from "../icons";
 import s from "./CommitTimeline.css";
+import { getGradient } from "./data/gradient";
 
 export interface CommitTimelineProps {
 	selected: number;
@@ -38,14 +39,16 @@ export function CommitTimeline(props: CommitTimelineProps) {
 				<ArrowBack />
 			</button>
 			<div class={s.items}>
-				{items.map((x, i) => (
-					<CommitItem
-						key={x}
-						onClick={() => onChange(i)}
-						selected={i === selected}
-						percent={x}
-					/>
-				))}
+				{items.map((x, i) => {
+					return (
+						<CommitItem
+							key={x}
+							onClick={() => onChange(i)}
+							selected={i === selected}
+							percent={x}
+						/>
+					);
+				})}
 			</div>
 			<button
 				onClick={onNext}
@@ -67,8 +70,8 @@ export interface CommitItem {
 
 export function CommitItem(props: CommitItem) {
 	const { percent } = props;
-	const weight = percent > 25 ? 2 : percent > 50 ? 3 : percent > 75 ? 4 : 1;
 	const top = Math.max(20, percent);
+	const color = getGradient(percent / 100);
 
 	return (
 		<div
@@ -79,8 +82,7 @@ export function CommitItem(props: CommitItem) {
 		>
 			<div
 				class={s.itemInner}
-				data-weight={weight}
-				style={`top: calc(100% - ${top}%)`}
+				style={`background: ${color}; top: calc(100% - ${top}%)`}
 			/>
 		</div>
 	);

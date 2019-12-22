@@ -7,6 +7,7 @@ import { useStore, useObserver } from "../../store/react-bindings";
 export function CommitInfo() {
 	const store = useStore();
 	const commit = useObserver(() => store.profiler.currentCommit.$);
+	const recordStart = useObserver(() => store.profiler.recordingStartTime.$);
 
 	if (commit === null || commit.length === 0) {
 		return null;
@@ -18,7 +19,9 @@ export function CommitInfo() {
 		<SidebarPanel title="Commit information" empty="None">
 			<dl class={s.list}>
 				<dt class={s.title}>Committed at:</dt>
-				<dd class={s.value}>{root ? formatTime(root.startTime) : "-"}</dd>
+				<dd class={s.value}>
+					{root ? formatTime(root.startTime - recordStart) : "-"}
+				</dd>
 				<br />
 				<dt class={s.title}>Render duration:</dt>
 				<dd class={s.value}>{root ? formatTime(root.duration) : "-"}</dd>

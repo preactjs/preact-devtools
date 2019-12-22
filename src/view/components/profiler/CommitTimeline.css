@@ -17,7 +17,9 @@
 	display: flex;
 	margin: 0 0rem;
 	min-height: 1rem;
-	height: calc(100% - 1rem);
+	height: 100%;
+	padding-top: 0.25rem;
+	padding-bottom: 0.25rem;
 }
 
 .item {
@@ -37,10 +39,10 @@
 
 .item[data-selected]::after {
 	content: "";
-	height: 0.125rem;
+	height: 0.1875rem;
 	width: 100%;
 	position: absolute;
-	top: calc(100% + 0.125rem);
+	top: calc(100% + 0.0625rem);
 	left: 0;
 	background: var(--color-selected-bg);
 }
@@ -50,19 +52,6 @@
 	bottom: 0;
 	left: 0;
 	right: 0;
-}
-
-.itemInner[data-weight="1"] {
-	background: var(--color-profiler-gradient-1);
-}
-.itemInner[data-weight="2"] {
-	background: var(--color-profiler-gradient-2);
-}
-.itemInner[data-weight="3"] {
-	background: var(--color-profiler-gradient-3);
-}
-.itemInner[data-weight="4"] {
-	background: var(--color-profiler-gradient-4);
 }
 
 .navBtn {
