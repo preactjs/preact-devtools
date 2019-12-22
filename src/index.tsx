@@ -57,48 +57,9 @@ wrapper.appendChild(container);
 wrapper.appendChild(devtools);
 container.appendChild(examples10);
 
-// Radio
-const radio = `
-	<form>
-		<select id="devtools-type">
-			<option value="elements">Elements</option>
-			<option value="profiler">Profiler</option>
-		</select>
-	</form>
-`;
-
-devtools.innerHTML = radio;
-
-const devtoolsInner = document.createElement("div");
-devtoolsInner.style.cssText = `
-	z-index: 999;
-	position: relative;
-`;
-devtools.appendChild(devtoolsInner);
-
 // Devtools, must be the first one to be initialised
 const { store } = setupFrontendStore(hook);
-const switcher = devtools.querySelector("#devtools-type")!;
-switcher.addEventListener("input", e => {
-	const panel = (e.target as any).value;
-	sessionStorage.setItem("inline-panel", panel);
-	if (panel === "elements") {
-		render(<DevTools store={store} />, devtoolsInner);
-	} else if (panel === "profiler") {
-		render(<Profiler store={store} />, devtoolsInner);
-	}
-});
-
-const panel = sessionStorage.getItem("inline-panel") || "elements";
-renderInline(store, panel);
-
-function renderInline(store: any, panel: string) {
-	if (panel === "elements") {
-		render(<DevTools store={store} />, devtoolsInner);
-	} else if (panel === "profiler") {
-		render(<Profiler store={store} />, devtoolsInner);
-	}
-}
+render(<DevTools store={store} />, devtools);
 
 // Preact 10 examples
 initPreact10(hook);

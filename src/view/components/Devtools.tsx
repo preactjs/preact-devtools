@@ -1,34 +1,60 @@
-import { h } from "preact";
-import { TreeView } from "./TreeView";
-import { Sidebar } from "./sidebar/Sidebar";
-import s from "./Devtools.css";
-import { TreeBar } from "./TreeBar";
+import { h, Fragment } from "preact";
 import { AppCtx, EmitCtx } from "../store/react-bindings";
-import { ModalRenderer } from "./Modals";
 import { Store } from "../store/types";
+import { Elements } from "./elements/Elements";
+import { Profiler } from "./profiler/Profiler";
+import { useState } from "preact/hooks";
+import { SmallTab, SmallTabGroup } from "./profiler/Tabs";
+import s from "./Devtools.css";
 import { ThemeSwitcher } from "./ThemeSwitcher";
-import { SidebarActions } from "./sidebar/SidebarActions";
+
+export enum Panel {
+	ELEMENTS = "ELEMENTS",
+	PROFILER = "PROFILER",
+}
 
 export function DevTools(props: { store: Store }) {
+	const [panel, setPanel] = useState<Panel>(Panel.ELEMENTS);
+
+	const showElements = panel === Panel.ELEMENTS;
+	const showProfiler = panel === Panel.PROFILER;
+
 	return (
 		<EmitCtx.Provider value={props.store.emit}>
 			<AppCtx.Provider value={props.store}>
-				<div class={s.root + " " + s.theme}>
-					<ThemeSwitcher />
-					<div class={s.componentActions}>
-						<TreeBar />
+				<Fragment>
+					<div class={`${s.theme} ${s.root}`}>
+						<ThemeSwitcher />
+						<SmallTabGroup class={s.switcher}>
+							<div class={s.switcherInner}>
+								<SmallTab
+									onClick={setPanel as any}
+									checked={showElements}
+									name="root-panel"
+									value={Panel.ELEMENTS}
+								>
+									Elements
+								</SmallTab>
+								<SmallTab
+									onClick={setPanel as any}
+									checked={showProfiler}
+									name="root-panel"
+									value={Panel.PROFILER}
+								>
+									Profiler
+								</SmallTab>
+							</div>
+							<a
+								class={s.bugLink}
+								href="https://github.com/preactjs/preact-devtools/issues"
+							>
+								Report a bug
+							</a>
+						</SmallTabGroup>
+						{showElements && <Elements />}
+						{showProfiler && <Profiler />}
 					</div>
-					<div class={s.components}>
-						<TreeView />
-					</div>
-					<div class={s.sidebarActions}>
-						<SidebarActions />
-					</div>
-					<div class={s.sidebar}>
-						<Sidebar />
-					</div>
-					<ModalRenderer />
-				</div>
+				</Fragment>
 			</AppCtx.Provider>
 		</EmitCtx.Provider>
 	);

@@ -2,8 +2,9 @@
 	height: 100%;
 	display: grid;
 	grid-template-columns: auto 35%;
-	grid-template-rows: 2.25rem 1fr;
+	grid-template-rows: 1.625rem 2.25rem 1fr;
 	grid-template-areas:
+		"switcher switcher"
 		"treeActions sidebarActions"
 		"tree sidebar";
 }
@@ -35,6 +36,7 @@
 	--color-inactive-child-bg: #e9e1f8;
 	--color-hover: #e9e1f8;
 	--color-border: #dedede;
+	--color-dim-border: #dedede;
 	--color-text-empty: #444;
 	--color-button-active: #7245c7;
 	--color-modal-backdrop: rgba(197, 197, 197, 0.8);
@@ -90,6 +92,7 @@
 	--color-inactive-child-bg: #e9e1f8;
 	--color-hover: #3a3a3a;
 	--color-border: #575757;
+	--color-dim-border: #474747;
 	--color-text-empty: #999;
 	--color-button-active: #d2adff;
 	--color-sidebar-title: #c5c5c5;
@@ -140,6 +143,26 @@
 	--color-profiler-gradient-7: #dfba57;
 	--color-profiler-gradient-8: #efbb49;
 	--color-profiler-gradient-9: #febc38;
+}
+
+.switcher {
+	border-bottom: 0.0625rem solid var(--color-dim-border);
+	display: flex;
+	flex-direction: row;
+	justify-content: space-between;
+	grid-area: switcher;
+	height: 1.625rem;
+}
+
+.switcherInner {
+	display: flex;
+}
+
+.bugLink {
+	margin-right: 0.25rem;
+	color: var(--color-element-text);
+	font-size: 0.8rem;
+	text-decoration: none;
 }
 
 .componentActions {

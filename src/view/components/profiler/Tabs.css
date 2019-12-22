@@ -1,3 +1,35 @@
+/* Tab Group */
+.group {
+	display: flex;
+	align-items: center;
+}
+
+/* Small Tab */
+.root {
+	cursor: pointer;
+	height: 100%;
+	display: flex;
+}
+
+.label {
+	font-size: 0.85rem;
+	display: flex;
+	align-items: center;
+	padding: 0.2rem 0.5rem;
+	position: relative;
+}
+
+.input:checked + .label::after {
+	content: "";
+	position: absolute;
+	bottom: 0;
+	left: 0;
+	right: 0;
+	height: 0.125rem;
+	background: var(--color-selected-bg);
+}
+
+/* IconTab */
 .iconRoot {
 	cursor: pointer;
 	height: 100%;
