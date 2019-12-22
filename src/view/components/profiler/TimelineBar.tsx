@@ -49,6 +49,7 @@ export function TimelineBar() {
 			</div>
 			<ActionSeparator />
 			<FlameGraphMode />
+			<ActionSeparator />
 			<div style="width: 100%" />
 			<div class={s.btnWrapper}>
 				<IconBtn
