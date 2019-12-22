@@ -7,6 +7,7 @@ import { SettingsIcon, RecordIcon, NotInterested } from "../icons";
 import s from "../TreeBar.css";
 import s2 from "./TimelineBar.css";
 import { useCallback } from "preact/hooks";
+import { FlameGraphMode } from "./FlameGraphMode";
 
 export function TimelineBar() {
 	const store = useStore();
@@ -47,6 +48,7 @@ export function TimelineBar() {
 				</IconBtn>
 			</div>
 			<ActionSeparator />
+			<FlameGraphMode />
 			<div style="width: 100%" />
 			<div class={s.btnWrapper}>
 				<IconBtn

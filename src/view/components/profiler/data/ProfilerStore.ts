@@ -60,6 +60,11 @@ mockCommits.push(JSON.parse(JSON.stringify(mockCommits[0])));
 mockCommits[1][0].duration = 50;
 mockCommits[1][0].selfDuration = 48.5;
 
+export enum DisplayType {
+	FLAMEGRAPH = "FLAMEGRAPH",
+	RANKED = "RANKED",
+}
+
 export function createProfilerStore(emit: EmitFn) {
 	const commits = valoo<ProfilerNode[][]>(mockCommits);
 	const selected = valoo(0);
@@ -91,16 +96,31 @@ export function createProfilerStore(emit: EmitFn) {
 		return commits.$[selected.$] || null;
 	});
 
-	const selectedNodeData = watch(() => {
-		if (currentCommit.$ === null) return null;
-		return currentCommit.$[selectedNode.$] || null;
-	});
-
 	const maxDepth = watch(() => {
 		return Math.max(0, ...(currentCommit.$ || []).map(x => x.depth));
 	});
 
+	const ranked = watch(() => {
+		return (currentCommit.$ || [])
+			.slice()
+			.sort((a, b) => b.duration - a.duration);
+	});
+
 	isRecording.on(v => emit(v ? "start-profiling" : "stop-profiling", null));
+
+	const displayType = valoo<DisplayType>(DisplayType.FLAMEGRAPH);
+	displayType.on(() => {
+		selectedNode.$ = 0;
+	});
+
+	const selectedNodeData = watch(() => {
+		if (displayType.$ === DisplayType.FLAMEGRAPH) {
+			if (currentCommit.$ === null) return null;
+			return currentCommit.$[selectedNode.$] || null;
+		} else {
+			return ranked.$[selectedNode.$] || null;
+		}
+	});
 
 	const clear = () => {
 		commits.$ = [];
@@ -110,6 +130,8 @@ export function createProfilerStore(emit: EmitFn) {
 	};
 
 	return {
+		displayType,
+		ranked,
 		maxDepth,
 		clear,
 		currentCommit,
