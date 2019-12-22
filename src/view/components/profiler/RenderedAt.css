@@ -1,0 +1,21 @@
+.item {
+	background: none;
+	border: none;
+	color: var(--color-text);
+	width: 100%;
+	text-align: start;
+	display: flex;
+	align-items: center;
+	font-size: 0.9rem;
+	padding: 0.25rem 0.5rem;
+	cursor: pointer;
+}
+
+.item[data-active] {
+	color: var(--color-selected-text);
+	background: var(--color-selected-bg);
+}
+
+.item span {
+	display: block;
+}

@@ -8,6 +8,7 @@ import { ModalRenderer } from "../Modals";
 import { TimelineBar } from "./TimelineBar";
 import { FlameGraph } from "./FlameGraph";
 import { SidebarHeader } from "./SidebarHeader";
+import { RenderedAt } from "./RenderedAt";
 
 export interface Props {
 	store: Store;
@@ -27,7 +28,9 @@ export function Profiler(props: Props) {
 				<div class={s.sidebarActions}>
 					<SidebarHeader />
 				</div>
-				<div class={s.sidebar}>sidebar</div>
+				<div class={s.sidebar}>
+					<RenderedAt />
+				</div>
 				<ModalRenderer />
 			</div>
 		</AppCtx.Provider>
