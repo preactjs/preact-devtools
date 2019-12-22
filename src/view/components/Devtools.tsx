@@ -48,7 +48,7 @@ export function DevTools(props: { store: Store }) {
 								class={s.bugLink}
 								href="https://github.com/preactjs/preact-devtools/issues"
 							>
-								Report a bug
+								Report bug
 							</a>
 						</SmallTabGroup>
 						{showElements && <Elements />}
