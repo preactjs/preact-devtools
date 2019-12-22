@@ -19,8 +19,8 @@ export interface Renderer {
 	update(id: ID, type: UpdateType, path: ObjPath, value: any): void;
 
 	// Profiler
-	startProfiling(): void;
-	stopProfiling(): void;
+	startProfiling?(): void; // V2
+	stopProfiling?(): void; // V2
 }
 
 export enum Elements {

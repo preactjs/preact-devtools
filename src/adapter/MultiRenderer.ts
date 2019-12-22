@@ -21,10 +21,10 @@ export function createMultiRenderer(
 ): Renderer {
 	return {
 		startProfiling() {
-			renderers.forEach(r => r.startProfiling());
+			renderers.forEach(r => r.startProfiling && r.startProfiling());
 		},
 		stopProfiling() {
-			renderers.forEach(r => r.stopProfiling());
+			renderers.forEach(r => r.stopProfiling && r.stopProfiling());
 		},
 		has(id) {
 			return getRendererByVNodeId(renderers, id) !== null;
