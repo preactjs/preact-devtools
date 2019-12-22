@@ -7,6 +7,11 @@ import { useStore, useObserver } from "../../store/react-bindings";
 export function CommitInfo() {
 	const store = useStore();
 	const commit = useObserver(() => store.profiler.selectedNodeData.$);
+	const commits = useObserver(() => store.profiler.commits.$);
+
+	if (commits.length === 0) {
+		return null;
+	}
 
 	return (
 		<SidebarPanel title="Commit information" empty="None">
