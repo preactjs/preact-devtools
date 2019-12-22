@@ -40,7 +40,7 @@ export function TimelineBar() {
 			<div class={s.btnWrapper}>
 				<IconBtn
 					title="Clear profiling data"
-					disabled={commits.length === 0}
+					disabled={commits.length === 0 || isRecording}
 					onClick={store.profiler.clear}
 				>
 					<NotInterested size="s" />
@@ -52,17 +52,33 @@ export function TimelineBar() {
 				<IconBtn
 					active={activeModal === "settings"}
 					title="Settings"
+					disabled={isRecording}
 					onClick={() => store.modal.open("settings")}
 				>
 					<SettingsIcon size="s" />
 				</IconBtn>
 			</div>
-			<ActionSeparator />
+			{commits.length > 0 && <ActionSeparator />}
 			<CommitTimeline
 				items={commits.map(x => 40)}
 				selected={selectedCommit}
 				onChange={onCommitChange}
 			/>
 		</Actions>
+	);
+}
+
+export function RecordBtn(props: {
+	isRecording?: boolean;
+	onRecord: () => void;
+}) {
+	return (
+		<IconBtn
+			title={!props.isRecording ? "Start Recording" : "Stop Recording"}
+			color={props.isRecording ? "var(--color-record-active)" : undefined}
+			onClick={props.onRecord}
+		>
+			<RecordIcon size="s" />
+		</IconBtn>
 	);
 }

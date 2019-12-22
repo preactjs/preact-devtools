@@ -68,6 +68,13 @@ export function createProfilerStore(emit: EmitFn) {
 
 	const isRecording = valoo(false);
 
+	isRecording.on(v => {
+		if (v) {
+			commits.$ = [];
+			selected.$ = 0;
+		}
+	});
+
 	const slowestCommit = watch(() => {
 		let max = 0;
 		for (let i = 0; i < commits.$.length; i++) {

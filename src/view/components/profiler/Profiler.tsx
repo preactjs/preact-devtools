@@ -9,6 +9,7 @@ import { TimelineBar } from "./TimelineBar";
 import { FlameGraph } from "./FlameGraph";
 import { SidebarHeader } from "./SidebarHeader";
 import { RenderedAt } from "./RenderedAt";
+import { ProfilerInfo } from "./ProfilerInfo";
 
 export interface Props {
 	store: Store;
@@ -23,6 +24,7 @@ export function Profiler(props: Props) {
 					<TimelineBar />
 				</div>
 				<div class={`${s.components} ${s2.flamegraphWrapper}`}>
+					<ProfilerInfo />
 					<FlameGraph />
 				</div>
 				<div class={s.sidebarActions}>
