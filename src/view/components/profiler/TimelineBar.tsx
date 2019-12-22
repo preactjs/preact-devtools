@@ -5,7 +5,6 @@ import { IconBtn } from "../IconBtn";
 import { useStore, useObserver } from "../../store/react-bindings";
 import { SettingsIcon, RecordIcon, NotInterested } from "../icons";
 import s from "../TreeBar.css";
-import s2 from "./TimelineBar.css";
 import { useCallback } from "preact/hooks";
 import { FlameGraphMode } from "./FlameGraphMode";
 
@@ -31,13 +30,7 @@ export function TimelineBar() {
 	return (
 		<Actions>
 			<div class={s.btnWrapper}>
-				<IconBtn
-					title={!isRecording ? "Start Recording" : "Stop Recording"}
-					color={isRecording ? "var(--color-record-active)" : undefined}
-					onClick={onRecord}
-				>
-					<RecordIcon size="s" />
-				</IconBtn>
+				<RecordBtn onRecord={onRecord} isRecording={isRecording} />
 			</div>
 			<div class={s.btnWrapper}>
 				<IconBtn
@@ -85,7 +78,11 @@ export function RecordBtn(props: {
 	return (
 		<IconBtn
 			title={!props.isRecording ? "Start Recording" : "Stop Recording"}
-			color={props.isRecording ? "var(--color-record-active)" : undefined}
+			color={
+				props.isRecording
+					? "var(--color-record-active)"
+					: "var(--color-selected-bg)"
+			}
 			onClick={props.onRecord}
 		>
 			<RecordIcon size="s" />
