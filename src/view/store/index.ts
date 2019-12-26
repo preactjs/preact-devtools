@@ -10,6 +10,7 @@ import { ID, DevNode, Store, Listener, Theme } from "./types";
 import { InspectData } from "../../adapter/adapter/adapter";
 import { debounce } from "../../shells/shared/utils";
 import { createProfilerStore } from "../components/profiler/data/ProfilerStore";
+import { createProfiler2 } from "./commits";
 
 export function createStore(): Store {
 	let listeners: Array<null | Listener> = [];
@@ -56,6 +57,7 @@ export function createStore(): Store {
 	});
 
 	return {
+		profiler2: createProfiler2(),
 		nodeList,
 		inspectData,
 		isPicking,

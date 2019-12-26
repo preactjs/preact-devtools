@@ -1,14 +1,15 @@
 import { flushTable, StringTable, parseTable } from "./string-table";
-import { valoo } from "../view/valoo";
 import { Store } from "../view/store/types";
-import { toSnapshot, parseCommitMessage } from "./debug";
+import { recordProfilerCommit } from "../view/store/commits";
 
 export enum MsgTypes {
 	ADD_ROOT = 1,
-	ADD_VNODE = 2,
+	ADD_VNODE = 2, // Used by Preact 10.1.x
 	REMOVE_VNODE = 3,
-	UPDATE_VNODE_TIMINGS = 4,
+	UPDATE_VNODE_TIMINGS = 4, // Used by Preact 10.1.x
 	REORDER_CHILDREN = 5,
+	UPDATE_VNODE_TIMINGS_V2 = 6,
+	ADD_VNODE_V2 = 7,
 }
 
 // Event Examples:
@@ -24,12 +25,27 @@ export enum MsgTypes {
 //   name
 //   key
 //
+// ADD_VNODE_V2
+//   id
+//   type
+//   parent
+//   owner
+//   name
+//   key
+//   startTime
+//   endTime
+//
 // REMOVE_VNODE
 //   id
 //
 // UPDATE_VNODE_TIMINGS
 //   id
 //   duration
+//
+// UPDATE_VNODE_TIMINGS_V2
+//   id
+//   startTime
+//   endTime
 //
 // REORDER_CHILDREN
 //   id
@@ -65,6 +81,7 @@ export function flush(commit: Commit) {
 // FIXME: Write tests for this function
 export function applyOperations(store: Store, data: number[]) {
 	const rootId = data[0];
+	let commitRootId = -1;
 
 	let i = data[1] + 1;
 	const strings = parseTable(data.slice(1, i + 1));
@@ -75,8 +92,13 @@ export function applyOperations(store: Store, data: number[]) {
 		switch (data[i]) {
 			case MsgTypes.ADD_ROOT:
 				const id = data[i + 1];
+
 				store.roots.$.push(id);
 				i += 1;
+
+				if (commitRootId === -1) {
+					commitRootId = id;
+				}
 				break;
 			case MsgTypes.ADD_VNODE: {
 				const id = data[i + 1];
@@ -109,26 +131,88 @@ export function applyOperations(store: Store, data: number[]) {
 						parent: parentId,
 						type,
 						key,
-						duration: valoo<number>(0),
+						startTime: -1,
+						endTime: -1,
 					});
 				}
 				i += 6;
 				break;
 			}
+			case MsgTypes.ADD_VNODE_V2: {
+				const id = data[i + 1];
+				const type = data[i + 2];
+				const name = strings[data[i + 5] - 1];
+				const key = data[i + 6] > 0 ? strings[data[i + 6] - 1] : "";
+				const startTime = data[i + 7];
+				const endTime = data[i + 8];
+
+				let parentId = data[i + 3];
+
+				if (!store.nodes.$.has(id)) {
+					// Roots have their own id as parentId
+					if (id !== parentId) {
+						const parent = store.nodes.$.get(parentId);
+						if (!parent) {
+							// throw new Error(`Parent node ${parentId} not found in store.`);
+							console.warn(`Parent node ${parentId} not found in store.`);
+							parentId = -1;
+						} else {
+							parent.children.push(id);
+						}
+					}
+
+					let parent = store.nodes.$.get(parentId)!;
+					const depth = parent ? parent.depth + 1 : 1;
+
+					store.nodes.$.set(id, {
+						children: [],
+						depth,
+						id,
+						name,
+						parent: parentId,
+						type,
+						key,
+						startTime,
+						endTime,
+					});
+				}
+				i += 8;
+
+				if (commitRootId === -1) {
+					commitRootId = id;
+				}
+				break;
+			}
 			case MsgTypes.UPDATE_VNODE_TIMINGS: {
 				const id = data[i + 1];
-				const duration = data[i + 2];
-
-				const node = store.nodes.$.get(id)!;
-				if (node) {
-					node.duration.$ = duration;
-				}
 
 				if (id === inspected) {
 					store.actions.inspect(id);
 				}
 
 				i += 2;
+				break;
+			}
+			case MsgTypes.UPDATE_VNODE_TIMINGS_V2: {
+				const id = data[i + 1];
+				const startTime = data[i + 2];
+				const endTime = data[i + 3];
+
+				const node = store.nodes.$.get(id)!;
+				if (node) {
+					node.startTime = startTime;
+					node.endTime = endTime;
+				}
+
+				if (id === inspected) {
+					store.actions.inspect(id);
+				}
+
+				i += 3;
+
+				if (commitRootId === -1) {
+					commitRootId = id;
+				}
 				break;
 			}
 			case MsgTypes.REMOVE_VNODE: {
@@ -176,6 +260,10 @@ export function applyOperations(store: Store, data: number[]) {
 					parent.children = data.slice(i + 3, i + 3 + count);
 				}
 				i = i + 3 + count;
+
+				if (commitRootId === -1) {
+					commitRootId = parentId;
+				}
 				break;
 			}
 		}
@@ -184,6 +272,12 @@ export function applyOperations(store: Store, data: number[]) {
 	// TODO: This triggers rendering twice :S
 	store.roots.update();
 	store.nodes.update();
+
+	// If we are profiling, we'll make a frozen copy of the mutable
+	// elements tree because the profiler can step through time
+	if (store.profiler2.isRecording.$) {
+		recordProfilerCommit(store.nodes.$, store.profiler2, commitRootId, rootId);
+	}
 }
 
 export function applyEvent(store: Store, name: string, data: any) {

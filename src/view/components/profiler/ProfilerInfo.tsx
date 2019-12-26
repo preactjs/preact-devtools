@@ -2,16 +2,11 @@ import { h } from "preact";
 import { useStore, useObserver } from "../../store/react-bindings";
 import s from "./ProfilerInfo.css";
 import { RecordBtn } from "./TimelineBar";
-import { useCallback } from "preact/hooks";
 
 export function ProfilerInfo() {
 	const store = useStore();
-	const isRecording = useObserver(() => store.profiler.isRecording.$);
-	const commits = useObserver(() => store.profiler.commits.$);
-
-	const onClick = useCallback(() => {
-		store.profiler.isRecording.$ = !store.profiler.isRecording.$;
-	}, [store]);
+	const isRecording = useObserver(() => store.profiler2.isRecording.$);
+	const commits = useObserver(() => store.profiler2.commits.$);
 
 	if (isRecording) {
 		return (
@@ -20,7 +15,7 @@ export function ProfilerInfo() {
 				<p class={s.descr}>
 					Click the record button{" "}
 					<span class={s.inlineBtn}>
-						<RecordBtn isRecording={isRecording} onRecord={onClick} />
+						<RecordBtn />
 					</span>{" "}
 					to stop recording.
 				</p>
@@ -33,7 +28,7 @@ export function ProfilerInfo() {
 				<p class={s.descr}>
 					Click the record button{" "}
 					<span class={s.inlineBtn}>
-						<RecordBtn isRecording={isRecording} onRecord={onClick} />
+						<RecordBtn />
 					</span>{" "}
 					to start recording.
 				</p>

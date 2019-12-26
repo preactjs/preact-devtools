@@ -40,14 +40,15 @@ export function getRootDomNode(el: HTMLElement): HTMLElement {
 	return item;
 }
 
-export function useInstance<T extends { destroy?: () => void }>(fn: () => T) {
+export function useInstance<T>(fn: () => T) {
 	const ref = useRef<T>(null as any);
 	const value = ref.current || (ref.current = fn());
 
 	useEffect(
 		() => () => {
-			if (ref.current && ref.current.destroy) {
-				ref.current.destroy();
+			const v = ref.current as any;
+			if (v && typeof v.destroy === "function") {
+				v.destroy();
 			}
 		},
 		[],

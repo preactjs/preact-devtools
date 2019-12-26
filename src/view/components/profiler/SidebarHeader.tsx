@@ -3,13 +3,9 @@ import { Actions } from "../Actions";
 import s from "../sidebar/Sidebar.css";
 import { useStore, useObserver } from "../../store/react-bindings";
 
-export interface ProfilerSidebarHeader {
-	title?: string;
-}
-
-export function SidebarHeader(props: ProfilerSidebarHeader) {
+export function SidebarHeader() {
 	const store = useStore();
-	const selected = useObserver(() => store.profiler.selectedNodeData.$);
+	const selected = useObserver(() => store.profiler2.selectedNode.$);
 
 	return (
 		<Actions class={s.actions}>

@@ -37,7 +37,7 @@ describe("applyEvent", () => {
 		expect(store.nodes.$.get(2)!.name).to.equal("Parent");
 	});
 
-	it("should update timings", () => {
+	it("should do nothing on legacy update timings", () => {
 		const store = createStore();
 		const data = fromSnapshot([
 			"rootId: 1",
@@ -52,9 +52,32 @@ describe("applyEvent", () => {
 			"Update timings 1 duration 2",
 			"Update timings 2 duration 4",
 		]);
+
+		expect(() => applyEvent(store, "operation", data2)).to.not.throw();
+	});
+
+	it("should update timings", () => {
+		const store = createStore();
+		const data = fromSnapshot([
+			"rootId: 1",
+			"Add 1 <Fragment> to parent 1",
+			"Add 2 <Parent> to parent 1",
+		]);
+		applyEvent(store, "operation", data);
+		expect(store.nodes.$.size).to.equal(2);
+
+		const data2 = fromSnapshot([
+			"rootId: 1",
+			"Update timings 1 time 2:5",
+			"Update timings 2 time 3:4",
+		]);
+
 		applyEvent(store, "operation", data2);
-		expect(store.nodes.$.get(1)!.duration.$).to.equal(2);
-		expect(store.nodes.$.get(2)!.duration.$).to.equal(4);
+
+		expect(store.nodes.$.get(1)!.startTime).to.equal(2);
+		expect(store.nodes.$.get(1)!.endTime).to.equal(5);
+		expect(store.nodes.$.get(2)!.startTime).to.equal(3);
+		expect(store.nodes.$.get(2)!.endTime).to.equal(4);
 	});
 
 	it("should remove nodes", () => {

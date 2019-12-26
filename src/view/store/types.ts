@@ -7,6 +7,7 @@ import { createSelectionStore } from "./selection";
 import { Collapser } from "./collapser";
 import { EmitFn } from "../../adapter/hook";
 import { createProfilerStore } from "../components/profiler/data/ProfilerStore";
+import { CommitData, ProfilerState } from "./commits";
 
 export type ID = number;
 
@@ -29,16 +30,18 @@ export interface DevNode {
 	parent: ID;
 	children: ID[];
 
-	// Profiling
-	duration: Observable<number>;
-
-	// Display properties
+	// Display (Elements + Profiler)
 	depth: number;
+
+	// Profiler
+	startTime: number;
+	endTime: number;
 }
 
 export type Theme = "auto" | "light" | "dark";
 
 export interface Store {
+	profiler2: ProfilerState;
 	isPicking: Observable<boolean>;
 	inspectData: Observable<InspectData | null>;
 	roots: Observable<ID[]>;

@@ -4,9 +4,10 @@ import { useStore, useObserver } from "../../store/react-bindings";
 
 export function RenderReasons() {
 	const store = useStore();
-	const commits = useObserver(() => store.profiler.commits.$);
+	const isRecording = useObserver(() => store.profiler2.isRecording.$);
+	const commits = useObserver(() => store.profiler2.commits.$);
 
-	if (commits.length === 0) {
+	if (commits.length === 0 || isRecording) {
 		return null;
 	}
 

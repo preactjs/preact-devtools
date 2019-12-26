@@ -10,6 +10,7 @@ import { Booleans, Complex } from "./DataTypes";
 import { FullWidthHighlighter } from "./Highlighting";
 import { Gradient } from "./Gradient";
 import s from "../../view/components/Devtools.css";
+import { Prime } from "./Prime";
 
 export function initPreact10(hook: DevtoolsHook) {
 	if (hook.attachPreact) {
@@ -36,6 +37,8 @@ export function renderExamples10(node: HTMLElement) {
 				<small>
 					Uncomment all other components so that the vertical scrollbar is gone
 				</small>
+				<p>Primes</p>
+				<Prime max={10000} />
 				<p>Todo list</p>
 				<TodoList />
 				<p>Legacy context</p>

@@ -138,13 +138,25 @@ export function fromSnapshot(events: string[]): number[] {
 				throw new Error("no match: " + ev);
 			}
 		} else if (/^Update\stimings/.test(ev)) {
-			const m = ev.match(/Update\stimings\s(\d+)\s+duration\s+(\d+)/);
-			if (m) {
-				const id = +m[1];
-				const duration = +m[2];
-				operations.push(MsgTypes.UPDATE_VNODE_TIMINGS, id, duration);
+			// V1 api
+			if (/duration/.test(ev)) {
+				const m = ev.match(/Update\stimings\s(\d+)\s+duration\s+(\d+)/);
+				if (m) {
+					const id = +m[1];
+					const duration = +m[2];
+					operations.push(MsgTypes.UPDATE_VNODE_TIMINGS, id, duration);
+				} else {
+					throw new Error("no match: " + ev);
+				}
 			} else {
-				throw new Error("no match: " + ev);
+				const m = ev.match(/Update\stimings\s(\d+)\s+time\s+(\d+):(\d+)/);
+				if (m) {
+					const id = +m[1];
+					const duration = +m[2];
+					operations.push(MsgTypes.UPDATE_VNODE_TIMINGS, id, duration);
+				} else {
+					throw new Error("no match: " + ev);
+				}
 			}
 		} else if (/^Remove/.test(ev)) {
 			const m = ev.match(/Remove\s+(\d+)/);

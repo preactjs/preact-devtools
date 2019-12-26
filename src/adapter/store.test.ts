@@ -35,11 +35,12 @@ describe("Store", () => {
 		// prettier-ignore
 		const event2 = fromSnapshot([
       "rootId: 1",
-      "Update timings 1 duration 12"
+      "Update timings 1 time 12:15"
     ]);
 		applyOperations(store, event2);
 
-		expect(store.nodes.$.get(1)!.duration.$).to.equal(12);
+		expect(store.nodes.$.get(1)!.startTime).to.equal(12);
+		expect(store.nodes.$.get(1)!.endTime).to.equal(15);
 	});
 
 	it("should unmount vnodes", () => {

@@ -66,6 +66,7 @@
 
 	/* Profiling */
 	--color-record-active: #ff5722;
+	--color-profiler-old: #aaa;
 	--color-profiler-gradient-0: #37afa9;
 	--color-profiler-gradient-1: #63b19e;
 	--color-profiler-gradient-2: #80b393;
@@ -133,6 +134,7 @@
 	--color-profiler-gradient-7: #ffc052;
 	--color-profiler-gradient-8: #ff855d;
 	--color-profiler-gradient-9: #ff4c7c; */
+	--color-profiler-old: #aaa;
 	--color-profiler-gradient-0: #37afa9;
 	--color-profiler-gradient-1: #63b19e;
 	--color-profiler-gradient-2: #80b393;
