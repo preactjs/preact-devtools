@@ -23,9 +23,9 @@ export function TodoList() {
 	const [todos, setTodos] = useState<string[]>([
 		"asd",
 		"asdf",
-		"foo",
-		"bob",
-		"rr",
+		// "foo",
+		// "bob",
+		// "rr",
 	]);
 	const [v, setV] = useState("");
 

@@ -2,15 +2,17 @@ import { h, Fragment } from "preact";
 import { AppCtx, EmitCtx } from "../store/react-bindings";
 import { Store } from "../store/types";
 import { Elements } from "./elements/Elements";
-import { Profiler } from "./profiler/Profiler";
+import { Profiler } from "./profiler/components/Profiler";
 import { useState } from "preact/hooks";
-import { SmallTab, SmallTabGroup } from "./profiler/Tabs";
+import { SmallTab, SmallTabGroup } from "./profiler/components/Tabs/Tabs";
 import s from "./Devtools.css";
 import { ThemeSwitcher } from "./ThemeSwitcher";
+import { Settings } from "./settings/Settings";
 
 export enum Panel {
 	ELEMENTS = "ELEMENTS",
 	PROFILER = "PROFILER",
+	SETTINGS = "SETTINGS",
 }
 
 export function DevTools(props: { store: Store }) {
@@ -18,6 +20,7 @@ export function DevTools(props: { store: Store }) {
 
 	const showElements = panel === Panel.ELEMENTS;
 	const showProfiler = panel === Panel.PROFILER;
+	const showSettings = panel === Panel.SETTINGS;
 
 	return (
 		<EmitCtx.Provider value={props.store.emit}>
@@ -43,6 +46,14 @@ export function DevTools(props: { store: Store }) {
 								>
 									Profiler
 								</SmallTab>
+								<SmallTab
+									onClick={setPanel as any}
+									checked={showSettings}
+									name="root-panel"
+									value={Panel.SETTINGS}
+								>
+									Settings
+								</SmallTab>
 							</div>
 							<a
 								class={s.bugLink}
@@ -53,6 +64,7 @@ export function DevTools(props: { store: Store }) {
 						</SmallTabGroup>
 						{showElements && <Elements />}
 						{showProfiler && <Profiler />}
+						{showSettings && <Settings />}
 					</div>
 				</Fragment>
 			</AppCtx.Provider>

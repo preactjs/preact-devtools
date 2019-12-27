@@ -8,7 +8,7 @@ import {
 import { createSimpleBridge } from "./examples/inline-devtools/simple-bridge";
 import { h, render } from "preact";
 import { DevTools } from "./view/components/Devtools";
-import { Profiler } from "./view/components/profiler/Profiler";
+import { Profiler } from "./view/components/profiler/components/Profiler";
 
 function div(id: string) {
 	const el = document.createElement("div");

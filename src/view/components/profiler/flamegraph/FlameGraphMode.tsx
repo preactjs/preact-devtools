@@ -1,17 +1,16 @@
 import { h, Fragment } from "preact";
-import { IconTab } from "../Tabs";
+import { IconTab } from "../components/Tabs/Tabs";
 import { SortIcon, FireIcon } from "../../icons";
-import { DisplayType } from "../data/ProfilerStore";
 import { useStore, useObserver } from "../../../store/react-bindings";
 import { useCallback } from "preact/hooks";
-import { FlamegraphType } from "../../../store/commits";
+import { FlamegraphType } from "../data/commits";
 
 export function FlameGraphMode() {
 	const store = useStore();
-	const type = useObserver(() => store.profiler2.flamegraphType.$);
+	const type = useObserver(() => store.profiler.flamegraphType.$);
 
 	const onClick = useCallback((value: string) => {
-		store.profiler2.flamegraphType.$ = value as any;
+		store.profiler.flamegraphType.$ = value as any;
 	}, []);
 
 	return (
@@ -19,8 +18,8 @@ export function FlameGraphMode() {
 			<IconTab
 				name="flamegraph_mode"
 				icon={<FireIcon />}
-				value={DisplayType.FLAMEGRAPH}
-				checked={type === FlamegraphType.TIMELINE}
+				value={FlamegraphType.FLAMEGRAPH}
+				checked={type === FlamegraphType.FLAMEGRAPH}
 				onClick={onClick}
 			>
 				Flamegraph
@@ -28,7 +27,7 @@ export function FlameGraphMode() {
 			<IconTab
 				name="flamegraph_mode"
 				icon={<SortIcon />}
-				value={DisplayType.RANKED}
+				value={FlamegraphType.RANKED}
 				checked={type === FlamegraphType.RANKED}
 				onClick={onClick}
 			>

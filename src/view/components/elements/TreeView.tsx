@@ -1,15 +1,15 @@
 import { h } from "preact";
-import s from "./Tree.css";
-import { useObserver, useStore } from "../store/react-bindings";
+import s from "./TreeView.css";
+import { useObserver, useStore } from "../../store/react-bindings";
 import { useEffect, useState, useRef, useCallback } from "preact/hooks";
-import { getLastChild } from "./tree/windowing";
-import { useKeyListNav } from "./tree/keyboard";
-import { useSelection } from "../store/selection";
-import { useCollapser } from "../store/collapser";
-import { BackgroundLogo } from "./tree/background-logo";
-import { useSearch } from "../store/search";
-import { scrollIntoView } from "./utils";
-import { ID } from "../store/types";
+import { getLastChild } from "../tree/windowing";
+import { useKeyListNav } from "../tree/keyboard";
+import { useSelection } from "../../store/selection";
+import { useCollapser } from "../../store/collapser";
+import { BackgroundLogo } from "./background-logo";
+import { useSearch } from "../../store/search";
+import { scrollIntoView } from "../utils";
+import { ID } from "../../store/types";
 
 export function TreeView() {
 	const store = useStore();

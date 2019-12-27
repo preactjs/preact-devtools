@@ -5,13 +5,12 @@ import { Sidebar } from "../view/components/sidebar/Sidebar";
 import d from "../view/components/Devtools.css";
 import { IconBtn } from "../view/components/IconBtn";
 import { Picker } from "../view/components/icons";
-import { TreeBar } from "../view/components/TreeBar";
-import { ModalBackdrop, SettingsModal } from "../view/components/Modals";
+import { TreeBar } from "../view/components/elements/TreeBar";
 import { createStore } from "../view/store";
 import { AppCtx, useObserver } from "../view/store/react-bindings";
 import { applyOperations } from "../adapter/events";
 import { fromSnapshot } from "../adapter/debug";
-import { TreeView } from "../view/components/TreeView";
+import { TreeView } from "../view/components/elements/TreeView";
 import { RadioBar } from "../view/components/RadioBar";
 import { TodoList } from "./10/TodoList";
 import { treeStore } from "./treeStore";
@@ -118,23 +117,6 @@ export function StyleGuide() {
 					>
 						show modal
 					</button>
-					<AppCtx.Provider value={store}>
-						{showModal && (
-							<SettingsModal
-								onClose={() => {
-									setShowModal(false);
-									localStorage.removeItem("show-modal");
-								}}
-							/>
-						)}
-					</AppCtx.Provider>
-					<ModalBackdrop
-						active={showModal}
-						onClick={() => {
-							setShowModal(false);
-							localStorage.removeItem("show-modal");
-						}}
-					/>
 					<Headline title="foobar" />
 					<h2>TreeBar</h2>
 					<div style="border: 1px solid #555">

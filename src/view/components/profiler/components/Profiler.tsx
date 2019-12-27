@@ -1,14 +1,13 @@
 import { h, Fragment } from "preact";
-import s from "../Devtools.css";
+import s from "../../Devtools.css";
 import s2 from "./Profiler.css";
-import { ThemeSwitcher } from "../ThemeSwitcher";
-import { ModalRenderer } from "../Modals";
-import { TimelineBar } from "./TimelineBar";
-import { FlameGraph } from "./flamegraph/FlameGraph";
+import { ThemeSwitcher } from "../../ThemeSwitcher";
+import { TimelineBar } from "./TimelineBar/TimelineBar";
+import { FlameGraph } from "../flamegraph/FlameGraph";
 import { SidebarHeader } from "./SidebarHeader";
-import { RenderedAt } from "./RenderedAt";
-import { ProfilerInfo } from "./ProfilerInfo";
-import { CommitInfo } from "./CommitInfo";
+import { RenderedAt } from "./RenderedAt/RenderedAt";
+import { ProfilerInfo } from "./ProfilerInfo/ProfilerInfo";
+import { CommitInfo } from "./CommitInfo/CommitInfo";
 import { RenderReasons } from "./RenderReasons";
 
 export function Profiler() {
@@ -30,7 +29,6 @@ export function Profiler() {
 				<RenderedAt />
 				<CommitInfo />
 			</div>
-			<ModalRenderer />
 		</Fragment>
 	);
 }

@@ -1,9 +1,10 @@
-import { ID, DevNode } from "./types";
-import { Observable, valoo, watch } from "../valoo";
+import { ID, DevNode } from "../../../store/types";
+import { Observable, valoo, watch } from "../../../valoo";
+import { resizeToMin } from "../flamegraph/transform/resizeToMin";
 
 export interface ProfilerNode extends DevNode {
-	duration: number;
 	selfDuration: number;
+	duration: number;
 }
 
 export interface CommitData {
@@ -17,48 +18,65 @@ export interface CommitData {
 	nodes: Map<ID, ProfilerNode>;
 }
 
+/**
+ * The Flamegraph supports these distinct
+ * view modes.
+ */
 export enum FlamegraphType {
-	TIMELINE = "TIMELINE",
+	FLAMEGRAPH = "FLAMEGRAPH",
 	RANKED = "RANKED",
 }
 
 export interface ProfilerState {
+	/**
+	 * Flag that indicates if we are currently
+	 * recording commits to be displayed in the
+	 * profiler.
+	 */
 	isRecording: Observable<boolean>;
-	recStartTime: Observable<number>;
 	commits: Observable<CommitData[]>;
+
+	// Selection
 	activeCommitIdx: Observable<number>;
 	activeCommit: Observable<CommitData | null>;
 	selectedNodeId: Observable<ID>;
 	selectedNode: Observable<ProfilerNode | null>;
+
+	// View state
 	flamegraphType: Observable<FlamegraphType>;
 }
 
-export function createProfiler2(): ProfilerState {
-	const activeCommitIdx = valoo(0);
-	const selectedNodeId = valoo(0);
+/**
+ * Create a new profiler instance. It intentiall doesn't have
+ * any methods, to not go down the OOP rabbit hole.
+ */
+export function createProfiler(): ProfilerState {
 	const commits = valoo<CommitData[]>([]);
 
-	commits.on(v => console.log("cmmits", v));
-
+	// Selection
+	const activeCommitIdx = valoo(0);
+	const selectedNodeId = valoo(0);
 	const activeCommit = watch(() => {
 		return (commits.$.length > 0 && commits.$[activeCommitIdx.$]) || null;
 	});
-
 	const selectedNode = watch(() => {
 		return activeCommit.$ != null
 			? activeCommit.$.nodes.get(selectedNodeId.$) || null
 			: null;
 	});
 
-	const recStartTime = valoo(0);
+	// Recording
 	const isRecording = valoo(false);
 	isRecording.on(v => {
+		// Clear current selection and profiling data when
+		// a new recording starts.
 		if (v) {
 			commits.$ = [];
 			activeCommitIdx.$ = 0;
 			selectedNodeId.$ = 0;
-			recStartTime.$ = performance.now();
 		} else {
+			// Reset selection when recording stopped
+			// and new profiling data was collected.
 			if (commits.$.length > 0) {
 				selectedNodeId.$ = commits.$[0].rootId;
 			}
@@ -66,14 +84,13 @@ export function createProfiler2(): ProfilerState {
 	});
 
 	// Flamegraph
-	const flamegraphType = valoo(FlamegraphType.TIMELINE);
+	const flamegraphType = valoo(FlamegraphType.FLAMEGRAPH);
 	flamegraphType.on(() => {
 		selectedNodeId.$ = -1;
 	});
 
-	const state: ProfilerState = {
+	return {
 		isRecording,
-		recStartTime,
 		commits,
 		activeCommitIdx,
 		activeCommit,
@@ -81,18 +98,10 @@ export function createProfiler2(): ProfilerState {
 		selectedNode,
 		flamegraphType,
 	};
-
-	return state;
-}
-
-export function startProfiling(state: ProfilerState) {
-	state.isRecording.$ = true;
-	state.recStartTime.$ = performance.now();
 }
 
 export function stopProfiling(state: ProfilerState) {
 	state.isRecording.$ = false;
-	state.recStartTime.$ = 0;
 	state.activeCommitIdx.$ = 0;
 	state.selectedNodeId.$ = -1;
 }
@@ -118,17 +127,11 @@ export function recordProfilerCommit(
 
 	// Make shallow copies of each node
 	tree.forEach((node, id) => {
-		const startTime = node.startTime;
-		const endTime = node.endTime;
-
-		const duration = endTime - startTime;
-
 		nodes.set(id, {
-			...node,
-			startTime,
-			endTime,
-			duration,
-			selfDuration: duration, // Will be filled out later
+			// deep clone
+			...JSON.parse(JSON.stringify(node)),
+			duration: node.endTime - node.startTime,
+			selfDuration: -1, // Will be set later
 		});
 
 		// Update maxDepth if needed
@@ -137,15 +140,20 @@ export function recordProfilerCommit(
 		}
 	});
 
+	// Nodes may have a timing duration of 0 due to lack of precision
+	// in high performance timers because of spectre CPU attack vectors.
+	// We'll assign a minimum width to those nodes.
+	resizeToMin(nodes, 0.1);
+
 	// Calculate self-durations
 	// TODO: Optimize this by iterating over a presorted array
 	//   and combining it with the above calculation
 	nodes.forEach(node => {
-		let selfDuration = node.duration;
+		let selfDuration = node.treeEndTime - node.treeStartTime;
 		node.children.forEach(childId => {
 			const child = nodes.get(childId);
 			if (child) {
-				selfDuration -= child.duration;
+				selfDuration = selfDuration - (child.treeEndTime - child.treeStartTime);
 			}
 		});
 
@@ -161,7 +169,7 @@ export function recordProfilerCommit(
 	let duration = 0;
 	const root = nodes.get(rootId);
 	if (root) {
-		duration = root.duration;
+		duration = root.treeEndTime - root.treeStartTime;
 	}
 
 	profiler.commits.update(arr => {

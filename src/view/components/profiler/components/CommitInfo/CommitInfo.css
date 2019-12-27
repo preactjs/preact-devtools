@@ -1,15 +1,15 @@
 .list {
-	margin: 0.25rem 0 0 0.75rem;
+	margin: 0 0 0 0.75rem;
 }
 
 .title {
 	display: inline-block;
-	font-size: 0.9rem;
-	margin-bottom: 0.25rem;
+	font-size: 0.8rem;
+	margin-bottom: 0.15rem;
 }
 
 .value {
-	color: white;
+	color: var(--color-text);
 	display: inline-block;
 	margin: 0 0 0 0.5rem;
 }

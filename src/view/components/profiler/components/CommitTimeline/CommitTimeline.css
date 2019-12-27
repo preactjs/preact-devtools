@@ -67,3 +67,34 @@
 .navBtn[disabled] {
 	color: var(--color-disabled);
 }
+
+.item[data-weight="0"] .itemInner {
+	background: var(--color-profiler-gradient-0);
+}
+.item[data-weight="1"] .itemInner {
+	background: var(--color-profiler-gradient-1);
+}
+.item[data-weight="2"] .itemInner {
+	background: var(--color-profiler-gradient-2);
+}
+.item[data-weight="3"] .itemInner {
+	background: var(--color-profiler-gradient-3);
+}
+.item[data-weight="4"] .itemInner {
+	background: var(--color-profiler-gradient-4);
+}
+.item[data-weight="5"] .itemInner {
+	background: var(--color-profiler-gradient-5);
+}
+.item[data-weight="6"] .itemInner {
+	background: var(--color-profiler-gradient-6);
+}
+.item[data-weight="7"] .itemInner {
+	background: var(--color-profiler-gradient-7);
+}
+.item[data-weight="8"] .itemInner {
+	background: var(--color-profiler-gradient-8);
+}
+.item[data-weight="9"] .itemInner {
+	background: var(--color-profiler-gradient-9);
+}

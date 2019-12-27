@@ -392,8 +392,10 @@ export function mount(
 			9999, // owner
 			getStringId(commit.strings, getDisplayName(vnode, config)),
 			vnode.key ? getStringId(commit.strings, vnode.key) : 0,
-			vnode.startTime || 0,
-			vnode.endTime || 0,
+			// Multiply, because operations array only supports integers
+			// and would otherwise cut off floats
+			(vnode.startTime || 0) * 1000,
+			(vnode.endTime || 0) * 1000,
 		);
 
 		ancestorId = id;
@@ -466,8 +468,8 @@ export function update(
 	commit.operations.push(
 		MsgTypes.UPDATE_VNODE_TIMINGS_V2,
 		id,
-		vnode.startTime || 0,
-		vnode.endTime || 0,
+		(vnode.startTime || 0) * 1000,
+		(vnode.endTime || 0) * 1000,
 	);
 
 	const oldVNode = ids.getVNode(id);

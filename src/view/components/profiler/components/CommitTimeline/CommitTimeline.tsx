@@ -1,8 +1,8 @@
 import { h } from "preact";
 import { useState, useCallback } from "preact/hooks";
-import { ArrowBack, ArrowForward } from "../icons";
+import { ArrowBack, ArrowForward } from "../../../icons";
 import s from "./CommitTimeline.css";
-import { getGradient } from "./data/gradient";
+import { getGradient } from "../../data/gradient";
 
 export interface CommitTimelineProps {
 	selected: number;
@@ -70,7 +70,7 @@ export interface CommitItem {
 
 export function CommitItem(props: CommitItem) {
 	const { percent } = props;
-	const top = Math.max(20, Math.min(98, percent));
+	const top = 100 - Math.max(20, Math.min(98, percent));
 	const color = getGradient(percent / 100);
 
 	return (
@@ -78,12 +78,10 @@ export function CommitItem(props: CommitItem) {
 			data-e2e="commit-item"
 			class={s.item}
 			data-selected={props.selected}
+			data-weight={color}
 			onClick={props.onClick}
 		>
-			<div
-				class={s.itemInner}
-				style={`background: ${color}; top: calc(100% - ${top}%)`}
-			/>
+			<div class={s.itemInner} style={`top: ${top}%`} />
 		</div>
 	);
 }

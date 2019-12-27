@@ -12,7 +12,6 @@ export function Prime(props: { max: number }) {
 }
 
 function getPrimes(max: number) {
-	console.time();
 	var sieve = [],
 		i,
 		j,
@@ -26,6 +25,5 @@ function getPrimes(max: number) {
 			}
 		}
 	}
-	console.timeEnd();
 	return primes;
 }

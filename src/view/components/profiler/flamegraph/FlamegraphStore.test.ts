@@ -1,69 +1,14 @@
 import { expect } from "chai";
-import {
-	createProfiler2,
-	FlamegraphType,
-	ProfilerNode,
-} from "../../../store/commits";
+import { createProfiler, FlamegraphType } from "../data/commits";
 import { createFlameGraphStore } from "./FlamegraphStore";
-import { DevNodeType, ID } from "../../../store/types";
-
-const defaultTree = new Map<ID, ProfilerNode>([
-	[
-		1,
-		{
-			id: 1,
-			key: "",
-			type: DevNodeType.FunctionComponent,
-			startTime: 1,
-			endTime: 25,
-			duration: 25,
-			selfDuration: 5,
-			children: [2, 3],
-			name: "App",
-			parent: 0,
-			depth: 0,
-		},
-	],
-	[
-		2,
-		{
-			id: 2,
-			key: "",
-			type: DevNodeType.FunctionComponent,
-			duration: 5,
-			selfDuration: 5,
-			children: [],
-			name: "Foo",
-			parent: 1,
-			startTime: 5,
-			endTime: 10,
-			depth: 1,
-		},
-	],
-	[
-		3,
-		{
-			id: 3,
-			key: "",
-			type: DevNodeType.FunctionComponent,
-			duration: 15,
-			selfDuration: 15,
-			children: [],
-			name: "Bar",
-			parent: 1,
-			startTime: 10,
-			endTime: 25,
-			depth: 1,
-		},
-	],
-]);
+import { flames } from "./testHelpers";
 
 describe("FlameGraphStore", () => {
-	let profiler: ReturnType<typeof createProfiler2>;
+	let profiler: ReturnType<typeof createProfiler>;
 	let flame: ReturnType<typeof createFlameGraphStore>;
 
 	beforeEach(() => {
-		profiler = createProfiler2();
+		profiler = createProfiler();
 		flame = createFlameGraphStore(profiler);
 		profiler.activeCommitIdx.$ = 0;
 	});
@@ -75,35 +20,248 @@ describe("FlameGraphStore", () => {
 	describe("ranked mode", () => {
 		beforeEach(() => {
 			profiler.flamegraphType.$ = FlamegraphType.RANKED;
-			profiler.selectedNodeId.$ = 1;
+			profiler.commits.on(commits => {
+				if (commits.length > 0) {
+					const list = Array.from(commits[0].nodes.values());
+					let max = list[0]!;
+					for (let i = 0; i < list.length; i++) {
+						const item = list[i];
+						if (max.selfDuration < item.selfDuration) {
+							max = item;
+						}
+					}
+					profiler.selectedNodeId.$ = max.id;
+				}
+			});
 		});
 
 		it("should always set x = 0", () => {
-			profiler.commits.$ = [
-				{
-					rootId: 1,
-					commitRootId: 1,
-					duration: 20,
-					maxSelfDuration: 10,
-					maxDepth: 1,
-					nodes: new Map(defaultTree),
-				},
-			];
+			const tree = flames`
+				App ***************
+				  Foo **   Bar ***
+			`;
+			profiler.commits.$ = [tree.commit];
 			expect(flame.nodes.$.map(x => x.x)).to.deep.equal([0, 0, 0]);
 		});
 
 		it("should rank nodes by selfDuration", () => {
-			profiler.commits.$ = [
+			const tree = flames`
+				App *****************
+				  Foo **   Bar ***
+			`;
+			profiler.commits.$ = [tree.commit];
+			expect(flame.nodes.$.map(x => tree.idMap.get(x.id)!.name)).to.deep.equal([
+				"App",
+				"Bar",
+				"Foo",
+			]);
+		});
+
+		it("should calculate width", () => {
+			const tree = flames`
+					App *****************
+						Foo **   Bar ***
+				`;
+			profiler.commits.$ = [tree.commit];
+			expect(flame.nodes.$.map(x => x.width)).to.deep.equal([1, 0.875, 0.75]);
+		});
+
+		it("should rank nodes by selfDuration #2", () => {
+			const tree = flames`
+				App *****************
+				  Foo **   Bar ******
+			`;
+			profiler.commits.$ = [tree.commit];
+			expect(flame.nodes.$.map(x => tree.idMap.get(x.id)!.name)).to.deep.equal([
+				"Bar",
+				"Foo",
+				"App",
+			]);
+		});
+
+		it("should calculate widths", () => {
+			const tree = flames`
+				App ********************
+				  Foo ****   Bar ******
+			`;
+			profiler.commits.$ = [tree.commit];
+
+			expect(flame.nodes.$.map(x => x.width)).to.deep.equal([1, 0.8, 0.6]);
+		});
+
+		it("should support maximizing nodes", () => {
+			const tree = flames`
+				App *****************
+				  Foo **   Bar ******
+			`;
+			profiler.commits.$ = [tree.commit];
+			profiler.selectedNodeId.$ = 2;
+
+			expect(flame.nodes.$.map(x => tree.idMap.get(x.id)!.name)).to.deep.equal([
+				"Bar",
+				"Foo",
+				"App",
+			]);
+
+			expect(flame.nodes.$.map(x => x.width)).to.deep.equal([
+				1,
+				1,
+				0.8333333333333334,
+			]);
+		});
+	});
+
+	describe("timeline mode", () => {
+		beforeEach(() => {
+			profiler.flamegraphType.$ = FlamegraphType.FLAMEGRAPH;
+			profiler.selectedNodeId.$ = 1;
+		});
+
+		it("should position nodes", () => {
+			const tree = flames`
+				App ********
+				  Foo ****
+				    Bar *
+			`;
+			profiler.commits.$ = [tree.commit];
+
+			const actual = flame.nodes.$.map(x => {
+				return {
+					...x,
+					name: tree.idMap.get(x.id)!.name,
+				};
+			});
+
+			expect(actual).to.deep.equal([
 				{
-					rootId: 1,
-					commitRootId: 1,
-					duration: 20,
-					maxSelfDuration: 10,
-					maxDepth: 1,
-					nodes: new Map(defaultTree),
+					id: 1,
+					name: "App",
+					x: 0,
+					row: 0,
+					width: 1,
+					color: "var(--color-profiler-gradient-3)",
 				},
-			];
-			expect(flame.nodes.$.map(x => x.id)).to.deep.equal([3, 1, 2]);
+				{
+					id: 2,
+					name: "Foo",
+					x: 20,
+					row: 1,
+					width: 0.6666666666666666,
+					color: "var(--color-profiler-gradient-2)",
+				},
+				{
+					id: 3,
+					name: "Bar",
+					x: 40,
+					row: 2,
+					width: 0.4166666666666667,
+					color: "var(--color-profiler-gradient-4)",
+				},
+			]);
+		});
+
+		it("should position with maximized nodes", () => {
+			const tree = flames`
+				App ********
+				  Foo ****
+				    Bar *
+			`;
+			profiler.commits.$ = [tree.commit];
+			profiler.selectedNodeId.$ = 2;
+
+			const actual = flame.nodes.$.map(x => {
+				return {
+					...x,
+					name: tree.idMap.get(x.id)!.name,
+				};
+			});
+
+			expect(actual).to.deep.equal([
+				{
+					id: 1,
+					name: "App",
+					x: 0,
+					row: 0,
+					width: 1,
+					color: "var(--color-profiler-gradient-5)",
+				},
+				{
+					id: 2,
+					name: "Foo",
+					x: 0,
+					row: 1,
+					width: 1,
+					color: "var(--color-profiler-gradient-3)",
+				},
+				{
+					id: 3,
+					name: "Bar",
+					x: 20,
+					row: 2,
+					width: 0.625,
+					color: "var(--color-profiler-gradient-6)",
+				},
+			]);
+		});
+
+		it("should position outside node when maximized", () => {
+			const tree = flames`
+				App ***************************
+				  Foo ****  Bob **   Boof ***
+				    Bar *
+			`;
+			profiler.commits.$ = [tree.commit];
+			profiler.selectedNodeId.$ = tree.byName("Bob")!.id;
+
+			const actual = flame.nodes.$.map(x => {
+				return {
+					...x,
+					name: tree.idMap.get(x.id)!.name,
+				};
+			});
+
+			expect(actual).to.deep.equal([
+				{
+					id: 1,
+					name: "App",
+					x: 0,
+					row: 0,
+					width: 1,
+					color: "var(--color-profiler-gradient-0)",
+				},
+				{
+					id: 2,
+					name: "Foo",
+					x: 0,
+					row: 1,
+					width: 1.2,
+					color: "var(--color-profiler-gradient-0)",
+				},
+				{
+					id: 3,
+					name: "Bar",
+					x: 20,
+					row: 2,
+					width: 0.625,
+					color: "var(--color-profiler-gradient-0)",
+				},
+				{
+					id: 4,
+					name: "Bob",
+					x: 20,
+					row: 2,
+					width: 0.625,
+					color: "var(--color-profiler-gradient-0)",
+				},
+				{
+					id: 5,
+					name: "Boof",
+					x: 20,
+					row: 2,
+					width: 0.625,
+					color: "var(--color-profiler-gradient-0)",
+				},
+			]);
 		});
 	});
 });

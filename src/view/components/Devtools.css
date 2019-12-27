@@ -26,6 +26,7 @@
 	--color-bg: white;
 	--color-text: #333;
 	--color-disabled: #dedede;
+	--color-panelbar-bg: #f7f7f7;
 	--color-selected-bg: #8058ca;
 	--color-selected-text: white;
 	--color-selected-inactive-bg: gray;
@@ -66,7 +67,7 @@
 
 	/* Profiling */
 	--color-record-active: #ff5722;
-	--color-profiler-old: #aaa;
+	--color-profiler-old: #d0d0d0;
 	--color-profiler-gradient-0: #37afa9;
 	--color-profiler-gradient-1: #63b19e;
 	--color-profiler-gradient-2: #80b393;
@@ -83,6 +84,7 @@
 	--color-bg: #242424;
 	--color-text: #b0b0b0;
 	--color-disabled: #575757;
+	--color-panelbar-bg: #373737;
 	--color-selected-bg: #ae80ff;
 	--color-selected-text: white;
 	--color-selected-inactive-bg: gray;
@@ -154,6 +156,7 @@
 	justify-content: space-between;
 	grid-area: switcher;
 	height: 1.625rem;
+	background: var(--color-panelbar-bg);
 }
 
 .switcherInner {

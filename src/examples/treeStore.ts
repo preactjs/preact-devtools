@@ -55,6 +55,8 @@ export const treeStore = () => {
 			type: DevNodeType.ClassComponent,
 			startTime: 0,
 			endTime: 0,
+			treeStartTime: 0,
+			treeEndTime: 0,
 		};
 
 		if (store.nodes.$.has(parent)) {

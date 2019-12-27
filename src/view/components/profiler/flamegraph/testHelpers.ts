@@ -1,5 +1,6 @@
 import { ID, DevNodeType } from "../../../store/types";
-import { ProfilerNode, CommitData } from "../../../store/commits";
+import { ProfilerNode, CommitData } from "../data/commits";
+import { sortTimeline } from "./FlamegraphStore";
 
 /**
  * Parse a visual flamegraph DSL into a `ProfilerNode` tree. Each
@@ -71,14 +72,16 @@ export function flames(
 			const node: ProfilerNode = {
 				depth: i,
 				key: "",
-				endTime: startTime + duration,
-				parent: 0, // FIXME
-				startTime,
+				parent: 0,
 				type:
 					name[0].toUpperCase() === name[0]
 						? DevNodeType.FunctionComponent
 						: DevNodeType.Element,
-				duration: duration,
+				startTime,
+				endTime: startTime + duration,
+				treeStartTime: startTime,
+				treeEndTime: startTime + duration,
+				duration,
 				selfDuration: duration,
 				children: [],
 				id: id++,
@@ -88,7 +91,7 @@ export function flames(
 			lastSiblingsNodes.forEach(child => {
 				if (
 					node.startTime <= child.startTime &&
-					node.startTime + node.duration > child.startTime
+					node.endTime > child.startTime
 				) {
 					node.children.push(child.id);
 				}
@@ -110,11 +113,7 @@ export function flames(
 		lastSiblingsNodes = lineNodes.reverse();
 	}
 
-	nodes.sort((a, b) => {
-		const time = a.startTime - b.startTime;
-		// Use depth as fallback if startTime is equal
-		return time === 0 ? a.depth - b.depth : time;
-	});
+	nodes.sort(sortTimeline);
 
 	// Rebuild ids based on sort order
 	const ids = new Map<number, number>();
@@ -149,6 +148,8 @@ export function flames(
 	nodes.forEach(node => {
 		node.startTime = node.startTime * 10;
 		node.endTime = node.endTime * 10;
+		node.treeStartTime = node.treeStartTime * 10;
+		node.treeEndTime = node.treeEndTime * 10;
 		node.duration = node.duration * 10;
 		node.selfDuration = node.selfDuration * 10;
 	});

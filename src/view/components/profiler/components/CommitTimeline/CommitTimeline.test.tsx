@@ -1,6 +1,6 @@
 import { h } from "preact";
 import { expect } from "chai";
-import { renderTest } from "../DataInput/DataInput.test";
+import { renderTest } from "../../../DataInput/DataInput.test";
 import { CommitTimeline } from "./CommitTimeline";
 import { fireEvent } from "@testing-library/preact";
 

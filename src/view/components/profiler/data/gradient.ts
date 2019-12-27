@@ -1,26 +1,15 @@
-export const gradient = [
-	"var(--color-profiler-gradient-0)",
-	"var(--color-profiler-gradient-1)",
-	"var(--color-profiler-gradient-2)",
-	"var(--color-profiler-gradient-3)",
-	"var(--color-profiler-gradient-4)",
-	"var(--color-profiler-gradient-5)",
-	"var(--color-profiler-gradient-6)",
-	"var(--color-profiler-gradient-7)",
-	"var(--color-profiler-gradient-8)",
-	"var(--color-profiler-gradient-9)",
-];
+import { normalize } from "../flamegraph/FlamegraphStore";
 
 export function getGradient(n: number) {
-	const max = gradient.length - 1;
+	const max = 9; // Amount of colors, see css variables
 	let i = 0;
 	if (!isNaN(n)) {
 		if (!isFinite(n)) {
 			i = max;
 		} else {
-			i = Math.max(0, Math.min(max, n)) * max;
+			i = Math.round(normalize(max, 0, n));
 		}
 	}
 
-	return gradient[Math.round(i)];
+	return i;
 }

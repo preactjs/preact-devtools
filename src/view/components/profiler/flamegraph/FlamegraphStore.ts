@@ -1,6 +1,11 @@
 import { valoo, watch } from "../../../valoo";
-import { ProfilerState, FlamegraphType } from "../../../store/commits";
+import { ProfilerState, FlamegraphType, ProfilerNode } from "../data/commits";
 import { getGradient } from "../data/gradient";
+import { ID } from "../../../store/types";
+import { layoutRanked } from "./modes/ranked";
+import { layoutTimeline } from "./modes/flamegraph";
+import { focusNode, NodeTransform } from "./transform/focusNode";
+import { padNodes } from "./transform/pad";
 
 /**
  * The minimum width of a node inside the flamegraph.
@@ -16,92 +21,61 @@ export const MIN_WIDTH = 6;
 export const ROW_HEIGHT = 20;
 
 export function createFlameGraphStore(profiler: ProfilerState) {
-	const canvasWidth = valoo(0);
-
-	const nodes = watch(() => {
+	const layoutNodes = watch(() => {
 		const commit = profiler.activeCommit.$;
 		const current = profiler.selectedNode.$;
 
-		if (commit === null || !current) {
+		if (commit === null) {
 			return [];
 		}
-		const root = commit.nodes.get(commit.rootId)!;
-		const commitRoot = commit.nodes.get(commit.commitRootId)!;
-
-		const viewMode = profiler.flamegraphType.$;
-		const isRanked = viewMode === FlamegraphType.RANKED;
 
 		const items = flattenNodeTree(commit.nodes, commit.rootId);
+		console.log(items);
 
-		if (isRanked) {
-			items.sort((a, b) => b.selfDuration - a.selfDuration);
+		const viewMode = profiler.flamegraphType.$;
+		let nodes: NodeTransform[] = [];
+		if (viewMode === FlamegraphType.RANKED) {
+			nodes = layoutRanked(items);
+		} else if (viewMode === FlamegraphType.FLAMEGRAPH) {
+			nodes = layoutTimeline(items);
 
-			items.forEach(x => {
-				if (x.startTime < commit.nodes.get(commit.commitRootId)!.startTime) {
-					console.log("OLD", x.name);
-				}
+			// Normalize timeline if it has an offset
+			const offset = nodes.length > 0 ? nodes[0].x : 0;
+			nodes = nodes.map(node => {
+				return { ...node, x: node.x - offset };
 			});
 		}
 
-		const totalDuration = isRanked ? commit.maxSelfDuration : commit.duration;
-		const currentIdx = items.findIndex(x => x.id === current.id);
+		nodes = padNodes(nodes, 0.1);
 
-		return items.map((node, i) => {
-			let x = 0;
-			let y = 0;
-			let width = 0;
+		if (nodes.length > 0) {
+			nodes = focusNode(nodes, current === null ? nodes[0].id : current.id);
+		}
 
-			// Root nodes + nodes that include and preceed
-			// the current selection, span over the full width
-			const isFull = isRanked ? i < currentIdx : current.depth >= node.depth;
+		return nodes;
+	});
 
-			// Ranked view mode
-			if (isRanked) {
-				// The x coordinate is always 0 and because all
-				// nodes are ordered from top to bottom.
-				x = 0;
-				y = i * ROW_HEIGHT + node.depth;
-				width = isFull ? totalDuration : node.selfDuration;
-			} else {
-				// Timeline view mode
-				if (!isFull) {
-					// Check if it's outside of the canvas
-					if (node.startTime > current.startTime) {
-						x = width;
-					} else if (
-						node.startTime < current.startTime &&
-						node.startTime + node.duration < current.startTime
-					) {
-						x = -(node.startTime - node.duration);
-					}
-				} else {
-					// Calculate new start time by subtracting maximized node's start time
-					const newStart =
-						node.startTime - (current !== null ? current.startTime : 0);
+	const colors = watch(() => {
+		const state = new Map<ID, number>();
+		const commit = profiler.activeCommit.$;
+		if (commit !== null) {
+			const root = commit.commitRootId;
 
-					x = newStart;
-				}
-			}
+			const children = flattenNodeTree(commit.nodes, root);
+			children.forEach(child => {
+				state.set(
+					child.id,
+					getGradient(commit.maxSelfDuration / (child.selfDuration || 1)),
+				);
+			});
+		}
 
-			// Ensure that even small components are visible
-			width = Math.max(MIN_WIDTH, width);
-
-			return {
-				id: node.id,
-				x,
-				y,
-				width,
-				color:
-					node.startTime > commitRoot.startTime
-						? getGradient(node.selfDuration / totalDuration)
-						: "var(--color-profiler-old)",
-			};
-		});
+		return state;
 	});
 
 	return {
-		canvasWidth,
-		nodes,
+		nodes: layoutNodes,
+		colors,
 	};
 }
 
@@ -131,4 +105,14 @@ export function flattenNodeTree<K, T extends { id: K; children: K[] }>(
 	}
 
 	return out;
+}
+
+export const normalize = (max: number, min: number, x: number) => {
+	return (x - min) / (max - min);
+};
+
+export function sortTimeline(a: ProfilerNode, b: ProfilerNode) {
+	const time = a.startTime - b.startTime;
+	// Use depth as fallback if startTime is equal
+	return time === 0 ? a.depth - b.depth : time;
 }

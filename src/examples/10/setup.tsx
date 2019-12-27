@@ -41,7 +41,7 @@ export function renderExamples10(node: HTMLElement) {
 				<Prime max={10000} />
 				<p>Todo list</p>
 				<TodoList />
-				<p>Legacy context</p>
+				{/* <p>Legacy context</p>
 				<LegacyContext />
 				<p>Class state</p>
 				<Stateful />
@@ -51,7 +51,7 @@ export function renderExamples10(node: HTMLElement) {
 				<p>Profiler Gradient</p>
 				<Gradient />
 				<p>Deep tree</p>
-				<DeepTree />
+				<DeepTree /> */}
 				<br />
 			</div>
 		</div>,
