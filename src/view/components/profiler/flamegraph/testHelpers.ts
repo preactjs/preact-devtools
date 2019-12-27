@@ -1,5 +1,5 @@
 import { ID, DevNodeType } from "../../../store/types";
-import { ProfilerNode } from "../../../store/commits";
+import { ProfilerNode, CommitData } from "../../../store/commits";
 
 /**
  * Parse a visual flamegraph DSL into a `ProfilerNode` tree. Each
@@ -153,7 +153,18 @@ export function flames(
 		node.selfDuration = node.selfDuration * 10;
 	});
 
+	// Create commit out of tree
+	const commit: CommitData = {
+		commitRootId: 1,
+		rootId: 1,
+		duration: nodes.length > 0 ? nodes[0].duration : 0,
+		maxDepth: Math.max(0, ...nodes.map(x => x.depth)),
+		maxSelfDuration: Math.max(0, ...nodes.map(x => x.selfDuration)),
+		nodes: idMap,
+	};
+
 	return {
+		commit,
 		idMap,
 		nodes,
 		byName: (name: string) => nameMap.get(name),

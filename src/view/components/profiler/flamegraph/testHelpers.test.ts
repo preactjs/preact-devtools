@@ -266,4 +266,20 @@ describe("FlameGraph DSL", () => {
 
 		expect(tree.nodes).to.deep.equal(expected);
 	});
+
+	it("should create a commit", () => {
+		const tree = flames`
+			App *******
+			  Bar **
+		`;
+
+		expect(tree.commit).to.deep.equal({
+			commitRootId: 1,
+			rootId: 1,
+			duration: 110,
+			maxDepth: 1,
+			maxSelfDuration: 60,
+			nodes: tree.idMap,
+		});
+	});
 });
