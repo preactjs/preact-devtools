@@ -14,11 +14,13 @@ export function CommitTimeline(props: CommitTimelineProps) {
 	const { items, onChange, selected } = props;
 
 	const onPrev = useCallback(() => {
-		onChange(Math.max(selected - 1, 0));
+		const next = selected - 1;
+		onChange(next < 0 ? items.length - 1 : next);
 	}, [selected]);
 
 	const onNext = useCallback(() => {
-		onChange(Math.min(selected + 1, items.length - 1));
+		const next = selected + 1;
+		onChange(next > items.length - 1 ? 0 : next);
 	}, [selected]);
 
 	if (items.length === 0) {
@@ -30,12 +32,7 @@ export function CommitTimeline(props: CommitTimelineProps) {
 			<div class={s.legend}>
 				{selected + 1} / {items.length}
 			</div>
-			<button
-				onClick={onPrev}
-				disabled={selected <= 0}
-				class={s.navBtn}
-				data-e2e="prev-commit"
-			>
+			<button onClick={onPrev} class={s.navBtn} data-e2e="prev-commit">
 				<ArrowBack />
 			</button>
 			<div class={s.items}>
@@ -50,12 +47,7 @@ export function CommitTimeline(props: CommitTimelineProps) {
 					);
 				})}
 			</div>
-			<button
-				onClick={onNext}
-				disabled={selected >= items.length - 1}
-				class={s.navBtn}
-				data-e2e="next-commit"
-			>
+			<button onClick={onNext} class={s.navBtn} data-e2e="next-commit">
 				<ArrowForward />
 			</button>
 		</div>
