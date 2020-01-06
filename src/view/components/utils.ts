@@ -56,3 +56,10 @@ export function useInstance<T>(fn: () => T) {
 
 	return value;
 }
+
+export function useResize(fn: () => void, args: any[]) {
+	useEffect(() => {
+		window.addEventListener("resize", fn);
+		return () => window.removeEventListener("resize", fn);
+	}, args);
+}
