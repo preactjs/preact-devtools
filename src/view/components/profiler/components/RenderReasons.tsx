@@ -12,9 +12,6 @@ export function RenderReasons() {
 	}
 
 	return (
-		<SidebarPanel
-			title="Why did this render?"
-			empty="Did not render during this profiling session"
-		></SidebarPanel>
+		<SidebarPanel title="Render reasons" empty="Did not render"></SidebarPanel>
 	);
 }
