@@ -46,7 +46,6 @@ export function TimelineBar() {
 			<ActionSeparator />
 			<FlameGraphMode />
 			<ActionSeparator />
-			<div style="width: 100%" />
 			{!isRecording && (
 				<CommitTimeline
 					items={commits.map(x => {
