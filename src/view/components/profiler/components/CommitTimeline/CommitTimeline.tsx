@@ -196,7 +196,7 @@ export interface CommitItem {
 export function CommitItem(props: CommitItem) {
 	const { percent } = props;
 	const top = 100 - Math.max(20, Math.min(98, percent));
-	const color = getGradient(percent / 100);
+	const color = getGradient(100, percent);
 
 	return (
 		<div

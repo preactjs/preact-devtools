@@ -64,7 +64,7 @@ export function createFlameGraphStore(profiler: ProfilerState) {
 			children.forEach(child => {
 				state.set(
 					child.id,
-					getGradient(commit.maxSelfDuration / (child.selfDuration || 1)),
+					getGradient(commit.maxSelfDuration, child.selfDuration || 1),
 				);
 			});
 		}
