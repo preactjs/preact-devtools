@@ -96,6 +96,9 @@ export function ops2Tree(oldTree: Tree, ops: number[]) {
 			case MsgTypes.REORDER_CHILDREN: {
 				const parentId = ops[i + 1];
 				const count = ops[i + 2];
+				if (!pending.has(parentId) && oldTree.has(parentId)) {
+					pending.set(parentId, deepClone(oldTree.get(parentId)!));
+				}
 				const parent = pending.get(parentId);
 				if (parent) {
 					parent.children = ops.slice(i + 3, i + 3 + count);

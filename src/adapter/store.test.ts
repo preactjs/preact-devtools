@@ -1,5 +1,5 @@
 import { createStore } from "../view/store";
-import { applyOperations } from "./events/events";
+import { applyOperationsV2 } from "./events/events";
 import { expect } from "chai";
 import { fromSnapshot } from "./debug";
 import * as sinon from "sinon";
@@ -9,14 +9,14 @@ describe("Store", () => {
 		const store = createStore();
 		const event = fromSnapshot([
 			"rootId: 1",
-			"Add 1 <Fragment> to parent 1",
+			"Add 1 <Fragment> to parent -1",
 			"Add 2 <div> to parent 1",
 			"Add 3 <span> to parent 2",
 			"Add 4 <#text> to parent 3",
 			"Add 5 <span> to parent 2",
 			"Add 6 <#text> to parent 5",
 		]);
-		applyOperations(store, event);
+		applyOperationsV2(store, event);
 
 		expect(store.nodes.$.get(1)!.children).to.deep.equal([2]);
 		expect(store.nodes.$.get(2)!.children).to.deep.equal([3, 5]);
@@ -27,17 +27,17 @@ describe("Store", () => {
 		const store = createStore();
 		const event = fromSnapshot([
 			"rootId: 1",
-			"Add 1 <Fragment> to parent 1",
+			"Add 1 <Fragment> to parent -1",
 			"Add 2 <div> to parent 1",
 		]);
-		applyOperations(store, event);
+		applyOperationsV2(store, event);
 
 		// prettier-ignore
 		const event2 = fromSnapshot([
       "rootId: 1",
       "Update timings 1 time 12:15"
     ]);
-		applyOperations(store, event2);
+		applyOperationsV2(store, event2);
 
 		expect(store.nodes.$.get(1)!.startTime).to.equal(12);
 		expect(store.nodes.$.get(1)!.endTime).to.equal(15);
@@ -47,11 +47,11 @@ describe("Store", () => {
 		const store = createStore();
 		const event = fromSnapshot([
 			"rootId: 1",
-			"Add 1 <Fragment> to parent 1",
+			"Add 1 <Fragment> to parent -1",
 			"Add 2 <div> to parent 1",
 			"Add 3 <div> to parent 2",
 		]);
-		applyOperations(store, event);
+		applyOperationsV2(store, event);
 
 		const spy = sinon.spy();
 		store.nodeList.on(spy);
@@ -62,7 +62,7 @@ describe("Store", () => {
       "Remove 2",
       "Remove 3",
     ]);
-		applyOperations(store, event2);
+		applyOperationsV2(store, event2);
 
 		expect(spy.callCount).to.eq(2); // TODO: Should be called once
 		expect(store.nodes.$.get(1)!.children).to.deep.equal([]);

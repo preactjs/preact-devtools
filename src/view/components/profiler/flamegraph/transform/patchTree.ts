@@ -6,6 +6,10 @@ export function patchTree(old: Tree, next: Tree, rootId: ID): Tree {
 	const oldRoot = old.get(rootId);
 	const root = next.get(rootId)!;
 
+	if (next.size === 0) {
+		return old;
+	}
+
 	// Fast path if tree is new
 	if (!oldRoot) {
 		const offset = root.startTime;

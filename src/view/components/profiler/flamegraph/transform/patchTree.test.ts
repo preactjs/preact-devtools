@@ -2,7 +2,13 @@ import { expect } from "chai";
 import { flames, byName } from "../testHelpers";
 import { patchTree } from "./patchTree";
 
-describe.only("patchTree", () => {
+describe("patchTree", () => {
+	it("should return old tree when new one is empty", () => {
+		const old = new Map();
+		const res = patchTree(old, new Map(), 1);
+		expect(res).to.equal(old);
+	});
+
 	it("should offset timings if tree is new", () => {
 		const state = flames`
 			App *******
@@ -130,8 +136,6 @@ describe.only("patchTree", () => {
 		const bar = byName(merged, "Bar")!;
 		const bob = byName(merged, "Bob")!;
 
-		console.log(Array.from(merged.values()));
-
 		expect(app.startTime < bar.startTime).to.equal(true);
 		expect(app.endTime > bar.endTime).to.equal(true);
 
@@ -140,106 +144,5 @@ describe.only("patchTree", () => {
 
 		expect(bar.startTime < bob.startTime).to.equal(true);
 		expect(bar.endTime < bob.endTime).to.equal(true);
-
-		console.log(b.nodes);
-	});
-
-	it("should mount node", () => {
-		const tree = new Map([
-			[
-				1,
-				{
-					children: [2, 3],
-					depth: 1,
-					id: 1,
-					name: "Fragment",
-					parent: 1,
-					type: 3,
-					key: "",
-					startTime: 385,
-					endTime: 392,
-					treeStartTime: 385,
-					treeEndTime: 392,
-				},
-			],
-			[
-				2,
-				{
-					children: [],
-					depth: 2,
-					id: 2,
-					name: "Prime",
-					parent: 1,
-					type: 3,
-					key: "",
-					startTime: 386,
-					endTime: 390,
-					treeStartTime: 386,
-					treeEndTime: 390,
-				},
-			],
-			[
-				3,
-				{
-					children: [4, 5],
-					depth: 2,
-					id: 3,
-					name: "TodoList",
-					parent: 1,
-					type: 3,
-					key: "",
-					startTime: 3236,
-					endTime: 3238,
-					treeStartTime: 390,
-					treeEndTime: 391,
-				},
-			],
-			[
-				4,
-				{
-					children: [],
-					depth: 3,
-					id: 4,
-					name: "TodoItem",
-					parent: 3,
-					type: 3,
-					key: "asd",
-					startTime: 390,
-					endTime: 391,
-					treeStartTime: 390,
-					treeEndTime: 391,
-				},
-			],
-			[
-				5,
-				{
-					children: [],
-					depth: 3,
-					id: 5,
-					name: "TodoItem",
-					parent: 3,
-					type: 3,
-					key: "asdf",
-					startTime: 391,
-					endTime: 391,
-					treeStartTime: 391,
-					treeEndTime: 391,
-				},
-			],
-		]);
-
-		const oldRoot = {
-			children: [4, 5],
-			depth: 2,
-			id: 3,
-			name: "TodoList",
-			parent: 1,
-			type: 3,
-			key: "",
-			startTime: 2526,
-			endTime: 2526,
-			treeStartTime: 355,
-			treeEndTime: 357,
-		};
 	});
 });

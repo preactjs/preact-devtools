@@ -3,6 +3,7 @@ import { expect } from "chai";
 import { renderTest } from "../../../DataInput/DataInput.test";
 import { CommitTimeline } from "./CommitTimeline";
 import { fireEvent } from "@testing-library/preact";
+import * as sinon from "sinon";
 
 const noop = () => null;
 
@@ -14,27 +15,26 @@ describe("CommitTimeline", () => {
 		expect($$('[data-e2e="commit-item"]').length).to.equal(4);
 	});
 
-	it("should disable prev button if selection === 0", () => {
-		const { e2e, $$ } = renderTest(
-			<CommitTimeline onChange={noop} selected={0} items={[20, 80, 10, 10]} />,
+	it("should wrap around if selection === 0", () => {
+		const spy = sinon.spy();
+		const { $ } = renderTest(
+			<CommitTimeline onChange={spy} selected={0} items={[20, 80, 10, 10]} />,
 		);
-		expect(e2e("prev-commit")?.hasAttribute("disabled")).to.equal(true);
 
-		const items = Array.from($$("[data-e2e='commit-item']"));
-		fireEvent.click(items[2]);
-		expect(e2e("prev-commit")?.hasAttribute("disabled")).to.equal(false);
+		const btn = $("[data-e2e='prev-commit']")!;
+		fireEvent.click(btn);
+		expect(spy.args[0][0]).to.equal(3);
 	});
 
-	it("should disable next button if selection === items.length", () => {
-		const { e2e, $$ } = renderTest(
-			<CommitTimeline onChange={noop} selected={0} items={[20, 80, 10, 10]} />,
+	it("should wrap around if selection === items.length", () => {
+		const spy = sinon.spy();
+		const { $ } = renderTest(
+			<CommitTimeline onChange={spy} selected={3} items={[20, 80, 10, 10]} />,
 		);
-		expect(e2e("next-commit")?.hasAttribute("disabled")).to.equal(false);
 
-		const items = Array.from($$("[data-e2e='commit-item']"));
-		const last = items[items.length - 1];
-		fireEvent.click(last);
+		const btn = $("[data-e2e='next-commit']")!;
+		fireEvent.click(btn);
 
-		expect(e2e("next-commit")?.hasAttribute("disabled")).to.equal(true);
+		expect(spy.args[0][0]).to.equal(0);
 	});
 });
