@@ -1,5 +1,5 @@
 import { ID, Tree } from "../../../../store/types";
-import { mapChildren, adjustNodesToRight, cloneTree, deepClone } from "./util";
+import { mapChildren, adjustNodesToRight, deepClone } from "./util";
 
 export function patchTree(old: Tree, next: Tree, rootId: ID): Tree {
 	const out: Tree = new Map(old);
@@ -20,24 +20,14 @@ export function patchTree(old: Tree, next: Tree, rootId: ID): Tree {
 		return out;
 	}
 
-	let deltaStart = root.startTime - oldRoot.treeStartTime;
-	let rootEnd = oldRoot.treeEndTime + deltaStart;
-	let deltaEnd = oldRoot.treeEndTime - rootEnd;
+	let deltaStart = oldRoot.treeStartTime - root.startTime;
+	let deltaEnd = oldRoot.treeStartTime + (root.endTime - root.startTime);
 
-	console.log(
-		root.name,
-		oldRoot.treeStartTime,
-		root.treeStartTime,
-		oldRoot.treeEndTime,
-		rootEnd,
-		"deltastart",
-		deltaStart,
-	);
 	// Move new tree to old tree position.
 	out.set(root.id, {
 		...deepClone(root),
 		treeStartTime: oldRoot.treeStartTime,
-		treeEndTime: rootEnd,
+		treeEndTime: oldRoot.treeStartTime + (root.endTime - root.startTime),
 	});
 
 	// Move children of newly committed sub-tree
@@ -45,30 +35,13 @@ export function patchTree(old: Tree, next: Tree, rootId: ID): Tree {
 		out.set(child.id, {
 			...deepClone(child),
 			// FIXME: This is completely wrong
-			treeStartTime: child.treeStartTime + deltaStart,
-			treeEndTime: child.treeEndTime + deltaStart,
+			treeStartTime: child.startTime + deltaStart,
+			treeEndTime: child.endTime + deltaStart,
 		});
 	});
 
-	const adjustClone = cloneTree(out);
-
 	// Enlarge parents and move children
 	adjustNodesToRight(out, root.id, deltaEnd);
-
-	// Validate
-	out.forEach(node => {
-		const parent = out.get(node.parent);
-		if (parent && parent.id > -1) {
-			if (node.treeEndTime > parent.treeEndTime) {
-				console.error(
-					`AFTER_ADJUST ${node.name} is larger than ${parent.name}: ${node.treeEndTime} vs ${parent.treeEndTime}`,
-				);
-
-				console.log(Array.from(adjustClone.values()));
-				console.log(Array.from(out.values()));
-			}
-		}
-	});
 
 	return out;
 }
