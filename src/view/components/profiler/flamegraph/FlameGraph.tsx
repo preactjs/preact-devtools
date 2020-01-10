@@ -94,14 +94,14 @@ export function FlameGraph() {
 						data-weight={color}
 						data-maximized={i <= selectedIndex}
 						data-selected={selectedNodeId === meta.id}
+						data-overflow={width <= 24}
 						style={{
 							width: width,
 							height: ROW_HEIGHT,
 							transform: `translate3d(${x}px,${y}px,0)`,
-							color: width <= 24 ? "transparent" : (undefined as any),
 						}}
 					>
-						{node.name} #{node.id} ({formatTime(node.selfDuration)} of{" "}
+						{node.name} ({formatTime(node.selfDuration)} of{" "}
 						{formatTime(node.treeEndTime - node.treeStartTime)})
 					</div>
 				);

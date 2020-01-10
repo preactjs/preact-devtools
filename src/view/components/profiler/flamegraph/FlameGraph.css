@@ -31,6 +31,11 @@
 	background: var(--color-profiler-old);
 }
 
+.node[data-overflow] {
+	color: transparent;
+	padding: 0;
+}
+
 .node[data-weight="-1"] {
 	color: white;
 }

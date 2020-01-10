@@ -87,7 +87,7 @@ export function createProfiler(): ProfilerState {
 	// Flamegraph
 	const flamegraphType = valoo(FlamegraphType.FLAMEGRAPH);
 	flamegraphType.on(() => {
-		selectedNodeId.$ = -1;
+		selectedNodeId.$ = activeCommit.$ ? activeCommit.$.rootId : -1;
 	});
 
 	return {
@@ -143,7 +143,7 @@ export function recordProfilerCommit(
 	// Nodes may have a timing duration of 0 due to lack of precision
 	// in high performance timers because of spectre CPU attack vectors.
 	// We'll assign a minimum width to those nodes.
-	resizeToMin(nodes, 0.1);
+	resizeToMin(nodes, 0.01);
 
 	// Calculate self-durations
 	// TODO: Optimize this by iterating over a presorted array
