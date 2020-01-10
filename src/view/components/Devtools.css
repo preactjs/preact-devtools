@@ -1,7 +1,7 @@
 .root {
 	height: 100%;
 	display: grid;
-	grid-template-columns: auto 35%;
+	grid-template-columns: minmax(0, 75%) minmax(35%, 15rem);
 	grid-template-rows: 1.625rem 2.25rem 1fr;
 	grid-template-areas:
 		"switcher switcher"

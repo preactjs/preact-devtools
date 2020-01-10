@@ -1,4 +1,4 @@
-import { ID, DevNodeType } from "../../../store/types";
+import { ID, DevNodeType, Tree } from "../../../store/types";
 import { ProfilerNode, CommitData } from "../data/commits";
 import { sortTimeline } from "./FlamegraphStore";
 
@@ -156,8 +156,8 @@ export function flames(
 
 	// Create commit out of tree
 	const commit: CommitData = {
-		commitRootId: 1,
 		rootId: 1,
+		commitRootId: 1,
 		duration: nodes.length > 0 ? nodes[0].duration : 0,
 		maxDepth: Math.max(0, ...nodes.map(x => x.depth)),
 		maxSelfDuration: Math.max(0, ...nodes.map(x => x.selfDuration)),
@@ -171,4 +171,8 @@ export function flames(
 		byName: (name: string) => nameMap.get(name),
 		byId: (id: ID) => idMap.get(id),
 	};
+}
+
+export function byName(tree: Tree, name: string) {
+	return Array.from(tree.values()).find(x => x.name === name);
 }

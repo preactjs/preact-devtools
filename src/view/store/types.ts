@@ -44,12 +44,14 @@ export interface DevNode {
 
 export type Theme = "auto" | "light" | "dark";
 
+export type Tree = Map<ID, DevNode>;
+
 export interface Store {
 	profiler: ProfilerState;
 	isPicking: Observable<boolean>;
 	inspectData: Observable<InspectData | null>;
 	roots: Observable<ID[]>;
-	nodes: Observable<Map<ID, DevNode>>;
+	nodes: Observable<Tree>;
 	nodeList: Observable<ID[]>;
 	theme: Observable<Theme>;
 	search: ReturnType<typeof createSearchStore>;

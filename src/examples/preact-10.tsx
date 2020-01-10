@@ -8,7 +8,7 @@ import { Picker } from "../view/components/icons";
 import { TreeBar } from "../view/components/elements/TreeBar";
 import { createStore } from "../view/store";
 import { AppCtx, useObserver } from "../view/store/react-bindings";
-import { applyOperations } from "../adapter/events";
+import { applyOperations } from "../adapter/events/events";
 import { fromSnapshot } from "../adapter/debug";
 import { TreeView } from "../view/components/elements/TreeView";
 import { RadioBar } from "../view/components/RadioBar";

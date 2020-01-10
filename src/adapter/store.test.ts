@@ -1,5 +1,5 @@
 import { createStore } from "../view/store";
-import { applyOperations } from "./events";
+import { applyOperations } from "./events/events";
 import { expect } from "chai";
 import { fromSnapshot } from "./debug";
 import * as sinon from "sinon";

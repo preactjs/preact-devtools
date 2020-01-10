@@ -1,4 +1,4 @@
-import { MsgTypes } from "./events";
+import { MsgTypes } from "./events/events";
 import { parseTable, flushTable } from "./string-table";
 import { Elements } from "./renderer";
 import { ID } from "../view/store/types";
@@ -98,7 +98,18 @@ export function toStringTable(...strs: string[]) {
 	const init = strs.map((x, i) => [x, i]);
 	return flushTable(new Map(init as any));
 }
-
+/**
+ * Create operations array from human readable actions. Available
+ * events:
+ *
+ * ```
+ * rootId: 12
+ * Add 3 <span> to parent 1
+ * Remove 5
+ * Update timings 12 duration 23
+ * Reorder 1 [2, 3, 4, 5]
+ * ```
+ */
 export function fromSnapshot(events: string[]): number[] {
 	const out: number[] = [];
 	let operations: number[] = [];
@@ -116,7 +127,7 @@ export function fromSnapshot(events: string[]): number[] {
 	for (let i = 1; i < events.length; i++) {
 		const ev = events[i];
 		if (/^Add/.test(ev)) {
-			const m = ev.match(/Add\s+(\d+)\s+<([#]?\w+)>\s+to\sparent\s(\d+)/);
+			const m = ev.match(/Add\s+(\d+)\s+<([#]?\w+)>\s+to\sparent\s([-]?\d+)/);
 			if (m) {
 				let idx = strings.indexOf(m[2]);
 				if (idx == -1) {
@@ -133,6 +144,8 @@ export function fromSnapshot(events: string[]): number[] {
 					9999,
 					idx,
 					0,
+					42000,
+					42000,
 				);
 			} else {
 				throw new Error("no match: " + ev);
@@ -152,8 +165,9 @@ export function fromSnapshot(events: string[]): number[] {
 				const m = ev.match(/Update\stimings\s(\d+)\s+time\s+(\d+):(\d+)/);
 				if (m) {
 					const id = +m[1];
-					const duration = +m[2];
-					operations.push(MsgTypes.UPDATE_VNODE_TIMINGS, id, duration);
+					const start = +m[2] * 1000;
+					const end = +m[3] * 1000;
+					operations.push(MsgTypes.UPDATE_VNODE_TIMINGS, id, start, end);
 				} else {
 					throw new Error("no match: " + ev);
 				}

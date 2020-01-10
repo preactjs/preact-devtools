@@ -1,7 +1,7 @@
-import { valoo, watch } from "../../../valoo";
+import { watch } from "../../../valoo";
 import { ProfilerState, FlamegraphType, ProfilerNode } from "../data/commits";
 import { getGradient } from "../data/gradient";
-import { ID } from "../../../store/types";
+import { ID, Tree } from "../../../store/types";
 import { layoutRanked } from "./modes/ranked";
 import { layoutTimeline } from "./modes/flamegraph";
 import { focusNode, NodeTransform } from "./transform/focusNode";
@@ -30,7 +30,6 @@ export function createFlameGraphStore(profiler: ProfilerState) {
 		}
 
 		const items = flattenNodeTree(commit.nodes, commit.rootId);
-		console.log(items);
 
 		const viewMode = profiler.flamegraphType.$;
 		let nodes: NodeTransform[] = [];
@@ -77,6 +76,17 @@ export function createFlameGraphStore(profiler: ProfilerState) {
 		nodes: layoutNodes,
 		colors,
 	};
+}
+
+export function getRoot(tree: Tree, id: ID) {
+	let item = tree.get(id);
+	let last = id;
+	while (item !== undefined) {
+		last = item.id;
+		item = tree.get(item.parent);
+	}
+
+	return last;
 }
 
 export function flattenNodeTree<K, T extends { id: K; children: K[] }>(

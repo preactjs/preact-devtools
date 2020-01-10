@@ -1,8 +1,8 @@
 import { expect } from "chai";
 import { applyEvent } from "./events";
 import * as sinon from "sinon";
-import { createStore } from "../view/store";
-import { fromSnapshot } from "./debug";
+import { createStore } from "../../view/store";
+import { fromSnapshot } from "../debug";
 
 describe("applyEvent", () => {
 	it("should add roots", () => {

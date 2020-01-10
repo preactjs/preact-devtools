@@ -1,6 +1,7 @@
 import { ID, DevNode } from "../../../store/types";
 import { Observable, valoo, watch } from "../../../valoo";
 import { resizeToMin } from "../flamegraph/transform/resizeToMin";
+import { getRoot } from "../flamegraph/FlamegraphStore";
 
 export interface ProfilerNode extends DevNode {
 	selfDuration: number;
@@ -114,7 +115,6 @@ export function resetProfiler(state: ProfilerState) {
 export function recordProfilerCommit(
 	tree: Map<ID, DevNode>,
 	profiler: ProfilerState,
-	commitRootId: number,
 	rootId: number,
 ) {
 	const nodes = new Map<ID, ProfilerNode>();
@@ -174,8 +174,8 @@ export function recordProfilerCommit(
 
 	profiler.commits.update(arr => {
 		arr.push({
-			rootId,
-			commitRootId,
+			rootId: getRoot(tree, rootId),
+			commitRootId: rootId,
 			nodes,
 			maxDepth,
 			maxSelfDuration,

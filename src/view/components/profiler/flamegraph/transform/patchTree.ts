@@ -1,75 +1,74 @@
-import { DevNode, ID } from "../../../../store/types";
-import { mapChildren, adjustNodesToRight, cloneTree } from "./util";
+import { ID, Tree } from "../../../../store/types";
+import { mapChildren, adjustNodesToRight, cloneTree, deepClone } from "./util";
 
-export function patchTree(
-	tree: Map<ID, DevNode>,
-	rootId: ID,
-	oldRoot: DevNode,
-) {
-	const root = tree.get(rootId)!;
+export function patchTree(old: Tree, next: Tree, rootId: ID): Tree {
+	const out: Tree = new Map(old);
+	const oldRoot = old.get(rootId);
+	const root = next.get(rootId)!;
 
-	// Bail out if timings didn't change
-	if (
-		oldRoot.startTime !== root.startTime ||
-		oldRoot.endTime !== root.endTime
-	) {
-		return;
+	// Fast path if tree is new
+	if (!oldRoot) {
+		const offset = root.startTime;
+
+		next.forEach(node => {
+			out.set(node.id, {
+				...deepClone(node),
+				treeStartTime: node.startTime - offset,
+				treeEndTime: node.endTime - offset,
+			});
+		});
+		return out;
 	}
 
-	console.log(Array.from(cloneTree(tree).values()));
-
-	let deltaStart = oldRoot.startTime - root.startTime;
-
-	// Move new tree to old tree position.
-	root.treeStartTime = oldRoot.treeStartTime;
-	console.log("old tree ned", root.treeEndTime, oldRoot.treeEndTime);
-	// FIXME: Somehow this leads to wrong numbers. Maybe due to minimum resizing?
-	root.treeEndTime += deltaStart;
-	let deltaEnd = oldRoot.treeEndTime - root.treeEndTime;
-	console.log("new tree ned", root.treeEndTime, oldRoot.treeEndTime);
+	let deltaStart = root.startTime - oldRoot.treeStartTime;
+	let rootEnd = oldRoot.treeEndTime + deltaStart;
+	let deltaEnd = oldRoot.treeEndTime - rootEnd;
 
 	console.log(
-		deltaStart,
-		deltaEnd,
-		"duration",
-		root.endTime - root.startTime,
-		"old druation",
-		oldRoot.endTime - oldRoot.startTime,
-		"start",
-		root.startTime,
-		oldRoot.startTime,
-		root.endTime,
-		oldRoot.endTime,
-		"tree start",
+		root.name,
 		oldRoot.treeStartTime,
 		root.treeStartTime,
+		oldRoot.treeEndTime,
+		rootEnd,
+		"deltastart",
+		deltaStart,
 	);
-
-	// Move children of newly committed sub-tree
-	mapChildren(tree, root.id, child => {
-		child.treeStartTime = child.treeStartTime + deltaStart;
-		child.treeEndTime = child.treeEndTime + deltaStart;
+	// Move new tree to old tree position.
+	out.set(root.id, {
+		...deepClone(root),
+		treeStartTime: oldRoot.treeStartTime,
+		treeEndTime: rootEnd,
 	});
 
-	const adjustClone = cloneTree(tree);
+	// Move children of newly committed sub-tree
+	mapChildren(next, root.id, child => {
+		out.set(child.id, {
+			...deepClone(child),
+			// FIXME: This is completely wrong
+			treeStartTime: child.treeStartTime + deltaStart,
+			treeEndTime: child.treeEndTime + deltaStart,
+		});
+	});
+
+	const adjustClone = cloneTree(out);
 
 	// Enlarge parents and move children
-	adjustNodesToRight(tree, root.id, deltaEnd);
+	adjustNodesToRight(out, root.id, deltaEnd);
 
 	// Validate
-	tree.forEach(node => {
-		const parent = tree.get(node.parent);
-		if (parent && parent !== node) {
+	out.forEach(node => {
+		const parent = out.get(node.parent);
+		if (parent && parent.id > -1) {
 			if (node.treeEndTime > parent.treeEndTime) {
 				console.error(
 					`AFTER_ADJUST ${node.name} is larger than ${parent.name}: ${node.treeEndTime} vs ${parent.treeEndTime}`,
 				);
 
 				console.log(Array.from(adjustClone.values()));
-				console.log(Array.from(tree.values()));
+				console.log(Array.from(out.values()));
 			}
 		}
 	});
 
-	return rootId;
+	return out;
 }

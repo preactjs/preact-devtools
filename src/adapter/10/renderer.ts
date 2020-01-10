@@ -1,5 +1,5 @@
 import { DevtoolsEvent } from "../adapter/adapter";
-import { Commit, MsgTypes, flush } from "../events";
+import { Commit, MsgTypes, flush } from "../events/events";
 import { Fragment, VNode, FunctionalComponent } from "preact";
 import { IdMapper, createIdMapper } from "./IdMapper";
 import { getStringId } from "../string-table";
@@ -343,12 +343,9 @@ export function createCommit(
 	const isNew = !ids.hasId(vnode);
 
 	if (isRoot(vnode, config)) {
-		const rootId = !isNew ? ids.getId(vnode) : ids.createId(vnode);
-		parentId = commit.rootId = rootId;
+		parentId = -1;
 		roots.add(vnode);
 	} else {
-		const root = findRoot(vnode, config);
-		commit.rootId = ids.getId(root);
 		parentId = ids.getId(getAncestor(vnode)!);
 	}
 
@@ -361,6 +358,8 @@ export function createCommit(
 	} else {
 		update(ids, commit, vnode, parentId, filters, domCache, config, profiler);
 	}
+
+	commit.rootId = ids.getId(vnode);
 
 	return commit;
 }
@@ -385,7 +384,7 @@ export function mount(
 		}
 
 		commit.operations.push(
-			MsgTypes.ADD_VNODE_V2,
+			MsgTypes.ADD_VNODE,
 			id,
 			getDevtoolsType(vnode), // Type
 			ancestorId,
@@ -466,7 +465,7 @@ export function update(
 
 	const id = ids.getId(vnode);
 	commit.operations.push(
-		MsgTypes.UPDATE_VNODE_TIMINGS_V2,
+		MsgTypes.UPDATE_VNODE_TIMINGS,
 		id,
 		(vnode.startTime || 0) * 1000,
 		(vnode.endTime || 0) * 1000,

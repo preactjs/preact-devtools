@@ -2,7 +2,7 @@ import { render, h } from "preact";
 import { DevTools } from "../../view/components/Devtools";
 import { injectStyles } from "./utils";
 import { createStore } from "../../view/store";
-import { applyEvent } from "../../adapter/events";
+import { applyEvent } from "../../adapter/events/events";
 
 let created = false;
 function createPanel() {

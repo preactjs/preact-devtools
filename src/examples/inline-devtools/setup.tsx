@@ -2,7 +2,7 @@ import { createStore } from "../../view/store";
 import { h, render } from "preact";
 import { DevTools } from "../../view/components/Devtools";
 import { DevtoolsHook } from "../../adapter/hook";
-import { applyEvent } from "../../adapter/events";
+import { applyEvent } from "../../adapter/events/events";
 
 export function setupFrontendStore(hook: DevtoolsHook) {
 	const store = createStore();

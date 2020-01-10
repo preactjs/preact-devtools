@@ -2,7 +2,7 @@ import { expect } from "chai";
 import { flames } from "../testHelpers";
 import { resizeToMin } from "./resizeToMin";
 
-describe.only("resizeToMin", () => {
+describe("resizeToMin", () => {
 	it("should resize node to minimum size", () => {
 		const tree = flames`
       App ********
