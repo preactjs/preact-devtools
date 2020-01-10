@@ -108,8 +108,6 @@ export function applyOperationsV2(store: Store, data: number[]) {
 
 	store.nodes.$ = merged;
 
-	console.log("merged", Array.from(merged.values()));
-
 	// If we are profiling, we'll make a frozen copy of the mutable
 	// elements tree because the profiler can step through time
 	if (store.profiler.isRecording.$) {
