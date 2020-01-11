@@ -101,3 +101,11 @@ export function getDisplayName(vnode: VNode, config: RendererConfig10) {
 	else if (typeof vnode.type === "string") return vnode.type;
 	return "#text";
 }
+
+export function getEndTime(vnode: VNode) {
+	return vnode.endTime || 0;
+}
+
+export function getStartTime(vnode: VNode) {
+	return vnode.startTime || 0;
+}

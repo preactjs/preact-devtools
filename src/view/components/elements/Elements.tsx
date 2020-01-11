@@ -1,9 +1,8 @@
 import { h, Fragment } from "preact";
-import { TreeBar } from "../TreeBar";
-import { TreeView } from "../TreeView";
+import { TreeBar } from "./TreeBar";
+import { TreeView } from "./TreeView";
 import { SidebarActions } from "../sidebar/SidebarActions";
 import { Sidebar } from "../sidebar/Sidebar";
-import { ModalRenderer } from "../Modals";
 import s from "../Devtools.css";
 
 export function Elements() {
@@ -21,7 +20,6 @@ export function Elements() {
 			<div class={s.sidebar}>
 				<Sidebar />
 			</div>
-			<ModalRenderer />
 		</Fragment>
 	);
 }

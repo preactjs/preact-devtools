@@ -1,12 +1,11 @@
 import { Observable } from "../valoo";
 import { InspectData } from "../../adapter/adapter/adapter";
 import { createSearchStore } from "./search";
-import { createModalState } from "../components/Modals";
 import { createFilterStore } from "./filter";
 import { createSelectionStore } from "./selection";
 import { Collapser } from "./collapser";
 import { EmitFn } from "../../adapter/hook";
-import { createProfilerStore } from "../components/profiler/data/ProfilerStore";
+import { ProfilerState } from "../components/profiler/data/commits";
 
 export type ID = number;
 
@@ -29,28 +28,36 @@ export interface DevNode {
 	parent: ID;
 	children: ID[];
 
-	// Profiling
-	duration: Observable<number>;
-
-	// Display properties
+	// Display (Elements + Profiler)
 	depth: number;
+
+	// Raw absolute timing data.
+	startTime: number;
+	endTime: number;
+	// Normalized timing data to keep the timings
+	// of the whole tree consistent across future
+	// commits. These timings are relative to the
+	// very first node.
+	treeStartTime: number;
+	treeEndTime: number;
 }
 
 export type Theme = "auto" | "light" | "dark";
 
+export type Tree = Map<ID, DevNode>;
+
 export interface Store {
+	profiler: ProfilerState;
 	isPicking: Observable<boolean>;
 	inspectData: Observable<InspectData | null>;
 	roots: Observable<ID[]>;
-	nodes: Observable<Map<ID, DevNode>>;
+	nodes: Observable<Tree>;
 	nodeList: Observable<ID[]>;
 	theme: Observable<Theme>;
 	search: ReturnType<typeof createSearchStore>;
-	modal: ReturnType<typeof createModalState>;
 	filter: ReturnType<typeof createFilterStore>;
 	selection: ReturnType<typeof createSelectionStore>;
 	collapser: Collapser<ID>;
-	profiler: ReturnType<typeof createProfilerStore>;
 	actions: {
 		inspect: (id: ID) => void;
 		highlightNode: (id: ID | null) => void;

@@ -1,26 +1,14 @@
-export const gradient = [
-	"var(--color-profiler-gradient-0)",
-	"var(--color-profiler-gradient-1)",
-	"var(--color-profiler-gradient-2)",
-	"var(--color-profiler-gradient-3)",
-	"var(--color-profiler-gradient-4)",
-	"var(--color-profiler-gradient-5)",
-	"var(--color-profiler-gradient-6)",
-	"var(--color-profiler-gradient-7)",
-	"var(--color-profiler-gradient-8)",
-	"var(--color-profiler-gradient-9)",
-];
-
-export function getGradient(n: number) {
-	const max = gradient.length - 1;
+export function getGradient(max: number, n: number) {
+	const maxColor = 9; // Amount of colors, see css variables
 	let i = 0;
 	if (!isNaN(n)) {
 		if (!isFinite(n)) {
 			i = max;
 		} else {
-			i = Math.max(0, Math.min(max, n)) * max;
+			const slope = (1 * (maxColor - 0)) / max - 0;
+			i = 0 + Math.round(slope * (n - 0));
 		}
 	}
 
-	return gradient[Math.round(i)];
+	return i;
 }

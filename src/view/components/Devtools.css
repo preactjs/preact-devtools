@@ -1,12 +1,16 @@
 .root {
 	height: 100%;
 	display: grid;
-	grid-template-columns: auto 35%;
+	grid-template-columns: minmax(0, 75%) minmax(35%, 15rem);
 	grid-template-rows: 1.625rem 2.25rem 1fr;
 	grid-template-areas:
 		"switcher switcher"
 		"treeActions sidebarActions"
 		"tree sidebar";
+}
+
+.root p {
+	margin-top: 0;
 }
 
 .theme {
@@ -26,6 +30,7 @@
 	--color-bg: white;
 	--color-text: #333;
 	--color-disabled: #dedede;
+	--color-panelbar-bg: #f7f7f7;
 	--color-selected-bg: #8058ca;
 	--color-selected-text: white;
 	--color-selected-inactive-bg: gray;
@@ -66,6 +71,7 @@
 
 	/* Profiling */
 	--color-record-active: #ff5722;
+	--color-profiler-old: #e7e7e7;
 	--color-profiler-gradient-0: #37afa9;
 	--color-profiler-gradient-1: #63b19e;
 	--color-profiler-gradient-2: #80b393;
@@ -82,6 +88,7 @@
 	--color-bg: #242424;
 	--color-text: #b0b0b0;
 	--color-disabled: #575757;
+	--color-panelbar-bg: #373737;
 	--color-selected-bg: #ae80ff;
 	--color-selected-text: white;
 	--color-selected-inactive-bg: gray;
@@ -133,6 +140,7 @@
 	--color-profiler-gradient-7: #ffc052;
 	--color-profiler-gradient-8: #ff855d;
 	--color-profiler-gradient-9: #ff4c7c; */
+	--color-profiler-old: #6a6a6a;
 	--color-profiler-gradient-0: #37afa9;
 	--color-profiler-gradient-1: #63b19e;
 	--color-profiler-gradient-2: #80b393;
@@ -152,6 +160,7 @@
 	justify-content: space-between;
 	grid-area: switcher;
 	height: 1.625rem;
+	background: var(--color-panelbar-bg);
 }
 
 .switcherInner {

@@ -49,11 +49,14 @@ export const treeStore = () => {
 			id: ++i,
 			children: [],
 			depth: 1,
-			duration: valoo(0),
 			key: "",
 			name: "Foo" + i,
 			parent,
 			type: DevNodeType.ClassComponent,
+			startTime: 0,
+			endTime: 0,
+			treeStartTime: 0,
+			treeEndTime: 0,
 		};
 
 		if (store.nodes.$.has(parent)) {

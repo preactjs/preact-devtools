@@ -1,6 +1,5 @@
 import { valoo, watch } from "../valoo";
 import { createSearchStore } from "./search";
-import { createModalState } from "../components/Modals";
 import { createFilterStore } from "./filter";
 import { flattenChildren } from "../components/tree/windowing";
 import { createSelectionStore } from "./selection";
@@ -9,7 +8,7 @@ import { EmitFn } from "../../adapter/hook";
 import { ID, DevNode, Store, Listener, Theme } from "./types";
 import { InspectData } from "../../adapter/adapter/adapter";
 import { debounce } from "../../shells/shared/utils";
-import { createProfilerStore } from "../components/profiler/data/ProfilerStore";
+import { createProfiler } from "../components/profiler/data/commits";
 
 export function createStore(): Store {
 	let listeners: Array<null | Listener> = [];
@@ -56,6 +55,7 @@ export function createStore(): Store {
 	});
 
 	return {
+		profiler: createProfiler(),
 		nodeList,
 		inspectData,
 		isPicking,
@@ -63,7 +63,6 @@ export function createStore(): Store {
 		nodes,
 		collapser,
 		search: createSearchStore(nodes, nodeList),
-		modal: createModalState(),
 		filter: filterState,
 		selection,
 		theme: valoo<Theme>("auto"),
@@ -91,6 +90,5 @@ export function createStore(): Store {
 			return () => (listeners[idx] = null);
 		},
 		emit: notify,
-		profiler: createProfilerStore(notify),
 	};
 }
