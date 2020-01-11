@@ -130,7 +130,7 @@ export function recordProfilerCommit(
 		nodes.set(id, {
 			// deep clone
 			...JSON.parse(JSON.stringify(node)),
-			duration: node.endTime - node.startTime,
+			duration: node.treeEndTime - node.treeStartTime,
 			selfDuration: -1, // Will be set later
 		});
 
@@ -149,7 +149,7 @@ export function recordProfilerCommit(
 	// TODO: Optimize this by iterating over a presorted array
 	//   and combining it with the above calculation
 	nodes.forEach(node => {
-		let selfDuration = node.treeEndTime - node.treeStartTime;
+		let selfDuration = node.endTime - node.startTime;
 		node.children.forEach(childId => {
 			const child = nodes.get(childId);
 			if (child) {

@@ -6,12 +6,12 @@ import { NodeTransform } from "../transform/focusNode";
  */
 export function layoutTimeline(nodes: ProfilerNode[]): NodeTransform[] {
 	return nodes
-		.sort((a, b) => a.treeStartTime - b.treeEndTime)
+		.sort((a, b) => a.treeStartTime - b.treeStartTime)
 		.map(node => {
 			return {
 				id: node.id,
 				x: node.treeStartTime,
-				row: node.depth - 1,
+				row: node.depth,
 				width: node.treeEndTime - node.treeStartTime,
 			};
 		});

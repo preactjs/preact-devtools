@@ -1,6 +1,20 @@
 import { expect } from "chai";
-import { flames, byName } from "../testHelpers";
+import { flames } from "../testHelpers";
 import { patchTree } from "./patchTree";
+import { cloneTree } from "./util";
+import { Tree } from "../../../../store/types";
+
+export function toTimings(tree: Tree) {
+	return Array.from(tree.values())
+		.map(x => ({
+			id: x.id,
+			name: x.name,
+			children: x.children,
+			treeStartTime: x.treeStartTime,
+			treeEndTime: x.treeEndTime,
+		}))
+		.sort((a, b) => a.id - b.id);
+}
 
 describe("patchTree", () => {
 	it("should return old tree when new one is empty", () => {
@@ -97,24 +111,6 @@ describe("patchTree", () => {
 		expect(bar.endTime > bob.endTime).to.equal(true);
 	});
 
-	it("should expand parent", () => {
-		const a = flames`
-			App ******
-		`;
-
-		const b = flames`
-			App ***********
-			 Bar ********
-		`;
-
-		patchTree(a.idMap, b.idMap, 1);
-
-		const app = b.byName("App")!;
-		const bar = b.byName("Bar")!;
-		expect(app.startTime < bar.startTime).to.equal(true);
-		expect(app.endTime > bar.endTime).to.equal(true);
-	});
-
 	it("should move siblings to the right", () => {
 		const a = flames`
 		App ***********
@@ -126,23 +122,52 @@ describe("patchTree", () => {
 		 Bob *  Bar **
 	`;
 
+		// Correct ids
 		b.byName("App")!.children = [3, 2];
 		b.byName("Bar")!.id = 2;
 		b.byName("Bob")!.id = 3;
 
-		const merged = patchTree(a.idMap, b.idMap, 1);
+		const expected = toTimings(cloneTree(b.idMap));
+		const actual = toTimings(patchTree(a.idMap, b.idMap, 1));
+		expect(actual).to.deep.equal(expected);
+	});
 
-		const app = byName(merged, "App")!;
-		const bar = byName(merged, "Bar")!;
-		const bob = byName(merged, "Bob")!;
+	it("should move siblings to the right #2", () => {
+		const a = flames`
+		App ******
+		  Bar **
+	`;
 
-		expect(app.startTime < bar.startTime).to.equal(true);
-		expect(app.endTime > bar.endTime).to.equal(true);
+		const b = flames`
+		App *************
+		 Bob ****  Bar **
+	`;
 
-		expect(app.startTime < bob.startTime).to.equal(true);
-		expect(app.endTime > bob.endTime).to.equal(true);
+		// Correct ids
+		b.byName("App")!.children = [3, 2];
+		b.byName("Bar")!.id = 2;
+		b.byName("Bob")!.id = 3;
 
-		expect(bar.startTime < bob.startTime).to.equal(true);
-		expect(bar.endTime < bob.endTime).to.equal(true);
+		const expected = toTimings(cloneTree(b.idMap));
+		const actual = toTimings(patchTree(a.idMap, b.idMap, 1));
+		expect(actual).to.deep.equal(expected);
+	});
+
+	it("should enlarge parent", () => {
+		const a = flames`
+			App ****
+			 Bar **
+		`;
+
+		const b = flames`
+			App ******
+			 Bar ****
+		`;
+
+		const expected = toTimings(cloneTree(b.idMap));
+		b.idMap.delete(1);
+
+		const actual = toTimings(patchTree(a.idMap, b.idMap, 2));
+		expect(actual).to.deep.equal(expected);
 	});
 });

@@ -86,7 +86,7 @@ describe("FlameGraphStore", () => {
 			`;
 			profiler.commits.$ = [tree.commit];
 
-			expect(flame.nodes.$.map(x => x.width)).to.deep.equal([1, 0.8, 0.6]);
+			expect(flame.nodes.$.map(x => x.width)).to.deep.equal([100, 80, 60]);
 		});
 
 		it("should support maximizing nodes", () => {
@@ -139,7 +139,6 @@ describe("FlameGraphStore", () => {
 					x: 0,
 					row: 0,
 					width: 1,
-					color: "var(--color-profiler-gradient-3)",
 				},
 				{
 					id: 2,
@@ -147,7 +146,6 @@ describe("FlameGraphStore", () => {
 					x: 20,
 					row: 1,
 					width: 0.6666666666666666,
-					color: "var(--color-profiler-gradient-2)",
 				},
 				{
 					id: 3,
@@ -155,7 +153,6 @@ describe("FlameGraphStore", () => {
 					x: 40,
 					row: 2,
 					width: 0.4166666666666667,
-					color: "var(--color-profiler-gradient-4)",
 				},
 			]);
 		});
@@ -182,24 +179,21 @@ describe("FlameGraphStore", () => {
 					name: "App",
 					x: 0,
 					row: 0,
-					width: 1,
-					color: "var(--color-profiler-gradient-5)",
+					width: 120,
 				},
 				{
 					id: 2,
 					name: "Foo",
 					x: 0,
 					row: 1,
-					width: 1,
-					color: "var(--color-profiler-gradient-3)",
+					width: 120,
 				},
 				{
 					id: 3,
 					name: "Bar",
-					x: 20,
+					x: 30,
 					row: 2,
-					width: 0.625,
-					color: "var(--color-profiler-gradient-6)",
+					width: 75,
 				},
 			]);
 		});
@@ -227,7 +221,6 @@ describe("FlameGraphStore", () => {
 					x: 0,
 					row: 0,
 					width: 1,
-					color: "var(--color-profiler-gradient-0)",
 				},
 				{
 					id: 2,
@@ -235,7 +228,6 @@ describe("FlameGraphStore", () => {
 					x: 0,
 					row: 1,
 					width: 1.2,
-					color: "var(--color-profiler-gradient-0)",
 				},
 				{
 					id: 3,
@@ -243,7 +235,6 @@ describe("FlameGraphStore", () => {
 					x: 20,
 					row: 2,
 					width: 0.625,
-					color: "var(--color-profiler-gradient-0)",
 				},
 				{
 					id: 4,
@@ -251,7 +242,6 @@ describe("FlameGraphStore", () => {
 					x: 20,
 					row: 2,
 					width: 0.625,
-					color: "var(--color-profiler-gradient-0)",
 				},
 				{
 					id: 5,
@@ -259,7 +249,6 @@ describe("FlameGraphStore", () => {
 					x: 20,
 					row: 2,
 					width: 0.625,
-					color: "var(--color-profiler-gradient-0)",
 				},
 			]);
 		});

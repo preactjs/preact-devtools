@@ -25,7 +25,10 @@ export function patchTree(old: Tree, next: Tree, rootId: ID): Tree {
 	}
 
 	let deltaStart = oldRoot.treeStartTime - root.startTime;
-	let deltaEnd = oldRoot.treeStartTime + (root.endTime - root.startTime);
+	let deltaEnd =
+		oldRoot.treeStartTime +
+		(root.endTime - root.startTime) -
+		oldRoot.treeEndTime;
 
 	// Move new tree to old tree position.
 	out.set(root.id, {
@@ -38,7 +41,7 @@ export function patchTree(old: Tree, next: Tree, rootId: ID): Tree {
 	mapChildren(next, root.id, child => {
 		out.set(child.id, {
 			...deepClone(child),
-			// FIXME: This is completely wrong
+			// TODO: Check for stale children
 			treeStartTime: child.startTime + deltaStart,
 			treeEndTime: child.endTime + deltaStart,
 		});
