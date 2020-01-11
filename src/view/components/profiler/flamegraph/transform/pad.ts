@@ -20,11 +20,15 @@ export function padNodes(
 	});
 
 	needsPad.forEach(pad => {
+		pad.width += factor;
+
 		nodes.forEach(node => {
 			// Enlarge width of parents
 			if (node.x <= pad.x && node.x + node.width >= pad.x + pad.width) {
-				node.width += factor;
-			} else if (node.x > pad.x) {
+				if (node.id !== pad.id) {
+					node.width += factor;
+				}
+			} else if (node.id !== pad.id && node.x >= pad.x) {
 				// Move nodes to the right by factor
 				node.x += factor;
 			}

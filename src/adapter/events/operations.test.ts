@@ -19,26 +19,21 @@ describe("ops2Tree", () => {
 	describe("ADD_VNODE", () => {
 		it("should add a vnode", () => {
 			const ops = fromSnapshot(["rootId: 1", "Add 1 <Fragment> to parent -1"]);
-			expect(ops2Tree(new Map(), ops).tree).to.deep.equal(
-				new Map([
-					[
-						1,
-						{
-							children: [],
-							depth: 1,
-							id: 1,
-							name: "Fragment",
-							parent: -1,
-							type: 3,
-							key: "",
-							startTime: 42,
-							endTime: 42,
-							treeStartTime: -1,
-							treeEndTime: -1,
-						},
-					],
-				]),
-			);
+			expect(Array.from(ops2Tree(new Map(), ops).tree.values())).to.deep.equal([
+				{
+					children: [],
+					depth: 0,
+					id: 1,
+					name: "Fragment",
+					parent: -1,
+					type: 3,
+					key: "",
+					startTime: 42,
+					endTime: 42,
+					treeStartTime: -1,
+					treeEndTime: -1,
+				},
+			]);
 		});
 
 		it("should add a children to its parent", () => {
@@ -49,42 +44,34 @@ describe("ops2Tree", () => {
 			]);
 
 			const { tree } = ops2Tree(new Map(), ops);
-			expect(tree).to.deep.equal(
-				new Map([
-					[
-						1,
-						{
-							children: [2],
-							depth: 1,
-							id: 1,
-							name: "Fragment",
-							parent: -1,
-							type: 3,
-							key: "",
-							startTime: 42,
-							endTime: 42,
-							treeStartTime: -1,
-							treeEndTime: -1,
-						},
-					],
-					[
-						2,
-						{
-							children: [],
-							depth: 2,
-							id: 2,
-							name: "span",
-							parent: 1,
-							type: 1,
-							key: "",
-							startTime: 42,
-							endTime: 42,
-							treeStartTime: -1,
-							treeEndTime: -1,
-						},
-					],
-				]),
-			);
+			expect(Array.from(tree.values())).to.deep.equal([
+				{
+					children: [2],
+					depth: 0,
+					id: 1,
+					name: "Fragment",
+					parent: -1,
+					type: 3,
+					key: "",
+					startTime: 42,
+					endTime: 42,
+					treeStartTime: -1,
+					treeEndTime: -1,
+				},
+				{
+					children: [],
+					depth: 1,
+					id: 2,
+					name: "span",
+					parent: 1,
+					type: 1,
+					key: "",
+					startTime: 42,
+					endTime: 42,
+					treeStartTime: -1,
+					treeEndTime: -1,
+				},
+			]);
 		});
 	});
 

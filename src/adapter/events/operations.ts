@@ -35,7 +35,7 @@ export function ops2Tree(oldTree: Tree, ops: number[]) {
 
 				pending.set(id, {
 					children: [],
-					depth: parent ? parent.depth + 1 : 1,
+					depth: parent ? parent.depth + 1 : 0,
 					id,
 					name: strings[ops[i + 5] - 1],
 					parent: parentId,

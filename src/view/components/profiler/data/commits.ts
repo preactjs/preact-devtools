@@ -86,8 +86,11 @@ export function createProfiler(): ProfilerState {
 
 	// Flamegraph
 	const flamegraphType = valoo(FlamegraphType.FLAMEGRAPH);
-	flamegraphType.on(() => {
-		selectedNodeId.$ = activeCommit.$ ? activeCommit.$.rootId : -1;
+	flamegraphType.on(type => {
+		selectedNodeId.$ =
+			type === FlamegraphType.FLAMEGRAPH && activeCommit.$
+				? activeCommit.$.rootId
+				: -1;
 	});
 
 	return {

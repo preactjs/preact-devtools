@@ -63,7 +63,7 @@ describe("FlameGraphStore", () => {
 						Foo **   Bar ***
 				`;
 			profiler.commits.$ = [tree.commit];
-			expect(flame.nodes.$.map(x => x.width)).to.deep.equal([1, 0.875, 0.75]);
+			expect(flame.nodes.$.map(x => x.width)).to.deep.equal([80, 70, 60]);
 		});
 
 		it("should rank nodes by selfDuration #2", () => {
@@ -104,9 +104,9 @@ describe("FlameGraphStore", () => {
 			]);
 
 			expect(flame.nodes.$.map(x => x.width)).to.deep.equal([
-				1,
-				1,
-				0.8333333333333334,
+				100,
+				100,
+				83.33333333333334,
 			]);
 		});
 	});
@@ -138,21 +138,21 @@ describe("FlameGraphStore", () => {
 					name: "App",
 					x: 0,
 					row: 0,
-					width: 1,
+					width: 120,
 				},
 				{
 					id: 2,
 					name: "Foo",
 					x: 20,
 					row: 1,
-					width: 0.6666666666666666,
+					width: 80,
 				},
 				{
 					id: 3,
 					name: "Bar",
 					x: 40,
 					row: 2,
-					width: 0.4166666666666667,
+					width: 50,
 				},
 			]);
 		});
@@ -220,35 +220,35 @@ describe("FlameGraphStore", () => {
 					name: "App",
 					x: 0,
 					row: 0,
-					width: 1,
+					width: 310,
 				},
 				{
 					id: 2,
 					name: "Foo",
-					x: 0,
+					x: -516.6666666666667,
 					row: 1,
-					width: 1.2,
-				},
-				{
-					id: 3,
-					name: "Bar",
-					x: 20,
-					row: 2,
-					width: 0.625,
+					width: 413.33333333333337,
 				},
 				{
 					id: 4,
 					name: "Bob",
-					x: 20,
-					row: 2,
-					width: 0.625,
+					x: 0,
+					row: 1,
+					width: 310,
 				},
 				{
 					id: 5,
 					name: "Boof",
-					x: 20,
+					x: 465,
+					row: 1,
+					width: 413.33333333333337,
+				},
+				{
+					id: 3,
+					name: "Bar",
+					x: -413.33333333333337,
 					row: 2,
-					width: 0.625,
+					width: 258.33333333333337,
 				},
 			]);
 		});

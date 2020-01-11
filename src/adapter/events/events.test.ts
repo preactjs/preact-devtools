@@ -183,11 +183,16 @@ describe("applyEvent", () => {
 
 		applyEvent(store, "operation_v2", data);
 
-		const data2 = fromSnapshot(["rootId: 1", "Remove 2"]);
+		const data2 = fromSnapshot([
+			"rootId: 1",
+			"Update timings 1 time 12:20",
+			"Remove 2",
+		]);
 		applyEvent(store, "operation_v2", data2);
 
 		const data3 = fromSnapshot([
 			"rootId: 1",
+			"Update timings 1 time 12:20",
 			"Add 17 <StyleGuide> to parent 1",
 			"Add 3 <TodoList> to parent 17",
 			"Add 4 <TodoItem> to parent 3",

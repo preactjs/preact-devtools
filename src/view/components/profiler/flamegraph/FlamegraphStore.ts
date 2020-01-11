@@ -6,6 +6,7 @@ import { layoutRanked } from "./modes/ranked";
 import { layoutTimeline } from "./modes/flamegraph";
 import { focusNode, NodeTransform } from "./transform/focusNode";
 import { padNodes } from "./transform/pad";
+import { deepClone } from "./transform/util";
 
 /**
  * The minimum width of a node inside the flamegraph.
