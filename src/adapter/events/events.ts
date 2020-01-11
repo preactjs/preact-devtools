@@ -4,6 +4,7 @@ import { recordProfilerCommit } from "../../view/components/profiler/data/commit
 import { patchTree } from "../../view/components/profiler/flamegraph/transform/patchTree";
 import { deepClone } from "../../view/components/profiler/flamegraph/transform/util";
 import { ops2Tree } from "./operations";
+import { applyOperationsV1 } from "./legacy/operationsV1";
 
 export enum MsgTypes {
 	ADD_ROOT = 1,
@@ -79,10 +80,6 @@ export function flush(commit: Commit) {
 	return { name: "operation_v2", data: msg };
 }
 
-export function applyOperations(store: Store, data: number[]) {
-	// FIXME: Bring back legacy support
-}
-
 /**
  * This is the heart of the devtools. Here we translate incoming events
  * and construct the tree data structure which all operations in the
@@ -125,7 +122,7 @@ export function applyOperationsV2(store: Store, data: number[]) {
 export function applyEvent(store: Store, name: string, data: any) {
 	switch (name) {
 		case "operation":
-			applyOperations(store, data);
+			applyOperationsV1(store, data);
 			break;
 		case "operation_v2":
 			applyOperationsV2(store, data);
