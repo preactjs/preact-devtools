@@ -115,7 +115,7 @@ export function TreeItem(props: { key: any; id: ID }) {
 			data-id={id}
 			data-depth={node.depth}
 			style={`padding-left: calc(var(--indent-depth) * ${node.depth -
-				(filterFragments ? 2 : 1)})`}
+				(filterFragments ? 1 : 0)})`}
 		>
 			<div class={s.itemHeader}>
 				{node.children.length > 0 && (
