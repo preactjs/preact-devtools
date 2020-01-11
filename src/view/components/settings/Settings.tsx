@@ -13,9 +13,8 @@ export function Settings() {
 
 	return (
 		<div class={s.root}>
-			<h1>Settings</h1>
 			<form>
-				<p>Theme:</p>
+				<label class={s.label}>Theme:</label>
 				<RadioBar
 					name="theme"
 					value={theme}

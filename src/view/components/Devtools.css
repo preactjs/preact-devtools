@@ -9,6 +9,10 @@
 		"tree sidebar";
 }
 
+.root p {
+	margin-top: 0;
+}
+
 .theme {
 	background: var(--color-bg);
 	color: var(--color-text);

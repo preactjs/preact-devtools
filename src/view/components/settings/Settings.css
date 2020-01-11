@@ -2,7 +2,8 @@
 	padding: 1rem;
 }
 
-.root h1 {
-	margin-top: 0;
-	font-weight: lighter;
+.label {
+	display: block;
+	margin-bottom: 0.75rem;
+	font-size: 0.9rem;
 }
