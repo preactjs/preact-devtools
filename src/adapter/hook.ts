@@ -19,6 +19,9 @@ export interface DevtoolEvents {
 	"force-update": ID;
 	"start-picker": null;
 	"stop-picker": null;
+	"start-profiling": null;
+	"stop-profiling": null;
+	"clear-profiling": null;
 	"update-filter": RawFilterState;
 	copy: string;
 	highlight: ID | null;
@@ -88,6 +91,10 @@ export function createHook(bridge: Bridge): DevtoolsHook {
 			multi.applyFilters(parseFilters(ev));
 		});
 		bridge.listen("force-update", ev => multi.forceUpdate(ev));
+
+		// Profiler
+		bridge.listen("start-profiling", multi.startProfiling!);
+		bridge.listen("stop-profiling", multi.stopProfiling!);
 	};
 
 	const attachRenderer = (renderer: Renderer) => {

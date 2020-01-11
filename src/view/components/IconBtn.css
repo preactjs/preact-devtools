@@ -50,8 +50,6 @@
 	z-index: -1;
 }
 
-.root:focus-within .bg,
-.root:not([disabled]):active .bg,
 .root:not([disabled])[data-active] .bg {
 	display: block;
 	content: "";

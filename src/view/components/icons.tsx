@@ -202,3 +202,71 @@ export function FileCopy({ size = "s" }: Props) {
 		/>,
 	);
 }
+
+export function ArrowBack({ size = "s" }: Props) {
+	return createSvgIcon(
+		size,
+		<g>
+			<path d="M0 0h24v24H0z" fill="none" />
+			<path
+				d="M20 11H7.83l5.59-5.59L12 4l-8 8 8 8 1.41-1.41L7.83 13H20v-2z"
+				fill="currentColor"
+			/>
+		</g>,
+	);
+}
+export function ArrowForward({ size = "s" }: Props) {
+	return createSvgIcon(
+		size,
+		<g>
+			<path d="M0 0h24v24H0z" fill="none" />
+			<path
+				d="M12 4l-1.41 1.41L16.17 11H4v2h12.17l-5.58 5.59L12 20l8-8z"
+				fill="currentColor"
+			/>
+		</g>,
+	);
+}
+
+export function RecordIcon({ size = "s" }: Props) {
+	return createSvgIcon(
+		size,
+		<circle fill="currentColor" cx="12" cy="12" r="8" />,
+	);
+}
+
+export function NotInterested({ size = "s" }: Props) {
+	return createSvgIcon(
+		size,
+		<path
+			d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm0 18c-4.42 0-8-3.58-8-8 0-1.85.63-3.55 1.69-4.9L16.9 18.31C15.55 19.37 13.85 20 12 20zm6.31-3.1L7.1 5.69C8.45 4.63 10.15 4 12 4c4.42 0 8 3.58 8 8 0 1.85-.63 3.55-1.69 4.9z"
+			fill="currentColor"
+		/>,
+	);
+}
+
+export function SortIcon({ size = "s" }: Props) {
+	return createSvgIcon(
+		size,
+		<Fragment>
+			<path
+				d="M3 18h6v-2H3v2zM3 6v2h18V6H3zm0 7h12v-2H3v2z"
+				fill="currentColor"
+			/>
+			<path d="M0 0h24v24H0z" fill="none" />
+		</Fragment>,
+	);
+}
+
+export function FireIcon({ size = "s" }: Props) {
+	return createSvgIcon(
+		size,
+		<Fragment>
+			<path
+				d="M13.5.67s.74 2.65.74 4.8c0 2.06-1.35 3.73-3.41 3.73-2.07 0-3.63-1.67-3.63-3.73l.03-.36C5.21 7.51 4 10.62 4 14c0 4.42 3.58 8 8 8s8-3.58 8-8C20 8.61 17.41 3.8 13.5.67zM11.71 19c-1.78 0-3.22-1.4-3.22-3.14 0-1.62 1.05-2.76 2.81-3.12 1.77-.36 3.6-1.21 4.62-2.58.39 1.29.59 2.65.59 4.04 0 2.65-2.15 4.8-4.8 4.8z"
+				fill="currentColor"
+			/>
+			<path d="M0 0h24v24H0z" fill="none" />
+		</Fragment>,
+	);
+}

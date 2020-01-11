@@ -1,0 +1,9 @@
+.root {
+	padding: 1rem;
+}
+
+.label {
+	display: block;
+	margin-bottom: 0.75rem;
+	font-size: 0.9rem;
+}

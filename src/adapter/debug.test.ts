@@ -1,6 +1,6 @@
 import { expect } from "chai";
 import { fromSnapshot, toStringTable } from "./debug";
-import { MsgTypes } from "./events";
+import { MsgTypes } from "./events/events";
 import { Elements } from "./renderer";
 
 describe("debug", () => {
@@ -31,6 +31,8 @@ describe("debug", () => {
 				9999,
 				1,
 				0,
+				42000,
+				42000,
 			]);
 		});
 

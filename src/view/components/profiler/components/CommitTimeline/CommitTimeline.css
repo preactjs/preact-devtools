@@ -1,0 +1,123 @@
+.root {
+	display: flex;
+	height: 100%;
+	flex-shrink: 0;
+	flex-grow: 1;
+	justify-content: flex-end;
+	position: relative;
+}
+
+.inner {
+	display: flex;
+	align-items: center;
+	height: 100%;
+}
+
+.legend {
+	display: flex;
+	flex-direction: row;
+	font-size: 0.8rem;
+	margin-left: 0.25rem;
+}
+
+.itemContainer {
+	position: relative;
+	height: 100%;
+	overflow: hidden;
+}
+
+.items {
+	position: absolute;
+	top: 0;
+	bottom: 0;
+	display: flex;
+	margin: 0 0rem;
+	min-height: 1rem;
+	height: 100%;
+	padding-top: 0.25rem;
+	padding-bottom: 0.25rem;
+	transition: all 0.15s;
+}
+
+.item {
+	position: relative;
+	width: 100%;
+	cursor: pointer;
+	min-width: 0.75rem;
+	max-width: 1.75rem;
+}
+
+.item::-moz-focus-inner {
+	border: 0;
+}
+
+.item + .item {
+	margin-left: 0.1rem;
+}
+
+.item[data-selected]::after {
+	content: "";
+	height: 0.1875rem;
+	width: 100%;
+	position: absolute;
+	top: calc(100% + 0.0625rem);
+	left: 0;
+	background: var(--color-selected-bg);
+}
+
+.itemInner {
+	position: absolute;
+	bottom: 0;
+	left: 0;
+	right: 0;
+}
+
+.navBtn {
+	display: flex;
+	background: none;
+	border: none;
+	padding: 0 0.5rem;
+	cursor: pointer;
+	color: var(--color-text);
+	transition: color 0.3s;
+}
+
+.navBtn[disabled] {
+	color: var(--color-disabled);
+	cursor: inherit;
+}
+
+.item[data-weight="0"] .itemInner {
+	background: var(--color-profiler-gradient-0);
+}
+.item[data-weight="1"] .itemInner {
+	background: var(--color-profiler-gradient-1);
+}
+.item[data-weight="2"] .itemInner {
+	background: var(--color-profiler-gradient-2);
+}
+.item[data-weight="3"] .itemInner {
+	background: var(--color-profiler-gradient-3);
+}
+.item[data-weight="4"] .itemInner {
+	background: var(--color-profiler-gradient-4);
+}
+.item[data-weight="5"] .itemInner {
+	background: var(--color-profiler-gradient-5);
+}
+.item[data-weight="6"] .itemInner {
+	background: var(--color-profiler-gradient-6);
+}
+.item[data-weight="7"] .itemInner {
+	background: var(--color-profiler-gradient-7);
+}
+.item[data-weight="8"] .itemInner {
+	background: var(--color-profiler-gradient-8);
+}
+.item[data-weight="9"] .itemInner {
+	background: var(--color-profiler-gradient-9);
+}
+
+.hidden {
+	visibility: hidden;
+}

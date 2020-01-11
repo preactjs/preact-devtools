@@ -3,7 +3,7 @@ import { render, h, Options } from "preact";
 import { DevTools } from "../../view/components/Devtools";
 import { createAdapter } from "../../adapter/adapter/adapter";
 import { DevtoolsHook } from "../../adapter/hook";
-import { applyEvent } from "../../adapter/events";
+import { applyEvent } from "../../adapter/events/events";
 import { setupOptions } from "../../adapter/10/options";
 import { Store } from "../../view/store/types";
 import { Preact10Renderer } from "../../adapter/10/renderer";

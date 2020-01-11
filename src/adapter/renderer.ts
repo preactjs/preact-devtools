@@ -17,6 +17,10 @@ export interface Renderer {
 	flushInitial(): void;
 	forceUpdate(id: ID): void;
 	update(id: ID, type: UpdateType, path: ObjPath, value: any): void;
+
+	// Profiler
+	startProfiling?(): void; // V2
+	stopProfiling?(): void; // V2
 }
 
 export enum Elements {

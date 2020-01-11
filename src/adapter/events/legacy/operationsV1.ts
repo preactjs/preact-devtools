@@ -1,69 +1,8 @@
-import { flushTable, StringTable, parseTable } from "./string-table";
-import { valoo } from "../view/valoo";
-import { Store } from "../view/store/types";
-import { toSnapshot, parseCommitMessage } from "./debug";
+import { MsgTypes } from "../events";
+import { parseTable } from "../../string-table";
+import { Store } from "../../../view/store/types";
 
-export enum MsgTypes {
-	ADD_ROOT = 1,
-	ADD_VNODE = 2,
-	REMOVE_VNODE = 3,
-	UPDATE_VNODE_TIMINGS = 4,
-	REORDER_CHILDREN = 5,
-}
-
-// Event Examples:
-//
-// ADD_ROOT
-//   id
-//
-// ADD_VNODE
-//   id
-//   type
-//   parent
-//   owner
-//   name
-//   key
-//
-// REMOVE_VNODE
-//   id
-//
-// UPDATE_VNODE_TIMINGS
-//   id
-//   duration
-//
-// REORDER_CHILDREN
-//   id
-//   childrenCount
-//   childId
-//   childId
-//   ...
-
-export interface Commit {
-	rootId: number;
-	strings: StringTable;
-	unmountIds: number[];
-	operations: number[];
-}
-
-/**
- * Collect all relevant data from a commit and convert it to a message
- * the detools can understand
- */
-export function flush(commit: Commit) {
-	const { rootId, unmountIds, operations, strings } = commit;
-	if (unmountIds.length === 0 && operations.length === 0) return;
-
-	let msg = [rootId, ...flushTable(strings)];
-	if (unmountIds.length > 0) {
-		msg.push(MsgTypes.REMOVE_VNODE, unmountIds.length, ...unmountIds);
-	}
-	msg.push(...operations);
-
-	return { name: "operation", data: msg };
-}
-
-// FIXME: Write tests for this function
-export function applyOperations(store: Store, data: number[]) {
+export function applyOperationsV1(store: Store, data: number[]) {
 	const rootId = data[0];
 
 	let i = data[1] + 1;
@@ -109,20 +48,18 @@ export function applyOperations(store: Store, data: number[]) {
 						parent: parentId,
 						type,
 						key,
-						duration: valoo<number>(0),
+						startTime: -1,
+						endTime: -1,
+						treeStartTime: -1,
+						treeEndTime: -1,
 					});
 				}
 				i += 6;
 				break;
 			}
 			case MsgTypes.UPDATE_VNODE_TIMINGS: {
+				// Unused event
 				const id = data[i + 1];
-				const duration = data[i + 2];
-
-				const node = store.nodes.$.get(id)!;
-				if (node) {
-					node.duration.$ = duration;
-				}
 
 				if (id === inspected) {
 					store.actions.inspect(id);
@@ -181,27 +118,6 @@ export function applyOperations(store: Store, data: number[]) {
 		}
 	}
 
-	// TODO: This triggers rendering twice :S
 	store.roots.update();
 	store.nodes.update();
-}
-
-export function applyEvent(store: Store, name: string, data: any) {
-	switch (name) {
-		case "operation":
-			applyOperations(store, data);
-			break;
-		case "inspect-result":
-			store.inspectData.$ = data;
-			if (store.selection.selected.$ !== data.id) {
-				store.selection.selectById(data.id);
-			}
-			break;
-		case "select-node":
-			store.selection.selectById(data);
-			break;
-		case "stop-picker":
-			store.actions.stopPickElement();
-			break;
-	}
 }

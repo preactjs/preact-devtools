@@ -11,6 +11,7 @@ export function renderTest(ui: ComponentChild) {
 	const res = render(ui);
 	return {
 		...res,
+		e2e: (name: string) => res.container.querySelector(`[data-e2e="${name}"]`),
 		$: (sel: string) => res.container.querySelector(sel),
 		$$: (sel: string) => res.container.querySelectorAll(sel),
 	};

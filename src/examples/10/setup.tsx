@@ -8,6 +8,9 @@ import { createRenderer } from "../../adapter/10/renderer";
 import { setupOptions } from "../../adapter/10/options";
 import { Booleans, Complex } from "./DataTypes";
 import { FullWidthHighlighter } from "./Highlighting";
+import { Gradient } from "./Gradient";
+import s from "../../view/components/Devtools.css";
+import { Prime } from "./Prime";
 
 export function initPreact10(hook: DevtoolsHook) {
 	if (hook.attachPreact) {
@@ -27,24 +30,28 @@ export function initPreact10(hook: DevtoolsHook) {
 
 export function renderExamples10(node: HTMLElement) {
 	render(
-		<div>
+		<div class={s.theme}>
 			{/* <FullWidthHighlighter /> */}
 			<div style="padding: 2rem">
 				<p>Highlight full width</p>
 				<small>
 					Uncomment all other components so that the vertical scrollbar is gone
 				</small>
+				<p>Primes</p>
+				<Prime max={10000} />
 				<p>Todo list</p>
 				<TodoList />
-				<p>Legacy context</p>
+				{/* <p>Legacy context</p>
 				<LegacyContext />
 				<p>Class state</p>
 				<Stateful />
 				<p>Data Types</p>
 				<Booleans value={true} />
 				<Complex />
+				<p>Profiler Gradient</p>
+				<Gradient />
 				<p>Deep tree</p>
-				<DeepTree />
+				<DeepTree /> */}
 				<br />
 			</div>
 		</div>,

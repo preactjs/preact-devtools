@@ -1,31 +1,28 @@
-import { h, Fragment } from "preact";
+import { h } from "preact";
 import { useState } from "preact/hooks";
-import { Actions, ActionSeparator } from "./Actions";
-import { IconBtn } from "./IconBtn";
+import { Actions, ActionSeparator } from "../Actions";
+import { IconBtn } from "../IconBtn";
 import {
-	SettingsIcon,
 	Picker,
 	KeyboardDown,
 	KeyboardUp,
 	Close,
 	Search,
-	Eye,
 	Remove,
 	AddCircle,
 	CheckboxChecked,
 	CheckboxUnChecked,
 	FilterList,
-} from "./icons";
-import { useStore, useObserver } from "../store/react-bindings";
+} from "../icons";
+import { useStore, useObserver } from "../../store/react-bindings";
 import s from "./TreeBar.css";
-import { useSearch } from "../store/search";
-import { OutsideClick } from "./OutsideClick";
+import { useSearch } from "../../store/search";
+import { OutsideClick } from "../OutsideClick";
 
 export function TreeBar() {
 	const store = useStore();
 	const isPicking = useObserver(() => store.isPicking.$);
 	const { value, count, selected, goPrev, goNext } = useSearch();
-	const activeModal = useObserver(() => store.modal.active.$);
 
 	const [filterVisible, setFilterVisible] = useState(false);
 
@@ -73,7 +70,6 @@ export function TreeBar() {
 					</div>
 				)}
 			</div>
-			<ActionSeparator />
 			<div class={s.btnWrapper}>
 				<IconBtn
 					onClick={store.search.selectNext}
@@ -116,15 +112,6 @@ export function TreeBar() {
 					</IconBtn>
 					{filterVisible && <FilterPopup />}
 				</OutsideClick>
-			</div>
-			<div class={s.btnWrapper}>
-				<IconBtn
-					active={activeModal === "settings"}
-					title="Settings"
-					onClick={() => store.modal.open("settings")}
-				>
-					<SettingsIcon size="s" />
-				</IconBtn>
 			</div>
 		</Actions>
 	);

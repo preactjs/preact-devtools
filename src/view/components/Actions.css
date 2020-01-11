@@ -16,4 +16,5 @@
 	height: 50%;
 	margin: 0 0.25rem;
 	display: flex;
+	flex-basis: 0.125rem;
 }

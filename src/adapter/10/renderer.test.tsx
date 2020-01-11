@@ -65,7 +65,7 @@ describe("Renderer 10", () => {
 		render(<div />, scratch);
 		expect(toSnapshot(spy.args[0][1])).to.deep.equal([
 			"rootId: 1",
-			"Add 1 <Fragment> to parent 1",
+			"Add 1 <Fragment> to parent -1",
 			"Add 2 <div> to parent 1",
 		]);
 
@@ -87,7 +87,7 @@ describe("Renderer 10", () => {
 		);
 		expect(toSnapshot(spy.args[0][1])).to.deep.equal([
 			"rootId: 1",
-			"Add 1 <Fragment> to parent 1",
+			"Add 1 <Fragment> to parent -1",
 			"Add 2 <div> to parent 1",
 			"Add 3 <span> to parent 2",
 			"Add 4 <span> to parent 2",
@@ -195,7 +195,7 @@ describe("Renderer 10", () => {
 			);
 			expect(toSnapshot(spy.args[0][1])).to.deep.equal([
 				"rootId: 1",
-				"Add 1 <Fragment> to parent 1",
+				"Add 1 <Fragment> to parent -1",
 				"Add 2 <div> to parent 1",
 			]);
 		});
@@ -214,7 +214,7 @@ describe("Renderer 10", () => {
 			);
 			expect(toSnapshot(spy.args[0][1])).to.deep.equal([
 				"rootId: 1",
-				"Add 1 <Fragment> to parent 1",
+				"Add 1 <Fragment> to parent -1",
 				"Add 2 <div> to parent 1",
 			]);
 		});
@@ -233,7 +233,7 @@ describe("Renderer 10", () => {
 			);
 			expect(toSnapshot(spy.args[0][1])).to.deep.equal([
 				"rootId: 1",
-				"Add 1 <Fragment> to parent 1",
+				"Add 1 <Fragment> to parent -1",
 			]);
 		});
 
@@ -256,7 +256,7 @@ describe("Renderer 10", () => {
 			);
 			expect(toSnapshot(spy.args[0][1])).to.deep.equal([
 				"rootId: 1",
-				"Add 1 <Fragment> to parent 1",
+				"Add 1 <Fragment> to parent -1",
 				"Add 2 <Foo> to parent 1",
 			]);
 		});
@@ -279,7 +279,7 @@ describe("Renderer 10", () => {
 			);
 			expect(toSnapshot(spy.args[0][1])).to.deep.equal([
 				"rootId: 1",
-				"Add 1 <Fragment> to parent 1",
+				"Add 1 <Fragment> to parent -1",
 				"Add 2 <div> to parent 1",
 				"Add 3 <Foo> to parent 2",
 				"Add 4 <div> to parent 3",
@@ -311,7 +311,7 @@ describe("Renderer 10", () => {
 
 			expect(toSnapshot(spy.args[0][1])).to.deep.equal([
 				"rootId: 1",
-				"Add 1 <Fragment> to parent 1",
+				"Add 1 <Fragment> to parent -1",
 				"Add 2 <Parent> to parent 1",
 				"Add 3 <Foo> to parent 2",
 			]);
@@ -321,7 +321,7 @@ describe("Renderer 10", () => {
 			});
 
 			expect(toSnapshot(spy.args[1][1])).to.deep.equal([
-				"rootId: 1",
+				"rootId: 2",
 				"Update timings 2",
 				"Update timings 3",
 			]);
@@ -346,7 +346,7 @@ describe("Renderer 10", () => {
 			);
 			expect(toSnapshot(spy.args[0][1])).to.deep.equal([
 				"rootId: 1",
-				"Add 1 <Fragment> to parent 1",
+				"Add 1 <Fragment> to parent -1",
 				"Add 2 <Foo> to parent 1",
 			]);
 
@@ -394,7 +394,7 @@ describe("Renderer 10", () => {
 			);
 			expect(toSnapshot(spy.args[0][1])).to.deep.equal([
 				"rootId: 1",
-				"Add 1 <Fragment> to parent 1",
+				"Add 1 <Fragment> to parent -1",
 				"Add 2 <Foo> to parent 1",
 				"Add 3 <Foo> to parent 2",
 			]);
