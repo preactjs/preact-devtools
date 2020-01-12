@@ -24,5 +24,8 @@ window.addEventListener("pageshow", ev => {
 	chrome.runtime.sendMessage(lastDetection);
 });
 
-inject(chrome.runtime.getURL("installHook.js"), "script");
-injectStyles(chrome.runtime.getURL("installHook.css"));
+// Only inject for HTML pages
+if (document.contentType === "text/html") {
+	inject(chrome.runtime.getURL("installHook.js"), "script");
+	injectStyles(chrome.runtime.getURL("installHook.css"));
+}
