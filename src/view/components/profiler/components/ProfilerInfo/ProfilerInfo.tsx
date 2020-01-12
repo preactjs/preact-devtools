@@ -6,9 +6,19 @@ import { RecordBtn } from "../TimelineBar/TimelineBar";
 export function ProfilerInfo() {
 	const store = useStore();
 	const isRecording = useObserver(() => store.profiler.isRecording.$);
+	const isSupported = useObserver(() => store.profiler.isSupported.$);
 	const commits = useObserver(() => store.profiler.commits.$);
 
-	if (isRecording) {
+	if (!isSupported) {
+		return (
+			<div class={s.root}>
+				<p class={s.title}>Profiling is not supported</p>
+				<p class={s.descr}>
+					Please upgrade Preact to a version that supports it (>=10.3.0).
+				</p>
+			</div>
+		);
+	} else if (isRecording) {
 		return (
 			<div class={s.root}>
 				<p class={s.title}>Profiling in progress...</p>

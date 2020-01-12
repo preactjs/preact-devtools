@@ -30,6 +30,11 @@ export enum FlamegraphType {
 
 export interface ProfilerState {
 	/**
+	 * Flag to indicate if profiling is supported by the attached renderer.
+	 */
+	isSupported: Observable<boolean>;
+
+	/**
 	 * Flag that indicates if we are currently
 	 * recording commits to be displayed in the
 	 * profiler.
@@ -53,6 +58,7 @@ export interface ProfilerState {
  */
 export function createProfiler(): ProfilerState {
 	const commits = valoo<CommitData[]>([]);
+	const isSupported = valoo(false);
 
 	// Selection
 	const activeCommitIdx = valoo(0);
@@ -94,6 +100,7 @@ export function createProfiler(): ProfilerState {
 	});
 
 	return {
+		isSupported,
 		isRecording,
 		commits,
 		activeCommitIdx,

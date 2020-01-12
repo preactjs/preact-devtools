@@ -39,6 +39,7 @@ export function SmallTabGroup(props: {
 
 export interface IconTabProps extends TabProps {
 	icon: ComponentChild;
+	disabled?: boolean;
 }
 
 export function IconTab(props: IconTabProps) {
@@ -55,6 +56,7 @@ export function IconTab(props: IconTabProps) {
 				value={props.value}
 				checked={props.checked}
 				onClick={onClick}
+				disabled={props.disabled}
 			/>
 			<span class={s.iconInner}>
 				{props.icon}

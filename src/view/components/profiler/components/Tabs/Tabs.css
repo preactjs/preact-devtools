@@ -41,7 +41,11 @@
 	visibility: hidden;
 }
 
-.input:checked + .iconInner::after {
+.input[disabled] + * {
+	opacity: 0.5;
+}
+
+.input:checked:not([disabled]) + .iconInner::after {
 	content: "";
 	position: absolute;
 	bottom: 0;
