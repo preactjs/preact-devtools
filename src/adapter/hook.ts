@@ -64,6 +64,8 @@ export function createHook(bridge: Bridge): DevtoolsHook {
 		listeners.forEach(l => l != null && l(name, data));
 	};
 
+	const queue: Array<[string, any]> = [];
+
 	// Lazily init the adapter when a renderer is attached
 	const init = () => {
 		const multi = createMultiRenderer(renderers);
@@ -86,7 +88,13 @@ export function createHook(bridge: Bridge): DevtoolsHook {
 		bridge.listen("update", adapter.log);
 		bridge.listen("start-picker", adapter.startPickElement);
 		bridge.listen("stop-picker", adapter.stopPickElement);
-		bridge.listen("initialized", multi.flushInitial);
+		bridge.listen("initialized", () => {
+			while (queue.length) {
+				const msg = queue.pop()!;
+				bridge.send(msg[0], msg[1]);
+			}
+			multi.flushInitial();
+		});
 		bridge.listen("update-filter", ev => {
 			multi.applyFilters(parseFilters(ev));
 		});
@@ -106,7 +114,20 @@ export function createHook(bridge: Bridge): DevtoolsHook {
 
 		// Content Script is likely not ready at this point, so don't
 		// flush any events here and politely request it to initialize
-		bridge.send("attach", uid);
+		const supportsProfiling =
+			typeof renderer.startProfiling === "function" &&
+			typeof renderer.stopProfiling === "function";
+		queue.push([
+			"attach",
+			{
+				id: uid,
+				supportsProfiling,
+			},
+		]);
+		emit("attach", {
+			id: uid,
+			supportsProfiling,
+		});
 		return uid;
 	};
 

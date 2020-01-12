@@ -34,6 +34,15 @@ export function createBridge(target: Window): Bridge {
 					},
 					"*",
 				);
+				if (name === "attach") {
+					target.postMessage(
+						{
+							source: "preact-devtools",
+							payload: { name, payload: data },
+						},
+						"*",
+					);
+				}
 			} else {
 				target.postMessage(
 					{

@@ -121,6 +121,11 @@ export function applyOperationsV2(store: Store, data: number[]) {
 
 export function applyEvent(store: Store, name: string, data: any) {
 	switch (name) {
+		case "attach":
+			if (!store.profiler.isSupported.$) {
+				store.profiler.isSupported.$ = !!data.supportsProfiling;
+			}
+			break;
 		case "operation":
 			applyOperationsV1(store, data);
 			break;

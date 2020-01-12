@@ -8,6 +8,7 @@ import { FlamegraphType } from "../data/commits";
 export function FlameGraphMode() {
 	const store = useStore();
 	const type = useObserver(() => store.profiler.flamegraphType.$);
+	const disabled = useObserver(() => !store.profiler.isSupported.$);
 
 	const onClick = useCallback((value: string) => {
 		store.profiler.flamegraphType.$ = value as any;
@@ -21,6 +22,7 @@ export function FlameGraphMode() {
 				value={FlamegraphType.FLAMEGRAPH}
 				checked={type === FlamegraphType.FLAMEGRAPH}
 				onClick={onClick}
+				disabled={disabled}
 			>
 				Flamegraph
 			</IconTab>
@@ -30,6 +32,7 @@ export function FlameGraphMode() {
 				value={FlamegraphType.RANKED}
 				checked={type === FlamegraphType.RANKED}
 				onClick={onClick}
+				disabled={disabled}
 			>
 				Ranked
 			</IconTab>

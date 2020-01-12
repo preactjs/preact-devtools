@@ -13,6 +13,7 @@ export function TimelineBar() {
 	const store = useStore();
 	const commits = useObserver(() => store.profiler.commits.$);
 	const isRecording = useObserver(() => store.profiler.isRecording.$);
+	const isSupported = useObserver(() => store.profiler.isSupported.$);
 	const selectedCommit = useObserver(() => store.profiler.activeCommitIdx.$);
 	const maxDuration = useObserver(() => {
 		return Math.max(0, ...store.profiler.commits.$.map(x => x.duration));
@@ -37,7 +38,7 @@ export function TimelineBar() {
 			<div class={s.btnWrapper}>
 				<IconBtn
 					title="Clear profiling data"
-					disabled={commits.length === 0 || isRecording}
+					disabled={!isSupported || commits.length === 0 || isRecording}
 					onClick={onReset}
 				>
 					<NotInterested size="s" />
@@ -46,7 +47,7 @@ export function TimelineBar() {
 			<ActionSeparator />
 			<FlameGraphMode />
 			<ActionSeparator />
-			{!isRecording && (
+			{isSupported && !isRecording && (
 				<CommitTimeline
 					items={commits.map(x => {
 						const root = x.nodes.get(x.commitRootId);
@@ -68,6 +69,7 @@ export function TimelineBar() {
 export function RecordBtn() {
 	const store = useStore();
 	const isRecording = useObserver(() => store.profiler.isRecording.$);
+	const isSupported = useObserver(() => store.profiler.isSupported.$);
 
 	const onClick = useCallback(() => {
 		store.profiler.isRecording.$ = !store.profiler.isRecording.$;
@@ -77,9 +79,14 @@ export function RecordBtn() {
 		<IconBtn
 			title={!isRecording ? "Start Recording" : "Stop Recording"}
 			color={
-				isRecording ? "var(--color-record-active)" : "var(--color-selected-bg)"
+				isSupported
+					? isRecording
+						? "var(--color-record-active)"
+						: "var(--color-selected-bg)"
+					: "var(--color-disabled)"
 			}
 			onClick={onClick}
+			disabled={!isSupported}
 		>
 			<RecordIcon size="s" />
 		</IconBtn>
