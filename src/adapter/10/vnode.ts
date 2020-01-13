@@ -96,9 +96,9 @@ export function getAncestor(vnode: VNode) {
  */
 export function getDisplayName(vnode: VNode, config: RendererConfig10) {
 	if (vnode.type === config.Fragment) return "Fragment";
-	else if (typeof vnode.type === "function")
-		return vnode.type.displayName || vnode.type.name;
-	else if (typeof vnode.type === "string") return vnode.type;
+	else if (typeof vnode.type === "function") {
+		return vnode.type.displayName || vnode.type.name || "Anonymous";
+	} else if (typeof vnode.type === "string") return vnode.type;
 	return "#text";
 }
 
