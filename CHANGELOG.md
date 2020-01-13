@@ -2,7 +2,7 @@
 
 ## 0.1.0
 
-The main new feature is a dedicated panel to profile Prect applications.
+The main new feature is a dedicated panel to profile Preect applications.
 
 - Reduce logging noise (#59, thanks @marvinhagemeister)
 - Only inject hook into html page (#58, thanks @marvinhagemeister)
