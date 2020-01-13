@@ -55,13 +55,13 @@ chrome.runtime.onConnect.addListener(port => {
 		);
 
 		const forwardToDevtools = (msg: any) => {
-			console.log("-> fwd to devtools ", devtools.name, msg);
+			// console.log("-> fwd to devtools ", devtools.name, msg);
 			devtools.postMessage(msg);
 		};
 		contentScript.onMessage.addListener(forwardToDevtools);
 
 		const forwardToContentScript = (msg: any) => {
-			console.log("-> fwd to content-script ", contentScript.name, msg);
+			// console.log("-> fwd to content-script ", contentScript.name, msg);
 			contentScript.postMessage(msg);
 		};
 		devtools.onMessage.addListener(forwardToContentScript);
