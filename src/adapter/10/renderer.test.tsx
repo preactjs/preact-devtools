@@ -180,6 +180,22 @@ describe("Renderer 10", () => {
 		]);
 	});
 
+	it("should set a fallback name", () => {
+		const Foo = () => <div>foo</div>;
+		Object.defineProperty(Foo, "name", {
+			get: () => "",
+		});
+
+		render(<Foo />, scratch);
+
+		expect(toSnapshot(spy.args[0][1])).to.deep.equal([
+			"rootId: 1",
+			"Add 1 <Fragment> to parent -1",
+			"Add 2 <Anonymous> to parent 1",
+			"Add 3 <div> to parent 2",
+		]);
+	});
+
 	describe("filters", () => {
 		it("should apply regex filters", () => {
 			renderer.applyFilters({
