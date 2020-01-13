@@ -160,10 +160,6 @@ export function createHook(bridge: Bridge): DevtoolsHook {
 				emit,
 			};
 
-			console.log(
-				`[PREACT DEVTOOLS] Attach renderer, preact version: ${version}`,
-			);
-
 			// attach the correct renderer/options hooks based on the preact version
 			const preactVersionMatch = parseSemverish(version);
 
