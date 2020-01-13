@@ -1,5 +1,15 @@
 # Changelog
 
+## 0.1.0
+
+The main new feature is a dedicated panel to profile Prect applications.
+
+- Reduce logging noise (#59, thanks @marvinhagemeister)
+- Only inject hook into html page (#58, thanks @marvinhagemeister)
+- Disable Profiler if renderer has no support for it (#57, thanks @marvinhagemeister)
+- Refactor Profiler backend (#55, thanks @marvinhagemeister)
+- Add Profiler Panel (#56, thanks @marvinhagemeister)
+
 ## 0.0.6
 
 - Minor UI polishing (#50, thanks @marvinhagemeister)
