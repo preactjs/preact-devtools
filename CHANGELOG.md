@@ -1,5 +1,13 @@
 # Changelog
 
+## 0.1.1
+
+- Fix indent growing larger than maximum (#65, thanks @marvinhagemeister)
+- Remove border around new prop (#64, thanks @marvinhagemeister)
+- Adapt indentation based on available screen space (#25, thanks @marvinhagemeister)
+- Remove special internal jsx props (#63, thanks @marvinhagemeister)
+- Set fallback component name (#62, thanks @marvinhagemeister)
+
 ## 0.1.0
 
 The main new feature is a dedicated panel to profile Preect applications.
