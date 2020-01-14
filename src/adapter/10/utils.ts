@@ -49,9 +49,15 @@ export function jsonify(
 	}
 }
 
-export function cleanProps(props: any) {
+export function cleanProps<T extends object>(
+	props: T,
+): Exclude<T, "__source" | "__self"> | null {
 	if (typeof props === "string" || !props) return null;
-	const out = { ...props };
+	let out: any = {};
+	for (let key in props) {
+		if (key === "__source" || key === "__self") continue;
+		out[key] = props[key];
+	}
 	if (!Object.keys(out).length) return null;
 	return out;
 }

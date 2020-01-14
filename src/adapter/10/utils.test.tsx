@@ -2,7 +2,8 @@ import { h, Component, createContext, render } from "preact";
 import { teardown } from "preact/test-utils";
 import { setupScratch } from "./renderer.test";
 import { expect } from "chai";
-import { cleanContext } from "./utils";
+import { cleanContext, cleanProps } from "./utils";
+import { getActualChildren } from "./vnode";
 
 describe("cleanContext", () => {
 	let scratch: HTMLDivElement;
@@ -50,5 +51,46 @@ describe("cleanContext", () => {
 
 	it("should return null when no context value is present", () => {
 		expect(cleanContext({})).to.equal(null);
+	});
+});
+
+describe("cleanProps", () => {
+	let scratch: HTMLDivElement;
+
+	beforeEach(() => {
+		scratch = setupScratch();
+	});
+
+	afterEach(() => {
+		teardown();
+		scratch.remove();
+	});
+
+	it("should return null if props is empty", () => {
+		const vnode = h("div", {});
+		expect(cleanProps(vnode.props)).to.equal(null);
+	});
+
+	it("should bail out if props is null", () => {
+		const vnode = h("div", null);
+		expect(cleanProps(vnode.props)).to.equal(null);
+	});
+
+	it("should return null for text vnodes", () => {
+		const parent = h("div", {}, "foo");
+		render(parent, scratch);
+
+		const child = getActualChildren(parent)[0]!;
+		expect(cleanProps(child.props)).to.equal(null);
+	});
+
+	it("should filter out __source", () => {
+		const vnode = h("div", { __source: "foo", foo: 1 });
+		expect(cleanProps(vnode.props)).to.deep.equal({ foo: 1 });
+	});
+
+	it("should filter out __self", () => {
+		const vnode = h("div", { __self: "foo", foo: 1 });
+		expect(cleanProps(vnode.props)).to.deep.equal({ foo: 1 });
 	});
 });
