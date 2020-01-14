@@ -65,7 +65,7 @@
 	left: 100%;
 	top: 0;
 	bottom: 0;
-	width: 100%;
+	width: 100vw;
 }
 
 .tree:focus-within .item[data-selected]::after {

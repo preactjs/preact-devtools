@@ -55,13 +55,11 @@ export function TreeView() {
 					setMaxIndent(current);
 				}
 
-				let indent =
+				const indent =
 					current - Math.round((diff / (treeDepth || 1)) * 100) / 100;
-				if (maxIndent > 0) {
-					indent = Math.min(maxIndent, indent);
-				}
+				const clamped = Math.min(maxIndent > 0 ? maxIndent : current, indent);
 
-				ref.current.style.setProperty("--indent-depth", `${indent}px`);
+				ref.current.style.setProperty("--indent-depth", `${clamped}px`);
 			}
 		}
 	}, [nodeList, updateCount]);
