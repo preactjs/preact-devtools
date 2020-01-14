@@ -3,6 +3,7 @@ import { teardown } from "preact/test-utils";
 import { setupScratch } from "./renderer.test";
 import { expect } from "chai";
 import { cleanContext, cleanProps } from "./utils";
+import { getActualChildren } from "./vnode";
 
 describe("cleanContext", () => {
 	let scratch: HTMLDivElement;
@@ -54,9 +55,33 @@ describe("cleanContext", () => {
 });
 
 describe("cleanProps", () => {
+	let scratch: HTMLDivElement;
+
+	beforeEach(() => {
+		scratch = setupScratch();
+	});
+
+	afterEach(() => {
+		teardown();
+		scratch.remove();
+	});
+
 	it("should return null if props is empty", () => {
 		const vnode = h("div", {});
 		expect(cleanProps(vnode.props)).to.equal(null);
+	});
+
+	it("should bail out if props is null", () => {
+		const vnode = h("div", null);
+		expect(cleanProps(vnode.props)).to.equal(null);
+	});
+
+	it("should return null for text vnodes", () => {
+		const parent = h("div", {}, "foo");
+		render(parent, scratch);
+
+		const child = getActualChildren(parent)[0]!;
+		expect(cleanProps(child.props)).to.equal(null);
 	});
 
 	it("should filter out __source", () => {
