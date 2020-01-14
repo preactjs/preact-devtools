@@ -13,6 +13,16 @@
 	user-select: none;
 	min-height: 15rem;
 	height: 100%;
+
+	overflow-x: hidden;
+}
+
+.pane {
+	/**
+	 * Hack to get the parent to grow with its children, see:
+	 * https://stackoverflow.com/questions/17291514/how-to-force-parent-div-to-expand-by-child-div-width-padding-margin-box
+	 */
+	display: inline-block;
 }
 
 .empty {
@@ -21,7 +31,7 @@
 	justify-content: center;
 	align-items: center;
 	height: 100%;
-	remin-height: 15rem;
+	min-height: 15rem;
 }
 
 .bgLogo {
@@ -39,11 +49,31 @@
 	font-family: monospace;
 	color: var(--color-element-text);
 	height: 1.5rem;
+	position: relative;
 }
 
 .tree:focus-within .item[data-selected] {
 	background: var(--color-selected-bg);
 	color: var(--color-selected-text);
+}
+
+.tree:focus-within .item[data-selected]::after,
+.tree .item[data-selected]::after,
+.item:not([data-selected]):hover::after {
+	content: "";
+	position: absolute;
+	left: 100%;
+	top: 0;
+	bottom: 0;
+	width: 100%;
+}
+
+.tree:focus-within .item[data-selected]::after {
+	background: var(--color-selected-bg);
+}
+
+.tree .item[data-selected]::after {
+	background: var(--color-selected-inactive-bg);
 }
 
 .item[data-selected] {
@@ -52,6 +82,10 @@
 }
 
 .item:not([data-selected]):hover {
+	background: var(--color-hover);
+}
+
+.item:not([data-selected]):hover::after {
 	background: var(--color-hover);
 }
 

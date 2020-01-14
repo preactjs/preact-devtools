@@ -31,6 +31,19 @@ export function scrollIntoView(el: HTMLElement) {
 	}
 }
 
+export function cssToPx(raw: string) {
+	if (raw.endsWith("rem")) {
+		const rem = parseFloat(raw.slice(0, -3));
+		return (
+			rem * parseFloat(getComputedStyle(document.documentElement).fontSize)
+		);
+	} else if (raw.endsWith("px")) {
+		return parseFloat(raw.slice(0, -2));
+	}
+
+	throw new Error(`Conversion of ${raw} is not supported yet`);
+}
+
 export function getRootDomNode(el: HTMLElement): HTMLElement {
 	let item = el;
 	while (item.parentNode != null) {
