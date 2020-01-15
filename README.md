@@ -1,9 +1,9 @@
 # Preact Devtools
 
-**!!! HIGHLY EXPERIMENTAL, NOT READY FOR GENERAL USE!!!**
-
 Browser extension that allows you to inspect a Preact component hierarchy,
 including props and state.
+
+⚠️ **Requires Preact >=10.1.0** ⚠️
 
 ![Screenshot of Preact devtools](media/preact-chrome-light.png)
 
