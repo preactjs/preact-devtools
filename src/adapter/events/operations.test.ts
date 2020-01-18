@@ -154,5 +154,19 @@ describe("ops2Tree", () => {
 			const next = ops2Tree(state.idMap, ops).tree;
 			expect(next.get(1)!.children).to.deep.equal([3, 2]);
 		});
+
+		it("should end with correct offset", () => {
+			const ops = fromSnapshot([
+				"rootId: 1",
+				"Add 1 <Fragment> to parent -1",
+				"Add 2 <span> to parent 1",
+				"Add 3 <span> to parent 1",
+				"Reorder 1 [2,3]",
+				"Update timings 1 time 20:40",
+			]);
+
+			expect(() => ops2Tree(new Map(), ops)).to.not.throw();
+			expect(ops2Tree(new Map(), ops).tree.get(1)!.startTime).to.equal(20);
+		});
 	});
 });

@@ -103,7 +103,7 @@ export function ops2Tree(oldTree: Tree, ops: number[]) {
 				if (parent) {
 					parent.children = ops.slice(i + 3, i + 3 + count);
 				}
-				i = i + 3 + count;
+				i = i + 2 + count;
 				break;
 			}
 		}
