@@ -106,6 +106,8 @@ export function ops2Tree(oldTree: Tree, ops: number[]) {
 				i = i + 2 + count;
 				break;
 			}
+			default:
+				throw new Error("Unknown event: " + ops[i]);
 		}
 	}
 
