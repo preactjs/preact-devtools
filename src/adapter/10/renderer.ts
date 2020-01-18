@@ -148,7 +148,12 @@ export function createRenderer(
 				Object.keys(c.state).length > 0;
 
 			const hasHooks = c != null && getComponentHooks(c) != null;
-			const context = c != null ? cleanContext(c.context) : null;
+			const context =
+				c != null
+					? jsonify(cleanContext(c.context), node =>
+							serializeVNode(node, config),
+					  )
+					: null;
 
 			return {
 				context,
