@@ -1,4 +1,4 @@
-import { h, render, Options, options, Fragment } from "preact";
+import { h, render, Options, options, Fragment, Component } from "preact";
 import * as sinon from "sinon";
 import { createRenderer, getFilteredChildren } from "./renderer";
 import { setupOptions } from "../10/options";
@@ -484,6 +484,53 @@ describe("Renderer 10", () => {
 					Fragment: Fragment as any,
 				}).map(name => getDisplayName(name, { Fragment: Fragment as any })),
 			).to.deep.equal(["Foo", "Bar"]);
+		});
+	});
+
+	describe("inspect", () => {
+		it("should inspect context", () => {
+			function Child() {
+				return <div>child</div>;
+			}
+
+			class Parent extends Component {
+				getChildContext() {
+					return { foo: 123 };
+				}
+
+				render() {
+					return <Child />;
+				}
+			}
+
+			render(<Parent />, scratch);
+
+			expect(renderer.inspect(3)!.context).to.deep.equal({ foo: 123 });
+		});
+
+		it("should serialize functions", () => {
+			function Child() {
+				return <div>child</div>;
+			}
+
+			class Parent extends Component {
+				getChildContext() {
+					return { foo: () => null };
+				}
+
+				render() {
+					return <Child />;
+				}
+			}
+
+			render(<Parent />, scratch);
+
+			expect(renderer.inspect(3)!.context).to.deep.equal({
+				foo: {
+					name: "foo",
+					type: "function",
+				},
+			});
 		});
 	});
 });
