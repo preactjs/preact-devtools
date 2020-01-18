@@ -1,5 +1,10 @@
 # Changelog
 
+## 0.1.2
+
+- Fix wrong reordering offset (#71, thanks @marvinhagemeister)
+- Fix inspect context not serializing functions (#70, thanks @marvinhagemeister)
+
 ## 0.1.1
 
 - Fix indent growing larger than maximum (#65, thanks @marvinhagemeister)
