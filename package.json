@@ -8,6 +8,7 @@
 	"scripts": {
 		"build": "rm -rf dist/ && rollup -c && node tools/build-inline.js && cp dist/inline/setup.css dist/preact-devtools.css && rm -rf dist/inline",
 		"build:chrome": "rm -rf dist/ && BROWSER=chrome rollup -c && BROWSER=chrome node tools/build.js && npm run archive",
+		"build:edge": "rm -rf dist/ && BROWSER=edge rollup -c && BROWSER=edge node tools/build.js && npm run archive",
 		"build:firefox": "rm -rf dist/ && BROWSER=firefox rollup -c && BROWSER=firefox node tools/build.js && npm run archive",
 		"archive": "git archive --format zip --output dist/source-code.zip master",
 		"test": "mochette -c tsconfig.json 'src/**/*.test.{ts,tsx}'",
