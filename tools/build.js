@@ -1,7 +1,7 @@
 const archiver = require("archiver");
 const fs = require("fs");
 
-const browser = process.env.BROWSER === "chrome" ? "chrome" : "firefox";
+const browser = process.env.BROWSER;
 
 const output = fs.createWriteStream(__dirname + `/../dist/${browser}.zip`);
 const archive = archiver("zip", { zlib: { level: 9 } });

@@ -4,7 +4,7 @@ import resolve from "rollup-plugin-node-resolve";
 import postcss from "rollup-plugin-postcss";
 import commonjs from "rollup-plugin-commonjs";
 
-const BROWSERS = ["chrome", "firefox"].filter(x => {
+const BROWSERS = ["chrome", "edge", "firefox"].filter(x => {
 	if (process.env.BROWSER) {
 		return process.env.BROWSER === x;
 	}
