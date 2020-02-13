@@ -23,7 +23,7 @@ Then, download the Preact Devtools extension for your browser:
 
 - [Firefox](https://addons.mozilla.org/en-US/firefox/addon/preact-devtools/)
 - [Chrome](https://chrome.google.com/webstore/detail/preact-developer-tools/ilcajpmogmhpliinlbcdebhbcanbghmd)
-
+- [Edge](https://microsoftedge.microsoft.com/addons/detail/hdkhobcafnfejjieimdkmjaiihkjpmhk)
 
 ## Contributing
 
