@@ -81,6 +81,9 @@ export function displayCollection(v: any): string {
 		}
 		return "Object";
 	}
-	if (typeof v === "string") return `"${v}"`;
+	if (typeof v === "string") {
+		if (v === "[[Circular]]") return v;
+		return `"${v}"`;
+	}
 	return "" + (v === undefined ? "" : v);
 }

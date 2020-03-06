@@ -150,8 +150,10 @@ export function createRenderer(
 			const hasHooks = c != null && getComponentHooks(c) != null;
 			const context =
 				c != null
-					? jsonify(cleanContext(c.context), node =>
-							serializeVNode(node, config),
+					? jsonify(
+							cleanContext(c.context),
+							node => serializeVNode(node, config),
+							new Set(),
 					  )
 					: null;
 
@@ -164,13 +166,15 @@ export function createRenderer(
 				canEditProps: true,
 				props:
 					vnode.type !== null
-						? jsonify(cleanProps(vnode.props), node =>
-								serializeVNode(node, config),
+						? jsonify(
+								cleanProps(vnode.props),
+								node => serializeVNode(node, config),
+								new Set(),
 						  )
 						: null,
 				canEditState: true,
 				state: hasState
-					? jsonify(c!.state, node => serializeVNode(node, config))
+					? jsonify(c!.state, node => serializeVNode(node, config), new Set())
 					: null,
 				type: 2,
 			};

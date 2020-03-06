@@ -9,6 +9,7 @@ import { setupOptions } from "../../adapter/10/options";
 import { Booleans, Complex } from "./DataTypes";
 import { FullWidthHighlighter } from "./Highlighting";
 import { Gradient } from "./Gradient";
+import { Circular } from "./Circular";
 import s from "../../view/components/Devtools.css";
 import { Prime } from "./Prime";
 
@@ -52,6 +53,7 @@ export function renderExamples10(node: HTMLElement) {
 				<Gradient />
 				<p>Deep tree</p>
 				<DeepTree /> */}
+				<Circular />
 				<br />
 			</div>
 		</div>,

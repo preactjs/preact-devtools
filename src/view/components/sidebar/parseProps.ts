@@ -199,7 +199,7 @@ export function parseProps(
 				id: pathStr,
 				type: type as any,
 				collapsable: false,
-				editable: type !== "undefined",
+				editable: type !== "undefined" && data !== "[[Circular]]",
 				path,
 				value: data,
 				children: [],
