@@ -7,6 +7,9 @@
 		"switcher switcher"
 		"treeActions sidebarActions"
 		"tree sidebar";
+
+	/* Different browsers may have different defaults */
+	font-family: sans-serif;
 }
 
 .root p {
