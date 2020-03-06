@@ -21,12 +21,22 @@ export interface SerializedVNode {
 export function jsonify(
 	data: any,
 	getVNode: (x: any) => SerializedVNode | null,
+	seen: Set<any>,
 ): any {
+	// Break out of circular references
+	if (seen.has(data)) {
+		return "[[Circular]]";
+	}
+
+	if (data !== null && typeof data === "object") {
+		seen.add(data);
+	}
+
 	const vnode = getVNode(data);
 	if (vnode != null) return vnode;
 
 	if (Array.isArray(data)) {
-		return data.map(x => jsonify(x, getVNode));
+		return data.map(x => jsonify(x, getVNode, seen));
 	}
 	switch (typeof data) {
 		case "string":
@@ -41,7 +51,7 @@ export function jsonify(
 			if (data === null) return null;
 			const out = { ...data };
 			Object.keys(out).forEach(key => {
-				out[key] = jsonify(out[key], getVNode);
+				out[key] = jsonify(out[key], getVNode, seen);
 			});
 			return out;
 		default:

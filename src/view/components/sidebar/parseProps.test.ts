@@ -284,4 +284,21 @@ describe("flatten", () => {
 			},
 		]);
 	});
+
+	it("should not mark [[Circular]] reference as editable", () => {
+		const tree = new Map();
+		parseProps("[[Circular]]", [], 2, noop, tree);
+		expect(serialize(tree)).to.deep.equal([
+			{
+				collapsable: false,
+				editable: false,
+				depth: 0,
+				id: "",
+				path: [],
+				type: "string",
+				value: "[[Circular]]",
+				children: [],
+			},
+		]);
+	});
 });
