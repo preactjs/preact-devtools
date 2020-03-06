@@ -1,5 +1,10 @@
 # Changelog
 
+## 0.1.3
+
+- Fix infinite loop on circular references in props (#80, thanks @marvinhagemeister)
+- Add default font (#81, thanks @marvinhagemeister)
+
 ## 0.1.2
 
 - Fix wrong reordering offset (#71, thanks @marvinhagemeister)
