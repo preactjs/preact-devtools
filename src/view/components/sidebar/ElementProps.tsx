@@ -41,7 +41,7 @@ export function ElementProps(props: Props) {
 							collapseable={item.collapsable}
 							collapsed={collapsed.has(id)}
 							onCollapse={() => onCollapse && onCollapse(id)}
-							editable={editable}
+							editable={editable && item.editable}
 							value={item.value}
 							path={item.path}
 							onChange={onChange}
