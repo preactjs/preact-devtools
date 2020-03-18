@@ -5,8 +5,9 @@ const path = require("path");
 const browser = process.env.BROWSER;
 
 // Manually bundle injection code to make sure it runs before everything else
-const source = path.join(__dirname, "..", "dist", browser, "installHook.js");
-const target = path.join(__dirname, "..", "dist", browser, "initClient.js");
+const dist = path.join(__dirname, "..", "dist", browser);
+const source = path.join(dist, "installHook.js");
+const target = path.join(dist, "initClient.js");
 const hook = fs
 	.readFileSync(source, "utf8")
 	.replace(/\(function \(\) \{/g, "function install() {")
@@ -31,6 +32,12 @@ fs.writeFileSync(target, targetFile);
 
 // Now that we inlined installHook.js we can delete it
 fs.unlinkSync(source);
+
+// Rename injected css file so users understand where it's coming from.
+fs.renameSync(
+	path.join(dist, "installHook.css"),
+	path.join(dist, "preact-devtools-page.css"),
+);
 
 // Package extension
 const output = fs.createWriteStream(__dirname + `/../dist/${browser}.zip`);

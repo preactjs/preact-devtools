@@ -14,7 +14,7 @@ window.addEventListener("message", ev => {
 			}),
 		);
 
-		injectStyles(chrome.runtime.getURL("installHook.css"));
+		injectStyles(chrome.runtime.getURL("preact-devtools-page.css"));
 	}
 });
 
