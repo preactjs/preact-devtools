@@ -3,6 +3,7 @@ import copy from "rollup-plugin-copy";
 import resolve from "rollup-plugin-node-resolve";
 import postcss from "rollup-plugin-postcss";
 import commonjs from "rollup-plugin-commonjs";
+import path from "path";
 
 const BROWSERS = ["chrome", "edge", "firefox"].filter(x => {
 	if (process.env.BROWSER) {
@@ -63,11 +64,13 @@ if (!process.env.BROWSER) {
 	);
 }
 
+const camelCase = str => str.replace(/-(\w)/g, (_, x) => x.toUpperCase());
+
 export default entries.map(data => ({
 	input: data.entry,
 	output: {
 		file: data.dist,
-		name: "index.js",
+		name: camelCase(path.basename(data.dist, path.extname(data.dist))),
 		format: "iife",
 	},
 	external: data.external || [],
