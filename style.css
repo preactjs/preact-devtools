@@ -56,7 +56,7 @@ h2 {
 	color: white;
 	font-weight: 300;
 	display: block;
-	margin-bottom: 1rem;
+	margin-bottom: 1.5rem;
 }
 
 .btn {
@@ -67,9 +67,10 @@ h2 {
 	font-weight: 500;
 	background: var(--btn-bg);
 	color: black;
-	padding: 0.5rem 1rem;
-	border: 0.0625rem solid var(--btn-border);
-	border-radius: 0.3rem;
+	padding: 0.75rem 2rem;
+	border: 0.2rem solid var(--btn-bg);
+	border-radius: 0.25rem;
+	letter-spacing: 0.075rem;
 	text-transform: uppercase;
 	margin: 0 0.5rem;
 }
