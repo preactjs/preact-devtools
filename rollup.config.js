@@ -77,7 +77,6 @@ export default entries.map(data => ({
 	plugins: [
 		typescript({
 			cacheRoot: "./node_modules/.cache/rts2",
-			objectHashIgnoreUnknownHack: true,
 		}),
 		resolve(),
 		commonjs(),
