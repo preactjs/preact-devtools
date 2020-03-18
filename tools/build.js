@@ -1,7 +1,6 @@
 const archiver = require("archiver");
 const fs = require("fs");
 const path = require("path");
-const rimraf = require("rimraf");
 
 const browser = process.env.BROWSER;
 
