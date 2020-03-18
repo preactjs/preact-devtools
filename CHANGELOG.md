@@ -1,5 +1,10 @@
 # Changelog
 
+## 0.1.4
+
+- Only inject devtools CSS when Preact was detected (#87, thanks @marvinhagemeister)
+- Fix race condition when injecting devtools hook (#86, thanks @marvinhagemeister)
+
 ## 0.1.3
 
 - Fix infinite loop on circular references in props (#80, thanks @marvinhagemeister)
