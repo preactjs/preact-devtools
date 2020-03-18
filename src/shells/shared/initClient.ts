@@ -13,6 +13,8 @@ window.addEventListener("message", ev => {
 				hasPreact: true,
 			}),
 		);
+
+		injectStyles(chrome.runtime.getURL("installHook.css"));
 	}
 });
 
@@ -42,5 +44,4 @@ if (document.contentType === "text/html") {
 	//
 	// The string "CODE_TO_INJECT" will be replaced by our build tool.
 	inject(`;(${"CODE_TO_INJECT"}(window))`, "code");
-	injectStyles(chrome.runtime.getURL("installHook.css"));
 }
