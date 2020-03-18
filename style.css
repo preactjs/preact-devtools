@@ -72,7 +72,7 @@ h2 {
 	border-radius: 0.25rem;
 	letter-spacing: 0.075rem;
 	text-transform: uppercase;
-	margin: 0 0.5rem;
+	margin: 0 0.5rem 1rem;
 }
 
 .btn:not([disabled]) {
@@ -94,7 +94,7 @@ h2 {
 	display: flex;
 	justify-content: center;
 	align-items: center;
-	margin-top: 3.5rem;
+	margin-top: 2.5rem;
 }
 
 .version {
