@@ -14,7 +14,6 @@
 		"type": "opencollective",
 		"url": "https://opencollective.com/preact"
 	},
-	"types": "src/index.d.ts",
 	"scripts": {
 		"build": "npm-run-all --parallel build:* && cp dist/preact.js dist/preact.min.js",
 		"build:core": "microbundle build --raw",
