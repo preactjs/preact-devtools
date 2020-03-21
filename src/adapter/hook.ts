@@ -9,8 +9,19 @@ import { createRenderer } from "./10/renderer";
 import { setupOptions } from "./10/options";
 import { createMultiRenderer } from "./MultiRenderer";
 import parseSemverish from "./parse-semverish";
+import { ClientToDevtools } from "../shells/shared/background/constants";
 
 export type EmitterFn = (event: string, data: any) => void;
+
+function sendToDevtools<K extends keyof DevtoolEvents>(
+	ctx: Window,
+	type: K,
+	message: DevtoolEvents[K],
+) {
+	ctx.dispatchEvent(
+		new CustomEvent(ClientToDevtools, { detail: { type, data: message } }),
+	);
+}
 
 export interface DevtoolEvents {
 	"update-prop": { id: ID; path: ObjPath; value: any };
@@ -59,17 +70,15 @@ export function createHook(bridge: Bridge): DevtoolsHook {
 
 	const listeners: Array<EmitterFn | null> = [];
 
-	const emit: EmitterFn = (name, data) => {
-		bridge.send(name, data);
-		listeners.forEach(l => l != null && l(name, data));
-	};
-
 	const queue: Array<[string, any]> = [];
 
 	// Lazily init the adapter when a renderer is attached
 	const init = () => {
 		const multi = createMultiRenderer(renderers);
-		adapter = createAdapter(emit, multi);
+		adapter = createAdapter(
+			(type, data) => sendToDevtools(window, type as any, data),
+			multi,
+		);
 
 		bridge.listen("highlight", adapter.highlight);
 		bridge.listen("update-prop", ev => {
@@ -89,6 +98,7 @@ export function createHook(bridge: Bridge): DevtoolsHook {
 		bridge.listen("start-picker", adapter.startPickElement);
 		bridge.listen("stop-picker", adapter.stopPickElement);
 		bridge.listen("initialized", () => {
+			console.log("initialized");
 			while (queue.length) {
 				const msg = queue.pop()!;
 				bridge.send(msg[0], msg[1]);
@@ -147,6 +157,7 @@ export function createHook(bridge: Bridge): DevtoolsHook {
 			};
 		},
 		attachPreact: (version, options, config) => {
+			console.log("attaching");
 			if (adapter == null) {
 				init();
 			}

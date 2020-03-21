@@ -265,6 +265,7 @@ export function createRenderer(
 			const ev = flush(commit);
 			if (!ev) return;
 
+			console.log("onCommit", hook.connected ? "flush" : "queue");
 			if (hook.connected) {
 				hook.emit(ev.name, ev.data);
 			} else {

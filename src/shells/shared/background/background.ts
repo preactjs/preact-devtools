@@ -1,3 +1,5 @@
+import { Mitt } from "./emitter";
+
 export interface Connection {
 	devtools: chrome.runtime.Port | null;
 	contentScript: chrome.runtime.Port | null;
@@ -9,7 +11,28 @@ export interface Connection {
  */
 const connections = new Map<number, Connection>();
 
+const mitt = Mitt();
+
+function addConnection(tabId: number, port: chrome.runtime.Port) {
+	const target = connections.get(tabId);
+
+	port.onMessage.addListener(e => mitt.emit(port.name, e));
+	port.onDisconnect.addListener(() => {
+		setPopupStatus(tabId, false);
+	});
+}
+
 chrome.runtime.onConnect.addListener(port => {
+	console.log("connecting", port.name);
+	// Don't inject into ourselves when our panel is opened as a tab.
+	// Don't inject into native devtools
+	if (
+		port.sender?.tab?.url?.includes(chrome.runtime.id) ||
+		port.sender?.tab?.url?.startsWith("devtools://")
+	) {
+		return;
+	}
+
 	// Ok, so this is a little weird:
 	// To be able to communicate from a content-script to the devtools panel
 	// we need to always go through the brackground script. We basically just pass
@@ -25,12 +48,12 @@ chrome.runtime.onConnect.addListener(port => {
 		// Make sure to disconnect an existing content script before injecting a new one
 		const existingConnection = connections.get(tab);
 		if (existingConnection) existingConnection.removeListeners();
-
-		installContentScript(tab);
 	} else {
 		tab = port.sender!.tab!.id!;
 		name = "contentScript";
 	}
+
+	console.log(tab, name, port);
 
 	if (!connections.has(tab)) {
 		connections.set(tab, {
@@ -106,33 +129,26 @@ chrome.runtime.onConnect.addListener(port => {
 	}
 });
 
-function activatePopup(tabId: number) {
+function setPopupStatus(tabId: number, enabled?: boolean) {
+	const suffix = enabled ? "" : "-disabled";
 	chrome.browserAction.setIcon({
 		tabId,
 		path: {
-			"16": "icons/icon-16.png",
-			"32": "icons/icon-32.png",
-			"48": "icons/icon-48.png",
-			"128": "icons/icon-128.png",
-			"192": "icons/icon-192.png",
+			"16": `icons/icon-16${suffix}.png`,
+			"32": `icons/icon-32${suffix}.png`,
+			"48": `icons/icon-48${suffix}.png`,
+			"128": `icons/icon-128${suffix}.png`,
+			"192": `icons/icon-192${suffix}.png`,
 		},
 	});
 	chrome.browserAction.setPopup({
 		tabId,
-		popup: "popup/enabled.html",
+		popup: `popup/${enabled ? "enabled" : "disabled"}.html`,
 	});
 }
 
 chrome.runtime.onMessage.addListener((message, sender) => {
 	if (message.hasPreact && sender.tab && sender.tab.id) {
-		activatePopup(sender.tab.id);
+		setPopupStatus(sender.tab.id, true);
 	}
 });
-
-function installContentScript(tabId: number) {
-	chrome.tabs.executeScript(
-		tabId,
-		{ file: "/content-script.js" },
-		function() {},
-	);
-}

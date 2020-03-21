@@ -5,7 +5,13 @@
 	"version": "0.1.4",
 	"devtools_page": "devtools.html",
 	"content_security_policy": "script-src 'self' 'unsafe-eval'; object-src 'self'",
-	"permissions": ["file:///*", "http://*/*", "https://*/*", "storage"],
+	"permissions": [
+		"file:///*",
+		"http://*/*",
+		"https://*/*",
+		"storage",
+		"*://*/*"
+	],
 	"icons": {
 		"16": "icons/icon-16.png",
 		"32": "icons/icon-32.png",
@@ -24,13 +30,13 @@
 		"default_popup": "popup/disabled.html"
 	},
 	"background": {
-		"scripts": ["background.js"],
+		"scripts": ["background/background.js"],
 		"persistent": false
 	},
 	"content_scripts": [
 		{
 			"matches": ["<all_urls>"],
-			"js": ["initClient.js"],
+			"js": ["content-script.js"],
 			"run_at": "document_start"
 		}
 	],

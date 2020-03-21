@@ -29,12 +29,12 @@
 		"default_popup": "popup/disabled.html"
 	},
 	"background": {
-		"scripts": ["background.js"]
+		"scripts": ["background/background.js"]
 	},
 	"content_scripts": [
 		{
 			"matches": ["<all_urls>"],
-			"js": ["initClient.js"],
+			"js": ["content-script.js"],
 			"run_at": "document_start"
 		}
 	],

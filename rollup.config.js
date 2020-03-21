@@ -31,16 +31,12 @@ const entries = BROWSERS.map(browser => {
 			entry: "src/shells/shared/panel.ts",
 		},
 		{
-			dist: `${dist}/background.js`,
-			entry: "src/shells/shared/background.ts",
+			dist: `${dist}/background/background.js`,
+			entry: "src/shells/shared/background/background.ts",
 		},
 		{
 			dist: `${dist}/content-script.js`,
 			entry: "src/shells/shared/content-script.ts",
-		},
-		{
-			dist: `${dist}/initClient.js`,
-			entry: "src/shells/shared/initClient.ts",
 		},
 		{
 			dist: `${dist}/installHook.js`,

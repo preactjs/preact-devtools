@@ -1,9 +1,13 @@
-import { EmitterFn } from "../hook";
+import { EmitterFn, DevtoolEvents } from "../hook";
 import { Renderer } from "../renderer";
 import { copyToClipboard } from "../../shells/shared/utils";
 import { createPicker } from "./picker";
 import { ID } from "../../view/store/types";
 import { createHightlighter } from "./highlight";
+import {
+	DevtoolsToClient,
+	ClientToDevtools,
+} from "../../shells/shared/background/constants";
 
 export type Path = Array<string | number>;
 
@@ -36,6 +40,55 @@ export interface InspectData {
 	props: Record<string, any> | null;
 	canEditState: boolean;
 	state: Record<string, any> | null;
+}
+
+function listenToDevtools<T extends { type: keyof DevtoolEvents; data: any }>(
+	ctx: Window,
+	type: keyof DevtoolEvents,
+	callback: (message: T["data"]) => void,
+) {
+	ctx.addEventListener(DevtoolsToClient, e => {
+		const detail = (e as CustomEvent<T>).detail;
+		if (detail.type === type) callback(detail.data);
+	});
+}
+
+function sendToDevtools<K extends keyof DevtoolEvents>(
+	ctx: Window,
+	type: K,
+	data: DevtoolEvents[K],
+) {
+	ctx.dispatchEvent(
+		new CustomEvent(ClientToDevtools, { detail: { type, data } }),
+	);
+}
+
+export function createAdapter2(ctx: Window, renderer: Renderer) {
+	const highlight = createHightlighter(renderer);
+	const picker = createPicker(
+		window,
+		renderer,
+		id => {
+			highlight.highlight(id);
+			sendToDevtools(ctx, "select-node", id);
+		},
+		() => {
+			sendToDevtools(ctx, "stop-picker", null);
+			highlight.destroy();
+		},
+	);
+	listenToDevtools(ctx, "log", e => {
+		if (renderer.has(e.id)) renderer.log(e.id, e.children);
+	});
+
+	listenToDevtools(ctx, "copy", value => {
+		try {
+			const data = JSON.stringify(value, null, 2);
+			copyToClipboard(data);
+		} catch (err) {
+			console.log(err);
+		}
+	});
 }
 
 export function createAdapter(emit: EmitterFn, renderer: Renderer): Adapter {
