@@ -112,11 +112,8 @@ export function createHook(port: Port): DevtoolsHook {
 			console.warn("Mutating __PREACT_DEVTOOLS__.connected is deprecated.");
 		},
 		emit: port.send,
-		listen: fn => {
-			const idx = listeners.push(fn) - 1;
-			return () => {
-				listeners[idx] = null;
-			};
+		listen: () => {
+			console.error("__PREACT_DEVTOOLS__.listen() is deprecated.");
 		},
 		attachPreact: (version, options, config) => {
 			if (status === "disconnected") {

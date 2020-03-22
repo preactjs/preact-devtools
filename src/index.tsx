@@ -60,7 +60,7 @@ const styleGuide = div("styleguide");
 container.appendChild(styleGuide);
 
 // Devtools, must be the first one to be initialised
-const { store } = setupFrontendStore(hook);
+const { store } = setupFrontendStore(window);
 render(<DevTools store={store} />, devtools);
 
 // Preact 10 examples

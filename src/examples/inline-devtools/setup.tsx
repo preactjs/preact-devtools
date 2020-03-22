@@ -1,39 +1,35 @@
 import { createStore } from "../../view/store";
 import { h, render } from "preact";
 import { DevTools } from "../../view/components/Devtools";
-import { DevtoolsHook } from "../../adapter/hook";
 import { applyEvent } from "../../adapter/events/events";
+import { BaseEvent } from "../../adapter/adapter/port";
+import { ClientToDevtools } from "../../constants";
 
-export function setupFrontendStore(hook: DevtoolsHook) {
+export function setupFrontendStore(ctx: Window) {
 	const store = createStore();
 
-	if (hook.listen == null) {
-		console.warn(
-			"Injected hook doesn't have a listen() method. " +
-				"This usually means that an old version of the 'preact-devtools' extension is running.",
-		);
-	} else {
-		hook.listen((name, data) => {
-			applyEvent(store, name, data);
-		});
+	function handleClientEvents(e: any) {
+		const detail = (e as CustomEvent<BaseEvent<any, any>>).detail;
+		applyEvent(store, detail.type, detail.data);
 	}
+	ctx.addEventListener(ClientToDevtools, handleClientEvents);
 
 	const unsubscribe = store.subscribe((name, data) => {
-		hook.emit(name as any, data);
+		ctx.dispatchEvent(
+			new CustomEvent(ClientToDevtools, { detail: { type: name, data } }),
+		);
 	});
 
 	return {
 		store,
 		destroy: () => {
+			ctx.removeEventListener(ClientToDevtools, handleClientEvents);
 			unsubscribe();
 		},
 	};
 }
 
-export function setupInlineDevtools(
-	container: HTMLElement,
-	hook: DevtoolsHook,
-) {
-	const { store } = setupFrontendStore(hook);
+export function setupInlineDevtools(container: HTMLElement, ctx: Window) {
+	const { store } = setupFrontendStore(ctx);
 	render(<DevTools store={store} />, container);
 }
