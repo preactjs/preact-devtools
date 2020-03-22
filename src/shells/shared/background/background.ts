@@ -1,4 +1,5 @@
 import { Mitt } from "./emitter";
+import { debug } from "../../../debug";
 
 export interface Connection {
 	devtools: chrome.runtime.Port | null;
@@ -23,7 +24,14 @@ function addConnection(tabId: number, port: chrome.runtime.Port) {
 }
 
 chrome.runtime.onConnect.addListener(port => {
-	console.log("connecting", port.name);
+	if (port.name === "preact-content-script") {
+		if (port.sender?.tab?.id) {
+			setPopupStatus(port.sender?.tab?.id, true);
+		} else {
+			debug("Could not detect sender from port.", port);
+		}
+	}
+
 	// Don't inject into ourselves when our panel is opened as a tab.
 	// Don't inject into native devtools
 	// if (
@@ -128,6 +136,7 @@ chrome.runtime.onConnect.addListener(port => {
 });
 
 function setPopupStatus(tabId: number, enabled?: boolean) {
+	debug(`${enabled ? "Enable" : "Disable"} popup`);
 	const suffix = enabled ? "" : "-disabled";
 	chrome.browserAction.setIcon({
 		tabId,
@@ -144,10 +153,3 @@ function setPopupStatus(tabId: number, enabled?: boolean) {
 		popup: `popup/${enabled ? "enabled" : "disabled"}.html`,
 	});
 }
-
-chrome.runtime.onMessage.addListener((message, sender) => {
-	console.log("background", message);
-	if (message.hasPreact && sender.tab && sender.tab.id) {
-		setPopupStatus(sender.tab.id, true);
-	}
-});
