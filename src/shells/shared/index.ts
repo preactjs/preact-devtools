@@ -36,8 +36,8 @@ function createPanel() {
 			name: "" + tabId,
 		});
 
-		store.subscribe((name, data) => {
-			port!.postMessage({ name, payload: data });
+		store.subscribe((type, data) => {
+			port!.postMessage({ type, data });
 		});
 
 		const dispose = store.theme.on(v => {
