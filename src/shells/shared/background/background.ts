@@ -26,12 +26,12 @@ chrome.runtime.onConnect.addListener(port => {
 	console.log("connecting", port.name);
 	// Don't inject into ourselves when our panel is opened as a tab.
 	// Don't inject into native devtools
-	if (
-		port.sender?.tab?.url?.includes(chrome.runtime.id) ||
-		port.sender?.tab?.url?.startsWith("devtools://")
-	) {
-		return;
-	}
+	// if (
+	// 	port.sender?.tab?.url?.includes(chrome.runtime.id) ||
+	// 	port.sender?.tab?.url?.startsWith("devtools://")
+	// ) {
+	// 	return;
+	// }
 
 	// Ok, so this is a little weird:
 	// To be able to communicate from a content-script to the devtools panel
@@ -121,10 +121,8 @@ chrome.runtime.onConnect.addListener(port => {
 
 		// Notify that we're ready to accept events
 		contentScript.postMessage({
-			name: "initialized",
-			payload: {
-				ready: true,
-			},
+			type: "initialized",
+			data: null,
 		});
 	}
 });
@@ -148,6 +146,7 @@ function setPopupStatus(tabId: number, enabled?: boolean) {
 }
 
 chrome.runtime.onMessage.addListener((message, sender) => {
+	console.log("background", message);
 	if (message.hasPreact && sender.tab && sender.tab.id) {
 		setPopupStatus(sender.tab.id, true);
 	}

@@ -19,7 +19,7 @@ export function setupFrontendStore(hook: DevtoolsHook) {
 	}
 
 	const unsubscribe = store.subscribe((name, data) => {
-		hook.emit(name, data);
+		hook.emit(name as any, data);
 	});
 
 	return {

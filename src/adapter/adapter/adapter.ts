@@ -1,20 +1,13 @@
-import { EmitterFn, DevtoolEvents } from "../hook";
+import { DevtoolEvents } from "../hook";
 import { Renderer } from "../renderer";
 import { copyToClipboard } from "../../shells/shared/utils";
 import { createPicker } from "./picker";
 import { ID } from "../../view/store/types";
 import { createHightlighter } from "./highlight";
-import {
-	DevtoolsToClient,
-	ClientToDevtools,
-} from "../../shells/shared/background/constants";
+import { parseFilters } from "./filter";
+import { createPort } from "./port";
 
 export type Path = Array<string | number>;
-
-export interface DevtoolsEvent {
-	name: string;
-	data: any;
-}
 
 export type UpdateType = "props" | "state" | "hooks" | "context";
 
@@ -42,46 +35,28 @@ export interface InspectData {
 	state: Record<string, any> | null;
 }
 
-function listenToDevtools<T extends { type: keyof DevtoolEvents; data: any }>(
-	ctx: Window,
-	type: keyof DevtoolEvents,
-	callback: (message: T["data"]) => void,
-) {
-	ctx.addEventListener(DevtoolsToClient, e => {
-		const detail = (e as CustomEvent<T>).detail;
-		if (detail.type === type) callback(detail.data);
-	});
-}
+export function createAdapter(ctx: Window, renderer: Renderer) {
+	const { listen, send } = createPort(ctx);
 
-function sendToDevtools<K extends keyof DevtoolEvents>(
-	ctx: Window,
-	type: K,
-	data: DevtoolEvents[K],
-) {
-	ctx.dispatchEvent(
-		new CustomEvent(ClientToDevtools, { detail: { type, data } }),
-	);
-}
-
-export function createAdapter2(ctx: Window, renderer: Renderer) {
 	const highlight = createHightlighter(renderer);
+
 	const picker = createPicker(
 		window,
 		renderer,
 		id => {
 			highlight.highlight(id);
-			sendToDevtools(ctx, "select-node", id);
+			send("select-node", id);
 		},
 		() => {
-			sendToDevtools(ctx, "stop-picker", null);
+			send("stop-picker", null);
 			highlight.destroy();
 		},
 	);
-	listenToDevtools(ctx, "log", e => {
-		if (renderer.has(e.id)) renderer.log(e.id, e.children);
-	});
 
-	listenToDevtools(ctx, "copy", value => {
+	listen("start-picker", () => picker.start());
+	listen("stop-picker", () => picker.stop());
+
+	listen("copy", value => {
 		try {
 			const data = JSON.stringify(value, null, 2);
 			copyToClipboard(data);
@@ -89,67 +64,51 @@ export function createAdapter2(ctx: Window, renderer: Renderer) {
 			console.log(err);
 		}
 	});
-}
 
-export function createAdapter(emit: EmitterFn, renderer: Renderer): Adapter {
-	const highlight = createHightlighter(renderer);
+	listen("inspect", id => {
+		if (renderer.has(id)) {
+			const data = renderer.inspect(id);
+			if (data) {
+				send("inspect-result", data);
+			}
+		}
+	});
 
-	const picker = createPicker(
-		window,
-		renderer,
-		id => {
-			highlight.highlight(id);
-			emit("select-node", id);
-		},
-		() => {
-			emit("stop-picker", null);
-			highlight.destroy();
-		},
-	);
+	listen("log", e => {
+		if (renderer.has(e.id)) {
+			renderer.log(e.id, e.children);
+		}
+	});
 
-	const inspect = (id: ID) => {
+	listen("highlight", id => {
+		if (id == null) highlight.destroy();
+		else highlight.highlight(id);
+	});
+
+	const update = (data: DevtoolEvents["update"]) => {
+		const { id, type, path, value } = data;
+		renderer.update(id, type, path, value);
+
+		// Notify all frontends that something changed
 		if (renderer.has(id)) {
 			const data = renderer.inspect(id);
 			if (data !== null) {
-				emit("inspect-result", data);
+				send("inspect-result", data);
 			}
 		}
 	};
 
-	return {
-		inspect,
-		log(data) {
-			if (renderer.has(data.id)) {
-				renderer.log(data.id, data.children);
-			}
-		},
-		select(id) {
-			// Unused
-		},
-		highlight: id => {
-			if (id == null) highlight.destroy();
-			else highlight.highlight(id);
-		},
-		update: (id, type, path, value) => {
-			renderer.update(id, type, path, value);
+	listen("update-prop", data => update({ ...data, type: "props" }));
+	listen("update-state", data => update({ ...data, type: "state" }));
+	listen("update-context", data => update({ ...data, type: "context" }));
 
-			// Notify all frontends that something changed
-			if (renderer.has(id)) {
-				const data = renderer.inspect(id);
-				if (data !== null) {
-					emit("inspect-result", data);
-				}
-			}
-		},
-		startPickElement: picker.start,
-		stopPickElement: picker.stop,
-		copy(value) {
-			try {
-				const data = JSON.stringify(value, null, 2);
-				copyToClipboard(data);
-			} catch (err) {
-				console.log(err);
-			}
-		},
-	};
+	listen("update-filter", data => {
+		renderer.applyFilters(parseFilters(data));
+	});
+
+	listen("force-update", id => renderer.forceUpdate(id));
+
+	// Profiler
+	listen("start-profiling", () => renderer.startProfiling!());
+	listen("stop-profiling", () => renderer.stopProfiling!());
 }

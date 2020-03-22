@@ -54,8 +54,8 @@ function createPanel() {
 		});
 
 		port!.onMessage.addListener(msg => {
-			const payload = msg.data.payload;
-			applyEvent(store, payload.name, payload.payload);
+			console.log("-> devtools", msg);
+			applyEvent(store, msg.type, msg.data);
 		});
 
 		const root = doc.getElementById("root")!;

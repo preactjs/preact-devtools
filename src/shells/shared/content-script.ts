@@ -3,15 +3,21 @@ import {
 	ContentScript,
 	DevtoolsToClient,
 	ClientToDevtools,
-} from "./background/constants";
+} from "../../constants";
 
 /** Connection to background page */
 let connection: chrome.runtime.Port | null = null;
+
+console.log("content-script running");
+
+let connected = false;
+let queue: any[] = [];
 
 /** Forward messages from the page to the devtools */
 window.addEventListener(ClientToDevtools, e => {
 	const data = (e as CustomEvent<any>).detail;
 
+	console.log("->", data);
 	if (data.type === "init") {
 		connection = chrome.runtime.connect({
 			name: ContentScript,
@@ -27,11 +33,23 @@ window.addEventListener(ClientToDevtools, e => {
 		return console.warn("Unable to connect to Preact Devtools extension.");
 	}
 
-	connection.postMessage(data);
+	if (!connected) {
+		console.log("  queue", data);
+		queue.push(data);
+	} else {
+		console.log("  send", data);
+		connection.postMessage(data);
+	}
 });
 
 /** Handle message from background script */
 function handleMessage(message: any) {
+	console.log("<-", message);
+	if (message.type === "initialized") {
+		connected = true;
+		console.log("  flush initial queue", queue);
+		queue.forEach(ev => connection!.postMessage(ev));
+	}
 	window.dispatchEvent(new CustomEvent(DevtoolsToClient, { detail: message }));
 }
 

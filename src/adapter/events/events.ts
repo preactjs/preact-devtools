@@ -77,7 +77,7 @@ export function flush(commit: Commit) {
 	}
 	msg.push(...operations);
 
-	return { name: "operation_v2", data: msg };
+	return { type: "operation_v2", data: msg };
 }
 
 /**
@@ -119,8 +119,8 @@ export function applyOperationsV2(store: Store, data: number[]) {
 	}
 }
 
-export function applyEvent(store: Store, name: string, data: any) {
-	switch (name) {
+export function applyEvent(store: Store, type: string, data: any) {
+	switch (type) {
 		case "attach":
 			if (!store.profiler.isSupported.$) {
 				store.profiler.isSupported.$ = !!data.supportsProfiling;
