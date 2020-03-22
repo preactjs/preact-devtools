@@ -1,3 +1,6 @@
+// Note: This file will be inlined into `content-script.ts`
+// when building the extension.
+
 import { createHook } from "../../adapter/hook";
 import { createPort } from "../../adapter/adapter/port";
 

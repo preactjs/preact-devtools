@@ -38,9 +38,5 @@
 			"run_at": "document_start"
 		}
 	],
-	"web_accessible_resources": [
-		"preact-devtools-page.css",
-		"panel.html",
-		"devtools.html"
-	]
+	"web_accessible_resources": ["preact-devtools-page.css"]
 }

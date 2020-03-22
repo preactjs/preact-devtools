@@ -1,6 +1,6 @@
 import { inject, injectStyles } from "./utils";
 import {
-	ContentScript,
+	ContentScriptName,
 	DevtoolsToClient,
 	ClientToDevtools,
 } from "../../constants";
@@ -21,7 +21,7 @@ window.addEventListener(ClientToDevtools, e => {
 	debug("->", data);
 	if (data.type === "init") {
 		connection = chrome.runtime.connect({
-			name: ContentScript,
+			name: ContentScriptName,
 		});
 		connection.onMessage.addListener(handleMessage);
 		connection.onDisconnect.addListener(handleDisconnect);

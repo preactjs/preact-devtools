@@ -1,10 +1,10 @@
 export type Handler<T> = (e: T) => void;
 
 export function Mitt<T = any>() {
-	const listeners = new Map<string, Handler<T>[]>();
+	const listeners: { name: string; port: chrome.runtime.Port }[] = [];
 	return {
-		listeners,
-		on(type: string, handler: Handler<T>) {
+		on(type: string, port: chrome.runtime.Port) {
+			listeners.push();
 			const arr = listeners.get(type) || [];
 			arr.push(handler);
 			listeners.set(type, arr);

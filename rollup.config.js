@@ -17,19 +17,15 @@ const entries = BROWSERS.map(browser => {
 	const dist = `dist/${browser}`;
 	return [
 		{
-			entry: "src/shells/shared/index.ts",
-			dist: `${dist}/index.js`,
+			dist: `${dist}/panel/panel.js`,
+			entry: "src/shells/shared/panel/panel.ts",
 			copy: {
 				[`src/shells/${browser}/manifest.json`]: dist,
-				"src/shells/shared/devtools.html": dist,
-				"src/shells/shared/panel.html": dist,
+				"src/shells/shared/panel/panel.html": path.join(dist, "panel"),
 				"src/shells/shared/icons": dist,
-				"src/shells/shared/popup": dist,
+				"src/shells/shared/popup/enabled.html": path.join(dist, "popup"),
+				"src/shells/shared/popup/disabled.html": path.join(dist, "popup"),
 			},
-		},
-		{
-			dist: `${dist}/panel.js`,
-			entry: "src/shells/shared/panel.ts",
 		},
 		{
 			dist: `${dist}/background/background.js`,
