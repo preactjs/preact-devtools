@@ -80,7 +80,6 @@ export function createHook(port: Port): DevtoolsHook {
 
 		listen("initialized", () => {
 			status = "connected";
-			console.log("initialized");
 			multi.flushInitial();
 		});
 	};
@@ -120,7 +119,6 @@ export function createHook(port: Port): DevtoolsHook {
 			};
 		},
 		attachPreact: (version, options, config) => {
-			console.log("attaching");
 			if (status === "disconnected") {
 				init();
 			}

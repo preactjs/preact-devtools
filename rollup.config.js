@@ -3,6 +3,7 @@ import copy from "rollup-plugin-copy";
 import resolve from "rollup-plugin-node-resolve";
 import postcss from "rollup-plugin-postcss";
 import commonjs from "rollup-plugin-commonjs";
+import replace from "@rollup/plugin-replace";
 import path from "path";
 
 const BROWSERS = ["chrome", "edge", "firefox"].filter(x => {
@@ -76,6 +77,9 @@ export default entries.map(data => ({
 		}),
 		resolve(),
 		commonjs(),
+		replace({
+			"process.env.DEBUG": !!process.env.DEBUG,
+		}),
 		data.copy &&
 			copy({
 				targets: Object.keys(data.copy).map(x => ({

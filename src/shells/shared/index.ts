@@ -3,6 +3,7 @@ import { DevTools } from "../../view/components/Devtools";
 import { injectStyles } from "./utils";
 import { createStore } from "../../view/store";
 import { applyEvent } from "../../adapter/events/events";
+import { debug } from "../../debug";
 
 let created = false;
 function createPanel() {
@@ -54,7 +55,7 @@ function createPanel() {
 		});
 
 		port!.onMessage.addListener(msg => {
-			console.log("-> devtools", msg);
+			debug("-> devtools", msg);
 			applyEvent(store, msg.type, msg.data);
 		});
 

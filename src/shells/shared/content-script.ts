@@ -4,11 +4,12 @@ import {
 	DevtoolsToClient,
 	ClientToDevtools,
 } from "../../constants";
+import { debug } from "../../debug";
 
 /** Connection to background page */
 let connection: chrome.runtime.Port | null = null;
 
-console.log("content-script running");
+debug("content-script running");
 
 let connected = false;
 let queue: any[] = [];
@@ -17,7 +18,7 @@ let queue: any[] = [];
 window.addEventListener(ClientToDevtools, e => {
 	const data = (e as CustomEvent<any>).detail;
 
-	console.log("->", data);
+	debug("->", data);
 	if (data.type === "init") {
 		connection = chrome.runtime.connect({
 			name: ContentScript,
@@ -34,20 +35,20 @@ window.addEventListener(ClientToDevtools, e => {
 	}
 
 	if (!connected) {
-		console.log("  queue", data);
+		debug("  queue", data);
 		queue.push(data);
 	} else {
-		console.log("  send", data);
+		debug("  send", data);
 		connection.postMessage(data);
 	}
 });
 
 /** Handle message from background script */
 function handleMessage(message: any) {
-	console.log("<-", message);
+	debug("<-", message);
 	if (message.type === "initialized") {
 		connected = true;
-		console.log("  flush initial queue", queue);
+		debug("  flush initial queue", queue);
 		queue.forEach(ev => connection!.postMessage(ev));
 	}
 	window.dispatchEvent(new CustomEvent(DevtoolsToClient, { detail: message }));
