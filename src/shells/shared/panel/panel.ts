@@ -37,7 +37,7 @@ const store = createStore();
 // Send messages from devtools to the content script
 store.subscribe((type, data) => {
 	debug("<- devtools", type, data);
-	port.postMessage({ type, data });
+	port.postMessage({ type, data, source: DevtoolsPanelName });
 });
 
 // Subscribe to messages from content script
