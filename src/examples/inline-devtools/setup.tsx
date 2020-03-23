@@ -2,20 +2,18 @@ import { createStore } from "../../view/store";
 import { h, render } from "preact";
 import { DevTools } from "../../view/components/Devtools";
 import { applyEvent } from "../../adapter/events/events";
-import {
-	ClientToDevtools,
-	DevtoolsPanelInlineName,
-	DevtoolsPanelName,
-	DevtoolsToClient,
-} from "../../constants";
+import { DevtoolsToClient, PageHookName } from "../../constants";
 
 export function setupFrontendStore(ctx: Window) {
 	const store = createStore();
 
 	function handleClientEvents(e: MessageEvent) {
-		if (e.source === window && e.data && e.data.type) {
+		if (
+			e.source === window &&
+			e.data &&
+			(e.data.source === PageHookName || e.data.source === DevtoolsToClient)
+		) {
 			const data = e.data;
-			console.log(data);
 			applyEvent(store, data.type, data.data);
 		}
 	}
