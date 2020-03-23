@@ -19,8 +19,7 @@ function addToTarget(tabId: number, port: chrome.runtime.Port) {
 
 	port.onDisconnect.addListener(() => {
 		debug("disconnect", port.name);
-		// const idx = target.findIndex(l => l.name === port.name);
-		// if (idx > -1) target.splice(idx, 1);
+		target.off(port.name);
 		setPopupStatus(tabId, false);
 	});
 }
