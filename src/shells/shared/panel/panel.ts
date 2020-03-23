@@ -8,7 +8,7 @@ import { loadTheme, storeTheme } from "./theme";
 
 async function showPanel(): Promise<Window> {
 	return new Promise(resolve => {
-		chrome.devtools.panels.create("Preact", "", "./panel/panel.html", panel => {
+		chrome.devtools.panels.create("Preact", "", "/panel/panel.html", panel => {
 			panel.onShown.addListener(window => resolve(window));
 		});
 	});
