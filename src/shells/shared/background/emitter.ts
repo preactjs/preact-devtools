@@ -1,27 +1,37 @@
-export type Handler<T> = (e: T) => void;
+import { debug } from "../../../debug";
 
-export function Mitt<T = any>() {
-	const listeners: { name: string; port: chrome.runtime.Port }[] = [];
+export type Handler<T> = (e: T) => void;
+export interface Emitter<T> {
+	on(source: string, handler: Handler<T>): void;
+	off(source: string): void;
+	emit(source: string, event: T): void;
+	connected(): string[];
+}
+
+/**
+ * Emitter which will dispatch to everyone but the
+ * calling source.
+ */
+export function BackgroundEmitter<T = any>() {
+	const targets: Record<string, Handler<T> | undefined> = {};
+
 	return {
-		on(type: string, port: chrome.runtime.Port) {
-			listeners.push();
-			const arr = listeners.get(type) || [];
-			arr.push(handler);
-			listeners.set(type, arr);
+		on(source: string, handler: Handler<T>) {
+			targets[source] = handler;
 		},
-		off(type: string, handler: Handler<T>) {
-			const arr = listeners.get(type) || [];
-			const idx = arr.indexOf(handler);
-			if (arr.length > 1) {
-				if (idx > -1) {
-					arr.splice(idx, 1);
+		off(source: string) {
+			targets[source] = undefined;
+		},
+		emit(source: string, event: T) {
+			Object.entries(targets).forEach(([name, f]) => {
+				if (name !== source && f) {
+					debug(source, "->", name, event);
+					f(event);
 				}
-			} else {
-				listeners.delete(type);
-			}
+			});
 		},
-		emit(type: string, event: T) {
-			//
+		connected() {
+			return Object.keys(targets);
 		},
 	};
 }

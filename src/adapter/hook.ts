@@ -68,8 +68,6 @@ export function createHook(port: Port): DevtoolsHook {
 	let uid = 0;
 	let status: "connected" | "pending" | "disconnected" = "disconnected";
 
-	const listeners: Array<EmitterFn | null> = [];
-
 	// Lazily init the adapter when a renderer is attached
 	const init = () => {
 		const multi = createMultiRenderer(renderers);

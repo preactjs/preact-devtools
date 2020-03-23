@@ -1,58 +1,28 @@
 import { render, h } from "preact";
 import { DevTools } from "../../../view/components/Devtools";
-import { injectStyles } from "../utils";
 import { createStore } from "../../../view/store";
 import { applyEvent } from "../../../adapter/events/events";
 import { debug } from "../../../debug";
-import { ContentScriptName } from "../../../constants";
+import { DevtoolsPanelName } from "../../../constants";
 import { loadTheme, storeTheme } from "./theme";
 
-// let created = false;
-// function createPanel() {
-// 	if (created) return;
-// 	created = true;
+async function showPanel(): Promise<Window> {
+	return new Promise(resolve => {
+		chrome.devtools.panels.create("Preact", "", "./panel/panel.html", panel => {
+			panel.onShown.addListener(window => resolve(window));
+		});
+	});
+}
 
-// 	let doc: Document;
+const port = chrome.runtime.connect({
+	name: DevtoolsPanelName,
+});
 
-// 	async function initPort() {
-// 		// Listen to messages from the content-script
-// 		const { tabId } = chrome.devtools.inspectedWindow;
-// 		const port = chrome.runtime.connect({
-// 			name: "" + tabId,
-// 		});
+let initialized = false;
 
-// 		store.subscribe((type, data) => {
-// 			port!.postMessage({ type, data });
-// 		});
-
-// 		port!.onDisconnect.addListener(() => {
-// 			store.actions.clear();
-// 			dispose();
-// 		});
-
-// 		port!.onMessage.addListener(msg => {
-// 			debug("-> devtools", msg);
-// 			applyEvent(store, msg.type, msg.data);
-// 		});
-
-// 		const root = doc.getElementById("root")!;
-// 		root.innerHTML = "";
-// 		render(h(DevTools, { store }), root);
-// 	}
-
-// 	// Re-initialize panel when a new page is loaded.
-// 	// chrome.devtools.network.onNavigated.addListener(() => {
-// 	// 	store.actions.clear();
-// 	// 	// initPort();
-// 	// });
-// }
-
-async function onPanelShown(
-	panel: chrome.devtools.panels.ExtensionPanel,
-	window: Window,
-) {
-	console.log("CREATED");
-	const store = createStore();
+async function initDevtools() {
+	initialized = true;
+	const window = await showPanel();
 
 	// Themes
 	await loadTheme(window, store);
@@ -60,16 +30,51 @@ async function onPanelShown(
 
 	// Render our application
 	const root = window.document.getElementById("root")!;
-	root.innerHTML = "";
 	render(h(DevTools, { store }), root);
 }
 
-chrome.runtime.onConnect.addListener(port => {
-	if (port.name === ContentScriptName) {
-		chrome.devtools.panels.create("Preact", "", "./panel/panel.html", panel => {
-			panel.onShown.addListener(window => {
-				onPanelShown(panel, window);
-			});
+const store = createStore();
+// Send messages from devtools to the content script
+store.subscribe((type, data) => {
+	debug("<- devtools", type, data);
+	port.postMessage({ type, data });
+});
+
+// Subscribe to messages from content script
+port.onMessage.addListener(async message => {
+	debug("> message", message);
+
+	if (!initialized) {
+		debug("initialize devtools panel");
+		await initDevtools();
+	}
+
+	if (message.type === "init") {
+		port.postMessage({
+			type: "init",
+			tabId: chrome.devtools.inspectedWindow.tabId,
+			source: DevtoolsPanelName,
 		});
+	} else {
+		debug("-> devtools", message);
+		applyEvent(store, message.type, message.data);
 	}
 });
+
+// Clear store when we navigate away from the current page.
+// Only fires on "true" navigation events, not when navigation
+// is done via the HTML5 history API
+chrome.devtools.network.onNavigated.addListener(() => {
+	debug("== Navigation: clear devtools state ==");
+	store.actions.clear();
+});
+
+// Notify background page of the panel
+// Note sometimes the tabId is null in Chrome...
+if (chrome.devtools.inspectedWindow.tabId) {
+	port.postMessage({
+		type: "init",
+		tabId: chrome.devtools.inspectedWindow.tabId,
+		source: DevtoolsPanelName + "_init",
+	});
+}

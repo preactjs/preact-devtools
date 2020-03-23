@@ -80,11 +80,10 @@ export function createStore(): Store {
 			inspect: id => notify("inspect", id),
 			highlightNode: debounce(id => notify("highlight", id), 100),
 			clear() {
-				nodes.$ = new Map();
 				roots.$ = [];
+				nodes.$ = new Map();
 				selection.selected.$ = -1;
 				collapser.collapsed.$ = new Set();
-				listeners = [];
 			},
 			startPickElement() {
 				isPicking.$ = true;

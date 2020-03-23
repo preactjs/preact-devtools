@@ -21,6 +21,7 @@ const entries = BROWSERS.map(browser => {
 			entry: "src/shells/shared/panel/panel.ts",
 			copy: {
 				[`src/shells/${browser}/manifest.json`]: dist,
+				"src/shells/shared/panel/empty-panel.html": path.join(dist, "panel"),
 				"src/shells/shared/panel/panel.html": path.join(dist, "panel"),
 				"src/shells/shared/icons": dist,
 				"src/shells/shared/popup/enabled.html": path.join(dist, "popup"),

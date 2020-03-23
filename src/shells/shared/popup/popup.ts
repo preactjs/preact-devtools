@@ -4,7 +4,7 @@
 import { debug } from "../../../debug";
 
 export function setPopupStatus(tabId: number, enabled?: boolean) {
-	debug(`${enabled ? "Enable" : "Disable"} popup`);
+	debug("Popup", `${enabled ? "Enable" : "Disable"} popup`);
 	const suffix = enabled ? "" : "-disabled";
 	chrome.browserAction.setIcon({
 		tabId,

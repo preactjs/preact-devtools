@@ -34,11 +34,10 @@ window.addEventListener(ClientToDevtools, e => {
 		return console.warn("Unable to connect to Preact Devtools extension.");
 	}
 
-	if (!connected) {
+	if (!connected && data.type !== "init") {
 		debug("  queue", data);
 		queue.push(data);
 	} else {
-		debug("  send", data);
 		connection.postMessage(data);
 	}
 });
@@ -46,10 +45,11 @@ window.addEventListener(ClientToDevtools, e => {
 /** Handle message from background script */
 function handleMessage(message: any) {
 	debug("<-", message);
-	if (message.type === "initialized") {
+	if (message.type === "init" && message.tabId) {
 		connected = true;
-		debug("  flush initial queue", queue);
+		debug("  flush initial queue", queue, message);
 		queue.forEach(ev => connection!.postMessage(ev));
+		queue = [];
 	}
 	window.dispatchEvent(new CustomEvent(DevtoolsToClient, { detail: message }));
 }
