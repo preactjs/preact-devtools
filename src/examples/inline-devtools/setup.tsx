@@ -2,7 +2,12 @@ import { createStore } from "../../view/store";
 import { h, render } from "preact";
 import { DevTools } from "../../view/components/Devtools";
 import { applyEvent } from "../../adapter/events/events";
-import { ClientToDevtools, DevtoolsPanelInlineName } from "../../constants";
+import {
+	ClientToDevtools,
+	DevtoolsPanelInlineName,
+	DevtoolsPanelName,
+	DevtoolsToClient,
+} from "../../constants";
 
 export function setupFrontendStore(ctx: Window) {
 	const store = createStore();
@@ -10,6 +15,7 @@ export function setupFrontendStore(ctx: Window) {
 	function handleClientEvents(e: MessageEvent) {
 		if (e.source === window && e.data && e.data.type) {
 			const data = e.data;
+			console.log(data);
 			applyEvent(store, data.type, data.data);
 		}
 	}
@@ -20,7 +26,7 @@ export function setupFrontendStore(ctx: Window) {
 			{
 				type: name,
 				data,
-				source: DevtoolsPanelInlineName,
+				source: DevtoolsToClient,
 			},
 			"*",
 		);
