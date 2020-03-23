@@ -3,7 +3,7 @@ import { h, render } from "preact";
 import { DevTools } from "../../view/components/Devtools";
 import { applyEvent } from "../../adapter/events/events";
 import { BaseEvent } from "../../adapter/adapter/port";
-import { ClientToDevtools } from "../../constants";
+import { ClientToDevtools, DevtoolsToClient } from "../../constants";
 
 export function setupFrontendStore(ctx: Window) {
 	const store = createStore();
@@ -16,7 +16,7 @@ export function setupFrontendStore(ctx: Window) {
 
 	const unsubscribe = store.subscribe((name, data) => {
 		ctx.dispatchEvent(
-			new CustomEvent(ClientToDevtools, { detail: { type: name, data } }),
+			new CustomEvent(DevtoolsToClient, { detail: { type: name, data } }),
 		);
 	});
 
