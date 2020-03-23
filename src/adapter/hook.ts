@@ -13,7 +13,7 @@ import { createRenderer } from "./10/renderer";
 import { setupOptions } from "./10/options";
 import { createMultiRenderer } from "./MultiRenderer";
 import parseSemverish from "./parse-semverish";
-import { Port } from "./adapter/port";
+import { PortPageHook } from "./adapter/port";
 
 export type EmitterFn = (event: string, data: any) => void;
 
@@ -62,7 +62,7 @@ export interface DevtoolsHook {
  * Create hook to which Preact will subscribe and listen to. The hook
  * is the entrypoint where everything begins.
  */
-export function createHook(port: Port): DevtoolsHook {
+export function createHook(port: PortPageHook): DevtoolsHook {
 	const { listen, send } = port;
 	const renderers = new Map<number, Renderer>();
 	let uid = 0;
@@ -71,7 +71,7 @@ export function createHook(port: Port): DevtoolsHook {
 	// Lazily init the adapter when a renderer is attached
 	const init = () => {
 		const multi = createMultiRenderer(renderers);
-		createAdapter(window, multi);
+		createAdapter(port, multi);
 
 		status = "pending";
 		send("init", null);

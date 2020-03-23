@@ -1,44 +1,50 @@
 import { inject, injectStyles } from "./utils";
 import {
 	ContentScriptName,
-	DevtoolsToClient,
+	PageHookName,
+	Status,
 	ClientToDevtools,
+	DevtoolsToClient,
 } from "../../constants";
 import { debug } from "../../debug";
 
 /** Connection to background page */
 let connection: chrome.runtime.Port | null = null;
 
-debug("content-script running");
-
-let connected = false;
+let status: Status = Status.Disconnected;
 let queue: any[] = [];
 
+debug("content-script running");
+
 /** Forward messages from the page to the devtools */
-window.addEventListener(ClientToDevtools, e => {
-	const data = (e as CustomEvent<any>).detail;
+window.addEventListener("message", e => {
+	if (e.source === window && e.data && e.data.source === PageHookName) {
+		const data = e.data;
+		debug("->", data);
 
-	debug("->", data);
-	if (data.type === "init") {
-		connection = chrome.runtime.connect({
-			name: ContentScriptName,
-		});
-		connection.onMessage.addListener(handleMessage);
-		connection.onDisconnect.addListener(handleDisconnect);
+		if (status === Status.Disconnected) {
+			status = Status.Pending;
+			debug("connecting content-script...");
+			connection = chrome.runtime.connect({
+				name: ContentScriptName,
+			});
+			connection.onMessage.addListener(handleMessage);
+			connection.onDisconnect.addListener(handleDisconnect);
 
-		// Inject styles only when when Preact was detected
-		injectStyles(chrome.runtime.getURL("preact-devtools-page.css"));
-	}
+			// Inject styles only when when Preact was detected
+			injectStyles(chrome.runtime.getURL("preact-devtools-page.css"));
+		}
 
-	if (connection === null) {
-		return console.warn("Unable to connect to Preact Devtools extension.");
-	}
+		if (connection === null) {
+			return console.warn("Unable to connect to Preact Devtools extension.");
+		}
 
-	if (!connected && data.type !== "init") {
-		debug("  queue", data);
-		queue.push(data);
-	} else {
-		connection.postMessage(data);
+		if (status !== Status.Connected && data.type !== "init") {
+			debug("  queue", data);
+			queue.push(data);
+		} else {
+			connection.postMessage({ ...data, source: ClientToDevtools });
+		}
 	}
 });
 
@@ -46,17 +52,18 @@ window.addEventListener(ClientToDevtools, e => {
 function handleMessage(message: any) {
 	debug("<-", message);
 	if (message.type === "init" && message.tabId) {
-		connected = true;
+		status = Status.Connected;
 		debug("  flush initial queue", queue, message);
 		queue.forEach(ev => connection!.postMessage(ev));
 		queue = [];
 	}
-	window.dispatchEvent(new CustomEvent(DevtoolsToClient, { detail: message }));
+	window.postMessage({ ...message, source: DevtoolsToClient }, "*");
 }
 
 /** Handle disconnect from background script */
 function handleDisconnect() {
 	connection = null;
+	status = Status.Disconnected;
 }
 
 // Only inject for HTML pages

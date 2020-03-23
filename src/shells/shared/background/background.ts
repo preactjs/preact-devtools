@@ -78,6 +78,10 @@ const connectionHandlers: Record<
 
 chrome.runtime.onConnect.addListener(port => {
 	const handler = connectionHandlers[port.name];
-	debug("connecting", port.name);
+	debug(
+		`[${port.sender?.tab?.id}] %cBackground: %cconnecting ${port.name}`,
+		"color: yellow;font-weight:bold",
+		"color: inherit",
+	);
 	handler && handler(port);
 });

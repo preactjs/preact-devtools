@@ -2,6 +2,6 @@
 // when building the extension.
 
 import { createHook } from "../../adapter/hook";
-import { createPort } from "../../adapter/adapter/port";
+import { createPortForHook } from "../../adapter/adapter/port";
 
-(window as any).__PREACT_DEVTOOLS__ = createHook(createPort(window));
+(window as any).__PREACT_DEVTOOLS__ = createHook(createPortForHook(window));

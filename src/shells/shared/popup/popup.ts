@@ -4,7 +4,12 @@
 import { debug } from "../../../debug";
 
 export function setPopupStatus(tabId: number, enabled?: boolean) {
-	debug("Popup", `${enabled ? "Enable" : "Disable"} popup`);
+	const status = enabled ? "enabled" : "disabled";
+	debug(
+		`[${tabId}] %cPopup: %c${status}`,
+		"font-weight: bold",
+		"font-weight: normal",
+	);
 	const suffix = enabled ? "" : "-disabled";
 	chrome.browserAction.setIcon({
 		tabId,
@@ -18,6 +23,6 @@ export function setPopupStatus(tabId: number, enabled?: boolean) {
 	});
 	chrome.browserAction.setPopup({
 		tabId,
-		popup: `popup/${enabled ? "enabled" : "disabled"}.html`,
+		popup: `popup/${status}.html`,
 	});
 }

@@ -7,7 +7,7 @@ import { useState } from "preact/hooks";
 import { DevTools } from "./view/components/Devtools";
 import { CommitTimeline } from "./view/components/profiler/components/CommitTimeline/CommitTimeline";
 import s from "./view/components/Devtools.css";
-import { createPort } from "./adapter/adapter/port";
+import { createPortForHook } from "./adapter/adapter/port";
 
 function div(id: string) {
 	const el = document.createElement("div");
@@ -23,7 +23,7 @@ if (hook == null) {
 		`No injected hook found, using a mocked one instead.
 This happens when the "preact-devtools" extension was not found or is not active.`,
 	);
-	const port = createPort(window);
+	const port = createPortForHook(window);
 	hook = (window as any).__PREACT_DEVTOOLS__ = createHook(port);
 	hook.connected = true;
 }

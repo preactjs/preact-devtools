@@ -2,28 +2,34 @@ import { createStore } from "../../view/store";
 import { h, render } from "preact";
 import { DevTools } from "../../view/components/Devtools";
 import { applyEvent } from "../../adapter/events/events";
-import { BaseEvent } from "../../adapter/adapter/port";
-import { ClientToDevtools, DevtoolsToClient } from "../../constants";
+import { ClientToDevtools, DevtoolsPanelInlineName } from "../../constants";
 
 export function setupFrontendStore(ctx: Window) {
 	const store = createStore();
 
-	function handleClientEvents(e: any) {
-		const detail = (e as CustomEvent<BaseEvent<any, any>>).detail;
-		applyEvent(store, detail.type, detail.data);
+	function handleClientEvents(e: MessageEvent) {
+		if (e.source === window && e.data && e.data.type) {
+			const data = e.data;
+			applyEvent(store, data.type, data.data);
+		}
 	}
-	ctx.addEventListener(ClientToDevtools, handleClientEvents);
+	ctx.addEventListener("message", handleClientEvents);
 
 	const unsubscribe = store.subscribe((name, data) => {
-		ctx.dispatchEvent(
-			new CustomEvent(DevtoolsToClient, { detail: { type: name, data } }),
+		ctx.postMessage(
+			{
+				type: name,
+				data,
+				source: DevtoolsPanelInlineName,
+			},
+			"*",
 		);
 	});
 
 	return {
 		store,
 		destroy: () => {
-			ctx.removeEventListener(ClientToDevtools, handleClientEvents);
+			ctx.removeEventListener("message", handleClientEvents);
 			unsubscribe();
 		},
 	};

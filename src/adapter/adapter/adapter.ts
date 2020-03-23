@@ -5,7 +5,7 @@ import { createPicker } from "./picker";
 import { ID } from "../../view/store/types";
 import { createHightlighter } from "./highlight";
 import { parseFilters } from "./filter";
-import { createPort } from "./port";
+import { createPortForHook, PortPageHook } from "./port";
 
 export type Path = Array<string | number>;
 
@@ -35,8 +35,8 @@ export interface InspectData {
 	state: Record<string, any> | null;
 }
 
-export function createAdapter(ctx: Window, renderer: Renderer) {
-	const { listen, send } = createPort(ctx);
+export function createAdapter(port: PortPageHook, renderer: Renderer) {
+	const { listen, send } = port;
 
 	const highlight = createHightlighter(renderer);
 

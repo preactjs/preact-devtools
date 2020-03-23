@@ -1,4 +1,4 @@
-import { BaseEvent, Port } from "../adapter/port";
+import { BaseEvent, PortPageHook } from "../adapter/port";
 import { Commit, MsgTypes, flush } from "../events/events";
 import { Fragment, VNode, FunctionalComponent } from "preact";
 import { IdMapper, createIdMapper } from "./IdMapper";
@@ -88,7 +88,7 @@ export interface Preact10Renderer extends Renderer {
 }
 
 export function createRenderer(
-	port: Port,
+	port: PortPageHook,
 	config: RendererConfig10,
 	filters: FilterState = DEFAULT_FIlTERS,
 ): Preact10Renderer {
