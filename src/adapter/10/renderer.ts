@@ -8,7 +8,6 @@ import {
 	isSuspenseVNode,
 	getDisplayName,
 	getComponent,
-	getComponentHooks,
 	getDom,
 	getLastDomChild,
 	getActualChildren,
@@ -16,14 +15,7 @@ import {
 } from "./vnode";
 import { shouldFilter } from "./filter";
 import { ID } from "../../view/store/types";
-import {
-	cleanContext,
-	jsonify,
-	cleanProps,
-	traverse,
-	setIn,
-	SerializedVNode,
-} from "./utils";
+import { traverse, setIn, SerializedVNode } from "./utils";
 import { FilterState } from "../adapter/filter";
 import { Renderer, Elements } from "../renderer";
 import {
@@ -31,7 +23,6 @@ import {
 	ProfilerBackend,
 	recordProfilingData,
 } from "./profiler";
-import { EmitFn } from "../hook";
 import {
 	createIdMappingState,
 	getVNodeById,
