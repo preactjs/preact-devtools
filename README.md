@@ -17,6 +17,10 @@ whole app.
 ```javascript
 // Must be the first import
 import "preact/debug";
+
+// Or if you just want the devtools bridge (~240B) without other
+// debug code (useful for production sites)
+import "preact/devtools";
 ```
 
 Then, download the Preact Devtools extension for your browser:
