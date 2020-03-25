@@ -20,17 +20,8 @@ export function setupScratch() {
 
 export function setupMockHook(options: Options) {
 	const spy = sinon.spy();
-	const fakeHook: DevtoolsHook = {
-		connected: true,
-		attach: () => 1,
-		attachPreact: () => 1,
-		listen: () => undefined,
-		detach: () => null,
-		emit: spy,
-		renderers: new Map(),
-	};
 	const renderer = createRenderer(
-		fakeHook,
+		{ send: spy, listen: () => null },
 		{ Fragment: Fragment as any },
 		{ type: new Set(), regex: [] },
 	);
