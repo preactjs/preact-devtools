@@ -44,6 +44,7 @@ import {
 	updateVNodeId,
 } from "./IdMapper";
 import { logVNode } from "./renderer/logVNode";
+import { inspectVNode } from "./renderer/inspectVNode";
 
 export interface RendererConfig10 {
 	Fragment: FunctionalComponent;
@@ -138,48 +139,7 @@ export function createRenderer(
 			}
 		},
 		log: (id, children) => logVNode(ids, config, id, children),
-		inspect(id) {
-			const vnode = getVNodeById(ids, id);
-			if (!vnode) return null;
-
-			const c = getComponent(vnode);
-			const hasState =
-				typeof vnode.type === "function" &&
-				c != null &&
-				Object.keys(c.state).length > 0;
-
-			const hasHooks = c != null && getComponentHooks(c) != null;
-			const context =
-				c != null
-					? jsonify(
-							cleanContext(c.context),
-							node => serializeVNode(node, config),
-							new Set(),
-					  )
-					: null;
-
-			return {
-				context,
-				canEditHooks: hasHooks,
-				hooks: null,
-				id,
-				name: getDisplayName(vnode, config),
-				canEditProps: true,
-				props:
-					vnode.type !== null
-						? jsonify(
-								cleanProps(vnode.props),
-								node => serializeVNode(node, config),
-								new Set(),
-						  )
-						: null,
-				canEditState: true,
-				state: hasState
-					? jsonify(c!.state, node => serializeVNode(node, config), new Set())
-					: null,
-				type: 2,
-			};
-		},
+		inspect: id => inspectVNode(ids, config, id),
 		findDomForVNode(id) {
 			const vnode = getVNodeById(ids, id);
 			return vnode ? [getDom(vnode), getLastDomChild(vnode)] : null;
