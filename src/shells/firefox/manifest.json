@@ -3,7 +3,7 @@
 	"name": "Preact Developer Tools",
 	"description": "Adds debugging tools for Preact to Chrome",
 	"version": "0.1.4",
-	"devtools_page": "devtools.html",
+	"devtools_page": "panel/empty-panel.html",
 	"content_security_policy": "script-src 'self' 'unsafe-eval'; object-src 'self'",
 	"permissions": ["file:///*", "http://*/*", "https://*/*", "storage"],
 	"applications": {
@@ -29,18 +29,14 @@
 		"default_popup": "popup/disabled.html"
 	},
 	"background": {
-		"scripts": ["background.js"]
+		"scripts": ["background/background.js"]
 	},
 	"content_scripts": [
 		{
 			"matches": ["<all_urls>"],
-			"js": ["initClient.js"],
+			"js": ["content-script.js"],
 			"run_at": "document_start"
 		}
 	],
-	"web_accessible_resources": [
-		"preact-devtools-page.css",
-		"panel.html",
-		"devtools.html"
-	]
+	"web_accessible_resources": ["preact-devtools-page.css"]
 }

@@ -1,0 +1,43 @@
+<!DOCTYPE html>
+<html lang="en">
+	<head>
+		<meta charset="utf-8" />
+		<title>Preact Devtools Extension</title>
+		<style>
+			* {
+				box-sizing: border-box;
+			}
+
+			html,
+			body {
+				margin: 0;
+			}
+
+			:root {
+				--color-text: #333;
+			}
+
+			#root {
+				height: 100vh;
+			}
+
+			#fallback {
+				position: fixed;
+				top: 0;
+				left: 0;
+				right: 0;
+				bottom: 0;
+				display: flex;
+				flex: 1;
+				justify-content: center;
+				align-items: center;
+				color: var(--color-text);
+			}
+		</style>
+		<!-- Paths must be relative to HTML file -->
+		<link rel="stylesheet" href="panel.css" />
+	</head>
+	<body>
+		<div id="root"></div>
+	</body>
+</html>

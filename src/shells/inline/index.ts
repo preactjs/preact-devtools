@@ -28,7 +28,7 @@ export function attach(
 	const renderer = rendererFn(fakeHook);
 	const destroy = setupOptions(options as any, renderer);
 
-	createAdapter(fakeHook.emit, renderer);
+	createAdapter(window, renderer);
 
 	return {
 		store,

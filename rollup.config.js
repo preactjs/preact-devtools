@@ -3,6 +3,7 @@ import copy from "rollup-plugin-copy";
 import resolve from "rollup-plugin-node-resolve";
 import postcss from "rollup-plugin-postcss";
 import commonjs from "rollup-plugin-commonjs";
+import replace from "@rollup/plugin-replace";
 import path from "path";
 
 const BROWSERS = ["chrome", "edge", "firefox"].filter(x => {
@@ -16,31 +17,24 @@ const entries = BROWSERS.map(browser => {
 	const dist = `dist/${browser}`;
 	return [
 		{
-			entry: "src/shells/shared/index.ts",
-			dist: `${dist}/index.js`,
+			dist: `${dist}/panel/panel.js`,
+			entry: "src/shells/shared/panel/panel.ts",
 			copy: {
 				[`src/shells/${browser}/manifest.json`]: dist,
-				"src/shells/shared/devtools.html": dist,
-				"src/shells/shared/panel.html": dist,
+				"src/shells/shared/panel/empty-panel.html": path.join(dist, "panel"),
+				"src/shells/shared/panel/panel.html": path.join(dist, "panel"),
 				"src/shells/shared/icons": dist,
-				"src/shells/shared/popup": dist,
+				"src/shells/shared/popup/enabled.html": path.join(dist, "popup"),
+				"src/shells/shared/popup/disabled.html": path.join(dist, "popup"),
 			},
 		},
 		{
-			dist: `${dist}/panel.js`,
-			entry: "src/shells/shared/panel.ts",
-		},
-		{
-			dist: `${dist}/background.js`,
-			entry: "src/shells/shared/background.ts",
+			dist: `${dist}/background/background.js`,
+			entry: "src/shells/shared/background/background.ts",
 		},
 		{
 			dist: `${dist}/content-script.js`,
 			entry: "src/shells/shared/content-script.ts",
-		},
-		{
-			dist: `${dist}/initClient.js`,
-			entry: "src/shells/shared/initClient.ts",
 		},
 		{
 			dist: `${dist}/installHook.js`,
@@ -80,6 +74,9 @@ export default entries.map(data => ({
 		}),
 		resolve(),
 		commonjs(),
+		replace({
+			"process.env.DEBUG": !!process.env.DEBUG,
+		}),
 		data.copy &&
 			copy({
 				targets: Object.keys(data.copy).map(x => ({

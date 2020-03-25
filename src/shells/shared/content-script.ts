@@ -1,76 +1,87 @@
-/**
- * IIFE is here to isolate the variable scope of the content script
- * as it might be injected into the same window/tab multiple times.
- */
-(function() {
-	let port = chrome.runtime.connect({
-		name: "contentScript",
-	});
+import { inject, injectStyles } from "./utils";
+import {
+	ContentScriptName,
+	PageHookName,
+	Status,
+	ClientToDevtools,
+	DevtoolsToClient,
+} from "../../constants";
+import { debug } from "../../debug";
 
-	/**
-	 * Keeps track whether the event piping done in the background script is ready
-	 * to accept events.
-	 */
-	let backendInitialized = false;
+/** Connection to background page */
+let connection: chrome.runtime.Port | null = null;
 
-	/**
-	 * Setup message forwarding from port.onMessage to window.onMessage and vice-versa
-	 */
-	const cleanupPortMessagesForward = forwardPortMessagesToWindowPostMessage();
-	const cleanupWindowPostMessagesForward = forwardWindowPostMessagesToPortMessage();
+let status: Status = Status.Disconnected;
+let queue: any[] = [];
 
-	/**
-	 * Cleanup message forwarding when the other end of the port disconnects
-	 */
-	port.onDisconnect.addListener(() => {
-		backendInitialized = false;
-		cleanupWindowPostMessagesForward();
-		cleanupPortMessagesForward();
-		// TODO(Sven): Do we need to call `port.onDisconnect.removeListener` for this listenere here or
-		// is this taken care of since the port will be destroyed later anyways?
-	});
+debug("content-script running");
 
-	function forwardWindowPostMessagesToPortMessage() {
-		function onWindowPostMessage(ev: MessageEvent) {
-			if (ev.source === window && ev.data) {
-				// TODO(Sven): Why are we forwarding this message from port.onMessage to window.postMessage
-				// when we are listening in the same closure?
-				if (
-					ev.data.source === "preact-devtools-content-script" &&
-					ev.data.name === "initialized"
-				) {
-					backendInitialized = true;
-				} else if (backendInitialized && ev.data.source === "preact-devtools") {
-					port.postMessage({
-						name: ev.data.name,
-						data: ev.data,
-					});
-				}
-			}
+/** Forward messages from the page to the devtools */
+window.addEventListener("message", e => {
+	if (e.source === window && e.data && e.data.source === PageHookName) {
+		const data = e.data;
+		debug("->", data);
+
+		if (status === Status.Disconnected) {
+			status = Status.Pending;
+			debug("connecting content-script...");
+			connection = chrome.runtime.connect({
+				name: ContentScriptName,
+			});
+			connection.onMessage.addListener(handleMessage);
+			connection.onDisconnect.addListener(handleDisconnect);
+
+			// Inject styles only when when Preact was detected
+			injectStyles(chrome.runtime.getURL("preact-devtools-page.css"));
 		}
 
-		window.addEventListener("message", onWindowPostMessage);
-
-		return () => {
-			window.removeEventListener("message", onWindowPostMessage);
-		};
-	}
-
-	function forwardPortMessagesToWindowPostMessage() {
-		function onPortMessage(message: any) {
-			window.postMessage(
-				{
-					source: "preact-devtools-content-script",
-					...message,
-				},
-				"*",
-			);
+		if (connection === null) {
+			return console.warn("Unable to connect to Preact Devtools extension.");
 		}
 
-		port.onMessage.addListener(onPortMessage);
-
-		return () => {
-			port.onMessage.removeListener(onPortMessage);
-		};
+		if (status !== Status.Connected && data.type !== "init") {
+			debug("  queue", data);
+			queue.push(data);
+		} else {
+			connection.postMessage({ ...data, source: ClientToDevtools });
+		}
 	}
-})();
+});
+
+/** Handle message from background script */
+function handleMessage(message: any) {
+	debug("<-", message);
+	if (message.type === "init" && message.tabId) {
+		status = Status.Connected;
+		debug("  flush initial queue", queue, message);
+		queue.forEach(ev => connection!.postMessage(ev));
+		queue = [];
+	}
+	window.postMessage({ ...message, source: DevtoolsToClient }, "*");
+}
+
+/** Handle disconnect from background script */
+function handleDisconnect() {
+	connection = null;
+	status = Status.Disconnected;
+}
+
+// Only inject for HTML pages
+if (document.contentType === "text/html") {
+	// We need to inject in time to catch the initial mount. There is no
+	// reliable way to ensure that our code runs before the page's javascript.
+	// Using a script tag with an src attribute leads to a race condition
+	// where the page's js will be run before us when it's cached by the
+	// browser or by a service worker.
+	//
+	//   inject(chrome.runtime.getURL("installHook.js"), "script");
+	//
+	// The only solution so far is to set script.textContent directly. For
+	// that we need to do some custom bundling logic to store the content of
+	// installHook.ts in a variable.
+	//
+	// See: https://github.com/preactjs/preact-devtools/issues/85
+	//
+	// The string "CODE_TO_INJECT" will be replaced by our build tool.
+	inject(`;(${"CODE_TO_INJECT"}(window))`, "code");
+}

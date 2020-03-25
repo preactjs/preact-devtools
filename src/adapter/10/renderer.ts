@@ -1,11 +1,10 @@
-import { DevtoolsEvent } from "../adapter/adapter";
+import { BaseEvent, PortPageHook } from "../adapter/port";
 import { Commit, MsgTypes, flush } from "../events/events";
 import { Fragment, VNode, FunctionalComponent } from "preact";
 import { IdMapper, createIdMapper } from "./IdMapper";
 import { getStringId } from "../string-table";
 import {
 	isRoot,
-	findRoot,
 	getAncestor,
 	isSuspenseVNode,
 	getDisplayName,
@@ -33,6 +32,7 @@ import {
 	ProfilerBackend,
 	recordProfilingData,
 } from "./profiler";
+import { EmitFn } from "../hook";
 
 export interface RendererConfig10 {
 	Fragment: FunctionalComponent;
@@ -88,18 +88,12 @@ export interface Preact10Renderer extends Renderer {
 }
 
 export function createRenderer(
-	hook: {
-		connected: boolean;
-		emit: (name: string, value: any) => void;
-	},
+	port: PortPageHook,
 	config: RendererConfig10,
 	filters: FilterState = DEFAULT_FIlTERS,
 ): Preact10Renderer {
 	const ids = createIdMapper();
 	const roots = new Set<VNode>();
-
-	/** Queue events until the extension is connected */
-	let queue: DevtoolsEvent[] = [];
 
 	let currentUnmounts: number[] = [];
 
@@ -108,6 +102,9 @@ export function createRenderer(
 	const profiler = createProfilerBackend();
 
 	return {
+		// TODO: Deprecate
+		flushInitial() {},
+
 		startProfiling: profiler.startProfiling,
 		stopProfiling: profiler.stopProfiling,
 		getVNodeById: id => ids.getVNode(id),
@@ -203,6 +200,9 @@ export function createRenderer(
 			return -1;
 		},
 		applyFilters(nextFilters) {
+			/** Queue events and flush in one go */
+			let queue: BaseEvent<any, any>[] = [];
+
 			roots.forEach(root => {
 				const children = getActualChildren(root);
 				if (children.length > 0 && children[0] != null) {
@@ -241,14 +241,8 @@ export function createRenderer(
 				queue.push(ev);
 			});
 
-			if (hook.connected) {
-				this.flushInitial();
-			}
-		},
-		flushInitial() {
-			queue.forEach(ev => hook.emit(ev.name, ev.data));
-			hook.connected = true;
-			queue = [];
+			this.flushInitial();
+			queue.forEach(ev => port.send(ev.type, ev.data));
 		},
 		onCommit(vnode) {
 			const commit = createCommit(
@@ -265,11 +259,7 @@ export function createRenderer(
 			const ev = flush(commit);
 			if (!ev) return;
 
-			if (hook.connected) {
-				hook.emit(ev.name, ev.data);
-			} else {
-				queue.push(ev);
-			}
+			port.send(ev.type as any, ev.data);
 		},
 		onUnmount(vnode) {
 			if (!shouldFilter(vnode, filters, config)) {

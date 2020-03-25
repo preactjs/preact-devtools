@@ -7,7 +7,7 @@ const browser = process.env.BROWSER;
 // Manually bundle injection code to make sure it runs before everything else
 const dist = path.join(__dirname, "..", "dist", browser);
 const source = path.join(dist, "installHook.js");
-const target = path.join(dist, "initClient.js");
+const target = path.join(dist, "content-script.js");
 const hook = fs
 	.readFileSync(source, "utf8")
 	.replace(/\(function \(\) \{/g, "function install() {")

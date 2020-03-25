@@ -2,12 +2,12 @@ import "./global.css";
 import { initPreact10, renderExamples10 } from "./examples/10/setup";
 import { DevtoolsHook, createHook } from "./adapter/hook";
 import { setupFrontendStore } from "./examples/inline-devtools/setup";
-import { createSimpleBridge } from "./examples/inline-devtools/simple-bridge";
 import { h, render } from "preact";
 import { useState } from "preact/hooks";
 import { DevTools } from "./view/components/Devtools";
 import { CommitTimeline } from "./view/components/profiler/components/CommitTimeline/CommitTimeline";
 import s from "./view/components/Devtools.css";
+import { createPortForHook } from "./adapter/adapter/port";
 
 function div(id: string) {
 	const el = document.createElement("div");
@@ -23,8 +23,8 @@ if (hook == null) {
 		`No injected hook found, using a mocked one instead.
 This happens when the "preact-devtools" extension was not found or is not active.`,
 	);
-	const bridge = createSimpleBridge();
-	hook = (window as any).__PREACT_DEVTOOLS__ = createHook(bridge);
+	const port = createPortForHook(window);
+	hook = (window as any).__PREACT_DEVTOOLS__ = createHook(port);
 	hook.connected = true;
 }
 
@@ -60,7 +60,7 @@ const styleGuide = div("styleguide");
 container.appendChild(styleGuide);
 
 // Devtools, must be the first one to be initialised
-const { store } = setupFrontendStore(hook);
+const { store } = setupFrontendStore(window);
 render(<DevTools store={store} />, devtools);
 
 // Preact 10 examples

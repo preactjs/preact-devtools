@@ -1,14 +1,19 @@
 import { Renderer } from "./renderer";
-import { Bridge } from "./bridge";
 import { ObjPath } from "../view/components/sidebar/ElementProps";
 import { ID } from "../view/store/types";
-import { createAdapter, Adapter } from "./adapter/adapter";
-import { RawFilterState, parseFilters } from "./adapter/filter";
+import {
+	createAdapter,
+	Adapter,
+	InspectData,
+	UpdateType,
+} from "./adapter/adapter";
+import { RawFilterState } from "./adapter/filter";
 import { Options, Fragment } from "preact";
 import { createRenderer } from "./10/renderer";
 import { setupOptions } from "./10/options";
 import { createMultiRenderer } from "./MultiRenderer";
 import parseSemverish from "./parse-semverish";
+import { PortPageHook } from "./adapter/port";
 
 export type EmitterFn = (event: string, data: any) => void;
 
@@ -27,6 +32,12 @@ export interface DevtoolEvents {
 	highlight: ID | null;
 	log: { id: ID; children: ID[] };
 	inspect: ID;
+	"select-node": ID;
+	update: { id: ID; type: UpdateType; path: ObjPath; value: any };
+	"inspect-result": InspectData;
+	attach: { id: ID; supportsProfiling: boolean };
+	initialized: null;
+	init: null;
 }
 export type EmitFn = <K extends keyof DevtoolEvents>(
 	name: K,
@@ -35,7 +46,7 @@ export type EmitFn = <K extends keyof DevtoolEvents>(
 
 export interface DevtoolsHook {
 	connected: boolean;
-	emit: EmitterFn;
+	emit: EmitFn;
 	listen: (fn: (name: string, cb: any) => any) => void;
 	renderers: Map<number, Renderer>;
 	attachPreact?(
@@ -51,62 +62,28 @@ export interface DevtoolsHook {
  * Create hook to which Preact will subscribe and listen to. The hook
  * is the entrypoint where everything begins.
  */
-export function createHook(bridge: Bridge): DevtoolsHook {
+export function createHook(port: PortPageHook): DevtoolsHook {
+	const { listen, send } = port;
 	const renderers = new Map<number, Renderer>();
 	let uid = 0;
-	let _connected = false;
-	let adapter: null | Adapter = null;
-
-	const listeners: Array<EmitterFn | null> = [];
-
-	const emit: EmitterFn = (name, data) => {
-		bridge.send(name, data);
-		listeners.forEach(l => l != null && l(name, data));
-	};
-
-	const queue: Array<[string, any]> = [];
+	let status: "connected" | "pending" | "disconnected" = "disconnected";
 
 	// Lazily init the adapter when a renderer is attached
 	const init = () => {
 		const multi = createMultiRenderer(renderers);
-		adapter = createAdapter(emit, multi);
+		createAdapter(port, multi);
 
-		bridge.listen("highlight", adapter.highlight);
-		bridge.listen("update-prop", ev => {
-			adapter!.update(ev.id, "props", ev.path, ev.value);
-		});
-		bridge.listen("update-state", ev => {
-			adapter!.update(ev.id, "state", ev.path, ev.value);
-		});
-		bridge.listen("update-context", ev => {
-			adapter!.update(ev.id, "context", ev.path, ev.value);
-		});
-		bridge.listen("select", adapter.select);
-		bridge.listen("copy", adapter.copy);
-		bridge.listen("inspect", adapter.inspect);
-		bridge.listen("log", adapter.log);
-		bridge.listen("update", adapter.log);
-		bridge.listen("start-picker", adapter.startPickElement);
-		bridge.listen("stop-picker", adapter.stopPickElement);
-		bridge.listen("initialized", () => {
-			while (queue.length) {
-				const msg = queue.pop()!;
-				bridge.send(msg[0], msg[1]);
-			}
+		status = "pending";
+		send("init", null);
+
+		listen("initialized", () => {
+			status = "connected";
 			multi.flushInitial();
 		});
-		bridge.listen("update-filter", ev => {
-			multi.applyFilters(parseFilters(ev));
-		});
-		bridge.listen("force-update", ev => multi.forceUpdate(ev));
-
-		// Profiler
-		bridge.listen("start-profiling", multi.startProfiling!);
-		bridge.listen("stop-profiling", multi.stopProfiling!);
 	};
 
 	const attachRenderer = (renderer: Renderer) => {
-		if (adapter == null) {
+		if (status === "disconnected") {
 			init();
 		}
 
@@ -117,14 +94,7 @@ export function createHook(bridge: Bridge): DevtoolsHook {
 		const supportsProfiling =
 			typeof renderer.startProfiling === "function" &&
 			typeof renderer.stopProfiling === "function";
-		queue.push([
-			"attach",
-			{
-				id: uid,
-				supportsProfiling,
-			},
-		]);
-		emit("attach", {
+		send("attach", {
 			id: uid,
 			supportsProfiling,
 		});
@@ -134,31 +104,19 @@ export function createHook(bridge: Bridge): DevtoolsHook {
 	return {
 		renderers,
 		get connected() {
-			return _connected;
+			return status === "connected";
 		},
-		set connected(value) {
-			_connected = value;
+		set connected(_) {
+			console.warn("Mutating __PREACT_DEVTOOLS__.connected is deprecated.");
 		},
-		emit,
-		listen: fn => {
-			const idx = listeners.push(fn) - 1;
-			return () => {
-				listeners[idx] = null;
-			};
+		emit: port.send,
+		listen: () => {
+			console.error("__PREACT_DEVTOOLS__.listen() is deprecated.");
 		},
 		attachPreact: (version, options, config) => {
-			if (adapter == null) {
+			if (status === "disconnected") {
 				init();
 			}
-			const hookProxy = {
-				get connected() {
-					return _connected;
-				},
-				set connected(value) {
-					_connected = value;
-				},
-				emit,
-			};
 
 			// attach the correct renderer/options hooks based on the preact version
 			const preactVersionMatch = parseSemverish(version);
@@ -172,7 +130,7 @@ export function createHook(bridge: Bridge): DevtoolsHook {
 
 			// currently we only support preact >= 10, later we can add another branch for major === 8
 			if (preactVersionMatch.major == 10) {
-				const renderer = createRenderer(hookProxy, config as any);
+				const renderer = createRenderer(port, config as any);
 				setupOptions(options, renderer);
 				return attachRenderer(renderer);
 			}
