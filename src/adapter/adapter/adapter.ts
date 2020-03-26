@@ -107,6 +107,11 @@ export function createAdapter(port: PortPageHook, renderer: Renderer) {
 	});
 
 	listen("force-update", id => renderer.forceUpdate(id));
+	listen("refresh", () => {
+		if (renderer.refresh) {
+			renderer.refresh();
+		}
+	});
 
 	// Profiler
 	listen("start-profiling", () => renderer.startProfiling!());

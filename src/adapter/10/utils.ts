@@ -8,6 +8,7 @@ export function traverse(vnode: VNode, fn: (vnode: VNode) => void) {
 	for (let i = 0; i < children.length; i++) {
 		const child = children[i];
 		if (child != null) {
+			traverse(child, fn);
 			fn(child);
 		}
 	}

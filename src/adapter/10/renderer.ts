@@ -154,19 +154,20 @@ export function createRenderer(
 
 			return -1;
 		},
+		refresh() {
+			this.applyFilters(filters);
+		},
 		applyFilters(nextFilters) {
 			/** Queue events and flush in one go */
 			let queue: BaseEvent<any, any>[] = [];
 
 			roots.forEach(root => {
-				const children = getActualChildren(root);
-				if (children.length > 0 && children[0] != null) {
-					traverse(children[0], vnode => this.onUnmount(vnode));
-				}
+				const rootId = getVNodeId(ids, root);
+				traverse(root, vnode => this.onUnmount(vnode));
 
 				const commit: Commit = {
 					operations: [],
-					rootId: getVNodeId(ids, root),
+					rootId,
 					strings: new Map(),
 					unmountIds: currentUnmounts,
 				};
@@ -221,7 +222,9 @@ export function createRenderer(
 				if (hasVNodeId(ids, vnode)) {
 					currentUnmounts.push(getVNodeId(ids, vnode));
 				}
-			} else if (typeof vnode.type !== "function") {
+			}
+
+			if (typeof vnode.type !== "function") {
 				const dom = getDom(vnode);
 				if (dom != null) domToVNode.delete(dom);
 			}
@@ -288,6 +291,7 @@ export function createCommit(
 	}
 
 	commit.rootId = getVNodeId(ids, vnode);
+	console.log("  isNew", isNew, getVNodeId(ids, vnode));
 
 	return commit;
 }

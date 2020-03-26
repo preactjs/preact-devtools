@@ -35,9 +35,13 @@ async function initDevtools() {
 
 const store = createStore();
 // Send messages from devtools to the content script
-store.subscribe((type, data) => {
+const destroy = store.subscribe((type, data) => {
 	debug("<- devtools", type, data);
 	port.postMessage({ type, data, source: DevtoolsPanelName });
+});
+
+port.onDisconnect.addListener(() => {
+	destroy();
 });
 
 // Subscribe to messages from content script
