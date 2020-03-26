@@ -364,17 +364,19 @@ describe("Renderer 10", () => {
 
 			expect(toSnapshot(spy.args[1][1])).to.deep.equal([
 				"rootId: 1",
+				"Remove 1",
 				"Remove 2",
 			]);
 
 			expect(toSnapshot(spy.args[2][1])).to.deep.equal([
-				"rootId: 1",
-				"Add 3 <div> to parent 1",
-				"Add 4 <Foo> to parent 3",
-				"Add 5 <div> to parent 4",
-				"Add 6 <span> to parent 3",
-				"Add 7 <span> to parent 3",
-				"Update timings 1",
+				"rootId: 3",
+				"Add 4 <div> to parent 3",
+				"Add 5 <Foo> to parent 4",
+				"Add 6 <div> to parent 5",
+				"Add 7 <span> to parent 4",
+				"Add 8 <span> to parent 4",
+				"Remove 3", // TODO: Seems wrong
+				"Remove 1",
 			]);
 		});
 
@@ -413,19 +415,21 @@ describe("Renderer 10", () => {
 
 			expect(toSnapshot(spy.args[1][1])).to.deep.equal([
 				"rootId: 1",
+				"Remove 1",
 				"Remove 2",
+				"Remove 3",
 			]);
 			expect(toSnapshot(spy.args[2][1])).to.deep.equal([
-				"rootId: 1",
-				"Add 4 <div> to parent 1",
-				"Add 5 <Foo> to parent 4",
-				"Add 6 <div> to parent 5",
-				"Add 7 <h1> to parent 6",
-				"Add 3 <Foo> to parent 7",
-				"Add 8 <div> to parent 3",
-				"Add 9 <span> to parent 4",
-				"Add 10 <span> to parent 4",
-				"Update timings 1",
+				"rootId: 4",
+				"Add 5 <div> to parent 4",
+				"Add 6 <Foo> to parent 5",
+				"Add 7 <div> to parent 6",
+				"Add 8 <h1> to parent 7",
+				"Add 9 <Foo> to parent 8",
+				"Add 10 <div> to parent 9",
+				"Add 11 <span> to parent 5",
+				"Add 12 <span> to parent 5",
+				"Update timings 2",
 			]);
 
 			renderer.applyFilters({
@@ -434,18 +438,23 @@ describe("Renderer 10", () => {
 			});
 
 			expect(toSnapshot(spy.args[3][1])).to.deep.equal([
-				"rootId: 1",
+				"rootId: 4",
 				"Remove 4",
 				"Remove 5",
+				"Remove 6",
+				"Remove 7",
+				"Remove 8",
 				"Remove 9",
 				"Remove 10",
+				"Remove 11",
+				"Remove 12",
 			]);
 
 			expect(toSnapshot(spy.args[4][1])).to.deep.equal([
-				"rootId: 1",
-				"Add 11 <Foo> to parent 1",
-				"Add 3 <Foo> to parent 11",
-				"Update timings 1",
+				"rootId: 13",
+				"Add 13 <Fragment> to parent -1",
+				"Add 14 <Foo> to parent 13",
+				"Add 15 <Foo> to parent 14",
 			]);
 		});
 	});

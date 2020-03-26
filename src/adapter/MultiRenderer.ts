@@ -15,11 +15,15 @@ export function getRendererByVNodeId(renderers: Map<number, Renderer>, id: ID) {
 
 /**
  * Combine many renderers into one.
+ * TODO: Deprecate this
  */
 export function createMultiRenderer(
 	renderers: Map<number, Renderer>,
 ): Renderer {
 	return {
+		refresh() {
+			renderers.forEach(r => r.refresh && r.refresh());
+		},
 		startProfiling() {
 			renderers.forEach(r => r.startProfiling && r.startProfiling());
 		},

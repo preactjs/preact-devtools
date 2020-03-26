@@ -38,6 +38,8 @@ export interface DevtoolEvents {
 	attach: { id: ID; supportsProfiling: boolean };
 	initialized: null;
 	init: null;
+	refresh: null;
+	disconnect: null;
 }
 export type EmitFn = <K extends keyof DevtoolEvents>(
 	name: K,

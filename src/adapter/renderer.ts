@@ -4,7 +4,11 @@ import { FilterState } from "./adapter/filter";
 import { InspectData, UpdateType } from "./adapter/adapter";
 import { ObjPath } from "../view/components/sidebar/ElementProps";
 
+/**
+ * TODO: Deprecate this
+ */
 export interface Renderer {
+	refresh?(): void;
 	getVNodeById(id: ID): VNode | null;
 	getDisplayName(vnode: VNode): string;
 	getDisplayNameById?(id: ID): string;
