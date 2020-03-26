@@ -85,6 +85,12 @@ export function createAdapter(port: PortPageHook, renderer: Renderer) {
 		else highlight.highlight(id);
 	});
 
+	listen("disconnect", () => {
+		// The devtools disconnected, clear any stateful
+		// ui elements we may be displaying.
+		highlight.destroy();
+	});
+
 	const update = (data: DevtoolEvents["update"]) => {
 		const { id, type, path, value } = data;
 		renderer.update(id, type, path, value);

@@ -1,6 +1,10 @@
 import { debug } from "../../../debug";
 import { setPopupStatus } from "../popup/popup";
-import { ContentScriptName, DevtoolsPanelName } from "../../../constants";
+import {
+	ContentScriptName,
+	DevtoolsPanelName,
+	DevtoolsToClient,
+} from "../../../constants";
 import { BaseEvent } from "../../../adapter/adapter/port";
 import { BackgroundEmitter, Emitter } from "./emitter";
 
@@ -19,6 +23,11 @@ function addToTarget(tabId: number, port: chrome.runtime.Port) {
 
 	port.onDisconnect.addListener(() => {
 		debug("disconnect", port.name);
+		target.emit(port.name, {
+			type: "disconnect",
+			data: null,
+			source: DevtoolsToClient,
+		});
 		target.off(port.name);
 		setPopupStatus(tabId, false);
 	});
