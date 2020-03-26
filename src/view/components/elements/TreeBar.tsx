@@ -126,7 +126,12 @@ export function FilterPopup() {
 	return (
 		<div class={s.filter}>
 			<div class={s.arrowFix} />
-			<form onSubmit={e => e.preventDefault()}>
+			<form
+				onSubmit={e => {
+					e.preventDefault();
+					store.filter.submit();
+				}}
+			>
 				{/* Native filters */}
 				<label class={s.filterRow}>
 					<span class={s.filterCheck}>
@@ -158,15 +163,16 @@ export function FilterPopup() {
 				{filters.map((x, i) => {
 					return (
 						<div key={i} class={s.filterRow}>
-							<span class={s.filterCheck}>
+							<label class={s.filterCheck}>
 								<input
 									type="checkbox"
 									checked={x.enabled}
-									onInput={e =>
-										store.filter.setEnabled(x, (e.target as any).checked)
-									}
+									onInput={e => {
+										store.filter.setEnabled(x, (e.target as any).checked);
+									}}
 								/>
-							</span>
+								{x.enabled ? <CheckboxChecked /> : <CheckboxUnChecked />}
+							</label>
 							<span class={s.filterValue}>
 								<input
 									className={s.filterName}
@@ -190,12 +196,17 @@ export function FilterPopup() {
 					);
 				})}
 				<div class={s.vSep} />
-				<IconBtn title="Add new filter" onClick={() => store.filter.add()}>
-					<span class={s.filterCheck}>
-						<AddCircle />
-					</span>
-					Add filter
-				</IconBtn>
+				<div class={s.filterActions}>
+					<IconBtn title="Add new filter" onClick={() => store.filter.add()}>
+						<span class={s.filterCheck}>
+							<AddCircle />
+						</span>
+						Add filter
+					</IconBtn>
+					<button type="submit" class={s.filterSubmitBtn}>
+						Update
+					</button>
+				</div>
 			</form>
 		</div>
 	);

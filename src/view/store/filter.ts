@@ -44,12 +44,10 @@ export function createFilterStore(
 				filter.enabled = v;
 			}
 			filters.update();
-			submit();
 		},
 		setValue(filter: RawFilter, value: string) {
 			filter.value = value;
 			filters.update();
-			submit();
 		},
 		add() {
 			filters.update(v => {
@@ -67,5 +65,6 @@ export function createFilterStore(
 				});
 			}
 		},
+		submit,
 	};
 }

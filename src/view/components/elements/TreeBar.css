@@ -153,6 +153,22 @@
 	color: var(--color-text);
 }
 
+.filterActions {
+	display: flex;
+	justify-content: space-between;
+	align-items: center;
+}
+
+.filterSubmitBtn {
+	display: block;
+	background: var(--color-selected-bg);
+	color: var(--color-selected-text);
+	border: none;
+	border-radius: 0.1875rem;
+	font-size: 0.8rem;
+	padding: 0.25rem 0.5rem;
+}
+
 .removeWrapper {
 	width: 1.5rem;
 	display: flex;

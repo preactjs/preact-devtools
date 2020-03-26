@@ -19,7 +19,7 @@ export function parseFilters(raw: RawFilterState): FilterState {
 	if (raw.type.dom) type.add("dom");
 
 	return {
-		regex: [],
+		regex: raw.regex.map(x => new RegExp(x, "gi")),
 		type,
 	};
 }
