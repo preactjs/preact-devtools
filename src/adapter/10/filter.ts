@@ -41,7 +41,11 @@ export function shouldFilter(
 
 	if (filters.regex.length > 0) {
 		const name = getDisplayName(vnode, config);
-		return filters.regex.some(r => r.test(name));
+		return filters.regex.some(r => {
+			// Regexes with a global flag are stateful in JS :((
+			r.lastIndex = 0;
+			return r.test(name);
+		});
 	}
 
 	return false;
