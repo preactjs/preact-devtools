@@ -1,68 +1,71 @@
 import { VNode } from "preact";
-import { getComponent, getDom, getDisplayName } from "./vnode";
-
-export interface IdMapper {
-	getVNode(id: number): VNode | null;
-	has(id: number): boolean;
-	hasId(vnode: VNode): boolean;
-	createId(vnode: VNode): number;
-	getId(vnode: VNode): number;
-	update(id: number, vnode: VNode): void;
-	remove(vnode: VNode): void;
-}
+import { getComponent, getDom } from "./vnode";
+import { ID } from "../../view/store/types";
 
 /**
  * VNode relationships are encoded as simple numbers for the devtools. We use
  * this function to keep track of existing id's and create new ones if needed.
  */
-export function createIdMapper(): IdMapper {
-	const instToId = new Map<any, number>();
-	const idToVNode = new Map<number, VNode>();
-	const idToInst = new Map<number, any>();
-
-	let uuid = 1;
-
-	const getVNode = (id: number) => idToVNode.get(id) || null;
-	const hasId = (vnode: VNode) => {
-		if (vnode != null) {
-			return instToId.has(getInstance(vnode));
-		}
-		return false;
-	};
-	const getId = (vnode: VNode) => {
-		if (vnode == null) return -1;
-		const inst = getInstance(vnode);
-		return instToId.get(inst) || -1;
-	};
-	const update = (id: number, vnode: VNode) => {
-		const inst = getInstance(vnode);
-		idToInst.set(id, inst);
-		idToVNode.set(id, vnode);
-	};
-	const remove = (vnode: VNode) => {
-		if (hasId(vnode)) {
-			const id = getId(vnode);
-			idToInst.delete(id);
-			idToVNode.delete(id);
-		}
-		const inst = getInstance(vnode);
-		instToId.delete(inst);
-	};
-	const createId = (vnode: VNode) => {
-		const id = uuid++;
-		const inst = getInstance(vnode);
-		instToId.set(inst, id);
-		idToInst.set(id, inst);
-		idToVNode.set(id, vnode);
-		return id;
-	};
-
-	const has = (id: number) => idToInst.has(id);
-
-	return { has, update, getVNode, hasId, createId, getId, remove };
+export interface IdMappingState {
+	instToId: Map<any, number>;
+	idToVNode: Map<number, VNode>;
+	idToInst: Map<number, any>;
+	nextId: number;
 }
 
-export function getInstance(vnode: VNode): any {
+export function createIdMappingState(): IdMappingState {
+	return {
+		instToId: new Map(),
+		idToVNode: new Map(),
+		idToInst: new Map(),
+		nextId: 1,
+	};
+}
+
+export function getVNodeById(state: IdMappingState, id: number) {
+	return state.idToVNode.get(id) || null;
+}
+
+export function hasVNodeId(state: IdMappingState, vnode: VNode) {
+	return vnode != null && state.instToId.has(getInstance(vnode));
+}
+
+export function getVNodeId(state: IdMappingState, vnode: VNode) {
+	if (vnode == null) return -1;
+	const inst = getInstance(vnode);
+	return state.instToId.get(inst) || -1;
+}
+
+export function updateVNodeId(state: IdMappingState, id: ID, vnode: VNode) {
+	const inst = getInstance(vnode);
+	state.idToInst.set(id, inst);
+	state.idToVNode.set(id, vnode);
+}
+
+export function removeVNodeId(state: IdMappingState, vnode: VNode) {
+	if (hasVNodeId(state, vnode)) {
+		const id = getVNodeId(state, vnode);
+		state.idToInst.delete(id);
+		state.idToVNode.delete(id);
+	}
+	const inst = getInstance(vnode);
+	state.instToId.delete(inst);
+}
+
+export function createVNodeId(state: IdMappingState, vnode: VNode) {
+	const id = state.nextId++;
+	const inst = getInstance(vnode);
+	state.instToId.set(inst, id);
+	state.idToInst.set(id, inst);
+	state.idToVNode.set(id, vnode);
+	return id;
+}
+
+export function hasId(state: IdMappingState, id: ID) {
+	return state.idToInst.has(id);
+}
+
+function getInstance(vnode: VNode): any {
 	// For components we use the instance to check refs, otherwise
 	// we'll use a dom node
 	if (typeof vnode.type === "function") {

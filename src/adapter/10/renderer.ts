@@ -1,7 +1,6 @@
 import { BaseEvent, PortPageHook } from "../adapter/port";
 import { Commit, MsgTypes, flush } from "../events/events";
 import { Fragment, VNode, FunctionalComponent } from "preact";
-import { IdMapper, createIdMapper } from "./IdMapper";
 import { getStringId } from "../string-table";
 import {
 	isRoot,
@@ -9,7 +8,6 @@ import {
 	isSuspenseVNode,
 	getDisplayName,
 	getComponent,
-	getComponentHooks,
 	getDom,
 	getLastDomChild,
 	getActualChildren,
@@ -17,14 +15,7 @@ import {
 } from "./vnode";
 import { shouldFilter } from "./filter";
 import { ID } from "../../view/store/types";
-import {
-	cleanContext,
-	jsonify,
-	cleanProps,
-	traverse,
-	setIn,
-	SerializedVNode,
-} from "./utils";
+import { traverse, setIn, SerializedVNode } from "./utils";
 import { FilterState } from "../adapter/filter";
 import { Renderer, Elements } from "../renderer";
 import {
@@ -32,7 +23,19 @@ import {
 	ProfilerBackend,
 	recordProfilingData,
 } from "./profiler";
-import { EmitFn } from "../hook";
+import {
+	createIdMappingState,
+	getVNodeById,
+	hasId,
+	getVNodeId,
+	hasVNodeId,
+	removeVNodeId,
+	IdMappingState,
+	createVNodeId,
+	updateVNodeId,
+} from "./IdMapper";
+import { logVNode } from "./renderer/logVNode";
+import { inspectVNode } from "./renderer/inspectVNode";
 
 export interface RendererConfig10 {
 	Fragment: FunctionalComponent;
@@ -92,7 +95,7 @@ export function createRenderer(
 	config: RendererConfig10,
 	filters: FilterState = DEFAULT_FIlTERS,
 ): Preact10Renderer {
-	const ids = createIdMapper();
+	const ids = createIdMappingState();
 	const roots = new Set<VNode>();
 
 	let currentUnmounts: number[] = [];
@@ -107,77 +110,29 @@ export function createRenderer(
 
 		startProfiling: profiler.startProfiling,
 		stopProfiling: profiler.stopProfiling,
-		getVNodeById: id => ids.getVNode(id),
-		has: id => ids.has(id),
+		getVNodeById: id => getVNodeById(ids, id),
+		has: id => hasId(ids, id),
 		getDisplayName(vnode) {
 			return getDisplayName(vnode, config);
 		},
 		getDisplayNameById: id => {
-			const vnode = ids.getVNode(id);
+			const vnode = getVNodeById(ids, id);
 			if (vnode) {
 				return getDisplayName(vnode, config);
 			}
 			return "Unknown";
 		},
 		forceUpdate: id => {
-			const vnode = ids.getVNode(id);
+			const vnode = getVNodeById(ids, id);
 			if (vnode) {
 				const c = getComponent(vnode);
 				if (c) c.forceUpdate();
 			}
 		},
-		log(id, children) {
-			const vnode = ids.getVNode(id);
-			if (vnode == null) {
-				console.warn(`Could not find vnode with id ${id}`);
-				return;
-			}
-			logVNode(vnode, id, children, config);
-		},
-		inspect(id) {
-			const vnode = ids.getVNode(id);
-			if (!vnode) return null;
-
-			const c = getComponent(vnode);
-			const hasState =
-				typeof vnode.type === "function" &&
-				c != null &&
-				Object.keys(c.state).length > 0;
-
-			const hasHooks = c != null && getComponentHooks(c) != null;
-			const context =
-				c != null
-					? jsonify(
-							cleanContext(c.context),
-							node => serializeVNode(node, config),
-							new Set(),
-					  )
-					: null;
-
-			return {
-				context,
-				canEditHooks: hasHooks,
-				hooks: null,
-				id,
-				name: getDisplayName(vnode, config),
-				canEditProps: true,
-				props:
-					vnode.type !== null
-						? jsonify(
-								cleanProps(vnode.props),
-								node => serializeVNode(node, config),
-								new Set(),
-						  )
-						: null,
-				canEditState: true,
-				state: hasState
-					? jsonify(c!.state, node => serializeVNode(node, config), new Set())
-					: null,
-				type: 2,
-			};
-		},
+		log: (id, children) => logVNode(ids, config, id, children),
+		inspect: id => inspectVNode(ids, config, id),
 		findDomForVNode(id) {
-			const vnode = ids.getVNode(id);
+			const vnode = getVNodeById(ids, id);
 			return vnode ? [getDom(vnode), getLastDomChild(vnode)] : null;
 		},
 		findVNodeIdForDom(node) {
@@ -190,10 +145,10 @@ export function createRenderer(
 					}
 
 					if (p != null) {
-						return ids.getId(p) || -1;
+						return getVNodeId(ids, p) || -1;
 					}
 				} else {
-					return ids.getId(vnode) || -1;
+					return getVNodeId(ids, vnode) || -1;
 				}
 			}
 
@@ -211,7 +166,7 @@ export function createRenderer(
 
 				const commit: Commit = {
 					operations: [],
-					rootId: ids.getId(root),
+					rootId: getVNodeId(ids, root),
 					strings: new Map(),
 					unmountIds: currentUnmounts,
 				};
@@ -263,18 +218,18 @@ export function createRenderer(
 		},
 		onUnmount(vnode) {
 			if (!shouldFilter(vnode, filters, config)) {
-				if (ids.hasId(vnode)) {
-					currentUnmounts.push(ids.getId(vnode));
+				if (hasVNodeId(ids, vnode)) {
+					currentUnmounts.push(getVNodeId(ids, vnode));
 				}
 			} else if (typeof vnode.type !== "function") {
 				const dom = getDom(vnode);
 				if (dom != null) domToVNode.delete(dom);
 			}
 
-			ids.remove(vnode);
+			removeVNodeId(ids, vnode);
 		},
 		update(id, type, path, value) {
-			const vnode = ids.getVNode(id);
+			const vnode = getVNodeById(ids, id);
 			if (vnode !== null) {
 				if (typeof vnode.type === "function") {
 					const c = getComponent(vnode);
@@ -295,34 +250,8 @@ export function createRenderer(
 	};
 }
 
-/**
- * Print an element to console
- */
-export function logVNode(
-	vnode: VNode,
-	id: ID,
-	children: ID[],
-	config: RendererConfig10,
-) {
-	const display = getDisplayName(vnode, config);
-	const name = display === "#text" ? display : `<${display || "Component"} />`;
-
-	/* eslint-disable no-console */
-	console.group(`LOG %c${name}`, "color: #ea88fd; font-weight: normal");
-	console.log("props:", vnode.props);
-	const c = getComponent(vnode);
-	if (c != null) {
-		console.log("state:", c.state);
-	}
-	console.log("vnode:", vnode);
-	console.log("devtools id:", id);
-	console.log("devtools children:", children);
-	console.groupEnd();
-	/* eslint-enable no-console */
-}
-
 export function createCommit(
-	ids: IdMapper,
+	ids: IdMappingState,
 	roots: Set<VNode>,
 	vnode: VNode,
 	filters: FilterState,
@@ -339,13 +268,13 @@ export function createCommit(
 
 	let parentId = -1;
 
-	const isNew = !ids.hasId(vnode);
+	const isNew = !hasVNodeId(ids, vnode);
 
 	if (isRoot(vnode, config)) {
 		parentId = -1;
 		roots.add(vnode);
 	} else {
-		parentId = ids.getId(getAncestor(vnode)!);
+		parentId = getVNodeId(ids, getAncestor(vnode)!);
 	}
 
 	if (profiler.isRecording) {
@@ -358,13 +287,13 @@ export function createCommit(
 		update(ids, commit, vnode, parentId, filters, domCache, config, profiler);
 	}
 
-	commit.rootId = ids.getId(vnode);
+	commit.rootId = getVNodeId(ids, vnode);
 
 	return commit;
 }
 
 export function mount(
-	ids: IdMapper,
+	ids: IdMappingState,
 	commit: Commit,
 	vnode: VNode,
 	ancestorId: ID,
@@ -377,7 +306,9 @@ export function mount(
 
 	const skip = shouldFilter(vnode, filters, config);
 	if (root || !skip) {
-		const id = ids.hasId(vnode) ? ids.getId(vnode) : ids.createId(vnode);
+		const id = hasVNodeId(ids, vnode)
+			? getVNodeId(ids, vnode)
+			: createVNodeId(ids, vnode);
 		if (isRoot(vnode, config)) {
 			commit.operations.push(MsgTypes.ADD_ROOT, id);
 		}
@@ -427,7 +358,7 @@ export function mount(
 }
 
 export function update(
-	ids: IdMapper,
+	ids: IdMappingState,
 	commit: Commit,
 	vnode: VNode,
 	ancestorId: number,
@@ -457,12 +388,12 @@ export function update(
 		return;
 	}
 
-	if (!ids.hasId(vnode)) {
+	if (!hasVNodeId(ids, vnode)) {
 		mount(ids, commit, vnode, ancestorId, filters, domCache, config, profiler);
 		return true;
 	}
 
-	const id = ids.getId(vnode);
+	const id = getVNodeId(ids, vnode);
 	commit.operations.push(
 		MsgTypes.UPDATE_VNODE_TIMINGS,
 		id,
@@ -470,11 +401,11 @@ export function update(
 		(vnode.endTime || 0) * 1000,
 	);
 
-	const oldVNode = ids.getVNode(id);
-	ids.update(id, vnode);
+	const oldVNode = getVNodeById(ids, id);
+	updateVNodeId(ids, id, vnode);
 
 	const oldChildren = oldVNode
-		? getActualChildren(oldVNode).map((v: any) => v && ids.getId(v))
+		? getActualChildren(oldVNode).map((v: any) => v && getVNodeId(ids, v))
 		: [];
 
 	let shouldReorder = false;
@@ -486,7 +417,7 @@ export function update(
 			if (oldChildren[i] != null) {
 				commit.unmountIds.push(oldChildren[i]);
 			}
-		} else if (ids.hasId(child) || shouldFilter(child, filters, config)) {
+		} else if (hasVNodeId(ids, child) || shouldFilter(child, filters, config)) {
 			update(ids, commit, child, id, filters, domCache, config, profiler);
 			// TODO: This is only sometimes necessary
 			shouldReorder = true;
@@ -503,7 +434,7 @@ export function update(
 
 export function resetChildren(
 	commit: Commit,
-	ids: IdMapper,
+	ids: IdMappingState,
 	id: ID,
 	vnode: VNode,
 	filters: FilterState,
@@ -519,7 +450,7 @@ export function resetChildren(
 		MsgTypes.REORDER_CHILDREN,
 		id,
 		next.length,
-		...next.map(x => ids.getId(x)),
+		...next.map(x => getVNodeId(ids, x)),
 	);
 }
 

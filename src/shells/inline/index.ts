@@ -7,6 +7,7 @@ import { applyEvent } from "../../adapter/events/events";
 import { setupOptions } from "../../adapter/10/options";
 import { Store } from "../../view/store/types";
 import { Preact10Renderer } from "../../adapter/10/renderer";
+import { createPortForHook } from "../../adapter/adapter/port";
 
 export function attach(
 	options: Options,
@@ -28,7 +29,7 @@ export function attach(
 	const renderer = rendererFn(fakeHook);
 	const destroy = setupOptions(options as any, renderer);
 
-	createAdapter(window, renderer);
+	createAdapter(createPortForHook(window), renderer);
 
 	return {
 		store,
