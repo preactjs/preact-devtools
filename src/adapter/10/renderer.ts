@@ -291,7 +291,6 @@ export function createCommit(
 	}
 
 	commit.rootId = getVNodeId(ids, vnode);
-	console.log("  isNew", isNew, getVNodeId(ids, vnode));
 
 	return commit;
 }
