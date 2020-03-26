@@ -1,5 +1,18 @@
 # Changelog
 
+## 0.2.0
+
+With this release the whole message passing between the extension and the page was rewritten from scratch. It's more robust now and rebuilds state whenever they are re-opened on the same page.
+
+The filters also received a nice upgrade with an improved UX :tada:
+
+- Fix filters not working (#95, thanks @marvinhagemeister)
+- Fix devtools losing state when re-opening them (#94, thanks @marvinhagemeister)
+- Renderer refactor (#93, thanks @marvinhagemeister)
+- Add preact/devtools to usage section in README (#92, thanks @marvinhagemeister)
+- Refactor extension connection handling (#90, thanks @marvinhagemeister)
+- Upgrade dependencies (#89, thanks @marvinhagemeister)
+
 ## 0.1.4
 
 - Only inject devtools CSS when Preact was detected (#87, thanks @marvinhagemeister)
