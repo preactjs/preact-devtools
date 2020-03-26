@@ -70,7 +70,7 @@
 					/>
 				</svg>
 
-				<h1 class="title">Devtools</h1>
+				<h1 class="title"><span class="a11y-hidden">Preact </span>Devtools</h1>
 
 				<p class="tagline">
 					Preact Devtools is a browser extension for Preact, a 3kB JavaScript
@@ -129,6 +129,24 @@
 
 			<hr />
 			<main>
+				<h2>Usage Instructions</h2>
+				<div class="text-container">
+					<p class="warn-info">
+						Note: This extension needs Preact >=10.1.0 or newer.
+					</p>
+					<p>
+						Import <code>preact/debug</code> somewhere to initialize the
+						connection to the extension. Make sure that this import is the first
+						import in your whole app.
+						<pre><span class="pl-c"><span class="pl-c">//</span> Must be the first import</span>
+<span class="pl-k">import</span> <span class="pl-s"><span class="pl-pds">"</span>preact/debug<span class="pl-pds">"</span></span>;
+
+<span class="pl-c"><span class="pl-c">//</span> Or if you just want the devtools bridge (~240B) without other</span>
+<span class="pl-c"><span class="pl-c">//</span> debug code (useful for production sites)</span>
+<span class="pl-k">import</span> <span class="pl-s"><span class="pl-pds">"</span>preact/devtools<span class="pl-pds">"</span></span>;</pre>
+					</p>
+					<p>That's it! Now you should see a "Preact" tab in the devtools showing up.</p>
+				</div>
 				<h2>Screenshots</h2>
 				<div class="screenshots">
 					<img
