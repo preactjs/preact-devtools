@@ -1,0 +1,11 @@
+.title {
+	color: var(--color-element-text);
+	font-family: monospace;
+	font-size: 1rem;
+}
+
+.nameCh {
+	color: var(--color-text);
+	opacity: 0.4;
+	font-size: 0.7rem;
+}

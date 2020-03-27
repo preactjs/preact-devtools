@@ -8,6 +8,7 @@ export interface IconBtnProps {
 	disabled?: boolean;
 	color?: string;
 	onClick?: () => void;
+	styling?: "secondary" | "primary";
 	children: ComponentChildren;
 }
 
@@ -15,7 +16,7 @@ export function IconBtn(props: IconBtnProps) {
 	return (
 		<button
 			type="button"
-			class={s.root}
+			class={`${s.root} + ${props.styling === "secondary" ? s.secondary : ""}`}
 			data-active={props.active}
 			title={props.title}
 			disabled={props.disabled}

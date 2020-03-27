@@ -1,15 +1,28 @@
 .root {
 	height: 100%;
 	display: grid;
-	grid-template-columns: minmax(0, 75%) minmax(35%, 15rem);
-	grid-template-rows: 1.625rem 2.25rem 1fr;
+	grid-template-columns: 1fr;
+	grid-template-rows: 1.625rem 2.25rem 1fr 2.25rem 1fr;
 	grid-template-areas:
-		"switcher switcher"
-		"treeActions sidebarActions"
-		"tree sidebar";
+		"switcher"
+		"treeActions"
+		"tree"
+		"sidebarActions"
+		"sidebar";
 
 	/* Different browsers may have different defaults */
 	font-family: sans-serif;
+}
+
+@media (min-width: 37.5rem) {
+	.root {
+		grid-template-columns: minmax(0, 75%) minmax(35%, 15rem);
+		grid-template-rows: 1.625rem 2.25rem 1fr;
+		grid-template-areas:
+			"switcher switcher"
+			"treeActions sidebarActions"
+			"tree sidebar";
+	}
 }
 
 .root p {
@@ -59,6 +72,7 @@
 	--color-key-value: #ff5722;
 	--color-key-value-selected: orange;
 	--color-radio: #7245c7;
+	--color-shadow: rgba(0, 0, 0, 0.15);
 
 	/* Props */
 	--color-props-input-bg: #f0f0f0;
@@ -118,6 +132,7 @@
 	--color-key-value: #ff5722;
 	--color-key-value-selected: yellow;
 	--color-radio: #d2adff;
+	--color-shadow: rgba(255, 255, 255, 0.15);
 
 	/* Props */
 	--color-props-input-bg: #444;
@@ -168,6 +183,7 @@
 
 .switcherInner {
 	display: flex;
+	height: 100%;
 }
 
 .bugLink {

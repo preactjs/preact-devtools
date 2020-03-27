@@ -62,13 +62,14 @@
 
 .filter {
 	position: absolute;
-	top: calc(100% + 0.9rem);
+	top: 90%;
 	right: -0.5rem;
-	border: 0.0625rem solid var(--color-modal-border);
+	border-top: none;
+	box-shadow: 0 0.1875rem 0.375rem var(--color-shadow);
 	background: var(--color-bg);
 	width: 12rem;
 	z-index: 10;
-	padding: 0.25rem 0.5rem;
+	padding: 0.5rem 0.5rem 0.5rem 0.75rem;
 }
 
 .filter label {
@@ -77,45 +78,12 @@
 
 .filterRow {
 	display: flex;
+	height: 1.375rem;
+	align-items: center;
 }
 
 .filterRow + .filterRow {
 	margin-top: 0.25rem;
-}
-
-.filter::after,
-.filter::before {
-	content: "";
-	display: block;
-	position: absolute;
-	right: 0.5rem;
-	top: 0;
-	width: 0;
-	height: 0;
-	border-style: solid;
-	transform: translate3d(0, -50%, 0);
-}
-
-.filter::after {
-	top: -7px;
-	border-color: transparent transparent var(--color-bg) transparent;
-	border-width: 7px;
-}
-
-.filter::before {
-	top: -9px;
-	right: calc(0.5rem - 2px);
-	border-color: transparent transparent var(--color-modal-border) transparent;
-	border-width: 9px;
-}
-
-.arrowFix {
-	position: absolute;
-	right: 8px;
-	background: var(--color-bg);
-	height: 1px;
-	top: -1px;
-	width: 13px;
 }
 
 .filterCheck {
@@ -151,6 +119,7 @@
 	background: var(--color-props-input-bg);
 	border: none;
 	color: var(--color-text);
+	padding: 0.15rem 0.3rem;
 }
 
 .filterActions {
@@ -169,6 +138,10 @@
 	padding: 0.25rem 0.5rem;
 }
 
+.filterSubmitBtn svg {
+	margin-right: 0.25rem;
+}
+
 .removeWrapper {
 	width: 1.5rem;
 	display: flex;
@@ -178,6 +151,5 @@
 
 .vSep {
 	height: 0.0625rem;
-	background: var(--color-modal-border);
 	margin: 0.4rem 0;
 }

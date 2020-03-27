@@ -12,17 +12,18 @@
 }
 
 .label {
-	font-size: 0.85rem;
+	font-size: 0.8rem;
 	display: flex;
 	align-items: center;
-	padding: 0.2rem 0.5rem;
+	padding: 0 0.5rem;
+	height: 100%;
 	position: relative;
 }
 
 .input:checked + .label::after {
 	content: "";
 	position: absolute;
-	bottom: 0;
+	bottom: -0.0625rem;
 	left: 0;
 	right: 0;
 	height: 0.125rem;

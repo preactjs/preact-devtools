@@ -2,6 +2,7 @@ import { h } from "preact";
 import { Actions } from "../../Actions";
 import s from "../../sidebar/Sidebar.css";
 import { useStore, useObserver } from "../../../store/react-bindings";
+import { ComponentName } from "../../ComponentName";
 
 export function SidebarHeader() {
 	const store = useStore();
@@ -9,7 +10,7 @@ export function SidebarHeader() {
 
 	return (
 		<Actions class={s.actions}>
-			<span class={s.title}>{selected ? selected.name : "-"}</span>
+			<ComponentName>{selected && selected.name}</ComponentName>
 		</Actions>
 	);
 }
