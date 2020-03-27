@@ -1,9 +1,9 @@
-import { h } from "../vendor/preact-10";
+import { html } from "../vendor/htm";
 
 function Inner() {
-	return (
+	return html`
 		<div
-			style={`
+			style=${`
         background: #aaa;
         width: 100vh;
         position: absolute;
@@ -14,13 +14,13 @@ function Inner() {
 		>
 			full width
 		</div>
-	);
+	`;
 }
 
 export function FullWidthHighlighter() {
-	return (
+	return html`
 		<div style="padding-top: 20rem">
-			<Inner />
+			<${Inner} />
 		</div>
-	);
+	`;
 }

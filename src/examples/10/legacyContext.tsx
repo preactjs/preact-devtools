@@ -1,8 +1,12 @@
-import { h, Component } from "../vendor/preact-10";
+// @ts-ignore
+import { Component } from "../vendor/preact-10";
+import { html } from "../vendor/htm";
 
 class Child extends Component {
 	render() {
-		return <div>Context value: {this.context.foo}</div>;
+		return html`
+			<div>Context value: ${(this as any).context.foo}</div>
+		`;
 	}
 }
 
@@ -12,10 +16,14 @@ class Parent extends Component {
 	}
 
 	render() {
-		return <Child />;
+		return html`
+			<${Child} />
+		`;
 	}
 }
 
 export function LegacyContext() {
-	return <Parent />;
+	return html`
+		<${Parent} />
+	`;
 }

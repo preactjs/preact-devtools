@@ -1,4 +1,6 @@
-import { h, Component } from "../vendor/preact-10";
+// @ts-ignore
+import { Component } from "../vendor/preact-10";
+import { html } from "../vendor/htm";
 
 export interface State {
 	foo: number;
@@ -10,13 +12,16 @@ export class Stateful extends Component<any, State> {
 	};
 
 	render() {
-		return (
+		return html`
 			<div>
-				<div>State: {this.state.foo}</div>
-				<button onClick={() => this.setState(p => ({ foo: p.foo + 1 }))}>
+				<div>State: ${this.state.foo}</div>
+				<button
+					onClick=${() =>
+						(this as any).setState((p: any) => ({ foo: p.foo + 1 }))}
+				>
 					Update
 				</button>
 			</div>
-		);
+		`;
 	}
 }

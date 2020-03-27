@@ -1,76 +1,77 @@
-import { h } from "../vendor/preact-10";
+import { html } from "../vendor/htm";
 
 function DeepNest(props: any) {
-	return <div>{props.children}</div>;
+	return html`
+		<div>${props.children}</div>
+	`;
 }
 
 export function ShallowTree() {
-	return (
-		<DeepNest>
-			{/* asd */}
-			<DeepNest>shallow</DeepNest>
-		</DeepNest>
-	);
+	return html`
+		<${DeepNest}>
+			<${DeepNest}>shallow<//>
+		<//>
+	`;
 }
 
 export function DeepTree() {
-	return (
-		<DeepNest>
-			<DeepNest>
-				<DeepNest>
-					<DeepNest>
-						<DeepNest>
-							<DeepNest>
-								<DeepNest>
-									<DeepNest>
-										<DeepNest>
-											<DeepNest>
-												<DeepNest>
-													<DeepNest>
-														<DeepNest>
-															<DeepNest>
-																<DeepNest>
-																	<DeepNest>
-																		<DeepNest>
-																			<DeepNest>
-																				<DeepNest>
-																					<DeepNest>
-																						<DeepNest>
-																							<DeepNest>
-																								<DeepNest>
-																									<DeepNest>
-																										<DeepNest>
-																											<DeepNest>
-																												<DeepNest>
-																													<DeepNest>
+	return html`
+		<${DeepNest}>
+			<${DeepNest}>
+				<${DeepNest}>
+					<${DeepNest}>
+						<${DeepNest}>
+							<${DeepNest}>
+								<${DeepNest}>
+									<${DeepNest}>
+										<${DeepNest}>
+											<${DeepNest}>
+												<${DeepNest}>
+													<${DeepNest}>
+														<${DeepNest}>
+															<${DeepNest}>
+																<${DeepNest}>
+																	<${DeepNest}>
+																		<${DeepNest}>
+																			<${DeepNest}>
+																				<${DeepNest}>
+																					<${DeepNest}>
+																						<${DeepNest}>
+																							<${DeepNest}>
+																								<${DeepNest}>
+																									<${DeepNest}>
+																										<${DeepNest}>
+																											<${DeepNest}>
+																												<${DeepNest}>
+																													<${DeepNest}>
 																														deep
-																													</DeepNest>
-																												</DeepNest>
-																											</DeepNest>
-																										</DeepNest>
-																									</DeepNest>
-																								</DeepNest>
-																							</DeepNest>
-																						</DeepNest>
-																					</DeepNest>
-																				</DeepNest>
-																			</DeepNest>
-																		</DeepNest>
-																	</DeepNest>
-																</DeepNest>
-															</DeepNest>
-														</DeepNest>
-													</DeepNest>
-												</DeepNest>
-											</DeepNest>
-										</DeepNest>
-									</DeepNest>
-								</DeepNest>
-							</DeepNest>
-						</DeepNest>
-					</DeepNest>
-				</DeepNest>
-			</DeepNest>
-		</DeepNest>
-	);
+																													<//>
+																												<//>
+																											<//>
+																										<//>
+																									<//>
+																								<//>
+																							<//>
+																						<//>
+																					<//>
+																				<//>
+																			<//>
+																		<//>
+																	<//>
+																<//>
+															<//>
+														<//>
+													<//>
+												<//>
+											<//>
+										<//>
+									<//>
+								<//>
+							<//>
+						<//>
+					<//>
+				<//>
+			<//>
+		<//>
+	`;
 }

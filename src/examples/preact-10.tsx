@@ -55,7 +55,7 @@ export function StyleGuide() {
 			<div style="padding: 5rem" class={d.theme}>
 				<div style="display: flex; flex-direction: column;">
 					<h2>Todo List</h2>
-					<TodoList />
+					{h(TodoList as any, null)}
 					<h2>Styleguide</h2>
 
 					<h3>RadioBar</h3>
@@ -73,9 +73,9 @@ export function StyleGuide() {
 						]}
 					/>
 					<h3>Legacy Context</h3>
-					<LegacyContext />
+					{h(LegacyContext as any, null)}
 					<h3>State</h3>
-					<Stateful />
+					{h(Stateful as any, null)}
 
 					<h3>Sidebar</h3>
 					<AppCtx.Provider value={tstore}>
@@ -155,9 +155,9 @@ export function StyleGuide() {
 						<TreeView />
 					</AppCtx.Provider>
 					<h3>ShallowTree</h3>
-					<ShallowTree />
+					{h(ShallowTree as any, null)}
 					<h3>Deeply nested</h3>
-					<DeepTree />
+					{h(DeepTree as any, null)}
 					{/* <Iframes /> */}
 				</div>
 			</div>

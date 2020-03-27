@@ -35,6 +35,7 @@
 		"cross-env": "^7.0.2",
 		"css-loader": "^3.4.2",
 		"fork-ts-checker-webpack-plugin": "^4.1.0",
+		"htm": "^3.0.3",
 		"html-webpack-plugin": "^3.2.0",
 		"husky": "^4.2.3",
 		"lint-staged": "^10.0.8",
