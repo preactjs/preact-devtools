@@ -11,7 +11,6 @@
 	-moz-user-select: none;
 	-ms-user-select: none;
 	user-select: none;
-	min-height: 15rem;
 	height: 100%;
 
 	overflow-x: hidden;
@@ -31,7 +30,13 @@
 	justify-content: center;
 	align-items: center;
 	height: 100%;
-	min-height: 15rem;
+}
+
+@media (min-width: 37.5rem) {
+	.tree,
+	.empty {
+		min-height: 15rem;
+	}
 }
 
 .bgLogo {

@@ -1,10 +1,11 @@
-import { h } from "preact";
+import { h, Fragment } from "preact";
 import s from "./Sidebar.css";
 import { Actions } from "../Actions";
 import { IconBtn } from "../IconBtn";
 import { Refresh, BugIcon } from "../icons";
 import { useStore, useEmitter, useObserver } from "../../store/react-bindings";
 import { useCallback } from "preact/hooks";
+import { ComponentName } from "../ComponentName";
 
 export function SidebarActions() {
 	const store = useStore();
@@ -21,7 +22,7 @@ export function SidebarActions() {
 
 	return (
 		<Actions class={s.actions}>
-			<span class={s.title}>{node ? node.name : "-"}</span>
+			<ComponentName>{node && node.name}</ComponentName>
 
 			<div class={s.iconActions}>
 				{node && node.name[0] === node.name[0].toUpperCase() && (

@@ -125,7 +125,6 @@ export function FilterPopup() {
 
 	return (
 		<div class={s.filter}>
-			<div class={s.arrowFix} />
 			<form
 				onSubmit={e => {
 					e.preventDefault();
@@ -187,6 +186,7 @@ export function FilterPopup() {
 							<span class={s.removeWrapper}>
 								<IconBtn
 									title="Remove filter"
+									styling="secondary"
 									onClick={() => store.filter.remove(x)}
 								>
 									<Remove />
@@ -197,7 +197,11 @@ export function FilterPopup() {
 				})}
 				<div class={s.vSep} />
 				<div class={s.filterActions}>
-					<IconBtn title="Add new filter" onClick={() => store.filter.add()}>
+					<IconBtn
+						styling="secondary"
+						title="Add new filter"
+						onClick={() => store.filter.add()}
+					>
 						<span class={s.filterCheck}>
 							<AddCircle />
 						</span>

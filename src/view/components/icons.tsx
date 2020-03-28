@@ -48,10 +48,10 @@ export function Eye({ size = "s" }: Props) {
 export function AddCircle({ size = "s" }: Props) {
 	return createSvgIcon(
 		size,
-		<path
-			d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm5 11h-4v4h-2v-4H7v-2h4V7h2v4h4v2z"
-			fill="currentColor"
-		/>,
+		<g>
+			<path d="M19 13h-6v6h-2v-6H5v-2h6V5h2v6h6v2z" fill="currentColor" />
+			<path d="M0 0h24v24H0z" fill="none" />
+		</g>,
 	);
 }
 
@@ -78,10 +78,13 @@ export function BugIcon({ size = "s" }: Props) {
 export function Remove({ size = "s" }: Props) {
 	return createSvgIcon(
 		size,
-		<path
-			d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm5 11H7v-2h10v2z"
-			fill="currentColor"
-		/>,
+		<g>
+			<path
+				d="M19 6.41L17.59 5 12 10.59 6.41 5 5 6.41 10.59 12 5 17.59 6.41 19 12 13.41 17.59 19 19 17.59 13.41 12z"
+				fill="currentColor"
+			/>
+			<path d="M0 0h24v24H0z" fill="none" />
+		</g>,
 	);
 }
 
