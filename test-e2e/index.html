@@ -52,6 +52,7 @@
 		<script src="vendor/preactHooks.js"></script>
 		<script src="vendor/htm.js"></script>
 		<script>
+			const log = (window.log = []);
 			const iframe = document.querySelector("iframe");
 			iframe.addEventListener("load", () => {
 				window.__PREACT_DEVTOOLS__.attachPreact("10.0.5", preact.options, {
@@ -67,11 +68,13 @@
 						document
 							.querySelector("#devtools")
 							.contentWindow.postMessage(e.data, "*");
+						log.push(e.data);
 					} else if (
 						e.data.source === "preact-devtools-to-client" &&
 						!e.data._forwarded
 					) {
 						console.log("PARENT", e.data);
+						log.push(e.data);
 						window.postMessage({ ...e.data, _forwarded: true }, "*");
 					}
 				});
