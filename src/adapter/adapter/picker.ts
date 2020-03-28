@@ -8,22 +8,33 @@ export function createPicker(
 ) {
 	let picking = false;
 
-	function clicker() {
+	function clicker(e: MouseEvent) {
+		e.preventDefault();
+		e.stopPropagation();
 		stop();
 	}
 
 	function listener(e: WindowEventMap["mouseover"]) {
-		if (e.target != null) {
+		e.preventDefault();
+		e.stopPropagation();
+		if (picking && e.target != null) {
 			const id = renderer.findVNodeIdForDom(e.target as any);
 			if (id > -1) highlight(id);
 		}
 	}
 
+	function onMouseEvent(e: MouseEvent) {
+		e.preventDefault();
+		e.stopPropagation();
+	}
+
 	function start() {
 		if (!picking) {
 			picking = true;
-			window.addEventListener("mouseover", listener);
-			window.addEventListener("click", clicker);
+			window.addEventListener("mousedown", onMouseEvent, true);
+			window.addEventListener("mouseover", listener, true);
+			window.addEventListener("mouseup", onMouseEvent, true);
+			window.addEventListener("click", clicker, true);
 		}
 	}
 
@@ -31,8 +42,11 @@ export function createPicker(
 		if (picking) {
 			picking = false;
 			onStop();
-			window.removeEventListener("mouseover", listener);
-			window.removeEventListener("click", clicker);
+
+			window.removeEventListener("mousedown", onMouseEvent, true);
+			window.removeEventListener("mouseover", listener, true);
+			window.removeEventListener("mouseup", onMouseEvent, true);
+			window.removeEventListener("click", clicker, true);
 		}
 	}
 

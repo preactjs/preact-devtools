@@ -92,3 +92,7 @@ export async function typeText(page: Page, selector: string, text: string) {
 	await input.click({ clickCount: 3 });
 	return page.type(selector, text);
 }
+
+export async function getLog(page: Page) {
+	return (await page.evaluate(() => (window as any).log)) as any[];
+}
