@@ -1,5 +1,6 @@
-import { h } from "../vendor/preact-10";
+// @ts-ignore
 import { useState } from "../vendor/preact-10/hooks";
+import { html } from "../vendor/htm";
 
 function shuffle<T = any>(arr: T[]): T[] {
 	let i = arr.length;
@@ -29,10 +30,10 @@ export function TodoList() {
 	]);
 	const [v, setV] = useState("");
 
-	return (
+	return html`
 		<div>
 			<form
-				onSubmit={e => {
+				onSubmit=${(e: any) => {
 					e.preventDefault();
 					setV("");
 					setTodos([...todos, v]);
@@ -41,35 +42,35 @@ export function TodoList() {
 				<input
 					type="text"
 					placeholder="todo item"
-					onInput={e => setV((e.target as any).value)}
-					value={v}
+					onInput=${(e: any) => setV((e.target as any).value)}
+					value=${v}
 				/>
 			</form>
-			<button onClick={() => setTodos([...shuffle(todos)])}>Randomize</button>
+			<button onClick=${() => setTodos([...shuffle(todos)])}>Randomize</button>
 			<p>Tasks</p>
 			<ul>
-				{todos.map(x => {
-					return (
-						<TodoItem
-							key={x}
-							text={x}
-							onRemove={() => {
+				${todos.map((x: any) => {
+					return html`
+						<${TodoItem}
+							key=${x}
+							text=${x}
+							onRemove=${() => {
 								const idx = todos.indexOf(x);
 								if (idx > -1) todos.splice(idx, 1);
 								setTodos([...todos]);
 							}}
 						/>
-					);
+					`;
 				})}
 			</ul>
 		</div>
-	);
+	`;
 }
 
 export function TodoItem(props: { text: string; onRemove: () => void }) {
-	return (
+	return html`
 		<li>
-			{props.text} - &nbsp; <button onClick={props.onRemove}>remove</button>
+			${props.text} - &nbsp; <button onClick="${props.onRemove}">remove</button>
 		</li>
-	);
+	`;
 }

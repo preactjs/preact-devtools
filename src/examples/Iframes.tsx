@@ -1,5 +1,7 @@
-import { h, Fragment } from "./vendor/preact-10";
+// @ts-ignore
+import { Fragment } from "./vendor/preact-10";
 import { Iframer } from "./Iframer";
+import { html } from "./vendor/htm";
 import { Highlighter } from "../view/components/Highlighter";
 
 const spacing = {
@@ -18,89 +20,89 @@ const spacing = {
 };
 
 export function Iframes() {
-	return (
-		<Fragment>
+	return html`
+		<${Fragment}>
 			<h3>Highlighter</h3>
 			<div class="grid">
 				<div>
 					<p>center</p>
-					<Iframer height={300}>
-						<Highlighter
-							bounds={{}}
-							top={20}
-							left={20}
-							label={"FooBarBob"}
-							height={200}
-							width={200}
-							{...spacing}
+					<${Iframer} height=${300}>
+						<${Highlighter}
+							bounds=${{}}
+							top=${20}
+							left=${20}
+							label=${"FooBarBob"}
+							height=${200}
+							width=${200}
+							...${spacing}
 						/>
-					</Iframer>
+					<//>
 				</div>
 				<div>
 					<p>left</p>
-					<Iframer height={300}>
-						<Highlighter
-							bounds={{
+					<${Iframer} height=${300}>
+						<${Highlighter}
+							bounds=${{
 								left: true,
 							}}
-							top={20}
-							left={-50}
-							label={"FooBarBob"}
-							height={200}
-							width={200}
-							{...spacing}
+							top=${20}
+							left=${-50}
+							label=${"FooBarBob"}
+							height=${200}
+							width=${200}
+							...${spacing}
 						/>
-					</Iframer>
+					<//>
 				</div>
 				<div>
 					<p>right</p>
-					<Iframer height={300}>
-						<Highlighter
-							bounds={{
+					<${Iframer} height=${300}>
+						<${Highlighter}
+							bounds=${{
 								right: true,
 							}}
-							top={20}
-							left={150}
-							label={"FooBarBob"}
-							height={200}
-							width={200}
-							{...spacing}
+							top=${20}
+							left=${150}
+							label=${"FooBarBob"}
+							height=${200}
+							width=${200}
+							...${spacing}
 						/>
-					</Iframer>
+					<//>
 				</div>
 				<div>
 					<p>top</p>
-					<Iframer height={300}>
-						<Highlighter
-							bounds={{
+					<${Iframer} height=${300}>
+						<${Highlighter}
+							bounds=${{
 								top: true,
 							}}
-							top={-250}
-							left={20}
-							label={"FooBarBob"}
-							height={200}
-							width={200}
-							{...spacing}
+							top=${-250}
+							left=${20}
+							label=${"FooBarBob"}
+							height=${200}
+							width=${200}
+							...${spacing}
 						/>
-					</Iframer>
+					<//>
 				</div>
 				<div>
 					<p>bottom</p>
-					<Iframer height={300}>
-						<Highlighter
-							bounds={{
+					<${Iframer} height=${300}>
+						<${Highlighter}
+							bounds=${{
 								bottom: true,
 							}}
-							top={150}
-							left={20}
-							label={"FooBarBob"}
-							height={200}
-							width={200}
-							{...spacing}
+							top=${150}
+							left=${20}
+							label=${"FooBarBob"}
+							height=${200}
+							width=${200}
+							...${spacing}
 						/>
-					</Iframer>
+					<//>
 				</div>
 			</div>
-		</Fragment>
-	);
+		<//>
+	`;
 }

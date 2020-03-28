@@ -1,12 +1,16 @@
-import { h } from "../vendor/preact-10";
+import { html } from "../vendor/htm";
 
 const props: any = { foo: 123, bar: 123 };
 props.foo = props;
 
 function CircularInner() {
-	return <h1>Circular</h1>;
+	return html`
+		<h1>Circular</h1>
+	`;
 }
 
 export function Circular() {
-	return <CircularInner {...props} />;
+	return html`
+		<${CircularInner} ...${props} />
+	`;
 }

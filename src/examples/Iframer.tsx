@@ -1,6 +1,10 @@
+// @ts-ignore
 import { h, ComponentChildren, Fragment } from "./vendor/preact-10";
+// @ts-ignore
 import { createPortal } from "./vendor/preact-10/compat";
+// @ts-ignore
 import { useRef, useEffect, useState, useMemo } from "./vendor/preact-10/hooks";
+import { html } from "./vendor/htm";
 
 export interface Props {
 	children: ComponentChildren;
@@ -27,19 +31,26 @@ export function Iframer({ children, ...rest }: Props) {
 	}
 
 	return useMemo(() => {
-		return (
-			<iframe ref={ref} {...rest}>
-				{container &&
+		return html`
+			<iframe ref=${ref} ...${rest}>
+				${container &&
 					createPortal(
-						<Fragment>
-							{styles.map(sheet => (
-								<style>{sheet}</style>
-							))}
-							{children as any}
-						</Fragment>,
+						html`
+							<${Fragment}>
+								${styles.map(
+									(sheet: any) =>
+										html`
+											<style>
+												${sheet}
+											</style>
+										`,
+								)}
+								${children as any}
+							<//>
+						`,
 						container,
 					)}
 			</iframe>
-		);
+		`;
 	}, [styles]);
 }

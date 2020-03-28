@@ -1,14 +1,15 @@
-import { h } from "../vendor/preact-10";
+import { html } from "../vendor/htm";
+// @ts-ignore
 import { useState } from "../vendor/preact-10/hooks";
 
 export function Prime(props: { max: number }) {
 	const [v, set] = useState(0);
 	const primes = getPrimes(props.max);
-	return (
+	return html`
 		<p>
-			{primes.join(",")} <button onClick={() => set(v + 1)}>Update</button>
+			${primes.join(",")} <button onClick=${() => set(v + 1)}>Update</button>
 		</p>
-	);
+	`;
 }
 
 function getPrimes(max: number) {

@@ -1,21 +1,27 @@
-import { h } from "../vendor/preact-10";
+// @ts-ignore
 import { useState } from "../vendor/preact-10/hooks";
+import { html } from "../vendor/htm";
 
 export function Booleans(props: { value: boolean }) {
-	return <p>Boolean: {props.value + ""}</p>;
+	return html`
+		<p>Boolean: ${props.value + ""}</p>
+	`;
 }
 
-const Dummy = (props: Record<string, any>) => <div>Dummy {props.count}</div>;
+const Dummy = (props: Record<string, any>) =>
+	html`
+		<div>Dummy ${props.count}</div>
+	`;
 
 export function Complex() {
 	const [i, set] = useState(0);
-	return (
+	return html`
 		<div>
-			<button onClick={() => set(i + 1)}>Update Dummy</button>
+			<button onClick=${() => set(i + 1)}>Update Dummy</button>
 			<p>Dummy render count {i}</p>
-			<Dummy
-				count={i}
-				data={{
+			<${Dummy}
+				count=${i}
+				data=${{
 					foo: true,
 					bar: false,
 					baz: i,
@@ -29,5 +35,5 @@ export function Complex() {
 				}}
 			/>
 		</div>
-	);
+	`;
 }
