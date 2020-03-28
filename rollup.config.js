@@ -6,7 +6,7 @@ import commonjs from "rollup-plugin-commonjs";
 import replace from "@rollup/plugin-replace";
 import path from "path";
 
-const BROWSERS = ["chrome", "edge", "firefox"].filter(x => {
+const BROWSERS = ["chrome", "edge", "firefox", "inline"].filter(x => {
 	if (process.env.BROWSER) {
 		return process.env.BROWSER === x;
 	}
@@ -15,6 +15,19 @@ const BROWSERS = ["chrome", "edge", "firefox"].filter(x => {
 
 const entries = BROWSERS.map(browser => {
 	const dist = `dist/${browser}`;
+
+	if (browser === "inline") {
+		return [
+			{
+				dist: `${dist}/setup.js`,
+				entry: "src/shells/inline/index.ts",
+			},
+			{
+				dist: `${dist}/installHook.js`,
+				entry: "src/shells/shared/installHook.ts",
+			},
+		];
+	}
 	return [
 		{
 			dist: `${dist}/panel/panel.js`,

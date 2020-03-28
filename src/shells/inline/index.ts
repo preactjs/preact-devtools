@@ -1,43 +1,51 @@
 import { createStore } from "../../view/store";
+export { createStore } from "../../view/store";
 import { render, h, Options } from "preact";
 import { DevTools } from "../../view/components/Devtools";
-import { createAdapter } from "../../adapter/adapter/adapter";
-import { DevtoolsHook } from "../../adapter/hook";
 import { applyEvent } from "../../adapter/events/events";
-import { setupOptions } from "../../adapter/10/options";
 import { Store } from "../../view/store/types";
-import { Preact10Renderer } from "../../adapter/10/renderer";
-import { createPortForHook } from "../../adapter/adapter/port";
+import { PageHookName, DevtoolsToClient } from "../../constants";
 
-export function attach(
-	options: Options,
-	rendererFn: (hook: DevtoolsHook) => Preact10Renderer,
-) {
+export function setupFrontendStore(ctx: Window) {
 	const store = createStore();
-	const fakeHook: DevtoolsHook = {
-		attach: () => 1,
-		attachPreact: () => 1,
-		listen: () => null,
-		connected: true,
-		detach: () => null,
-		emit: (name, data) => {
-			applyEvent(store, name, data);
-		},
-		renderers: new Map(),
-	};
 
-	const renderer = rendererFn(fakeHook);
-	const destroy = setupOptions(options as any, renderer);
+	function handleClientEvents(e: MessageEvent) {
+		if (
+			e.data &&
+			(e.data.source === PageHookName || e.data.source === DevtoolsToClient)
+		) {
+			const data = e.data;
+			applyEvent(store, data.type, data.data);
+		}
+	}
+	ctx.addEventListener("message", handleClientEvents);
 
-	createAdapter(createPortForHook(window), renderer);
+	const unsubscribe = store.subscribe((name, data) => {
+		ctx.postMessage(
+			{
+				type: name,
+				data,
+				source: DevtoolsToClient,
+			},
+			"*",
+		);
+	});
 
 	return {
 		store,
-		destroy,
+		destroy: () => {
+			ctx.removeEventListener("message", handleClientEvents);
+			unsubscribe();
+		},
 	};
 }
 
-export type Container = Element | Document | ShadowRoot | DocumentFragment;
-export function renderDevtools(store: Store, container: Container) {
+export function setupInlineDevtools(container: HTMLElement, ctx: Window) {
+	const { store } = setupFrontendStore(ctx);
+	render(h(DevTools, { store }), container);
+	return store;
+}
+
+export function renderDevtools(store: Store, container: HTMLElement) {
 	render(h(DevTools, { store }), container);
 }
