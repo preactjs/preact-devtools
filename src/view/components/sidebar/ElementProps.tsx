@@ -100,6 +100,7 @@ export function SingleItem(props: SingleProps) {
 		<div
 			key={path.join(".")}
 			class={s.row}
+			data-testid="props-row"
 			data-depth={depth}
 			style={`padding-left: calc(var(--indent-depth) * ${depth - 1})`}
 		>

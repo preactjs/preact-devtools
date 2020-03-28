@@ -71,3 +71,5 @@ typings/
 
 /dist/
 .rts*
+*.pdf
+test-e2e/screenshots
