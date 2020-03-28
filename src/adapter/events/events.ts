@@ -142,7 +142,7 @@ export function applyEvent(store: Store, type: string, data: any) {
 			store.selection.selectById(data);
 			break;
 		case "stop-picker":
-			store.actions.stopPickElement();
+			store.isPicking.$ = false;
 			break;
 	}
 }

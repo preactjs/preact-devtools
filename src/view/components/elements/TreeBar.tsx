@@ -45,6 +45,7 @@ export function TreeBar() {
 				<IconBtn
 					active={isPicking}
 					title="Pick a Component from the page"
+					testId="inspect-btn"
 					onClick={() => {
 						if (!isPicking) store.actions.startPickElement();
 						else store.actions.stopPickElement();

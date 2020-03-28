@@ -10,6 +10,7 @@ export interface IconBtnProps {
 	onClick?: () => void;
 	styling?: "secondary" | "primary";
 	children: ComponentChildren;
+	testId?: string;
 }
 
 export function IconBtn(props: IconBtnProps) {
@@ -20,6 +21,7 @@ export function IconBtn(props: IconBtnProps) {
 			data-active={props.active}
 			title={props.title}
 			disabled={props.disabled}
+			data-testid={props.testId}
 			onClick={e => {
 				e.stopPropagation();
 				if (props.onClick) props.onClick();
