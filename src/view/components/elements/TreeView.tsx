@@ -145,6 +145,7 @@ export function TreeItem(props: { key: any; id: ID }) {
 			ref={ref}
 			class={s.item}
 			data-testid="tree-item"
+			data-name={node.name}
 			onClick={() => sel.selectById(id)}
 			onMouseEnter={() => store.actions.highlightNode(id)}
 			data-selected={isSelected}
