@@ -34,8 +34,18 @@ export function mockResponse(req: Request, test: string, file: string) {
 	return false;
 }
 
-export async function newTestPage(config: any, name: string) {
+export interface TestOptions {
+	preact?: string;
+}
+
+export async function newTestPage(
+	config: any,
+	name: string,
+	options: TestOptions = {},
+) {
 	const page = await newPage(config);
+
+	const preactVersion = options.preact ? options.preact : "10.3.4";
 
 	// Reset emulation
 	await (page as any)._client.send("Emulation.clearDeviceMetricsOverride");
@@ -48,8 +58,16 @@ export async function newTestPage(config: any, name: string) {
 			!mockResponse(req, "devtools.css", "../dist/inline/setup.css") &&
 			!mockResponse(req, "installHook.js", "../dist/inline/installHook.js") &&
 			!mockResponse(req, "installHook.css", "../dist/inline/installHook.css") &&
-			!mockResponse(req, "preact.js", "./vendor/preact.js") &&
-			!mockResponse(req, "preactHooks.js", "./vendor/preactHooks.js") &&
+			!mockResponse(
+				req,
+				"preact.js",
+				`./vendor/preact/${preactVersion}/preact.js`,
+			) &&
+			!mockResponse(
+				req,
+				"preactHooks.js",
+				`./vendor/preact/${preactVersion}/preactHooks.js`,
+			) &&
 			!mockResponse(req, "htm.js", "./vendor/htm.js") &&
 			!mockResponse(req, "test-case.js", `./tests/fixtures/${name}.js`) &&
 			!mockResponse(req, TEST_URL, "./index.html")
