@@ -96,3 +96,19 @@ export async function typeText(page: Page, selector: string, text: string) {
 export async function getLog(page: Page) {
 	return (await page.evaluate(() => (window as any).log)) as any[];
 }
+
+export async function getSize(page: Page, selector: string) {
+	return page.$eval(selector, el => {
+		const rect = el.getBoundingClientRect();
+		return {
+			x: rect.x,
+			y: rect.y,
+			top: rect.top,
+			bottom: rect.bottom,
+			left: rect.left,
+			right: rect.right,
+			width: rect.width,
+			height: rect.height,
+		};
+	});
+}

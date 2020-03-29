@@ -15,7 +15,11 @@ export function Highlighter(props: Props) {
 		bounds.bottom || bounds.left || bounds.right || bounds.top;
 
 	return (
-		<div class={s.root} style={`top: ${top}px; left: ${left}px;`}>
+		<div
+			class={s.root}
+			data-testid="highlight"
+			style={`top: ${top}px; left: ${left}px;`}
+		>
 			<div
 				class={s.margin}
 				style={`width: ${width}px; height: ${height}px; ${css2Border(
