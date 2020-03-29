@@ -28,8 +28,16 @@ export function TreeView() {
 			return node ? node.children.length > 0 : false;
 		},
 		checkCollapsed: id => collapsed.has(id),
-		onNext: selectNext,
-		onPrev: selectPrev,
+		onNext: () => {
+			selectNext();
+			store.actions.highlightNode(store.selection.selected.$);
+			store.actions.inspect(store.selection.selected.$);
+		},
+		onPrev: () => {
+			selectPrev();
+			store.actions.highlightNode(store.selection.selected.$);
+			store.actions.inspect(store.selection.selected.$);
+		},
 	});
 
 	const onMouseLeave = useCallback(() => store.actions.highlightNode(null), []);
@@ -146,7 +154,10 @@ export function TreeItem(props: { key: any; id: ID }) {
 			class={s.item}
 			data-testid="tree-item"
 			data-name={node.name}
-			onClick={() => sel.selectById(id)}
+			onClick={() => {
+				sel.selectById(id);
+				store.actions.inspect(id);
+			}}
 			onMouseEnter={() => store.actions.highlightNode(id)}
 			data-selected={isSelected}
 			data-id={id}
