@@ -15,6 +15,7 @@
 		"test": "mochette -c tsconfig.json 'src/**/*.test.{ts,tsx}'",
 		"test-e2e": "TS_NODE_PROJECT=tsconfig.cjs.json yarn ts-node test-e2e/run.ts",
 		"dev": "webpack-dev-server --inline",
+		"run:chrome": "DEBUG=true npm run build:chrome && node tools/run-chrome.js",
 		"watch": "rollup -c -w"
 	},
 	"repository": {
