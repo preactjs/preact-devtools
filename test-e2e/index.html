@@ -22,7 +22,7 @@
 				overflow: hidden;
 			}
 
-			#app {
+			.test-case {
 				height: 50vh;
 				width: 100%;
 				overflow: auto;
@@ -45,7 +45,10 @@
 	<body>
 		<script src="installHook.js"></script>
 		<div id="wrapper">
-			<div id="app"></div>
+			<div class="test-case">
+				<div id="app"></div>
+				<div id="app2"></div>
+			</div>
 			<iframe id="devtools" src="/devtools.html"></iframe>
 		</div>
 		<script src="vendor/preact.js"></script>
