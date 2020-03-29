@@ -140,12 +140,16 @@ export function createRenderer(
 			if (vnode) {
 				if (shouldFilter(vnode, filters, config)) {
 					let p = vnode;
+					let found = null;
 					while ((p = getVNodeParent(p)) != null) {
-						if (!shouldFilter(p, filters, config)) break;
+						if (!shouldFilter(p, filters, config)) {
+							found = p;
+							break;
+						}
 					}
 
-					if (p != null) {
-						return getVNodeId(ids, p) || -1;
+					if (found != null) {
+						return getVNodeId(ids, found) || -1;
 					}
 				} else {
 					return getVNodeId(ids, vnode) || -1;

@@ -7,7 +7,13 @@ import { RendererConfig10 } from "./renderer";
  * Get the direct parent of a `vnode`
  */
 export function getVNodeParent(vnode: VNode) {
-	return (vnode as any)._parent || (vnode as any).__ || null;
+	return (
+		(vnode as any)._parent ||
+		(vnode as any).__ ||
+		// Older Preact X versions used `__p`
+		(vnode as any).__p ||
+		null
+	);
 }
 
 /**
