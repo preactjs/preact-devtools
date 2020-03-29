@@ -54,15 +54,6 @@ export function createStore(): Store {
 	const inspectData = valoo<InspectData | null>(null);
 	const selection = createSelectionStore(nodeList);
 
-	// Update inspect data on selection
-	selection.selected.on(id => {
-		if (id > -1) {
-			notify("inspect", id);
-		} else {
-			inspectData.$ = null;
-		}
-	});
-
 	return {
 		profiler: createProfiler(),
 		nodeList,

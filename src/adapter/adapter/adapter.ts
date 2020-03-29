@@ -40,11 +40,21 @@ export function createAdapter(port: PortPageHook, renderer: Renderer) {
 
 	const highlight = createHightlighter(renderer);
 
+	const inspect = (id: ID) => {
+		if (renderer.has(id)) {
+			const data = renderer.inspect(id);
+			if (data) {
+				send("inspect-result", data);
+			}
+		}
+	};
+
 	const picker = createPicker(
 		window,
 		renderer,
 		id => {
 			highlight.highlight(id);
+			inspect(id);
 			send("select-node", id);
 		},
 		() => {
@@ -65,14 +75,7 @@ export function createAdapter(port: PortPageHook, renderer: Renderer) {
 		}
 	});
 
-	listen("inspect", id => {
-		if (renderer.has(id)) {
-			const data = renderer.inspect(id);
-			if (data) {
-				send("inspect-result", data);
-			}
-		}
-	});
+	listen("inspect", id => inspect(id));
 
 	listen("log", e => {
 		if (renderer.has(e.id)) {
@@ -96,12 +99,7 @@ export function createAdapter(port: PortPageHook, renderer: Renderer) {
 		renderer.update(id, type, path, value);
 
 		// Notify all frontends that something changed
-		if (renderer.has(id)) {
-			const data = renderer.inspect(id);
-			if (data !== null) {
-				send("inspect-result", data);
-			}
-		}
+		inspect(id);
 	};
 
 	listen("update-prop", data => update({ ...data, type: "props" }));

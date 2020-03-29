@@ -3,10 +3,11 @@ import { Renderer } from "../renderer";
 export function createPicker(
 	window: Window,
 	renderer: Renderer,
-	highlight: (id: number) => void,
+	onHover: (id: number) => void,
 	onStop: () => void,
 ) {
 	let picking = false;
+	let lastId = -1;
 
 	function clicker(e: MouseEvent) {
 		e.preventDefault();
@@ -19,7 +20,10 @@ export function createPicker(
 		e.stopPropagation();
 		if (picking && e.target != null) {
 			const id = renderer.findVNodeIdForDom(e.target as any);
-			if (id > -1) highlight(id);
+			if (id > -1 && lastId !== id) {
+				onHover(id);
+			}
+			lastId = id;
 		}
 	}
 
@@ -30,6 +34,7 @@ export function createPicker(
 
 	function start() {
 		if (!picking) {
+			lastId = -1;
 			picking = true;
 			window.addEventListener("mousedown", onMouseEvent, true);
 			window.addEventListener("mouseover", listener, true);
@@ -40,6 +45,7 @@ export function createPicker(
 
 	function stop() {
 		if (picking) {
+			lastId = -1;
 			picking = false;
 			onStop();
 
