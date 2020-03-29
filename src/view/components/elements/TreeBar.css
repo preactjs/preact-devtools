@@ -73,6 +73,10 @@
 	padding: 0.5rem 0.5rem 0.5rem 0.75rem;
 }
 
+.filter form {
+	margin: 0;
+}
+
 .filter label {
 	cursor: pointer;
 }
