@@ -1,5 +1,23 @@
 # Changelog
 
+## 0.2.1
+
+With the introduction of a proper end-to-end (e2e) testing framework, we managed to quickly find and fix many bugs related to the element picker or highlighting of nodes on the inspected page :tada:
+
+The extension is pretty stable by now and we expect to cut a proper 1.0.0 release in the not so distant future.
+
+- Minor design tweaks to element search input (#109, thanks @marvinhagemeister)
+- Refactor inspection to be less error prone (#108, thanks @marvinhagemeister)
+- Fix inspect highlight not working on preactjs.com (#107, thanks @marvinhagemeister)
+- E2E test framework improvements (#106, thanks @marvinhagemeister)
+- Fix incorrect padding in filter dropdown (#105, thanks @marvinhagemeister)
+- Add test case for multiple roots (#103, thanks @marvinhagemeister)
+- Fix inspect picker not working anymore (#102, thanks @marvinhagemeister)
+- Fix highlight flickering (#101, thanks @marvinhagemeister)
+- Add proper end to end test setup (#100, thanks @marvinhagemeister)
+- Minor design improvements (#99, thanks @marvinhagemeister)
+- Port examples to htm (#98, thanks @marvinhagemeister)
+
 ## 0.2.0
 
 With this release the whole message passing between the extension and the page was rewritten from scratch. It's more robust now and rebuilds state whenever they are re-opened on the same page.
