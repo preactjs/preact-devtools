@@ -26,6 +26,7 @@
 	align-items: center;
 	flex: 1 1 auto;
 	display: flex;
+	height: 100%;
 	margin-left: 0.5rem;
 	margin-right: 0.5rem;
 	min-width: 0;
@@ -34,6 +35,7 @@
 .search {
 	flex: 1 1 auto;
 	border: none;
+	height: 100%;
 	background: none;
 	color: var(--color-text);
 	margin-left: 0.25rem !important;
