@@ -1,4 +1,9 @@
-import { getComponent, getComponentHooks, getDisplayName } from "../vnode";
+import {
+	getComponent,
+	getComponentHooks,
+	getDisplayName,
+	getHookState,
+} from "../vnode";
 import { jsonify, cleanContext, cleanProps, setIn, hasIn } from "../utils";
 import { serializeVNode, RendererConfig10, getDevtoolsType } from "../renderer";
 import { ID } from "../../../view/store/types";
@@ -154,15 +159,9 @@ function parseHookData(
 
 			if (!hasIn(parent, itemPath)) {
 				let value = null;
-				const hookList = componentHooks._list || componentHooks.__;
-				if (hookList) {
-					const hookState = hookList[hookIdx];
-					if (isNative && ("_value" in hookState || "__" in hookState)) {
-						const hookValue = hookState._value || hookState.__;
-						if (hookValue) {
-							value = serialize(config, hookValue[0]);
-						}
-					}
+				if (isNative) {
+					const s = getHookState(component, hookIdx);
+					value = serialize(config, s[0]);
 				}
 
 				setIn(out, itemPath, value);

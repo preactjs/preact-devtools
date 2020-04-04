@@ -54,6 +54,9 @@ export function createMultiRenderer(
 				renderer.update(id, type, path, value);
 			}
 		},
+		updateHook(id, index, value) {
+			renderers.forEach(r => r.updateHook && r.updateHook(id, index, value));
+		},
 		flushInitial() {
 			renderers.forEach(r => r.flushInitial());
 		},

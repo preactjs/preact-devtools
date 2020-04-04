@@ -104,6 +104,12 @@ export function createAdapter(port: PortPageHook, renderer: Renderer) {
 	listen("update-prop", data => update({ ...data, type: "props" }));
 	listen("update-state", data => update({ ...data, type: "state" }));
 	listen("update-context", data => update({ ...data, type: "context" }));
+	listen("update-hook", data => {
+		if (renderer.updateHook) {
+			renderer.updateHook(data.id, data.index, data.value);
+			inspect(data.id);
+		}
+	});
 
 	listen("update-filter", data => {
 		renderer.applyFilters(parseFilters(data));

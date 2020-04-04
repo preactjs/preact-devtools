@@ -18,6 +18,7 @@ import {
 	getVNodeParent,
 	hasDom,
 	setNextState,
+	getHookState,
 } from "./vnode";
 import { shouldFilter } from "./filter";
 import { ID } from "../../view/store/types";
@@ -543,6 +544,17 @@ export function createRenderer(
 
 						c.forceUpdate();
 					}
+				}
+			}
+		},
+		updateHook(id, index, value) {
+			const vnode = getVNodeById(ids, id);
+			if (vnode !== null && typeof vnode.type === "function") {
+				const c = getComponent(vnode);
+				if (c) {
+					const s = getHookState(c, index);
+					s[0] = value;
+					c.forceUpdate();
 				}
 			}
 		},

@@ -15,7 +15,7 @@ export interface DevtoolEvents {
 	"update-prop": { id: ID; path: string; value: any };
 	"update-state": { id: ID; path: string; value: any };
 	"update-context": { id: ID; path: string; value: any };
-	"update-hook": { id: ID; path: string; value: any };
+	"update-hook": { id: ID; index: number; value: any };
 	"force-update": ID;
 	"start-picker": null;
 	"stop-picker": null;

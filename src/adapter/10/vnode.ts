@@ -83,6 +83,15 @@ export function getStatefulHookValue(hookState: any) {
 	return null;
 }
 
+export function getHookState(c: Component, index: number) {
+	const list = getStatefulHooks(c);
+	if (list && list[index]) {
+		return list[index]._value || list[index].__;
+	}
+
+	return [];
+}
+
 /**
  * Get teh diffed children of a `vnode`
  */
