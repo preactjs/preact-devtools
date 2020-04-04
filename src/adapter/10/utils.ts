@@ -119,3 +119,20 @@ export function setIn(obj: Record<string, any>, path: ObjPath, value: any) {
 		parent[last] = value;
 	}
 }
+
+export function hasIn(obj: Record<string, any>, path: ObjPath) {
+	let item = obj;
+	for (let i = 0; i < path.length; i++) {
+		const key = path[i];
+		if (item && key in item) {
+			const next = item[key];
+			if (next !== null && typeof next === "object") {
+				item = next;
+			}
+		} else {
+			return false;
+		}
+	}
+
+	return true;
+}

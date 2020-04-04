@@ -9,6 +9,7 @@ import {
 	getStatefulHookValue,
 	getComponent,
 } from "./vnode";
+import { addHookStack } from "./renderer/inspectVNode";
 
 /**
  * Inject tracking into setState
@@ -106,6 +107,11 @@ export function setupOptions(
 	options.unmount = vnode => {
 		if (prevBeforeUnmount) prevBeforeUnmount(vnode);
 		renderer.onUnmount(vnode as any);
+	};
+
+	(options as any)._hook = o.__h = (currentComponent: any, type: number) => {
+		addHookStack(type);
+		if (prevHook) prevHook(currentComponent, type);
 	};
 
 	// Teardown devtools options. Mainly used for testing

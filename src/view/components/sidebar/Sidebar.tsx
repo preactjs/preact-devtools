@@ -6,7 +6,7 @@ import { serializeProps } from "./inspect/serializeProps";
 export function Sidebar() {
 	const store = useStore();
 	const inspect = useObserver(() => store.inspectData.$);
-	const { props: propData, state, context } = store.sidebar;
+	const { props: propData, state, context, hooks } = store.sidebar;
 	const { emit } = store;
 
 	return (
@@ -21,6 +21,17 @@ export function Sidebar() {
 				onCopy={() => inspect && emit("copy", serializeProps(inspect.props))}
 				canAddNew
 			/>
+			{inspect && inspect.hooks !== null && (
+				<PropsPanel
+					label="Hooks"
+					items={hooks.items}
+					uncollapsed={hooks.uncollapsed}
+					onChange={(value, path) =>
+						emit("update-hook", { id: inspect!.id, path, value })
+					}
+					onCopy={() => inspect && emit("copy", serializeProps(inspect.hooks))}
+				/>
+			)}
 			{inspect && inspect.state !== null && (
 				<PropsPanel
 					label="State"

@@ -74,6 +74,10 @@ export interface Store {
 			uncollapsed: Observable<string[]>;
 			items: Observable<PropData[]>;
 		};
+		hooks: {
+			uncollapsed: Observable<string[]>;
+			items: Observable<PropData[]>;
+		};
 	};
 	clear(): void;
 	emit: EmitFn;

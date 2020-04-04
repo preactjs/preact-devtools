@@ -66,6 +66,10 @@ export function createStore(): Store {
 			uncollapsed: valoo<string[]>([]),
 			items: valoo<PropData[]>([]),
 		},
+		hooks: {
+			uncollapsed: valoo<string[]>([]),
+			items: valoo<PropData[]>([]),
+		},
 	};
 
 	const inspectData = valoo<InspectData | null>(null);
@@ -84,6 +88,10 @@ export function createStore(): Store {
 			data,
 			sidebar.context.uncollapsed.$,
 		);
+	});
+	watch(() => {
+		const data = inspectData.$ ? inspectData.$.hooks : null;
+		sidebar.hooks.items.$ = parseObjectState(data, sidebar.hooks.uncollapsed.$);
 	});
 
 	const selection = createSelectionStore(nodeList);
