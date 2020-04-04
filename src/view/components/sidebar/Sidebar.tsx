@@ -26,8 +26,8 @@ export function Sidebar() {
 					label="Hooks"
 					items={hooks.items}
 					uncollapsed={hooks.uncollapsed}
-					onChange={(value, path) =>
-						emit("update-hook", { id: inspect!.id, path, value })
+					onChange={value =>
+						emit("update-hook", { id: inspect!.id, index: 0, value })
 					}
 					onCopy={() => inspect && emit("copy", serializeProps(inspect.hooks))}
 				/>
