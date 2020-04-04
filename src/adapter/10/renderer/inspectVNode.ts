@@ -12,6 +12,7 @@ import { VNode, Component } from "preact";
 import { parseStackTrace, StackFrame } from "errorstacks";
 import { HookType } from "../../../constants";
 import { debug } from "../../../debug";
+import { ObjPath } from "../../../view/components/sidebar/ElementProps";
 
 function serialize(config: RendererConfig10, data: object | null) {
 	return jsonify(data, node => serializeVNode(node, config), new Set());
@@ -147,14 +148,19 @@ function parseHookData(
 	component: Component,
 ): Record<string, any> {
 	const out: Record<string, any> = {};
-	const componentHooks = getComponentHooks(component);
 
 	data.forEach((hook, hookIdx) => {
 		let itemPath = [];
 		for (let i = hook.stack.length - 1; i >= 0; i--) {
 			const frame = hook.stack[i];
 			const isNative = i === 0;
-			const name = isNative ? HookType[hook.type] : frame.name;
+			// Store hook index in the name to be able to retreive it later for
+			// updating. On top of that htis helps to work around an issue where
+			// a user may have named a custom hook like an internal one
+			// lile "useState". Since identifiers cannot start with numeric literals
+			// in JavaScript, but our native function has a numeric prefix, we can
+			// differentiate the two.
+			const name = isNative ? `${hookIdx}__${HookType[hook.type]}` : frame.name;
 			itemPath.push(name);
 
 			if (!hasIn(parent, itemPath)) {
@@ -170,4 +176,15 @@ function parseHookData(
 	});
 
 	return out;
+}
+
+const nativeName = /^\d+__\S+$/;
+export function getHookFromPath(objPath: ObjPath) {
+	for (let i = objPath.length - 1; i >= 0; i--) {
+		if (nativeName.test("" + objPath[i])) {
+			return objPath.slice(0, i);
+		}
+	}
+
+	return objPath;
 }
