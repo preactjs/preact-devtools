@@ -119,7 +119,9 @@ export function SingleItem(props: SingleProps) {
 			)}
 			{!collapseable && (
 				<span class={`${s.name} ${s.noCollapse}`} data-type={type}>
-					<span class={s.nameStatic}>{name}</span>
+					<span class={`${s.nameStatic} ${editable ? s.nameEditable : ""}`}>
+						{name}
+					</span>
 				</span>
 			)}
 			<div class={s.property}>

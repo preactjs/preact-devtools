@@ -17,7 +17,6 @@
 
 .name {
 	display: inline-block;
-	color: var(--color-element-text);
 	line-height: 1;
 	white-space: nowrap;
 }
@@ -29,10 +28,15 @@
 
 .nameStatic {
 	padding: 0.2em 0 0.2em 0.2em;
+	color: var(--name-static);
 	display: inline-block;
 	line-height: 1.4;
 	font-size: 1rem;
 	font-family: monospace;
+}
+
+.nameStatic.nameEditable {
+	color: var(--name-dynamic);
 }
 
 .nameInput {
