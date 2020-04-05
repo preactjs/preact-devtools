@@ -108,7 +108,7 @@
 	background: none;
 	border: none;
 	outline: none;
-	color: #aaa;
+	color: var(--color-toggle);
 	z-index: 100;
 	display: inline-flex;
 	justify-content: center;
@@ -118,12 +118,12 @@
 	transition: transform 0.3s;
 }
 
-[data-collapsed].toggle svg {
-	transform: rotate(-90deg);
+.item[data-selected] .toggle {
+	color: var(--color-toggle-selected);
 }
 
-[data-selected] .toggle {
-	color: var(--color-selected-text);
+[data-collapsed].toggle svg {
+	transform: rotate(-90deg);
 }
 
 .noToggle {
@@ -139,6 +139,10 @@
 	pointer-events: none;
 	opacity: 0.5;
 	z-index: -1;
+}
+
+.tree:focus-within .dimmer {
+	background: var(--color-dim-active-bg);
 }
 
 .keyLabel {
