@@ -35,7 +35,14 @@ export function createFlameGraphStore(profiler: ProfilerState) {
 		const viewMode = profiler.flamegraphType.$;
 		let nodes: NodeTransform[] = [];
 		if (viewMode === FlamegraphType.RANKED) {
-			nodes = layoutRanked(items);
+			const root = commit.nodes.get(commit.commitRootId)!;
+			nodes = layoutRanked(
+				items.filter(node => {
+					return (
+						node.startTime >= root.startTime && node.endTime <= root.endTime
+					);
+				}),
+			);
 		} else if (viewMode === FlamegraphType.FLAMEGRAPH) {
 			nodes = layoutTimeline(items);
 

@@ -87,6 +87,7 @@ export function RecordBtn() {
 			}
 			onClick={onClick}
 			disabled={!isSupported}
+			testId="record-btn"
 		>
 			<RecordIcon size="s" />
 		</IconBtn>
