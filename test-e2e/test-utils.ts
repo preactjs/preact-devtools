@@ -100,9 +100,38 @@ export async function getText(page: Page, selector: string) {
 	return getAttribute(page, selector, "textContent");
 }
 
+export async function waitForAttribute(
+	page: Page,
+	selector: string,
+	name: string,
+	value: string | number | null | undefined | RegExp,
+	options: any = {},
+) {
+	await page.waitForFunction(
+		(s, n, v) => {
+			const el = document.querySelector(s);
+			if (el === null) return false;
+			const attr = n in el ? (el as any)[n] : el.getAttribute(n);
+			if (typeof v === "object" && v !== null && v.type === "regex") {
+				return new RegExp(v.source, v.flags).test(attr);
+			}
+
+			return attr === v;
+		},
+		{ timeout: 3000, ...options },
+		selector,
+		name,
+		value instanceof RegExp
+			? { type: "regex", source: value.source, flags: value.flags }
+			: value === undefined
+			? null
+			: value,
+	);
+}
+
 export async function click(page: Page, selector: string) {
 	await page.waitForSelector(selector);
-	return page.$eval(selector, (el: any) => el.click());
+	return page.click(selector);
 }
 
 export async function typeText(page: Page, selector: string, text: string) {
