@@ -76,7 +76,6 @@
 						e.data.source === "preact-devtools-to-client" &&
 						!e.data._forwarded
 					) {
-						console.log("PARENT", e.data);
 						log.push(e.data);
 						window.postMessage({ ...e.data, _forwarded: true }, "*");
 					}
