@@ -37,6 +37,10 @@ export function getDom(vnode: VNode) {
 	return (vnode as any)._dom || (vnode as any).__e || null;
 }
 
+export function hasDom(x: any) {
+	return x != null && ("_dom" in x || "__e" in x);
+}
+
 /**
  * Get the last dom child of a `vnode`
  */

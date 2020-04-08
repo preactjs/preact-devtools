@@ -31,6 +31,7 @@ export function NewProp(props: NewPropProps) {
 		<div class={s.root}>
 			<div class={`${s2.name} ${s.nameWrapper}`}>
 				<input
+					name="new-prop-name"
 					type="text"
 					placeholder="new prop"
 					class={`${s2.nameInput} ${s.name}`}

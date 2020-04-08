@@ -78,6 +78,7 @@ export function displayCollection(v: any): string {
 			if (v.type === "set") return `Set<${v.name}>`;
 			if (v.type === "map") return `Map<${v.name}>`;
 			if (v.type === "function") return v.name + "()";
+			if (v.type === "blob") return "Blob {}";
 		}
 		return "Object";
 	}

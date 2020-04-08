@@ -13,6 +13,7 @@ export type PropDataType =
 	| "function"
 	| "bigint"
 	| "vnode"
+	| "blob"
 	| "symbol";
 
 export interface PropData {
@@ -161,6 +162,25 @@ export function parseProps(
 						depth,
 						id: pathStr,
 						type: "map",
+						collapsable: false,
+						editable: false,
+						path,
+						value: data,
+						children: [],
+					}),
+				);
+			} else if (
+				// Same for Blobs
+				maybeCustom &&
+				typeof data.name === "string" &&
+				data.type === "blob"
+			) {
+				out.set(
+					pathStr,
+					transform({
+						depth,
+						id: pathStr,
+						type: "blob",
 						collapsable: false,
 						editable: false,
 						path,

@@ -12,6 +12,7 @@ import {
 	getLastDomChild,
 	getActualChildren,
 	getVNodeParent,
+	hasDom,
 } from "./vnode";
 import { shouldFilter } from "./filter";
 import { ID } from "../../view/store/types";
@@ -63,7 +64,7 @@ export function getDevtoolsType(vnode: VNode): Elements {
 }
 
 export function isVNode(x: any): x is VNode {
-	return x != null && x.type !== undefined && getDom(x) !== undefined;
+	return x != null && x.type !== undefined && hasDom(x);
 }
 
 export function serializeVNode(

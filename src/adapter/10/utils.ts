@@ -50,6 +50,12 @@ export function jsonify(
 		}
 		case "object":
 			if (data === null) return null;
+			else if (data instanceof window.Blob) {
+				return {
+					type: "blob",
+					name: "Blob",
+				};
+			}
 			const out = { ...data };
 			Object.keys(out).forEach(key => {
 				out[key] = jsonify(out[key], getVNode, seen);

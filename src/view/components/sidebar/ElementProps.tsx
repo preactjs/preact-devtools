@@ -124,7 +124,7 @@ export function SingleItem(props: SingleProps) {
 					</span>
 				</span>
 			)}
-			<div class={s.property}>
+			<div class={s.property} data-testid="prop-value">
 				{editable ? (
 					<DataInput
 						value={value}
