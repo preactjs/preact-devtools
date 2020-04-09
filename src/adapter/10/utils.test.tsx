@@ -2,7 +2,7 @@ import { h, Component, createContext, render } from "preact";
 import { teardown } from "preact/test-utils";
 import { setupScratch } from "./renderer.test";
 import { expect } from "chai";
-import { cleanContext, cleanProps, jsonify } from "./utils";
+import { cleanContext, cleanProps, jsonify, setInCopy } from "./utils";
 import { getActualChildren } from "./vnode";
 
 describe("cleanContext", () => {
@@ -116,5 +116,27 @@ describe("jsonify", () => {
 			foo: 123,
 			bar: { foo: 123 },
 		});
+	});
+});
+
+describe("setInCopy", () => {
+	it("should update arrays", () => {
+		const obj = { foo: [1] };
+		const res = setInCopy(obj, ["foo", 0], 2);
+		expect(res).to.deep.equal({
+			foo: [2],
+		});
+		expect(res).not.equal(obj);
+		expect(res.foo).not.equal(obj.foo);
+	});
+
+	it("should not mutate existing object", () => {
+		const obj = { foo: { bar: 1 } };
+		const res = setInCopy(obj, ["foo", "bar"], 2);
+		expect(res).to.deep.equal({
+			foo: { bar: 2 },
+		});
+		expect(res).not.equal(obj);
+		expect(res.foo).not.equal(obj.foo);
 	});
 });
