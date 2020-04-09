@@ -16,6 +16,7 @@
 		"test-e2e": "TS_NODE_PROJECT=tsconfig.cjs.json yarn ts-node test-e2e/run.ts",
 		"dev": "webpack-dev-server --inline",
 		"run:chrome": "DEBUG=true npm run build:chrome && node tools/run-chrome.js",
+		"run:firefox": "DEBUG=true npm run build:firefox && web-ext run --source-dir ./dist/firefox/ --start-url https://preactjs.com",
 		"watch": "rollup -c -w"
 	},
 	"repository": {
@@ -59,6 +60,7 @@
 		"ts-loader": "^6.2.1",
 		"ts-node": "^8.6.2",
 		"typescript": "^3.8.3",
+		"web-ext": "^4.1.0",
 		"webpack": "^4.42.0",
 		"webpack-cli": "^3.3.11",
 		"webpack-dev-server": "^3.10.3"
