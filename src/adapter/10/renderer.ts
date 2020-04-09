@@ -13,10 +13,11 @@ import {
 	getActualChildren,
 	getVNodeParent,
 	hasDom,
+	setNextState,
 } from "./vnode";
 import { shouldFilter } from "./filter";
 import { ID } from "../../view/store/types";
-import { traverse, setIn, SerializedVNode } from "./utils";
+import { traverse, setIn, SerializedVNode, setInCopy } from "./utils";
 import { FilterState } from "../adapter/filter";
 import { Renderer, Elements } from "../renderer";
 import {
@@ -243,10 +244,21 @@ export function createRenderer(
 					const c = getComponent(vnode);
 					if (c) {
 						if (type === "props") {
-							setIn((vnode.props as any) || {}, path.slice(), value);
+							vnode.props = setInCopy(
+								(vnode.props as any) || {},
+								path.slice(),
+								value,
+							);
 						} else if (type === "state") {
-							setIn((c.state as any) || {}, path.slice(), value);
+							const res = setInCopy(
+								(c.state as any) || {},
+								path.slice(),
+								value,
+							);
+							setNextState(c, res);
 						} else if (type === "context") {
+							// TODO: Investigate if we should disallow modifying context
+							// from devtools and make it readonly.
 							setIn((c.context as any) || {}, path.slice(), value);
 						}
 

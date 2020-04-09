@@ -92,6 +92,23 @@ export function cleanContext(context: Record<string, any>) {
 }
 
 /**
+ * Deeply set a property and clone all parent objects/arrays
+ */
+export function setInCopy<T = any>(
+	obj: T,
+	path: ObjPath,
+	value: any,
+	idx = 0,
+): T {
+	if (idx >= path.length) return value;
+
+	const updated = Array.isArray(obj) ? obj.slice() : { ...obj };
+	const key = path[idx];
+	(updated as any)[key] = setInCopy((obj as any)[key], path, value, idx + 1);
+	return updated as any;
+}
+
+/**
  * Deeply mutate a property by walking down an array of property keys
  */
 export function setIn(obj: Record<string, any>, path: ObjPath, value: any) {

@@ -1,5 +1,5 @@
 import { newTestPage, typeText } from "../test-utils";
-import { clickText, closePage, waitForText } from "pintf/browser_utils";
+import { clickText, closePage } from "pintf/browser_utils";
 import { Page } from "puppeteer";
 
 async function type(page: Page, devtools: Page, value: string | number) {
@@ -8,6 +8,18 @@ async function type(page: Page, devtools: Page, value: string | number) {
 
 	await typeText(devtools, input, String(value));
 	await page.keyboard.press("Enter");
+}
+
+async function waitForResult(page: Page, selector: string, value: string) {
+	await page.waitForFunction(
+		(s, v) => {
+			const el = document.querySelector(`[data-testid="${s}"]`);
+			return el !== null ? el.textContent === v : false;
+		},
+		{ timeout: 1000 },
+		selector,
+		value,
+	);
 }
 
 export const description =
@@ -19,17 +31,17 @@ export async function run(config: any) {
 	// Props
 	await clickText(devtools, "Props", { elementXPath: "//*" });
 	await type(page, devtools, "1");
-	await waitForText(page, "props: 1, true", { timeout: 1000 });
+	await waitForResult(page, "props-result", "props: 1, true");
 
 	// State
 	await clickText(devtools, "State", { elementXPath: "//*" });
 	await type(page, devtools, "1");
-	await waitForText(page, "state: 1, true", { timeout: 1000 });
+	await waitForResult(page, "state-result", "state: 1, true");
 
 	// Legacy Context
 	await clickText(devtools, "LegacyConsumer", { elementXPath: "//*" });
 	await type(page, devtools, "1");
-	await waitForText(page, "legacy context: 1, true", { timeout: 1000 });
+	await waitForResult(page, "legacy-context-result", "legacy context: 1");
 
 	await closePage(page);
 }

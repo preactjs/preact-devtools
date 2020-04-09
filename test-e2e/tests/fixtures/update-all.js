@@ -54,14 +54,11 @@ function Context() {
 
 let lastLegacyContext;
 function LegacyConsumer(_, context) {
-	const out = html`
+	return html`
 		<div data-testid="legacy-context-result">
-			legacy context: ${context.value}, ${String(lastLegacyContext !== context)}
+			legacy context: ${context.value}
 		</div>
 	`;
-
-	lastLegacyContext = context;
-	return out;
 }
 
 class LegacyContext extends Component {

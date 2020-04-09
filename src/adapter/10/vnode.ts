@@ -119,3 +119,7 @@ export function getEndTime(vnode: VNode) {
 export function getStartTime(vnode: VNode) {
 	return vnode.startTime || 0;
 }
+
+export function setNextState(c: Component, value: any) {
+	(c as any)._nextState = (c as any).__s = value;
+}
