@@ -105,10 +105,32 @@ export function getAncestor(vnode: VNode) {
  * Get human readable name of the component/dom element
  */
 export function getDisplayName(vnode: VNode, config: RendererConfig10) {
-	if (vnode.type === config.Fragment) return "Fragment";
-	else if (typeof vnode.type === "function") {
-		return vnode.type.displayName || vnode.type.name || "Anonymous";
-	} else if (typeof vnode.type === "string") return vnode.type;
+	const { type } = vnode;
+	if (type === config.Fragment) return "Fragment";
+	else if (typeof type === "function") {
+		// Context is a special case :((
+		// See: https://reactjs.org/docs/context.html#contextdisplayname
+		const c = getComponent(vnode)!;
+		if (c !== null) {
+			// Consumer
+			if (c.constructor) {
+				const ct = (c.constructor as any).contextType;
+				if (ct && ct.Consumer === type && ct.displayName) {
+					return `${ct.displayName}.Consumer`;
+				}
+			}
+
+			// Provider
+			if ((c as any).sub) {
+				const ctx = (type as any)._contextRef || (type as any).__;
+				if (ctx && ctx.displayName) {
+					return `${ctx.displayName}.Provider`;
+				}
+			}
+		}
+
+		return type.displayName || type.name || "Anonymous";
+	} else if (typeof type === "string") return type;
 	return "#text";
 }
 
