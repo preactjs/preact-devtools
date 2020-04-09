@@ -7,7 +7,6 @@ including props and state.
 
 ![Screenshot of Preact devtools](media/preact-chrome-light.png)
 
-
 ## Usage
 
 Firstly, we need to import `preact/debug` somewhere to initialize the connection
@@ -49,3 +48,17 @@ Firefox:
 3. Select "Debug addons"
 4. Click "Load temporary addon"
 5. Select the `manifest.json` in `dist/firefox/`
+
+## For extension reviewers
+
+These commands will build the extension and load it into a browser with a temporary profile. The browser will automatically navigate to [preactjs.com](https://preactjs.com). There you can test the extension.
+
+Chrome:
+
+1. Execute `npm run run:chrome`
+2. Click on `Preact` tab in devtools
+
+Firefox:
+
+1. Exectue `npm run run:firefox`
+2. Open devtools + click on `Preact` tab in devtools
