@@ -61,7 +61,6 @@ export interface Store {
 	selection: ReturnType<typeof createSelectionStore>;
 	collapser: Collapser<ID>;
 	actions: {
-		inspect: (id: ID) => void;
 		clear(): void;
 	};
 	emit: EmitFn;

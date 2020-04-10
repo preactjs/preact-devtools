@@ -108,7 +108,7 @@ export function applyOperationsV2(store: Store, data: number[]) {
 	if (store.inspectData.$) {
 		const id = store.inspectData.$.id;
 		if (tree.has(id)) {
-			store.actions.inspect(id);
+			store.notify("inspect", id);
 		}
 	}
 

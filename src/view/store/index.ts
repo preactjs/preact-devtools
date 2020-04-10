@@ -68,7 +68,6 @@ export function createStore(): Store {
 		selection,
 		theme: valoo<Theme>("auto"),
 		actions: {
-			inspect: id => notify("inspect", id),
 			clear() {
 				roots.$ = [];
 				nodes.$ = new Map();

@@ -37,13 +37,15 @@ export function TreeView() {
 		checkCollapsed: id => collapsed.has(id),
 		onNext: () => {
 			selectNext();
-			highlightNode(store.notify, store.selection.selected.$);
-			store.actions.inspect(store.selection.selected.$);
+			const s = store.selection.selected.$;
+			highlightNode(store.notify, s);
+			store.notify("inspect", s);
 		},
 		onPrev: () => {
 			selectPrev();
-			highlightNode(store.notify, store.selection.selected.$);
-			store.actions.inspect(store.selection.selected.$);
+			const s = store.selection.selected.$;
+			highlightNode(store.notify, s);
+			store.notify("inspect", s);
 		},
 	});
 
@@ -139,19 +141,19 @@ export function MarkResult(props: { text: string; id: ID }) {
 export function TreeItem(props: { key: any; id: ID }) {
 	const { id } = props;
 	const store = useStore();
-	const sel = useSelection();
+	const as = useSelection();
 	const { collapsed, toggle } = useCollapser();
 	const filterFragments = useObserver(() => store.filter.filterFragment.$);
 	const node = useObserver(() => store.nodes.$.get(id) || null);
 	const onToggle = () => toggle(id);
 	const ref = useRef<HTMLDivElement>();
 
-	let isSelected = sel.selected === id;
+	let isSelected = as.selected === id;
 	useEffect(() => {
 		if (ref.current && isSelected) {
 			scrollIntoView(ref.current);
 		}
-	}, [ref.current, sel.selected, id]);
+	}, [ref.current, as.selected, id]);
 
 	if (!node) return null;
 
@@ -162,8 +164,8 @@ export function TreeItem(props: { key: any; id: ID }) {
 			data-testid="tree-item"
 			data-name={node.name}
 			onClick={() => {
-				sel.selectById(id);
-				store.actions.inspect(id);
+				as.selectById(id);
+				store.notify("inspect", id);
 			}}
 			onMouseEnter={() => highlightNode(store.notify, id)}
 			data-selected={isSelected}
