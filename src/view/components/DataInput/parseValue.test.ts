@@ -1,5 +1,5 @@
 import { expect } from "chai";
-import { parseValue, valueToHuman } from "./parseValue";
+import { parseValue, valueToHuman, genPreview } from "./parseValue";
 
 describe("parseValue", () => {
 	it("should parse booleans", () => {
@@ -92,5 +92,19 @@ describe("valueToHuman", () => {
 		expect(valueToHuman({ type: "foo", name: "bob" })).to.equal(
 			"{type:'foo',name:'bob'}",
 		);
+	});
+});
+
+describe("genPreview", () => {
+	it("should format values", () => {
+		expect(genPreview(undefined)).to.equal("");
+		expect(genPreview(null)).to.equal("null");
+		expect(genPreview(-100)).to.equal("-100");
+		expect(genPreview(0)).to.equal("0");
+		expect(genPreview(-0)).to.equal("0");
+		expect(genPreview(10000)).to.equal("10000");
+		expect(genPreview("foo")).to.equal('"foo"');
+		expect(genPreview([1, 2, { a: 3 }])).to.equal("[1, 2, {a: 3}]");
+		expect(genPreview({ a: 123, b: [1, 2] })).to.equal("{a: 123, b: [1, 2]}");
 	});
 });

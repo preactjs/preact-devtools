@@ -1,5 +1,5 @@
 import { valoo, watch, Observable } from "../../valoo";
-import { parseValue, displayCollection, valueToHuman } from "./parseValue";
+import { parseValue, genPreview, valueToHuman } from "./parseValue";
 
 export function createInputStore(value: Observable<any>) {
 	// Local state
@@ -27,10 +27,10 @@ export function createInputStore(value: Observable<any>) {
 
 	const actualValue = watch(() => {
 		if (local.$ === undefined) {
-			return displayCollection(value.$);
+			return genPreview(value.$);
 		}
 		if (valid.$ && !focus.$) {
-			return displayCollection(parseValue(local.$));
+			return genPreview(parseValue(local.$));
 		}
 
 		return local.$;

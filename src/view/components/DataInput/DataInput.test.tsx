@@ -74,7 +74,7 @@ describe("DataInput", () => {
 		);
 
 		const input = container.querySelector("input") as HTMLInputElement;
-		expect(input.value).to.equal("Object");
+		expect(input.value).to.equal("{foo: 1}");
 	});
 
 	// Focus handling seems to be wrong in our testing framework

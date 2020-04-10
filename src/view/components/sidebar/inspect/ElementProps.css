@@ -90,3 +90,9 @@
 .toggle[data-collapsed="true"] svg {
 	transform: rotate(-90deg);
 }
+
+.mask {
+	text-overflow: ellipsis;
+	overflow: hidden;
+	white-space: nowrap;
+}

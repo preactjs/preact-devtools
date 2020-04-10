@@ -3,7 +3,7 @@ import s from "./ElementProps.css";
 import { Arrow } from "../../elements/TreeView";
 import { PropDataType, PropData } from "./parseProps";
 import { DataInput } from "../../DataInput";
-import { displayCollection } from "../../DataInput/parseValue";
+import { genPreview } from "../../DataInput/parseValue";
 import { ID } from "../../../store/types";
 
 export type ObjPath = Array<string | number>;
@@ -114,7 +114,7 @@ export function SingleItem(props: SingleProps) {
 						name={`${id}#${path.join(".")}`}
 					/>
 				) : (
-					<div class={s.mask}>{displayCollection(value)}</div>
+					<div class={s.mask}>{genPreview(value)}</div>
 				)}
 			</div>
 		</div>
