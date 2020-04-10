@@ -1,5 +1,5 @@
 import { Renderer } from "./renderer";
-import { ObjPath } from "../view/components/sidebar/ElementProps";
+import { ObjPath } from "../view/components/sidebar/inspect/ElementProps";
 import { ID } from "../view/store/types";
 import {
 	createAdapter,

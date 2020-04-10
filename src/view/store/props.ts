@@ -1,5 +1,5 @@
 import { Observable, valoo, watch } from "../valoo";
-import { PropData, parseProps } from "../components/sidebar/parseProps";
+import { PropData, parseProps } from "../components/sidebar/inspect/parseProps";
 import { createCollapser } from "./collapser";
 import { InspectData } from "../../adapter/adapter/adapter";
 import { flattenChildren } from "../components/tree/windowing";

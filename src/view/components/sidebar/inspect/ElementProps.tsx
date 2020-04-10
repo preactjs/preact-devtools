@@ -1,10 +1,10 @@
 import { h } from "preact";
 import s from "./ElementProps.css";
-import { Arrow } from "../elements/TreeView";
+import { Arrow } from "../../elements/TreeView";
 import { PropDataType, PropData } from "./parseProps";
-import { DataInput } from "../DataInput";
-import { displayCollection } from "../DataInput/parseValue";
-import { ID } from "../../store/types";
+import { DataInput } from "../../DataInput";
+import { displayCollection } from "../../DataInput/parseValue";
+import { ID } from "../../../store/types";
 
 export type ObjPath = Array<string | number>;
 export type ChangeFn = (value: any, path: ObjPath) => void;

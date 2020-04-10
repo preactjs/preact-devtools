@@ -1,12 +1,12 @@
 import { h } from "preact";
 import { ElementProps, ObjPath } from "./ElementProps";
-import { useStore, useObserver } from "../../store/react-bindings";
+import { useStore, useObserver } from "../../../store/react-bindings";
 import { useCallback } from "preact/hooks";
-import { createPropsStore } from "../../store/props";
-import { useInstance } from "../utils";
-import { SidebarPanel } from "./SidebarPanel";
-import { ID } from "../../store/types";
-import { InspectData } from "../../../adapter/adapter/adapter";
+import { createPropsStore } from "../../../store/props";
+import { useInstance } from "../../utils";
+import { SidebarPanel } from "../SidebarPanel";
+import { ID } from "../../../store/types";
+import { InspectData } from "../../../../adapter/adapter/adapter";
 import { NewProp } from "./NewProp";
 
 const noop = () => null;

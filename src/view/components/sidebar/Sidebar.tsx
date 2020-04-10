@@ -1,7 +1,7 @@
 import { h, Fragment } from "preact";
 import { useEmitter } from "../../store/react-bindings";
-import { PropsPanel } from "./PropsPanel";
-import { serializeProps } from "./serializeProps";
+import { PropsPanel } from "./inspect/PropsPanel";
+import { serializeProps } from "./inspect/serializeProps";
 import { useCallback } from "preact/hooks";
 
 export function Sidebar() {

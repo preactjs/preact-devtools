@@ -1,6 +1,6 @@
 import { h } from "preact";
 import { useState, useCallback } from "preact/hooks";
-import { DataInput } from "../DataInput";
+import { DataInput } from "../../DataInput";
 import s from "./NewProp.css";
 import s2 from "./ElementProps.css";
 import { ObjPath } from "./ElementProps";
