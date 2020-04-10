@@ -159,3 +159,15 @@ export async function getSize(page: Page, selector: string) {
 		};
 	});
 }
+
+export async function waitFor(
+	fn: () => Promise<boolean> | boolean,
+	{ timeout = 4000 }: { timeout?: number } = {},
+) {
+	const t = setTimeout(() => {
+		throw new Error(`TimoutError: waiting for function exceeded ${timeout}ms`);
+	}, timeout);
+
+	await fn();
+	clearTimeout(t);
+}

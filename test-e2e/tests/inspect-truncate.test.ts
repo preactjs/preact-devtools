@@ -2,7 +2,7 @@ import { newTestPage } from "../test-utils";
 import { expect } from "chai";
 import { closePage, clickText } from "pintf/browser_utils";
 
-export const description = "Inspect should select node in elements panel";
+export const description = "Format inspected data";
 
 export async function run(config: any) {
 	const { page, devtools } = await newTestPage(config, "truncate");
