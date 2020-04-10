@@ -67,13 +67,11 @@ export function createStore(): Store {
 		filter: filterState,
 		selection,
 		theme: valoo<Theme>("auto"),
-		actions: {
-			clear() {
-				roots.$ = [];
-				nodes.$ = new Map();
-				selection.selected.$ = -1;
-				collapser.collapsed.$ = new Set();
-			},
+		clear() {
+			roots.$ = [];
+			nodes.$ = new Map();
+			selection.selected.$ = -1;
+			collapser.collapsed.$ = new Set();
 		},
 		subscribe(fn) {
 			const idx = listeners.push(fn);

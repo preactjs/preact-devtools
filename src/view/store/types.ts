@@ -60,9 +60,7 @@ export interface Store {
 	filter: ReturnType<typeof createFilterStore>;
 	selection: ReturnType<typeof createSelectionStore>;
 	collapser: Collapser<ID>;
-	actions: {
-		clear(): void;
-	};
+	clear(): void;
 	emit: EmitFn;
 	subscribe(fn: Listener): () => void;
 }
