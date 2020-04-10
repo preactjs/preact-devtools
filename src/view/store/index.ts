@@ -56,6 +56,7 @@ export function createStore(): Store {
 
 	return {
 		profiler: createProfiler(),
+		notify,
 		nodeList,
 		inspectData,
 		isPicking,
@@ -75,14 +76,6 @@ export function createStore(): Store {
 				nodes.$ = new Map();
 				selection.selected.$ = -1;
 				collapser.collapsed.$ = new Set();
-			},
-			startPickElement() {
-				isPicking.$ = true;
-				notify("start-picker", null);
-			},
-			stopPickElement() {
-				isPicking.$ = false;
-				notify("stop-picker", null);
 			},
 		},
 		subscribe(fn) {

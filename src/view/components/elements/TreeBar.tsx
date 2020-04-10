@@ -47,8 +47,8 @@ export function TreeBar() {
 					title="Pick a Component from the page"
 					testId="inspect-btn"
 					onClick={() => {
-						if (!isPicking) store.actions.startPickElement();
-						else store.actions.stopPickElement();
+						store.isPicking.$ = !isPicking;
+						store.notify(!isPicking ? "start-picker" : "stop-picker", null);
 					}}
 				>
 					<Picker />
