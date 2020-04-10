@@ -10,8 +10,15 @@ import { BackgroundLogo } from "./background-logo";
 import { useSearch } from "../../store/search";
 import { scrollIntoView, cssToPx, useResize } from "../utils";
 import { ID } from "../../store/types";
+import { debounce } from "../../../shells/shared/utils";
+import { EmitFn } from "../../../adapter/hook";
 
 const SCROLLBAR_WIDTH = 24;
+
+const highlightNode = debounce(
+	(notify: EmitFn, id: ID | null) => notify("highlight", id),
+	100,
+);
 
 export function TreeView() {
 	const store = useStore();
@@ -30,17 +37,17 @@ export function TreeView() {
 		checkCollapsed: id => collapsed.has(id),
 		onNext: () => {
 			selectNext();
-			store.actions.highlightNode(store.selection.selected.$);
+			highlightNode(store.notify, store.selection.selected.$);
 			store.actions.inspect(store.selection.selected.$);
 		},
 		onPrev: () => {
 			selectPrev();
-			store.actions.highlightNode(store.selection.selected.$);
+			highlightNode(store.notify, store.selection.selected.$);
 			store.actions.inspect(store.selection.selected.$);
 		},
 	});
 
-	const onMouseLeave = useCallback(() => store.actions.highlightNode(null), []);
+	const onMouseLeave = useCallback(() => highlightNode(store.notify, null), []);
 	const ref = useRef<HTMLDivElement | null>(null);
 	const paneRef = useRef<HTMLDivElement | null>(null);
 
@@ -158,7 +165,7 @@ export function TreeItem(props: { key: any; id: ID }) {
 				sel.selectById(id);
 				store.actions.inspect(id);
 			}}
-			onMouseEnter={() => store.actions.highlightNode(id)}
+			onMouseEnter={() => highlightNode(store.notify, id)}
 			data-selected={isSelected}
 			data-id={id}
 			data-depth={node.depth}

@@ -7,7 +7,6 @@ import { createCollapser } from "./collapser";
 import { EmitFn } from "../../adapter/hook";
 import { ID, DevNode, Store, Listener, Theme } from "./types";
 import { InspectData } from "../../adapter/adapter/adapter";
-import { debounce } from "../../shells/shared/utils";
 import { createProfiler } from "../components/profiler/data/commits";
 
 export function createStore(): Store {
@@ -70,7 +69,6 @@ export function createStore(): Store {
 		theme: valoo<Theme>("auto"),
 		actions: {
 			inspect: id => notify("inspect", id),
-			highlightNode: debounce(id => notify("highlight", id), 100),
 			clear() {
 				roots.$ = [];
 				nodes.$ = new Map();

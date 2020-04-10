@@ -62,7 +62,6 @@ export interface Store {
 	collapser: Collapser<ID>;
 	actions: {
 		inspect: (id: ID) => void;
-		highlightNode: (id: ID | null) => void;
 		clear(): void;
 	};
 	emit: EmitFn;
