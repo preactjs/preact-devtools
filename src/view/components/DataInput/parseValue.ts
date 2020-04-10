@@ -70,21 +70,32 @@ export function isStringifiedVNode(v: string) {
 	return v.startsWith("<") && v.endsWith("/>");
 }
 
-export function displayCollection(v: any): string {
-	if (Array.isArray(v)) return "Array";
+const MAX_PREVIEW = 50;
+function truncate(s: string) {
+	return s.length > MAX_PREVIEW ? `${s.substr(0, MAX_PREVIEW)}…` : s;
+}
+
+export function genPreview(v: any): string {
+	if (Array.isArray(v)) {
+		return `[${v.map(x => genPreview(x)).join(", ")}]`;
+	}
 	if (v !== null && typeof v === "object") {
 		if (Object.keys(v).length === 2) {
-			if (v.type === "vnode") return `<${v.name} />`;
-			if (v.type === "set") return `Set<${v.name}>`;
-			if (v.type === "map") return `Map<${v.name}>`;
-			if (v.type === "function") return v.name + "()";
+			if (v.type === "vnode") return `<${truncate(v.name)} />`;
+			if (v.type === "set") return `Set<${truncate(v.name)}>`;
+			if (v.type === "map") return `Map<${truncate(v.name)}>`;
+			if (v.type === "function") return `${truncate(v.name)}()`;
 			if (v.type === "blob") return "Blob {}";
 		}
-		return "Object";
+
+		const obj = Object.entries(v).map(x => {
+			return `${x[0]}: ${genPreview(x[1])}`;
+		});
+		return `{${obj.join(", ")}}`;
 	}
 	if (typeof v === "string") {
 		if (v === "[[Circular]]") return v;
-		return `"${v}"`;
+		return `"${truncate(v)}"`;
 	}
-	return "" + (v === undefined ? "" : v);
+	return truncate("" + (v === undefined ? "" : v));
 }
