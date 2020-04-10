@@ -5,7 +5,6 @@ import { PropDataType, PropData } from "./parseProps";
 import { DataInput } from "../DataInput";
 import { displayCollection } from "../DataInput/parseValue";
 import { ID } from "../../store/types";
-import { useCallback } from "preact/hooks";
 
 export type ObjPath = Array<string | number>;
 export type ChangeFn = (value: any, path: ObjPath) => void;
@@ -24,12 +23,7 @@ export function ElementProps(props: Props) {
 
 	return (
 		<div class={s.root}>
-			<form
-				class={s.form}
-				onSubmit={e => {
-					e.preventDefault();
-				}}
-			>
+			<form class={s.form} onSubmit={e => e.preventDefault()}>
 				{items.map(item => {
 					const id = item.id;
 					return (
@@ -84,18 +78,6 @@ export function SingleItem(props: SingleProps) {
 		value,
 	} = props;
 
-	const update = useCallback(
-		(v: any) => {
-			onChange && onChange(v, path);
-		},
-		[onChange, path],
-	);
-
-	const onCollapseClick = useCallback(() => onCollapse && onCollapse(path), [
-		onCollapse,
-		path,
-	]);
-
 	return (
 		<div
 			key={path.join(".")}
@@ -109,7 +91,7 @@ export function SingleItem(props: SingleProps) {
 					class={s.toggle}
 					type="button"
 					data-collapsed={collapsed}
-					onClick={onCollapseClick}
+					onClick={() => onCollapse && onCollapse(path)}
 				>
 					<Arrow />
 					<span class={s.name} data-type={type}>
@@ -128,7 +110,7 @@ export function SingleItem(props: SingleProps) {
 				{editable ? (
 					<DataInput
 						value={value}
-						onChange={update}
+						onChange={v => onChange && onChange(v, path)}
 						name={`${id}#${path.join(".")}`}
 					/>
 				) : (
