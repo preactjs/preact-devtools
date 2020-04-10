@@ -5,6 +5,8 @@ import { PropDataType, PropData } from "./parseProps";
 import { DataInput } from "../../DataInput";
 import { genPreview } from "../../DataInput/parseValue";
 import { ID } from "../../../store/types";
+import { Observable } from "../../../valoo";
+import { isCollapsed } from "../../../store/props";
 
 export type ObjPath = Array<string | number>;
 export type ChangeFn = (value: any, path: ObjPath) => void;
@@ -14,18 +16,19 @@ export interface Props {
 	editable?: boolean;
 	onChange?: ChangeFn;
 	onCollapse?: (path: string) => void;
-	collapsed: Set<string>;
+	uncollapsed: Observable<string[]>;
 	items: PropData[];
 }
 
 export function ElementProps(props: Props) {
-	const { editable, onChange, collapsed, items, onCollapse, nodeId } = props;
+	const { editable, onChange, uncollapsed, items, onCollapse, nodeId } = props;
 
 	return (
 		<div class={s.root}>
 			<form class={s.form} onSubmit={e => e.preventDefault()}>
 				{items.map(item => {
 					const id = item.id;
+					console.log(item);
 					return (
 						<SingleItem
 							id={nodeId}
@@ -33,7 +36,7 @@ export function ElementProps(props: Props) {
 							type={item.type}
 							name={id.slice(id.lastIndexOf(".") + 1)}
 							collapseable={item.collapsable}
-							collapsed={collapsed.has(id)}
+							collapsed={isCollapsed(uncollapsed.$, id)}
 							onCollapse={() => onCollapse && onCollapse(id)}
 							editable={editable && item.editable}
 							value={item.value}

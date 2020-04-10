@@ -1,6 +1,5 @@
 import { Observable, valoo, watch } from "../valoo";
 import { PropData, parseProps } from "../components/sidebar/inspect/parseProps";
-import { createCollapser } from "./collapser";
 import { InspectData } from "../../adapter/adapter/adapter";
 import { flattenChildren } from "../components/tree/windowing";
 
@@ -10,8 +9,7 @@ export function createPropsStore(
 	inspectData: Observable<InspectData | null>,
 	getData: (data: InspectData) => any,
 ) {
-	const collapsed = valoo(new Set<string>());
-	const collapser = createCollapser<string>(collapsed);
+	const uncollapsed = valoo<string[]>([]);
 	const tree = valoo(new Map<string, PropData>());
 	let lastId = inspectData.$ ? inspectData.$.id : -1;
 
@@ -29,39 +27,43 @@ export function createPropsStore(
 				value: null,
 			});
 
-			const collapseAll = collapsed.$.size === 0;
-
 			if (lastId !== v.id) {
 				lastId = v.id;
-				collapsed.update(n => {
-					n.clear();
-				});
+				uncollapsed.$ = [];
 			}
 
-			parseProps(
-				getData(v),
-				["root"],
-				PROPS_LIMIT,
-				data => {
-					if (collapseAll && data.id !== "root" && data.collapsable) {
-						collapsed.$.add(data.id);
-					}
-					return data;
-				},
-				tree.$,
-			);
+			parseProps(getData(v), ["root"], PROPS_LIMIT, data => data, tree.$);
 		} else {
 			tree.$.clear();
 		}
 
-		collapsed.update();
 		tree.update();
 	});
 
 	const list = watch(() => {
-		const { items } = flattenChildren(tree.$, "root", collapser.collapsed.$);
+		const { items } = flattenChildren(tree.$, "root", id => {
+			return (
+				tree.$.get(id)!.collapsable &&
+				isCollapsed(uncollapsed.$, id) &&
+				uncollapsed.$.indexOf(id) === -1
+			);
+		});
 		return items.slice(1);
 	});
 
-	return { list, collapser, tree, destroy: () => dispose() };
+	return { list, uncollapsed, tree, destroy: () => dispose() };
+}
+
+export function isCollapsed(ids: string[], id: string) {
+	return id !== "root" && ids.indexOf(id) === -1;
+}
+
+export function toggleCollapsed(uncollapsed: Observable<string[]>, id: string) {
+	const idx = uncollapsed.$.indexOf(id);
+	if (idx > -1) {
+		uncollapsed.$.splice(idx, 1);
+	} else {
+		uncollapsed.$.push(id);
+	}
+	uncollapsed.update();
 }

@@ -32,7 +32,7 @@ export function createStore(): Store {
 			const { items, maxDepth } = flattenChildren<ID, DevNode>(
 				nodes.$,
 				root,
-				collapser.collapsed.$,
+				id => collapser.collapsed.$.has(id),
 			);
 
 			if (filterState.filterFragment.$) {

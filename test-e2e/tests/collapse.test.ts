@@ -3,7 +3,6 @@ import { expect } from "chai";
 import { closePage, clickText } from "pintf/browser_utils";
 
 export const description = "Collapse all the things!";
-export const expectedToFail = () => true;
 
 export async function run(config: any) {
 	const { page, devtools } = await newTestPage(config, "update-all");
