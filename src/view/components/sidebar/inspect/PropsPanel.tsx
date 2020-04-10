@@ -1,12 +1,12 @@
 import { h } from "preact";
 import { ElementProps, ObjPath } from "./ElementProps";
-import { useStore, useObserver } from "../../store/react-bindings";
+import { useStore, useObserver } from "../../../store/react-bindings";
 import { useCallback } from "preact/hooks";
-import { createPropsStore } from "../../store/props";
-import { useInstance } from "../utils";
-import { SidebarPanel } from "./SidebarPanel";
-import { ID } from "../../store/types";
-import { InspectData } from "../../../adapter/adapter/adapter";
+import { createPropsStore } from "../../../store/props";
+import { useInstance } from "../../utils";
+import { SidebarPanel } from "../SidebarPanel";
+import { ID } from "../../../store/types";
+import { InspectData } from "../../../../adapter/adapter/adapter";
 import { NewProp } from "./NewProp";
 
 const noop = () => null;
@@ -39,14 +39,6 @@ export function PropsPanel(props: Props) {
 		[inspect],
 	);
 
-	const onCopy = props.onCopy
-		? useCallback(() => {
-				if (inspect != null && props.onCopy != null) {
-					props.onCopy(props.getData(inspect));
-				}
-		  }, [inspect, props.onCopy])
-		: undefined;
-
 	if (inspect == null || props.getData(inspect) == null) {
 		return !props.isOptional ? (
 			<SidebarPanel title={props.label} empty="None" onCopy={noop} />
@@ -54,7 +46,15 @@ export function PropsPanel(props: Props) {
 	}
 
 	return (
-		<SidebarPanel title={props.label} empty="None" onCopy={onCopy}>
+		<SidebarPanel
+			title={props.label}
+			empty="None"
+			onCopy={() => {
+				if (props.onCopy && inspect != null && props.onCopy != null) {
+					props.onCopy(props.getData(inspect));
+				}
+			}}
+		>
 			<ElementProps
 				nodeId={inspect.id}
 				editable={props.checkEditable(inspect)}

@@ -2,7 +2,7 @@ import { VNode } from "preact";
 import { ID } from "../view/store/types";
 import { FilterState } from "./adapter/filter";
 import { InspectData, UpdateType } from "./adapter/adapter";
-import { ObjPath } from "../view/components/sidebar/ElementProps";
+import { ObjPath } from "../view/components/sidebar/inspect/ElementProps";
 
 /**
  * TODO: Deprecate this

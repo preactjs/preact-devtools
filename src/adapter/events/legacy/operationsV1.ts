@@ -62,7 +62,7 @@ export function applyOperationsV1(store: Store, data: number[]) {
 				const id = data[i + 1];
 
 				if (id === inspected) {
-					store.actions.inspect(id);
+					store.notify("inspect", id);
 				}
 
 				i += 2;

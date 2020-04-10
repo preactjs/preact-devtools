@@ -47,6 +47,7 @@ export type Theme = "auto" | "light" | "dark";
 export type Tree = Map<ID, DevNode>;
 
 export interface Store {
+	notify: EmitFn;
 	profiler: ProfilerState;
 	isPicking: Observable<boolean>;
 	inspectData: Observable<InspectData | null>;
@@ -59,13 +60,7 @@ export interface Store {
 	filter: ReturnType<typeof createFilterStore>;
 	selection: ReturnType<typeof createSelectionStore>;
 	collapser: Collapser<ID>;
-	actions: {
-		inspect: (id: ID) => void;
-		highlightNode: (id: ID | null) => void;
-		clear(): void;
-		startPickElement(): void;
-		stopPickElement(): void;
-	};
+	clear(): void;
 	emit: EmitFn;
 	subscribe(fn: Listener): () => void;
 }

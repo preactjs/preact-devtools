@@ -70,7 +70,7 @@ port.onMessage.addListener(async message => {
 // is done via the HTML5 history API
 chrome.devtools.network.onNavigated.addListener(() => {
 	debug("== Navigation: clear devtools state ==");
-	store.actions.clear();
+	store.clear();
 });
 
 // Notify background page of the panel

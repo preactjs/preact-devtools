@@ -7,7 +7,6 @@ import { createCollapser } from "./collapser";
 import { EmitFn } from "../../adapter/hook";
 import { ID, DevNode, Store, Listener, Theme } from "./types";
 import { InspectData } from "../../adapter/adapter/adapter";
-import { debounce } from "../../shells/shared/utils";
 import { createProfiler } from "../components/profiler/data/commits";
 
 export function createStore(): Store {
@@ -56,6 +55,7 @@ export function createStore(): Store {
 
 	return {
 		profiler: createProfiler(),
+		notify,
 		nodeList,
 		inspectData,
 		isPicking,
@@ -67,23 +67,11 @@ export function createStore(): Store {
 		filter: filterState,
 		selection,
 		theme: valoo<Theme>("auto"),
-		actions: {
-			inspect: id => notify("inspect", id),
-			highlightNode: debounce(id => notify("highlight", id), 100),
-			clear() {
-				roots.$ = [];
-				nodes.$ = new Map();
-				selection.selected.$ = -1;
-				collapser.collapsed.$ = new Set();
-			},
-			startPickElement() {
-				isPicking.$ = true;
-				notify("start-picker", null);
-			},
-			stopPickElement() {
-				isPicking.$ = false;
-				notify("stop-picker", null);
-			},
+		clear() {
+			roots.$ = [];
+			nodes.$ = new Map();
+			selection.selected.$ = -1;
+			collapser.collapsed.$ = new Set();
 		},
 		subscribe(fn) {
 			const idx = listeners.push(fn);
