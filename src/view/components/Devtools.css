@@ -14,6 +14,14 @@
 	font-family: sans-serif;
 }
 
+/* Global reset */
+button,
+input {
+	border: none;
+	font: inherit;
+	padding: 0;
+}
+
 @media (min-width: 37.5rem) {
 	.root {
 		grid-template-columns: minmax(0, 75%) minmax(35%, 15rem);
