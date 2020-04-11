@@ -5,18 +5,17 @@ import { InspectData } from "../../adapter/adapter/adapter";
 
 const createStore = () => {
 	const inspectData = valoo<InspectData | null>(null);
-	const store = createPropsStore(inspectData, () =>
+	const uncollapsed = valoo<string[]>([]);
+	const store = createPropsStore(inspectData, uncollapsed, () =>
 		inspectData.$ ? inspectData.$.props : null,
 	);
-	return { store, inspectData };
+	return { store, inspectData, uncollapsed };
 };
 
 describe("Props Store", () => {
 	it("should reset collapse on element change", () => {
 		const { inspectData, store } = createStore();
-		store.collapser.collapsed.update(v => {
-			v.add("foo");
-		});
+		store.uncollapsed.$.push("foo");
 
 		inspectData.$ = {
 			id: 42,
@@ -30,7 +29,7 @@ describe("Props Store", () => {
 			canEditState: false,
 			state: null,
 		};
-		expect(store.collapser.collapsed.$.size).to.equal(0);
+		expect(store.uncollapsed.$.length).to.equal(0);
 	});
 
 	it("should collapse complex properties by default", () => {
@@ -54,17 +53,12 @@ describe("Props Store", () => {
 			state: null,
 		};
 
-		expect(Array.from(store.collapser.collapsed.$)).to.deep.equal([
-			"root.foo",
-			"root.bob",
-		]);
+		expect(store.uncollapsed.$.length).to.equal(0);
 	});
 
 	it("should NOT collapse by default when user un/collapsed something", () => {
 		const { inspectData, store } = createStore();
-		store.collapser.collapsed.update(v => {
-			v.add("root.foo");
-		});
+		store.uncollapsed.$.push("root.foo");
 
 		inspectData.$ = {
 			id: -1, // Use same id as default
@@ -84,6 +78,6 @@ describe("Props Store", () => {
 			state: null,
 		};
 
-		expect(Array.from(store.collapser.collapsed.$)).to.deep.equal(["root.foo"]);
+		expect(store.uncollapsed.$).to.deep.equal(["root.foo"]);
 	});
 });

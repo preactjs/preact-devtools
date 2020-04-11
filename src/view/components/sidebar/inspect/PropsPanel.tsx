@@ -2,7 +2,7 @@ import { h } from "preact";
 import { ElementProps, ObjPath } from "./ElementProps";
 import { useStore, useObserver } from "../../../store/react-bindings";
 import { useCallback } from "preact/hooks";
-import { createPropsStore } from "../../../store/props";
+import { createPropsStore, toggleCollapsed } from "../../../store/props";
 import { useInstance } from "../../utils";
 import { SidebarPanel } from "../SidebarPanel";
 import { ID } from "../../../store/types";
@@ -25,10 +25,13 @@ export function PropsPanel(props: Props) {
 	const store = useStore();
 
 	const s = useInstance(() => {
-		return createPropsStore(store.inspectData, props.getData);
+		return createPropsStore(
+			store.inspectData,
+			store.sidebarUncollapsed,
+			props.getData,
+		);
 	});
 	const inspect = useObserver(() => store.inspectData.$);
-	const collapsed = useObserver(() => s.collapser.collapsed.$);
 	const items = useObserver(() => s.list.$);
 
 	const onChange = useCallback(
@@ -58,10 +61,10 @@ export function PropsPanel(props: Props) {
 			<ElementProps
 				nodeId={inspect.id}
 				editable={props.checkEditable(inspect)}
-				collapsed={collapsed}
+				uncollapsed={s.uncollapsed}
 				items={items.map(x => s.tree.$.get(x)!)}
 				onChange={onChange}
-				onCollapse={s.collapser.toggle}
+				onCollapse={id => toggleCollapsed(s.uncollapsed, id)}
 			/>
 			{props.canAddNew && <NewProp onChange={onChange} />}
 		</SidebarPanel>

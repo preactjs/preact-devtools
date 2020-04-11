@@ -3,7 +3,11 @@ import { ID } from "../../store/types";
 export function flattenChildren<
 	K,
 	T extends { id: K; children: K[]; depth: number }
->(tree: Map<K, T>, id: K, collapsed: Set<K>): { maxDepth: number; items: K[] } {
+>(
+	tree: Map<K, T>,
+	id: K,
+	isCollapsed: (id: K) => boolean,
+): { maxDepth: number; items: K[] } {
 	const out: K[] = [];
 	const visited = new Set<K>();
 	let stack: K[] = [id];
@@ -24,7 +28,7 @@ export function flattenChildren<
 				maxDepth = node.depth;
 			}
 
-			if (!collapsed.has(node.id)) {
+			if (!isCollapsed(node.id)) {
 				for (let i = node.children.length; i--; ) {
 					stack.push(node.children[i]);
 				}
