@@ -28,7 +28,6 @@ export function ElementProps(props: Props) {
 			<form class={s.form} onSubmit={e => e.preventDefault()}>
 				{items.map(item => {
 					const id = item.id;
-					console.log(item);
 					return (
 						<SingleItem
 							id={nodeId}
