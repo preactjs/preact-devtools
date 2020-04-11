@@ -60,6 +60,7 @@ export interface Store {
 	filter: ReturnType<typeof createFilterStore>;
 	selection: ReturnType<typeof createSelectionStore>;
 	collapser: Collapser<ID>;
+	sidebarUncollapsed: Observable<string[]>;
 	clear(): void;
 	emit: EmitFn;
 	subscribe(fn: Listener): () => void;

@@ -5,10 +5,11 @@ import { InspectData } from "../../adapter/adapter/adapter";
 
 const createStore = () => {
 	const inspectData = valoo<InspectData | null>(null);
-	const store = createPropsStore(inspectData, () =>
+	const uncollapsed = valoo<string[]>([]);
+	const store = createPropsStore(inspectData, uncollapsed, () =>
 		inspectData.$ ? inspectData.$.props : null,
 	);
-	return { store, inspectData };
+	return { store, inspectData, uncollapsed };
 };
 
 describe("Props Store", () => {

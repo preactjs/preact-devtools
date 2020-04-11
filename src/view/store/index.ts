@@ -50,7 +50,10 @@ export function createStore(): Store {
 		}).flat();
 	});
 
+	// Sidebar
 	const inspectData = valoo<InspectData | null>(null);
+	const sidebarUncollapsed = valoo<string[]>([]);
+
 	const selection = createSelectionStore(nodeList);
 
 	return {
@@ -67,6 +70,7 @@ export function createStore(): Store {
 		filter: filterState,
 		selection,
 		theme: valoo<Theme>("auto"),
+		sidebarUncollapsed,
 		clear() {
 			roots.$ = [];
 			nodes.$ = new Map();

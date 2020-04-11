@@ -25,7 +25,11 @@ export function PropsPanel(props: Props) {
 	const store = useStore();
 
 	const s = useInstance(() => {
-		return createPropsStore(store.inspectData, props.getData);
+		return createPropsStore(
+			store.inspectData,
+			store.sidebarUncollapsed,
+			props.getData,
+		);
 	});
 	const inspect = useObserver(() => store.inspectData.$);
 	const items = useObserver(() => s.list.$);

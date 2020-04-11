@@ -54,5 +54,14 @@ export async function run(config: any) {
 	// Our input should still be visible
 	expect((await devtools.$$(selector)).length).to.equal(0);
 
+	// Switching to Profiler and back should not change collapse state
+	await click(devtools, '[name="root-panel"][value="PROFILER"]');
+	await devtools.waitForSelector('[data-testid="record-btn"]');
+	await click(devtools, '[name="root-panel"][value="ELEMENTS"]');
+
+	// Our input should still be visible
+	expect((await devtools.$$(row)).length > 0).to.equal(true);
+	expect((await devtools.$$(selector)).length).to.equal(0);
+
 	await closePage(page);
 }
