@@ -1,5 +1,5 @@
 .tree {
-	--indent-depth: 1.6rem;
+	--indent-depth: 1.5rem;
 
 	width: 100%;
 	position: relative;
@@ -55,6 +55,7 @@
 	color: var(--color-element-text);
 	height: 1.5rem;
 	position: relative;
+	white-space: nowrap;
 }
 
 .tree:focus-within .item[data-selected] {
@@ -129,6 +130,10 @@
 .noToggle {
 	width: 1.25rem;
 	height: 1.25rem;
+}
+
+.name {
+	font-size: 0.9rem;
 }
 
 .dimmer {

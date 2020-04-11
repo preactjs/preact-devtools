@@ -1,4 +1,4 @@
-import { h } from "preact";
+import { h, Fragment } from "preact";
 import s from "./ElementProps.css";
 import { Arrow } from "../../elements/TreeView";
 import { PropDataType, PropData } from "./parseProps";
@@ -97,28 +97,36 @@ export function SingleItem(props: SingleProps) {
 				>
 					<Arrow />
 					<span class={s.name} data-type={type}>
-						<span class={s.nameStatic}>{name}</span>
+						{name}
+					</span>
+					<span class={s.property} data-testid="prop-value">
+						<span class={s.mask}>{genPreview(value)}</span>
 					</span>
 				</button>
 			)}
 			{!collapseable && (
-				<span class={`${s.name} ${s.noCollapse}`} data-type={type}>
-					<span class={`${s.nameStatic} ${editable ? s.nameEditable : ""}`}>
+				<Fragment>
+					<span
+						class={`${s.name} ${s.noCollapse} ${s.nameStatic} ${
+							editable ? s.nameEditable : ""
+						}`}
+						data-type={type}
+					>
 						{name}
 					</span>
-				</span>
+					<div class={s.property} data-testid="prop-value">
+						{editable ? (
+							<DataInput
+								value={value}
+								onChange={v => onChange && onChange(v, path)}
+								name={`${id}#${path.join(".")}`}
+							/>
+						) : (
+							<div class={s.mask}>{genPreview(value)}</div>
+						)}
+					</div>
+				</Fragment>
 			)}
-			<div class={s.property} data-testid="prop-value">
-				{editable ? (
-					<DataInput
-						value={value}
-						onChange={v => onChange && onChange(v, path)}
-						name={`${id}#${path.join(".")}`}
-					/>
-				) : (
-					<div class={s.mask}>{genPreview(value)}</div>
-				)}
-			</div>
 		</div>
 	);
 }
