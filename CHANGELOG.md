@@ -1,5 +1,29 @@
 # Changelog
 
+## 0.3.0
+
+This release brings a few new features and many usability improvements. Thanks to everyone who reported bugs and helped make preact-devtools even more awesome!
+
+Features:
+
+- Add support for User Timing API (#129, thanks @marvinhagemeister)
+- Improve value preview (#125, thanks @marvinhagemeister)
+- Add firefox run command (#123, thanks @marvinhagemeister)
+- Add support for context `displayName` (#119, thanks @marvinhagemeister)
+- Only display nodes of the current commit in ranked view (#115, thanks @marvinhagemeister)
+
+Bug Fixes:
+
+- Fix sidebar collapsing on user input (#128, thanks @marvinhagemeister)
+- Add collapse test (#127, thanks @marvinhagemeister)
+- Revert to use purple as element color (#126, thanks @marvinhagemeister)
+- Maintenance (#124, thanks @marvinhagemeister)
+- Fix updates mutating existing vnode properties (#121, thanks @marvinhagemeister)
+- Remove debug logs from e2e tests (#120, thanks @marvinhagemeister)
+- Fix objects wrongly detected as vnodes (#117, thanks @marvinhagemeister)
+- Minor design improvements (#113, thanks @marvinhagemeister)
+- Fix mixed font size in props panel (#112, thanks @marvinhagemeister)
+
 ## 0.2.1
 
 With the introduction of a proper end-to-end (e2e) testing framework, we managed to quickly find and fix many bugs related to the element picker or highlighting of nodes on the inspected page :tada:
