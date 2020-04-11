@@ -25,7 +25,9 @@ export function setupMockHook(options: Options) {
 		{ Fragment: Fragment as any },
 		{ type: new Set(), regex: [] },
 	);
-	const destroy = setupOptions(options, renderer);
+	const destroy = setupOptions(options, renderer, {
+		Fragment: Fragment as any,
+	});
 	return {
 		renderer,
 		destroy,

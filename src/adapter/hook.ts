@@ -133,7 +133,7 @@ export function createHook(port: PortPageHook): DevtoolsHook {
 			// currently we only support preact >= 10, later we can add another branch for major === 8
 			if (preactVersionMatch.major == 10) {
 				const renderer = createRenderer(port, config as any);
-				setupOptions(options, renderer);
+				setupOptions(options, renderer, config as any);
 				return attachRenderer(renderer);
 			}
 

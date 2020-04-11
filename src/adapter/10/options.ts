@@ -1,7 +1,13 @@
 import { Options, VNode } from "preact";
-import { Preact10Renderer } from "./renderer";
+import { Preact10Renderer, RendererConfig10 } from "./renderer";
+import { recordMark, endMark } from "./marks";
+import { getDisplayName } from "./vnode";
 
-export function setupOptions(options: Options, renderer: Preact10Renderer) {
+export function setupOptions(
+	options: Options,
+	renderer: Preact10Renderer,
+	config: RendererConfig10,
+) {
 	const o = options as any;
 
 	// Store (possible) previous hooks so that we don't overwrite them
@@ -28,11 +34,21 @@ export function setupOptions(options: Options, renderer: Preact10Renderer) {
 
 	o._diff = o.__b = (vnode: VNode) => {
 		vnode.startTime = performance.now();
+
+		if (typeof vnode.type === "function") {
+			const name = getDisplayName(vnode, config);
+			recordMark(`${name}_diff`);
+		}
+
 		if (prevBeforeDiff != null) prevBeforeDiff(vnode);
 	};
 
 	options.diffed = vnode => {
 		vnode.endTime = performance.now();
+
+		if (typeof vnode.type === "function") {
+			endMark(getDisplayName(vnode, config));
+		}
 
 		if (prevAfterDiff) prevAfterDiff(vnode);
 	};
