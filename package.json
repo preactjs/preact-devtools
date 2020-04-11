@@ -80,7 +80,8 @@
 	],
 	"prettier": {
 		"useTabs": true,
-		"trailingComma": "all"
+		"trailingComma": "all",
+		"arrowParens": "avoid"
 	},
 	"lint-staged": {
 		"**/*.{js,jsx,ts,tsx,json}": [
