@@ -1,8 +1,7 @@
-import { flushTable, StringTable, parseTable } from "../string-table";
-import { Store, DevNode, ID } from "../../view/store/types";
+import { flushTable, StringTable } from "../string-table";
+import { Store } from "../../view/store/types";
 import { recordProfilerCommit } from "../../view/components/profiler/data/commits";
 import { patchTree } from "../../view/components/profiler/flamegraph/transform/patchTree";
-import { deepClone } from "../../view/components/profiler/flamegraph/transform/util";
 import { ops2Tree } from "./operations";
 import { applyOperationsV1 } from "./legacy/operationsV1";
 
@@ -71,7 +70,7 @@ export function flush(commit: Commit) {
 	const { rootId, unmountIds, operations, strings } = commit;
 	if (unmountIds.length === 0 && operations.length === 0) return;
 
-	let msg = [rootId, ...flushTable(strings)];
+	const msg = [rootId, ...flushTable(strings)];
 	if (unmountIds.length > 0) {
 		msg.push(MsgTypes.REMOVE_VNODE, unmountIds.length, ...unmountIds);
 	}

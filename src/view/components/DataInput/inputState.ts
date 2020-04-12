@@ -92,6 +92,7 @@ export function createInputStore(value: Observable<any>) {
 		try {
 			const parsed = valueToHuman(value.$);
 			local.$ = parsed;
+			// eslint-disable-next-line no-empty
 		} catch (err) {}
 	};
 
@@ -102,6 +103,7 @@ export function createInputStore(value: Observable<any>) {
 			if (typeof parsed === "number") {
 				local.$ = String(parsed + 1);
 			}
+			// eslint-disable-next-line no-empty
 		} catch (err) {}
 	};
 
@@ -112,6 +114,7 @@ export function createInputStore(value: Observable<any>) {
 			if (typeof parsed === "number") {
 				local.$ = String(parsed - 1);
 			}
+			// eslint-disable-next-line no-empty
 		} catch (err) {}
 	};
 

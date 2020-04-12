@@ -1,4 +1,4 @@
-import { newTestPage, click, getLog, getText } from "../test-utils";
+import { newTestPage, click, getText } from "../test-utils";
 import { expect } from "chai";
 import { closePage } from "pintf/browser_utils";
 

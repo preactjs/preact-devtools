@@ -2,6 +2,10 @@ export function getNearestElement(dom: Element | Text): Element {
 	return dom instanceof Text ? (dom.parentNode as any) : dom;
 }
 
+export function px2Int(input: string | null) {
+	return input ? +input.replace(/px/, "") : 0;
+}
+
 export interface Measurements {
 	top: number;
 	left: number;
@@ -64,8 +68,4 @@ export function measureNode(dom: Element): Measurements {
 		paddingBottom: px2Int(s.paddingBottom),
 		paddingLeft: px2Int(s.paddingLeft),
 	};
-}
-
-export function px2Int(input: string | null) {
-	return input ? +input.replace(/px/, "") : 0;
 }

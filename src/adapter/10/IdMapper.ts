@@ -2,6 +2,16 @@ import { VNode } from "preact";
 import { getComponent, getDom } from "./vnode";
 import { ID } from "../../view/store/types";
 
+function getInstance(vnode: VNode): any {
+	// For components we use the instance to check refs, otherwise
+	// we'll use a dom node
+	if (typeof vnode.type === "function") {
+		return getComponent(vnode);
+	}
+
+	return getDom(vnode);
+}
+
 /**
  * VNode relationships are encoded as simple numbers for the devtools. We use
  * this function to keep track of existing id's and create new ones if needed.
@@ -63,14 +73,4 @@ export function createVNodeId(state: IdMappingState, vnode: VNode) {
 
 export function hasId(state: IdMappingState, id: ID) {
 	return state.idToInst.has(id);
-}
-
-function getInstance(vnode: VNode): any {
-	// For components we use the instance to check refs, otherwise
-	// we'll use a dom node
-	if (typeof vnode.type === "function") {
-		return getComponent(vnode);
-	}
-
-	return getDom(vnode);
 }

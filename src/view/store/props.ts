@@ -37,6 +37,10 @@ function parseInspectData(
 	tree.update();
 }
 
+export function isCollapsed(ids: string[], id: string) {
+	return id !== "root" && ids.indexOf(id) === -1;
+}
+
 export function createPropsStore(
 	inspectData: Observable<InspectData | null>,
 	uncollapsed: Observable<string[]>,
@@ -63,10 +67,6 @@ export function createPropsStore(
 	});
 
 	return { list, uncollapsed, tree, destroy: () => dispose() };
-}
-
-export function isCollapsed(ids: string[], id: string) {
-	return id !== "root" && ids.indexOf(id) === -1;
 }
 
 export function toggleCollapsed(uncollapsed: Observable<string[]>, id: string) {

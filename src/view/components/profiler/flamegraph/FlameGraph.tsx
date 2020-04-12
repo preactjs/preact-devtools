@@ -74,14 +74,14 @@ export function FlameGraph() {
 		return null;
 	}
 
-	let scale = (canvasWidth || 1) / nodes[0].width;
+	const scale = (canvasWidth || 1) / nodes[0].width;
 
 	return (
 		<div class={s.root} ref={ref} data-type={displayType.toLowerCase()}>
 			{nodes.map((meta, i) => {
-				let x = meta.x * scale;
-				let y = meta.row * ROW_HEIGHT;
-				let width = meta.width * scale;
+				const x = meta.x * scale;
+				const y = meta.row * ROW_HEIGHT;
+				const width = meta.width * scale;
 
 				const node = commit.nodes.get(meta.id)!;
 

@@ -1,5 +1,4 @@
 import { createStore } from "../view/store";
-import { valoo } from "../view/valoo";
 import { InspectData } from "../adapter/adapter/adapter";
 import { DevNodeType, DevNode, ID } from "../view/store/types";
 
@@ -93,7 +92,7 @@ export const treeStore = () => {
 
 	store.nodes.$.get(3)!.key = "foobar";
 
-	store.subscribe(name => {
+	store.subscribe(() => {
 		store.inspectData.$ = inspect;
 	});
 

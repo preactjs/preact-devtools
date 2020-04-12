@@ -12,6 +12,7 @@ export function createPicker(
 	function clicker(e: MouseEvent) {
 		e.preventDefault();
 		e.stopPropagation();
+		// eslint-disable-next-line @typescript-eslint/no-use-before-define
 		stop();
 	}
 

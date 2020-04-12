@@ -11,13 +11,14 @@ export const useEmitter = () => useContext(EmitCtx);
 export const useStore = () => useContext(AppCtx);
 
 export function useObserver<T>(fn: () => T): T {
-	let [_, set] = useState(0);
-	let count = useRef(0);
-	let tmp = useRef<any>(null as any);
-	let ref = useRef<Observable<T>>(tmp.current || (tmp.current = watch(fn)));
+	// eslint-disable-next-line @typescript-eslint/no-unused-vars
+	const [_, set] = useState(0);
+	const count = useRef(0);
+	const tmp = useRef<any>(null as any);
+	const ref = useRef<Observable<T>>(tmp.current || (tmp.current = watch(fn)));
 
 	const dispose = useMemo(() => {
-		let disp = ref.current.on(() => {
+		const disp = ref.current.on(() => {
 			set((count.current = count.current + 1));
 		});
 		return () => {

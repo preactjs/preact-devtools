@@ -54,6 +54,7 @@ function calcSize(
 					? Math.min(
 							viewport - selOffset - (selected < count - 1 ? itemWidth / 2 : 0),
 							paneWidth - viewport,
+							// eslint-disable-next-line no-mixed-spaces-and-tabs
 					  )
 					: 0;
 

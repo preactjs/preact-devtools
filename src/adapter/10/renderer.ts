@@ -43,8 +43,8 @@ export interface RendererConfig10 {
 	Fragment: FunctionalComponent;
 }
 
-let memoReg = /^Memo\(/;
-let forwardRefReg = /^ForwardRef\(/;
+const memoReg = /^Memo\(/;
+const forwardRefReg = /^ForwardRef\(/;
 /**
  * Get the type of a vnode. The devtools uses these constants to differentiate
  * between the various forms of components.
@@ -82,7 +82,239 @@ export function serializeVNode(
 	return null;
 }
 
-let DEFAULT_FIlTERS: FilterState = {
+export function getFilteredChildren(
+	vnode: VNode,
+	filters: FilterState,
+	config: RendererConfig10,
+): VNode[] {
+	const children = getActualChildren(vnode);
+	const stack = children.slice();
+
+	const out: VNode[] = [];
+
+	let child;
+	while (stack.length) {
+		child = stack.pop();
+		if (child != null) {
+			if (!shouldFilter(child, filters, config)) {
+				out.push(child);
+			} else {
+				const nextChildren = getActualChildren(child);
+				if (nextChildren.length > 0) {
+					stack.push(...nextChildren.slice());
+				}
+			}
+		}
+	}
+
+	return out.reverse();
+}
+
+export function mount(
+	ids: IdMappingState,
+	commit: Commit,
+	vnode: VNode,
+	ancestorId: ID,
+	filters: FilterState,
+	domCache: WeakMap<HTMLElement | Text, VNode>,
+	config: RendererConfig10,
+	profiler: ProfilerBackend,
+) {
+	const root = isRoot(vnode, config);
+
+	const skip = shouldFilter(vnode, filters, config);
+	if (root || !skip) {
+		const id = hasVNodeId(ids, vnode)
+			? getVNodeId(ids, vnode)
+			: createVNodeId(ids, vnode);
+		if (isRoot(vnode, config)) {
+			commit.operations.push(MsgTypes.ADD_ROOT, id);
+		}
+
+		commit.operations.push(
+			MsgTypes.ADD_VNODE,
+			id,
+			getDevtoolsType(vnode), // Type
+			ancestorId,
+			9999, // owner
+			getStringId(commit.strings, getDisplayName(vnode, config)),
+			vnode.key ? getStringId(commit.strings, vnode.key) : 0,
+			// Multiply, because operations array only supports integers
+			// and would otherwise cut off floats
+			(vnode.startTime || 0) * 1000,
+			(vnode.endTime || 0) * 1000,
+		);
+
+		ancestorId = id;
+	}
+
+	if (skip && typeof vnode.type !== "function") {
+		const dom = getDom(vnode);
+		if (dom) domCache.set(dom, vnode);
+	}
+
+	const children = getActualChildren(vnode);
+	for (let i = 0; i < children.length; i++) {
+		const child = children[i];
+		if (child != null) {
+			mount(
+				ids,
+				commit,
+				child,
+				ancestorId,
+				filters,
+				domCache,
+				config,
+				profiler,
+			);
+		}
+	}
+
+	if (profiler.isRecording) {
+		recordProfilingData(ancestorId, vnode, profiler);
+	}
+}
+
+export function resetChildren(
+	commit: Commit,
+	ids: IdMappingState,
+	id: ID,
+	vnode: VNode,
+	filters: FilterState,
+	config: RendererConfig10,
+) {
+	const children = getActualChildren(vnode);
+	if (!children.length) return;
+
+	const next = getFilteredChildren(vnode, filters, config);
+	if (next.length < 2) return;
+
+	commit.operations.push(
+		MsgTypes.REORDER_CHILDREN,
+		id,
+		next.length,
+		...next.map(x => getVNodeId(ids, x)),
+	);
+}
+
+export function update(
+	ids: IdMappingState,
+	commit: Commit,
+	vnode: VNode,
+	ancestorId: number,
+	filters: FilterState,
+	domCache: WeakMap<HTMLElement | Text, VNode>,
+	config: RendererConfig10,
+	profiler: ProfilerBackend,
+) {
+	const skip = shouldFilter(vnode, filters, config);
+	if (skip) {
+		const children = getActualChildren(vnode);
+		for (let i = 0; i < children.length; i++) {
+			const child = children[i];
+			if (child != null) {
+				update(
+					ids,
+					commit,
+					child,
+					ancestorId,
+					filters,
+					domCache,
+					config,
+					profiler,
+				);
+			}
+		}
+		return;
+	}
+
+	if (!hasVNodeId(ids, vnode)) {
+		mount(ids, commit, vnode, ancestorId, filters, domCache, config, profiler);
+		return true;
+	}
+
+	const id = getVNodeId(ids, vnode);
+	commit.operations.push(
+		MsgTypes.UPDATE_VNODE_TIMINGS,
+		id,
+		(vnode.startTime || 0) * 1000,
+		(vnode.endTime || 0) * 1000,
+	);
+
+	const oldVNode = getVNodeById(ids, id);
+	updateVNodeId(ids, id, vnode);
+
+	const oldChildren = oldVNode
+		? getActualChildren(oldVNode).map((v: any) => v && getVNodeId(ids, v))
+		: [];
+
+	let shouldReorder = false;
+
+	const children = getActualChildren(vnode);
+	for (let i = 0; i < children.length; i++) {
+		const child = children[i];
+		if (child == null) {
+			if (oldChildren[i] != null) {
+				commit.unmountIds.push(oldChildren[i]);
+			}
+		} else if (hasVNodeId(ids, child) || shouldFilter(child, filters, config)) {
+			update(ids, commit, child, id, filters, domCache, config, profiler);
+			// TODO: This is only sometimes necessary
+			shouldReorder = true;
+		} else {
+			mount(ids, commit, child, id, filters, domCache, config, profiler);
+			shouldReorder = true;
+		}
+	}
+
+	if (shouldReorder) {
+		resetChildren(commit, ids, id, vnode, filters, config);
+	}
+}
+
+export function createCommit(
+	ids: IdMappingState,
+	roots: Set<VNode>,
+	vnode: VNode,
+	filters: FilterState,
+	domCache: WeakMap<HTMLElement | Text, VNode>,
+	config: RendererConfig10,
+	profiler: ProfilerBackend,
+): Commit {
+	const commit = {
+		operations: [],
+		rootId: -1,
+		strings: new Map(),
+		unmountIds: [],
+	};
+
+	let parentId = -1;
+
+	const isNew = !hasVNodeId(ids, vnode);
+
+	if (isRoot(vnode, config)) {
+		parentId = -1;
+		roots.add(vnode);
+	} else {
+		parentId = getVNodeId(ids, getAncestor(vnode)!);
+	}
+
+	if (profiler.isRecording) {
+		profiler.addNewCommit();
+	}
+
+	if (isNew) {
+		mount(ids, commit, vnode, parentId, filters, domCache, config, profiler);
+	} else {
+		update(ids, commit, vnode, parentId, filters, domCache, config, profiler);
+	}
+
+	commit.rootId = getVNodeId(ids, vnode);
+
+	return commit;
+}
+
+const DEFAULT_FIlTERS: FilterState = {
 	regex: [],
 	type: new Set(["dom", "fragment"]),
 };
@@ -102,12 +334,13 @@ export function createRenderer(
 
 	let currentUnmounts: number[] = [];
 
-	let domToVNode = new WeakMap<HTMLElement | Text, VNode>();
+	const domToVNode = new WeakMap<HTMLElement | Text, VNode>();
 
 	const profiler = createProfilerBackend();
 
 	return {
 		// TODO: Deprecate
+		// eslint-disable-next-line @typescript-eslint/no-empty-function
 		flushInitial() {},
 
 		startProfiling: profiler.startProfiling,
@@ -165,7 +398,7 @@ export function createRenderer(
 		},
 		applyFilters(nextFilters) {
 			/** Queue events and flush in one go */
-			let queue: BaseEvent<any, any>[] = [];
+			const queue: BaseEvent<any, any>[] = [];
 
 			roots.forEach(root => {
 				const rootId = getVNodeId(ids, root);
@@ -268,236 +501,4 @@ export function createRenderer(
 			}
 		},
 	};
-}
-
-export function createCommit(
-	ids: IdMappingState,
-	roots: Set<VNode>,
-	vnode: VNode,
-	filters: FilterState,
-	domCache: WeakMap<HTMLElement | Text, VNode>,
-	config: RendererConfig10,
-	profiler: ProfilerBackend,
-): Commit {
-	const commit = {
-		operations: [],
-		rootId: -1,
-		strings: new Map(),
-		unmountIds: [],
-	};
-
-	let parentId = -1;
-
-	const isNew = !hasVNodeId(ids, vnode);
-
-	if (isRoot(vnode, config)) {
-		parentId = -1;
-		roots.add(vnode);
-	} else {
-		parentId = getVNodeId(ids, getAncestor(vnode)!);
-	}
-
-	if (profiler.isRecording) {
-		profiler.addNewCommit(commit.rootId);
-	}
-
-	if (isNew) {
-		mount(ids, commit, vnode, parentId, filters, domCache, config, profiler);
-	} else {
-		update(ids, commit, vnode, parentId, filters, domCache, config, profiler);
-	}
-
-	commit.rootId = getVNodeId(ids, vnode);
-
-	return commit;
-}
-
-export function mount(
-	ids: IdMappingState,
-	commit: Commit,
-	vnode: VNode,
-	ancestorId: ID,
-	filters: FilterState,
-	domCache: WeakMap<HTMLElement | Text, VNode>,
-	config: RendererConfig10,
-	profiler: ProfilerBackend,
-) {
-	const root = isRoot(vnode, config);
-
-	const skip = shouldFilter(vnode, filters, config);
-	if (root || !skip) {
-		const id = hasVNodeId(ids, vnode)
-			? getVNodeId(ids, vnode)
-			: createVNodeId(ids, vnode);
-		if (isRoot(vnode, config)) {
-			commit.operations.push(MsgTypes.ADD_ROOT, id);
-		}
-
-		commit.operations.push(
-			MsgTypes.ADD_VNODE,
-			id,
-			getDevtoolsType(vnode), // Type
-			ancestorId,
-			9999, // owner
-			getStringId(commit.strings, getDisplayName(vnode, config)),
-			vnode.key ? getStringId(commit.strings, vnode.key) : 0,
-			// Multiply, because operations array only supports integers
-			// and would otherwise cut off floats
-			(vnode.startTime || 0) * 1000,
-			(vnode.endTime || 0) * 1000,
-		);
-
-		ancestorId = id;
-	}
-
-	if (skip && typeof vnode.type !== "function") {
-		const dom = getDom(vnode);
-		if (dom) domCache.set(dom, vnode);
-	}
-
-	const children = getActualChildren(vnode);
-	for (let i = 0; i < children.length; i++) {
-		const child = children[i];
-		if (child != null) {
-			mount(
-				ids,
-				commit,
-				child,
-				ancestorId,
-				filters,
-				domCache,
-				config,
-				profiler,
-			);
-		}
-	}
-
-	if (profiler.isRecording) {
-		recordProfilingData(ancestorId, vnode, profiler);
-	}
-}
-
-export function update(
-	ids: IdMappingState,
-	commit: Commit,
-	vnode: VNode,
-	ancestorId: number,
-	filters: FilterState,
-	domCache: WeakMap<HTMLElement | Text, VNode>,
-	config: RendererConfig10,
-	profiler: ProfilerBackend,
-) {
-	const skip = shouldFilter(vnode, filters, config);
-	if (skip) {
-		const children = getActualChildren(vnode);
-		for (let i = 0; i < children.length; i++) {
-			const child = children[i];
-			if (child != null) {
-				update(
-					ids,
-					commit,
-					child,
-					ancestorId,
-					filters,
-					domCache,
-					config,
-					profiler,
-				);
-			}
-		}
-		return;
-	}
-
-	if (!hasVNodeId(ids, vnode)) {
-		mount(ids, commit, vnode, ancestorId, filters, domCache, config, profiler);
-		return true;
-	}
-
-	const id = getVNodeId(ids, vnode);
-	commit.operations.push(
-		MsgTypes.UPDATE_VNODE_TIMINGS,
-		id,
-		(vnode.startTime || 0) * 1000,
-		(vnode.endTime || 0) * 1000,
-	);
-
-	const oldVNode = getVNodeById(ids, id);
-	updateVNodeId(ids, id, vnode);
-
-	const oldChildren = oldVNode
-		? getActualChildren(oldVNode).map((v: any) => v && getVNodeId(ids, v))
-		: [];
-
-	let shouldReorder = false;
-
-	const children = getActualChildren(vnode);
-	for (let i = 0; i < children.length; i++) {
-		const child = children[i];
-		if (child == null) {
-			if (oldChildren[i] != null) {
-				commit.unmountIds.push(oldChildren[i]);
-			}
-		} else if (hasVNodeId(ids, child) || shouldFilter(child, filters, config)) {
-			update(ids, commit, child, id, filters, domCache, config, profiler);
-			// TODO: This is only sometimes necessary
-			shouldReorder = true;
-		} else {
-			mount(ids, commit, child, id, filters, domCache, config, profiler);
-			shouldReorder = true;
-		}
-	}
-
-	if (shouldReorder) {
-		resetChildren(commit, ids, id, vnode, filters, config);
-	}
-}
-
-export function resetChildren(
-	commit: Commit,
-	ids: IdMappingState,
-	id: ID,
-	vnode: VNode,
-	filters: FilterState,
-	config: RendererConfig10,
-) {
-	let children = getActualChildren(vnode);
-	if (!children.length) return;
-
-	let next = getFilteredChildren(vnode, filters, config);
-	if (next.length < 2) return;
-
-	commit.operations.push(
-		MsgTypes.REORDER_CHILDREN,
-		id,
-		next.length,
-		...next.map(x => getVNodeId(ids, x)),
-	);
-}
-
-export function getFilteredChildren(
-	vnode: VNode,
-	filters: FilterState,
-	config: RendererConfig10,
-): VNode[] {
-	const children = getActualChildren(vnode);
-	const stack = children.slice();
-
-	const out: VNode[] = [];
-
-	let child;
-	while (stack.length) {
-		child = stack.pop();
-		if (child != null) {
-			if (!shouldFilter(child, filters, config)) {
-				out.push(child);
-			} else {
-				const nextChildren = getActualChildren(child);
-				if (nextChildren.length > 0) {
-					stack.push(...nextChildren.slice());
-				}
-			}
-		}
-	}
-
-	return out.reverse();
 }

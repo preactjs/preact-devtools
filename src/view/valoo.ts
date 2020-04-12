@@ -8,6 +8,13 @@ export type Observable<T = any> = {
 };
 
 /**
+ * We'll use this variable to track used dependencies
+ */
+let tracking = new Set<Observable>();
+
+const dummy = new Set<Observable>();
+
+/**
  * Base observable primitive.
  */
 export function valoo<T>(v: T): Observable<T> {
@@ -39,7 +46,7 @@ export function valoo<T>(v: T): Observable<T> {
 			v = c;
 
 			// Be careful not to track any observables in callbacks
-			let old = tracking;
+			const old = tracking;
 			tracking = dummy;
 
 			// Call listeners
@@ -64,25 +71,18 @@ export function valoo<T>(v: T): Observable<T> {
 }
 
 /**
- * We'll use this variable to track used dependencies
- */
-let tracking = new Set<Observable>();
-
-const dummy = new Set<Observable>();
-
-/**
  * Track used observables automatically and re-execute the callback
  * whenever one of the dependencies changes.
  */
 export function watch<R>(fn: () => R): Observable<R> {
-	let out = valoo(null as any);
+	const out = valoo(null as any);
 
 	// Perf: Don't allocate this in update, because it's much better
 	// to reuse the Set and just mutate + clear it for an update cycle.
-	let tracker = new Set<Observable>();
+	const tracker = new Set<Observable>();
 
 	const update = () => {
-		let oldTracker = tracking;
+		const oldTracker = tracking;
 		tracking = tracker;
 
 		// Unsubscribe previous listeners
@@ -94,7 +94,7 @@ export function watch<R>(fn: () => R): Observable<R> {
 
 		// Resubscribe to listeners
 		tracking.forEach(x => {
-			let disp = x.on(update);
+			const disp = x.on(update);
 			out._disposers.push(disp);
 		});
 

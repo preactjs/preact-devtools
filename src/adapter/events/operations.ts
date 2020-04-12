@@ -81,7 +81,7 @@ export function ops2Tree(oldTree: Tree, ops: number[]) {
 							}
 						}
 
-						let parent = pending.get(parentId);
+						const parent = pending.get(parentId);
 						if (parent) {
 							const idx = parent.children.indexOf(nodeId);
 							if (idx > -1) parent.children.splice(idx, 1);

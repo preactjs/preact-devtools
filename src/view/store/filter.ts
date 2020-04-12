@@ -15,7 +15,7 @@ export function createFilterStore(
 	const filterDom = valoo(true);
 
 	const submit = () => {
-		let s: RawFilterState = {
+		const s: RawFilterState = {
 			regex: [],
 			type: {
 				fragment: filterFragment.$,

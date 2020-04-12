@@ -18,7 +18,7 @@ describe("cleanContext", () => {
 	});
 
 	it("should remove createContext items", () => {
-		class LegacyProvider extends Component {
+		class LegacyProvider extends Component<{ children: any }> {
 			getChildContext() {
 				return { foo: 1 };
 			}

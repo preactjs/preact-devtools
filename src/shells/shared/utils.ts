@@ -1,5 +1,3 @@
-import { ObjPath } from "../../view/components/sidebar/inspect/ElementProps";
-
 export function inject(codeOrSrc: string, mode: "script" | "code" = "code") {
 	const s = document.createElement("script");
 	// This runs before `<head>` is available

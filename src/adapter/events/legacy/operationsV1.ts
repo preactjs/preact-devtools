@@ -3,8 +3,6 @@ import { parseTable } from "../../string-table";
 import { Store } from "../../../view/store/types";
 
 export function applyOperationsV1(store: Store, data: number[]) {
-	const rootId = data[0];
-
 	let i = data[1] + 1;
 	const strings = parseTable(data.slice(1, i + 1));
 
@@ -12,11 +10,12 @@ export function applyOperationsV1(store: Store, data: number[]) {
 
 	for (; i < data.length; i++) {
 		switch (data[i]) {
-			case MsgTypes.ADD_ROOT:
+			case MsgTypes.ADD_ROOT: {
 				const id = data[i + 1];
 				store.roots.$.push(id);
 				i += 1;
 				break;
+			}
 			case MsgTypes.ADD_VNODE: {
 				const id = data[i + 1];
 				const type = data[i + 2];
@@ -37,7 +36,7 @@ export function applyOperationsV1(store: Store, data: number[]) {
 						}
 					}
 
-					let parent = store.nodes.$.get(parentId)!;
+					const parent = store.nodes.$.get(parentId)!;
 					const depth = parent ? parent.depth + 1 : 1;
 
 					store.nodes.$.set(id, {

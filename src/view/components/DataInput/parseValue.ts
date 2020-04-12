@@ -37,6 +37,10 @@ export function parseValue(v: string) {
 	}
 }
 
+export function isStringifiedVNode(v: string) {
+	return v.startsWith("<") && v.endsWith("/>");
+}
+
 export function valueToHuman(v: any): string {
 	switch (typeof v) {
 		case "string":
@@ -64,10 +68,6 @@ export function valueToHuman(v: any): string {
 	}
 
 	return json5.stringify(v);
-}
-
-export function isStringifiedVNode(v: string) {
-	return v.startsWith("<") && v.endsWith("/>");
 }
 
 const MAX_PREVIEW = 50;

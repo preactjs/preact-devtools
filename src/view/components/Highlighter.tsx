@@ -2,6 +2,20 @@ import { h } from "preact";
 import s from "./Highlighter.css";
 import { Measurements } from "../../adapter/dom";
 
+export function css2Border(
+	top: number,
+	right: number,
+	bottom: number,
+	left: number,
+) {
+	return `
+		border-top-width: ${top}px;
+		border-right-width: ${right}px;
+		border-bottom-width: ${bottom}px;
+		border-left-width: ${left}px;
+	`;
+}
+
 export const style = s;
 
 export interface Props extends Measurements {
@@ -9,7 +23,7 @@ export interface Props extends Measurements {
 }
 
 export function Highlighter(props: Props) {
-	let { width, height, top, left, bounds } = props;
+	const { width, height, top, left, bounds } = props;
 
 	const isOutOfBounds =
 		bounds.bottom || bounds.left || bounds.right || bounds.top;
@@ -62,18 +76,4 @@ export function Highlighter(props: Props) {
 			</span>
 		</div>
 	);
-}
-
-export function css2Border(
-	top: number,
-	right: number,
-	bottom: number,
-	left: number,
-) {
-	return `
-		border-top-width: ${top}px;
-		border-right-width: ${right}px;
-		border-bottom-width: ${bottom}px;
-		border-left-width: ${left}px;
-	`;
 }

@@ -1,4 +1,4 @@
-import { h, Fragment } from "preact";
+import { h } from "preact";
 import s from "./Sidebar.css";
 import { Actions } from "../Actions";
 import { IconBtn } from "../IconBtn";

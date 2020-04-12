@@ -1,13 +1,13 @@
 import { h, ComponentChildren, Fragment } from "preact";
 
-export type Size = keyof typeof sizes;
-
 const sizes: Record<string, string> = {
 	xs: ".8rem",
 	s: "1rem",
 	m: "2rem",
 	l: "4rem",
 };
+
+export type Size = keyof typeof sizes;
 
 export interface Props {
 	size?: Size;

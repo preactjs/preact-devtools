@@ -110,10 +110,10 @@ export function TreeView() {
 
 export function MarkResult(props: { text: string; id: ID }) {
 	const { regex, selectedId } = useSearch();
-	let { text, id } = props;
-	let isActive = id === selectedId;
+	const { text, id } = props;
+	const isActive = id === selectedId;
 
-	let ref = useRef<HTMLSpanElement>();
+	const ref = useRef<HTMLSpanElement>();
 	useEffect(() => {
 		if (ref.current && isActive) {
 			scrollIntoView(ref.current);
@@ -121,10 +121,10 @@ export function MarkResult(props: { text: string; id: ID }) {
 	}, [ref.current, selectedId, id]);
 
 	if (regex != null && regex.test(text)) {
-		let m = text.match(regex)!;
-		let idx = m.index || 0;
-		let start = idx > 0 ? text.slice(0, idx) : "";
-		let end = idx < text.length ? text.slice(idx + m[0].length) : "";
+		const m = text.match(regex)!;
+		const idx = m.index || 0;
+		const start = idx > 0 ? text.slice(0, idx) : "";
+		const end = idx < text.length ? text.slice(idx + m[0].length) : "";
 		return (
 			<span ref={ref}>
 				{start}
@@ -148,7 +148,7 @@ export function TreeItem(props: { key: any; id: ID }) {
 	const onToggle = () => toggle(id);
 	const ref = useRef<HTMLDivElement>();
 
-	let isSelected = as.selected === id;
+	const isSelected = as.selected === id;
 	useEffect(() => {
 		if (ref.current && isSelected) {
 			scrollIntoView(ref.current);
@@ -171,8 +171,9 @@ export function TreeItem(props: { key: any; id: ID }) {
 			data-selected={isSelected}
 			data-id={id}
 			data-depth={node.depth}
-			style={`padding-left: calc(var(--indent-depth) * ${node.depth -
-				(filterFragments ? 1 : 0)})`}
+			style={`padding-left: calc(var(--indent-depth) * ${
+				node.depth - (filterFragments ? 1 : 0)
+			})`}
 		>
 			<div class={s.itemHeader}>
 				{node.children.length > 0 && (
@@ -190,7 +191,7 @@ export function TreeItem(props: { key: any; id: ID }) {
 					{node.key ? (
 						<span class={s.keyLabel}>
 							{" "}
-							key="<span class={s.key}>{node.key}</span>"
+							key=&quot;<span class={s.key}>{node.key}</span>&quot;
 						</span>
 					) : (
 						""
@@ -224,15 +225,15 @@ export function HighlightPane(props: { treeDom: HTMLDivElement | null }) {
 	// are collapsed
 	const list = useObserver(() => store.nodeList.$);
 
-	let [pos, setPos] = useState({ top: 0, height: 0 });
+	const [pos, setPos] = useState({ top: 0, height: 0 });
 	useEffect(() => {
 		if (selected > -1 && !collapsed.has(selected)) {
 			if (props.treeDom != null) {
-				let start = props.treeDom.querySelector(
+				const start = props.treeDom.querySelector(
 					`[data-id="${selected}"`,
 				) as HTMLDivElement | null;
-				let lastId = getLastChild(nodes, selected);
-				let last = props.treeDom.querySelector(
+				const lastId = getLastChild(nodes, selected);
+				const last = props.treeDom.querySelector(
 					`[data-id="${lastId}"]`,
 				) as HTMLDivElement | null;
 
@@ -240,7 +241,7 @@ export function HighlightPane(props: { treeDom: HTMLDivElement | null }) {
 					const rect = start.getBoundingClientRect();
 					const top = start.offsetTop + rect.height;
 					const lastRect = last.getBoundingClientRect();
-					let height = last.offsetTop + lastRect.height - top;
+					const height = last.offsetTop + lastRect.height - top;
 					setPos({ top, height });
 				} else {
 					setPos({ top: 0, height: 0 });

@@ -2,7 +2,6 @@ import { h, render, Options, options, Fragment, Component } from "preact";
 import * as sinon from "sinon";
 import { createRenderer, getFilteredChildren } from "./renderer";
 import { setupOptions } from "../10/options";
-import { DevtoolsHook } from "../hook";
 import { expect } from "chai";
 import { toSnapshot } from "../debug";
 import { useState } from "preact/hooks";

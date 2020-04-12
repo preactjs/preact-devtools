@@ -20,13 +20,28 @@ export function getStringId(table: StringTable, input: string): number {
 	return table.get(input)!;
 }
 
+// TODO: Use a proper LRU cache?
+const encoded = new Map<string, number[]>();
+
+const toCodePoint = (s: string) => s.codePointAt(0) || 124; // "|"" symbol;
+
+/**
+ * Convert a string to an array of codepoints
+ */
+export function encode(input: string): number[] {
+	if (!encoded.has(input)) {
+		encoded.set(input, input.split("").map(toCodePoint));
+	}
+	return encoded.get(input)!;
+}
+
 /**
  * Convert string table to something the extension understands
  * @param {import('./devtools').AdapterState["stringTable"]} table
  * @returns {number[]}
  */
 export function flushTable(table: StringTable) {
-	let ops = [0];
+	const ops = [0];
 
 	table.forEach((_, k) => {
 		ops[0] += k.length + 1;
@@ -57,19 +72,4 @@ export function parseTable(data: number[]) {
 	}
 
 	return strings;
-}
-
-// TODO: Use a proper LRU cache?
-const encoded = new Map<string, number[]>();
-
-const toCodePoint = (s: string) => s.codePointAt(0) || 124; // "|"" symbol;
-
-/**
- * Convert a string to an array of codepoints
- */
-export function encode(input: string): number[] {
-	if (!encoded.has(input)) {
-		encoded.set(input, input.split("").map(toCodePoint));
-	}
-	return encoded.get(input)!;
 }
