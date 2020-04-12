@@ -12,6 +12,7 @@
 		"build:firefox": "rimraf dist/ && cross-env BROWSER=firefox rollup -c && cross-env BROWSER=firefox node tools/build.js && npm run archive",
 		"build:inline": "rimraf dist/ && cross-env BROWSER=inline rollup -c",
 		"archive": "git archive --format zip --output dist/source-code.zip master",
+		"lint": "eslint 'src/**/*.{ts,tsx}' 'test-e2e/**/*.ts'",
 		"test": "mochette -c tsconfig.json 'src/**/*.test.{ts,tsx}'",
 		"test-e2e": "TS_NODE_PROJECT=tsconfig.cjs.json yarn ts-node test-e2e/run.ts",
 		"dev": "webpack-dev-server --inline",
@@ -33,12 +34,16 @@
 		"@types/archiver": "^3.1.0",
 		"@types/chrome": "^0.0.104",
 		"@types/puppeteer": "^2.0.1",
+		"@typescript-eslint/eslint-plugin": "^2.27.0",
+		"@typescript-eslint/parser": "^2.27.0",
 		"archiver": "^3.1.1",
 		"babel-loader": "^8.1.0",
 		"babel-plugin-transform-rename-properties": "^0.0.3",
 		"cpy-cli": "^3.1.0",
 		"cross-env": "^7.0.2",
 		"css-loader": "^3.5.2",
+		"eslint": "^6.8.0",
+		"eslint-plugin-react": "^7.19.0",
 		"fork-ts-checker-webpack-plugin": "^4.1.3",
 		"htm": "^3.0.3",
 		"html-webpack-plugin": "^4.2.0",
@@ -82,6 +87,56 @@
 		"useTabs": true,
 		"trailingComma": "all",
 		"arrowParens": "avoid"
+	},
+	"eslintConfig": {
+		"extends": [
+			"eslint:recommended",
+			"plugin:react/recommended",
+			"plugin:@typescript-eslint/eslint-recommended",
+			"plugin:@typescript-eslint/recommended"
+		],
+		"settings": {
+			"react": {
+				"pragma": "h",
+				"version": "16.13.1"
+			}
+		},
+		"parser": "@typescript-eslint/parser",
+		"parserOptions": {
+			"ecmaFeatures": {
+				"jsx": true
+			},
+			"ecmaVersion": 2018,
+			"sourceType": "module"
+		},
+		"env": {
+			"browser": true,
+			"node": true,
+			"mocha": true
+		},
+		"rules": {
+			"@typescript-eslint/explicit-function-return-type": "off",
+			"@typescript-eslint/no-explicit-any": "off",
+			"@typescript-eslint/no-non-null-assertion": "off",
+			"@typescript-eslint/no-unused-vars": "error",
+			"@typescript-eslint/camelcase": "off",
+			"react/no-unknown-property": [
+				2,
+				{
+					"ignore": [
+						"class",
+						"fill-rule",
+						"stroke-width",
+						"stroke-linecap",
+						"stroke-linejoin",
+						"stroke-width"
+					]
+				}
+			]
+		},
+		"ignorePatterns": [
+			"src/examples/**"
+		]
 	},
 	"lint-staged": {
 		"**/*.{js,jsx,ts,tsx,json}": [
