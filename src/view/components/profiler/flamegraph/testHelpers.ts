@@ -56,7 +56,7 @@ export function flames(
 			const sib = siblings[j];
 			const match = sib.match(/^(\s+)/);
 
-			let indent = match ? match[0].length : 0;
+			const indent = match ? match[0].length : 0;
 			let startTime = indent;
 
 			// Add previous sibling lengths
@@ -128,7 +128,7 @@ export function flames(
 
 	// Add self durations (basically: duration - child durations)
 	nodes.forEach(node => {
-		let childDurations = node.children.reduce((acc, id) => {
+		const childDurations = node.children.reduce((acc, id) => {
 			return acc + idMap.get(id)!.duration;
 		}, 0);
 

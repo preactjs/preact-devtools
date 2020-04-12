@@ -1,4 +1,4 @@
-import { newTestPage, getText, getSize } from "../../test-utils";
+import { newTestPage, getSize } from "../../test-utils";
 import { expect } from "chai";
 import { closePage } from "pintf/browser_utils";
 import { wait } from "pintf/utils";

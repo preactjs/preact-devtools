@@ -10,7 +10,7 @@ export function flattenChildren<
 ): { maxDepth: number; items: K[] } {
 	const out: K[] = [];
 	const visited = new Set<K>();
-	let stack: K[] = [id];
+	const stack: K[] = [id];
 	let maxDepth = 1;
 
 	while (stack.length > 0) {
@@ -50,7 +50,7 @@ export interface Traversable {
 }
 
 export function getLastChild(nodes: Map<ID, Traversable>, id: ID): ID {
-	let stack = [id];
+	const stack = [id];
 	let item;
 	let last = id;
 	while ((item = stack.pop()) != null) {

@@ -14,7 +14,7 @@ export function ProfilerInfo() {
 			<div class={s.root}>
 				<p class={s.title}>Profiling is not supported</p>
 				<p class={s.descr}>
-					Please upgrade Preact to a version that supports it (>=10.3.0).
+					Please upgrade Preact to a version that supports it (&gt;=10.3.0).
 				</p>
 			</div>
 		);

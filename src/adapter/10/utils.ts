@@ -48,7 +48,7 @@ export function jsonify(
 				name: data.displayName || data.name || "anonymous",
 			};
 		}
-		case "object":
+		case "object": {
 			if (data === null) return null;
 			else if (data instanceof window.Blob) {
 				return {
@@ -61,6 +61,7 @@ export function jsonify(
 				out[key] = jsonify(out[key], getVNode, seen);
 			});
 			return out;
+		}
 		default:
 			return data;
 	}
@@ -70,8 +71,8 @@ export function cleanProps<T extends object>(
 	props: T,
 ): Exclude<T, "__source" | "__self"> | null {
 	if (typeof props === "string" || !props) return null;
-	let out: any = {};
-	for (let key in props) {
+	const out: any = {};
+	for (const key in props) {
 		if (key === "__source" || key === "__self") continue;
 		out[key] = props[key];
 	}
@@ -79,10 +80,10 @@ export function cleanProps<T extends object>(
 	return out;
 }
 
-let reg = /__cC\d+/;
+const reg = /__cC\d+/;
 export function cleanContext(context: Record<string, any>) {
-	let res: Record<string, any> = {};
-	for (let key in context) {
+	const res: Record<string, any> = {};
+	for (const key in context) {
 		if (reg.test(key)) continue;
 		res[key] = context[key];
 	}
@@ -112,8 +113,8 @@ export function setInCopy<T = any>(
  * Deeply mutate a property by walking down an array of property keys
  */
 export function setIn(obj: Record<string, any>, path: ObjPath, value: any) {
-	let last = path.pop();
-	let parent = path.reduce((acc, attr) => (acc ? acc[attr] : null), obj);
+	const last = path.pop();
+	const parent = path.reduce((acc, attr) => (acc ? acc[attr] : null), obj);
 	if (parent && last) {
 		parent[last] = value;
 	}

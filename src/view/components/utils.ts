@@ -12,7 +12,7 @@ export function scrollIntoView(el: HTMLElement) {
 	}
 
 	if (parent) {
-		let rect = el.getBoundingClientRect();
+		const rect = el.getBoundingClientRect();
 		let top = parent.scrollTop;
 
 		if (el.offsetTop <= parent.scrollTop) {

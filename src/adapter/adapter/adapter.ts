@@ -5,7 +5,7 @@ import { createPicker } from "./picker";
 import { ID } from "../../view/store/types";
 import { createHightlighter } from "./highlight";
 import { parseFilters } from "./filter";
-import { createPortForHook, PortPageHook } from "./port";
+import { PortPageHook } from "./port";
 
 export type Path = Array<string | number>;
 

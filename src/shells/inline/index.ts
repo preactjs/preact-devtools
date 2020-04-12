@@ -1,6 +1,6 @@
 import { createStore } from "../../view/store";
 export { createStore } from "../../view/store";
-import { render, h, Options } from "preact";
+import { render, h } from "preact";
 import { DevTools } from "../../view/components/Devtools";
 import { applyEvent } from "../../adapter/events/events";
 import { Store } from "../../view/store/types";

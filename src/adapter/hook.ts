@@ -1,12 +1,7 @@
 import { Renderer } from "./renderer";
 import { ObjPath } from "../view/components/sidebar/inspect/ElementProps";
 import { ID } from "../view/store/types";
-import {
-	createAdapter,
-	Adapter,
-	InspectData,
-	UpdateType,
-} from "./adapter/adapter";
+import { createAdapter, InspectData, UpdateType } from "./adapter/adapter";
 import { RawFilterState } from "./adapter/filter";
 import { Options, Fragment } from "preact";
 import { createRenderer } from "./10/renderer";

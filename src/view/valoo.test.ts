@@ -5,7 +5,7 @@ import { valoo, watch } from "./valoo";
 describe("valoo", () => {
 	describe("primitive", () => {
 		it("should read and write values", () => {
-			let a = valoo(2);
+			const a = valoo(2);
 			expect(a.$).to.eq(2);
 
 			a.$ = 3;
@@ -13,7 +13,7 @@ describe("valoo", () => {
 		});
 
 		it("should update mutable values", () => {
-			let a = valoo([1]);
+			const a = valoo([1]);
 			a.update(v => {
 				v.push(2);
 			});
@@ -21,8 +21,8 @@ describe("valoo", () => {
 		});
 
 		it("should update mutable values without arguments to update", () => {
-			let a = valoo([1]);
-			let spy = sinon.spy();
+			const a = valoo([1]);
+			const spy = sinon.spy();
 			a.on(spy);
 
 			a.$.push(2);
@@ -34,8 +34,8 @@ describe("valoo", () => {
 		});
 
 		it("should call listener", () => {
-			let a = valoo(1);
-			let spy = sinon.spy();
+			const a = valoo(1);
+			const spy = sinon.spy();
 			a.on(spy);
 
 			a.$ = 2;
@@ -44,9 +44,9 @@ describe("valoo", () => {
 		});
 
 		it("should dispose listener", () => {
-			let a = valoo(1);
-			let spy = sinon.spy();
-			let disp = a.on(spy);
+			const a = valoo(1);
+			const spy = sinon.spy();
+			const disp = a.on(spy);
 
 			a.$ = 2;
 			disp();
@@ -58,11 +58,11 @@ describe("valoo", () => {
 
 	describe("watch", () => {
 		it("should subscribe to dependencies", () => {
-			let a = valoo(1);
-			let b = valoo(2);
-			let spy = sinon.spy();
+			const a = valoo(1);
+			const b = valoo(2);
+			const spy = sinon.spy();
 
-			let c = watch(() => a.$ + b.$);
+			const c = watch(() => a.$ + b.$);
 			c.on(spy);
 
 			expect(c.$).to.eq(3);
@@ -77,11 +77,11 @@ describe("valoo", () => {
 		});
 
 		it("should unsubscribe from dependencies", () => {
-			let a = valoo(1);
-			let b = valoo(2);
-			let spy = sinon.spy();
+			const a = valoo(1);
+			const b = valoo(2);
+			const spy = sinon.spy();
 
-			let c = watch(() => (a.$ > 2 ? a.$ : b.$));
+			const c = watch(() => (a.$ > 2 ? a.$ : b.$));
 			c.on(spy);
 
 			a.$ = 3;
@@ -92,11 +92,11 @@ describe("valoo", () => {
 		});
 
 		it("should not track itself", () => {
-			let a = valoo<number[]>([]);
-			let b = valoo(1);
-			let spy = sinon.spy();
+			const a = valoo<number[]>([]);
+			const b = valoo(1);
+			const spy = sinon.spy();
 
-			let c = watch(() => {
+			const c = watch(() => {
 				a.update(v => {
 					v.push(b.$);
 				});
@@ -110,9 +110,9 @@ describe("valoo", () => {
 		});
 
 		it("should not watch on callback", () => {
-			let a = valoo<number[]>([]);
-			let b = valoo(1);
-			let spy = sinon.spy();
+			const a = valoo<number[]>([]);
+			const b = valoo(1);
+			const spy = sinon.spy();
 
 			a.on(() => {
 				b.$ = a.$.length + 1;

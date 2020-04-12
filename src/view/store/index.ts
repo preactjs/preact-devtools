@@ -10,7 +10,7 @@ import { InspectData } from "../../adapter/adapter/adapter";
 import { createProfiler } from "../components/profiler/data/commits";
 
 export function createStore(): Store {
-	let listeners: Array<null | Listener> = [];
+	const listeners: Array<null | Listener> = [];
 	const notify: EmitFn = (name, data) => {
 		listeners.forEach(fn => fn && fn(name, data));
 	};

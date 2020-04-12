@@ -1,6 +1,5 @@
 import { VNode } from "preact";
-import { ID, Store } from "../../view/store/types";
-import { getEndTime, getStartTime } from "./vnode";
+import { ID } from "../../view/store/types";
 import { valoo } from "../../view/valoo";
 
 export interface ProfilerCommit {
@@ -16,10 +15,10 @@ export interface ProfilerSession {
 }
 
 export function createProfilerBackend() {
-	let isRecording = valoo(false);
-	let timeStamp = valoo(-1);
+	const isRecording = valoo(false);
+	const timeStamp = valoo(-1);
 
-	let session: ProfilerSession = {
+	const session: ProfilerSession = {
 		commits: [],
 	};
 
@@ -30,7 +29,7 @@ export function createProfilerBackend() {
 			const { commits } = session;
 			return commits.length > 0 ? commits[commits.length - 1] : null;
 		},
-		addNewCommit(rootId: number) {
+		addNewCommit() {
 			// session.commits.push({
 			// 	rootId,
 			// });
@@ -58,8 +57,6 @@ export function recordProfilingData(
 	profiler: ProfilerBackend,
 ) {
 	const commit = profiler.currentCommit;
-	const start = getStartTime(vnode);
-	const end = getEndTime(vnode);
 	if (commit) {
 		// commit.durations.push(id, end - start);
 	}

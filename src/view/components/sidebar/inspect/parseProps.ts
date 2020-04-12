@@ -34,7 +34,7 @@ export function parseProps(
 	transform: (data: PropData) => PropData,
 	out: Map<string, PropData>,
 ): Map<string, PropData> {
-	let depth = path.length > 0 ? path.length - 1 : 0;
+	const depth = path.length > 0 ? path.length - 1 : 0;
 	const pathStr = path.join(".");
 
 	if (path.length > limit) {
@@ -42,7 +42,7 @@ export function parseProps(
 	}
 
 	if (Array.isArray(data)) {
-		let children: string[] = [];
+		const children: string[] = [];
 		out.set(
 			path.join("."),
 			transform({

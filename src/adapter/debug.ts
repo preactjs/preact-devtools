@@ -18,10 +18,10 @@ export function parseCommitMessage(data: number[]): ParsedMsg {
 	let i = 1;
 	const len = data[i++];
 	const strings = parseTable(data.slice(1, len + 2));
-	let mounts: any[] = [];
-	let unmounts: any[] = [];
-	let timings: any[] = [];
-	let reorders: any[] = [];
+	const mounts: any[] = [];
+	const unmounts: any[] = [];
+	const timings: any[] = [];
+	const reorders: any[] = [];
 
 	i = len > 0 ? len + 2 : i;
 
@@ -70,7 +70,7 @@ export function parseCommitMessage(data: number[]): ParsedMsg {
 }
 
 export function formatForTest(msg: ParsedMsg) {
-	let out = [];
+	const out = [];
 	out.push("rootId: " + msg.rootId);
 	msg.mounts.forEach(m => {
 		const key = m.key ? "#" + m.key : "";
@@ -112,11 +112,11 @@ export function toStringTable(...strs: string[]) {
  */
 export function fromSnapshot(events: string[]): number[] {
 	const out: number[] = [];
-	let operations: number[] = [];
-	let strings: string[] = [];
-	let unmounts: number[] = [];
+	const operations: number[] = [];
+	const strings: string[] = [];
+	const unmounts: number[] = [];
 
-	if (/^rootId\:/.test(events[0])) {
+	if (/^rootId:/.test(events[0])) {
 		const id = +events[0].slice(events[0].indexOf(":") + 1);
 		out.push(id);
 		operations.push(MsgTypes.ADD_ROOT, id);
@@ -181,7 +181,7 @@ export function fromSnapshot(events: string[]): number[] {
 				throw new Error("no match: " + ev);
 			}
 		} else if (/^Reorder/.test(ev)) {
-			const m = ev.match(/Reorder\s+(\d+)\s+([\[].*[\]])/);
+			const m = ev.match(/Reorder\s+(\d+)\s+([[].*[\]])/);
 			if (m) {
 				const id = +m[1];
 				const children = JSON.parse(m[2]);

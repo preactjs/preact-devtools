@@ -3,6 +3,21 @@ import { useStore, useObserver } from "./react-bindings";
 import escapeRegex from "escape-string-regexp";
 import { ID, DevNode } from "./types";
 
+export function createRegex(s: string): RegExp {
+	if (s[0] === "/") {
+		s = s.slice(1);
+		if (s[s.length - 1] === "/") {
+			s = s.slice(0, -1);
+		}
+		try {
+			return new RegExp(s, "i");
+		} catch (err) {
+			return new RegExp("");
+		}
+	}
+	return new RegExp(`(${escapeRegex(s)})`, "i");
+}
+
 export function createSearchStore(
 	items: Observable<Map<ID, DevNode>>,
 	list: Observable<ID[]>,
@@ -13,7 +28,6 @@ export function createSearchStore(
 	const match = valoo<number[]>([]);
 	const count = valoo(0);
 
-	const reset = () => onChange("");
 	const onChange = (s: string) => {
 		value.$ = s;
 
@@ -29,9 +43,9 @@ export function createSearchStore(
 		const reg = createRegex(s);
 		regex.$ = reg;
 
-		let ids: number[] = [];
+		const ids: number[] = [];
 		list.$.forEach(id => {
-			let node = items.$.get(id);
+			const node = items.$.get(id);
 			if (node && reg.test(node.name)) {
 				ids.push(id);
 			}
@@ -43,6 +57,8 @@ export function createSearchStore(
 		count.$ = ids.length;
 		match.$ = ids;
 	};
+
+	const reset = () => onChange("");
 
 	function go(n: number) {
 		if (n < 0) n = match.$.length - 1;
@@ -66,30 +82,15 @@ export function createSearchStore(
 	};
 }
 
-export function createRegex(s: string): RegExp {
-	if (s[0] === "/") {
-		s = s.slice(1);
-		if (s[s.length - 1] === "/") {
-			s = s.slice(0, -1);
-		}
-		try {
-			return new RegExp(s, "i");
-		} catch (err) {
-			return new RegExp("");
-		}
-	}
-	return new RegExp(`(${escapeRegex(s)})`, "i");
-}
-
 export function useSearch() {
-	let { search: s } = useStore();
-	let match = useObserver(() => s.match.$);
-	let value = useObserver(() => s.value.$);
-	let marked = useObserver(() => s.selected.$);
-	let regex = useObserver(() => s.regex.$);
-	let count = useObserver(() => s.count.$);
-	let selected = useObserver(() => s.selected.$);
-	let selectedId = useObserver(() => s.match.$[s.selected.$]);
+	const { search: s } = useStore();
+	const match = useObserver(() => s.match.$);
+	const value = useObserver(() => s.value.$);
+	const marked = useObserver(() => s.selected.$);
+	const regex = useObserver(() => s.regex.$);
+	const count = useObserver(() => s.count.$);
+	const selected = useObserver(() => s.selected.$);
+	const selectedId = useObserver(() => s.match.$[s.selected.$]);
 	return {
 		count,
 		selected,

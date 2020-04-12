@@ -14,13 +14,13 @@ export interface Collapser<T> {
 export function createCollapser<T>(
 	collapsed: Observable<Set<T>>,
 ): Collapser<T> {
-	let collapseNode = (id: T, shouldCollapse: boolean) => {
+	const collapseNode = (id: T, shouldCollapse: boolean) => {
 		collapsed.update(s => {
 			shouldCollapse ? s.add(id) : s.delete(id);
 		});
 	};
 
-	let toggle = (id: T) => collapseNode(id, !collapsed.$.has(id));
+	const toggle = (id: T) => collapseNode(id, !collapsed.$.has(id));
 
 	return {
 		collapsed,
@@ -30,7 +30,7 @@ export function createCollapser<T>(
 }
 
 export function useCollapser() {
-	let c = useContext(AppCtx).collapser;
-	let collapsed = useObserver(() => c.collapsed.$);
+	const c = useContext(AppCtx).collapser;
+	const collapsed = useObserver(() => c.collapsed.$);
 	return { collapsed, collapseNode: c.collapseNode, toggle: c.toggle };
 }

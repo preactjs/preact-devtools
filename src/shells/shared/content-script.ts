@@ -16,6 +16,34 @@ let queue: any[] = [];
 
 debug("content-script running");
 
+/** Handle message from background script */
+function handleMessage(message: any) {
+	debug("<-", message);
+	if (message.type === "init" && message.tabId) {
+		status = Status.Connected;
+
+		// If the queue is empty we re-openend the devtools. Whenever the
+		// panel is closed, our panel frame is completely destroyed and we
+		// need to requery the whole component tree
+		if (queue.length === 0) {
+			debug("  refresh tree", message);
+			window.postMessage({ type: "refresh", source: DevtoolsToClient }, "*");
+			return;
+		} else {
+			debug("  flush initial queue", queue, message);
+			queue.forEach(ev => connection!.postMessage(ev));
+			queue = [];
+		}
+	}
+	window.postMessage({ ...message, source: DevtoolsToClient }, "*");
+}
+
+/** Handle disconnect from background script */
+function handleDisconnect() {
+	connection = null;
+	status = Status.Disconnected;
+}
+
 /** Forward messages from the page to the devtools */
 window.addEventListener("message", e => {
 	if (e.source === window && e.data && e.data.source === PageHookName) {
@@ -47,34 +75,6 @@ window.addEventListener("message", e => {
 		}
 	}
 });
-
-/** Handle message from background script */
-function handleMessage(message: any) {
-	debug("<-", message);
-	if (message.type === "init" && message.tabId) {
-		status = Status.Connected;
-
-		// If the queue is empty we re-openend the devtools. Whenever the
-		// panel is closed, our panel frame is completely destroyed and we
-		// need to requery the whole component tree
-		if (queue.length === 0) {
-			debug("  refresh tree", message);
-			window.postMessage({ type: "refresh", source: DevtoolsToClient }, "*");
-			return;
-		} else {
-			debug("  flush initial queue", queue, message);
-			queue.forEach(ev => connection!.postMessage(ev));
-			queue = [];
-		}
-	}
-	window.postMessage({ ...message, source: DevtoolsToClient }, "*");
-}
-
-/** Handle disconnect from background script */
-function handleDisconnect() {
-	connection = null;
-	status = Status.Disconnected;
-}
 
 // Only inject for HTML pages
 if (document.contentType === "text/html") {

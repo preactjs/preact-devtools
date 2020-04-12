@@ -12,7 +12,7 @@ export function createSelectionStore(list: Observable<ID[]>) {
 	const selectedIdx = valoo(0);
 
 	const selectByIndex = (idx: number) => {
-		let n = clamp(idx, list.$.length - 1);
+		const n = clamp(idx, list.$.length - 1);
 		selected.$ = list.$[n];
 		selectedIdx.$ = n;
 	};

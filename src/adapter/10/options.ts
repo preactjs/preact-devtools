@@ -11,11 +11,11 @@ export function setupOptions(
 	const o = options as any;
 
 	// Store (possible) previous hooks so that we don't overwrite them
-	let prevVNodeHook = options.vnode;
-	let prevCommitRoot = o._commit || o.__c;
-	let prevBeforeUnmount = options.unmount;
-	let prevBeforeDiff = o._diff || o.__b;
-	let prevAfterDiff = options.diffed;
+	const prevVNodeHook = options.vnode;
+	const prevCommitRoot = o._commit || o.__c;
+	const prevBeforeUnmount = options.unmount;
+	const prevBeforeDiff = o._diff || o.__b;
+	const prevAfterDiff = options.diffed;
 
 	options.vnode = vnode => {
 		// Tiny performance improvement by initializing fields as doubles

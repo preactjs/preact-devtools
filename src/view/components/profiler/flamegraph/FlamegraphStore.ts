@@ -6,7 +6,6 @@ import { layoutRanked } from "./modes/ranked";
 import { layoutTimeline } from "./modes/flamegraph";
 import { focusNode, NodeTransform } from "./transform/focusNode";
 import { padNodes } from "./transform/pad";
-import { deepClone } from "./transform/util";
 
 /**
  * The minimum width of a node inside the flamegraph.
@@ -20,6 +19,34 @@ export const MIN_WIDTH = 6;
  * a fixed height.
  */
 export const ROW_HEIGHT = 20;
+
+export function flattenNodeTree<K, T extends { id: K; children: K[] }>(
+	tree: Map<K, T>,
+	id: K,
+): T[] {
+	const out: T[] = [];
+	const visited = new Set<K>();
+	const stack: K[] = [id];
+
+	while (stack.length > 0) {
+		const item = stack.pop();
+		if (item == null) continue;
+
+		const node = tree.get(item);
+		if (!node) continue;
+
+		if (!visited.has(node.id)) {
+			out.push(node);
+			visited.add(node.id);
+
+			for (let i = node.children.length; i--; ) {
+				stack.push(node.children[i]);
+			}
+		}
+	}
+
+	return out;
+}
 
 export function createFlameGraphStore(profiler: ProfilerState) {
 	const layoutNodes = watch(() => {
@@ -95,34 +122,6 @@ export function getRoot(tree: Tree, id: ID) {
 	}
 
 	return last;
-}
-
-export function flattenNodeTree<K, T extends { id: K; children: K[] }>(
-	tree: Map<K, T>,
-	id: K,
-): T[] {
-	const out: T[] = [];
-	const visited = new Set<K>();
-	let stack: K[] = [id];
-
-	while (stack.length > 0) {
-		const item = stack.pop();
-		if (item == null) continue;
-
-		const node = tree.get(item);
-		if (!node) continue;
-
-		if (!visited.has(node.id)) {
-			out.push(node);
-			visited.add(node.id);
-
-			for (let i = node.children.length; i--; ) {
-				stack.push(node.children[i]);
-			}
-		}
-	}
-
-	return out;
 }
 
 export const normalize = (max: number, min: number, x: number) => {

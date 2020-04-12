@@ -24,8 +24,8 @@ export function patchTree(old: Tree, next: Tree, rootId: ID): Tree {
 		return out;
 	}
 
-	let deltaStart = oldRoot.treeStartTime - root.startTime;
-	let deltaEnd =
+	const deltaStart = oldRoot.treeStartTime - root.startTime;
+	const deltaEnd =
 		oldRoot.treeStartTime +
 		(root.endTime - root.startTime) -
 		oldRoot.treeEndTime;

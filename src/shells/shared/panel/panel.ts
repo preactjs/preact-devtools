@@ -20,6 +20,8 @@ const port = chrome.runtime.connect({
 
 let initialized = false;
 
+const store = createStore();
+
 async function initDevtools() {
 	initialized = true;
 	const window = await showPanel();
@@ -33,7 +35,6 @@ async function initDevtools() {
 	render(h(DevTools, { store }), root);
 }
 
-const store = createStore();
 // Send messages from devtools to the content script
 const destroy = store.subscribe((type, data) => {
 	debug("<- devtools", type, data);
