@@ -130,7 +130,7 @@ export async function waitForAttribute(
 }
 
 export async function click(page: Page, selector: string) {
-	await page.waitForSelector(selector);
+	await page.waitForSelector(selector, { timeout: 2000 });
 	return page.click(selector);
 }
 
