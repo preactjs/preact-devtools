@@ -64,6 +64,22 @@ export function getComponentHooks(c: Component) {
 	return (c as any).__hooks || (c as any).__H || null;
 }
 
+export function getStatefulHooks(c: Component) {
+	const hooks = getComponentHooks(c);
+	return hooks !== null ? hooks._list || hooks.__ || null : null;
+}
+
+export function getStatefulHookValue(hookState: any) {
+	if (hookState !== null) {
+		const value = hookState._value || hookState.__ || null;
+		if (Array.isArray(value)) {
+			return value[0];
+		}
+	}
+
+	return null;
+}
+
 /**
  * Get teh diffed children of a `vnode`
  */
