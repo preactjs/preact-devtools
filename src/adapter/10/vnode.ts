@@ -27,7 +27,7 @@ export function isRoot(vnode: VNode, config: RendererConfig10) {
 /**
  * Return the component instance of a `vnode`
  */
-export function getComponent(vnode: VNode): Component | null {
+export function getComponent(vnode: VNode | any): Component | null {
 	return (vnode as any)._component || (vnode as any).__c || null;
 }
 
@@ -75,10 +75,14 @@ export function getStatefulHooks(c: Component) {
 		: null;
 }
 
+export function isUseReducerOrState(hookState: any) {
+	return !!hookState._component || !!hookState.__c;
+}
+
 export function getStatefulHookValue(hookState: any) {
 	if (hookState !== null) {
 		const value = hookState._value || hookState.__ || null;
-		if (Array.isArray(value)) {
+		if (value !== null && Array.isArray(value)) {
 			return value[0];
 		}
 	}
@@ -164,6 +168,10 @@ export function getStartTime(vnode: VNode) {
 	return vnode.startTime || 0;
 }
 
+export function getNextState(c: Component) {
+	return (c as any)._nextState || (c as any).__s || null;
+}
+
 export function setNextState(c: Component, value: any) {
-	(c as any)._nextState = (c as any).__s = value;
+	return ((c as any)._nextState = (c as any).__s = value);
 }

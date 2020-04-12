@@ -149,7 +149,7 @@ export function CommitTimeline(props: CommitTimelineProps) {
 					disabled={items.length <= 1}
 					onClick={onPrev}
 					class={s.navBtn}
-					data-e2e="prev-commit"
+					data-testid="prev-commit"
 				>
 					<ArrowBack />
 				</button>
@@ -179,7 +179,7 @@ export function CommitTimeline(props: CommitTimelineProps) {
 					disabled={items.length <= 1}
 					onClick={onNext}
 					class={s.navBtn}
-					data-e2e="next-commit"
+					data-testid="next-commit"
 				>
 					<ArrowForward />
 				</button>
@@ -201,7 +201,7 @@ export function CommitItem(props: CommitItem) {
 
 	return (
 		<div
-			data-e2e="commit-item"
+			data-testid="commit-item"
 			class={s.item}
 			data-selected={props.selected}
 			data-weight={color}

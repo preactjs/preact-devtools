@@ -1,13 +1,44 @@
-import { Options, VNode } from "preact";
+import { Options, VNode, ComponentConstructor, Component } from "preact";
 import { Preact10Renderer, RendererConfig10 } from "./renderer";
 import { recordMark, endMark } from "./marks";
-import { getDisplayName } from "./vnode";
+import {
+	getDisplayName,
+	setNextState,
+	getNextState,
+	getStatefulHooks,
+	getStatefulHookValue,
+	getComponent,
+} from "./vnode";
+
+/**
+ * Inject tracking into setState
+ */
+function trackPrevState(Ctor: ComponentConstructor) {
+	const setState = Ctor.prototype.setState;
+	Ctor.prototype.setState = function (update: any, callback: any) {
+		// Duplicated in setState() but doesn't matter due to the guard.
+		const nextState = getNextState(this);
+		const s =
+			(nextState !== this.state && nextState) ||
+			setNextState(this, Object.assign({}, this.state));
+
+		// Needed in order to check if state has changed after the tree has been committed:
+		this._prevState = Object.assign({}, s);
+
+		return setState.call(this, update, callback);
+	};
+}
 
 export function setupOptions(
 	options: Options,
 	renderer: Preact10Renderer,
 	config: RendererConfig10,
 ) {
+	// Track component state. Only supported in Preact > 10.4.0
+	if (config.Component) {
+		trackPrevState(config.Component);
+	}
+
 	const o = options as any;
 
 	// Store (possible) previous hooks so that we don't overwrite them
@@ -16,6 +47,7 @@ export function setupOptions(
 	const prevBeforeUnmount = options.unmount;
 	const prevBeforeDiff = o._diff || o.__b;
 	const prevAfterDiff = options.diffed;
+	const prevHook = o._hook || o.__h;
 
 	options.vnode = vnode => {
 		// Tiny performance improvement by initializing fields as doubles
@@ -30,6 +62,15 @@ export function setupOptions(
 		if (prevVNodeHook) prevVNodeHook(vnode);
 
 		(vnode as any).old = null;
+	};
+
+	o._hook = o.__h = (c: Component) => {
+		const s = getStatefulHooks(c);
+		if (Array.isArray(s) && getComponent(s[0])) {
+			s[0]._oldValue = getStatefulHookValue(s);
+		}
+
+		if (prevHook) prevHook(c);
 	};
 
 	o._diff = o.__b = (vnode: VNode) => {
@@ -74,5 +115,6 @@ export function setupOptions(
 		options.diffed = prevAfterDiff;
 		o._diff = o.__b = prevBeforeDiff;
 		options.vnode = prevVNodeHook;
+		o._hook = o.__h = prevHook;
 	};
 }

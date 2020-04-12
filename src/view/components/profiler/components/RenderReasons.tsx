@@ -36,7 +36,7 @@ export function RenderReasons() {
 	return (
 		<SidebarPanel title="Render reasons" empty="Did not render">
 			{reason !== null ? (
-				<dl class={s.reason}>
+				<dl class={s.reason} data-testid="render-reasons">
 					<dt class={s.reasonName}>
 						{getReasonName(reason.type)}
 						{hasReasons ? ":" : ""}

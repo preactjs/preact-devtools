@@ -126,7 +126,9 @@ export function applyOperationsV2(store: Store, data: number[]) {
 	// elements tree because the profiler can step through time
 	if (store.profiler.isRecording.$) {
 		recordProfilerCommit(merged, store.profiler, rootId);
-		store.profiler.renderReasons.$.set(rootId, reasons);
+		store.profiler.renderReasons.update(m => {
+			m.set(rootId, reasons);
+		});
 	}
 }
 

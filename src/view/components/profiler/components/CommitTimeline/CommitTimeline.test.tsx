@@ -12,7 +12,7 @@ describe("CommitTimeline", () => {
 		const { $$ } = renderTest(
 			<CommitTimeline onChange={noop} selected={0} items={[20, 80, 10, 10]} />,
 		);
-		expect($$('[data-e2e="commit-item"]').length).to.equal(4);
+		expect($$('[data-testid="commit-item"]').length).to.equal(4);
 	});
 
 	it("should wrap around if selection === 0", () => {
@@ -21,7 +21,7 @@ describe("CommitTimeline", () => {
 			<CommitTimeline onChange={spy} selected={0} items={[20, 80, 10, 10]} />,
 		);
 
-		const btn = $("[data-e2e='prev-commit']")!;
+		const btn = $("[data-testid='prev-commit']")!;
 		fireEvent.click(btn);
 		expect(spy.args[0][0]).to.equal(3);
 	});
@@ -32,7 +32,7 @@ describe("CommitTimeline", () => {
 			<CommitTimeline onChange={spy} selected={3} items={[20, 80, 10, 10]} />,
 		);
 
-		const btn = $("[data-e2e='next-commit']")!;
+		const btn = $("[data-testid='next-commit']")!;
 		fireEvent.click(btn);
 
 		expect(spy.args[0][0]).to.equal(0);

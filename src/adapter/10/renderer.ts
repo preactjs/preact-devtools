@@ -1,6 +1,11 @@
 import { BaseEvent, PortPageHook } from "../adapter/port";
 import { Commit, MsgTypes, flush } from "../events/events";
-import { Fragment, VNode, FunctionalComponent } from "preact";
+import {
+	Fragment,
+	VNode,
+	FunctionalComponent,
+	ComponentConstructor,
+} from "preact";
 import { getStringId } from "../string-table";
 import {
 	isRoot,
@@ -37,6 +42,7 @@ import { getRenderReason, RenderReason } from "./renderer/renderReasons";
 
 export interface RendererConfig10 {
 	Fragment: FunctionalComponent;
+	Component?: ComponentConstructor;
 }
 
 const memoReg = /^Memo\(/;
@@ -251,7 +257,7 @@ export function update(
 	updateVNodeId(ids, id, vnode);
 
 	if (isProfiling) {
-		const reason = getRenderReason(oldVNode, vnode, config);
+		const reason = getRenderReason(oldVNode, vnode);
 		if (reason !== null) {
 			const count = reason.items ? reason.items.length : 0;
 			commit.operations.push(MsgTypes.RENDER_REASON, id, reason.type, count);

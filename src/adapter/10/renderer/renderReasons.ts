@@ -2,10 +2,9 @@ import { VNode } from "preact";
 import {
 	getComponent,
 	getStatefulHooks,
-	getDisplayName,
 	getStatefulHookValue,
+	isUseReducerOrState,
 } from "../vnode";
-import { RendererConfig10 } from "../renderer";
 import { ID } from "../../../view/store/types";
 
 export const enum RenderReason {
@@ -60,46 +59,37 @@ export function getChangedKeys(
 export function getRenderReason(
 	old: VNode | null,
 	next: VNode | null,
-	config: RendererConfig10,
 ): RenderReasonData | null {
 	if (old === null) {
 		return next !== null ? createReason(RenderReason.MOUNT, null) : null;
-	} else if (old === next || next === null) {
+	} else if (next === null) {
 		return null;
 	}
 	// Components
 	else if (typeof old.type === "function" && old.type === next.type) {
-		const oldComponent = getComponent(old);
-		const nextComponent = getComponent(next);
-		if (oldComponent !== null && nextComponent !== null) {
-			// Check state
-			if (oldComponent.state !== nextComponent.state) {
-				return createReason(
-					RenderReason.STATE_CHANGED,
-					getChangedKeys(oldComponent.state, nextComponent.state),
-				);
+		const c = getComponent(next);
+		if (c !== null) {
+			// Check hooks
+			const hooks = getStatefulHooks(c);
+
+			if (hooks !== null) {
+				for (let i = 0; i < hooks.length; i++) {
+					if (
+						isUseReducerOrState(hooks[i]) &&
+						hooks[i]._oldValue !== getStatefulHookValue(hooks[i])
+					) {
+						return createReason(RenderReason.HOOKS_CHANGED, null);
+					}
+				}
 			}
 
-			// Check hooks
-			const oldStates = getStatefulHooks(oldComponent);
-			const nextStates = getStatefulHooks(nextComponent);
-
-			if (oldStates !== null && nextStates !== null) {
-				if (oldStates.length === nextStates.length) {
-					for (let i = 0; i < oldStates.length; i++) {
-						if (
-							getStatefulHookValue(oldStates[i]) !==
-							getStatefulHookValue(nextStates[i])
-						) {
-							return createReason(RenderReason.HOOKS_CHANGED, null);
-						}
-					}
-				} else {
-					// TODO: Move this to debug
-					console.error(
-						"Number of hooks changed for: " + getDisplayName(next, config),
-					);
-				}
+			// Check state
+			const prevState = (c as any)._prevState;
+			if (prevState != null && prevState !== c.state) {
+				return createReason(
+					RenderReason.STATE_CHANGED,
+					getChangedKeys(prevState, c.state),
+				);
 			}
 		}
 	}
