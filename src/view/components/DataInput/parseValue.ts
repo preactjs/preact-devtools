@@ -97,5 +97,5 @@ export function genPreview(v: any): string {
 		if (v === "[[Circular]]") return v;
 		return `"${truncate(v)}"`;
 	}
-	return truncate("" + (v === undefined ? "" : v));
+	return truncate("" + v);
 }
