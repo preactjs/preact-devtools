@@ -12,6 +12,7 @@ describe("ops2Tree", () => {
 				roots: [1],
 				removals: [],
 				tree: new Map(),
+				reasons: new Map(),
 			});
 		});
 	});

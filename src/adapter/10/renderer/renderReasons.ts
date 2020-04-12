@@ -1,25 +1,27 @@
 import { VNode } from "preact";
 import {
 	getComponent,
-	getComponentHooks,
 	getStatefulHooks,
 	getDisplayName,
 	getStatefulHookValue,
 } from "../vnode";
 import { RendererConfig10 } from "../renderer";
+import { ID } from "../../../view/store/types";
 
 export const enum RenderReason {
-	MOUNT = "mount",
-	PARENT_UPDATE = "parent_update",
-	PROPS_CHANGED = "props_changed",
-	STATE_CHANGED = "state_changed",
-	HOOKS_CHANGED = "hooks_changed",
+	MOUNT = 1,
+	PARENT_UPDATE = 2,
+	PROPS_CHANGED = 3,
+	STATE_CHANGED = 4,
+	HOOKS_CHANGED = 5,
 }
 
 export interface RenderReasonData {
 	type: RenderReason;
 	items: string[] | null;
 }
+
+export type RenderReasonMap = Map<ID, RenderReasonData | null>;
 
 function createReason(
 	type: RenderReason,
@@ -79,12 +81,10 @@ export function getRenderReason(
 			}
 
 			// Check hooks
-			const oldHooks = getComponentHooks(oldComponent);
-			const nextHooks = getComponentHooks(nextComponent);
-			if (oldHooks !== null && nextHooks !== null) {
-				const oldStates = getStatefulHooks(oldHooks);
-				const nextStates = getStatefulHooks(nextHooks);
+			const oldStates = getStatefulHooks(oldComponent);
+			const nextStates = getStatefulHooks(nextComponent);
 
+			if (oldStates !== null && nextStates !== null) {
 				if (oldStates.length === nextStates.length) {
 					for (let i = 0; i < oldStates.length; i++) {
 						if (
@@ -106,10 +106,10 @@ export function getRenderReason(
 
 	// Check props
 	if (old.props !== next.props) {
-		return createReason(
-			RenderReason.PROPS_CHANGED,
-			getChangedKeys(old.props, next.props),
-		);
+		const propsChanged = getChangedKeys(old.props, next.props);
+		if (propsChanged.length > 0) {
+			return createReason(RenderReason.PROPS_CHANGED, propsChanged);
+		}
 	}
 
 	return createReason(RenderReason.PARENT_UPDATE, null);

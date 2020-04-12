@@ -1,3 +1,4 @@
+/* eslint-disable no-mixed-spaces-and-tabs */
 import { Component, VNode } from "preact";
 import { RendererConfig10 } from "./renderer";
 
@@ -66,7 +67,12 @@ export function getComponentHooks(c: Component) {
 
 export function getStatefulHooks(c: Component) {
 	const hooks = getComponentHooks(c);
-	return hooks !== null ? hooks._list || hooks.__ || null : null;
+	return hooks !== null
+		? hooks._list ||
+		  hooks.__ ||
+		  hooks.i || // Preact 10.1.0
+				null
+		: null;
 }
 
 export function getStatefulHookValue(hookState: any) {

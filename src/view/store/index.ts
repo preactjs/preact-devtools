@@ -57,7 +57,7 @@ export function createStore(): Store {
 	const selection = createSelectionStore(nodeList);
 
 	return {
-		profiler: createProfiler(),
+		profiler: createProfiler(notify),
 		notify,
 		nodeList,
 		inspectData,

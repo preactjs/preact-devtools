@@ -11,6 +11,7 @@ export enum MsgTypes {
 	REMOVE_VNODE = 3,
 	UPDATE_VNODE_TIMINGS = 4, // Used by Preact 10.1.x
 	REORDER_CHILDREN = 5,
+	RENDER_REASON = 6,
 }
 
 // Event Examples:
@@ -54,6 +55,13 @@ export enum MsgTypes {
 //   childId
 //   childId
 //   ...
+//
+// RENDER_REASON
+//   id
+//   type
+//   stringsCount
+//   ...stringIds
+//
 
 export interface Commit {
 	rootId: number;
@@ -87,7 +95,10 @@ export function flush(commit: Commit) {
  * We currently expect all operations to be in order.
  */
 export function applyOperationsV2(store: Store, data: number[]) {
-	const { rootId, removals, roots, tree } = ops2Tree(store.nodes.$, data);
+	const { rootId, removals, roots, tree, reasons } = ops2Tree(
+		store.nodes.$,
+		data,
+	);
 
 	// Apply all removals
 	removals.forEach(id => store.nodes.$.delete(id));
@@ -115,6 +126,7 @@ export function applyOperationsV2(store: Store, data: number[]) {
 	// elements tree because the profiler can step through time
 	if (store.profiler.isRecording.$) {
 		recordProfilerCommit(merged, store.profiler, rootId);
+		store.profiler.renderReasons.$.set(rootId, reasons);
 	}
 }
 

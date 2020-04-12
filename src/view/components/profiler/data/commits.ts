@@ -2,6 +2,11 @@ import { ID, DevNode } from "../../../store/types";
 import { Observable, valoo, watch } from "../../../valoo";
 import { resizeToMin } from "../flamegraph/transform/resizeToMin";
 import { getRoot } from "../flamegraph/FlamegraphStore";
+import {
+	RenderReasonMap,
+	RenderReasonData,
+} from "../../../../adapter/10/renderer/renderReasons";
+import { EmitFn } from "../../../../adapter/hook";
 
 export interface ProfilerNode extends DevNode {
 	selfDuration: number;
@@ -48,6 +53,10 @@ export interface ProfilerState {
 	selectedNodeId: Observable<ID>;
 	selectedNode: Observable<ProfilerNode | null>;
 
+	// Render reasons
+	renderReasons: Observable<Map<ID, RenderReasonMap>>;
+	activeReason: Observable<RenderReasonData | null>;
+
 	// View state
 	flamegraphType: Observable<FlamegraphType>;
 }
@@ -56,9 +65,10 @@ export interface ProfilerState {
  * Create a new profiler instance. It intentiall doesn't have
  * any methods, to not go down the OOP rabbit hole.
  */
-export function createProfiler(): ProfilerState {
+export function createProfiler(emit: EmitFn): ProfilerState {
 	const commits = valoo<CommitData[]>([]);
 	const isSupported = valoo(false);
+	const renderReasons = valoo<Map<ID, RenderReasonMap>>(new Map());
 
 	// Selection
 	const activeCommitIdx = valoo(0);
@@ -88,6 +98,8 @@ export function createProfiler(): ProfilerState {
 				selectedNodeId.$ = commits.$[0].rootId;
 			}
 		}
+
+		emit(v ? "start-profiling" : "stop-profiling", null);
 	});
 
 	// Flamegraph
@@ -99,12 +111,27 @@ export function createProfiler(): ProfilerState {
 				: -1;
 	});
 
+	// Render reasons
+	const activeReason = watch(() => {
+		if (activeCommit.$ !== null) {
+			const commitId = activeCommit.$.commitRootId;
+			const reason = renderReasons.$.get(commitId);
+			if (reason) {
+				return reason.get(selectedNodeId.$) || null;
+			}
+		}
+
+		return null;
+	});
+
 	return {
 		isSupported,
 		isRecording,
 		commits,
 		activeCommitIdx,
 		activeCommit,
+		renderReasons,
+		activeReason,
 		selectedNodeId,
 		selectedNode,
 		flamegraphType,

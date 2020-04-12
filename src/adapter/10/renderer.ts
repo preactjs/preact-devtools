@@ -21,11 +21,6 @@ import { traverse, setIn, SerializedVNode, setInCopy } from "./utils";
 import { FilterState } from "../adapter/filter";
 import { Renderer, Elements } from "../renderer";
 import {
-	createProfilerBackend,
-	ProfilerBackend,
-	recordProfilingData,
-} from "./profiler";
-import {
 	createIdMappingState,
 	getVNodeById,
 	hasId,
@@ -38,6 +33,7 @@ import {
 } from "./IdMapper";
 import { logVNode } from "./renderer/logVNode";
 import { inspectVNode } from "./renderer/inspectVNode";
+import { getRenderReason, RenderReason } from "./renderer/renderReasons";
 
 export interface RendererConfig10 {
 	Fragment: FunctionalComponent;
@@ -118,7 +114,7 @@ export function mount(
 	filters: FilterState,
 	domCache: WeakMap<HTMLElement | Text, VNode>,
 	config: RendererConfig10,
-	profiler: ProfilerBackend,
+	isProfiling: boolean,
 ) {
 	const root = isRoot(vnode, config);
 
@@ -145,6 +141,11 @@ export function mount(
 			(vnode.endTime || 0) * 1000,
 		);
 
+		// Capture render reason (mount here)
+		if (isProfiling) {
+			commit.operations.push(MsgTypes.RENDER_REASON, id, RenderReason.MOUNT, 0);
+		}
+
 		ancestorId = id;
 	}
 
@@ -165,13 +166,9 @@ export function mount(
 				filters,
 				domCache,
 				config,
-				profiler,
+				isProfiling,
 			);
 		}
-	}
-
-	if (profiler.isRecording) {
-		recordProfilingData(ancestorId, vnode, profiler);
 	}
 }
 
@@ -205,7 +202,7 @@ export function update(
 	filters: FilterState,
 	domCache: WeakMap<HTMLElement | Text, VNode>,
 	config: RendererConfig10,
-	profiler: ProfilerBackend,
+	isProfiling: boolean,
 ) {
 	const skip = shouldFilter(vnode, filters, config);
 	if (skip) {
@@ -221,7 +218,7 @@ export function update(
 					filters,
 					domCache,
 					config,
-					profiler,
+					isProfiling,
 				);
 			}
 		}
@@ -229,7 +226,16 @@ export function update(
 	}
 
 	if (!hasVNodeId(ids, vnode)) {
-		mount(ids, commit, vnode, ancestorId, filters, domCache, config, profiler);
+		mount(
+			ids,
+			commit,
+			vnode,
+			ancestorId,
+			filters,
+			domCache,
+			config,
+			isProfiling,
+		);
 		return true;
 	}
 
@@ -243,6 +249,19 @@ export function update(
 
 	const oldVNode = getVNodeById(ids, id);
 	updateVNodeId(ids, id, vnode);
+
+	if (isProfiling) {
+		const reason = getRenderReason(oldVNode, vnode, config);
+		if (reason !== null) {
+			const count = reason.items ? reason.items.length : 0;
+			commit.operations.push(MsgTypes.RENDER_REASON, id, reason.type, count);
+			if (reason.items && count > 0) {
+				commit.operations.push(
+					...reason.items.map(str => getStringId(commit.strings, str)),
+				);
+			}
+		}
+	}
 
 	const oldChildren = oldVNode
 		? getActualChildren(oldVNode).map((v: any) => v && getVNodeId(ids, v))
@@ -258,11 +277,11 @@ export function update(
 				commit.unmountIds.push(oldChildren[i]);
 			}
 		} else if (hasVNodeId(ids, child) || shouldFilter(child, filters, config)) {
-			update(ids, commit, child, id, filters, domCache, config, profiler);
+			update(ids, commit, child, id, filters, domCache, config, isProfiling);
 			// TODO: This is only sometimes necessary
 			shouldReorder = true;
 		} else {
-			mount(ids, commit, child, id, filters, domCache, config, profiler);
+			mount(ids, commit, child, id, filters, domCache, config, isProfiling);
 			shouldReorder = true;
 		}
 	}
@@ -279,13 +298,14 @@ export function createCommit(
 	filters: FilterState,
 	domCache: WeakMap<HTMLElement | Text, VNode>,
 	config: RendererConfig10,
-	profiler: ProfilerBackend,
+	isProfiling: boolean,
 ): Commit {
 	const commit = {
 		operations: [],
 		rootId: -1,
 		strings: new Map(),
 		unmountIds: [],
+		renderReasons: new Map(),
 	};
 
 	let parentId = -1;
@@ -299,14 +319,19 @@ export function createCommit(
 		parentId = getVNodeId(ids, getAncestor(vnode)!);
 	}
 
-	if (profiler.isRecording) {
-		profiler.addNewCommit();
-	}
-
 	if (isNew) {
-		mount(ids, commit, vnode, parentId, filters, domCache, config, profiler);
+		mount(ids, commit, vnode, parentId, filters, domCache, config, isProfiling);
 	} else {
-		update(ids, commit, vnode, parentId, filters, domCache, config, profiler);
+		update(
+			ids,
+			commit,
+			vnode,
+			parentId,
+			filters,
+			domCache,
+			config,
+			isProfiling,
+		);
 	}
 
 	commit.rootId = getVNodeId(ids, vnode);
@@ -336,15 +361,19 @@ export function createRenderer(
 
 	const domToVNode = new WeakMap<HTMLElement | Text, VNode>();
 
-	const profiler = createProfilerBackend();
+	let isProfiling = false;
 
 	return {
 		// TODO: Deprecate
 		// eslint-disable-next-line @typescript-eslint/no-empty-function
 		flushInitial() {},
 
-		startProfiling: profiler.startProfiling,
-		stopProfiling: profiler.stopProfiling,
+		startProfiling: () => {
+			isProfiling = true;
+		},
+		stopProfiling: () => {
+			isProfiling = false;
+		},
 		getVNodeById: id => getVNodeById(ids, id),
 		has: id => hasId(ids, id),
 		getDisplayName(vnode) {
@@ -429,7 +458,7 @@ export function createRenderer(
 					filters,
 					domToVNode,
 					config,
-					profiler,
+					isProfiling,
 				);
 				const ev = flush(commit);
 				if (!ev) return;
@@ -447,8 +476,9 @@ export function createRenderer(
 				filters,
 				domToVNode,
 				config,
-				profiler,
+				isProfiling,
 			);
+
 			commit.unmountIds.push(...currentUnmounts);
 			currentUnmounts = [];
 			const ev = flush(commit);
