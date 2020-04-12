@@ -36,11 +36,15 @@ export function RenderReasons() {
 	return (
 		<SidebarPanel title="Render reasons" empty="Did not render">
 			{reason !== null ? (
-				<p class={s.reason}>
-					{getReasonName(reason.type)}
-					{hasReasons ? ": " : " "}
-					{hasReasons && <b>{reason!.items!.join(", ")}</b>}
-				</p>
+				<dl class={s.reason}>
+					<dt class={s.reasonName}>
+						{getReasonName(reason.type)}
+						{hasReasons ? ":" : ""}
+					</dt>
+					<dd class={s.reasonValue}>
+						{hasReasons && reason!.items!.join(", ")}
+					</dd>
+				</dl>
 			) : null}
 		</SidebarPanel>
 	);
