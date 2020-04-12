@@ -80,7 +80,7 @@ export function DataInput({ value, onChange, name, ...props }: InputProps) {
 					type="text"
 					ref={ref}
 					class={`${s.valueInput} ${props.class || ""} ${focus ? s.focus : ""}`}
-					value={inputVal}
+					value={inputVal === "undefined" ? "" : inputVal}
 					onFocus={store.onFocus}
 					onBlur={store.onBlur}
 					onKeyUp={onKeyUp}
