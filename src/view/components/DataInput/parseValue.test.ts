@@ -97,7 +97,7 @@ describe("valueToHuman", () => {
 
 describe("genPreview", () => {
 	it("should format values", () => {
-		expect(genPreview(undefined)).to.equal("");
+		expect(genPreview(undefined)).to.equal("undefined");
 		expect(genPreview(null)).to.equal("null");
 		expect(genPreview(-100)).to.equal("-100");
 		expect(genPreview(0)).to.equal("0");
