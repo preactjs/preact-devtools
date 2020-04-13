@@ -20,12 +20,14 @@ export async function run(config: any) {
 	await click(devtools, recordBtn);
 
 	await click(page, '[data-testid="counter-1"]');
+	await click(page, '[data-testid="class-state-multi"]');
 	await click(page, '[data-testid="counter-2"]');
 	await click(page, '[data-testid="force-update"]');
 	await wait(1000);
 
 	await click(devtools, recordBtn);
 
+	// Class state
 	await clickText(devtools, "ComponentState", { elementXPath: "//*" });
 	let reasons = await getText(devtools, '[data-testid="render-reasons"');
 	expect(reasons).to.equal("State changed:value");
@@ -33,6 +35,15 @@ export async function run(config: any) {
 	await clickText(devtools, "Display", { elementXPath: "//*" });
 	reasons = await getText(devtools, '[data-testid="render-reasons"]');
 	expect(reasons).to.equal("Props changed:value");
+
+	// Reset flamegraph
+	await clickText(devtools, "Fragment", { elementXPath: "//*" });
+
+	// Class state multiple
+	await click(devtools, '[data-testid="next-commit"]');
+	await clickText(devtools, "ComponentMultiState", { elementXPath: "//*" });
+	reasons = await getText(devtools, '[data-testid="render-reasons"');
+	expect(reasons).to.equal("State changed:counter, other");
 
 	// Reset flamegraph
 	await clickText(devtools, "Fragment", { elementXPath: "//*" });
