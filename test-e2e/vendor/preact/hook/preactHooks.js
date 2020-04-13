@@ -40,7 +40,7 @@
 	}
 	function s(n, i) {
 		var o = p(u++, 4);
-		!t.options.t && T(o.__H, i) && ((o.__ = n), (o.__H = i), r.__h.push(o));
+		!t.options.__s && T(o.__H, i) && ((o.__ = n), (o.__H = i), r.__h.push(o));
 	}
 	function l(n, t) {
 		var r = p(u++, 7);
@@ -58,11 +58,11 @@
 			(f = []);
 	}
 	function h(n) {
-		n.u && n.u();
+		n.t && n.t();
 	}
 	function x(n) {
 		var t = n.__();
-		"function" == typeof t && (n.u = t);
+		"function" == typeof t && (n.t = t);
 	}
 	function T(n, t) {
 		return (
@@ -127,7 +127,7 @@
 				if (r)
 					try {
 						r.__.forEach(function (n) {
-							return n.u && n.u();
+							return n.t && n.t();
 						});
 					} catch (n) {
 						t.options.__e(n, u.__v);
@@ -138,7 +138,7 @@
 		(n.useReducer = y),
 		(n.useEffect = function (n, i) {
 			var o = p(u++, 3);
-			!t.options.t &&
+			!t.options.__s &&
 				T(o.__H, i) &&
 				((o.__ = n), (o.__H = i), r.__H.__h.push(o));
 		}),

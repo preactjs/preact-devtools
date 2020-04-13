@@ -31,7 +31,7 @@ let layoutEffect = 0;
 function LayoutEffect() {
 	useLayoutEffect(() => {
 		layoutEffect++;
-	});
+	}, []);
 
 	return html`<p>LayoutEffect: ${layoutEffect}</p>`;
 }
@@ -40,13 +40,14 @@ let effect = 0;
 function Effect() {
 	useEffect(() => {
 		effect++;
-	});
+	}, []);
 
 	return html`<p>effect: ${effect}</p>`;
 }
 
+let customHook = 0;
 const useBar = () => {
-	useEffect(() => null);
+	useEffect(() => customHook++, []);
 	return useState(false);
 };
 
@@ -56,7 +57,7 @@ const useFoo = () => {
 
 function CustomHooks() {
 	const [v] = useFoo();
-	return html`<p>Custom hooks: ${"" + v}</p>`;
+	return html`<p>Custom hooks: ${"" + v}, ${customHook}</p>`;
 }
 
 render(
