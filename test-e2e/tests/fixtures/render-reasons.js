@@ -60,11 +60,32 @@ class ForceUpdate extends Component {
 	}
 }
 
+class ComponentMultiState extends Component {
+	state = { counter: 0, other: 0 };
+
+	render() {
+		const v = this.state.counter;
+		return html`
+			<div style="padding: 2rem;">
+				<${Display} value=${v} />
+				<${MemoParent} />
+				<button
+					data-testid="class-state-multi"
+					onClick=${() => this.setState({ counter: v + 1, other: v + 2 })}
+				>
+					Increment multi class state
+				</button>
+			</div>
+		`;
+	}
+}
+
 render(
 	html`
 		<${ComponentState} />
 		<${HookState} />
 		<${ForceUpdate} />
+		<${ComponentMultiState} />
 	`,
 	document.getElementById("app"),
 );
