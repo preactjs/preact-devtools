@@ -71,7 +71,6 @@ export function DataInput({ value, onChange, name, ...props }: InputProps) {
 					onInput={e => {
 						const value = "" + (e.target as any).checked;
 						value$.$ = parseValue(value);
-						onChange(value$.$);
 					}}
 				/>
 			)}

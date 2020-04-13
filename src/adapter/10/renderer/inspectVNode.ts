@@ -149,7 +149,7 @@ export function inspectHooks(
 		(vnode.type as any).prototype && (vnode.type as any).prototype.render;
 
 	// Disable hook effects
-	(options as any)._skipHook = true;
+	(options as any)._skipHooks = (options as any).__s = true;
 	try {
 		// Call render on a dummy component, so that any possible
 		// state changes or effect are not written to our original
@@ -169,7 +169,7 @@ export function inspectHooks(
 		// the hook call sites
 		debug(e);
 	} finally {
-		(options as any)._skipHook = false;
+		(options as any)._skipHooks = (options as any).__s = false;
 	}
 
 	const parsed = hookLog.length ? parseHookData(config, hookLog, c) : null;
