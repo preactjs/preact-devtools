@@ -40,6 +40,7 @@ export interface ProfilerState {
 	isSupported: Observable<boolean>;
 
 	// Render reasons
+	supportsRenderReasons: Observable<boolean>;
 	captureRenderReasons: Observable<boolean>;
 	setRenderReasonCapture: (v: boolean) => void;
 
@@ -72,9 +73,11 @@ export interface ProfilerState {
 export function createProfiler(emit: EmitFn): ProfilerState {
 	const commits = valoo<CommitData[]>([]);
 	const isSupported = valoo(false);
+
+	// Render Reasons
+	const supportsRenderReasons = valoo(false);
 	const renderReasons = valoo<Map<ID, RenderReasonMap>>(new Map());
 	const captureRenderReasons = valoo(false);
-
 	const setRenderReasonCapture = (v: boolean) => {
 		captureRenderReasons.$ = v;
 	};
@@ -138,6 +141,7 @@ export function createProfiler(emit: EmitFn): ProfilerState {
 	});
 
 	return {
+		supportsRenderReasons,
 		captureRenderReasons,
 		setRenderReasonCapture,
 		isSupported,

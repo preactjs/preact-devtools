@@ -68,6 +68,11 @@ export async function newTestPage(
 				"preactHooks.js",
 				`./vendor/preact/${preactVersion}/preactHooks.js`,
 			) &&
+			!mockResponse(
+				req,
+				"preactDevtools.js",
+				`./vendor/preact/${preactVersion}/preactDevtools.js`,
+			) &&
 			!mockResponse(req, "htm.js", "./vendor/htm.js") &&
 			!mockResponse(req, "test-case.js", `./tests/fixtures/${name}.js`) &&
 			!mockResponse(req, TEST_URL, "./index.html")

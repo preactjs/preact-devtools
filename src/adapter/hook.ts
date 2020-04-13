@@ -3,8 +3,8 @@ import { ObjPath } from "../view/components/sidebar/inspect/ElementProps";
 import { ID } from "../view/store/types";
 import { createAdapter, InspectData, UpdateType } from "./adapter/adapter";
 import { RawFilterState } from "./adapter/filter";
-import { Options, Fragment } from "preact";
-import { createRenderer } from "./10/renderer";
+import { Options } from "preact";
+import { createRenderer, RendererConfig10 } from "./10/renderer";
 import { setupOptions } from "./10/options";
 import { createMultiRenderer } from "./MultiRenderer";
 import parseSemverish from "./parse-semverish";
@@ -49,7 +49,7 @@ export interface DevtoolsHook {
 	attachPreact?(
 		version: string,
 		options: Options,
-		config: { Fragment: typeof Fragment },
+		config: RendererConfig10,
 	): number;
 	attach(renderer: Renderer): number;
 	detach(id: number): void;
@@ -79,7 +79,10 @@ export function createHook(port: PortPageHook): DevtoolsHook {
 		});
 	};
 
-	const attachRenderer = (renderer: Renderer) => {
+	const attachRenderer = (
+		renderer: Renderer,
+		supports: { renderReasons?: boolean },
+	) => {
 		if (status === "disconnected") {
 			init();
 		}
@@ -94,6 +97,7 @@ export function createHook(port: PortPageHook): DevtoolsHook {
 		send("attach", {
 			id: uid,
 			supportsProfiling,
+			supportsRenderReasons: !!supports.renderReasons,
 		});
 		return uid;
 	};
@@ -129,12 +133,14 @@ export function createHook(port: PortPageHook): DevtoolsHook {
 			if (preactVersionMatch.major == 10) {
 				const renderer = createRenderer(port, config as any);
 				setupOptions(options, renderer, config as any);
-				return attachRenderer(renderer);
+				return attachRenderer(renderer, {
+					renderReasons: !!config.Component,
+				});
 			}
 
 			return -1;
 		},
-		attach: attachRenderer,
+		attach: renderer => attachRenderer(renderer, { renderReasons: false }),
 		detach: id => renderers.delete(id),
 	};
 }

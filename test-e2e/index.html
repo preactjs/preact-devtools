@@ -53,15 +53,13 @@
 		</div>
 		<script src="vendor/preact.js"></script>
 		<script src="vendor/preactHooks.js"></script>
+		<script src="vendor/preactDevtools.js"></script>
 		<script src="vendor/htm.js"></script>
 		<script>
 			const log = (window.log = []);
 			const iframe = document.querySelector("iframe");
 			iframe.addEventListener("load", () => {
-				window.__PREACT_DEVTOOLS__.attachPreact("10.0.5", preact.options, {
-					Fragment: preact.Fragment,
-					Component: preact.Component,
-				});
+				attachToDevtools(preact);
 
 				document
 					.querySelector("iframe")

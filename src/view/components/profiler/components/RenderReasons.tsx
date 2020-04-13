@@ -29,6 +29,7 @@ export function RenderReasons() {
 	const reason = useObserver(() => store.profiler.activeReason.$);
 	const commit = useObserver(() => store.profiler.activeCommit.$);
 	const selected = useObserver(() => store.profiler.selectedNode.$);
+	const isSupported = useObserver(() => store.profiler.supportsRenderReasons.$);
 	const captureReason = useObserver(
 		() => store.profiler.captureRenderReasons.$,
 	);
@@ -70,20 +71,26 @@ export function RenderReasons() {
 				)}
 			</div>
 			<div class={s.message}>
-				<Message type={captureReason ? "info" : "warning"}>
-					{captureReason
-						? "Timings may be less accurate. "
-						: "Capturing disabled. "}
-					<MessageBtn
-						onClick={() => {
-							store.profiler.setRenderReasonCapture(!captureReason);
-							store.profiler.isRecording.$ = true;
-						}}
-						testId="toggle-render-reason"
-					>
-						{captureReason ? "Disable" : "Enable"}
-					</MessageBtn>
-				</Message>
+				{isSupported ? (
+					<Message type={captureReason ? "info" : "warning"}>
+						{captureReason
+							? "Timings may be less accurate. "
+							: "Capturing disabled. "}
+						<MessageBtn
+							onClick={() => {
+								store.profiler.setRenderReasonCapture(!captureReason);
+								store.profiler.isRecording.$ = true;
+							}}
+							testId="toggle-render-reason"
+						>
+							{captureReason ? "Disable" : "Enable"}
+						</MessageBtn>
+					</Message>
+				) : (
+					<Message type="warning">
+						Upgrade Preact to &gt;=10.4.1 to fully enable this feature.
+					</Message>
+				)}
 			</div>
 		</SidebarPanel>
 	);

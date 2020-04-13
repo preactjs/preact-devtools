@@ -12,7 +12,9 @@ import { wait } from "pintf/utils";
 export const description = "Disables render reason capturing";
 
 export async function run(config: any) {
-	const { page, devtools } = await newTestPage(config, "render-reasons");
+	const { page, devtools } = await newTestPage(config, "render-reasons", {
+		preact: "next",
+	});
 
 	// Enable Capturing
 	await clickTab(devtools, "SETTINGS");

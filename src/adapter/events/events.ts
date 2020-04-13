@@ -138,6 +138,9 @@ export function applyEvent(store: Store, type: string, data: any) {
 			if (!store.profiler.isSupported.$) {
 				store.profiler.isSupported.$ = !!data.supportsProfiling;
 			}
+			if (!store.profiler.supportsRenderReasons.$) {
+				store.profiler.supportsRenderReasons.$ = !!data.supportsRenderReasons;
+			}
 			break;
 		case "operation":
 			applyOperationsV1(store, data);
