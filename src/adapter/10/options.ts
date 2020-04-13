@@ -65,10 +65,13 @@ export function setupOptions(
 		(vnode as any).old = null;
 	};
 
-	o._hook = o.__h = (c: Component) => {
+	o._hook = o.__h = (c: Component, type: number) => {
 		const s = getStatefulHooks(c);
 		if (Array.isArray(s) && getComponent(s[0])) {
 			s[0]._oldValue = getStatefulHookValue(s);
+		}
+		if (type) {
+			addHookStack(type);
 		}
 
 		if (prevHook) prevHook(c);
@@ -107,11 +110,6 @@ export function setupOptions(
 	options.unmount = vnode => {
 		if (prevBeforeUnmount) prevBeforeUnmount(vnode);
 		renderer.onUnmount(vnode as any);
-	};
-
-	(options as any)._hook = o.__h = (currentComponent: any, type: number) => {
-		addHookStack(type);
-		if (prevHook) prevHook(currentComponent, type);
 	};
 
 	// Teardown devtools options. Mainly used for testing
