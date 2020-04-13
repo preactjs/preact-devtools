@@ -26,7 +26,7 @@ class ComponentState extends Component {
 					data-testid="counter-1"
 					onClick=${() => this.setState({ value: v + 1 })}
 				>
-					Increment
+					Increment class state
 				</button>
 			</div>
 		`;
@@ -41,16 +41,30 @@ function HookState() {
 			<${Display} value=${v} />
 			<${MemoParent} />
 			<button data-testid="counter-2" onClick=${() => set(v + 1)}>
-				Increment
+				Increment hook state
 			</button>
 		</div>
 	`;
+}
+
+class ForceUpdate extends Component {
+	render() {
+		return html`
+			<div style="padding: 2rem;">
+				<${MemoParent} />
+				<button data-testid="force-update" onClick=${() => this.forceUpdate()}>
+					Force Update
+				</button>
+			</div>
+		`;
+	}
 }
 
 render(
 	html`
 		<${ComponentState} />
 		<${HookState} />
+		<${ForceUpdate} />
 	`,
 	document.getElementById("app"),
 );

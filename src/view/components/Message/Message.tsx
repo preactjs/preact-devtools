@@ -34,11 +34,15 @@ const warnIcon = (
 export interface MessageProps {
 	type: "info" | "warning";
 	children: any;
+	testId?: string;
 }
 
 export function Message(props: MessageProps) {
 	return (
-		<div class={`${s.root} ${props.type === "info" ? s.info : s.warning}`}>
+		<div
+			class={`${s.root} ${props.type === "info" ? s.info : s.warning}`}
+			data-testid={props.testId}
+		>
 			<span class={s.icon}>{props.type === "info" ? infoIcon : warnIcon}</span>
 			{props.children}
 		</div>

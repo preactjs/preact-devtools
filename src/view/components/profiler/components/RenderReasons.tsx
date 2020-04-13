@@ -17,6 +17,8 @@ function getReasonName(reason: RenderReason) {
 			return "Props changed";
 		case RenderReason.STATE_CHANGED:
 			return "State changed";
+		case RenderReason.FORCE_UPDATE:
+			return "Force update";
 		default:
 			return "Unknown reason";
 	}

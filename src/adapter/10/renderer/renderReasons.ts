@@ -4,6 +4,7 @@ import {
 	getStatefulHooks,
 	getStatefulHookValue,
 	isUseReducerOrState,
+	getVNodeParent,
 } from "../vnode";
 import { ID } from "../../../view/store/types";
 
@@ -13,6 +14,7 @@ export const enum RenderReason {
 	PROPS_CHANGED = 3,
 	STATE_CHANGED = 4,
 	HOOKS_CHANGED = 5,
+	FORCE_UPDATE = 6,
 }
 
 export interface RenderReasonData {
@@ -90,6 +92,8 @@ export function getRenderReason(
 					RenderReason.STATE_CHANGED,
 					getChangedKeys(prevState, c.state),
 				);
+			} else if (prevState === undefined && Object.keys(c.state).length > 0) {
+				return createReason(RenderReason.STATE_CHANGED, null);
 			}
 		}
 	}
@@ -102,5 +106,14 @@ export function getRenderReason(
 		}
 	}
 
-	return createReason(RenderReason.PARENT_UPDATE, null);
+	const parent = getVNodeParent(next);
+	if (
+		parent != null &&
+		(next.startTime || 0) >= parent.startTime &&
+		(next.endTime || 0) <= parent.endTime
+	) {
+		return createReason(RenderReason.PARENT_UPDATE, null);
+	}
+
+	return createReason(RenderReason.FORCE_UPDATE, null);
 }

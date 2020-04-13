@@ -21,6 +21,7 @@ export async function run(config: any) {
 
 	await click(page, '[data-testid="counter-1"]');
 	await click(page, '[data-testid="counter-2"]');
+	await click(page, '[data-testid="force-update"]');
 	await wait(1000);
 
 	await click(devtools, recordBtn);
@@ -46,6 +47,17 @@ export async function run(config: any) {
 	});
 	reasons = await getText(devtools, '[data-testid="render-reasons"');
 	expect(reasons).to.equal("Hooks changed");
+
+	// Force update
+	await click(devtools, '[data-testid="next-commit"]');
+
+	await wait(1000);
+	await clickText(devtools, "ForceUpdate", {
+		elementXPath: "//*",
+		timeout: 2000,
+	});
+	reasons = await getText(devtools, '[data-testid="render-reasons"');
+	expect(reasons).to.equal("Force update");
 
 	await closePage(page);
 }
