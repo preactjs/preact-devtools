@@ -8,11 +8,11 @@ import { jsonify, cleanContext, cleanProps, setIn, hasIn } from "../utils";
 import { serializeVNode, RendererConfig10, getDevtoolsType } from "../renderer";
 import { ID } from "../../../view/store/types";
 import { IdMappingState, getVNodeById } from "../IdMapper";
-import { VNode, Component } from "preact";
+import { VNode, Component, Options } from "preact";
 import { parseStackTrace, StackFrame } from "errorstacks";
 import { HookType } from "../../../constants";
 import { debug } from "../../../debug";
-import { ObjPath } from "../../../view/components/sidebar/ElementProps";
+import { ObjPath } from "../../../view/components/sidebar/inspect/ElementProps";
 
 function serialize(config: RendererConfig10, data: object | null) {
 	return jsonify(data, node => serializeVNode(node, config), new Set());
@@ -27,6 +27,7 @@ function serialize(config: RendererConfig10, data: object | null) {
 export function inspectVNode(
 	ids: IdMappingState,
 	config: RendererConfig10,
+	options: Options,
 	id: ID,
 ) {
 	const vnode = getVNodeById(ids, id);
@@ -39,7 +40,7 @@ export function inspectVNode(
 		Object.keys(c.state).length > 0;
 
 	const hasHooks = c != null && getComponentHooks(c) != null;
-	const hooks = hasHooks ? inspectHooks(config, vnode) : null;
+	const hooks = hasHooks ? inspectHooks(config, options, vnode) : null;
 	const context = c != null ? serialize(config, cleanContext(c.context)) : null;
 	const props =
 		vnode.type !== null ? serialize(config, cleanProps(vnode.props)) : null;
@@ -60,6 +61,7 @@ export function inspectVNode(
 /**
  * Throwaway component to render hooks
  */
+// eslint-disable-next-line @typescript-eslint/no-empty-function
 function Dummy() {}
 Dummy.prototype = Component.prototype;
 
@@ -95,7 +97,48 @@ export function addHookStack(type: HookType) {
 	hookLog.push({ type, stack });
 }
 
-export function inspectHooks(config: RendererConfig10, vnode: VNode) {
+function parseHookData(
+	config: RendererConfig10,
+	data: HookData[],
+	component: Component,
+): Record<string, any> {
+	const out: Record<string, any> = {};
+
+	data.forEach((hook, hookIdx) => {
+		const itemPath = [];
+		for (let i = hook.stack.length - 1; i >= 0; i--) {
+			const frame = hook.stack[i];
+			const isNative = i === 0;
+			const name = isNative ? HookType[hook.type] : frame.name;
+			itemPath.push(name);
+
+			if (!hasIn(parent, itemPath)) {
+				let value = null;
+				if (isNative) {
+					const s = getHookState(component, hookIdx);
+					value = {
+						name: "__meta__",
+						meta: {
+							index: hookIdx,
+							type: hook.type,
+						},
+						value: serialize(config, s[0]),
+					};
+				}
+
+				setIn(out, itemPath, value);
+			}
+		}
+	});
+
+	return out;
+}
+
+export function inspectHooks(
+	config: RendererConfig10,
+	options: Options,
+	vnode: VNode,
+) {
 	inspectingHooks = true;
 	hookLog = [];
 	// TODO: Temporarily disable any console logs
@@ -105,6 +148,8 @@ export function inspectHooks(config: RendererConfig10, vnode: VNode) {
 	const isClass =
 		(vnode.type as any).prototype && (vnode.type as any).prototype.render;
 
+	// Disable hook effects
+	(options as any)._skipHook = true;
 	try {
 		// Call render on a dummy component, so that any possible
 		// state changes or effect are not written to our original
@@ -123,10 +168,13 @@ export function inspectHooks(config: RendererConfig10, vnode: VNode) {
 		// We don't care about any errors here. We only need
 		// the hook call sites
 		debug(e);
+	} finally {
+		(options as any)._skipHook = false;
 	}
 
 	const parsed = hookLog.length ? parseHookData(config, hookLog, c) : null;
 
+	console.log("HOOKS", parsed);
 	inspectingHooks = false;
 	ancestorName = "unknown";
 	hookLog = [];
@@ -140,42 +188,6 @@ export interface HookItem {
 	index: number;
 	value: any;
 	children: HookItem[];
-}
-
-function parseHookData(
-	config: RendererConfig10,
-	data: HookData[],
-	component: Component,
-): Record<string, any> {
-	const out: Record<string, any> = {};
-
-	data.forEach((hook, hookIdx) => {
-		let itemPath = [];
-		for (let i = hook.stack.length - 1; i >= 0; i--) {
-			const frame = hook.stack[i];
-			const isNative = i === 0;
-			// Store hook index in the name to be able to retreive it later for
-			// updating. On top of that htis helps to work around an issue where
-			// a user may have named a custom hook like an internal one
-			// lile "useState". Since identifiers cannot start with numeric literals
-			// in JavaScript, but our native function has a numeric prefix, we can
-			// differentiate the two.
-			const name = isNative ? `${hookIdx}__${HookType[hook.type]}` : frame.name;
-			itemPath.push(name);
-
-			if (!hasIn(parent, itemPath)) {
-				let value = null;
-				if (isNative) {
-					const s = getHookState(component, hookIdx);
-					value = serialize(config, s[0]);
-				}
-
-				setIn(out, itemPath, value);
-			}
-		}
-	});
-
-	return out;
 }
 
 const nativeName = /^\d+__\S+$/;

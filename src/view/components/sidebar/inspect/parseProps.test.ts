@@ -16,6 +16,7 @@ describe("parseProps", () => {
 				type: "string",
 				value: "foo",
 				children: [],
+				meta: null,
 			},
 		]);
 	});
@@ -32,6 +33,7 @@ describe("parseProps", () => {
 				type: "number",
 				value: 12,
 				children: [],
+				meta: null,
 			},
 		]);
 	});
@@ -48,6 +50,7 @@ describe("parseProps", () => {
 				type: "boolean",
 				value: false,
 				children: [],
+				meta: null,
 			},
 		]);
 	});
@@ -63,6 +66,7 @@ describe("parseProps", () => {
 				type: "null",
 				value: null,
 				children: [],
+				meta: null,
 			},
 		]);
 	});
@@ -78,6 +82,7 @@ describe("parseProps", () => {
 				type: "undefined",
 				value: undefined,
 				children: [],
+				meta: null,
 			},
 		]);
 	});
@@ -97,6 +102,7 @@ describe("parseProps", () => {
 				type: "function",
 				value: fn,
 				children: [],
+				meta: null,
 			},
 		]);
 	});
@@ -112,6 +118,7 @@ describe("parseProps", () => {
 				type: "array",
 				value: [1, 2],
 				children: ["foo.0", "foo.1"],
+				meta: null,
 			},
 			{
 				editable: true,
@@ -120,6 +127,7 @@ describe("parseProps", () => {
 				type: "number",
 				value: 1,
 				children: [],
+				meta: null,
 			},
 			{
 				editable: true,
@@ -128,6 +136,7 @@ describe("parseProps", () => {
 				type: "number",
 				value: 2,
 				children: [],
+				meta: null,
 			},
 		]);
 	});
@@ -143,6 +152,7 @@ describe("parseProps", () => {
 				type: "array",
 				value: [],
 				children: [],
+				meta: null,
 			},
 		]);
 	});
@@ -161,6 +171,7 @@ describe("parseProps", () => {
 					bar: "abc",
 				},
 				children: [".foo", ".bar"],
+				meta: null,
 			},
 			{
 				editable: true,
@@ -169,6 +180,7 @@ describe("parseProps", () => {
 				type: "number",
 				value: 123,
 				children: [],
+				meta: null,
 			},
 			{
 				editable: true,
@@ -177,6 +189,7 @@ describe("parseProps", () => {
 				type: "string",
 				value: "abc",
 				children: [],
+				meta: null,
 			},
 		]);
 	});
@@ -196,6 +209,7 @@ describe("parseProps", () => {
 					},
 				},
 				children: ["foo.foo"],
+				meta: null,
 			},
 			{
 				editable: false,
@@ -206,6 +220,7 @@ describe("parseProps", () => {
 					bar: "abc",
 				},
 				children: ["foo.foo.bar"],
+				meta: null,
 			},
 			{
 				editable: true,
@@ -214,6 +229,7 @@ describe("parseProps", () => {
 				type: "string",
 				value: "abc",
 				children: [],
+				meta: null,
 			},
 		]);
 	});
@@ -233,6 +249,7 @@ describe("parseProps", () => {
 					},
 				},
 				children: ["foo.foo"],
+				meta: null,
 			},
 			{
 				editable: false,
@@ -243,6 +260,7 @@ describe("parseProps", () => {
 					bar: "abc",
 				},
 				children: ["foo.foo.bar"],
+				meta: null,
 			},
 		]);
 	});
@@ -258,6 +276,103 @@ describe("parseProps", () => {
 				type: "string",
 				value: "[[Circular]]",
 				children: [],
+				meta: null,
+			},
+		]);
+	});
+
+	it("should support meta data", () => {
+		const tree = new Map();
+		parseProps(
+			{
+				name: "__meta__",
+				value: 123,
+				meta: {
+					foo: true,
+					bob: false,
+				},
+			},
+			[],
+			2,
+			noop,
+			tree,
+		);
+		expect(serialize(tree)).to.deep.equal([
+			{
+				collapsable: false,
+				editable: true,
+				depth: 0,
+				id: "",
+				path: [],
+				type: "number",
+				value: 123,
+				children: [],
+				meta: {
+					foo: true,
+					bob: false,
+				},
+			},
+		]);
+	});
+
+	it("should support meta object in-between", () => {
+		const tree = new Map();
+		parseProps(
+			{
+				name: "__meta__",
+				value: {
+					a: "A",
+					b: "B",
+				},
+				meta: {
+					foo: true,
+					bob: false,
+				},
+			},
+			[],
+			2,
+			noop,
+			tree,
+		);
+		expect(serialize(tree)).to.deep.equal([
+			{
+				collapsable: true,
+				editable: false,
+				depth: 0,
+				id: "",
+				path: [],
+				type: "object",
+				value: {
+					a: "A",
+					b: "B",
+				},
+				children: ["a", "b"],
+				meta: {
+					foo: true,
+					bob: false,
+				},
+			},
+			{
+				children: [],
+				collapsable: false,
+				depth: 0,
+				editable: true,
+				id: "a",
+				meta: null,
+				path: ["a"],
+				type: "string",
+				value: "A",
+			},
+			{
+				children: [],
+				collapsable: false,
+				depth: 0,
+				editable: true,
+				id: "b",
+				meta: null,
+				path: ["b"],
+				type: "string",
+				value: "B",
 			},
 		]);
 	});

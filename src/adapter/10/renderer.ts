@@ -5,6 +5,7 @@ import {
 	VNode,
 	FunctionalComponent,
 	ComponentConstructor,
+	Options,
 } from "preact";
 import { getStringId } from "../string-table";
 import {
@@ -335,6 +336,7 @@ const DEFAULT_FIlTERS: FilterState = {
 export interface Preact10Renderer extends Renderer {
 	onCommit(vnode: VNode): void;
 	onUnmount(vnode: VNode): void;
+	updateHook(id: ID, index: number, value: any): void;
 }
 
 export interface ProfilerState {
@@ -345,6 +347,7 @@ export interface ProfilerState {
 export function createRenderer(
 	port: PortPageHook,
 	config: RendererConfig10,
+	options: Options,
 	filters: FilterState = DEFAULT_FIlTERS,
 ): Preact10Renderer {
 	const ids = createIdMappingState();
@@ -392,7 +395,7 @@ export function createRenderer(
 			}
 		},
 		log: (id, children) => logVNode(ids, config, id, children),
-		inspect: id => inspectVNode(ids, config, id),
+		inspect: id => inspectVNode(ids, config, options, id),
 		findDomForVNode(id) {
 			const vnode = getVNodeById(ids, id);
 			if (!vnode) return null;

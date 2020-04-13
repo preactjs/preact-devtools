@@ -65,11 +65,13 @@ export function setupOptions(
 		(vnode as any).old = null;
 	};
 
-	o._hook = o.__h = (c: Component, type: number) => {
+	o._hook = o.__h = (c: Component, index: number, type: number) => {
 		const s = getStatefulHooks(c);
 		if (Array.isArray(s) && getComponent(s[0])) {
 			s[0]._oldValue = getStatefulHookValue(s);
+			s[0]._index = index;
 		}
+
 		if (type) {
 			addHookStack(type);
 		}

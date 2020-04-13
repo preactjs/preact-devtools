@@ -6,7 +6,7 @@ import { DataInput } from "../../DataInput";
 import { genPreview } from "../../DataInput/parseValue";
 import { isCollapsed } from "../../../store/props";
 
-export type ChangeFn = (value: any, path: string) => void;
+export type ChangeFn = (value: any, path: string, node: null | any) => void;
 
 export interface Props {
 	onChange?: ChangeFn;
@@ -34,7 +34,7 @@ export function ElementProps(props: Props) {
 							onCollapse={() => onCollapse && onCollapse(id)}
 							editable={item.editable}
 							value={item.value}
-							onChange={onChange}
+							onChange={v => onChange && onChange(v, id, item)}
 							depth={item.depth}
 						/>
 					);
@@ -53,7 +53,7 @@ export interface SingleProps {
 	collapsed?: boolean;
 	name: string;
 	value: any;
-	onChange?: ChangeFn;
+	onChange?: (value: any) => void;
 	onCollapse?: (path: string) => void;
 	depth: number;
 }
@@ -110,7 +110,7 @@ export function SingleItem(props: SingleProps) {
 						{editable ? (
 							<DataInput
 								value={value}
-								onChange={v => onChange && onChange(v, id)}
+								onChange={v => onChange && onChange(v)}
 								name={`${id}`}
 							/>
 						) : (

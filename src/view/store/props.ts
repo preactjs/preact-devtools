@@ -25,6 +25,7 @@ export function parseObjectState(
 			id: "root",
 			type: "object",
 			value: null,
+			meta: null,
 		});
 
 		parseProps(data, "root", PROPS_LIMIT, tree);

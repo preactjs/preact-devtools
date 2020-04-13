@@ -35,7 +35,9 @@ export function PropsPanel(props: Props) {
 							});
 						}}
 					/>
-					{canAddNew && <NewProp onChange={onChange} />}
+					{canAddNew && (
+						<NewProp onChange={(v, path) => onChange(v, path, null)} />
+					)}
 				</Fragment>
 			) : (
 				<Empty>None</Empty>
