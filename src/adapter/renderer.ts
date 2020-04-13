@@ -3,6 +3,7 @@ import { ID } from "../view/store/types";
 import { FilterState } from "./adapter/filter";
 import { InspectData, UpdateType } from "./adapter/adapter";
 import { ObjPath } from "../view/components/sidebar/inspect/ElementProps";
+import { DevtoolEvents } from "./hook";
 
 /**
  * TODO: Deprecate this
@@ -23,7 +24,7 @@ export interface Renderer {
 	update(id: ID, type: UpdateType, path: ObjPath, value: any): void;
 
 	// Profiler
-	startProfiling?(): void; // V2
+	startProfiling?(options: DevtoolEvents["start-profiling"]): void; // V2
 	stopProfiling?(): void; // V2
 }
 

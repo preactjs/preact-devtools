@@ -7,3 +7,14 @@
 	margin-bottom: 0.75rem;
 	font-size: 0.9rem;
 }
+
+h2 {
+	margin-top: 3rem;
+	font-size: 2rem;
+	font-weight: lighter;
+}
+
+.message {
+	margin-left: 1.25rem;
+	margin-top: 0.5rem;
+}

@@ -2,6 +2,11 @@ import { ID, DevNode } from "../../../store/types";
 import { Observable, valoo, watch } from "../../../valoo";
 import { resizeToMin } from "../flamegraph/transform/resizeToMin";
 import { getRoot } from "../flamegraph/FlamegraphStore";
+import {
+	RenderReasonMap,
+	RenderReasonData,
+} from "../../../../adapter/10/renderer/renderReasons";
+import { EmitFn } from "../../../../adapter/hook";
 
 export interface ProfilerNode extends DevNode {
 	selfDuration: number;
@@ -34,6 +39,11 @@ export interface ProfilerState {
 	 */
 	isSupported: Observable<boolean>;
 
+	// Render reasons
+	supportsRenderReasons: Observable<boolean>;
+	captureRenderReasons: Observable<boolean>;
+	setRenderReasonCapture: (v: boolean) => void;
+
 	/**
 	 * Flag that indicates if we are currently
 	 * recording commits to be displayed in the
@@ -48,6 +58,10 @@ export interface ProfilerState {
 	selectedNodeId: Observable<ID>;
 	selectedNode: Observable<ProfilerNode | null>;
 
+	// Render reasons
+	renderReasons: Observable<Map<ID, RenderReasonMap>>;
+	activeReason: Observable<RenderReasonData | null>;
+
 	// View state
 	flamegraphType: Observable<FlamegraphType>;
 }
@@ -56,9 +70,17 @@ export interface ProfilerState {
  * Create a new profiler instance. It intentiall doesn't have
  * any methods, to not go down the OOP rabbit hole.
  */
-export function createProfiler(): ProfilerState {
+export function createProfiler(emit: EmitFn): ProfilerState {
 	const commits = valoo<CommitData[]>([]);
 	const isSupported = valoo(false);
+
+	// Render Reasons
+	const supportsRenderReasons = valoo(false);
+	const renderReasons = valoo<Map<ID, RenderReasonMap>>(new Map());
+	const captureRenderReasons = valoo(false);
+	const setRenderReasonCapture = (v: boolean) => {
+		captureRenderReasons.$ = v;
+	};
 
 	// Selection
 	const activeCommitIdx = valoo(0);
@@ -88,6 +110,12 @@ export function createProfiler(): ProfilerState {
 				selectedNodeId.$ = commits.$[0].rootId;
 			}
 		}
+
+		if (v) {
+			emit("start-profiling", { captureRenderReasons: captureRenderReasons.$ });
+		} else {
+			emit("stop-profiling", null);
+		}
 	});
 
 	// Flamegraph
@@ -99,12 +127,30 @@ export function createProfiler(): ProfilerState {
 				: -1;
 	});
 
+	// Render reasons
+	const activeReason = watch(() => {
+		if (activeCommit.$ !== null) {
+			const commitId = activeCommit.$.commitRootId;
+			const reason = renderReasons.$.get(commitId);
+			if (reason) {
+				return reason.get(selectedNodeId.$) || null;
+			}
+		}
+
+		return null;
+	});
+
 	return {
+		supportsRenderReasons,
+		captureRenderReasons,
+		setRenderReasonCapture,
 		isSupported,
 		isRecording,
 		commits,
 		activeCommitIdx,
 		activeCommit,
+		renderReasons,
+		activeReason,
 		selectedNodeId,
 		selectedNode,
 		flamegraphType,

@@ -2,6 +2,7 @@ import { ID, Tree } from "../../view/store/types";
 import { parseTable } from "../string-table";
 import { MsgTypes } from "./events";
 import { deepClone } from "../../view/components/profiler/flamegraph/transform/util";
+import { RenderReasonMap } from "../10/renderer/renderReasons";
 
 /**
  * This is the heart of the devtools. Here we translate incoming events
@@ -15,6 +16,7 @@ export function ops2Tree(oldTree: Tree, ops: number[]) {
 	const rootId = ops[0];
 	const roots: ID[] = [];
 	const removals: ID[] = [];
+	const reasons: RenderReasonMap = new Map();
 
 	let i = ops[1] + 1;
 	const strings = parseTable(ops.slice(1, i + 1));
@@ -106,10 +108,25 @@ export function ops2Tree(oldTree: Tree, ops: number[]) {
 				i = i + 2 + count;
 				break;
 			}
+			case MsgTypes.RENDER_REASON: {
+				const id = ops[i + 1];
+				const type = ops[i + 2];
+				const count = ops[i + 3];
+				let items: string[] | null = null;
+				if (count > 0) {
+					items = ops.slice(i + 4, i + 4 + count).map(x => strings[x - 1]);
+				}
+				reasons.set(id, {
+					type,
+					items,
+				});
+				i = i + 3 + count;
+				break;
+			}
 			default:
 				throw new Error("Unknown event: " + ops[i]);
 		}
 	}
 
-	return { rootId, roots, tree: pending, removals };
+	return { rootId, roots, tree: pending, removals, reasons };
 }

@@ -11,7 +11,7 @@ export function ProfilerInfo() {
 
 	if (!isSupported) {
 		return (
-			<div class={s.root}>
+			<div class={s.root} data-testid="profiler-info">
 				<p class={s.title}>Profiling is not supported</p>
 				<p class={s.descr}>
 					Please upgrade Preact to a version that supports it (&gt;=10.3.0).
@@ -20,7 +20,7 @@ export function ProfilerInfo() {
 		);
 	} else if (isRecording) {
 		return (
-			<div class={s.root}>
+			<div class={s.root} data-testid="profiler-info">
 				<p class={s.title}>Profiling in progress...</p>
 				<p class={s.descr}>
 					Click the record button{" "}
@@ -33,7 +33,7 @@ export function ProfilerInfo() {
 		);
 	} else if (commits.length === 0) {
 		return (
-			<div class={s.root}>
+			<div class={s.root} data-testid="profiler-info">
 				<p class={s.title}>No profiling data collected</p>
 				<p class={s.descr}>
 					Click the record button{" "}

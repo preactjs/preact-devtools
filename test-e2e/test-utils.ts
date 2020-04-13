@@ -68,6 +68,11 @@ export async function newTestPage(
 				"preactHooks.js",
 				`./vendor/preact/${preactVersion}/preactHooks.js`,
 			) &&
+			!mockResponse(
+				req,
+				"preactDevtools.js",
+				`./vendor/preact/${preactVersion}/preactDevtools.js`,
+			) &&
 			!mockResponse(req, "htm.js", "./vendor/htm.js") &&
 			!mockResponse(req, "test-case.js", `./tests/fixtures/${name}.js`) &&
 			!mockResponse(req, TEST_URL, "./index.html")
@@ -130,7 +135,7 @@ export async function waitForAttribute(
 }
 
 export async function click(page: Page, selector: string) {
-	await page.waitForSelector(selector);
+	await page.waitForSelector(selector, { timeout: 2000 });
 	return page.click(selector);
 }
 
@@ -170,4 +175,12 @@ export async function waitFor(
 
 	await fn();
 	clearTimeout(t);
+}
+
+// Preact Devtools specific functions
+export async function clickTab(
+	page: Page,
+	tab: "ELEMENTS" | "PROFILER" | "SETTINGS",
+) {
+	await click(page, `[name="root-panel"][value="${tab}"]`);
 }

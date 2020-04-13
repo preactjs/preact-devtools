@@ -24,8 +24,8 @@ export function createMultiRenderer(
 		refresh() {
 			renderers.forEach(r => r.refresh && r.refresh());
 		},
-		startProfiling() {
-			renderers.forEach(r => r.startProfiling && r.startProfiling());
+		startProfiling(options) {
+			renderers.forEach(r => r.startProfiling && r.startProfiling(options));
 		},
 		stopProfiling() {
 			renderers.forEach(r => r.stopProfiling && r.stopProfiling());

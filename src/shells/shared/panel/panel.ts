@@ -4,7 +4,11 @@ import { createStore } from "../../../view/store";
 import { applyEvent } from "../../../adapter/events/events";
 import { debug } from "../../../debug";
 import { DevtoolsPanelName } from "../../../constants";
-import { loadTheme, storeTheme } from "./theme";
+import {
+	loadSettings,
+	storeTheme,
+	storeCaptureRenderReasons,
+} from "./settings";
 
 async function showPanel(): Promise<Window> {
 	return new Promise(resolve => {
@@ -26,9 +30,10 @@ async function initDevtools() {
 	initialized = true;
 	const window = await showPanel();
 
-	// Themes
-	await loadTheme(window, store);
+	// Settings
+	await loadSettings(window, store);
 	store.theme.on(v => storeTheme(v));
+	store.profiler.captureRenderReasons.on(v => storeCaptureRenderReasons(v));
 
 	// Render our application
 	const root = window.document.getElementById("root")!;
