@@ -39,7 +39,11 @@ export function Settings() {
 					Capture render reasons
 				</Checkbox>
 				<div class={s.message}>
-					<Message type="info">Timings will be less accurate</Message>
+					<Message type="info">
+						All props, state, and hooks of the current node will be compared to
+						the previous node to determine what changed between renders. Timings
+						may be less accurate because of that.
+					</Message>
 				</div>
 			</form>
 		</div>
