@@ -1,0 +1,52 @@
+.root {
+	border-radius: 3px;
+	display: flex;
+	align-items: center;
+	padding: 0.2rem 0.4rem;
+	border-width: 0.0625rem;
+	border-style: solid;
+	font-size: 0.9rem;
+}
+
+.root.info {
+	background: var(--message-info-bg);
+	border-color: var(--message-info-border);
+}
+
+.root.warning {
+	background: var(--message-warning-bg);
+	border-color: var(--message-warning-border);
+}
+
+.root svg {
+	width: 1rem;
+	height: 1rem;
+}
+
+.icon {
+	margin-right: 0.4rem;
+}
+
+.info .icon {
+	color: var(--message-info-strong);
+}
+.info .btn {
+	color: var(--message-info-link);
+}
+
+.warning .icon {
+	color: var(--message-warning-strong);
+}
+.warning .btn {
+	color: var(--message-warning-link);
+}
+
+.btn {
+	border: none;
+	background: none;
+	padding: 0;
+	text-decoration: underline;
+	display: inline-block;
+	margin-left: 0.25rem;
+	cursor: pointer;
+}

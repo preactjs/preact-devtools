@@ -19,7 +19,7 @@ export interface DevtoolEvents {
 	"force-update": ID;
 	"start-picker": null;
 	"stop-picker": null;
-	"start-profiling": null;
+	"start-profiling": { captureRenderReasons?: boolean };
 	"stop-profiling": null;
 	"clear-profiling": null;
 	"update-filter": RawFilterState;

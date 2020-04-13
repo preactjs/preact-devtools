@@ -118,6 +118,6 @@ export function createAdapter(port: PortPageHook, renderer: Renderer) {
 	});
 
 	// Profiler
-	listen("start-profiling", () => renderer.startProfiling!());
+	listen("start-profiling", options => renderer.startProfiling!(options));
 	listen("stop-profiling", () => renderer.stopProfiling!());
 }

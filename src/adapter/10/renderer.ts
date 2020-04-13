@@ -120,7 +120,7 @@ export function mount(
 	filters: FilterState,
 	domCache: WeakMap<HTMLElement | Text, VNode>,
 	config: RendererConfig10,
-	isProfiling: boolean,
+	profiler: ProfilerState,
 ) {
 	const root = isRoot(vnode, config);
 
@@ -148,7 +148,7 @@ export function mount(
 		);
 
 		// Capture render reason (mount here)
-		if (isProfiling) {
+		if (profiler.isProfiling && profiler.captureRenderReasons) {
 			commit.operations.push(MsgTypes.RENDER_REASON, id, RenderReason.MOUNT, 0);
 		}
 
@@ -172,7 +172,7 @@ export function mount(
 				filters,
 				domCache,
 				config,
-				isProfiling,
+				profiler,
 			);
 		}
 	}
@@ -208,7 +208,7 @@ export function update(
 	filters: FilterState,
 	domCache: WeakMap<HTMLElement | Text, VNode>,
 	config: RendererConfig10,
-	isProfiling: boolean,
+	profiler: ProfilerState,
 ) {
 	const skip = shouldFilter(vnode, filters, config);
 	if (skip) {
@@ -224,7 +224,7 @@ export function update(
 					filters,
 					domCache,
 					config,
-					isProfiling,
+					profiler,
 				);
 			}
 		}
@@ -232,16 +232,7 @@ export function update(
 	}
 
 	if (!hasVNodeId(ids, vnode)) {
-		mount(
-			ids,
-			commit,
-			vnode,
-			ancestorId,
-			filters,
-			domCache,
-			config,
-			isProfiling,
-		);
+		mount(ids, commit, vnode, ancestorId, filters, domCache, config, profiler);
 		return true;
 	}
 
@@ -256,7 +247,7 @@ export function update(
 	const oldVNode = getVNodeById(ids, id);
 	updateVNodeId(ids, id, vnode);
 
-	if (isProfiling) {
+	if (profiler.isProfiling && profiler.captureRenderReasons) {
 		const reason = getRenderReason(oldVNode, vnode);
 		if (reason !== null) {
 			const count = reason.items ? reason.items.length : 0;
@@ -283,11 +274,11 @@ export function update(
 				commit.unmountIds.push(oldChildren[i]);
 			}
 		} else if (hasVNodeId(ids, child) || shouldFilter(child, filters, config)) {
-			update(ids, commit, child, id, filters, domCache, config, isProfiling);
+			update(ids, commit, child, id, filters, domCache, config, profiler);
 			// TODO: This is only sometimes necessary
 			shouldReorder = true;
 		} else {
-			mount(ids, commit, child, id, filters, domCache, config, isProfiling);
+			mount(ids, commit, child, id, filters, domCache, config, profiler);
 			shouldReorder = true;
 		}
 	}
@@ -304,7 +295,7 @@ export function createCommit(
 	filters: FilterState,
 	domCache: WeakMap<HTMLElement | Text, VNode>,
 	config: RendererConfig10,
-	isProfiling: boolean,
+	profiler: ProfilerState,
 ): Commit {
 	const commit = {
 		operations: [],
@@ -326,18 +317,9 @@ export function createCommit(
 	}
 
 	if (isNew) {
-		mount(ids, commit, vnode, parentId, filters, domCache, config, isProfiling);
+		mount(ids, commit, vnode, parentId, filters, domCache, config, profiler);
 	} else {
-		update(
-			ids,
-			commit,
-			vnode,
-			parentId,
-			filters,
-			domCache,
-			config,
-			isProfiling,
-		);
+		update(ids, commit, vnode, parentId, filters, domCache, config, profiler);
 	}
 
 	commit.rootId = getVNodeId(ids, vnode);
@@ -355,6 +337,11 @@ export interface Preact10Renderer extends Renderer {
 	onUnmount(vnode: VNode): void;
 }
 
+export interface ProfilerState {
+	isProfiling: boolean;
+	captureRenderReasons: boolean;
+}
+
 export function createRenderer(
 	port: PortPageHook,
 	config: RendererConfig10,
@@ -367,18 +354,23 @@ export function createRenderer(
 
 	const domToVNode = new WeakMap<HTMLElement | Text, VNode>();
 
-	let isProfiling = false;
+	const profiler: ProfilerState = {
+		isProfiling: false,
+		captureRenderReasons: false,
+	};
 
 	return {
 		// TODO: Deprecate
 		// eslint-disable-next-line @typescript-eslint/no-empty-function
 		flushInitial() {},
 
-		startProfiling: () => {
-			isProfiling = true;
+		startProfiling: options => {
+			profiler.isProfiling = true;
+			profiler.captureRenderReasons =
+				!!options && !!options.captureRenderReasons;
 		},
 		stopProfiling: () => {
-			isProfiling = false;
+			profiler.isProfiling = false;
 		},
 		getVNodeById: id => getVNodeById(ids, id),
 		has: id => hasId(ids, id),
@@ -464,7 +456,7 @@ export function createRenderer(
 					filters,
 					domToVNode,
 					config,
-					isProfiling,
+					profiler,
 				);
 				const ev = flush(commit);
 				if (!ev) return;
@@ -482,7 +474,7 @@ export function createRenderer(
 				filters,
 				domToVNode,
 				config,
-				isProfiling,
+				profiler,
 			);
 
 			commit.unmountIds.push(...currentUnmounts);

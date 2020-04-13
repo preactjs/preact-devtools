@@ -171,3 +171,11 @@ export async function waitFor(
 	await fn();
 	clearTimeout(t);
 }
+
+// Preact Devtools specific functions
+export async function clickTab(
+	page: Page,
+	tab: "ELEMENTS" | "PROFILER" | "SETTINGS",
+) {
+	await click(page, `[name="root-panel"][value="${tab}"]`);
+}

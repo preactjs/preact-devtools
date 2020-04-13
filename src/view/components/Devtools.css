@@ -112,6 +112,16 @@ input {
 	--color-profiler-gradient-7: #dfba57;
 	--color-profiler-gradient-8: #efbb49;
 	--color-profiler-gradient-9: #febc38;
+
+	/* Messages */
+	--message-info-bg: #e3f7fc;
+	--message-info-border: #c2eaf9;
+	--message-info-strong: #0265c7;
+	--message-info-link: #0265c7;
+	--message-warning-bg: #fffabc;
+	--message-warning-border: #ffd400;
+	--message-warning-strong: #ffab00;
+	--message-warning-link: #0265c7;
 }
 
 :global(.dark) .theme {
@@ -187,6 +197,16 @@ input {
 	--color-profiler-gradient-7: #dfba57;
 	--color-profiler-gradient-8: #efbb49;
 	--color-profiler-gradient-9: #febc38;
+
+	/* Messages */
+	--message-info-bg: #1b3941;
+	--message-info-border: #006e97;
+	--message-info-strong: #8dbff2;
+	--message-info-link: #8dbff2;
+	--message-warning-bg: #fffabc;
+	--message-warning-border: #ffd400;
+	--message-warning-strong: #ffab00;
+	--message-warning-link: #0265c7;
 }
 
 .switcher {

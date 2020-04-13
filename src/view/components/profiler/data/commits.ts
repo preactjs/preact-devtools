@@ -39,6 +39,10 @@ export interface ProfilerState {
 	 */
 	isSupported: Observable<boolean>;
 
+	// Render reasons
+	captureRenderReasons: Observable<boolean>;
+	setRenderReasonCapture: (v: boolean) => void;
+
 	/**
 	 * Flag that indicates if we are currently
 	 * recording commits to be displayed in the
@@ -69,6 +73,11 @@ export function createProfiler(emit: EmitFn): ProfilerState {
 	const commits = valoo<CommitData[]>([]);
 	const isSupported = valoo(false);
 	const renderReasons = valoo<Map<ID, RenderReasonMap>>(new Map());
+	const captureRenderReasons = valoo(false);
+
+	const setRenderReasonCapture = (v: boolean) => {
+		captureRenderReasons.$ = v;
+	};
 
 	// Selection
 	const activeCommitIdx = valoo(0);
@@ -99,7 +108,11 @@ export function createProfiler(emit: EmitFn): ProfilerState {
 			}
 		}
 
-		emit(v ? "start-profiling" : "stop-profiling", null);
+		if (v) {
+			emit("start-profiling", { captureRenderReasons: captureRenderReasons.$ });
+		} else {
+			emit("stop-profiling", null);
+		}
 	});
 
 	// Flamegraph
@@ -125,6 +138,8 @@ export function createProfiler(emit: EmitFn): ProfilerState {
 	});
 
 	return {
+		captureRenderReasons,
+		setRenderReasonCapture,
 		isSupported,
 		isRecording,
 		commits,

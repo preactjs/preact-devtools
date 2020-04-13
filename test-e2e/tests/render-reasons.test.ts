@@ -1,14 +1,19 @@
-import { newTestPage, click, getText } from "../test-utils";
+import { newTestPage, click, getText, clickTab } from "../test-utils";
 import { expect } from "chai";
 import { closePage, clickText } from "pintf/browser_utils";
 import { wait } from "pintf/utils";
 
-export const description = "Inspect should select node in elements panel";
+export const description = "Captures render reasons";
 
 export async function run(config: any) {
 	const { page, devtools } = await newTestPage(config, "render-reasons");
 
-	await click(devtools, '[name="root-panel"][value="PROFILER"]');
+	// Enable Capturing
+	await clickTab(devtools, "SETTINGS");
+	await click(devtools, '[data-testid="toggle-render-reason"]');
+
+	// Start profiling
+	await clickTab(devtools, "PROFILER");
 	const recordBtn = '[data-testid="record-btn"]';
 	await click(devtools, recordBtn);
 
@@ -23,7 +28,7 @@ export async function run(config: any) {
 	expect(reasons).to.equal("State changed:value");
 
 	await clickText(devtools, "Display", { elementXPath: "//*" });
-	reasons = await getText(devtools, '[data-testid="render-reasons"');
+	reasons = await getText(devtools, '[data-testid="render-reasons"]');
 	expect(reasons).to.equal("Props changed:value");
 
 	// Reset flamegraph
