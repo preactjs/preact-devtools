@@ -1,5 +1,5 @@
 const { h, render } = preact;
-const { useState, useEffect, useLayoutEffect } = preactHooks;
+const { useState, useEffect, useLayoutEffect, useCallback } = preactHooks;
 
 function Display(props) {
 	return html` <div data-testid=${props.testId}>Counter: ${props.value}</div> `;
@@ -18,11 +18,12 @@ function Counter() {
 
 function CounterCallback() {
 	const [v, set] = useState(0);
+	const cb = useCallback(() => set(v + 1), [v]);
 
 	return html`
 		<div style="padding: 2rem;">
 			<${Display} value=${v} testId="callback-result" />
-			<button onClick=${() => set(v + 1)}>Increment</button>
+			<button onClick=${cb}>Increment</button>
 		</div>
 	`;
 }
