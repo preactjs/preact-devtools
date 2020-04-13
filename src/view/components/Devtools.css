@@ -203,10 +203,10 @@ input {
 	--message-info-border: #006e97;
 	--message-info-strong: #8dbff2;
 	--message-info-link: #8dbff2;
-	--message-warning-bg: #fffabc;
-	--message-warning-border: #ffd400;
+	--message-warning-bg: #323018;
+	--message-warning-border: #917b0f;
 	--message-warning-strong: #ffab00;
-	--message-warning-link: #0265c7;
+	--message-warning-link: #8dbff2;
 }
 
 .switcher {
