@@ -90,7 +90,7 @@ export function RenderReasons() {
 					</Message>
 				) : (
 					<Message type="warning">
-						Upgrade Preact to &gt;=10.4.1 to fully enable this feature.
+						Upgrade to Preact &gt;=10.4.1 to fully enable this feature.
 					</Message>
 				)}
 			</div>
