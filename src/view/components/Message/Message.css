@@ -24,6 +24,7 @@
 }
 
 .icon {
+	display: inline-flex;
 	margin-right: 0.4rem;
 }
 
