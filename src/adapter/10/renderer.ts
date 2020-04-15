@@ -14,7 +14,6 @@ import {
 	getDisplayName,
 	getComponent,
 	getDom,
-	getLastDomChild,
 	getActualChildren,
 	getVNodeParent,
 	hasDom,
@@ -395,7 +394,26 @@ export function createRenderer(
 		inspect: id => inspectVNode(ids, config, id),
 		findDomForVNode(id) {
 			const vnode = getVNodeById(ids, id);
-			return vnode ? [getDom(vnode), getLastDomChild(vnode)] : null;
+			if (!vnode) return null;
+
+			const first = getDom(vnode);
+			let last = null;
+			if (typeof vnode.type === "function") {
+				const children = getActualChildren(vnode);
+				for (let i = children.length - 1; i >= 0; i--) {
+					const child = children[i];
+					if (child) {
+						const dom = getDom(child);
+						if (dom === first) break;
+						if (dom !== null) {
+							last = dom;
+							break;
+						}
+					}
+				}
+			}
+
+			return [first, last];
 		},
 		findVNodeIdForDom(node) {
 			const vnode = domToVNode.get(node);
