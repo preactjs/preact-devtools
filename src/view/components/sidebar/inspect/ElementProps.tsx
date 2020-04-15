@@ -4,15 +4,12 @@ import { Arrow } from "../../elements/TreeView";
 import { PropDataType, PropData } from "./parseProps";
 import { DataInput } from "../../DataInput";
 import { genPreview } from "../../DataInput/parseValue";
-import { ID } from "../../../store/types";
 import { Observable } from "../../../valoo";
 import { isCollapsed } from "../../../store/props";
 
-export type ObjPath = Array<string | number>;
-export type ChangeFn = (value: any, path: ObjPath) => void;
+export type ChangeFn = (value: any, path: string) => void;
 
 export interface Props {
-	nodeId: ID;
 	editable?: boolean;
 	onChange?: ChangeFn;
 	onCollapse?: (path: string) => void;
@@ -21,7 +18,7 @@ export interface Props {
 }
 
 export function ElementProps(props: Props) {
-	const { editable, onChange, uncollapsed, items, onCollapse, nodeId } = props;
+	const { editable, onChange, uncollapsed, items, onCollapse } = props;
 
 	return (
 		<div class={s.root}>
@@ -30,7 +27,7 @@ export function ElementProps(props: Props) {
 					const id = item.id;
 					return (
 						<SingleItem
-							id={nodeId}
+							id={id}
 							key={id}
 							type={item.type}
 							name={id.slice(id.lastIndexOf(".") + 1)}
@@ -39,7 +36,6 @@ export function ElementProps(props: Props) {
 							onCollapse={() => onCollapse && onCollapse(id)}
 							editable={editable && item.editable}
 							value={item.value}
-							path={item.path}
 							onChange={onChange}
 							depth={item.depth}
 						/>
@@ -51,17 +47,16 @@ export function ElementProps(props: Props) {
 }
 
 export interface SingleProps {
-	id: ID;
+	id: string;
 	key?: string;
 	editable?: boolean;
 	type: PropDataType;
 	collapseable?: boolean;
 	collapsed?: boolean;
-	path: ObjPath;
 	name: string;
 	value: any;
 	onChange?: ChangeFn;
-	onCollapse?: (path: ObjPath) => void;
+	onCollapse?: (path: string) => void;
 	depth: number;
 }
 
@@ -69,7 +64,6 @@ export function SingleItem(props: SingleProps) {
 	const {
 		id,
 		onChange,
-		path,
 		editable = false,
 		name,
 		type,
@@ -82,7 +76,7 @@ export function SingleItem(props: SingleProps) {
 
 	return (
 		<div
-			key={path.join(".")}
+			key={id}
 			class={s.row}
 			data-testid="props-row"
 			data-depth={depth}
@@ -93,7 +87,7 @@ export function SingleItem(props: SingleProps) {
 					class={s.toggle}
 					type="button"
 					data-collapsed={collapsed}
-					onClick={() => onCollapse && onCollapse(path)}
+					onClick={() => onCollapse && onCollapse(id)}
 				>
 					<Arrow />
 					<span class={s.name} data-type={type}>
@@ -118,8 +112,8 @@ export function SingleItem(props: SingleProps) {
 						{editable ? (
 							<DataInput
 								value={value}
-								onChange={v => onChange && onChange(v, path)}
-								name={`${id}#${path.join(".")}`}
+								onChange={v => onChange && onChange(v, id)}
+								name={`${id}`}
 							/>
 						) : (
 							<div class={s.mask}>{genPreview(value)}</div>

@@ -19,7 +19,6 @@ function parseInspectData(
 			depth: 0,
 			editable: false,
 			id: "root",
-			path: ["root"],
 			type: "object",
 			value: null,
 		});
@@ -29,7 +28,7 @@ function parseInspectData(
 			uncollapsed.$ = [];
 		}
 
-		parseProps(getData(v), ["root"], PROPS_LIMIT, data => data, tree.$);
+		parseProps(getData(v), "root", PROPS_LIMIT, tree.$);
 	} else {
 		tree.$.clear();
 	}

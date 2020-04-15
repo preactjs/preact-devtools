@@ -2,8 +2,9 @@ import { VNode } from "preact";
 import { ID } from "../view/store/types";
 import { FilterState } from "./adapter/filter";
 import { InspectData, UpdateType } from "./adapter/adapter";
-import { ObjPath } from "../view/components/sidebar/inspect/ElementProps";
 import { DevtoolEvents } from "./hook";
+
+export type ObjPath = Array<string | number>;
 
 /**
  * TODO: Deprecate this
