@@ -3,10 +3,9 @@ import { useState, useCallback } from "preact/hooks";
 import { DataInput } from "../../DataInput";
 import s from "./NewProp.css";
 import s2 from "./ElementProps.css";
-import { ObjPath } from "./ElementProps";
 
 export interface NewPropProps {
-	onChange: (value: any, path: ObjPath) => void;
+	onChange: (value: any, path: string) => void;
 }
 
 export function NewProp(props: NewPropProps) {
@@ -19,8 +18,7 @@ export function NewProp(props: NewPropProps) {
 	const onCommit = useCallback(
 		(value: any) => {
 			if (name) {
-				const path = ["root", ...name.split(".").filter(Boolean)];
-				props.onChange(value, path);
+				props.onChange(value, name);
 				setName("");
 			}
 		},

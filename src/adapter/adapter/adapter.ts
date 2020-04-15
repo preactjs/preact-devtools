@@ -96,7 +96,7 @@ export function createAdapter(port: PortPageHook, renderer: Renderer) {
 
 	const update = (data: DevtoolEvents["update"]) => {
 		const { id, type, path, value } = data;
-		renderer.update(id, type, path, value);
+		renderer.update(id, type, path.split(".").slice(1), value);
 
 		// Notify all frontends that something changed
 		inspect(id);

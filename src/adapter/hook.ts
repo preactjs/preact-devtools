@@ -1,5 +1,4 @@
 import { Renderer } from "./renderer";
-import { ObjPath } from "../view/components/sidebar/inspect/ElementProps";
 import { ID } from "../view/store/types";
 import { createAdapter, InspectData, UpdateType } from "./adapter/adapter";
 import { RawFilterState } from "./adapter/filter";
@@ -13,9 +12,9 @@ import { PortPageHook } from "./adapter/port";
 export type EmitterFn = (event: string, data: any) => void;
 
 export interface DevtoolEvents {
-	"update-prop": { id: ID; path: ObjPath; value: any };
-	"update-state": { id: ID; path: ObjPath; value: any };
-	"update-context": { id: ID; path: ObjPath; value: any };
+	"update-prop": { id: ID; path: string; value: any };
+	"update-state": { id: ID; path: string; value: any };
+	"update-context": { id: ID; path: string; value: any };
 	"force-update": ID;
 	"start-picker": null;
 	"stop-picker": null;
@@ -28,7 +27,7 @@ export interface DevtoolEvents {
 	log: { id: ID; children: ID[] };
 	inspect: ID;
 	"select-node": ID;
-	update: { id: ID; type: UpdateType; path: ObjPath; value: any };
+	update: { id: ID; type: UpdateType; path: string; value: any };
 	"inspect-result": InspectData;
 	attach: { id: ID; supportsProfiling: boolean };
 	initialized: null;

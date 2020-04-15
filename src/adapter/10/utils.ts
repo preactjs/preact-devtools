@@ -1,6 +1,6 @@
 import { getActualChildren } from "./vnode";
 import { VNode } from "preact";
-import { ObjPath } from "../../view/components/sidebar/inspect/ElementProps";
+import { ObjPath } from "../renderer";
 
 export function traverse(vnode: VNode, fn: (vnode: VNode) => void) {
 	fn(vnode);

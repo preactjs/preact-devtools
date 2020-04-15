@@ -1,5 +1,5 @@
 import { h } from "preact";
-import { ElementProps, ObjPath } from "./ElementProps";
+import { ElementProps } from "./ElementProps";
 import { useStore, useObserver } from "../../../store/react-bindings";
 import { useCallback } from "preact/hooks";
 import { createPropsStore, toggleCollapsed } from "../../../store/props";
@@ -17,7 +17,7 @@ export interface Props {
 	checkEditable: (data: InspectData) => boolean;
 	getData(data: InspectData): any;
 	canAddNew?: boolean;
-	onChange: (id: ID, path: ObjPath, value: any) => void;
+	onChange: (id: ID, path: string, value: any) => void;
 	onCopy?: (data: any) => void;
 }
 
@@ -35,9 +35,8 @@ export function PropsPanel(props: Props) {
 	const items = useObserver(() => s.list.$);
 
 	const onChange = useCallback(
-		(value: any, path: ObjPath) => {
-			const key = path.slice(1);
-			props.onChange(inspect!.id, key, value);
+		(value: any, path: string) => {
+			props.onChange(inspect!.id, path, value);
 		},
 		[inspect],
 	);
@@ -59,7 +58,6 @@ export function PropsPanel(props: Props) {
 			}}
 		>
 			<ElementProps
-				nodeId={inspect.id}
 				editable={props.checkEditable(inspect)}
 				uncollapsed={s.uncollapsed}
 				items={items.map(x => s.tree.$.get(x)!)}
