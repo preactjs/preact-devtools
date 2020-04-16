@@ -60,6 +60,11 @@ export function TreeView() {
 
 	useEffect(() => {
 		if (ref.current && paneRef.current) {
+			const oldDisplay = paneRef.current.style.display;
+			// Hack to get the parent to grow with its children, see:
+			// https://stackoverflow.com/questions/17291514/how-to-force-parent-div-to-expand-by-child-div-width-padding-margin-box
+			paneRef.current.style.display = "inline-block";
+
 			const available = ref.current.offsetWidth - SCROLLBAR_WIDTH;
 			const actual = paneRef.current.offsetWidth;
 			const diff = actual - available;
@@ -78,6 +83,7 @@ export function TreeView() {
 
 				ref.current.style.setProperty("--indent-depth", `${clamped}px`);
 			}
+			paneRef.current.style.display = oldDisplay;
 		}
 	}, [nodeList, updateCount]);
 
