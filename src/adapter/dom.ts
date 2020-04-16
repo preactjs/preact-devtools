@@ -31,6 +31,20 @@ export interface Measurements {
 	};
 }
 
+function getBoundsState(rect: {
+	top: number;
+	height: number;
+	left: number;
+	width: number;
+}) {
+	return {
+		top: rect.top + window.pageYOffset < window.scrollY,
+		bottom: rect.top + rect.height > window.innerHeight + scrollY,
+		left: rect.left + window.pageXOffset < window.scrollX,
+		right: rect.left + rect.width > window.scrollX + window.innerWidth,
+	};
+}
+
 export function measureNode(dom: Element): Measurements {
 	const s = window.getComputedStyle(dom);
 	const r = dom.getBoundingClientRect();
@@ -38,17 +52,10 @@ export function measureNode(dom: Element): Measurements {
 	const top = r.top + window.pageYOffset;
 	const left = r.left + window.pageXOffset;
 
-	const bounds = {
-		top: top < window.scrollY,
-		bottom: r.top + r.height > window.innerHeight + scrollY,
-		left: left < window.scrollX,
-		right: r.left + r.width > window.scrollX + window.innerWidth,
-	};
-
 	return {
 		top,
 		left,
-		bounds,
+		bounds: getBoundsState(r),
 
 		// Round to at most 2 decimals. This is not 100% accurate,
 		// but good enough for our use case
@@ -67,5 +74,39 @@ export function measureNode(dom: Element): Measurements {
 		paddingRight: px2Int(s.paddingRight),
 		paddingBottom: px2Int(s.paddingBottom),
 		paddingLeft: px2Int(s.paddingLeft),
+	};
+}
+
+export function mergeMeasure(a: Measurements, b: Measurements): Measurements {
+	const top = Math.min(a.top, b.top);
+	const left = Math.min(a.left, b.left);
+	const height = Math.max(a.top + a.height, b.top + b.height) - top;
+	const width = Math.max(a.left + a.width, b.left + b.width) - left;
+	return {
+		top,
+		left,
+		bounds: getBoundsState({
+			height,
+			left,
+			top,
+			width,
+		}),
+		width,
+		height,
+
+		// Reset all margines for combined nodes. There is no
+		// meaningful way to display them.
+		marginTop: 0,
+		marginRight: 0,
+		marginBottom: 0,
+		marginLeft: 0,
+		borderTop: 0,
+		borderRight: 0,
+		borderBottom: 0,
+		borderLeft: 0,
+		paddingTop: 0,
+		paddingRight: 0,
+		paddingBottom: 0,
+		paddingLeft: 0,
 	};
 }

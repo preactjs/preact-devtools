@@ -1,6 +1,6 @@
 import { Renderer } from "../renderer";
 import { render, h } from "preact";
-import { getNearestElement, measureNode } from "../dom";
+import { getNearestElement, measureNode, mergeMeasure } from "../dom";
 import { ID } from "../../view/store/types";
 import { Highlighter, style } from "../../view/components/Highlighter";
 
@@ -40,16 +40,25 @@ export function createHightlighter(renderer: Renderer) {
 				document.body.appendChild(highlightRef);
 			}
 
-			const node = getNearestElement(dom[0]!);
+			const [first, last] = dom;
+
+			const node = getNearestElement(first!);
+			const nodeEnd = last ? getNearestElement(last) : null;
 			if (node != null) {
 				const label = renderer.getDisplayNameById
 					? renderer.getDisplayNameById(id)
 					: renderer.getDisplayName(vnode);
 
+				let size = measureNode(node);
+				if (nodeEnd !== null) {
+					const sizeLast = measureNode(nodeEnd);
+					size = mergeMeasure(size, sizeLast);
+				}
+
 				render(
 					h(Highlighter, {
 						label,
-						...measureNode(node),
+						...size,
 					}),
 					highlightRef,
 				);

@@ -43,13 +43,6 @@ export function hasDom(x: any) {
 }
 
 /**
- * Get the last dom child of a `vnode`
- */
-export function getLastDomChild(vnode: VNode) {
-	return (vnode as any)._lastDomChild || (vnode as any).__d || null;
-}
-
-/**
  * Check if a `vnode` represents a `Suspense` component
  */
 export function isSuspenseVNode(vnode: VNode) {
