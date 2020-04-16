@@ -54,8 +54,10 @@ export function createAdapter(port: PortPageHook, renderer: Renderer) {
 		renderer,
 		id => {
 			highlight.highlight(id);
-			inspect(id);
-			send("select-node", id);
+			if (id > -1) {
+				inspect(id);
+				send("select-node", id);
+			}
 		},
 		() => {
 			send("stop-picker", null);
