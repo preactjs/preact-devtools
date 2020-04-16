@@ -71,7 +71,6 @@
 .toggle {
 	background: none;
 	display: flex;
-	justify-content: center;
 	align-items: center;
 	height: 100%;
 	width: 100%;
