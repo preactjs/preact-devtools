@@ -1,5 +1,35 @@
 # Changelog
 
+## 0.4.0
+
+This release improves a lot of little UX interactions and contains a lot of house cleaning in preparation for hooks inspection.
+
+We couldn't resist adding a major feature too as it turned out to be easier to implement than initially assumed. The profiler is now able to inspect why a node rendered! The full support for this feature required a change in Preact. But don't worry we'll cut a new release over there in the coming days!
+
+Features:
+
+- Profiler: Display why a node rendered (#138, thanks @marvinhagemeister)
+
+Bug Fixes:
+
+- Fix elements only clickable on text (#150, thanks @marvinhagemeister)
+- Fix toggle alignment (#149, thanks @AlexMunoz)
+- Fix highlight stuck on scroll (#147, thanks @marvinhagemeister)
+- Fix only first DOM element highlighted on Fragments (#146, thanks @marvinhagemeister)
+- Minor wording change (#142, thanks @marvinhagemeister)
+- Fix undefined display in input (#139, thanks @marvinhagemeister)
+- Improve contrast on component name (#135, thanks @marvinhagemeister)
+- Fix invisible `undefined` prop value in preview (#134, thanks @marvinhagemeister)
+- Make design more consistent across browsers (#133, thanks @marvinhagemeister)
+
+Maintenance:
+
+- Minor props parser refactoring (#145, thanks @marvinhagemeister)
+- Enhance test for multiple property changes (#140, thanks @marvinhagemeister)
+- Only delete relevant files in build commands (#137, thanks @marvinhagemeister)
+- Add eslint config (#136, thanks @marvinhagemeister)
+- Upgrade all dependencies (#132, thanks @marvinhagemeister)
+
 ## 0.3.0
 
 This release brings a few new features and many usability improvements. Thanks to everyone who reported bugs and helped make preact-devtools even more awesome!
