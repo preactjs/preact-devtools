@@ -105,6 +105,13 @@ export async function getText(page: Page, selector: string) {
 	return getAttribute(page, selector, "textContent");
 }
 
+export async function hasSelector(page: Page, selector: string) {
+	return page.evaluate(
+		(s: string) => document.querySelector(s) !== null,
+		selector,
+	);
+}
+
 export async function waitForAttribute(
 	page: Page,
 	selector: string,
