@@ -87,6 +87,12 @@ export async function newTestPage(
 	const frames = await page.frames();
 	const devtools = frames.find(f => f.url().includes("devtools.html"))!;
 
+	(devtools as any).mouse = Object.assign(
+		Object.create(Object.getPrototypeOf(page.mouse)),
+		page.mouse,
+	);
+	(devtools as any).mouse._client = (devtools as any)._client;
+
 	return { page, devtools: (devtools as any) as Page };
 }
 
@@ -190,4 +196,73 @@ export async function clickTab(
 	tab: "ELEMENTS" | "PROFILER" | "SETTINGS",
 ) {
 	await click(page, `[name="root-panel"][value="${tab}"]`);
+}
+
+// This injects a box into the page that moves with the mouse;
+// Useful for debugging
+export async function installMouseHelper(page: Page) {
+	await page.evaluate(() => {
+		// Install mouse helper only for top-level frame.
+		// if (window !== window.parent) return;
+		const box = document.createElement("puppeteer-mouse-pointer");
+		const styleElement = document.createElement("style");
+		styleElement.innerHTML = `
+        puppeteer-mouse-pointer {
+          pointer-events: none;
+          position: absolute;
+          top: 0;
+          z-index: 10000;
+          left: 0;
+          width: 20px;
+          height: 20px;
+          background: red;
+          border: 1px solid white;
+          border-radius: 10px;
+          margin: -10px 0 0 -10px;
+          padding: 0;
+          transition: background .2s, border-radius .2s, border-color .2s;
+        }
+        puppeteer-mouse-pointer.button-1 {
+          transition: none;
+          background: rgba(0,0,0,0.9);
+        }
+        puppeteer-mouse-pointer.button-2 {
+          transition: none;
+          border-color: rgba(0,0,255,0.9);
+        }
+        puppeteer-mouse-pointer.button-3 {
+          transition: none;
+          border-radius: 4px;
+        }
+        puppeteer-mouse-pointer.button-4 {
+          transition: none;
+          border-color: rgba(255,0,0,0.9);
+        }
+        puppeteer-mouse-pointer.button-5 {
+          transition: none;
+          border-color: rgba(0,255,0,0.9);
+        }
+      `;
+
+		function updateButtons(event: any) {
+			box.style.left = event.pageX + "px";
+			box.style.top = event.pageY + "px";
+			for (let i = 0; i < 5; i++)
+				box.classList.toggle(
+					"button-" + i,
+					// @ts-ignore
+					(event.buttons as any) & ((1 << i) as any),
+				);
+		}
+
+		function handleEvent(event: MouseEvent) {
+			updateButtons(event);
+			box.classList.add("button-" + event.which);
+		}
+		document.head.appendChild(styleElement);
+		document.body.appendChild(box);
+		document.addEventListener("mousedown", handleEvent, true);
+		document.addEventListener("click", handleEvent, true);
+		document.addEventListener("mouseup", handleEvent, true);
+	});
 }
