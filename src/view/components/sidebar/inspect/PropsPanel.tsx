@@ -4,7 +4,7 @@ import { useStore, useObserver } from "../../../store/react-bindings";
 import { useCallback } from "preact/hooks";
 import { createPropsStore, toggleCollapsed } from "../../../store/props";
 import { useInstance } from "../../utils";
-import { SidebarPanel } from "../SidebarPanel";
+import { SidebarPanel, Empty } from "../SidebarPanel";
 import { ID } from "../../../store/types";
 import { InspectData } from "../../../../adapter/adapter/adapter";
 import { NewProp } from "./NewProp";
@@ -43,14 +43,15 @@ export function PropsPanel(props: Props) {
 
 	if (inspect == null || props.getData(inspect) == null) {
 		return !props.isOptional ? (
-			<SidebarPanel title={props.label} empty="None" onCopy={noop} />
+			<SidebarPanel title={props.label} onCopy={noop}>
+				<Empty>None</Empty>
+			</SidebarPanel>
 		) : null;
 	}
 
 	return (
 		<SidebarPanel
 			title={props.label}
-			empty="None"
 			onCopy={() => {
 				if (props.onCopy && inspect != null && props.onCopy != null) {
 					props.onCopy(props.getData(inspect));
