@@ -10,7 +10,6 @@ describe("parseProps", () => {
 
 		expect(serialize(tree)).to.deep.equal([
 			{
-				collapsable: false,
 				editable: true,
 				depth: 0,
 				id: "foo",
@@ -27,7 +26,6 @@ describe("parseProps", () => {
 
 		expect(serialize(tree)).to.deep.equal([
 			{
-				collapsable: false,
 				editable: true,
 				depth: 0,
 				id: "foo",
@@ -44,7 +42,6 @@ describe("parseProps", () => {
 
 		expect(serialize(tree)).to.deep.equal([
 			{
-				collapsable: false,
 				editable: true,
 				depth: 0,
 				id: "foo",
@@ -60,7 +57,6 @@ describe("parseProps", () => {
 		parseProps(null, "foo", 2, tree);
 		expect(serialize(tree)).to.deep.equal([
 			{
-				collapsable: false,
 				editable: false,
 				depth: 0,
 				id: "foo",
@@ -76,7 +72,6 @@ describe("parseProps", () => {
 		parseProps(undefined, "foo", 2, tree);
 		expect(serialize(tree)).to.deep.equal([
 			{
-				collapsable: false,
 				editable: false,
 				depth: 0,
 				id: "foo",
@@ -96,7 +91,6 @@ describe("parseProps", () => {
 		parseProps(fn, "foo", 2, tree);
 		expect(serialize(tree)).to.deep.equal([
 			{
-				collapsable: false,
 				editable: false,
 				depth: 0,
 				id: "foo",
@@ -112,7 +106,6 @@ describe("parseProps", () => {
 		parseProps([1, 2], "foo", 2, tree);
 		expect(serialize(tree)).to.deep.equal([
 			{
-				collapsable: true,
 				editable: false,
 				depth: 0,
 				id: "foo",
@@ -121,7 +114,6 @@ describe("parseProps", () => {
 				children: ["foo.0", "foo.1"],
 			},
 			{
-				collapsable: false,
 				editable: true,
 				depth: 1,
 				id: "foo.0",
@@ -130,7 +122,6 @@ describe("parseProps", () => {
 				children: [],
 			},
 			{
-				collapsable: false,
 				editable: true,
 				depth: 1,
 				id: "foo.1",
@@ -146,7 +137,6 @@ describe("parseProps", () => {
 		parseProps([], "foo", 2, tree);
 		expect(serialize(tree)).to.deep.equal([
 			{
-				collapsable: false,
 				editable: false,
 				depth: 0,
 				id: "foo",
@@ -162,7 +152,6 @@ describe("parseProps", () => {
 		parseProps({ foo: 123, bar: "abc" }, "", 2, tree);
 		expect(serialize(tree)).to.deep.equal([
 			{
-				collapsable: true,
 				editable: false,
 				depth: 0,
 				id: "",
@@ -174,7 +163,6 @@ describe("parseProps", () => {
 				children: [".foo", ".bar"],
 			},
 			{
-				collapsable: false,
 				editable: true,
 				depth: 1,
 				id: ".foo",
@@ -183,7 +171,6 @@ describe("parseProps", () => {
 				children: [],
 			},
 			{
-				collapsable: false,
 				editable: true,
 				depth: 1,
 				id: ".bar",
@@ -199,7 +186,6 @@ describe("parseProps", () => {
 		parseProps({ foo: { bar: "abc" } }, "foo", 4, tree);
 		expect(serialize(tree)).to.deep.equal([
 			{
-				collapsable: true,
 				editable: false,
 				depth: 0,
 				id: "foo",
@@ -212,7 +198,6 @@ describe("parseProps", () => {
 				children: ["foo.foo"],
 			},
 			{
-				collapsable: true,
 				editable: false,
 				depth: 1,
 				id: "foo.foo",
@@ -223,7 +208,6 @@ describe("parseProps", () => {
 				children: ["foo.foo.bar"],
 			},
 			{
-				collapsable: false,
 				editable: true,
 				depth: 2,
 				id: "foo.foo.bar",
@@ -239,7 +223,6 @@ describe("parseProps", () => {
 		parseProps({ foo: { bar: "abc" } }, "foo", 2, tree);
 		expect(serialize(tree)).to.deep.equal([
 			{
-				collapsable: true,
 				editable: false,
 				depth: 0,
 				id: "foo",
@@ -252,7 +235,6 @@ describe("parseProps", () => {
 				children: ["foo.foo"],
 			},
 			{
-				collapsable: true,
 				editable: false,
 				depth: 1,
 				id: "foo.foo",
@@ -270,7 +252,6 @@ describe("parseProps", () => {
 		parseProps("[[Circular]]", "", 2, tree);
 		expect(serialize(tree)).to.deep.equal([
 			{
-				collapsable: false,
 				editable: false,
 				depth: 0,
 				id: "",
