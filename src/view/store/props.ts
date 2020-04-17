@@ -41,7 +41,7 @@ export function createPropsStore(
 				tree.get(id)!.children.length > 0 && isCollapsed(uncollapsed.$, id)
 			);
 		});
-		return items.slice(1).map(id => tree.get(id));
+		return items.slice(1).map(id => tree.get(id)!);
 	});
 
 	return { list, destroy: () => null };
