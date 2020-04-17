@@ -50,12 +50,12 @@ export function createPropsStore(
 		lastId: inspectData.$ ? inspectData.$.id : -1,
 	};
 
-	// Parse data on mount
-	parseInspectData(inspectData.$, tree, getData, uncollapsed, state);
-
 	// Whenever the inspection data changes, we'll update the tree
-	const dispose = inspectData.on(v =>
-		parseInspectData(v, tree, getData, uncollapsed, state),
+	const dispose = inspectData.on(
+		v => {
+			return parseInspectData(v, tree, getData, uncollapsed, state);
+		},
+		{ init: true },
 	);
 
 	const list = watch(() => {
