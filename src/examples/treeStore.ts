@@ -3,9 +3,6 @@ import { InspectData } from "../adapter/adapter/adapter";
 import { DevNodeType, DevNode, ID } from "../view/store/types";
 
 export const inspect: InspectData = {
-	canEditHooks: false,
-	canEditProps: true,
-	canEditState: false,
 	context: null,
 	hooks: null,
 	id: 2,

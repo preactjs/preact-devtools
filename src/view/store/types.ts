@@ -6,6 +6,7 @@ import { createSelectionStore } from "./selection";
 import { Collapser } from "./collapser";
 import { EmitFn } from "../../adapter/hook";
 import { ProfilerState } from "../components/profiler/data/commits";
+import { PropData } from "../components/sidebar/inspect/parseProps";
 
 export type ID = number;
 
@@ -60,7 +61,20 @@ export interface Store {
 	filter: ReturnType<typeof createFilterStore>;
 	selection: ReturnType<typeof createSelectionStore>;
 	collapser: Collapser<ID>;
-	sidebarUncollapsed: Observable<string[]>;
+	sidebar: {
+		props: {
+			uncollapsed: Observable<string[]>;
+			items: Observable<PropData[]>;
+		};
+		state: {
+			uncollapsed: Observable<string[]>;
+			items: Observable<PropData[]>;
+		};
+		context: {
+			uncollapsed: Observable<string[]>;
+			items: Observable<PropData[]>;
+		};
+	};
 	clear(): void;
 	emit: EmitFn;
 	subscribe(fn: Listener): () => void;

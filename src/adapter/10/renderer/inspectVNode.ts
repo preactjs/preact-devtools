@@ -1,4 +1,4 @@
-import { getComponent, getComponentHooks, getDisplayName } from "../vnode";
+import { getComponent, getDisplayName } from "../vnode";
 import { jsonify, cleanContext, cleanProps } from "../utils";
 import { serializeVNode, RendererConfig10, getDevtoolsType } from "../renderer";
 import { ID } from "../../../view/store/types";
@@ -28,7 +28,6 @@ export function inspectVNode(
 		c != null &&
 		Object.keys(c.state).length > 0;
 
-	const hasHooks = c != null && getComponentHooks(c) != null;
 	const context = c != null ? serialize(config, cleanContext(c.context)) : null;
 	const props =
 		vnode.type !== null ? serialize(config, cleanProps(vnode.props)) : null;
@@ -36,13 +35,10 @@ export function inspectVNode(
 
 	return {
 		context,
-		canEditHooks: hasHooks,
 		hooks: null,
 		id,
 		name: getDisplayName(vnode, config),
-		canEditProps: true,
 		props,
-		canEditState: true,
 		state,
 		// TODO: We're not using this information anywhere yet
 		type: getDevtoolsType(vnode),

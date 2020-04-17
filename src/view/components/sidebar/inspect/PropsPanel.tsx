@@ -1,71 +1,45 @@
-import { h } from "preact";
-import { ElementProps } from "./ElementProps";
-import { useStore, useObserver } from "../../../store/react-bindings";
-import { useCallback } from "preact/hooks";
-import { createPropsStore, toggleCollapsed } from "../../../store/props";
-import { useInstance } from "../../utils";
+import { h, Fragment } from "preact";
+import { ElementProps, ChangeFn } from "./ElementProps";
 import { SidebarPanel, Empty } from "../SidebarPanel";
-import { ID } from "../../../store/types";
-import { InspectData } from "../../../../adapter/adapter/adapter";
 import { NewProp } from "./NewProp";
-
-const noop = () => null;
+import { Observable } from "../../../valoo";
+import { PropData } from "./parseProps";
+import { useObserver } from "../../../store/react-bindings";
 
 export interface Props {
 	label: string;
 	isOptional?: boolean;
-	checkEditable: (data: InspectData) => boolean;
-	getData(data: InspectData): any;
+	uncollapsed: Observable<string[]>;
+	items: Observable<PropData[]>;
 	canAddNew?: boolean;
-	onChange: (id: ID, path: string, value: any) => void;
-	onCopy?: (data: any) => void;
+	onChange: ChangeFn;
+	onCopy?: () => void;
 }
 
 export function PropsPanel(props: Props) {
-	const store = useStore();
-
-	const s = useInstance(() => {
-		return createPropsStore(
-			store.inspectData,
-			store.sidebarUncollapsed,
-			props.getData,
-		);
-	});
-	const inspect = useObserver(() => store.inspectData.$);
-	const items = useObserver(() => s.list.$);
-
-	const onChange = useCallback(
-		(value: any, path: string) => {
-			props.onChange(inspect!.id, path, value);
-		},
-		[inspect],
-	);
-
-	if (inspect == null || props.getData(inspect) == null) {
-		return !props.isOptional ? (
-			<SidebarPanel title={props.label} onCopy={noop}>
-				<Empty>None</Empty>
-			</SidebarPanel>
-		) : null;
-	}
-
+	const { label, onCopy, onChange, canAddNew } = props;
+	const uncollapsed = useObserver(() => props.uncollapsed.$);
+	const items = useObserver(() => props.items.$);
 	return (
-		<SidebarPanel
-			title={props.label}
-			onCopy={() => {
-				if (props.onCopy && inspect != null && props.onCopy != null) {
-					props.onCopy(props.getData(inspect));
-				}
-			}}
-		>
-			<ElementProps
-				editable={props.checkEditable(inspect)}
-				uncollapsed={s.uncollapsed}
-				items={items.map(x => s.tree.$.get(x)!)}
-				onChange={onChange}
-				onCollapse={id => toggleCollapsed(s.uncollapsed, id)}
-			/>
-			{props.canAddNew && <NewProp onChange={onChange} />}
+		<SidebarPanel title={label} onCopy={onCopy}>
+			{items.length ? (
+				<Fragment>
+					<ElementProps
+						uncollapsed={uncollapsed}
+						items={items}
+						onChange={onChange}
+						onCollapse={id => {
+							const idx = props.uncollapsed.$.indexOf(id);
+							props.uncollapsed.update(v => {
+								idx > -1 ? v.splice(idx, 1) : v.push(id);
+							});
+						}}
+					/>
+					{canAddNew && <NewProp onChange={onChange} />}
+				</Fragment>
+			) : (
+				<Empty>None</Empty>
+			)}
 		</SidebarPanel>
 	);
 }

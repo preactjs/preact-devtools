@@ -4,21 +4,19 @@ import { Arrow } from "../../elements/TreeView";
 import { PropDataType, PropData } from "./parseProps";
 import { DataInput } from "../../DataInput";
 import { genPreview } from "../../DataInput/parseValue";
-import { Observable } from "../../../valoo";
 import { isCollapsed } from "../../../store/props";
 
 export type ChangeFn = (value: any, path: string) => void;
 
 export interface Props {
-	editable?: boolean;
 	onChange?: ChangeFn;
 	onCollapse?: (path: string) => void;
-	uncollapsed: Observable<string[]>;
+	uncollapsed: string[];
 	items: PropData[];
 }
 
 export function ElementProps(props: Props) {
-	const { editable, onChange, uncollapsed, items, onCollapse } = props;
+	const { onChange, uncollapsed, items, onCollapse } = props;
 
 	return (
 		<div class={s.root}>
@@ -31,10 +29,10 @@ export function ElementProps(props: Props) {
 							key={id}
 							type={item.type}
 							name={id.slice(id.lastIndexOf(".") + 1)}
-							collapseable={item.collapsable}
-							collapsed={isCollapsed(uncollapsed.$, id)}
+							collapseable={item.children.length > 0}
+							collapsed={isCollapsed(uncollapsed, id)}
 							onCollapse={() => onCollapse && onCollapse(id)}
-							editable={editable && item.editable}
+							editable={item.editable}
 							value={item.value}
 							onChange={onChange}
 							depth={item.depth}

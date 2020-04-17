@@ -1,8 +1,13 @@
 export type Disposer = () => void;
 
+export interface SubscribeOptions {
+	/** Call callback immediately on subscription */
+	init?: boolean;
+}
+
 export type Observable<T = any> = {
 	$: T;
-	on(fn: (value: T) => void): Disposer;
+	on(fn: (value: T) => void, options?: SubscribeOptions): Disposer;
 	update(fn?: (value: T) => T | void): T;
 	_disposers: Disposer[];
 };
@@ -56,8 +61,9 @@ export function valoo<T>(v: T): Observable<T> {
 			tracking = old;
 			dummy.clear();
 		},
-		on(c: (v: T) => void) {
+		on(c: (v: T) => void, options: SubscribeOptions = {}) {
 			const i = cb.push(c) - 1;
+			if (options.init) c(v);
 			return () => (cb[i] = null);
 		},
 		update(fn?: (v: T) => T | void) {

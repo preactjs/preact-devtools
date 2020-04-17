@@ -19,7 +19,6 @@ export interface PropData {
 	type: PropDataType;
 	value: any;
 	editable: boolean;
-	collapsable: boolean;
 	depth: number;
 	children: string[];
 }
@@ -42,7 +41,6 @@ export function parseProps(
 			depth,
 			id: path,
 			type: "array",
-			collapsable: data.length > 0,
 			editable: false,
 			value: data,
 			children,
@@ -58,7 +56,6 @@ export function parseProps(
 			depth,
 			id: path,
 			type: "set",
-			collapsable: false,
 			editable: false,
 			value: "Set",
 			children: [],
@@ -69,7 +66,6 @@ export function parseProps(
 				depth,
 				id: path,
 				type: "null",
-				collapsable: false,
 				editable: false,
 				value: data,
 				children: [],
@@ -86,7 +82,6 @@ export function parseProps(
 					depth,
 					id: path,
 					type: "function",
-					collapsable: false,
 					editable: false,
 					value: data,
 					children: [],
@@ -101,7 +96,6 @@ export function parseProps(
 					depth,
 					id: path,
 					type: "vnode",
-					collapsable: false,
 					editable: false,
 					value: data,
 					children: [],
@@ -116,7 +110,6 @@ export function parseProps(
 					depth,
 					id: path,
 					type: "set",
-					collapsable: false,
 					editable: false,
 					value: data,
 					children: [],
@@ -131,7 +124,6 @@ export function parseProps(
 					depth,
 					id: path,
 					type: "map",
-					collapsable: false,
 					editable: false,
 					value: data,
 					children: [],
@@ -146,7 +138,6 @@ export function parseProps(
 					depth,
 					id: path,
 					type: "blob",
-					collapsable: false,
 					editable: false,
 					value: data,
 					children: [],
@@ -156,7 +147,6 @@ export function parseProps(
 					depth,
 					id: path,
 					type: "object",
-					collapsable: Object.keys(data).length > 0,
 					editable: false,
 					value: data,
 					children: [],
@@ -178,7 +168,6 @@ export function parseProps(
 			depth,
 			id: path,
 			type: type as any,
-			collapsable: false,
 			editable: type !== "undefined" && data !== "[[Circular]]",
 			value: data,
 			children: [],
