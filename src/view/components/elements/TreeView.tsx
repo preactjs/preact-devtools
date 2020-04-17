@@ -197,7 +197,11 @@ export function TreeItem(props: { key: any; id: ID }) {
 					{node.key ? (
 						<span class={s.keyLabel}>
 							{" "}
-							key=&quot;<span class={s.key}>{node.key}</span>&quot;
+							key=&quot;
+							<span class={s.key}>
+								{node.key.length > 15 ? `${node.key.slice(0, 15)}…` : node.key}
+							</span>
+							&quot;
 						</span>
 					) : (
 						""
