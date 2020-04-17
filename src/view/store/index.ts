@@ -47,12 +47,17 @@ export function createStore(): Store {
 			}
 
 			return items;
-		}).flat();
+		}).reduce((acc, val) => acc.concat(val), []);
 	});
 
 	// Sidebar
 	const inspectData = valoo<InspectData | null>(null);
-	const sidebarUncollapsed = valoo<string[]>([]);
+
+	const sidebarUncollapsed = {
+		props: valoo<string[]>([]),
+		state: valoo<string[]>([]),
+		context: valoo<string[]>([]),
+	};
 
 	const selection = createSelectionStore(nodeList);
 

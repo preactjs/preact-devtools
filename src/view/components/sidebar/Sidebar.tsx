@@ -14,6 +14,7 @@ export function Sidebar() {
 			<PropsPanel
 				label="Props"
 				getData={d => d.props}
+				getUncollapsed={store => store.sidebarUncollapsed.props}
 				checkEditable={data => data.canEditProps}
 				onChange={(id, path, value) => emit("update-prop", { id, path, value })}
 				onCopy={onCopy}
@@ -23,6 +24,7 @@ export function Sidebar() {
 				label="State"
 				isOptional
 				getData={d => d.state}
+				getUncollapsed={store => store.sidebarUncollapsed.state}
 				checkEditable={data => data.canEditState}
 				onChange={(id, path, value) =>
 					emit("update-state", { id, path, value })
@@ -33,6 +35,7 @@ export function Sidebar() {
 				label="Context"
 				isOptional
 				getData={d => d.context}
+				getUncollapsed={store => store.sidebarUncollapsed.context}
 				checkEditable={() => true}
 				onChange={(id, path, value) =>
 					emit("update-context", { id, path, value })

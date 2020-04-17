@@ -244,4 +244,42 @@ describe("applyEvent", () => {
 		expect(spy.callCount).to.equal(1);
 		expect(spy.args[0]).to.deep.equal(["inspect", 2]);
 	});
+
+	it("should reset uncollapsed state", () => {
+		const store = createStore();
+
+		store.inspectData.$ = {
+			id: 2,
+			canEditHooks: false,
+			canEditProps: false,
+			canEditState: false,
+			context: null,
+			hooks: null,
+			name: "Foo",
+			props: null,
+			state: null,
+			type: "asd",
+		};
+
+		store.sidebarUncollapsed.props.$ = ["a", "b", "c"];
+		store.sidebarUncollapsed.state.$ = ["a", "b", "c"];
+		store.sidebarUncollapsed.context.$ = ["a", "b", "c"];
+
+		applyEvent(store, "inspect-result", {
+			id: 42,
+			name: "foo",
+			type: "string",
+			context: null,
+			canEditHooks: false,
+			hooks: null,
+			canEditProps: false,
+			props: null,
+			canEditState: false,
+			state: null,
+		});
+
+		expect(store.sidebarUncollapsed.props.$).to.deep.equal([]);
+		expect(store.sidebarUncollapsed.state.$).to.deep.equal([]);
+		expect(store.sidebarUncollapsed.context.$).to.deep.equal([]);
+	});
 });

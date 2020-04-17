@@ -152,6 +152,9 @@ export function applyEvent(store: Store, type: string, data: any) {
 			store.inspectData.$ = data;
 			if (store.selection.selected.$ !== data.id) {
 				store.selection.selectById(data.id);
+				store.sidebarUncollapsed.props.$ = [];
+				store.sidebarUncollapsed.state.$ = [];
+				store.sidebarUncollapsed.context.$ = [];
 			}
 			break;
 		case "select-node":

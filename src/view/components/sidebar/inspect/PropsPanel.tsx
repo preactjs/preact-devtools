@@ -5,9 +5,10 @@ import { useCallback } from "preact/hooks";
 import { createPropsStore, toggleCollapsed } from "../../../store/props";
 import { useInstance } from "../../utils";
 import { SidebarPanel, Empty } from "../SidebarPanel";
-import { ID } from "../../../store/types";
+import { ID, Store } from "../../../store/types";
 import { InspectData } from "../../../../adapter/adapter/adapter";
 import { NewProp } from "./NewProp";
+import { Observable } from "../../../valoo";
 
 const noop = () => null;
 
@@ -16,6 +17,7 @@ export interface Props {
 	isOptional?: boolean;
 	checkEditable: (data: InspectData) => boolean;
 	getData(data: InspectData): any;
+	getUncollapsed: (store: Store) => Observable<string[]>;
 	canAddNew?: boolean;
 	onChange: (id: ID, path: string, value: any) => void;
 	onCopy?: (data: any) => void;
@@ -23,13 +25,9 @@ export interface Props {
 
 export function PropsPanel(props: Props) {
 	const store = useStore();
-
+	const uncollapsed = useObserver(() => props.getUncollapsed(store));
 	const s = useInstance(() => {
-		return createPropsStore(
-			store.inspectData,
-			store.sidebarUncollapsed,
-			props.getData,
-		);
+		return createPropsStore(store.inspectData, uncollapsed, props.getData);
 	});
 	const inspect = useObserver(() => store.inspectData.$);
 	const items = useObserver(() => s.list.$);
@@ -60,10 +58,10 @@ export function PropsPanel(props: Props) {
 		>
 			<ElementProps
 				editable={props.checkEditable(inspect)}
-				uncollapsed={s.uncollapsed}
-				items={items.map(x => s.tree.$.get(x)!)}
+				uncollapsed={uncollapsed}
+				items={items}
 				onChange={onChange}
-				onCollapse={id => toggleCollapsed(s.uncollapsed, id)}
+				onCollapse={id => toggleCollapsed(uncollapsed, id)}
 			/>
 			{props.canAddNew && <NewProp onChange={onChange} />}
 		</SidebarPanel>
