@@ -5,8 +5,6 @@ import { FileCopy } from "../icons";
 
 export interface Props {
 	title: string;
-	empty: string;
-	isEmpty?: boolean;
 	onCopy?: () => void;
 	children?: ComponentChildren;
 }
@@ -22,13 +20,7 @@ export function SidebarPanel(props: Props) {
 					</IconBtn>
 				)}
 			</header>
-			<div class={s.content}>
-				{props.children == null || props.isEmpty ? (
-					<span class={s.empty}>{props.empty}</span>
-				) : (
-					props.children
-				)}
-			</div>
+			<div class={s.content}>{props.children}</div>
 		</div>
 	);
 }

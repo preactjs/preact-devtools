@@ -16,7 +16,7 @@ export function CommitInfo() {
 	const root = commit.nodes.get(commit.commitRootId)!;
 
 	return (
-		<SidebarPanel title="Commit Stats" empty="None">
+		<SidebarPanel title="Commit Stats">
 			<dl class={s.list}>
 				<dt class={s.title}>Start:</dt>
 				<dd class={s.value}>{formatTime(root.startTime)}</dd>

@@ -1,6 +1,6 @@
 import { h } from "preact";
 import { useStore, useObserver } from "../../../../store/react-bindings";
-import { SidebarPanel } from "../../../sidebar/SidebarPanel";
+import { SidebarPanel, Empty } from "../../../sidebar/SidebarPanel";
 import s from "./RenderedAt.css";
 import { formatTime } from "../../util";
 import { mapParents } from "../../flamegraph/transform/util";
@@ -34,27 +34,28 @@ export function RenderedAt() {
 	if (data.length <= 0) return null;
 
 	return (
-		<SidebarPanel
-			title="Rendered at:"
-			isEmpty={data.length <= 0}
-			empty="Did not render during this profiling session"
-		>
-			<nav>
-				{data.map(node => {
-					return (
-						<button
-							key={node.id}
-							class={s.item}
-							data-active={commitIdx === node.id}
-							onClick={() => (store.profiler.activeCommitIdx.$ = node.id)}
-						>
-							<span>
-								{formatTime(node.startTime)} for {formatTime(node.selfDuration)}
-							</span>
-						</button>
-					);
-				})}
-			</nav>
+		<SidebarPanel title="Rendered at:">
+			{data.length <= 0 ? (
+				<Empty>Did not render during this profiling session</Empty>
+			) : (
+				<nav>
+					{data.map(node => {
+						return (
+							<button
+								key={node.id}
+								class={s.item}
+								data-active={commitIdx === node.id}
+								onClick={() => (store.profiler.activeCommitIdx.$ = node.id)}
+							>
+								<span>
+									{formatTime(node.startTime)} for{" "}
+									{formatTime(node.selfDuration)}
+								</span>
+							</button>
+						);
+					})}
+				</nav>
+			)}
 		</SidebarPanel>
 	);
 }

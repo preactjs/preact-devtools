@@ -56,7 +56,7 @@ export function RenderReasons() {
 	}
 
 	return (
-		<SidebarPanel title="Render reasons" empty="Did not render">
+		<SidebarPanel title="Render reasons">
 			<div data-testid="render-reasons">
 				{reason !== null ? (
 					<dl class={s.reason}>
