@@ -1,16 +1,24 @@
-import { Observable, watch } from "../valoo";
 import { parseProps, PropData } from "../components/sidebar/inspect/parseProps";
-import { InspectData } from "../../adapter/adapter/adapter";
 import { flattenChildren } from "../components/tree/windowing";
 
 const PROPS_LIMIT = 7;
-function parseInspectData(
-	v: InspectData | null,
-	getData: (data: InspectData) => any,
+
+export function isCollapsed(ids: string[], id: string) {
+	return id !== "root" && ids.indexOf(id) === -1;
+}
+
+/**
+ * Props, Context and State are passed as serialized objects.
+ * We just need to convert that into a tree-like structure
+ * for rendering.
+ */
+export function parseObjectState(
+	data: Record<string, any> | null,
+	uncollapsed: string[],
 ) {
-	const newTree = new Map<string, PropData>();
-	if (v != null) {
-		newTree.set("root", {
+	if (data != null) {
+		const tree = new Map<string, PropData>();
+		tree.set("root", {
 			children: [],
 			depth: 0,
 			editable: false,
@@ -19,37 +27,12 @@ function parseInspectData(
 			value: null,
 		});
 
-		parseProps(getData(v), "root", PROPS_LIMIT, newTree);
-	}
-
-	return newTree;
-}
-
-export function isCollapsed(ids: string[], id: string) {
-	return id !== "root" && ids.indexOf(id) === -1;
-}
-
-export function createPropsStore(
-	inspectData: Observable<InspectData | null>,
-	uncollapsed: Observable<string[]>,
-	getData: (data: InspectData) => any,
-) {
-	const list = watch(() => {
-		const tree = parseInspectData(inspectData.$, getData);
+		parseProps(data, "root", PROPS_LIMIT, tree);
 		const { items } = flattenChildren(tree, "root", id => {
-			return (
-				tree.get(id)!.children.length > 0 && isCollapsed(uncollapsed.$, id)
-			);
+			return tree.get(id)!.children.length > 0 && isCollapsed(uncollapsed, id);
 		});
 		return items.slice(1).map(id => tree.get(id)!);
-	});
+	}
 
-	return { list, destroy: () => null };
-}
-
-export function toggleCollapsed(uncollapsed: Observable<string[]>, id: string) {
-	const idx = uncollapsed.$.indexOf(id);
-	uncollapsed.update(v => {
-		idx > -1 ? v.splice(idx, 1) : v.push(id);
-	});
+	return [];
 }

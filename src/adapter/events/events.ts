@@ -148,15 +148,20 @@ export function applyEvent(store: Store, type: string, data: any) {
 		case "operation_v2":
 			applyOperationsV2(store, data);
 			break;
-		case "inspect-result":
+		case "inspect-result": {
+			const { props, state, context } = store.sidebar;
 			store.inspectData.$ = data;
+
 			if (store.selection.selected.$ !== data.id) {
 				store.selection.selectById(data.id);
-				store.sidebarUncollapsed.props.$ = [];
-				store.sidebarUncollapsed.state.$ = [];
-				store.sidebarUncollapsed.context.$ = [];
+
+				// Reset collapsible state
+				props.uncollapsed.$ = [];
+				state.uncollapsed.$ = [];
+				context.uncollapsed.$ = [];
 			}
 			break;
+		}
 		case "select-node":
 			store.selection.selectById(data);
 			break;

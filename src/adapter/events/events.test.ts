@@ -255,9 +255,9 @@ describe("applyEvent", () => {
 			type: "asd",
 		};
 
-		store.sidebarUncollapsed.props.$ = ["a", "b", "c"];
-		store.sidebarUncollapsed.state.$ = ["a", "b", "c"];
-		store.sidebarUncollapsed.context.$ = ["a", "b", "c"];
+		store.sidebar.props.uncollapsed.$ = ["a", "b", "c"];
+		store.sidebar.state.uncollapsed.$ = ["a", "b", "c"];
+		store.sidebar.context.uncollapsed.$ = ["a", "b", "c"];
 
 		applyEvent(store, "inspect-result", {
 			id: 42,
@@ -269,8 +269,8 @@ describe("applyEvent", () => {
 			state: null,
 		});
 
-		expect(store.sidebarUncollapsed.props.$).to.deep.equal([]);
-		expect(store.sidebarUncollapsed.state.$).to.deep.equal([]);
-		expect(store.sidebarUncollapsed.context.$).to.deep.equal([]);
+		expect(store.sidebar.props.uncollapsed.$).to.deep.equal([]);
+		expect(store.sidebar.state.uncollapsed.$).to.deep.equal([]);
+		expect(store.sidebar.context.uncollapsed.$).to.deep.equal([]);
 	});
 });
