@@ -10,7 +10,6 @@ import { isCollapsed } from "../../../store/props";
 export type ChangeFn = (value: any, path: string) => void;
 
 export interface Props {
-	editable?: boolean;
 	onChange?: ChangeFn;
 	onCollapse?: (path: string) => void;
 	uncollapsed: Observable<string[]>;
@@ -18,7 +17,7 @@ export interface Props {
 }
 
 export function ElementProps(props: Props) {
-	const { editable, onChange, uncollapsed, items, onCollapse } = props;
+	const { onChange, uncollapsed, items, onCollapse } = props;
 
 	return (
 		<div class={s.root}>
@@ -34,7 +33,7 @@ export function ElementProps(props: Props) {
 							collapseable={item.children.length > 0}
 							collapsed={isCollapsed(uncollapsed.$, id)}
 							onCollapse={() => onCollapse && onCollapse(id)}
-							editable={editable && item.editable}
+							editable={item.editable}
 							value={item.value}
 							onChange={onChange}
 							depth={item.depth}

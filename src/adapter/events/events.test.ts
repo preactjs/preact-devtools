@@ -223,9 +223,6 @@ describe("applyEvent", () => {
 
 		store.inspectData.$ = {
 			id: 2,
-			canEditHooks: false,
-			canEditProps: false,
-			canEditState: false,
 			context: null,
 			hooks: null,
 			name: "Foo",
@@ -250,9 +247,6 @@ describe("applyEvent", () => {
 
 		store.inspectData.$ = {
 			id: 2,
-			canEditHooks: false,
-			canEditProps: false,
-			canEditState: false,
 			context: null,
 			hooks: null,
 			name: "Foo",
@@ -270,11 +264,8 @@ describe("applyEvent", () => {
 			name: "foo",
 			type: "string",
 			context: null,
-			canEditHooks: false,
 			hooks: null,
-			canEditProps: false,
 			props: null,
-			canEditState: false,
 			state: null,
 		});
 

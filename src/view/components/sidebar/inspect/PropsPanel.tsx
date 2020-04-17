@@ -15,7 +15,6 @@ const noop = () => null;
 export interface Props {
 	label: string;
 	isOptional?: boolean;
-	checkEditable: (data: InspectData) => boolean;
 	getData(data: InspectData): any;
 	getUncollapsed: (store: Store) => Observable<string[]>;
 	canAddNew?: boolean;
@@ -57,7 +56,6 @@ export function PropsPanel(props: Props) {
 			}}
 		>
 			<ElementProps
-				editable={props.checkEditable(inspect)}
 				uncollapsed={uncollapsed}
 				items={items}
 				onChange={onChange}
