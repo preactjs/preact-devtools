@@ -28,8 +28,17 @@ let hookLog: HookData[] = [];
 let inspectingHooks = false;
 let ancestorName = "unknown";
 
+let ignoreNext = false;
 export function addHookStack(type: HookType) {
-	if (!inspectingHooks) return;
+	if (!inspectingHooks || ignoreNext) {
+		ignoreNext = false;
+		return;
+	}
+
+	// Ignore next useState call coming from useErrorBoundary
+	if (type === HookType.useErrorBoundary) {
+		ignoreNext = true;
+	}
 
 	// By default browser limit stack trace length to 10 entries
 	const oldLimit = Error.stackTraceLimit;
@@ -46,7 +55,8 @@ export function addHookStack(type: HookType) {
 		if (
 			type === HookType.useState ||
 			type === HookType.useImperativeHandle ||
-			type === HookType.useCallback
+			type === HookType.useCallback ||
+			type === HookType.useRef
 		) {
 			trim += 1;
 		}
@@ -107,14 +117,17 @@ export function parseHookData(
 			let id = `${parentId}.${frame.location}.${frame.name}`;
 
 			if (!tree.has(id)) {
-				let value = "__preact_emtpy__";
+				let value: any = "__preact_empty__";
 				let editable = false;
 
 				if (isNative) {
-					const s = getHookState(component, hookIdx);
+					const s = getHookState(component, hookIdx, hook.type);
 					const rawValue = Array.isArray(s) ? s[0] : s;
 					value = serialize(config, rawValue);
-					editable = isEditable(rawValue);
+					editable =
+						(hook.type === HookType.useState ||
+							hook.type === HookType.useReducer) &&
+						isEditable(rawValue);
 					id += `.${type}`;
 				}
 

@@ -6,8 +6,8 @@
 		: t((n.preactHooks = {}), n.preact);
 })(this, function (n, t) {
 	var u,
-		r,
 		i,
+		r,
 		o = 0,
 		f = [],
 		e = t.options.__r,
@@ -15,20 +15,20 @@
 		a = t.options.__c,
 		v = t.options.unmount;
 	function p(n, u) {
-		t.options.__h && t.options.__h(r, n, o || u), (o = 0);
-		var i = r.__H || (r.__H = { __: [], __h: [] });
-		return n >= i.__.length && i.__.push({}), i.__[n];
+		t.options.__h && t.options.__h(i, n, o || u), (o = 0);
+		var r = i.__H || (i.__H = { __: [], __h: [] });
+		return n >= r.__.length && r.__.push({}), r.__[n];
 	}
 	function d(n) {
 		return (o = 1), y(q, n);
 	}
-	function y(n, t, i) {
+	function y(n, t, r) {
 		var o = p(u++, 2);
 		return (
 			o.__c ||
-				((o.__c = r),
+				((o.__c = i),
 				(o.__ = [
-					i ? i(t) : q(void 0, t),
+					r ? r(t) : q(void 0, t),
 					function (t) {
 						var u = n(o.__[0], t);
 						o.__[0] !== u && ((o.__[0] = u), o.__c.setState({}));
@@ -37,13 +37,13 @@
 			o.__
 		);
 	}
-	function s(n, i) {
+	function s(n, r) {
 		var o = p(u++, 4);
-		!t.options.__s && T(o.__H, i) && ((o.__ = n), (o.__H = i), r.__h.push(o));
+		!t.options.__s && T(o.__H, r) && ((o.__ = n), (o.__H = r), i.__h.push(o));
 	}
 	function l(n, t) {
-		var r = p(u++, 7);
-		return T(r.__H, t) ? ((r.__H = t), (r.__h = n), (r.__ = n())) : r.__;
+		var i = p(u++, 7);
+		return T(i.__H, t) ? ((i.__H = t), (i.__h = n), (i.__ = n())) : i.__;
 	}
 	function m() {
 		f.some(function (n) {
@@ -77,25 +77,25 @@
 	(t.options.__r = function (n) {
 		e && e(n),
 			(u = 0),
-			(r = n.__c).__H &&
-				(r.__H.__h.forEach(h), r.__H.__h.forEach(x), (r.__H.__h = []));
+			(i = n.__c).__H &&
+				(i.__H.__h.forEach(h), i.__H.__h.forEach(x), (i.__H.__h = []));
 	}),
 		(t.options.diffed = function (n) {
 			c && c(n);
 			var u = n.__c;
 			if (u) {
-				var r = u.__H;
-				r &&
-					r.__h.length &&
-					((1 !== f.push(u) && i === t.options.requestAnimationFrame) ||
+				var i = u.__H;
+				i &&
+					i.__h.length &&
+					((1 !== f.push(u) && r === t.options.requestAnimationFrame) ||
 						(
-							(i = t.options.requestAnimationFrame) ||
+							(r = t.options.requestAnimationFrame) ||
 							function (n) {
 								var t,
 									u = function () {
-										clearTimeout(r), cancelAnimationFrame(t), setTimeout(n);
+										clearTimeout(i), cancelAnimationFrame(t), setTimeout(n);
 									},
-									r = setTimeout(u, 100);
+									i = setTimeout(u, 100);
 								"undefined" != typeof window && (t = requestAnimationFrame(u));
 							}
 						)(m));
@@ -108,12 +108,12 @@
 						(n.__h = n.__h.filter(function (n) {
 							return !n.__ || x(n);
 						}));
-				} catch (r) {
+				} catch (i) {
 					u.some(function (n) {
 						n.__h && (n.__h = []);
 					}),
 						(u = []),
-						t.options.__e(r, n.__v);
+						t.options.__e(i, n.__v);
 				}
 			}),
 				a && a(n, u);
@@ -122,10 +122,10 @@
 			v && v(n);
 			var u = n.__c;
 			if (u) {
-				var r = u.__H;
-				if (r)
+				var i = u.__H;
+				if (i)
 					try {
-						r.__.forEach(function (n) {
+						i.__.forEach(function (n) {
 							return n.t && n.t();
 						});
 					} catch (n) {
@@ -135,11 +135,11 @@
 		}),
 		(n.useState = d),
 		(n.useReducer = y),
-		(n.useEffect = function (n, i) {
+		(n.useEffect = function (n, r) {
 			var o = p(u++, 3);
 			!t.options.__s &&
-				T(o.__H, i) &&
-				((o.__ = n), (o.__H = i), r.__H.__h.push(o));
+				T(o.__H, r) &&
+				((o.__ = n), (o.__H = r), i.__H.__h.push(o));
 		}),
 		(n.useLayoutEffect = s),
 		(n.useRef = function (n) {
@@ -169,27 +169,29 @@
 			);
 		}),
 		(n.useContext = function (n) {
-			var t = r.context[n.__c];
-			if (!t) return n.__;
-			var i = p(u++, 9);
-			return null == i.__ && ((i.__ = !0), t.sub(r)), t.props.value;
+			var t = i.context[n.__c],
+				r = p(u++, 9);
+			return (
+				(r.__c = n),
+				t ? (null == r.__ && ((r.__ = !0), t.sub(i)), t.props.value) : n.__
+			);
 		}),
 		(n.useDebugValue = function (n, u) {
 			t.options.useDebugValue && t.options.useDebugValue(u ? u(n) : n);
 		}),
 		(n.useErrorBoundary = function (n) {
 			var t = p(u++, 10),
-				i = d();
+				r = d();
 			return (
 				(t.__ = n),
-				r.componentDidCatch ||
-					(r.componentDidCatch = function (n) {
-						t.__ && t.__(n), i[1](n);
+				i.componentDidCatch ||
+					(i.componentDidCatch = function (n) {
+						t.__ && t.__(n), r[1](n);
 					}),
 				[
-					i[0],
+					r[0],
 					function () {
-						i[1](void 0);
+						r[1](void 0);
 					},
 				]
 			);

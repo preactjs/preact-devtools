@@ -1,5 +1,15 @@
-const { h, render } = preact;
-const { useState, useEffect, useLayoutEffect, useCallback } = preactHooks;
+const { h, render, createContext, createRef } = preact;
+const {
+	useState,
+	useEffect,
+	useLayoutEffect,
+	useCallback,
+	useMemo,
+	useRef,
+	useContext,
+	useImperativeHandle,
+	useErrorBoundary,
+} = preactHooks;
 
 function Display(props) {
 	return html` <div data-testid=${props.testId}>Counter: ${props.value}</div> `;
@@ -12,6 +22,17 @@ function Counter() {
 		<div style="padding: 2rem;">
 			<${Display} value=${v} testId="result" />
 			<button onClick=${() => set(v + 1)}>Increment</button>
+		</div>
+	`;
+}
+
+function CallbackOnly() {
+	const cb = useCallback(() => 2, []);
+
+	return html`
+		<div style="padding: 2rem;">
+			<${Display} value="0" testId="callback-result" />
+			<button onClick=${cb}>Increment</button>
 		</div>
 	`;
 }
@@ -46,6 +67,28 @@ function Effect() {
 	return html`<p>effect: ${effect}</p>`;
 }
 
+function Memo() {
+	const v = useMemo(() => 0, []);
+	return html`<p>Memo: ${v}</p>`;
+}
+
+function RefComponent() {
+	const v = useRef(0);
+	return html`<p>Ref: ${v.current}</p>`;
+}
+
+const Ctx = createContext(0);
+
+function ContextComponent() {
+	const v = useContext(Ctx);
+	return html`<p>Context: ${v}</p>`;
+}
+
+function ContextNoProvider() {
+	const v = useContext(Ctx);
+	return html`<p>NoProvider: ${v}</p>`;
+}
+
 let customHook = 0;
 const useBar = () => {
 	useEffect(() => customHook++, []);
@@ -76,12 +119,40 @@ function CustomHooks3() {
 	return html`<p>Custom hooks: ${"" + v}, ${"" + v2} ${customHook}</p>`;
 }
 
+const refOuter = createRef();
+function ImperativeHandle() {
+	useImperativeHandle(refOuter, () => ({
+		focus: () => null,
+	}));
+	return html`<input />`;
+}
+
+function ErrorBoundary1() {
+	useErrorBoundary();
+	return html`<p>Error Boundary 1</p>`;
+}
+
+function ErrorBoundary2() {
+	useErrorBoundary(() => null);
+	return html`<p>Error Boundary 2</p>`;
+}
+
 render(
 	html`
 		<${Counter} />
 		<${CounterCallback} />
-		<${LayoutEffect} />
+		<${CallbackOnly} />
+		<${Memo} />
+		<${RefComponent} />
 		<${Effect} />
+		<${Ctx.Provider} value="foobar">
+			<${ContextComponent} />
+		<//>
+		<${ContextNoProvider} />
+		<${LayoutEffect} />
+		<${ImperativeHandle} />
+		<${ErrorBoundary1} />
+		<${ErrorBoundary2} />
 		<${CustomHooks} />
 		<${CustomHooks2} />
 		<${CustomHooks3} />

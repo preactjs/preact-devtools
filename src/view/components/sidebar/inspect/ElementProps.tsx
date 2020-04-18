@@ -90,11 +90,12 @@ export function SingleItem(props: SingleProps) {
 					<Arrow />
 					<span
 						class={s.name}
-						data-type={value !== "__preact_emtpy__" ? type : "empty"}
+						data-testid="prop-name"
+						data-type={value !== "__preact_empty__" ? type : "empty"}
 					>
 						{name}
 					</span>
-					{value !== "__preact_emtpy__" && (
+					{value !== "__preact_empty__" && (
 						<span class={s.property} data-testid="prop-value">
 							<span class={s.mask}>{genPreview(value)}</span>
 						</span>
@@ -107,19 +108,24 @@ export function SingleItem(props: SingleProps) {
 						class={`${s.name} ${s.noCollapse} ${s.nameStatic} ${
 							editable ? s.nameEditable : ""
 						}`}
-						data-type={type}
+						data-testid="prop-name"
+						data-type={value !== "__preact_empty__" ? type : "empty"}
 					>
 						{name}
 					</span>
 					<div class={s.property} data-testid="prop-value">
-						{editable ? (
-							<DataInput
-								value={value}
-								onChange={v => onChange && onChange(v)}
-								name={`${id}`}
-							/>
-						) : (
-							<div class={s.mask}>{genPreview(value)}</div>
+						{value !== "__preact_empty__" && (
+							<Fragment>
+								{editable ? (
+									<DataInput
+										value={value}
+										onChange={v => onChange && onChange(v)}
+										name={`${id}`}
+									/>
+								) : (
+									<div class={s.mask}>{genPreview(value)}</div>
+								)}
+							</Fragment>
 						)}
 					</div>
 				</Fragment>
