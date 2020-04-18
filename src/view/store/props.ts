@@ -21,6 +21,7 @@ export function parseObjectState(
 		tree.set("root", {
 			children: [],
 			depth: 0,
+			name: "root",
 			editable: false,
 			id: "root",
 			type: "object",

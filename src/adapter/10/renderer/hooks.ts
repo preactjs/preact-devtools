@@ -78,6 +78,7 @@ export function parseHookData(
 	const root: PropData = {
 		children: [],
 		depth: 0,
+		name: "root",
 		editable: false,
 		id: "root",
 		type: "object",
@@ -115,6 +116,7 @@ export function parseHookData(
 					editable,
 					id,
 					type: "undefined",
+					name: isNative ? type : frame.name,
 					meta: isNative
 						? {
 								index: hookIdx,

@@ -16,6 +16,7 @@ export type PropDataType =
 
 export interface PropData {
 	id: string;
+	name: string;
 	type: PropDataType;
 	value: any;
 	editable: boolean;
@@ -35,10 +36,13 @@ export function parseProps(
 		return out;
 	}
 
+	const name = path.slice(path.lastIndexOf(".") + 1);
+
 	if (Array.isArray(data)) {
 		const children: string[] = [];
 		out.set(path, {
 			depth,
+			name,
 			id: path,
 			type: "array",
 			editable: false,
@@ -55,6 +59,7 @@ export function parseProps(
 		// TODO: We're dealing with serialized data here, not a Set object
 		out.set(path, {
 			depth,
+			name,
 			id: path,
 			type: "set",
 			editable: false,
@@ -66,6 +71,7 @@ export function parseProps(
 		if (data === null) {
 			out.set(path, {
 				depth,
+				name,
 				id: path,
 				type: "null",
 				editable: false,
@@ -83,6 +89,7 @@ export function parseProps(
 			) {
 				out.set(path, {
 					depth,
+					name,
 					id: path,
 					type: "function",
 					editable: false,
@@ -98,6 +105,7 @@ export function parseProps(
 			) {
 				out.set(path, {
 					depth,
+					name,
 					id: path,
 					type: "vnode",
 					editable: false,
@@ -113,6 +121,7 @@ export function parseProps(
 			) {
 				out.set(path, {
 					depth,
+					name,
 					id: path,
 					type: "set",
 					editable: false,
@@ -128,6 +137,7 @@ export function parseProps(
 			) {
 				out.set(path, {
 					depth,
+					name,
 					id: path,
 					type: "map",
 					editable: false,
@@ -143,6 +153,7 @@ export function parseProps(
 			) {
 				out.set(path, {
 					depth,
+					name,
 					id: path,
 					type: "blob",
 					editable: false,
@@ -153,6 +164,7 @@ export function parseProps(
 			} else {
 				const node: PropData = {
 					depth,
+					name,
 					id: path,
 					type: "object",
 					editable: false,
@@ -175,6 +187,7 @@ export function parseProps(
 		const type = typeof data;
 		out.set(path, {
 			depth,
+			name,
 			id: path,
 			type: type as any,
 			editable: type !== "undefined" && data !== "[[Circular]]",
