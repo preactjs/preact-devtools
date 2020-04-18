@@ -12,8 +12,7 @@ export type PropDataType =
 	| "bigint"
 	| "vnode"
 	| "blob"
-	| "symbol"
-	| "__meta__";
+	| "symbol";
 
 export interface PropData {
 	id: string;
@@ -32,7 +31,6 @@ export function parseProps(
 	out: Map<string, PropData>,
 ): Map<string, PropData> {
 	const depth = (path.match(/\./g) || []).length;
-
 	if (depth >= limit) {
 		return out;
 	}
@@ -75,128 +73,115 @@ export function parseProps(
 				children: [],
 				meta: null,
 			});
-		} else if (typeof data === "object") {
-			if (data === null) {
+		} else {
+			const maybeCustom = Object.keys(data).length === 2;
+			// Functions are encoded as objects
+			if (
+				maybeCustom &&
+				typeof data.name === "string" &&
+				data.type === "function"
+			) {
 				out.set(path, {
 					depth,
 					id: path,
-					type: "null",
+					type: "function",
+					editable: false,
+					value: data,
+					children: [],
+					meta: null,
+				});
+			} else if (
+				// Same for vnodes
+				maybeCustom &&
+				typeof data.name === "string" &&
+				data.type === "vnode"
+			) {
+				out.set(path, {
+					depth,
+					id: path,
+					type: "vnode",
+					editable: false,
+					value: data,
+					children: [],
+					meta: null,
+				});
+			} else if (
+				// Same for Set
+				maybeCustom &&
+				typeof data.name === "string" &&
+				data.type === "set"
+			) {
+				out.set(path, {
+					depth,
+					id: path,
+					type: "set",
+					editable: false,
+					value: data,
+					children: [],
+					meta: null,
+				});
+			} else if (
+				// Same for Map
+				maybeCustom &&
+				typeof data.name === "string" &&
+				data.type === "map"
+			) {
+				out.set(path, {
+					depth,
+					id: path,
+					type: "map",
+					editable: false,
+					value: data,
+					children: [],
+					meta: null,
+				});
+			} else if (
+				// Same for Blobs
+				maybeCustom &&
+				typeof data.name === "string" &&
+				data.type === "blob"
+			) {
+				out.set(path, {
+					depth,
+					id: path,
+					type: "blob",
 					editable: false,
 					value: data,
 					children: [],
 					meta: null,
 				});
 			} else {
-				const maybeCustom = Object.keys(data).length === 2;
-				// Functions are encoded as objects
-				if (
-					maybeCustom &&
-					typeof data.name === "string" &&
-					data.type === "function"
-				) {
-					out.set(path, {
-						depth,
-						id: path,
-						type: "function",
-						editable: false,
-						value: data,
-						children: [],
-						meta: null,
-					});
-				} else if (
-					// Same for vnodes
-					maybeCustom &&
-					typeof data.name === "string" &&
-					data.type === "vnode"
-				) {
-					out.set(path, {
-						depth,
-						id: path,
-						type: "vnode",
-						editable: false,
-						value: data,
-						children: [],
-						meta: null,
-					});
-				} else if (
-					// Same for Set
-					maybeCustom &&
-					typeof data.name === "string" &&
-					data.type === "set"
-				) {
-					out.set(path, {
-						depth,
-						id: path,
-						type: "set",
-						editable: false,
-						value: data,
-						children: [],
-						meta: null,
-					});
-				} else if (
-					// Same for Map
-					maybeCustom &&
-					typeof data.name === "string" &&
-					data.type === "map"
-				) {
-					out.set(path, {
-						depth,
-						id: path,
-						type: "map",
-						editable: false,
-						value: data,
-						children: [],
-						meta: null,
-					});
-				} else if (
-					// Same for Blobs
-					maybeCustom &&
-					typeof data.name === "string" &&
-					data.type === "blob"
-				) {
-					out.set(path, {
-						depth,
-						id: path,
-						type: "blob",
-						editable: false,
-						value: data,
-						children: [],
-						meta: null,
-					});
-				} else {
-					// Check if
-					const node: PropData = {
-						depth,
-						id: path,
-						type: "object",
-						editable: false,
-						value: data,
-						children: [],
-						meta: null,
-					};
-					out.set(path, node);
+				const node: PropData = {
+					depth,
+					id: path,
+					type: "object",
+					editable: false,
+					value: data,
+					children: [],
+					meta: null,
+				};
+				out.set(path, node);
 
-					Object.keys(data).forEach(key => {
-						const nextPath = `${path}.${key}`;
-						node.children.push(nextPath);
-						parseProps(data[key], nextPath, limit, out);
-					});
+				Object.keys(data).forEach(key => {
+					const nextPath = `${path}.${key}`;
+					node.children.push(nextPath);
+					parseProps(data[key], nextPath, limit, out);
+				});
 
-					out.set(path, node);
-				}
+				out.set(path, node);
 			}
-		} else {
-			const type = typeof data;
-			out.set(path, {
-				depth,
-				id: path,
-				type: type as any,
-				editable: type !== "undefined" && data !== "[[Circular]]",
-				value: data,
-				children: [],
-				meta: null,
-			});
 		}
+	} else {
+		const type = typeof data;
+		out.set(path, {
+			depth,
+			id: path,
+			type: type as any,
+			editable: type !== "undefined" && data !== "[[Circular]]",
+			value: data,
+			children: [],
+			meta: null,
+		});
 	}
 
 	return out;
