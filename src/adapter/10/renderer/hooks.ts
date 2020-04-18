@@ -98,7 +98,7 @@ export function parseHookData(
 			let id = `${parentId}.${frame.location}.${frame.name}`;
 
 			if (!tree.has(id)) {
-				let value = undefined;
+				let value = "__preact_emtpy__";
 				let editable = false;
 
 				if (isNative) {

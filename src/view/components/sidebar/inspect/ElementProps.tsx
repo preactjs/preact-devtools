@@ -88,12 +88,17 @@ export function SingleItem(props: SingleProps) {
 					onClick={() => onCollapse && onCollapse(id)}
 				>
 					<Arrow />
-					<span class={s.name} data-type={type}>
+					<span
+						class={s.name}
+						data-type={value !== "__preact_emtpy__" ? type : "empty"}
+					>
 						{name}
 					</span>
-					<span class={s.property} data-testid="prop-value">
-						<span class={s.mask}>{genPreview(value)}</span>
-					</span>
+					{value !== "__preact_emtpy__" && (
+						<span class={s.property} data-testid="prop-value">
+							<span class={s.mask}>{genPreview(value)}</span>
+						</span>
+					)}
 				</button>
 			)}
 			{!collapseable && (

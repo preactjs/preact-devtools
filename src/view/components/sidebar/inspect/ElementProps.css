@@ -32,7 +32,7 @@
 	color: var(--name-dynamic);
 }
 
-.name::after {
+.name:not([data-type="empty"])::after {
 	content: ":";
 	/**
 	 * Firefox doesn't reset ::after elements somehow.
