@@ -30,6 +30,11 @@ let ancestorName = "unknown";
 
 export function addHookStack(type: HookType) {
 	if (!inspectingHooks) return;
+
+	// By default browser limit stack trace length to 10 entries
+	const oldLimit = Error.stackTraceLimit;
+	Error.stackTraceLimit = 1000;
+
 	const err = new Error();
 	let stack = err.stack ? parseStackTrace(err.stack) : [];
 	const ancestorIdx = stack.findIndex(x => x.name === ancestorName);
@@ -67,6 +72,9 @@ export function addHookStack(type: HookType) {
 	}
 
 	hookLog.push({ type, stack: normalized });
+
+	// Restore original stack trace limit
+	Error.stackTraceLimit = oldLimit;
 }
 
 export function parseHookData(
@@ -115,8 +123,8 @@ export function parseHookData(
 					depth: hook.stack.length - i - 1,
 					editable,
 					id,
-					type: "undefined",
 					name: isNative ? type : frame.name,
+					type: "undefined",
 					meta: isNative
 						? {
 								index: hookIdx,
