@@ -61,6 +61,21 @@ function CustomHooks() {
 	return html`<p>Custom hooks: ${"" + v}, ${customHook}</p>`;
 }
 
+function CustomHooks2() {
+	const [v] = useBar();
+	const [v2] = useBar();
+	return html`<p>Custom hooks: ${"" + v}, ${"" + v2} ${customHook}</p>`;
+}
+
+const useBob = () => useFoo();
+const useBoof = () => useBob();
+
+function CustomHooks3() {
+	const [v] = useBar();
+	const [v2] = useBoof();
+	return html`<p>Custom hooks: ${"" + v}, ${"" + v2} ${customHook}</p>`;
+}
+
 render(
 	html`
 		<${Counter} />
@@ -68,6 +83,8 @@ render(
 		<${LayoutEffect} />
 		<${Effect} />
 		<${CustomHooks} />
+		<${CustomHooks2} />
+		<${CustomHooks3} />
 	`,
 	document.getElementById("app"),
 );

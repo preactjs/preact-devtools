@@ -15,7 +15,7 @@
 		a = t.options.__c,
 		v = t.options.unmount;
 	function p(n, u) {
-		t.options.__h && t.options.__h(r, n, u);
+		t.options.__h && t.options.__h(r, n, o || u), (o = 0);
 		var i = r.__H || (r.__H = { __: [], __h: [] });
 		return n >= i.__.length && i.__.push({}), i.__[n];
 	}
@@ -23,19 +23,18 @@
 		return (o = 1), y(q, n);
 	}
 	function y(n, t, i) {
-		var f = p(u++, o || 2);
+		var o = p(u++, 2);
 		return (
-			(o = 0),
-			f.__c ||
-				((f.__c = r),
-				(f.__ = [
+			o.__c ||
+				((o.__c = r),
+				(o.__ = [
 					i ? i(t) : q(void 0, t),
 					function (t) {
-						var u = n(f.__[0], t);
-						f.__[0] !== u && ((f.__[0] = u), f.__c.setState({}));
+						var u = n(o.__[0], t);
+						o.__[0] !== u && ((o.__[0] = u), o.__c.setState({}));
 					},
 				])),
-			f.__
+			o.__
 		);
 	}
 	function s(n, i) {

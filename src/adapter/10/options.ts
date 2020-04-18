@@ -9,7 +9,7 @@ import {
 	getStatefulHookValue,
 	getComponent,
 } from "./vnode";
-import { addHookStack } from "./renderer/inspectVNode";
+import { addHookStack } from "./renderer/hooks";
 
 /**
  * Inject tracking into setState

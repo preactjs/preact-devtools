@@ -6,6 +6,7 @@ import { ID } from "../../view/store/types";
 import { createHightlighter } from "./highlight";
 import { parseFilters } from "./filter";
 import { PortPageHook } from "./port";
+import { PropData } from "../../view/components/sidebar/inspect/parseProps";
 
 export type Path = Array<string | number>;
 
@@ -27,7 +28,7 @@ export interface InspectData {
 	name: string;
 	type: any;
 	context: Record<string, any> | null;
-	hooks: any | null;
+	hooks: PropData[] | null;
 	props: Record<string, any> | null;
 	state: Record<string, any> | null;
 }

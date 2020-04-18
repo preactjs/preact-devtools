@@ -1,6 +1,7 @@
 import { getActualChildren } from "./vnode";
 import { VNode } from "preact";
 import { ObjPath } from "../renderer";
+import { RendererConfig10, serializeVNode } from "./renderer";
 
 export function traverse(vnode: VNode, fn: (vnode: VNode) => void) {
 	fn(vnode);
@@ -64,6 +65,21 @@ export function jsonify(
 		}
 		default:
 			return data;
+	}
+}
+
+export function serialize(config: RendererConfig10, data: object | null) {
+	return jsonify(data, node => serializeVNode(node, config), new Set());
+}
+
+export function isEditable(x: any) {
+	switch (typeof x) {
+		case "string":
+		case "number":
+		case "boolean":
+			return true;
+		default:
+			return false;
 	}
 }
 

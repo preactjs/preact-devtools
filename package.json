@@ -72,7 +72,7 @@
 	},
 	"dependencies": {
 		"escape-string-regexp": "^3.0.0",
-		"errorstacks": "^1.0.0",
+		"errorstacks": "^1.1.4",
 		"json5-es": "^2.1.1"
 	},
 	"peerDependency": {

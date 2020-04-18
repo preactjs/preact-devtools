@@ -37,3 +37,29 @@ export function parseObjectState(
 
 	return [];
 }
+
+export function filterCollapsed<T extends { id: string; children: string[] }>(
+	items: T[],
+	uncollapsed: string[],
+): T[] {
+	const skip = new Set<string>();
+	const visible = new Set<string>();
+
+	return items.filter(node => {
+		const isUncollapsed = uncollapsed.indexOf(node.id) > -1;
+		if (node.id === "root" || isUncollapsed) {
+			node.children.forEach(childId => visible.add(childId));
+		}
+
+		if (
+			node.id !== "root" &&
+			!visible.has(node.id) &&
+			(skip.has(node.id) || !isUncollapsed)
+		) {
+			node.children.forEach(childId => skip.add(childId));
+			return false;
+		}
+
+		return true;
+	});
+}

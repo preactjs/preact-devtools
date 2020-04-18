@@ -9,7 +9,7 @@ import { ID, DevNode, Store, Listener, Theme } from "./types";
 import { InspectData } from "../../adapter/adapter/adapter";
 import { createProfiler } from "../components/profiler/data/commits";
 import { PropData } from "../components/sidebar/inspect/parseProps";
-import { parseObjectState } from "./props";
+import { parseObjectState, filterCollapsed } from "./props";
 
 export function createStore(): Store {
 	const listeners: Array<null | Listener> = [];
@@ -90,8 +90,12 @@ export function createStore(): Store {
 		);
 	});
 	watch(() => {
-		const data = inspectData.$ ? inspectData.$.hooks : null;
-		sidebar.hooks.items.$ = parseObjectState(data, sidebar.hooks.uncollapsed.$);
+		const items =
+			inspectData.$ && inspectData.$.hooks ? inspectData.$.hooks : [];
+		sidebar.hooks.items.$ = filterCollapsed(
+			items,
+			sidebar.hooks.uncollapsed.$,
+		).slice(1);
 	});
 
 	const selection = createSelectionStore(nodeList);
