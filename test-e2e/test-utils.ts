@@ -200,6 +200,10 @@ export async function checkNotPresent(page: Page, selector: string) {
 	assert.equal(res, true, `Expected '${selector}' not to exist`);
 }
 
+export async function getCount(page: Page, selector: string) {
+	return await (await page.$$(selector)).length;
+}
+
 // Preact Devtools specific functions
 export async function clickTab(
 	page: Page,

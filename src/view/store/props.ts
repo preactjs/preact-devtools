@@ -43,22 +43,18 @@ export function filterCollapsed<T extends { id: string; children: string[] }>(
 	items: T[],
 	uncollapsed: string[],
 ): T[] {
-	const skip = new Set<string>();
+	const skip: string[] = [];
 	const visible = new Set<string>();
+	const uncoll = new Set(uncollapsed);
 
 	return items.filter(node => {
-		const isUncollapsed = uncollapsed.indexOf(node.id) > -1;
-		if (node.id === "root" || isUncollapsed) {
-			node.children.forEach(childId => visible.add(childId));
-		}
-
-		if (
-			node.id !== "root" &&
-			!visible.has(node.id) &&
-			(skip.has(node.id) || !isUncollapsed)
-		) {
-			node.children.forEach(childId => skip.add(childId));
+		if (skip.some(x => node.id.startsWith(x))) {
 			return false;
+		}
+		if (node.id === "root" || uncoll.has(node.id)) {
+			node.children.forEach(childId => visible.add(childId));
+		} else if (node.children.length) {
+			skip.push(node.id);
 		}
 
 		return true;

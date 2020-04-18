@@ -113,8 +113,10 @@ function CustomHooks2() {
 const useBob = () => useFoo();
 const useBoof = () => useBob();
 
+const useHey = () => useBar();
+
 function CustomHooks3() {
-	const [v] = useBar();
+	const [v] = useHey();
 	const [v2] = useBoof();
 	return html`<p>Custom hooks: ${"" + v}, ${"" + v2} ${customHook}</p>`;
 }
