@@ -21,5 +21,5 @@ export async function run(config: any) {
 
 	const text = await getText(page, '[data-testid="result"]');
 	expect(text).to.equal("Counter: 1");
-	// await closePage(page);
+	await closePage(page);
 }
