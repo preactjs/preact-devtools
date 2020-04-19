@@ -5,6 +5,7 @@ import {
 	VNode,
 	FunctionalComponent,
 	ComponentConstructor,
+	Options,
 } from "preact";
 import { getStringId } from "../string-table";
 import {
@@ -18,6 +19,7 @@ import {
 	getVNodeParent,
 	hasDom,
 	setNextState,
+	getHookState,
 } from "./vnode";
 import { shouldFilter } from "./filter";
 import { ID } from "../../view/store/types";
@@ -334,6 +336,7 @@ const DEFAULT_FIlTERS: FilterState = {
 export interface Preact10Renderer extends Renderer {
 	onCommit(vnode: VNode): void;
 	onUnmount(vnode: VNode): void;
+	updateHook(id: ID, index: number, value: any): void;
 }
 
 export interface ProfilerState {
@@ -341,9 +344,16 @@ export interface ProfilerState {
 	captureRenderReasons: boolean;
 }
 
+export interface Supports {
+	renderReasons: boolean;
+	hooks: boolean;
+}
+
 export function createRenderer(
 	port: PortPageHook,
 	config: RendererConfig10,
+	options: Options,
+	supports: Supports,
 	filters: FilterState = DEFAULT_FIlTERS,
 ): Preact10Renderer {
 	const ids = createIdMappingState();
@@ -391,7 +401,7 @@ export function createRenderer(
 			}
 		},
 		log: (id, children) => logVNode(ids, config, id, children),
-		inspect: id => inspectVNode(ids, config, id),
+		inspect: id => inspectVNode(ids, config, options, id, supports.hooks),
 		findDomForVNode(id) {
 			const vnode = getVNodeById(ids, id);
 			if (!vnode) return null;
@@ -543,6 +553,17 @@ export function createRenderer(
 
 						c.forceUpdate();
 					}
+				}
+			}
+		},
+		updateHook(id, index, value) {
+			const vnode = getVNodeById(ids, id);
+			if (vnode !== null && typeof vnode.type === "function") {
+				const c = getComponent(vnode);
+				if (c) {
+					const s = getHookState(c, index);
+					s[0] = value;
+					c.forceUpdate();
 				}
 			}
 		},

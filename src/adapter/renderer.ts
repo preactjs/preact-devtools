@@ -27,6 +27,9 @@ export interface Renderer {
 	// Profiler
 	startProfiling?(options: DevtoolEvents["start-profiling"]): void; // V2
 	stopProfiling?(): void; // V2
+
+	// Hooks
+	updateHook?(id: ID, index: number, value: any): void; // V3
 }
 
 export enum Elements {

@@ -3593,6 +3593,11 @@ error-ex@^1.3.1:
   dependencies:
     is-arrayish "^0.2.1"
 
+errorstacks@^1.1.4:
+  version "1.1.4"
+  resolved "https://registry.yarnpkg.com/errorstacks/-/errorstacks-1.1.4.tgz#7753e02403021459cbac1e05e9922d96fe831d16"
+  integrity sha512-nr+i2IMyaerF1HsKso1eaNJiJBVbjC1MAvKgkGBp1biezh2XvdNQLk0k4q8gi9syDuHv2THWWS/3ywLfcdErDw==
+
 es-abstract@^1.12.0, es-abstract@^1.5.1:
   version "1.13.0"
   resolved "https://registry.yarnpkg.com/es-abstract/-/es-abstract-1.13.0.tgz#ac86145fdd5099d8dd49558ccba2eaf9b88e24e9"

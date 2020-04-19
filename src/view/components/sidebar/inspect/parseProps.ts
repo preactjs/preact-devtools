@@ -16,10 +16,12 @@ export type PropDataType =
 
 export interface PropData {
 	id: string;
+	name: string;
 	type: PropDataType;
 	value: any;
 	editable: boolean;
 	depth: number;
+	meta: any;
 	children: string[];
 }
 
@@ -30,20 +32,23 @@ export function parseProps(
 	out: Map<string, PropData>,
 ): Map<string, PropData> {
 	const depth = (path.match(/\./g) || []).length;
-
 	if (depth >= limit) {
 		return out;
 	}
+
+	const name = path.slice(path.lastIndexOf(".") + 1);
 
 	if (Array.isArray(data)) {
 		const children: string[] = [];
 		out.set(path, {
 			depth,
+			name,
 			id: path,
 			type: "array",
 			editable: false,
 			value: data,
 			children,
+			meta: null,
 		});
 		data.forEach((item, i) => {
 			const childPath = `${path}.${i}`;
@@ -54,21 +59,25 @@ export function parseProps(
 		// TODO: We're dealing with serialized data here, not a Set object
 		out.set(path, {
 			depth,
+			name,
 			id: path,
 			type: "set",
 			editable: false,
 			value: "Set",
 			children: [],
+			meta: null,
 		});
 	} else if (typeof data === "object") {
 		if (data === null) {
 			out.set(path, {
 				depth,
+				name,
 				id: path,
 				type: "null",
 				editable: false,
 				value: data,
 				children: [],
+				meta: null,
 			});
 		} else {
 			const maybeCustom = Object.keys(data).length === 2;
@@ -80,11 +89,13 @@ export function parseProps(
 			) {
 				out.set(path, {
 					depth,
+					name,
 					id: path,
 					type: "function",
 					editable: false,
 					value: data,
 					children: [],
+					meta: null,
 				});
 			} else if (
 				// Same for vnodes
@@ -94,11 +105,13 @@ export function parseProps(
 			) {
 				out.set(path, {
 					depth,
+					name,
 					id: path,
 					type: "vnode",
 					editable: false,
 					value: data,
 					children: [],
+					meta: null,
 				});
 			} else if (
 				// Same for Set
@@ -108,11 +121,13 @@ export function parseProps(
 			) {
 				out.set(path, {
 					depth,
+					name,
 					id: path,
 					type: "set",
 					editable: false,
 					value: data,
 					children: [],
+					meta: null,
 				});
 			} else if (
 				// Same for Map
@@ -122,11 +137,13 @@ export function parseProps(
 			) {
 				out.set(path, {
 					depth,
+					name,
 					id: path,
 					type: "map",
 					editable: false,
 					value: data,
 					children: [],
+					meta: null,
 				});
 			} else if (
 				// Same for Blobs
@@ -136,20 +153,24 @@ export function parseProps(
 			) {
 				out.set(path, {
 					depth,
+					name,
 					id: path,
 					type: "blob",
 					editable: false,
 					value: data,
 					children: [],
+					meta: null,
 				});
 			} else {
 				const node: PropData = {
 					depth,
+					name,
 					id: path,
 					type: "object",
 					editable: false,
 					value: data,
 					children: [],
+					meta: null,
 				};
 				out.set(path, node);
 
@@ -166,11 +187,13 @@ export function parseProps(
 		const type = typeof data;
 		out.set(path, {
 			depth,
+			name,
 			id: path,
 			type: type as any,
 			editable: type !== "undefined" && data !== "[[Circular]]",
 			value: data,
 			children: [],
+			meta: null,
 		});
 	}
 

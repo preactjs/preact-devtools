@@ -13,9 +13,11 @@ describe("parseProps", () => {
 				editable: true,
 				depth: 0,
 				id: "foo",
+				name: "foo",
 				type: "string",
 				value: "foo",
 				children: [],
+				meta: null,
 			},
 		]);
 	});
@@ -29,9 +31,11 @@ describe("parseProps", () => {
 				editable: true,
 				depth: 0,
 				id: "foo",
+				name: "foo",
 				type: "number",
 				value: 12,
 				children: [],
+				meta: null,
 			},
 		]);
 	});
@@ -45,9 +49,11 @@ describe("parseProps", () => {
 				editable: true,
 				depth: 0,
 				id: "foo",
+				name: "foo",
 				type: "boolean",
 				value: false,
 				children: [],
+				meta: null,
 			},
 		]);
 	});
@@ -60,9 +66,11 @@ describe("parseProps", () => {
 				editable: false,
 				depth: 0,
 				id: "foo",
+				name: "foo",
 				type: "null",
 				value: null,
 				children: [],
+				meta: null,
 			},
 		]);
 	});
@@ -75,9 +83,11 @@ describe("parseProps", () => {
 				editable: false,
 				depth: 0,
 				id: "foo",
+				name: "foo",
 				type: "undefined",
 				value: undefined,
 				children: [],
+				meta: null,
 			},
 		]);
 	});
@@ -94,9 +104,11 @@ describe("parseProps", () => {
 				editable: false,
 				depth: 0,
 				id: "foo",
+				name: "foo",
 				type: "function",
 				value: fn,
 				children: [],
+				meta: null,
 			},
 		]);
 	});
@@ -109,25 +121,31 @@ describe("parseProps", () => {
 				editable: false,
 				depth: 0,
 				id: "foo",
+				name: "foo",
 				type: "array",
 				value: [1, 2],
 				children: ["foo.0", "foo.1"],
+				meta: null,
 			},
 			{
 				editable: true,
 				depth: 1,
 				id: "foo.0",
+				name: "0",
 				type: "number",
 				value: 1,
 				children: [],
+				meta: null,
 			},
 			{
 				editable: true,
 				depth: 1,
 				id: "foo.1",
+				name: "1",
 				type: "number",
 				value: 2,
 				children: [],
+				meta: null,
 			},
 		]);
 	});
@@ -140,9 +158,11 @@ describe("parseProps", () => {
 				editable: false,
 				depth: 0,
 				id: "foo",
+				name: "foo",
 				type: "array",
 				value: [],
 				children: [],
+				meta: null,
 			},
 		]);
 	});
@@ -155,28 +175,34 @@ describe("parseProps", () => {
 				editable: false,
 				depth: 0,
 				id: "",
+				name: "",
 				type: "object",
 				value: {
 					foo: 123,
 					bar: "abc",
 				},
 				children: [".foo", ".bar"],
+				meta: null,
 			},
 			{
 				editable: true,
 				depth: 1,
 				id: ".foo",
+				name: "foo",
 				type: "number",
 				value: 123,
 				children: [],
+				meta: null,
 			},
 			{
 				editable: true,
 				depth: 1,
 				id: ".bar",
+				name: "bar",
 				type: "string",
 				value: "abc",
 				children: [],
+				meta: null,
 			},
 		]);
 	});
@@ -189,6 +215,7 @@ describe("parseProps", () => {
 				editable: false,
 				depth: 0,
 				id: "foo",
+				name: "foo",
 				type: "object",
 				value: {
 					foo: {
@@ -196,24 +223,29 @@ describe("parseProps", () => {
 					},
 				},
 				children: ["foo.foo"],
+				meta: null,
 			},
 			{
 				editable: false,
 				depth: 1,
 				id: "foo.foo",
+				name: "foo",
 				type: "object",
 				value: {
 					bar: "abc",
 				},
 				children: ["foo.foo.bar"],
+				meta: null,
 			},
 			{
 				editable: true,
 				depth: 2,
 				id: "foo.foo.bar",
+				name: "bar",
 				type: "string",
 				value: "abc",
 				children: [],
+				meta: null,
 			},
 		]);
 	});
@@ -226,6 +258,7 @@ describe("parseProps", () => {
 				editable: false,
 				depth: 0,
 				id: "foo",
+				name: "foo",
 				type: "object",
 				value: {
 					foo: {
@@ -233,16 +266,19 @@ describe("parseProps", () => {
 					},
 				},
 				children: ["foo.foo"],
+				meta: null,
 			},
 			{
 				editable: false,
 				depth: 1,
 				id: "foo.foo",
+				name: "foo",
 				type: "object",
 				value: {
 					bar: "abc",
 				},
 				children: ["foo.foo.bar"],
+				meta: null,
 			},
 		]);
 	});
@@ -255,9 +291,11 @@ describe("parseProps", () => {
 				editable: false,
 				depth: 0,
 				id: "",
+				name: "",
 				type: "string",
 				value: "[[Circular]]",
 				children: [],
+				meta: null,
 			},
 		]);
 	});

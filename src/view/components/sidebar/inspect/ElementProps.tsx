@@ -6,7 +6,7 @@ import { DataInput } from "../../DataInput";
 import { genPreview } from "../../DataInput/parseValue";
 import { isCollapsed } from "../../../store/props";
 
-export type ChangeFn = (value: any, path: string) => void;
+export type ChangeFn = (value: any, path: string, node: null | any) => void;
 
 export interface Props {
 	onChange?: ChangeFn;
@@ -34,7 +34,7 @@ export function ElementProps(props: Props) {
 							onCollapse={() => onCollapse && onCollapse(id)}
 							editable={item.editable}
 							value={item.value}
-							onChange={onChange}
+							onChange={v => onChange && onChange(v, id, item)}
 							depth={item.depth}
 						/>
 					);
@@ -53,7 +53,7 @@ export interface SingleProps {
 	collapsed?: boolean;
 	name: string;
 	value: any;
-	onChange?: ChangeFn;
+	onChange?: (value: any) => void;
 	onCollapse?: (path: string) => void;
 	depth: number;
 }
@@ -88,12 +88,18 @@ export function SingleItem(props: SingleProps) {
 					onClick={() => onCollapse && onCollapse(id)}
 				>
 					<Arrow />
-					<span class={s.name} data-type={type}>
+					<span
+						class={s.name}
+						data-testid="prop-name"
+						data-type={value !== "__preact_empty__" ? type : "empty"}
+					>
 						{name}
 					</span>
-					<span class={s.property} data-testid="prop-value">
-						<span class={s.mask}>{genPreview(value)}</span>
-					</span>
+					{value !== "__preact_empty__" && (
+						<span class={s.property} data-testid="prop-value">
+							<span class={s.mask}>{genPreview(value)}</span>
+						</span>
+					)}
 				</button>
 			)}
 			{!collapseable && (
@@ -102,19 +108,24 @@ export function SingleItem(props: SingleProps) {
 						class={`${s.name} ${s.noCollapse} ${s.nameStatic} ${
 							editable ? s.nameEditable : ""
 						}`}
-						data-type={type}
+						data-testid="prop-name"
+						data-type={value !== "__preact_empty__" ? type : "empty"}
 					>
 						{name}
 					</span>
 					<div class={s.property} data-testid="prop-value">
-						{editable ? (
-							<DataInput
-								value={value}
-								onChange={v => onChange && onChange(v, id)}
-								name={`${id}`}
-							/>
-						) : (
-							<div class={s.mask}>{genPreview(value)}</div>
+						{value !== "__preact_empty__" && (
+							<Fragment>
+								{editable ? (
+									<DataInput
+										value={value}
+										onChange={v => onChange && onChange(v)}
+										name={`${id}`}
+									/>
+								) : (
+									<div class={s.mask}>{genPreview(value)}</div>
+								)}
+							</Fragment>
 						)}
 					</div>
 				</Fragment>

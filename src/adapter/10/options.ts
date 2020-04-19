@@ -9,6 +9,8 @@ import {
 	getStatefulHookValue,
 	getComponent,
 } from "./vnode";
+import { addHookStack, addDebugValue } from "./renderer/hooks";
+import { HookType } from "../../constants";
 
 /**
  * Inject tracking into setState
@@ -47,7 +49,8 @@ export function setupOptions(
 	const prevBeforeUnmount = options.unmount;
 	const prevBeforeDiff = o._diff || o.__b;
 	const prevAfterDiff = options.diffed;
-	const prevHook = o._hook || o.__h;
+	let prevHook = o._hook || o.__h;
+	let prevUseDebug = options.useDebugValue;
 
 	options.vnode = vnode => {
 		// Tiny performance improvement by initializing fields as doubles
@@ -64,14 +67,35 @@ export function setupOptions(
 		(vnode as any).old = null;
 	};
 
-	o._hook = o.__h = (c: Component) => {
-		const s = getStatefulHooks(c);
-		if (Array.isArray(s) && getComponent(s[0])) {
-			s[0]._oldValue = getStatefulHookValue(s);
-		}
+	// Make sure that we are always the first `option._hook` to be called.
+	// This is necessary to ensure that our callstack remains consistent.
+	// Othwerwise we'll end up with an unknown number of frames in-between
+	// the called hook and `options._hook`. This will lead to wrongly
+	// parsed hooks.
+	setTimeout(() => {
+		prevHook = o._hook || o.__h;
+		prevUseDebug = options.useDebugValue;
 
-		if (prevHook) prevHook(c);
-	};
+		o._hook = o.__h = (c: Component, index: number, type: number) => {
+			const s = getStatefulHooks(c);
+			if (Array.isArray(s) && getComponent(s[0])) {
+				s[0]._oldValue = getStatefulHookValue(s);
+				s[0]._index = index;
+			}
+
+			if (type) {
+				addHookStack(type);
+			}
+
+			if (prevHook) prevHook(c);
+		};
+
+		options.useDebugValue = (value: any) => {
+			addHookStack(HookType.useDebugValue);
+			addDebugValue(value);
+			if (prevUseDebug) prevUseDebug(value);
+		};
+	}, 100);
 
 	o._diff = o.__b = (vnode: VNode) => {
 		vnode.startTime = performance.now();
@@ -116,5 +140,6 @@ export function setupOptions(
 		o._diff = o.__b = prevBeforeDiff;
 		options.vnode = prevVNodeHook;
 		o._hook = o.__h = prevHook;
+		options.useDebugValue = prevUseDebug;
 	};
 }

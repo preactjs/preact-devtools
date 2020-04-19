@@ -1,12 +1,10 @@
-import { getComponent, getDisplayName } from "../vnode";
-import { jsonify, cleanContext, cleanProps } from "../utils";
-import { serializeVNode, RendererConfig10, getDevtoolsType } from "../renderer";
+import { getComponent, getComponentHooks, getDisplayName } from "../vnode";
+import { serialize, cleanContext, cleanProps } from "../utils";
+import { RendererConfig10, getDevtoolsType } from "../renderer";
 import { ID } from "../../../view/store/types";
 import { IdMappingState, getVNodeById } from "../IdMapper";
-
-function serialize(config: RendererConfig10, data: object | null) {
-	return jsonify(data, node => serializeVNode(node, config), new Set());
-}
+import { Options } from "preact";
+import { inspectHooks } from "./hooks";
 
 /**
  * Serialize all properties/attributes of a `VNode` like `props`, `context`,
@@ -17,7 +15,9 @@ function serialize(config: RendererConfig10, data: object | null) {
 export function inspectVNode(
 	ids: IdMappingState,
 	config: RendererConfig10,
+	options: Options,
 	id: ID,
+	supportsHooks: boolean,
 ) {
 	const vnode = getVNodeById(ids, id);
 	if (!vnode) return null;
@@ -28,6 +28,9 @@ export function inspectVNode(
 		c != null &&
 		Object.keys(c.state).length > 0;
 
+	const hasHooks = c != null && getComponentHooks(c) != null;
+	const hooks =
+		supportsHooks && hasHooks ? inspectHooks(config, options, vnode) : null;
 	const context = c != null ? serialize(config, cleanContext(c.context)) : null;
 	const props =
 		vnode.type !== null ? serialize(config, cleanProps(vnode.props)) : null;
@@ -35,7 +38,7 @@ export function inspectVNode(
 
 	return {
 		context,
-		hooks: null,
+		hooks: supportsHooks ? hooks : !supportsHooks && hasHooks ? [] : null,
 		id,
 		name: getDisplayName(vnode, config),
 		props,

@@ -6,6 +6,7 @@ import { ID } from "../../view/store/types";
 import { createHightlighter } from "./highlight";
 import { parseFilters } from "./filter";
 import { PortPageHook } from "./port";
+import { PropData } from "../../view/components/sidebar/inspect/parseProps";
 
 export type Path = Array<string | number>;
 
@@ -27,7 +28,7 @@ export interface InspectData {
 	name: string;
 	type: any;
 	context: Record<string, any> | null;
-	hooks: any | null;
+	hooks: PropData[] | null;
 	props: Record<string, any> | null;
 	state: Record<string, any> | null;
 }
@@ -104,6 +105,11 @@ export function createAdapter(port: PortPageHook, renderer: Renderer) {
 	listen("update-prop", data => update({ ...data, type: "props" }));
 	listen("update-state", data => update({ ...data, type: "state" }));
 	listen("update-context", data => update({ ...data, type: "context" }));
+	listen("update-hook", data => {
+		if (renderer.updateHook && data.meta) {
+			renderer.updateHook(data.id, data.meta.index, data.value);
+		}
+	});
 
 	listen("update-filter", data => {
 		renderer.applyFilters(parseFilters(data));

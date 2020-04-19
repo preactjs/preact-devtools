@@ -22,6 +22,8 @@ export function setupMockHook(options: Options) {
 	const renderer = createRenderer(
 		{ send: spy, listen: () => null },
 		{ Fragment: Fragment as any },
+		{},
+		{ hooks: false, renderReasons: false },
 		{ type: new Set(), regex: [] },
 	);
 	const destroy = setupOptions(options, renderer, {

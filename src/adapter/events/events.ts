@@ -141,6 +141,10 @@ export function applyEvent(store: Store, type: string, data: any) {
 			if (!store.profiler.supportsRenderReasons.$) {
 				store.profiler.supportsRenderReasons.$ = !!data.supportsRenderReasons;
 			}
+
+			if (!store.supports.hooks.$) {
+				store.supports.hooks.$ = !!data.supportsHooks;
+			}
 			break;
 		case "operation":
 			applyOperationsV1(store, data);

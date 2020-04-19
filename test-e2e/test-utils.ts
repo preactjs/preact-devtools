@@ -2,6 +2,7 @@ import { newPage } from "pintf/browser_utils";
 import fs from "fs";
 import path from "path";
 import { Request, Page } from "puppeteer";
+import assert from "assert";
 
 const readFile = (name: string) => {
 	return fs.readFileSync(
@@ -188,6 +189,19 @@ export async function waitFor(
 
 	await fn();
 	clearTimeout(t);
+}
+
+export async function checkNotPresent(page: Page, selector: string) {
+	const res = await page.evaluate(
+		(s: string) => document.querySelector(s) === null,
+		selector,
+	);
+
+	assert.equal(res, true, `Expected '${selector}' not to exist`);
+}
+
+export async function getCount(page: Page, selector: string) {
+	return await (await page.$$(selector)).length;
 }
 
 // Preact Devtools specific functions

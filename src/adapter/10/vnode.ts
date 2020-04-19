@@ -1,6 +1,7 @@
 /* eslint-disable no-mixed-spaces-and-tabs */
 import { Component, VNode } from "preact";
 import { RendererConfig10 } from "./renderer";
+import { HookType } from "../../constants";
 
 // Mangle accessors
 
@@ -81,6 +82,31 @@ export function getStatefulHookValue(hookState: any) {
 	}
 
 	return null;
+}
+
+export function getHookState(c: Component, index: number, type?: HookType) {
+	const list = getStatefulHooks(c);
+	if (list && list[index]) {
+		// useContext
+		if (type === HookType.useContext) {
+			const context = list[index]._context || list[index].__c;
+			const provider = c.context[context._id] || c.context[context.__c];
+			return provider
+				? provider.props.value
+				: context._defaultValue || context.__;
+		}
+		const value = list[index]._value || list[index].__;
+
+		if (type === HookType.useRef) {
+			return value.current;
+		} else if (type === HookType.useErrorBoundary && !value) {
+			return "__preact_empty__";
+		}
+
+		return value;
+	}
+
+	return [];
 }
 
 /**

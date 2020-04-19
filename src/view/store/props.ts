@@ -21,10 +21,12 @@ export function parseObjectState(
 		tree.set("root", {
 			children: [],
 			depth: 0,
+			name: "root",
 			editable: false,
 			id: "root",
 			type: "object",
 			value: null,
+			meta: null,
 		});
 
 		parseProps(data, "root", PROPS_LIMIT, tree);
@@ -35,4 +37,26 @@ export function parseObjectState(
 	}
 
 	return [];
+}
+
+export function filterCollapsed<T extends { id: string; children: string[] }>(
+	items: T[],
+	uncollapsed: string[],
+): T[] {
+	const skip: string[] = [];
+	const visible = new Set<string>();
+	const uncoll = new Set(uncollapsed);
+
+	return items.filter(node => {
+		if (skip.some(x => node.id.startsWith(x))) {
+			return false;
+		}
+		if (node.id === "root" || uncoll.has(node.id)) {
+			node.children.forEach(childId => visible.add(childId));
+		} else if (node.children.length) {
+			skip.push(node.id);
+		}
+
+		return true;
+	});
 }

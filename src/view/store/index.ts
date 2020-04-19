@@ -9,7 +9,7 @@ import { ID, DevNode, Store, Listener, Theme } from "./types";
 import { InspectData } from "../../adapter/adapter/adapter";
 import { createProfiler } from "../components/profiler/data/commits";
 import { PropData } from "../components/sidebar/inspect/parseProps";
-import { parseObjectState } from "./props";
+import { parseObjectState, filterCollapsed } from "./props";
 
 export function createStore(): Store {
 	const listeners: Array<null | Listener> = [];
@@ -66,6 +66,10 @@ export function createStore(): Store {
 			uncollapsed: valoo<string[]>([]),
 			items: valoo<PropData[]>([]),
 		},
+		hooks: {
+			uncollapsed: valoo<string[]>([]),
+			items: valoo<PropData[]>([]),
+		},
 	};
 
 	const inspectData = valoo<InspectData | null>(null);
@@ -86,9 +90,24 @@ export function createStore(): Store {
 		);
 	});
 
+	const supportsHooks = valoo(false);
+	watch(() => {
+		if (supportsHooks) {
+			const items =
+				inspectData.$ && inspectData.$.hooks ? inspectData.$.hooks : [];
+			sidebar.hooks.items.$ = filterCollapsed(
+				items,
+				sidebar.hooks.uncollapsed.$,
+			).slice(1);
+		}
+	});
+
 	const selection = createSelectionStore(nodeList);
 
 	return {
+		supports: {
+			hooks: supportsHooks,
+		},
 		profiler: createProfiler(notify),
 		notify,
 		nodeList,

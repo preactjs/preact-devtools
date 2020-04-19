@@ -1,6 +1,7 @@
 import { getActualChildren } from "./vnode";
 import { VNode } from "preact";
 import { ObjPath } from "../renderer";
+import { RendererConfig10, serializeVNode } from "./renderer";
 
 export function traverse(vnode: VNode, fn: (vnode: VNode) => void) {
 	fn(vnode);
@@ -67,6 +68,21 @@ export function jsonify(
 	}
 }
 
+export function serialize(config: RendererConfig10, data: object | null) {
+	return jsonify(data, node => serializeVNode(node, config), new Set());
+}
+
+export function isEditable(x: any) {
+	switch (typeof x) {
+		case "string":
+		case "number":
+		case "boolean":
+			return true;
+		default:
+			return false;
+	}
+}
+
 export function cleanProps<T extends object>(
 	props: T,
 ): Exclude<T, "__source" | "__self"> | null {
@@ -118,4 +134,21 @@ export function setIn(obj: Record<string, any>, path: ObjPath, value: any) {
 	if (parent && last) {
 		parent[last] = value;
 	}
+}
+
+export function hasIn(obj: Record<string, any>, path: ObjPath) {
+	let item = obj;
+	for (let i = 0; i < path.length; i++) {
+		const key = path[i];
+		if (item && key in item) {
+			const next = item[key];
+			if (next !== null && typeof next === "object") {
+				item = next;
+			}
+		} else {
+			return false;
+		}
+	}
+
+	return true;
 }
