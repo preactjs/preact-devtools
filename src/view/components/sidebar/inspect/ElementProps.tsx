@@ -89,7 +89,7 @@ export function SingleItem(props: SingleProps) {
 				>
 					<Arrow />
 					<span
-						class={s.name}
+						class={`${s.name} ${s.nameEditable}`}
 						data-testid="prop-name"
 						data-type={value !== "__preact_empty__" ? type : "empty"}
 					>

@@ -84,7 +84,9 @@ export function genPreview(v: any): string {
 			if (v.type === "vnode") return `<${truncate(v.name)} />`;
 			if (v.type === "set") return `Set<${truncate(v.name)}>`;
 			if (v.type === "map") return `Map<${truncate(v.name)}>`;
-			if (v.type === "function") return `${truncate(v.name)}()`;
+			if (v.type === "function") {
+				return `ƒ ${v.name === "anonymous" ? "" : truncate(v.name)}()`;
+			}
 			if (v.type === "blob") return "Blob {}";
 		}
 
