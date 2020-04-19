@@ -269,14 +269,3 @@ export interface HookItem {
 	value: any;
 	children: HookItem[];
 }
-
-const nativeName = /^\d+__\S+$/;
-export function getHookFromPath(objPath: any) {
-	for (let i = objPath.length - 1; i >= 0; i--) {
-		if (nativeName.test("" + objPath[i])) {
-			return objPath.slice(0, i);
-		}
-	}
-
-	return objPath;
-}
