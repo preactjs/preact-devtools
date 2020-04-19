@@ -64,7 +64,8 @@ input {
 	--color-selected-inactive-bg: #e5e5e5;
 	--color-selected-inactive-text: #673ab8;
 	--color-toggle: #aaa;
-	--color-toggle-selected: #white;
+	--color-toggle-selected: white;
+	--property-static: #333;
 	--name-dynamic: #673ab8;
 	--name-static: #767676;
 	--color-element-text: #673ab8;
@@ -139,6 +140,7 @@ input {
 	--color-selected-inactive-text: white;
 	--color-toggle: #aaa;
 	--color-toggle-selected: #eee;
+	--property-static: #eee;
 	--name-dynamic: #d2adff;
 	--name-static: #aaa;
 	--color-element-text: #d2adff;
