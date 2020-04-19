@@ -62,6 +62,7 @@
 	text-overflow: ellipsis;
 	white-space: nowrap;
 	overflow: hidden;
+	color: var(--property-static);
 }
 
 .noCollapse {
