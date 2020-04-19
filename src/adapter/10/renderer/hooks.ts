@@ -2,7 +2,6 @@ import { h, Component, Options, VNode } from "preact";
 import { RendererConfig10 } from "../renderer";
 import { serialize, isEditable } from "../utils";
 import { getComponent, getHookState, getComponentHooks } from "../vnode";
-import { debug } from "../../../debug";
 import { parseStackTrace } from "errorstacks";
 import { HookType } from "../../../constants";
 import { PropData } from "../../../view/components/sidebar/inspect/parseProps";
@@ -197,6 +196,19 @@ export function inspectHooks(
 	// Disable hook effects
 	(options as any)._skipEffects = (options as any).__s = true;
 
+	const prevConsole: Record<string, any> = {};
+
+	// Temporarily disable all console methods to not confuse users
+	// It sucks that we need to do this :/
+	for (const method in console) {
+		try {
+			prevConsole[method] = (console as any)[method];
+			(console as any)[method] = () => undefined;
+		} catch (error) {
+			// Ignore errors here
+		}
+	}
+
 	try {
 		// Call render on a dummy component, so that any possible
 		// state changes or effect are not written to our original
@@ -226,11 +238,18 @@ export function inspectHooks(
 		} else {
 			c.constructor.call(dummy, dummy.props, dummy.context);
 		}
-	} catch (e) {
+	} catch (error) {
 		// We don't care about any errors here. We only need
 		// the hook call sites
-		debug(e);
 	} finally {
+		// Restore original console
+		for (const method in prevConsole) {
+			try {
+				(console as any)[method] = prevConsole[method];
+			} catch (error) {
+				// Ignore errors
+			}
+		}
 		(options as any)._skipEffects = (options as any).__s = false;
 	}
 
