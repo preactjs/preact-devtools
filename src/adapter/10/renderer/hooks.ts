@@ -4,7 +4,11 @@ import { serialize, isEditable } from "../utils";
 import { getComponent, getHookState, getComponentHooks } from "../vnode";
 import { parseStackTrace } from "errorstacks";
 import { HookType } from "../../../constants";
-import { PropData } from "../../../view/components/sidebar/inspect/parseProps";
+import {
+	PropData,
+	parseProps,
+	PropDataType,
+} from "../../../view/components/sidebar/inspect/parseProps";
 
 /**
  * Throwaway component to render hooks
@@ -127,34 +131,57 @@ export function parseHookData(
 			const frame = hook.stack[i];
 			const isNative = i === 0;
 
-			let id = `${parentId}.${frame.location}.${frame.name}`;
+			const id = `${parentId}.${frame.location}.${frame.name}`;
 
 			if (!tree.has(id)) {
 				let value: any = "__preact_empty__";
 				let editable = false;
+				let children = [];
+				let nodeType: PropDataType = "undefined";
+				const depth = hook.stack.length - i - 1;
 
 				if (debugValues.has(id)) {
 					value = debugValues.get(id);
 				}
 
+				let hookValueTree: PropData[] = [];
+
 				if (isNative) {
 					const s = getHookState(component, hookIdx, hook.type);
 					const rawValue = Array.isArray(s) ? s[0] : s;
 					value = serialize(config, rawValue);
+
+					// The user should be able to click through the value
+					// properties if the value is an object. We parse it
+					// separately and append it as children to our hook node
+					if (typeof rawValue === "object") {
+						const tree = new Map();
+						parseProps(value, id, 7, tree);
+						children = tree.get(id)!.children;
+						hookValueTree = Array.from(tree.values()).slice(1);
+						nodeType = hookValueTree[0].type;
+
+						// TODO: Parse props relies on dots in id
+						const wrongDepth = (id.match(/\./g) || []).length;
+
+						hookValueTree.forEach(node => {
+							node.editable = false;
+							node.depth = node.depth - wrongDepth + depth;
+						});
+					}
 					editable =
 						(hook.type === HookType.useState ||
 							hook.type === HookType.useReducer) &&
 						isEditable(rawValue);
-					id += `.${type}`;
 				}
 
 				const item: PropData = {
-					children: [],
-					depth: hook.stack.length - i - 1,
+					children,
+					depth,
 					editable,
 					id,
 					name: isNative ? type : frame.name,
-					type: "undefined",
+					type: nodeType,
 					meta: isNative
 						? {
 								index: hookIdx,
@@ -168,6 +195,13 @@ export function parseHookData(
 
 				if (tree.has(parentId)) {
 					tree.get(parentId)!.children.push(id);
+				}
+
+				if (hookValueTree.length) {
+					hookValueTree.forEach(v => {
+						tree.set(v.id, v);
+						out.push(v);
+					});
 				}
 			}
 
@@ -186,7 +220,6 @@ export function inspectHooks(
 	inspectingHooks = true;
 	hookLog = [];
 	debugValues.clear();
-	// TODO: Temporarily disable any console logs
 	ancestorName = parseStackTrace(new Error().stack!)[0].name;
 
 	const c = getComponent(vnode)!;
