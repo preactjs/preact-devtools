@@ -1,7 +1,7 @@
-import { Component, Options, VNode } from "preact";
+import { h, Component, Options, VNode } from "preact";
 import { RendererConfig10 } from "../renderer";
 import { serialize, isEditable } from "../utils";
-import { getComponent, getHookState } from "../vnode";
+import { getComponent, getHookState, getComponentHooks } from "../vnode";
 import { debug } from "../../../debug";
 import { parseStackTrace } from "errorstacks";
 import { HookType } from "../../../constants";
@@ -27,6 +27,20 @@ export interface HookData {
 let hookLog: HookData[] = [];
 let inspectingHooks = false;
 let ancestorName = "unknown";
+const debugValues = new Map<string, string>();
+
+export function addDebugValue(value: any) {
+	if (!inspectingHooks) return;
+
+	const last = hookLog.pop()!;
+	const location = last.stack
+		.reverse()
+		.slice(0, -1)
+		.map(x => (x.name === "root" ? x.name : `${x.location}.${x.name}`))
+		.join(".");
+
+	debugValues.set(location, "" + value);
+}
 
 let ignoreNext = false;
 export function addHookStack(type: HookType) {
@@ -50,7 +64,7 @@ export function addHookStack(type: HookType) {
 
 	if (ancestorIdx > -1 && stack.length > 0) {
 		// Remove `addHookStack` + `options._hook` + `getHookState` from stack
-		let trim = 3;
+		let trim = type === HookType.useDebugValue ? 2 : 3;
 		// These hooks are implemented with other hooks
 		if (
 			type === HookType.useState ||
@@ -120,6 +134,10 @@ export function parseHookData(
 				let value: any = "__preact_empty__";
 				let editable = false;
 
+				if (debugValues.has(id)) {
+					value = debugValues.get(id);
+				}
+
 				if (isNative) {
 					const s = getHookState(component, hookIdx, hook.type);
 					const rawValue = Array.isArray(s) ? s[0] : s;
@@ -168,6 +186,7 @@ export function inspectHooks(
 ) {
 	inspectingHooks = true;
 	hookLog = [];
+	debugValues.clear();
 	// TODO: Temporarily disable any console logs
 	ancestorName = parseStackTrace(new Error().stack!)[0].name;
 
@@ -177,19 +196,35 @@ export function inspectHooks(
 
 	// Disable hook effects
 	(options as any)._skipEffects = (options as any).__s = true;
+
 	try {
 		// Call render on a dummy component, so that any possible
 		// state changes or effect are not written to our original
 		// component.
+		const hooks = getComponentHooks(c);
 		const dummy = {
 			props: c.props,
 			context: c.context,
 			state: {},
+			__hooks: hooks,
+			__H: hooks,
 		};
+
+		// Force preact to reset internal hooks index
+		const renderHook = (options as any)._render || (options as any).__r;
+		if (renderHook) {
+			const vnode = h("div", null);
+			// Note: A "div" normally won't have the _component property set,
+			// but we can get away with that for the devtools
+			(vnode as any)._component = dummy;
+			(vnode as any).__c = dummy;
+			renderHook(vnode);
+		}
+
 		if (isClass) {
 			c.render.call(dummy, dummy.props, dummy.state);
 		} else {
-			c.constructor(dummy.props, dummy.context);
+			c.constructor.call(dummy, dummy.props, dummy.context);
 		}
 	} catch (e) {
 		// We don't care about any errors here. We only need

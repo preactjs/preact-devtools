@@ -9,7 +9,8 @@ import {
 	getStatefulHookValue,
 	getComponent,
 } from "./vnode";
-import { addHookStack } from "./renderer/hooks";
+import { addHookStack, addDebugValue } from "./renderer/hooks";
+import { HookType } from "../../constants";
 
 /**
  * Inject tracking into setState
@@ -49,6 +50,7 @@ export function setupOptions(
 	const prevBeforeDiff = o._diff || o.__b;
 	const prevAfterDiff = options.diffed;
 	const prevHook = o._hook || o.__h;
+	const prevUseDebug = options.useDebugValue;
 
 	options.vnode = vnode => {
 		// Tiny performance improvement by initializing fields as doubles
@@ -77,6 +79,12 @@ export function setupOptions(
 		}
 
 		if (prevHook) prevHook(c);
+	};
+
+	options.useDebugValue = (value: any) => {
+		addHookStack(HookType.useDebugValue);
+		addDebugValue(value);
+		if (prevUseDebug) prevUseDebug(value);
 	};
 
 	o._diff = o.__b = (vnode: VNode) => {
@@ -122,5 +130,6 @@ export function setupOptions(
 		o._diff = o.__b = prevBeforeDiff;
 		options.vnode = prevVNodeHook;
 		o._hook = o.__h = prevHook;
+		options.useDebugValue = prevUseDebug;
 	};
 }

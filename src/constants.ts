@@ -22,6 +22,7 @@ export enum HookType {
 	useCallback = 8,
 	useContext = 9,
 	useErrorBoundary = 10,
+	useDebugValue = 11,
 	custom = 99,
 	devtoolsParent = 9999,
 }

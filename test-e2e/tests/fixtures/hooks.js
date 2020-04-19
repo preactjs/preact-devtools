@@ -9,6 +9,7 @@ const {
 	useContext,
 	useImperativeHandle,
 	useErrorBoundary,
+	useDebugValue,
 } = preactHooks;
 
 function Display(props) {
@@ -139,6 +140,24 @@ function ErrorBoundary2() {
 	return html`<p>Error Boundary 2</p>`;
 }
 
+function useMyHook() {
+	const [v, set] = useState(false);
+	useDebugValue(v ? "Online" : "Offline");
+
+	return [v, set];
+}
+
+function DebugValue() {
+	const [v, set] = useMyHook();
+
+	return html`
+		<p>Is online: ${"" + v}</p>
+		<button onClick=${() => set(!v)} data-testid="debug-hook-toggle">
+			Toggle online
+		</button>
+	`;
+}
+
 render(
 	html`
 		<${Counter} />
@@ -155,6 +174,7 @@ render(
 		<${ImperativeHandle} />
 		<${ErrorBoundary1} />
 		<${ErrorBoundary2} />
+		<${DebugValue} />
 		<${CustomHooks} />
 		<${CustomHooks2} />
 		<${CustomHooks3} />
