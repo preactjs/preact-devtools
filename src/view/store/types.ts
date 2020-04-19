@@ -48,6 +48,9 @@ export type Theme = "auto" | "light" | "dark";
 export type Tree = Map<ID, DevNode>;
 
 export interface Store {
+	supports: {
+		hooks: Observable<boolean>;
+	};
 	notify: EmitFn;
 	profiler: ProfilerState;
 	isPicking: Observable<boolean>;

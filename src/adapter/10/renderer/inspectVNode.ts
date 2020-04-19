@@ -17,6 +17,7 @@ export function inspectVNode(
 	config: RendererConfig10,
 	options: Options,
 	id: ID,
+	supportsHooks: boolean,
 ) {
 	const vnode = getVNodeById(ids, id);
 	if (!vnode) return null;
@@ -28,7 +29,8 @@ export function inspectVNode(
 		Object.keys(c.state).length > 0;
 
 	const hasHooks = c != null && getComponentHooks(c) != null;
-	const hooks = hasHooks ? inspectHooks(config, options, vnode) : null;
+	const hooks =
+		supportsHooks && hasHooks ? inspectHooks(config, options, vnode) : null;
 	const context = c != null ? serialize(config, cleanContext(c.context)) : null;
 	const props =
 		vnode.type !== null ? serialize(config, cleanProps(vnode.props)) : null;
@@ -36,7 +38,7 @@ export function inspectVNode(
 
 	return {
 		context,
-		hooks,
+		hooks: supportsHooks ? hooks : !supportsHooks && hasHooks ? [] : null,
 		id,
 		name: getDisplayName(vnode, config),
 		props,

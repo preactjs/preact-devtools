@@ -81,7 +81,7 @@ export function createHook(port: PortPageHook): DevtoolsHook {
 
 	const attachRenderer = (
 		renderer: Renderer,
-		supports: { renderReasons?: boolean },
+		supports: { renderReasons?: boolean; hooks?: boolean },
 	) => {
 		if (status === "disconnected") {
 			init();
@@ -98,6 +98,7 @@ export function createHook(port: PortPageHook): DevtoolsHook {
 			id: uid,
 			supportsProfiling,
 			supportsRenderReasons: !!supports.renderReasons,
+			supportsHooks: !!supports.hooks,
 		});
 		return uid;
 	};
@@ -131,11 +132,13 @@ export function createHook(port: PortPageHook): DevtoolsHook {
 
 			// currently we only support preact >= 10, later we can add another branch for major === 8
 			if (preactVersionMatch.major == 10) {
-				const renderer = createRenderer(port, config as any, options);
-				setupOptions(options, renderer, config as any);
-				return attachRenderer(renderer, {
+				const supports = {
 					renderReasons: !!config.Component,
-				});
+					hooks: preactVersionMatch.minor >= 4 && preactVersionMatch.patch >= 1,
+				};
+				const renderer = createRenderer(port, config as any, options, supports);
+				setupOptions(options, renderer, config as any);
+				return attachRenderer(renderer, supports);
 			}
 
 			return -1;

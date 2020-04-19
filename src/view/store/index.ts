@@ -89,18 +89,25 @@ export function createStore(): Store {
 			sidebar.context.uncollapsed.$,
 		);
 	});
+
+	const supportsHooks = valoo(false);
 	watch(() => {
-		const items =
-			inspectData.$ && inspectData.$.hooks ? inspectData.$.hooks : [];
-		sidebar.hooks.items.$ = filterCollapsed(
-			items,
-			sidebar.hooks.uncollapsed.$,
-		).slice(1);
+		if (supportsHooks) {
+			const items =
+				inspectData.$ && inspectData.$.hooks ? inspectData.$.hooks : [];
+			sidebar.hooks.items.$ = filterCollapsed(
+				items,
+				sidebar.hooks.uncollapsed.$,
+			).slice(1);
+		}
 	});
 
 	const selection = createSelectionStore(nodeList);
 
 	return {
+		supports: {
+			hooks: supportsHooks,
+		},
 		profiler: createProfiler(notify),
 		notify,
 		nodeList,

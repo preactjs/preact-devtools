@@ -344,10 +344,16 @@ export interface ProfilerState {
 	captureRenderReasons: boolean;
 }
 
+export interface Supports {
+	renderReasons: boolean;
+	hooks: boolean;
+}
+
 export function createRenderer(
 	port: PortPageHook,
 	config: RendererConfig10,
 	options: Options,
+	supports: Supports,
 	filters: FilterState = DEFAULT_FIlTERS,
 ): Preact10Renderer {
 	const ids = createIdMappingState();
@@ -395,7 +401,7 @@ export function createRenderer(
 			}
 		},
 		log: (id, children) => logVNode(ids, config, id, children),
-		inspect: id => inspectVNode(ids, config, options, id),
+		inspect: id => inspectVNode(ids, config, options, id, supports.hooks),
 		findDomForVNode(id) {
 			const vnode = getVNodeById(ids, id);
 			if (!vnode) return null;
