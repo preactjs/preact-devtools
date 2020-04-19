@@ -28,7 +28,7 @@ export function ElementProps(props: Props) {
 							id={id}
 							key={id}
 							type={item.type}
-							name={id.slice(id.lastIndexOf(".") + 1)}
+							name={item.name}
 							collapseable={item.children.length > 0}
 							collapsed={isCollapsed(uncollapsed, id)}
 							onCollapse={() => onCollapse && onCollapse(id)}
