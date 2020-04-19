@@ -22,7 +22,7 @@ export async function run(config: any) {
 	const value = await getText(devtools, '[data-testid="prop-value"]');
 
 	expect(name).to.equal("useEffect");
-	expect(value).to.equal("anonymous()");
+	expect(value).to.equal("ƒ ()");
 
 	// Should not be collapsable
 	await checkNotPresent(devtools, '[data-testid="props-row"] > button');

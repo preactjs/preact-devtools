@@ -40,7 +40,7 @@ export async function run(config: any) {
 	value = await getText(devtools, '[data-testid="prop-value"]');
 
 	expect(name).to.equal("useErrorBoundary");
-	expect(value).to.equal("anonymous()");
+	expect(value).to.equal("ƒ ()");
 
 	await closePage(page);
 }
