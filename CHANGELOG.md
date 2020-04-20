@@ -1,5 +1,22 @@
 # Changelog
 
+## 0.5.0
+
+This release finally brings support for hooks inspection to preact devtools! It allows you to fully debug all hooks of a component, including custom ones. This is big for me as it took me a few tries to get it right. If you find any issues with it, please reach out!
+
+Apart from that there have been some minor visual changes to improve readability.
+
+- Make complex hook values collapsable (#160, thanks @marvinhagemeister)
+- Use better color hierarchy in sidebar (#159, thanks @marvinhagemeister)
+- Minor design improvements (#158, thanks @marvinhagemeister)
+- Add support for hooks (#143, thanks @marvinhagemeister)
+- Limit key length display (#154, thanks @marvinhagemeister)
+
+Maintenance:
+
+- Extract parsing logic from sidebar components (#156, thanks @marvinhagemeister)
+- Refactor SidebarPanel empty message handling (#155, thanks @marvinhagemeister)
+
 ## 0.4.0
 
 This release improves a lot of little UX interactions and contains a lot of house cleaning in preparation for hooks inspection.
