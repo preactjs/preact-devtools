@@ -60,6 +60,7 @@ export function TreeBar() {
 				<input
 					class={s.search}
 					type="text"
+					data-testid="element-search"
 					placeholder="Search (text or /regex/)"
 					value={value}
 					onKeyDown={onKeyDown}

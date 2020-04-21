@@ -122,7 +122,7 @@ export function MarkResult(props: { text: string; id: ID }) {
 	const ref = useRef<HTMLSpanElement>();
 	useEffect(() => {
 		if (ref.current && isActive) {
-			scrollIntoView(ref.current);
+			scrollIntoView(ref.current.closest('[data-testid="tree-item"]') as any);
 		}
 	}, [ref.current, selectedId, id]);
 
@@ -134,7 +134,10 @@ export function MarkResult(props: { text: string; id: ID }) {
 		return (
 			<span ref={ref}>
 				{start}
-				<mark class={`${s.mark} ${isActive ? s.markSelected : ""}`}>
+				<mark
+					class={`${s.mark} ${isActive ? s.markSelected : ""}`}
+					data-marked={isActive}
+				>
 					{m[0]}
 				</mark>
 				{end}
@@ -157,6 +160,7 @@ export function TreeItem(props: { key: any; id: ID }) {
 	const isSelected = as.selected === id;
 	useEffect(() => {
 		if (ref.current && isSelected) {
+			console.log("SELECT #2");
 			scrollIntoView(ref.current);
 		}
 	}, [ref.current, as.selected, id]);
