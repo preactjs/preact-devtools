@@ -1,5 +1,5 @@
 import { newTestPage } from "../../test-utils";
-import { closePage, clickText } from "pintf/browser_utils";
+import { closePage, clickText } from "pentf/browser_utils";
 
 export const description =
 	"Show upgrade warning when Preact version is too old";

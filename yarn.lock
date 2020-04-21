@@ -8025,6 +8025,25 @@ pend@~1.2.0:
   resolved "https://registry.yarnpkg.com/pend/-/pend-1.2.0.tgz#7a57eb550a6783f9115331fcf4663d5c8e007a50"
   integrity sha1-elfrVQpng/kRUzH89GY9XI4AelA=
 
+pentf@^1.0.54:
+  version "1.0.54"
+  resolved "https://registry.yarnpkg.com/pentf/-/pentf-1.0.54.tgz#3019a2f7fadef30872d92b19eb2e233a6494cc6e"
+  integrity sha512-YiJLfyGDQDvR1y81bMlnP4EmzFAWlSlhgEJ/qGt9C0FEzOqEgKPwZH/vCxh+61d+Llo9OVXTXNDqDGsxEalcEQ==
+  dependencies:
+    "@types/glob" "^7.1.1"
+    "@types/puppeteer" "^2.0.1"
+    argparse "^1.0.10"
+    emailjs-imap-client "^3.0.7"
+    emailjs-mime-parser "^2.0.5"
+    form-data "^2.3.3"
+    glob "^7.1.6"
+    he "^1.2.0"
+    libmime "^4.0.1"
+    mkdirp "^0.5.1"
+    node-fetch "^2.3.0"
+    stream-buffers "^3.0.2"
+    tmp-promise "^2.0.2"
+
 performance-now@^2.1.0:
   version "2.1.0"
   resolved "https://registry.yarnpkg.com/performance-now/-/performance-now-2.1.0.tgz#6309f4e0e5fa913ec1c69307ae364b4b377c9e7b"
@@ -8083,25 +8102,6 @@ pino@5.15.0, pino@~5.15.0:
     pino-std-serializers "^2.4.2"
     quick-format-unescaped "^3.0.3"
     sonic-boom "^0.7.5"
-
-pintf@^1.0.52:
-  version "1.0.52"
-  resolved "https://registry.yarnpkg.com/pintf/-/pintf-1.0.52.tgz#9fb97a281d2d42601473ae5809e1076bcf171482"
-  integrity sha512-klZar/xe5Ikmk7owc4CyBmwTp2CcQp9tp4DHFBvDE7X2NFTOccu88blAaR5CKDJcneB08biW0oGXqYo4Ah2n5Q==
-  dependencies:
-    "@types/glob" "^7.1.1"
-    "@types/puppeteer" "^2.0.1"
-    argparse "^1.0.10"
-    emailjs-imap-client "^3.0.7"
-    emailjs-mime-parser "^2.0.5"
-    form-data "^2.3.3"
-    glob "^7.1.6"
-    he "^1.2.0"
-    libmime "^4.0.1"
-    mkdirp "^0.5.1"
-    node-fetch "^2.3.0"
-    stream-buffers "^3.0.2"
-    tmp-promise "^2.0.2"
 
 pkg-dir@^3.0.0:
   version "3.0.0"

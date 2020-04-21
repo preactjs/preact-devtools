@@ -1,5 +1,5 @@
 import { newTestPage, typeText } from "../test-utils";
-import { clickText, closePage } from "pintf/browser_utils";
+import { clickText, closePage } from "pentf/browser_utils";
 import { Page } from "puppeteer";
 
 async function type(page: Page, devtools: Page, value: string | number) {

@@ -1,6 +1,6 @@
 import { newTestPage, click, waitForAttribute } from "../test-utils";
 import { expect } from "chai";
-import { closePage } from "pintf/browser_utils";
+import { closePage } from "pentf/browser_utils";
 
 export const description =
 	"Ranked profile view should only show nodes of the current commit";

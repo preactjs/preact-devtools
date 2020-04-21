@@ -1,7 +1,7 @@
 import { newTestPage, getSize } from "../../test-utils";
 import { expect } from "chai";
-import { closePage } from "pintf/browser_utils";
-import { wait } from "pintf/utils";
+import { closePage } from "pentf/browser_utils";
+import { wait } from "pentf/utils";
 
 export const description = "Test inspect highlighting in Preact 10.0.0-rc.0";
 

@@ -1,6 +1,6 @@
 import { newTestPage, click, getText } from "../test-utils";
 import { expect } from "chai";
-import { closePage } from "pintf/browser_utils";
+import { closePage } from "pentf/browser_utils";
 
 export const description = "Don't trigger events on click during inspection";
 
