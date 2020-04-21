@@ -252,7 +252,7 @@ describe("parseProps", () => {
 
 	it("should limit depth", () => {
 		const tree = new Map();
-		parseProps({ foo: { bar: "abc" } }, "foo", 2, tree);
+		parseProps({ foo: { bar: { boof: "abc" } } }, "foo", 2, tree);
 		expect(serialize(tree)).to.deep.equal([
 			{
 				editable: false,
@@ -262,7 +262,7 @@ describe("parseProps", () => {
 				type: "object",
 				value: {
 					foo: {
-						bar: "abc",
+						bar: { boof: "abc" },
 					},
 				},
 				children: ["foo.foo"],
@@ -275,9 +275,19 @@ describe("parseProps", () => {
 				name: "foo",
 				type: "object",
 				value: {
-					bar: "abc",
+					bar: { boof: "abc" },
 				},
 				children: ["foo.foo.bar"],
+				meta: null,
+			},
+			{
+				editable: false,
+				depth: 2,
+				id: "foo.foo.bar",
+				name: "bar",
+				type: "string",
+				value: "…",
+				children: [],
 				meta: null,
 			},
 		]);

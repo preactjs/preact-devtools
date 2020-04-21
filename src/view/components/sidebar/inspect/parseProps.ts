@@ -32,11 +32,21 @@ export function parseProps(
 	out: Map<string, PropData>,
 ): Map<string, PropData> {
 	const depth = (path.match(/\./g) || []).length;
+	const name = path.slice(path.lastIndexOf(".") + 1);
+
 	if (depth >= limit) {
+		out.set(path, {
+			depth,
+			name,
+			id: path,
+			type: "string",
+			editable: false,
+			value: "…",
+			children: [],
+			meta: null,
+		});
 		return out;
 	}
-
-	const name = path.slice(path.lastIndexOf(".") + 1);
 
 	if (Array.isArray(data)) {
 		const children: string[] = [];
