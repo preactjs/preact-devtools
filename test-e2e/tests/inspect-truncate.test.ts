@@ -1,6 +1,6 @@
 import { newTestPage } from "../test-utils";
 import { expect } from "chai";
-import { closePage, clickText } from "pintf/browser_utils";
+import { closePage, clickText } from "pentf/browser_utils";
 
 export const description = "Format inspected data";
 

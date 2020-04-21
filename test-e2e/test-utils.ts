@@ -1,4 +1,4 @@
-import { newPage } from "pintf/browser_utils";
+import { newPage } from "pentf/browser_utils";
 import fs from "fs";
 import path from "path";
 import { Request, Page } from "puppeteer";

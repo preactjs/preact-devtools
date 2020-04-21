@@ -1,4 +1,4 @@
-import { main } from "pintf";
+import { main } from "pentf";
 
 main({
 	rootDir: __dirname,

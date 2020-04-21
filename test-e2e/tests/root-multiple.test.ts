@@ -1,6 +1,6 @@
 import { newTestPage, getText } from "../test-utils";
 import { expect } from "chai";
-import { closePage } from "pintf/browser_utils";
+import { closePage } from "pentf/browser_utils";
 
 export const description = "Inspect should select node in elements panel";
 

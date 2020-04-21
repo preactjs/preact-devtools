@@ -1,4 +1,4 @@
-const { newPage } = require("pintf/browser_utils");
+const { newPage } = require("pentf/browser_utils");
 const path = require("path");
 
 async function main() {

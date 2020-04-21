@@ -1,7 +1,7 @@
 import { newTestPage, getSize, click, hasSelector } from "../test-utils";
 import { expect } from "chai";
-import { closePage, waitForTestId } from "pintf/browser_utils";
-import { wait } from "pintf/utils";
+import { closePage, waitForTestId } from "pentf/browser_utils";
+import { wait } from "pentf/utils";
 
 export const description = "Highlighting should move with scroll";
 
