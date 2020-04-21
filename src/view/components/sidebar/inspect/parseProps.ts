@@ -29,11 +29,10 @@ export function parseProps(
 	data: any,
 	path: string,
 	limit: number,
-	out: Map<string, PropData>,
+	depth = 0,
+	name = path,
+	out = new Map<string, PropData>(),
 ): Map<string, PropData> {
-	const depth = (path.match(/\./g) || []).length;
-	const name = path.slice(path.lastIndexOf(".") + 1);
-
 	if (depth >= limit) {
 		out.set(path, {
 			depth,
@@ -63,7 +62,7 @@ export function parseProps(
 		data.forEach((item, i) => {
 			const childPath = `${path}.${i}`;
 			children.push(childPath);
-			parseProps(item, childPath, limit, out);
+			parseProps(item, childPath, limit, depth + 1, "" + i, out);
 		});
 	} else if (data instanceof Set) {
 		// TODO: We're dealing with serialized data here, not a Set object
@@ -187,7 +186,7 @@ export function parseProps(
 				Object.keys(data).forEach(key => {
 					const nextPath = `${path}.${key}`;
 					node.children.push(nextPath);
-					parseProps(data[key], nextPath, limit, out);
+					parseProps(data[key], nextPath, limit, depth + 1, key, out);
 				});
 
 				out.set(path, node);
