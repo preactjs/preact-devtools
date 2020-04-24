@@ -77,6 +77,14 @@ export async function newTestPage(
 			) &&
 			!mockResponse(req, "htm.js", "./vendor/htm.js") &&
 			!mockResponse(req, "test-case.js", `./tests/fixtures/${name}.js`) &&
+			!mockResponse(req, "iframe.html", "./iframe.html") &&
+			!mockResponse(req, "iframe2.html", "./iframe2.html") &&
+			!mockResponse(req, "iframe-content.js", "./tests/fixtures/counter.js") &&
+			!mockResponse(
+				req,
+				"iframe-content2.js",
+				"./tests/fixtures/context-displayName.js",
+			) &&
 			!mockResponse(req, TEST_URL, "./index.html")
 		) {
 			req.continue();
