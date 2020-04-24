@@ -6,9 +6,7 @@ import { wait } from "pentf/utils";
 export const description = "Captures render reasons";
 
 export async function run(config: any) {
-	const { page, devtools } = await newTestPage(config, "render-reasons", {
-		preact: "next",
-	});
+	const { page, devtools } = await newTestPage(config, "render-reasons");
 
 	// Enable Capturing
 	await clickTab(devtools, "SETTINGS");
