@@ -136,9 +136,10 @@ export function parseHookData(
 			if (!tree.has(id)) {
 				let value: any = "__preact_empty__";
 				let editable = false;
-				let children = [];
+				let children: string[] = [];
 				let nodeType: PropDataType = "undefined";
 				const depth = hook.stack.length - i - 1;
+				const name = isNative ? type : frame.name;
 
 				if (debugValues.has(id)) {
 					value = debugValues.get(id);
@@ -155,18 +156,18 @@ export function parseHookData(
 					// properties if the value is an object. We parse it
 					// separately and append it as children to our hook node
 					if (typeof rawValue === "object") {
-						const tree = new Map();
-						parseProps(value, id, 7, tree);
+						const tree = parseProps(value, id, 7, 0, name);
 						children = tree.get(id)!.children;
-						hookValueTree = Array.from(tree.values()).slice(1);
+						hookValueTree = Array.from(tree.values());
+						if (hookValueTree.length > 1) {
+							hookValueTree = hookValueTree.slice(1);
+						}
 						nodeType = hookValueTree[0].type;
 
-						// TODO: Parse props relies on dots in id
-						const wrongDepth = (id.match(/\./g) || []).length;
-
 						hookValueTree.forEach(node => {
+							node.id = id + node.id;
 							node.editable = false;
-							node.depth = node.depth - wrongDepth + depth;
+							node.depth += depth;
 						});
 					}
 					editable =
@@ -180,7 +181,7 @@ export function parseHookData(
 					depth,
 					editable,
 					id,
-					name: isNative ? type : frame.name,
+					name,
 					type: nodeType,
 					meta: isNative
 						? {

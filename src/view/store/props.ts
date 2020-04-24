@@ -29,7 +29,7 @@ export function parseObjectState(
 			meta: null,
 		});
 
-		parseProps(data, "root", PROPS_LIMIT, tree);
+		parseProps(data, "root", PROPS_LIMIT, 0, "root", tree);
 		const { items } = flattenChildren(tree, "root", id => {
 			return tree.get(id)!.children.length > 0 && isCollapsed(uncollapsed, id);
 		});
