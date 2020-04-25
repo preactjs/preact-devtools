@@ -40,7 +40,13 @@ export function createHightlighter(renderer: Renderer) {
 				document.body.appendChild(highlightRef);
 			}
 
-			const [first, last] = dom;
+			// eslint-disable-next-line prefer-const
+			let [first, last] = dom;
+			if (first === null) return;
+
+			if (first.nodeType === Node.TEXT_NODE) {
+				first = first.parentNode as any;
+			}
 
 			const node = getNearestElement(first!);
 			const nodeEnd = last ? getNearestElement(last) : null;
