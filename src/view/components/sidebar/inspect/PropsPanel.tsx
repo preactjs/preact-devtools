@@ -25,7 +25,7 @@ export function PropsPanel(props: Props) {
 	const isSupported = useObserver(() => store.supports.hooks.$);
 
 	return (
-		<SidebarPanel title={label} onCopy={onCopy}>
+		<SidebarPanel title={label} onCopy={onCopy} testId={label}>
 			{items.length ? (
 				<Fragment>
 					<ElementProps
