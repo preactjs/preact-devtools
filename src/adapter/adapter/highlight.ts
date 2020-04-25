@@ -61,6 +61,28 @@ export function createHightlighter(renderer: Renderer) {
 					size = mergeMeasure(size, sizeLast);
 				}
 
+				// If the current DOM is inside an iframe, the position data
+				// is relative to the content inside the iframe. We need to
+				// add the position of the iframe in the parent document to
+				// display the highlight overlay at the correct place.
+				if (document !== first?.ownerDocument) {
+					let iframe;
+					const iframes = Array.from(document.querySelectorAll("iframe"));
+					for (let i = 0; i < iframes.length; i++) {
+						const w = iframes[i].contentWindow;
+						if (w && w.document === first?.ownerDocument) {
+							iframe = iframes[i];
+							break;
+						}
+					}
+
+					if (iframe) {
+						const sizeIframe = measureNode(iframe);
+						size.top += sizeIframe.top;
+						size.left += sizeIframe.left;
+					}
+				}
+
 				render(
 					h(Highlighter, {
 						label,
