@@ -160,7 +160,6 @@ export function TreeItem(props: { key: any; id: ID }) {
 	const isSelected = as.selected === id;
 	useEffect(() => {
 		if (ref.current && isSelected) {
-			console.log("SELECT #2");
 			scrollIntoView(ref.current);
 		}
 	}, [ref.current, as.selected, id]);

@@ -21,6 +21,7 @@ export async function loadSettings(window: Window, store: Store) {
 		}
 	} catch (e) {
 		// We don't really care if we couldn't load the settings
+		// eslint-disable-next-line no-console
 		console.error(e);
 	}
 }
@@ -31,6 +32,7 @@ function store(obj: object) {
 	} catch (e) {
 		// Storing the settings is not a critical operation, so we'll
 		// just log the error and continue
+		// eslint-disable-next-line no-console
 		console.error(e);
 	}
 }

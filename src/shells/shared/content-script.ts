@@ -64,6 +64,7 @@ window.addEventListener("message", e => {
 		}
 
 		if (connection === null) {
+			// eslint-disable-next-line no-console
 			return console.warn("Unable to connect to Preact Devtools extension.");
 		}
 

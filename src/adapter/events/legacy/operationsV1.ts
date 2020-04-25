@@ -29,6 +29,7 @@ export function applyOperationsV1(store: Store, data: number[]) {
 						const parent = store.nodes.$.get(parentId);
 						if (!parent) {
 							// throw new Error(`Parent node ${parentId} not found in store.`);
+							// eslint-disable-next-line no-console
 							console.warn(`Parent node ${parentId} not found in store.`);
 							parentId = -1;
 						} else {
