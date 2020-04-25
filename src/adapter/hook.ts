@@ -136,7 +136,17 @@ export function createHook(port: PortPageHook): DevtoolsHook {
 					renderReasons: !!config.Component,
 					hooks: preactVersionMatch.minor >= 4 && preactVersionMatch.patch >= 1,
 				};
-				const renderer = createRenderer(port, config as any, options, supports);
+
+				// Create an integer-based namespace to avoid clashing ids caused by
+				// multiple connected renderers
+				const namespace = Math.floor(Math.random() * 2 ** 32);
+				const renderer = createRenderer(
+					port,
+					namespace,
+					config as any,
+					options,
+					supports,
+				);
 				setupOptions(options, renderer, config as any);
 				return attachRenderer(renderer, supports);
 			}

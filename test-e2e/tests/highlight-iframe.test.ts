@@ -1,7 +1,6 @@
-import { newTestPage } from "../test-utils";
+import { newTestPage, getText$$ } from "../test-utils";
 import { expect } from "chai";
 import { closePage } from "pentf/browser_utils";
-import { wait } from "pentf/utils";
 
 export const description = "Mirror component state to the devtools";
 
@@ -10,13 +9,15 @@ export async function run(config: any) {
 		preact: "next",
 	});
 
-	await devtools.hover('[data-testid="tree-item"][data-name="Counter"]');
-
-	// Wait for possible flickering to occur
-	await wait(1000);
-
-	const log = (await page.evaluate(() => (window as any).log)) as any[];
-	expect(log.filter(x => x.type === "highlight").length).to.equal(1);
+	const elements = await getText$$(devtools, '[data-testid="tree-item"]');
+	expect(elements).to.deep.equal([
+		"View",
+		"Counter",
+		"Display",
+		"App",
+		"Foobar.Provider",
+		"Foobar.Consumer",
+	]);
 
 	await closePage(page);
 }

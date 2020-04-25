@@ -116,9 +116,31 @@ export async function getAttribute(page: Page, selector: string, name: string) {
 		name,
 	);
 }
+export async function getAttribute$$(
+	page: Page,
+	selector: string,
+	name: string,
+) {
+	await page.waitForSelector(selector);
+	return page.$$eval(
+		selector,
+		(els, propName) => {
+			return els.map(el => {
+				return propName in el
+					? (el as any)[propName]
+					: el.getAttribute(propName);
+			});
+		},
+		name,
+	);
+}
 
 export async function getText(page: Page, selector: string) {
 	return getAttribute(page, selector, "textContent");
+}
+
+export async function getText$$(page: Page, selector: string) {
+	return getAttribute$$(page, selector, "textContent");
 }
 
 export async function hasSelector(page: Page, selector: string) {
