@@ -1,5 +1,29 @@
 # Changelog
 
+## 0.6.0
+
+This release hardens the recently introduced hooks inspection and fixes several edge cases. Apart from that it's now possible to properly debug Preact applications that are rendered inside an `iframe`. The highlight overlay will adapt to the `iframe`'s position accordingly :tada:
+
+Despite this being mostly a maintenance release, there is one new feature: "Reload and profile". This allows to capture the very first render of any application and inspect the render performance!
+
+Features:
+
+- Sync (only user) selection Profiler -> Elements (#174, thanks @marvinhagemeister)
+- Add support for reload and profile (#172, thanks @marvinhagemeister)
+
+Bug Fixes:
+
+- Fix wrong highlight position if rendered in iframe (#171, thanks @marvinhagemeister)
+- Fix hooks parsing error when value is shortened (#167, thanks @marvinhagemeister)
+- Fix possible exception in hooks parsing code (#166, thanks @marvinhagemeister)
+- Fix tree item not scrolling into view in search (#165, thanks @marvinhagemeister)
+
+Maintenance:
+
+- Always enable no-console linting rule (#173, thanks @marvinhagemeister)
+- Make e2e tests more resilient (#170, thanks @marvinhagemeister)
+- Upgrade all dependencies (#163, thanks @marvinhagemeister)
+
 ## 0.5.0
 
 This release finally brings support for hooks inspection to preact devtools! It allows you to fully debug all hooks of a component, including custom ones. This is big for me as it took me a few tries to get it right. If you find any issues with it, please reach out!
