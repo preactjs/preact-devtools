@@ -38,7 +38,7 @@ export async function run(config: any) {
 
 	await clickText(devtools, "ComponentState", { elementXPath: "//*" });
 	let reasons = await getText(devtools, '[data-testid="render-reasons"');
-	expect(reasons).to.equal("State changed");
+	expect(reasons).to.equal("State changed:value");
 
 	// Reset flamegraph
 	await clickText(devtools, "Fragment", { elementXPath: "//*" });

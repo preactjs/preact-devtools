@@ -9,7 +9,7 @@ export async function run(config: any) {
 	const { page, devtools } = await newTestPage(config, "counter");
 
 	const elem1 = '[data-testid="tree-item"][data-name="Counter"]';
-	const prop = '[data-testid="props-row"]';
+	const prop = '[data-testid="Props"] [data-testid="props-row"]';
 	await devtools.click(elem1);
 	await wait(500);
 	expect((await devtools.$$(prop)).length).to.equal(0);
