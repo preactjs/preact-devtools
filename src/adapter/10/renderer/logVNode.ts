@@ -15,6 +15,7 @@ export function logVNode(
 ) {
 	const vnode = getVNodeById(ids, id);
 	if (vnode == null) {
+		// eslint-disable-next-line no-console
 		console.warn(`Could not find vnode with id ${id}`);
 		return;
 	}

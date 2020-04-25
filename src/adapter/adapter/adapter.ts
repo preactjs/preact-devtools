@@ -72,6 +72,7 @@ export function createAdapter(port: PortPageHook, renderer: Renderer) {
 			const data = JSON.stringify(value, null, 2);
 			copyToClipboard(data);
 		} catch (err) {
+			// eslint-disable-next-line no-console
 			console.log(err);
 		}
 	});
@@ -132,7 +133,9 @@ export function createAdapter(port: PortPageHook, renderer: Renderer) {
 		try {
 			window.location.reload();
 		} catch (err) {
+			// eslint-disable-next-line no-console
 			console.error("Preact Devtools was not able to reload the current page.");
+			// eslint-disable-next-line no-console
 			console.log(err);
 		}
 	});

@@ -124,10 +124,12 @@ export function createHook(port: PortPageHook): DevtoolsHook {
 			return status === "connected";
 		},
 		set connected(_) {
+			// eslint-disable-next-line no-console
 			console.warn("Mutating __PREACT_DEVTOOLS__.connected is deprecated.");
 		},
 		emit: port.send,
 		listen: () => {
+			// eslint-disable-next-line no-console
 			console.error("__PREACT_DEVTOOLS__.listen() is deprecated.");
 		},
 		attachPreact: (version, options, config) => {
@@ -139,6 +141,7 @@ export function createHook(port: PortPageHook): DevtoolsHook {
 			const preactVersionMatch = parseSemverish(version);
 
 			if (!preactVersionMatch) {
+				// eslint-disable-next-line no-console
 				console.error(
 					`[PREACT DEVTOOLS] Could not parse preact version ${version}`,
 				);
