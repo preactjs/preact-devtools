@@ -47,7 +47,7 @@ export async function newTestPage(
 ) {
 	const page = await newPage(config);
 
-	const preactVersion = options.preact ? options.preact : "10.3.4";
+	const preactVersion = options.preact ? options.preact : "10.4.1";
 
 	// Reset emulation
 	await (page as any)._client.send("Emulation.clearDeviceMetricsOverride");
@@ -77,6 +77,14 @@ export async function newTestPage(
 			) &&
 			!mockResponse(req, "htm.js", "./vendor/htm.js") &&
 			!mockResponse(req, "test-case.js", `./tests/fixtures/${name}.js`) &&
+			!mockResponse(req, "iframe.html", "./iframe.html") &&
+			!mockResponse(req, "iframe2.html", "./iframe2.html") &&
+			!mockResponse(req, "iframe-content.js", "./tests/fixtures/counter.js") &&
+			!mockResponse(
+				req,
+				"iframe-content2.js",
+				"./tests/fixtures/context-displayName.js",
+			) &&
 			!mockResponse(req, TEST_URL, "./index.html")
 		) {
 			req.continue();
@@ -108,9 +116,31 @@ export async function getAttribute(page: Page, selector: string, name: string) {
 		name,
 	);
 }
+export async function getAttribute$$(
+	page: Page,
+	selector: string,
+	name: string,
+) {
+	await page.waitForSelector(selector);
+	return page.$$eval(
+		selector,
+		(els, propName) => {
+			return els.map(el => {
+				return propName in el
+					? (el as any)[propName]
+					: el.getAttribute(propName);
+			});
+		},
+		name,
+	);
+}
 
 export async function getText(page: Page, selector: string) {
 	return getAttribute(page, selector, "textContent");
+}
+
+export async function getText$$(page: Page, selector: string) {
+	return getAttribute$$(page, selector, "textContent");
 }
 
 export async function hasSelector(page: Page, selector: string) {

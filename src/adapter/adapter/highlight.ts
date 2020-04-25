@@ -40,7 +40,13 @@ export function createHightlighter(renderer: Renderer) {
 				document.body.appendChild(highlightRef);
 			}
 
-			const [first, last] = dom;
+			// eslint-disable-next-line prefer-const
+			let [first, last] = dom;
+			if (first === null) return;
+
+			if (first.nodeType === Node.TEXT_NODE) {
+				first = first.parentNode as any;
+			}
 
 			const node = getNearestElement(first!);
 			const nodeEnd = last ? getNearestElement(last) : null;
@@ -53,6 +59,28 @@ export function createHightlighter(renderer: Renderer) {
 				if (nodeEnd !== null) {
 					const sizeLast = measureNode(nodeEnd);
 					size = mergeMeasure(size, sizeLast);
+				}
+
+				// If the current DOM is inside an iframe, the position data
+				// is relative to the content inside the iframe. We need to
+				// add the position of the iframe in the parent document to
+				// display the highlight overlay at the correct place.
+				if (document !== first?.ownerDocument) {
+					let iframe;
+					const iframes = Array.from(document.querySelectorAll("iframe"));
+					for (let i = 0; i < iframes.length; i++) {
+						const w = iframes[i].contentWindow;
+						if (w && w.document === first?.ownerDocument) {
+							iframe = iframes[i];
+							break;
+						}
+					}
+
+					if (iframe) {
+						const sizeIframe = measureNode(iframe);
+						size.top += sizeIframe.top;
+						size.left += sizeIframe.left;
+					}
 				}
 
 				render(

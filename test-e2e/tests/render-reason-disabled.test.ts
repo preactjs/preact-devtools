@@ -12,9 +12,7 @@ import { wait } from "pentf/utils";
 export const description = "Disables render reason capturing";
 
 export async function run(config: any) {
-	const { page, devtools } = await newTestPage(config, "render-reasons", {
-		preact: "next",
-	});
+	const { page, devtools } = await newTestPage(config, "render-reasons");
 
 	// Enable Capturing
 	await clickTab(devtools, "SETTINGS");

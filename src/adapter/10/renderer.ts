@@ -351,12 +351,13 @@ export interface Supports {
 
 export function createRenderer(
 	port: PortPageHook,
+	namespace: number,
 	config: RendererConfig10,
 	options: Options,
 	supports: Supports,
 	filters: FilterState = DEFAULT_FIlTERS,
 ): Preact10Renderer {
-	const ids = createIdMappingState();
+	const ids = createIdMappingState(namespace);
 	const roots = new Set<VNode>();
 
 	let currentUnmounts: number[] = [];

@@ -5,9 +5,7 @@ import { closePage } from "pentf/browser_utils";
 export const description = "Inspect should select node in elements panel";
 
 export async function run(config: any) {
-	const { page, devtools } = await newTestPage(config, "context-displayName", {
-		preact: "next",
-	});
+	const { page, devtools } = await newTestPage(config, "context-displayName");
 
 	const items = await devtools.evaluate(() => {
 		return Array.from(

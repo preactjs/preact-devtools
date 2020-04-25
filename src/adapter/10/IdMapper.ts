@@ -17,22 +17,22 @@ function getInstance(vnode: VNode): any {
  * this function to keep track of existing id's and create new ones if needed.
  */
 export interface IdMappingState {
-	instToId: Map<any, number>;
-	idToVNode: Map<number, VNode>;
-	idToInst: Map<number, any>;
-	nextId: number;
+	instToId: Map<any, ID>;
+	idToVNode: Map<ID, VNode>;
+	idToInst: Map<ID, any>;
+	nextId: ID;
 }
 
-export function createIdMappingState(): IdMappingState {
+export function createIdMappingState(initial: number): IdMappingState {
 	return {
 		instToId: new Map(),
 		idToVNode: new Map(),
 		idToInst: new Map(),
-		nextId: 1,
+		nextId: initial,
 	};
 }
 
-export function getVNodeById(state: IdMappingState, id: number) {
+export function getVNodeById(state: IdMappingState, id: ID) {
 	return state.idToVNode.get(id) || null;
 }
 

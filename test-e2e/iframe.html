@@ -1,0 +1,21 @@
+<!DOCTYPE html>
+<html lang="en">
+	<head>
+		<meta charset="utf8" />
+		<title>Iframe</title>
+	</head>
+	<body>
+		<div id="app"></div>
+		<script src="vendor/preact.js"></script>
+		<script src="vendor/preactHooks.js"></script>
+		<script src="vendor/preactDevtools.js"></script>
+		<script src="vendor/htm.js"></script>
+		<script>
+			attachToDevtools(preact);
+			window.html = htm.bind(preact.h);
+			const s = document.createElement("script");
+			s.src = "./iframe-content.js";
+			document.body.appendChild(s);
+		</script>
+	</body>
+</html>

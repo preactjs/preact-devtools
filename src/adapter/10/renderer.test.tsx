@@ -21,6 +21,7 @@ export function setupMockHook(options: Options) {
 	const spy = sinon.spy();
 	const renderer = createRenderer(
 		{ send: spy, listen: () => null },
+		1,
 		{ Fragment: Fragment as any },
 		{},
 		{ hooks: false, renderReasons: false },

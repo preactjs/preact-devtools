@@ -104,7 +104,7 @@ export function TreeView() {
 					</p>
 				</div>
 			)}
-			<div class={s.pane} ref={paneRef}>
+			<div class={s.pane} ref={paneRef} data-testid="elements-tree">
 				{nodeList.map(id => (
 					<TreeItem key={id} id={id} />
 				))}
