@@ -8,8 +8,13 @@ import { setupOptions } from "./10/options";
 import { createMultiRenderer } from "./MultiRenderer";
 import parseSemverish from "./parse-semverish";
 import { PortPageHook } from "./adapter/port";
+import { PROFILE_RELOAD } from "../constants";
 
 export type EmitterFn = (event: string, data: any) => void;
+
+export interface ProfilerOptions {
+	captureRenderReasons?: boolean;
+}
 
 export interface DevtoolEvents {
 	"update-prop": { id: ID; path: string; value: any };
@@ -19,9 +24,10 @@ export interface DevtoolEvents {
 	"force-update": ID;
 	"start-picker": null;
 	"stop-picker": null;
-	"start-profiling": { captureRenderReasons?: boolean };
+	"start-profiling": ProfilerOptions;
 	"stop-profiling": null;
 	"clear-profiling": null;
+	"reload-and-profile": ProfilerOptions;
 	"update-filter": RawFilterState;
 	copy: string;
 	highlight: ID | null;
@@ -100,6 +106,15 @@ export function createHook(port: PortPageHook): DevtoolsHook {
 			supportsRenderReasons: !!supports.renderReasons,
 			supportsHooks: !!supports.hooks,
 		});
+
+		// Feature: Profile and reaload
+		// Check if we should immediately start profiling on create
+		const profilerOptions = window.localStorage.getItem(PROFILE_RELOAD);
+		if (profilerOptions !== null) {
+			window.localStorage.removeItem(PROFILE_RELOAD);
+			renderer.startProfiling!(JSON.parse(profilerOptions));
+		}
+
 		return uid;
 	};
 

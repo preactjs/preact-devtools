@@ -7,6 +7,7 @@ import { createHightlighter } from "./highlight";
 import { parseFilters } from "./filter";
 import { PortPageHook } from "./port";
 import { PropData } from "../../view/components/sidebar/inspect/parseProps";
+import { PROFILE_RELOAD } from "../../constants";
 
 export type Path = Array<string | number>;
 
@@ -125,4 +126,14 @@ export function createAdapter(port: PortPageHook, renderer: Renderer) {
 	// Profiler
 	listen("start-profiling", options => renderer.startProfiling!(options));
 	listen("stop-profiling", () => renderer.stopProfiling!());
+	listen("reload-and-profile", options => {
+		window.localStorage.setItem(PROFILE_RELOAD, JSON.stringify(options));
+
+		try {
+			window.location.reload();
+		} catch (err) {
+			console.error("Preact Devtools was not able to reload the current page.");
+			console.log(err);
+		}
+	});
 }
