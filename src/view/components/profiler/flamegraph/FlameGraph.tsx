@@ -66,6 +66,7 @@ export function FlameGraph() {
 	const onSelect = useCallback(
 		(id: number) => {
 			store.profiler.selectedNodeId.$ = id;
+			store.selection.selectById(id);
 		},
 		[store],
 	);
