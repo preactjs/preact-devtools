@@ -6,7 +6,6 @@ import {
 	RenderReasonMap,
 	RenderReasonData,
 } from "../../../../adapter/10/renderer/renderReasons";
-import { EmitFn } from "../../../../adapter/hook";
 
 export interface ProfilerNode extends DevNode {
 	selfDuration: number;
@@ -70,7 +69,7 @@ export interface ProfilerState {
  * Create a new profiler instance. It intentiall doesn't have
  * any methods, to not go down the OOP rabbit hole.
  */
-export function createProfiler(emit: EmitFn): ProfilerState {
+export function createProfiler(): ProfilerState {
 	const commits = valoo<CommitData[]>([]);
 	const isSupported = valoo(false);
 
@@ -109,12 +108,6 @@ export function createProfiler(emit: EmitFn): ProfilerState {
 			if (commits.$.length > 0) {
 				selectedNodeId.$ = commits.$[0].rootId;
 			}
-		}
-
-		if (v) {
-			emit("start-profiling", { captureRenderReasons: captureRenderReasons.$ });
-		} else {
-			emit("stop-profiling", null);
 		}
 	});
 

@@ -3,7 +3,7 @@ import { Actions, ActionSeparator } from "../../../Actions";
 import { CommitTimeline } from "../CommitTimeline/CommitTimeline";
 import { IconBtn } from "../../../IconBtn";
 import { useStore, useObserver } from "../../../../store/react-bindings";
-import { RecordIcon, NotInterested } from "../../../icons";
+import { RecordIcon, NotInterested, Refresh } from "../../../icons";
 import s from "../../../elements/TreeBar.css";
 import { useCallback } from "preact/hooks";
 import { FlameGraphMode } from "../../flamegraph/FlameGraphMode";
@@ -26,6 +26,13 @@ export function TimelineBar() {
 		[store],
 	);
 
+	const onReloadAndProfile = useCallback(() => {
+		store.profiler.isRecording.$ = true;
+		store.emit("reload-and-profile", {
+			captureRenderReasons: store.profiler.captureRenderReasons.$,
+		});
+	}, []);
+
 	const onReset = useCallback(() => {
 		resetProfiler(store.profiler);
 	}, [store]);
@@ -34,6 +41,16 @@ export function TimelineBar() {
 		<Actions>
 			<div class={s.btnWrapper}>
 				<RecordBtn />
+			</div>
+			<div class={s.btnWrapper}>
+				<IconBtn
+					title="Reload and profile"
+					disabled={!isSupported || isRecording}
+					testId="reload-and-profile-btn"
+					onClick={onReloadAndProfile}
+				>
+					<Refresh size="s" />
+				</IconBtn>
 			</div>
 			<div class={s.btnWrapper}>
 				<IconBtn
@@ -72,7 +89,17 @@ export function RecordBtn() {
 	const isSupported = useObserver(() => store.profiler.isSupported.$);
 
 	const onClick = useCallback(() => {
-		store.profiler.isRecording.$ = !store.profiler.isRecording.$;
+		const { isRecording, captureRenderReasons } = store.profiler;
+		const v = !isRecording.$;
+		isRecording.$ = v;
+
+		if (v) {
+			store.emit("start-profiling", {
+				captureRenderReasons: captureRenderReasons.$,
+			});
+		} else {
+			store.emit("stop-profiling", null);
+		}
 	}, [store]);
 
 	return (

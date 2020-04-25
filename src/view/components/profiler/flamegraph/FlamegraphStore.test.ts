@@ -8,7 +8,7 @@ describe("FlameGraphStore", () => {
 	let flame: ReturnType<typeof createFlameGraphStore>;
 
 	beforeEach(() => {
-		profiler = createProfiler(() => null);
+		profiler = createProfiler();
 		flame = createFlameGraphStore(profiler);
 		profiler.activeCommitIdx.$ = 0;
 	});

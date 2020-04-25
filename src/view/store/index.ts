@@ -108,7 +108,7 @@ export function createStore(): Store {
 		supports: {
 			hooks: supportsHooks,
 		},
-		profiler: createProfiler(notify),
+		profiler: createProfiler(),
 		notify,
 		nodeList,
 		inspectData,

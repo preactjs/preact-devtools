@@ -12,7 +12,7 @@ const readFile = (name: string) => {
 	);
 };
 
-const TEST_URL = "http://test-preact-devtools.dev";
+const TEST_URL = "http://localhost";
 
 export function mockResponse(req: Request, test: string, file: string) {
 	const mime = file.endsWith(".html")

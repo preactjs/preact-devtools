@@ -11,6 +11,8 @@ export enum Status {
 	Pending = "pending",
 }
 
+export const PROFILE_RELOAD = "preact-devtools_profile-and-reload";
+
 export enum HookType {
 	useState = 1,
 	useReducer = 2,
