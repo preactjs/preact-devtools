@@ -105,6 +105,7 @@ input {
 	--color-props-vnode: #1b1b1b;
 
 	/* Profiling */
+	--color-bystander-text: #333;
 	--color-record-active: #ff5722;
 	--color-profiler-old: #e7e7e7;
 	--color-profiler-gradient-0: #37afa9;
@@ -181,6 +182,7 @@ input {
 	--color-props-vnode: #dedede;
 
 	/* Profiling */
+	--color-bystander-text: white;
 	--color-record-active: #ff5722;
 	/* --color-profiler-gradient-0: #00b397;
 	--color-profiler-gradient-1: #00b397;
