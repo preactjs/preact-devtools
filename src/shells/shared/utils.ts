@@ -28,6 +28,20 @@ export function debounce<T extends any[]>(
 	};
 }
 
+export function throttle<T extends any[]>(
+	callback: (...args: T) => void,
+	wait: number,
+) {
+	let running = false;
+	return (...args: T) => {
+		if (!running) {
+			callback(...args);
+			running = true;
+			setTimeout(() => (running = false), wait);
+		}
+	};
+}
+
 export function copyToClipboard(text: string) {
 	const dom = document.createElement("textarea");
 	dom.textContent = text;

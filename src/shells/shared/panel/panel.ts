@@ -37,7 +37,7 @@ async function initDevtools() {
 
 	// Render our application
 	const root = window.document.getElementById("root")!;
-	render(h(DevTools, { store }), root);
+	render(h(DevTools, { store, window }), root);
 }
 
 // Send messages from devtools to the content script

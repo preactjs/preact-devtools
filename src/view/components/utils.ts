@@ -1,4 +1,6 @@
-import { useRef, useEffect } from "preact/hooks";
+import { useRef, useEffect, useContext, useLayoutEffect } from "preact/hooks";
+import { WindowCtx } from "../store/react-bindings";
+import { throttle } from "../../shells/shared/utils";
 
 const OFFSET = 16;
 
@@ -71,8 +73,12 @@ export function useInstance<T>(fn: () => T) {
 }
 
 export function useResize(fn: () => void, args: any[]) {
-	useEffect(() => {
-		window.addEventListener("resize", fn);
-		return () => window.removeEventListener("resize", fn);
+	const window = useContext(WindowCtx);
+	const fn2 = throttle(fn, 100);
+	useLayoutEffect(() => {
+		window.addEventListener("resize", fn2);
+		return () => {
+			window.removeEventListener("resize", fn2);
+		};
 	}, args);
 }

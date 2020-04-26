@@ -41,5 +41,5 @@ export function setupFrontendStore(ctx: Window) {
 
 export function setupInlineDevtools(container: HTMLElement, ctx: Window) {
 	const { store } = setupFrontendStore(ctx);
-	render(<DevTools store={store} />, container);
+	render(<DevTools store={store} window={ctx} />, container);
 }
