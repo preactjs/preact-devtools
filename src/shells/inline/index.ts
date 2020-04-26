@@ -42,10 +42,10 @@ export function setupFrontendStore(ctx: Window) {
 
 export function setupInlineDevtools(container: HTMLElement, ctx: Window) {
 	const { store } = setupFrontendStore(ctx);
-	render(h(DevTools, { store }), container);
+	render(h(DevTools, { store, window: ctx }), container);
 	return store;
 }
 
 export function renderDevtools(store: Store, container: HTMLElement) {
-	render(h(DevTools, { store }), container);
+	render(h(DevTools, { store, window }), container);
 }

@@ -62,7 +62,7 @@ container.appendChild(styleGuide);
 
 // Devtools, must be the first one to be initialised
 const { store } = setupFrontendStore(window);
-render(<DevTools store={store} />, devtools);
+render(<DevTools store={store} window={window} />, devtools);
 
 // Preact 10 examples
 initPreact10(hook);

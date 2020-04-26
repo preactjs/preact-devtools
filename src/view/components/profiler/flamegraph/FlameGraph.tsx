@@ -11,7 +11,7 @@ import {
 import { formatTime } from "../util";
 import { CommitData } from "../data/commits";
 import { createFlameGraphStore } from "./FlamegraphStore";
-import { useInstance } from "../../utils";
+import { useInstance, useResize } from "../../utils";
 
 const ROW_HEIGHT = 21; // Account 1px for border
 
@@ -51,14 +51,10 @@ export function FlameGraph() {
 		}
 	}, [ref.current, selectedNodeId, selected, displayType]);
 
-	useEffect(() => {
-		const listener = () => {
-			if (ref.current) {
-				setWidth(ref.current.clientWidth);
-			}
-		};
-		window.addEventListener("resize", listener);
-		return () => window.removeEventListener("resize", listener);
+	useResize(() => {
+		if (ref.current) {
+			setWidth(ref.current.clientWidth);
+		}
 	}, []);
 
 	const isRecording = useObserver(() => store.profiler.isRecording.$);
