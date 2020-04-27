@@ -31,7 +31,7 @@ export function parseValue(v: string) {
 	}
 
 	try {
-		return json5.parse(v);
+		return JSON.parse(v);
 	} catch (err) {
 		throw new TypeError(err.message);
 	}
