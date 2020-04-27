@@ -5,7 +5,7 @@
 		"esModuleInterop": true,
 		"target": "es2019",
 		"strict": true,
-		"jsx": "react",
+		"jsx": "preserve",
 		"jsxFactory": "h"
 	},
 	"include": ["./src/global.d.ts", "./src"]
