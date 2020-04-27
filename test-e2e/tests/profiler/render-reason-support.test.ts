@@ -4,7 +4,7 @@ import {
 	getText,
 	clickTab,
 	getAttribute,
-} from "../test-utils";
+} from "../../test-utils";
 import { expect } from "chai";
 import { closePage, clickText } from "pentf/browser_utils";
 import { wait } from "pentf/utils";
@@ -16,13 +16,14 @@ export async function run(config: any) {
 
 	// Enable Capturing
 	await clickTab(devtools, "SETTINGS");
+	await click(devtools, '[data-testid="toggle-render-reason"]');
 	expect(
 		await getAttribute(
 			devtools,
 			'[data-testid="toggle-render-reason"]',
 			"checked",
 		),
-	).to.equal(false);
+	).to.equal(true);
 
 	// Start profiling
 	await clickTab(devtools, "PROFILER");
@@ -37,30 +38,12 @@ export async function run(config: any) {
 
 	await clickText(devtools, "ComponentState", { elementXPath: "//*" });
 	let reasons = await getText(devtools, '[data-testid="render-reasons"');
-	expect(reasons).to.equal("-");
+	expect(reasons).to.equal("State changed:value");
 
 	// Reset flamegraph
 	await clickText(devtools, "Fragment", { elementXPath: "//*" });
 	reasons = await getText(devtools, '[data-testid="render-reasons"]');
 	expect(reasons).to.equal("Did not render");
-
-	// Enable capturing
-	await click(devtools, '[data-testid="toggle-render-reason"]');
-
-	// Should start profiling immediately
-	const text = await getText(devtools, '[data-testid="profiler-info"]');
-	expect(text).to.match(/Profiling in progress/);
-
-	await click(devtools, recordBtn);
-
-	await clickTab(devtools, "SETTINGS");
-	expect(
-		await getAttribute(
-			devtools,
-			'[data-testid="toggle-render-reason"]',
-			"checked",
-		),
-	).to.equal(true);
 
 	await closePage(page);
 }
