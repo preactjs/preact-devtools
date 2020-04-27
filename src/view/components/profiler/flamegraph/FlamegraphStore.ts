@@ -107,7 +107,28 @@ export function createFlameGraphStore(profiler: ProfilerState) {
 		return state;
 	});
 
+	const activeParents = watch(() => {
+		const parents = new Set<ID>();
+		const commit = profiler.activeCommit.$;
+		if (commit !== null) {
+			// Collect all parents from the node where the update
+			// originated from.
+			let current = commit.commitRootId;
+			while (current > -1) {
+				const node = commit.nodes.get(current);
+				if (node && node.parent > -1) {
+					parents.add(node.parent);
+					current = node.parent;
+				} else {
+					break;
+				}
+			}
+		}
+		return parents;
+	});
+
 	return {
+		activeParents,
 		nodes: layoutNodes,
 		colors,
 	};

@@ -1,4 +1,4 @@
-import { newTestPage, click, waitForAttribute } from "../test-utils";
+import { newTestPage, click, waitForAttribute } from "../../test-utils";
 import { expect } from "chai";
 import { closePage } from "pentf/browser_utils";
 

@@ -1,4 +1,4 @@
-import { newTestPage, click, getText, clickTab } from "../test-utils";
+import { newTestPage, click, getText, clickTab } from "../../test-utils";
 import { expect } from "chai";
 import { closePage, clickText } from "pentf/browser_utils";
 import { wait } from "pentf/utils";

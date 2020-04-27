@@ -105,6 +105,7 @@ input {
 	--color-props-vnode: #1b1b1b;
 
 	/* Profiling */
+	--color-bystander-text: #333;
 	--color-record-active: #ff5722;
 	--color-profiler-old: #e7e7e7;
 	--color-profiler-gradient-0: #37afa9;
@@ -181,6 +182,7 @@ input {
 	--color-props-vnode: #dedede;
 
 	/* Profiling */
+	--color-bystander-text: #e7e7e7;
 	--color-record-active: #ff5722;
 	/* --color-profiler-gradient-0: #00b397;
 	--color-profiler-gradient-1: #00b397;
@@ -192,7 +194,7 @@ input {
 	--color-profiler-gradient-7: #ffc052;
 	--color-profiler-gradient-8: #ff855d;
 	--color-profiler-gradient-9: #ff4c7c; */
-	--color-profiler-old: #6a6a6a;
+	--color-profiler-old: #6e6e6e;
 	--color-profiler-gradient-0: #37afa9;
 	--color-profiler-gradient-1: #63b19e;
 	--color-profiler-gradient-2: #80b393;

@@ -35,6 +35,7 @@ export function FlameGraph() {
 	const ref2 = useInstance(() => createFlameGraphStore(store.profiler));
 	const nodes = useObserver(() => ref2.nodes.$);
 	const colorMap = useObserver(() => ref2.colors.$);
+	const activeParents = useObserver(() => ref2.activeParents.$);
 	const selectedNodeId = useObserver(() => store.profiler.selectedNodeId.$);
 	const selectedIndex = useMemo(
 		() => nodes.findIndex(x => x.id === selectedNodeId),
@@ -88,7 +89,9 @@ export function FlameGraph() {
 						key={meta.id}
 						class={s.node}
 						onClick={() => onSelect(meta.id)}
-						data-weight={color}
+						data-weight={
+							color == null && !activeParents.has(meta.id) ? -1 : color
+						}
 						data-maximized={i <= selectedIndex}
 						data-selected={selectedNodeId === meta.id}
 						data-overflow={width <= 24}

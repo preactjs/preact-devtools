@@ -1,4 +1,4 @@
-import { newTestPage, click } from "../test-utils";
+import { newTestPage, click } from "../../test-utils";
 import { closePage } from "pentf/browser_utils";
 
 export const description = "Reload and immediately start profiling";
