@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/no-var-requires,no-console */
 const archiver = require("archiver");
 const fs = require("fs");
 const path = require("path");
@@ -10,14 +11,13 @@ const source = path.join(dist, "installHook.js");
 const target = path.join(dist, "content-script.js");
 const hook = fs
 	.readFileSync(source, "utf8")
-	.replace(/\(function \(\) \{/g, "function install() {")
-	.replace(/\}\(\)\);/g, "}");
+	.replace(/^\(function \(\) \{/g, "function install() {")
+	.replace(/\}\(\)\);[\s\n]*$/g, "}");
 
 let targetFile = fs
 	.readFileSync(target, "utf8")
-	.replace(/\(function \(\) \{/g, "")
-	.replace(/\}\(\)\);/g, "")
-	.replace(/\}\(\)\);/g, "")
+	.replace(/^\(function \(\) \{/g, "")
+	.replace(/\}\(\)\);[\s\n]*$/g, "")
 	.replace(/"use\sstrict";/g, "")
 	.replace(/['"]CODE_TO_INJECT['"]/g, "installHook.toString()");
 
@@ -25,7 +25,7 @@ targetFile = `;(function () {
 	"use strict";
 
 	let installHook = ${hook}
-	
+
 	${targetFile}
 }());`;
 fs.writeFileSync(target, targetFile);

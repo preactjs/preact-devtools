@@ -1,4 +1,5 @@
 import typescript from "rollup-plugin-typescript2";
+import babel from "rollup-plugin-babel";
 import copy from "rollup-plugin-copy";
 import resolve from "rollup-plugin-node-resolve";
 import postcss from "rollup-plugin-postcss";
@@ -85,6 +86,32 @@ export default entries.map(data => ({
 		typescript({
 			cacheRoot: "./node_modules/.cache/rts2",
 		}),
+		babel({
+			babelrc: false,
+			extensions: [".ts", ".tsx", ".js", ".jsx"],
+			plugins: [
+				[
+					"babel-plugin-transform-jsx-to-htm",
+					{
+						tag: "$$html",
+						import: {
+							module: "htm/preact",
+							export: "html",
+						},
+					},
+				],
+			],
+		}),
+		{
+			name: "moduleDebugPlugin",
+			transform(code, id) {
+				if (!/\.(jsx|js|tsx|ts)$/.test(id)) return;
+
+				const debugPath = path.relative(__dirname, id).replace(/\\/g, "/");
+				const comment = `// MODULE: ${debugPath}\n`;
+				return comment + code;
+			},
+		},
 		resolve(),
 		commonjs(),
 		replace({
