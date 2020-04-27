@@ -1,5 +1,5 @@
 import { valoo, watch, Observable } from "../../valoo";
-import { parseValue, genPreview, valueToHuman } from "./parseValue";
+import { parseValue, genPreview } from "./parseValue";
 
 export function createInputStore(value: Observable<any>) {
 	// Local state
@@ -14,11 +14,7 @@ export function createInputStore(value: Observable<any>) {
 	// Derived state
 	const valid = watch(() => {
 		try {
-			if (local.$ !== undefined) {
-				parseValue(local.$);
-			} else {
-				valueToHuman(value.$);
-			}
+			parseValue(local.$ !== undefined ? local.$ : value.$);
 			return true;
 		} catch (err) {
 			return false;
@@ -59,7 +55,7 @@ export function createInputStore(value: Observable<any>) {
 	const showReset = watch(() => {
 		if (local.$ !== undefined) {
 			try {
-				return local.$ !== valueToHuman(value.$);
+				return local.$ !== value.$;
 			} catch (err) {
 				return true;
 			}
@@ -80,7 +76,7 @@ export function createInputStore(value: Observable<any>) {
 
 	const onFocus = () => {
 		focus.$ = true;
-		local.$ = valueToHuman(value.$);
+		local.$ = value.$;
 	};
 
 	const onBlur = () => {
@@ -89,11 +85,7 @@ export function createInputStore(value: Observable<any>) {
 	};
 
 	const onReset = () => {
-		try {
-			const parsed = valueToHuman(value.$);
-			local.$ = parsed;
-			// eslint-disable-next-line no-empty
-		} catch (err) {}
+		local.$ = value.$;
 	};
 
 	// Only for number field
