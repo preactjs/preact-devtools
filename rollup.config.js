@@ -85,6 +85,16 @@ export default entries.map(data => ({
 		typescript({
 			cacheRoot: "./node_modules/.cache/rts2",
 		}),
+		{
+			name: "moduleDebugPlugin",
+			transform(code, id) {
+				if (!/\.(jsx|js|tsx|ts)$/.test(id)) return;
+
+				const debugPath = path.relative(__dirname, id).replace(/\\/g, "/");
+				const comment = `// MODULE: ${debugPath}\n`;
+				return comment + code;
+			},
+		},
 		resolve(),
 		commonjs(),
 		replace({
