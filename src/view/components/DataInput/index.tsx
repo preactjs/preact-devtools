@@ -1,8 +1,9 @@
 import { h } from "preact";
 import s from "./DataInput.css";
-import { useCallback, useRef, useMemo } from "preact/hooks";
+import { useCallback, useRef, useMemo, useState } from "preact/hooks";
 import { Undo } from "../icons";
 import { parseValue } from "./parseValue";
+import { debug } from "../../../debug";
 
 export interface InputProps {
 	name: string;
@@ -24,6 +25,8 @@ export function DataInput({
 	showReset,
 	...props
 }: InputProps) {
+	const [focus, setFocus] = useState(false);
+
 	const valid = useMemo(() => {
 		try {
 			parseValue(value);
@@ -54,10 +57,17 @@ export function DataInput({
 
 	const onKeyUp = useCallback(
 		(e: KeyboardEvent) => {
+			let parsed: any;
+			try {
+				parsed = parseValue(value);
+			} catch (err) {
+				debug(err);
+				return;
+			}
+
 			if (e.key === "Enter") {
-				onCommit(value);
+				onCommit(parsed);
 			} else {
-				const parsed = parseValue(value);
 				if (typeof parsed === "number") {
 					if (e.key === "ArrowUp") {
 						onChange(String(parsed + 1));
@@ -84,6 +94,9 @@ export function DataInput({
 		[onChange],
 	);
 
+	const onFocus = useCallback(() => setFocus(true), []);
+	const onBlur = useCallback(() => setFocus(false), []);
+
 	return (
 		<div class={s.valueWrapper}>
 			{typeof value === "boolean" && !focus && (
@@ -106,6 +119,8 @@ export function DataInput({
 					value={value === undefined ? "" : value}
 					onKeyUp={onKeyUp}
 					onInput={onInput}
+					onFocus={onFocus}
+					onBlur={onBlur}
 					placeholder={props.placeholder}
 					data-type={type}
 					name={name}

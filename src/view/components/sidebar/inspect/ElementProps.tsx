@@ -5,7 +5,7 @@ import { PropDataType, PropData } from "./parseProps";
 import { DataInput } from "../../DataInput";
 import { genPreview } from "../../DataInput/parseValue";
 import { isCollapsed } from "../../../store/props";
-import { useState, useCallback } from "preact/hooks";
+import { useState, useCallback, useLayoutEffect } from "preact/hooks";
 
 export type ChangeFn = (value: any, path: string, node: null | any) => void;
 
@@ -74,6 +74,10 @@ export function SingleItem(props: SingleProps) {
 	} = props;
 	const [value, setValue] = useState(initial);
 
+	useLayoutEffect(() => {
+		setValue(genPreview(initial));
+	}, [initial]);
+
 	const onCommit = useCallback(
 		(v: any) => {
 			if (onChange) onChange(v);
@@ -108,13 +112,13 @@ export function SingleItem(props: SingleProps) {
 					<span
 						class={`${s.name} ${s.nameEditable}`}
 						data-testid="prop-name"
-						data-type={value !== "__preact_empty__" ? type : "empty"}
+						data-type={initial !== "__preact_empty__" ? type : "empty"}
 					>
 						{name}
 					</span>
-					{value !== "__preact_empty__" && (
+					{initial !== "__preact_empty__" && (
 						<span class={s.property} data-testid="prop-value">
-							<span class={s.mask}>{genPreview(value)}</span>
+							<span class={s.mask}>{genPreview(initial)}</span>
 						</span>
 					)}
 				</button>
@@ -143,7 +147,7 @@ export function SingleItem(props: SingleProps) {
 										name={`${id}`}
 									/>
 								) : (
-									<div class={s.mask}>{genPreview(value)}</div>
+									<div class={s.mask}>{genPreview(initial)}</div>
 								)}
 							</Fragment>
 						)}

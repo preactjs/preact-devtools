@@ -19,12 +19,12 @@ export function parseValue(v: string) {
 			return -Infinity;
 	}
 
-	if (/^['"]/.test(v)) {
-		if (/['"]$/.test(v)) return v.slice(1, v.length - 1);
+	if (/^["]/.test(v)) {
+		if (/["]$/.test(v)) return v.slice(1, v.length - 1);
 		throw new TypeError("Invalid input");
 	} else if (/^[-+.]?\d*(?:[.]?\d*)$/.test(v)) {
 		return Number(v);
-	} else if (/^\{.*\}$/.test(v)) {
+	} else if (/^\{.*\}$/.test(v) || /^\[.*\]$/.test(v)) {
 		try {
 			return JSON.parse(v);
 		} catch (err) {
@@ -32,7 +32,7 @@ export function parseValue(v: string) {
 		}
 	}
 
-	return "" + v;
+	throw new TypeError("Unknown type");
 }
 
 export function isStringifiedVNode(v: string) {
