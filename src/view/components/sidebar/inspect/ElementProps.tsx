@@ -5,6 +5,7 @@ import { PropDataType, PropData } from "./parseProps";
 import { DataInput } from "../../DataInput";
 import { genPreview } from "../../DataInput/parseValue";
 import { isCollapsed } from "../../../store/props";
+import { useState, useCallback } from "preact/hooks";
 
 export type ChangeFn = (value: any, path: string, node: null | any) => void;
 
@@ -69,8 +70,24 @@ export function SingleItem(props: SingleProps) {
 		collapsed = false,
 		depth,
 		onCollapse,
-		value,
+		value: initial,
 	} = props;
+	const [value, setValue] = useState(initial);
+
+	const onCommit = useCallback(
+		(v: any) => {
+			if (onChange) onChange(v);
+		},
+		[onChange],
+	);
+
+	const onChangeValue = useCallback((v: any) => {
+		setValue(v);
+	}, []);
+
+	const onReset = useCallback(() => {
+		setValue(initial);
+	}, [initial]);
 
 	return (
 		<div
@@ -119,7 +136,10 @@ export function SingleItem(props: SingleProps) {
 								{editable ? (
 									<DataInput
 										value={value}
-										onChange={v => onChange && onChange(v)}
+										onReset={onReset}
+										onCommit={onCommit}
+										showReset={value !== initial}
+										onChange={onChangeValue}
 										name={`${id}`}
 									/>
 								) : (

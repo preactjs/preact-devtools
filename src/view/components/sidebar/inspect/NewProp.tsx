@@ -8,21 +8,32 @@ export interface NewPropProps {
 	onChange: (value: any, path: string) => void;
 }
 
+const initial = undefined;
 export function NewProp(props: NewPropProps) {
 	const [name, setName] = useState("");
+	const [value, setValue] = useState(initial);
 
 	const onChangeName = useCallback((e: Event) => {
 		setName((e.target as any).value);
 	}, []);
 
+	const onReset = useCallback(() => {
+		setValue(initial);
+	}, []);
+
+	const onChangeValue = useCallback((v: any) => {
+		setValue(v);
+	}, []);
+
 	const onCommit = useCallback(
 		(value: any) => {
 			if (name) {
-				props.onChange(value, name);
+				props.onChange(value, "." + name);
 				setName("");
+				setValue(initial);
 			}
 		},
-		[name],
+		[name, props.onChange],
 	);
 
 	return (
@@ -39,10 +50,13 @@ export function NewProp(props: NewPropProps) {
 			</div>
 			<DataInput
 				class={s.value}
-				value={undefined}
-				onChange={onCommit}
+				value={value}
+				showReset={initial !== value}
+				onChange={onChangeValue}
+				onCommit={onCommit}
+				onReset={onReset}
 				placeholder="new value"
-				name="foobar"
+				name="new-prop-value"
 			/>
 		</div>
 	);
