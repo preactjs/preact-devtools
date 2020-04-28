@@ -96,7 +96,7 @@ export async function newTestPage(
 	// Grab devtools that's inside the iframe
 	const frames = await page.frames();
 	const devtools = frames.find(f => f.url().includes("devtools.html"))!;
-
+	(devtools as any).keyboard = page.keyboard;
 	(devtools as any).mouse = Object.assign(
 		Object.create(Object.getPrototypeOf(page.mouse)),
 		page.mouse,
@@ -107,7 +107,7 @@ export async function newTestPage(
 }
 
 export async function getAttribute(page: Page, selector: string, name: string) {
-	await page.waitForSelector(selector);
+	await page.waitForSelector(selector, { timeout: 2000 });
 	return page.$eval(
 		selector,
 		(el, propName) => {
@@ -187,7 +187,11 @@ export async function click(page: Page, selector: string) {
 export async function typeText(page: Page, selector: string, text: string) {
 	const input = (await page.$(selector))!;
 	await input.click({ clickCount: 3 });
-	return page.type(selector, text);
+	if (text) {
+		await page.type(selector, text);
+	} else {
+		await page.keyboard.press("Delete");
+	}
 }
 
 export async function getLog(page: Page) {
@@ -220,6 +224,13 @@ export async function waitFor(
 
 	await fn();
 	clearTimeout(t);
+}
+
+export async function doesExist(page: Page, selector: string) {
+	return await page.evaluate(
+		(s: string) => document.querySelector(s) !== null,
+		selector,
+	);
 }
 
 export async function checkNotPresent(page: Page, selector: string) {
