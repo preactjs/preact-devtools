@@ -121,7 +121,7 @@ export async function getAttribute$$(
 	selector: string,
 	name: string,
 ) {
-	await page.waitForSelector(selector);
+	await page.waitForSelector(selector, { timeout: 2000 });
 	return page.$$eval(
 		selector,
 		(els, propName) => {
