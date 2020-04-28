@@ -1,6 +1,6 @@
 import { h } from "preact";
 import s from "./DataInput.css";
-import { useCallback, useRef, useMemo, useState } from "preact/hooks";
+import { useCallback, useRef, useMemo } from "preact/hooks";
 import { Undo } from "../icons";
 import { parseValue } from "./parseValue";
 

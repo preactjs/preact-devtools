@@ -1,5 +1,5 @@
 import { expect } from "chai";
-import { parseValue, valueToHuman, genPreview } from "./parseValue";
+import { parseValue, genPreview } from "./parseValue";
 
 describe("parseValue", () => {
 	it("should parse booleans", () => {
