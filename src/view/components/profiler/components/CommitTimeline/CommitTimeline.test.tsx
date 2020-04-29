@@ -1,9 +1,19 @@
-import { h } from "preact";
+import { h, ComponentChild } from "preact";
 import { expect } from "chai";
-import { renderTest } from "../../../DataInput/DataInput.test";
 import { CommitTimeline } from "./CommitTimeline";
-import { fireEvent } from "@testing-library/preact";
+import { fireEvent, render } from "@testing-library/preact";
 import * as sinon from "sinon";
+
+export function renderTest(ui: ComponentChild) {
+	const res = render(ui);
+	return {
+		...res,
+		e2e: (name: string) =>
+			res.container.querySelector(`[data-testid="${name}"]`),
+		$: (sel: string) => res.container.querySelector(sel),
+		$$: (sel: string) => res.container.querySelectorAll(sel),
+	};
+}
 
 const noop = () => null;
 
