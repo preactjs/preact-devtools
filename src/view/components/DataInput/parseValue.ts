@@ -1,7 +1,5 @@
-import * as json5 from "json5-es";
-
 export function parseValue(v: string) {
-	v = v.trim();
+	v = ("" + v).trim();
 
 	switch (v) {
 		case "true":
@@ -21,53 +19,24 @@ export function parseValue(v: string) {
 			return -Infinity;
 	}
 
-	if (/^['"]/.test(v)) {
-		if (/['"]$/.test(v)) return v.slice(1, v.length - 1);
+	if (/^["]/.test(v)) {
+		if (/["]$/.test(v)) return v.slice(1, v.length - 1);
 		throw new TypeError("Invalid input");
 	} else if (/^[-+.]?\d*(?:[.]?\d*)$/.test(v)) {
 		return Number(v);
-	} else if (/\(\)$/.test(v)) {
-		return { type: "function", name: v.slice(0, -2) };
+	} else if (/^\{.*\}$/.test(v) || /^\[.*\]$/.test(v)) {
+		try {
+			return JSON.parse(v);
+		} catch (err) {
+			throw new TypeError(err.message);
+		}
 	}
 
-	try {
-		return json5.parse(v);
-	} catch (err) {
-		throw new TypeError(err.message);
-	}
+	throw new TypeError("Unknown type");
 }
 
 export function isStringifiedVNode(v: string) {
 	return v.startsWith("<") && v.endsWith("/>");
-}
-
-export function valueToHuman(v: any): string {
-	switch (typeof v) {
-		case "string":
-			if (isStringifiedVNode(v) || v.endsWith("()")) {
-				return v;
-			}
-			return v[0] !== '"' || v[v.length - 1] !== '"' ? `"${v}"` : v;
-		case "number":
-		case "boolean":
-			return "" + v;
-		case "undefined":
-			return "";
-	}
-
-	if (v === null) return "" + v;
-
-	if (Object.keys(v).length === 2) {
-		if (typeof v.name === "string") {
-			if (v.type === "vnode") {
-				return `<${v.name} />`;
-			} else if (v.type === "function") {
-				return `${v.name}()`;
-			}
-		}
-	}
-
-	return json5.stringify(v);
 }
 
 const MAX_PREVIEW = 50;
@@ -96,6 +65,7 @@ export function genPreview(v: any): string {
 		return `{${obj.join(", ")}}`;
 	}
 	if (typeof v === "string") {
+		if (v === "__preact_empty__") return "";
 		if (v === "[[Circular]]") return v;
 		return `"${truncate(v)}"`;
 	}

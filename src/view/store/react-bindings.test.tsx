@@ -1,9 +1,9 @@
 import { h } from "preact";
 import { expect } from "chai";
 import { act } from "preact/test-utils";
-import { renderTest } from "../components/DataInput/DataInput.test";
 import { valoo } from "../valoo";
 import { useObserver } from "./react-bindings";
+import { renderTest } from "../components/profiler/components/CommitTimeline/CommitTimeline.test";
 
 describe("useObserver", () => {
 	it("should render on update", () => {

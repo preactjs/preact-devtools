@@ -5,6 +5,7 @@ import { PropDataType, PropData } from "./parseProps";
 import { DataInput } from "../../DataInput";
 import { genPreview } from "../../DataInput/parseValue";
 import { isCollapsed } from "../../../store/props";
+import { useState, useCallback, useLayoutEffect, useMemo } from "preact/hooks";
 
 export type ChangeFn = (value: any, path: string, node: null | any) => void;
 
@@ -69,8 +70,30 @@ export function SingleItem(props: SingleProps) {
 		collapsed = false,
 		depth,
 		onCollapse,
-		value,
+		value: initial,
 	} = props;
+	const [value, setValue] = useState(initial);
+
+	useLayoutEffect(() => {
+		setValue(genPreview(initial));
+	}, [initial]);
+
+	const onCommit = useCallback(
+		(v: any) => {
+			if (onChange) onChange(v);
+		},
+		[onChange],
+	);
+
+	const onChangeValue = useCallback((v: any) => {
+		setValue(v);
+	}, []);
+
+	const onReset = useCallback(() => {
+		setValue(initial);
+	}, [initial]);
+
+	const preview = useMemo(() => genPreview(initial), [initial]);
 
 	return (
 		<div
@@ -91,13 +114,13 @@ export function SingleItem(props: SingleProps) {
 					<span
 						class={`${s.name} ${s.nameEditable}`}
 						data-testid="prop-name"
-						data-type={value !== "__preact_empty__" ? type : "empty"}
+						data-type={initial !== "__preact_empty__" ? type : "empty"}
 					>
 						{name}
 					</span>
-					{value !== "__preact_empty__" && (
+					{initial !== "__preact_empty__" && (
 						<span class={s.property} data-testid="prop-value">
-							<span class={s.mask}>{genPreview(value)}</span>
+							<span class={s.mask}>{preview}</span>
 						</span>
 					)}
 				</button>
@@ -119,11 +142,14 @@ export function SingleItem(props: SingleProps) {
 								{editable ? (
 									<DataInput
 										value={value}
-										onChange={v => onChange && onChange(v)}
+										onReset={onReset}
+										onCommit={onCommit}
+										showReset={value !== preview}
+										onChange={onChangeValue}
 										name={`${id}`}
 									/>
 								) : (
-									<div class={s.mask}>{genPreview(value)}</div>
+									<div class={s.mask}>{preview}</div>
 								)}
 							</Fragment>
 						)}

@@ -1,96 +1,136 @@
 import { h } from "preact";
 import s from "./DataInput.css";
-import { useCallback, useRef, useMemo, useEffect } from "preact/hooks";
+import { useCallback, useRef, useMemo, useState } from "preact/hooks";
 import { Undo } from "../icons";
-import { createInputStore } from "./inputState";
-import { valoo } from "../../valoo";
-import { useObserver } from "../../store/react-bindings";
 import { parseValue } from "./parseValue";
+import { debug } from "../../../debug";
 
 export interface InputProps {
 	name: string;
 	value: any;
 	class?: string;
 	placeholder?: string;
+	showReset?: boolean;
 	onChange: (value: any) => void;
+	onCommit: (value: any) => void;
+	onReset: (value: any) => void;
 }
 
-export function DataInput({ value, onChange, name, ...props }: InputProps) {
-	const value$ = useRef(valoo(value)).current;
-	const tmp = useRef(null as any);
-	const store = useRef<ReturnType<typeof createInputStore>>(
-		(tmp as any).current || (tmp.current = createInputStore(value$)),
-	).current;
+export function DataInput({
+	value,
+	onChange,
+	name,
+	onCommit,
+	onReset,
+	showReset,
+	...props
+}: InputProps) {
+	const [focus, setFocus] = useState(false);
 
-	useEffect(() => {
-		store.onClear();
-	}, [name]);
-
-	useEffect(() => {
-		if (value$.$ !== value) {
-			value$.$ = value;
+	const valid = useMemo(() => {
+		try {
+			parseValue(value);
+			return true;
+		} catch (err) {
+			return false;
 		}
-		const dispose = value$.on(v => onChange(v));
-		return () => dispose();
-	}, [value$, value, onChange]);
+	}, [value]);
 
-	const valid = useObserver(() => store.valid.$);
-	const type = useObserver(() => store.valueType.$);
-	const inputVal = useObserver(() => store.actualValue.$);
-	const focus = useObserver(() => store.focus.$);
-	const showReset = useObserver(() => store.showReset.$);
+	const type = useMemo(() => {
+		try {
+			const parsed = parseValue(value);
+			if (parsed === null) return "null";
+			else if (Array.isArray(parsed)) return "array";
+			return typeof parsed;
+		} catch (err) {
+			return "undefined";
+		}
+	}, [value]);
+
 	const ref = useRef<HTMLInputElement>();
 
 	useMemo(() => {
 		if (ref.current) {
-			ref.current.setCustomValidity(valid ? "" : "Invalid input");
+			ref.current.setCustomValidity(valid ? "" : "Invalid input value");
 		}
 	}, [ref.current, valid]);
 
-	const onKeyUp = useCallback((e: KeyboardEvent) => {
-		if (e.key === "Enter") {
-			store.onConfirm();
-		} else if (e.key === "ArrowUp") {
-			store.onIncrement();
-		} else if (e.key === "ArrowDown") {
-			store.onDecrement();
-		}
-	}, []);
+	const onKeyUp = useCallback(
+		(e: KeyboardEvent) => {
+			let parsed: any;
+			try {
+				parsed = parseValue(value);
+			} catch (err) {
+				debug(err);
+				return;
+			}
 
-	const onInput = useCallback((e: Event) => {
-		store.onInput((e.target as any).value);
-	}, []);
+			if (e.key === "Enter") {
+				onCommit(parsed);
+			} else {
+				if (typeof parsed === "number") {
+					if (e.key === "ArrowUp") {
+						onChange(String(parsed + 1));
+					} else if (e.key === "ArrowDown") {
+						onChange(String(parsed - 1));
+					}
+				}
+			}
+		},
+		[onChange, value, onCommit],
+	);
+
+	const onInput = useCallback(
+		(e: Event) => {
+			onChange((e.target as any).value);
+		},
+		[onChange],
+	);
+
+	const onCheckboxChange = useCallback(
+		(e: Event) => {
+			onChange((e.target as any).checked);
+		},
+		[onChange],
+	);
+
+	const onFocus = useCallback(() => setFocus(true), []);
+	const onBlur = useCallback(() => setFocus(false), []);
 
 	return (
 		<div class={s.valueWrapper}>
-			{store.asCheckbox.$ && !focus && (
+			{typeof value === "boolean" && !focus && (
 				<input
 					class={s.check}
 					type="checkbox"
-					checked={store.actualValue.$ === "true"}
-					onInput={e => {
-						const value = "" + (e.target as any).checked;
-						value$.$ = parseValue(value);
-					}}
+					checked={value}
+					onInput={onCheckboxChange}
 				/>
 			)}
-			<div class={`${s.innerWrapper} ${store.asCheckbox.$ ? s.withCheck : ""}`}>
+			<div
+				class={`${s.innerWrapper} ${
+					typeof value === "boolean" ? s.withCheck : ""
+				}`}
+			>
 				<input
 					type="text"
 					ref={ref}
 					class={`${s.valueInput} ${props.class || ""} ${focus ? s.focus : ""}`}
-					value={inputVal === "undefined" ? "" : inputVal}
-					onFocus={store.onFocus}
-					onBlur={store.onBlur}
+					value={value === undefined ? "" : value}
 					onKeyUp={onKeyUp}
 					onInput={onInput}
+					onFocus={onFocus}
+					onBlur={onBlur}
 					placeholder={props.placeholder}
 					data-type={type}
+					name={name}
+					autoComplete="off"
 				/>
 				<button
 					class={`${s.undoBtn} ${showReset ? s.showUndoBtn : ""}`}
 					type="button"
-					onClick={store.onReset}
+					onClick={onReset}
+					data-testid={showReset ? "undo-btn" : "undo-btn-hidden"}
 				>
 					<Undo size="s" />
 				</button>
