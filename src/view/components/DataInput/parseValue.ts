@@ -65,6 +65,7 @@ export function genPreview(v: any): string {
 		return `{${obj.join(", ")}}`;
 	}
 	if (typeof v === "string") {
+		if (v === "__preact_empty__") return "";
 		if (v === "[[Circular]]") return v;
 		return `"${truncate(v)}"`;
 	}

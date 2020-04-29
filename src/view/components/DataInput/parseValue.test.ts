@@ -32,10 +32,9 @@ describe("parseValue", () => {
 	});
 
 	it("should parse strings", () => {
-		expect(parseValue("'abc'")).to.equal("abc");
 		expect(parseValue('"abc"')).to.equal("abc");
 		expect(parseValue('"123"')).to.equal("123");
-		expect(parseValue("''")).to.equal("");
+		expect(parseValue('""')).to.equal("");
 	});
 
 	it("should parse arrays", () => {
@@ -43,7 +42,11 @@ describe("parseValue", () => {
 	});
 
 	it("should parse objects", () => {
-		expect(parseValue("{a:1,b:2,c:3}")).to.deep.equal({ a: 1, b: 2, c: 3 });
+		expect(parseValue('{"a":1,"b":2,"c":3}')).to.deep.equal({
+			a: 1,
+			b: 2,
+			c: 3,
+		});
 	});
 
 	it("should throw on invalid data", () => {
@@ -62,5 +65,8 @@ describe("genPreview", () => {
 		expect(genPreview("foo")).to.equal('"foo"');
 		expect(genPreview([1, 2, { a: 3 }])).to.equal("[1, 2, {a: 3}]");
 		expect(genPreview({ a: 123, b: [1, 2] })).to.equal("{a: 123, b: [1, 2]}");
+
+		// Special values
+		expect(genPreview("__preact_empty__")).to.equal("");
 	});
 });
