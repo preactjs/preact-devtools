@@ -124,11 +124,13 @@ export function DataInput({
 					placeholder={props.placeholder}
 					data-type={type}
 					name={name}
+					autoComplete="off"
 				/>
 				<button
 					class={`${s.undoBtn} ${showReset ? s.showUndoBtn : ""}`}
 					type="button"
 					onClick={onReset}
+					data-testid={showReset ? "undo-btn" : "undo-btn-hidden"}
 				>
 					<Undo size="s" />
 				</button>

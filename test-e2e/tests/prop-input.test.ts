@@ -7,6 +7,7 @@ import {
 	getLog,
 	click,
 	doesExist,
+	checkNotPresent,
 } from "../test-utils";
 import { expect } from "chai";
 import { closePage, waitForTestId } from "pentf/browser_utils";
@@ -34,6 +35,7 @@ async function enterText(
 ) {
 	await click(page, "button");
 	await clickNestedText(devtools, "Display");
+	await checkNotPresent(devtools, '[data-testid="undo-btn"]');
 	await typeText(devtools, selector, text);
 	await page.keyboard.press("Enter");
 	await clickNestedText(page, "Counter");
@@ -53,7 +55,7 @@ async function enterText(
 }
 
 export async function run(config: any) {
-	const { page, devtools } = await newTestPage(config, "counter");
+	const { page, devtools } = await newTestPage(config, "data-input");
 
 	await clickNestedText(devtools, "Display");
 	await waitForTestId(devtools, "props-row", { timeout: 2000 });
@@ -138,14 +140,14 @@ export async function run(config: any) {
 	expect(data).to.deep.equal({
 		value: "{}",
 		rendered: {},
-		type: "object",
+		type: "non-editable",
 	});
 
 	data = await enterText(page, devtools, input, '{"foo":123, "bar": [1,2]}');
 	expect(data).to.deep.equal({
-		value: '{"foo":123, "bar": [1,2]}',
+		value: "{foo: 123, bar: [1, 2]}",
 		rendered: { foo: 123, bar: [1, 2] },
-		type: "object",
+		type: "non-editable",
 	});
 
 	// undefined

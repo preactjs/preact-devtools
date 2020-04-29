@@ -5,7 +5,7 @@ import { PropDataType, PropData } from "./parseProps";
 import { DataInput } from "../../DataInput";
 import { genPreview } from "../../DataInput/parseValue";
 import { isCollapsed } from "../../../store/props";
-import { useState, useCallback, useLayoutEffect } from "preact/hooks";
+import { useState, useCallback, useLayoutEffect, useMemo } from "preact/hooks";
 
 export type ChangeFn = (value: any, path: string, node: null | any) => void;
 
@@ -93,6 +93,8 @@ export function SingleItem(props: SingleProps) {
 		setValue(initial);
 	}, [initial]);
 
+	const preview = useMemo(() => genPreview(initial), [initial]);
+
 	return (
 		<div
 			key={id}
@@ -118,7 +120,7 @@ export function SingleItem(props: SingleProps) {
 					</span>
 					{initial !== "__preact_empty__" && (
 						<span class={s.property} data-testid="prop-value">
-							<span class={s.mask}>{genPreview(initial)}</span>
+							<span class={s.mask}>{preview}</span>
 						</span>
 					)}
 				</button>
@@ -142,12 +144,12 @@ export function SingleItem(props: SingleProps) {
 										value={value}
 										onReset={onReset}
 										onCommit={onCommit}
-										showReset={value !== initial}
+										showReset={value !== preview}
 										onChange={onChangeValue}
 										name={`${id}`}
 									/>
 								) : (
-									<div class={s.mask}>{genPreview(initial)}</div>
+									<div class={s.mask}>{preview}</div>
 								)}
 							</Fragment>
 						)}

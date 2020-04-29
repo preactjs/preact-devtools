@@ -186,6 +186,9 @@ export async function click(page: Page, selector: string) {
 
 export async function typeText(page: Page, selector: string, text: string) {
 	const input = (await page.$(selector))!;
+	if (!input) {
+		throw new Error(`Could not find selector ${selector}`);
+	}
 	await input.click({ clickCount: 3 });
 	if (text) {
 		await page.type(selector, text);
