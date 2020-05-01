@@ -1,4 +1,9 @@
-import { newTestPage, click, waitForAttribute } from "../../test-utils";
+import {
+	newTestPage,
+	click,
+	waitForAttribute,
+	getText,
+} from "../../test-utils";
 import { expect } from "chai";
 import { closePage } from "pentf/browser_utils";
 
@@ -25,6 +30,13 @@ export async function run(config: any) {
 		'[data-type="ranked"] > *:not([data-weight])',
 	);
 	expect(nodes.length).to.equal(0);
+
+	// Only shows self time
+	const text = await getText(
+		devtools,
+		'[data-type="ranked"] [data-weight]:first-child',
+	);
+	expect(text).to.match(/Counter \([0-9]+(\.[0-9]+)?ms\)/);
 
 	await closePage(page);
 }

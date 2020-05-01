@@ -9,7 +9,7 @@ import {
 	useMemo,
 } from "preact/hooks";
 import { formatTime } from "../util";
-import { CommitData } from "../data/commits";
+import { CommitData, FlamegraphType } from "../data/commits";
 import { createFlameGraphStore } from "./FlamegraphStore";
 import { useInstance, useResize } from "../../utils";
 import { ID } from "../../../store/types";
@@ -140,8 +140,10 @@ export function FlameGraph() {
 						}}
 					>
 						<span class={s.text}>
-							{node.name} ({formatTime(node.selfDuration)} of{" "}
-							{formatTime(node.treeEndTime - node.treeStartTime)})
+							{node.name} ({formatTime(node.selfDuration)}
+							{displayType === FlamegraphType.FLAMEGRAPH &&
+								"of " + formatTime(node.treeEndTime - node.treeStartTime)}
+							)
 						</span>
 					</div>
 				);
