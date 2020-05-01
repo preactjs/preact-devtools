@@ -101,8 +101,10 @@ export function FlameGraph() {
 							transform: `translate3d(${x}px,${y}px,0)`,
 						}}
 					>
-						{node.name} ({formatTime(node.selfDuration)} of{" "}
-						{formatTime(node.treeEndTime - node.treeStartTime)})
+						<span class={s.text}>
+							{node.name} ({formatTime(node.selfDuration)} of{" "}
+							{formatTime(node.treeEndTime - node.treeStartTime)})
+						</span>
 					</div>
 				);
 			})}

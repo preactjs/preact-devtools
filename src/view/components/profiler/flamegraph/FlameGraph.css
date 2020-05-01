@@ -31,9 +31,8 @@
 	background: var(--color-profiler-old);
 }
 
-.node[data-overflow] {
-	color: transparent;
-	padding: 0;
+.node[data-overflow] .text {
+	display: none;
 }
 
 .node[data-weight="-1"]:not([data-overflow]) {
