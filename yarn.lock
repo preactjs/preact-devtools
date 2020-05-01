@@ -6361,6 +6361,11 @@ kleur@^3.0.3:
   resolved "https://registry.yarnpkg.com/kleur/-/kleur-3.0.3.tgz#a79c9ecc86ee1ce3fa6206d1216c501f147fc07e"
   integrity sha512-eTIzlVOSUR+JxdDFepEYcBMtZ9Qqdef+rnzWdRZuMbOywu5tO2w2N7rqjoANZ5k9vywhL6Br1VRjUIgTQx4E8w==
 
+kolorist@^1.2.0:
+  version "1.2.0"
+  resolved "https://registry.yarnpkg.com/kolorist/-/kolorist-1.2.0.tgz#b6c76ed1634aab9bbe157dc2736e59f48b4cfbd8"
+  integrity sha512-WMRaf2kYZYllod4vnmpAh1fmtuyqYKsjEA7VsU2kYydtWqq2Vm92oZW2K4y/IczCAYJXQKLTth6/ldc1WCVXhQ==
+
 latest-version@^5.0.0:
   version "5.1.0"
   resolved "https://registry.yarnpkg.com/latest-version/-/latest-version-5.1.0.tgz#119dfe908fe38d15dfa43ecd13fa12ec8832face"
@@ -8059,24 +8064,27 @@ pend@~1.2.0:
   resolved "https://registry.yarnpkg.com/pend/-/pend-1.2.0.tgz#7a57eb550a6783f9115331fcf4663d5c8e007a50"
   integrity sha1-elfrVQpng/kRUzH89GY9XI4AelA=
 
-pentf@^1.0.54:
-  version "1.0.54"
-  resolved "https://registry.yarnpkg.com/pentf/-/pentf-1.0.54.tgz#3019a2f7fadef30872d92b19eb2e233a6494cc6e"
-  integrity sha512-YiJLfyGDQDvR1y81bMlnP4EmzFAWlSlhgEJ/qGt9C0FEzOqEgKPwZH/vCxh+61d+Llo9OVXTXNDqDGsxEalcEQ==
+pentf@^1.0.61:
+  version "1.0.61"
+  resolved "https://registry.yarnpkg.com/pentf/-/pentf-1.0.61.tgz#8f8a474e7cf6eb74b089b78f19eab52d5fa5929f"
+  integrity sha512-wLb6dCn5ZY8NOmJl3Jlw10WBTIe7MWmFjffaGyvm9MkArJA50sp6zuSgA2pRUuO+kpLCwITeYTqYcjuRIAzy+Q==
   dependencies:
     "@types/glob" "^7.1.1"
     "@types/puppeteer" "^2.0.1"
     argparse "^1.0.10"
+    diff "^4.0.2"
     emailjs-imap-client "^3.0.7"
     emailjs-mime-parser "^2.0.5"
     form-data "^2.3.3"
     glob "^7.1.6"
     he "^1.2.0"
+    kolorist "^1.2.0"
     libmime "^4.0.1"
     mkdirp "^0.5.1"
     node-fetch "^2.3.0"
     stream-buffers "^3.0.2"
     tmp-promise "^2.0.2"
+    tough-cookie "^4.0.0"
 
 performance-now@^2.1.0:
   version "2.1.0"
@@ -8710,6 +8718,11 @@ psl@^1.1.24, psl@^1.1.28:
   version "1.3.1"
   resolved "https://registry.yarnpkg.com/psl/-/psl-1.3.1.tgz#d5aa3873a35ec450bc7db9012ad5a7246f6fc8bd"
   integrity sha512-2KLd5fKOdAfShtY2d/8XDWVRnmp3zp40Qt6ge2zBPFARLXOGUf2fHD5eg+TV/5oxBtQKVhjUaKFsAaE4HnwfSA==
+
+psl@^1.1.33:
+  version "1.8.0"
+  resolved "https://registry.yarnpkg.com/psl/-/psl-1.8.0.tgz#9326f8bcfb013adcc005fdff056acce020e51c24"
+  integrity sha512-RIdOzyoavK+hA18OGGWDqUTsCLhtA7IcZ/6NCs4fFJaHBDab+pDDmDIByWFRQJq2Cd7r1OoQxBGKOaztq+hjIQ==
 
 public-encrypt@^4.0.0:
   version "4.0.3"
@@ -10657,6 +10670,15 @@ tough-cookie@^3.0.1:
     psl "^1.1.28"
     punycode "^2.1.1"
 
+tough-cookie@^4.0.0:
+  version "4.0.0"
+  resolved "https://registry.yarnpkg.com/tough-cookie/-/tough-cookie-4.0.0.tgz#d822234eeca882f991f0f908824ad2622ddbece4"
+  integrity sha512-tHdtEpQCMrc1YLrMaqXXcj6AxhYi/xgit6mZu1+EDWUn+qhUf8wMQoFIy9NXuq23zAwtcB0t/MjACGR18pcRbg==
+  dependencies:
+    psl "^1.1.33"
+    punycode "^2.1.1"
+    universalify "^0.1.2"
+
 tough-cookie@~2.4.3:
   version "2.4.3"
   resolved "https://registry.yarnpkg.com/tough-cookie/-/tough-cookie-2.4.3.tgz#53f36da3f47783b0925afa06ff9f3b165280f781"
@@ -10855,7 +10877,7 @@ unique-string@^2.0.0:
   dependencies:
     crypto-random-string "^2.0.0"
 
-universalify@^0.1.0:
+universalify@^0.1.0, universalify@^0.1.2:
   version "0.1.2"
   resolved "https://registry.yarnpkg.com/universalify/-/universalify-0.1.2.tgz#b646f69be3942dabcecc9d6639c80dc105efaa66"
   integrity sha512-rBJeI5CXAlmy1pV+617WB9J63U6XcazHHF2f2dbJix4XzpUF0RS3Zbj0FGIOCAva5P/d/GBOYaACQ1w+0azUkg==
