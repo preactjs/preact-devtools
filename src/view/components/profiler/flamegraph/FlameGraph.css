@@ -16,7 +16,8 @@
 	white-space: nowrap;
 	overflow: hidden;
 	text-overflow: ellipsis;
-	transition: all 0.3s;
+	transition-property: all;
+	transition-duration: 0.3s;
 	padding-bottom: 1px;
 }
 
@@ -31,9 +32,8 @@
 	background: var(--color-profiler-old);
 }
 
-.node[data-overflow] {
-	color: transparent;
-	padding: 0;
+.node[data-overflow] .text {
+	display: none;
 }
 
 .node[data-weight="-1"]:not([data-overflow]) {

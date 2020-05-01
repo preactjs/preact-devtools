@@ -12,6 +12,7 @@ import { formatTime } from "../util";
 import { CommitData } from "../data/commits";
 import { createFlameGraphStore } from "./FlamegraphStore";
 import { useInstance, useResize } from "../../utils";
+import { ID } from "../../../store/types";
 
 const ROW_HEIGHT = 21; // Account 1px for border
 
@@ -23,6 +24,12 @@ const EMTPY: CommitData = {
 	duration: 0,
 	nodes: new Map(),
 };
+
+export interface TransformData {
+	transform: string;
+	opacity: number;
+	width: number;
+}
 
 export function FlameGraph() {
 	const store = useStore();
@@ -41,6 +48,20 @@ export function FlameGraph() {
 		() => nodes.findIndex(x => x.id === selectedNodeId),
 		[selectedNodeId, nodes],
 	);
+
+	const cache = useRef(new Map<ID, TransformData>());
+	const oldPosition = useMemo(() => {
+		const cacheNew = new Map<ID, TransformData>();
+		nodes.forEach(node => {
+			if (cache.current.has(node.id)) {
+				cacheNew.set(node.id, cache.current.get(node.id)!);
+			} else {
+				cacheNew.set(node.id, { transform: "", opacity: 0, width: 0 });
+			}
+		});
+		cache.current = cacheNew;
+		return cacheNew;
+	}, [commit.commitRootId]);
 
 	const displayType = useObserver(() => store.profiler.flamegraphType.$);
 	const [canvasWidth, setWidth] = useState(100);
@@ -83,6 +104,21 @@ export function FlameGraph() {
 
 				const node = commit.nodes.get(meta.id)!;
 
+				const pos = oldPosition.get(meta.id)!;
+				let property = "opacity";
+				if (
+					activeParents.has(meta.id) ||
+					(x >= 0 && x <= canvasWidth) ||
+					(x + width >= 0 && x + width <= canvasWidth)
+				) {
+					if (pos.opacity > 0) property = "all";
+					pos.transform = `translate3d(${x}px,${y}px,0)`;
+					pos.opacity = 1;
+					pos.width = Math.max(2, width); // 2 for HiDPI screens
+				} else {
+					pos.opacity = 0;
+				}
+
 				const color = colorMap.get(meta.id);
 				return (
 					<div
@@ -94,15 +130,19 @@ export function FlameGraph() {
 						}
 						data-maximized={i <= selectedIndex}
 						data-selected={selectedNodeId === meta.id}
-						data-overflow={width <= 24}
+						data-overflow={width <= 32}
 						style={{
-							width: Math.max(2, width), // 2 for HiDPI screens
+							width: pos.width,
 							height: ROW_HEIGHT,
-							transform: `translate3d(${x}px,${y}px,0)`,
+							opacity: pos.opacity,
+							transform: pos.transform,
+							transitionProperty: property,
 						}}
 					>
-						{node.name} ({formatTime(node.selfDuration)} of{" "}
-						{formatTime(node.treeEndTime - node.treeStartTime)})
+						<span class={s.text}>
+							{node.name} ({formatTime(node.selfDuration)} of{" "}
+							{formatTime(node.treeEndTime - node.treeStartTime)})
+						</span>
 					</div>
 				);
 			})}
