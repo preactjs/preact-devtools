@@ -94,7 +94,7 @@ export function FlameGraph() {
 						}
 						data-maximized={i <= selectedIndex}
 						data-selected={selectedNodeId === meta.id}
-						data-overflow={width <= 24}
+						data-overflow={width <= 32}
 						style={{
 							width: Math.max(2, width), // 2 for HiDPI screens
 							height: ROW_HEIGHT,
