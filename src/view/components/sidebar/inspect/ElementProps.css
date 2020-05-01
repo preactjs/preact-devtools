@@ -1,5 +1,5 @@
 .root {
-	font-family: monospace;
+	font-family: var(--font-monospace);
 	font-size: 1rem;
 }
 
@@ -15,7 +15,7 @@
 	font-size: 0.9rem;
 	line-height: 1.4;
 	height: 1.6rem;
-	font-family: monospace;
+	font-family: var(--font-monospace);
 	--indent-depth: 0.75rem;
 }
 
@@ -38,7 +38,7 @@
 	 * Firefox doesn't reset ::after elements somehow.
 	 * Using "inherit" isn't respected either.
 	 */
-	font-family: monospace;
+	font-family: var(--font-monospace);
 	color: var(--color-props-sep);
 }
 
@@ -49,7 +49,7 @@
 	outline: none;
 	color: inherit;
 	font-size: 0.9rem;
-	font-family: monospace;
+	font-family: var(--font-monospace);
 }
 
 .nameInput:focus {

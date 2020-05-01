@@ -22,6 +22,7 @@ body {
 	--color-border: #dedede;
 	--color-text-empty: #444;
 	--color-button-active: #7245c7;
+	--font-monospace: Hack, monospace;
 }
 
 :root :global(.dark) {

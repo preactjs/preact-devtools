@@ -43,7 +43,7 @@
 
 .item {
 	font-size: 0.9rem;
-	font-family: monospace;
+	font-family: var(--font-monospace);
 	color: var(--color-element-text);
 	height: 1.5rem;
 	position: relative;
