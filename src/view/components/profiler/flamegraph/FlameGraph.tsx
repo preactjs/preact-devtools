@@ -25,6 +25,8 @@ const EMTPY: CommitData = {
 	nodes: new Map(),
 };
 
+const EMPTY_POS = { transform: "", opacity: 0, width: 0 };
+
 export interface TransformData {
 	transform: string;
 	opacity: number;
@@ -56,7 +58,7 @@ export function FlameGraph() {
 			if (cache.current.has(node.id)) {
 				cacheNew.set(node.id, cache.current.get(node.id)!);
 			} else {
-				cacheNew.set(node.id, { transform: "", opacity: 0, width: 0 });
+				cacheNew.set(node.id, { ...EMPTY_POS });
 			}
 		});
 		cache.current = cacheNew;
@@ -104,7 +106,11 @@ export function FlameGraph() {
 
 				const node = commit.nodes.get(meta.id)!;
 
-				const pos = oldPosition.get(meta.id)!;
+				let pos = oldPosition.get(meta.id);
+				if (!pos) {
+					pos = { ...EMPTY_POS };
+					oldPosition.set(meta.id, pos);
+				}
 				let property = "opacity";
 				if (
 					activeParents.has(meta.id) ||
