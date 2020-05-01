@@ -16,7 +16,8 @@
 	white-space: nowrap;
 	overflow: hidden;
 	text-overflow: ellipsis;
-	transition: all 0.3s;
+	transition-property: all;
+	transition-duration: 0.3s;
 	padding-bottom: 1px;
 }
 
