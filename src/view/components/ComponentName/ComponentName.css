@@ -1,6 +1,6 @@
 .title {
 	color: var(--color-element-text);
-	font-family: monospace;
+	font-family: var(--font-monospace);
 	font-size: 1.2rem;
 }
 

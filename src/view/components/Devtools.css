@@ -54,6 +54,11 @@ input {
 	margin: 0;
 }
 
+:root {
+	--font-monospace: "SFMono-Regular", Consolas, "Liberation Mono", Menlo,
+		Courier, monospace;
+}
+
 :global(.light) .theme {
 	--color-bg: white;
 	--color-text: #333;
