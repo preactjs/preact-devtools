@@ -59,6 +59,8 @@ export function DevTools(props: { store: Store; window: Window }) {
 								<a
 									class={s.bugLink}
 									href="https://github.com/preactjs/preact-devtools/issues"
+									target="_blank"
+									rel="noopener noreferrer"
 								>
 									Report bug
 								</a>
