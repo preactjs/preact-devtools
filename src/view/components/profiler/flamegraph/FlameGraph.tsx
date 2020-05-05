@@ -1,20 +1,12 @@
 import { h } from "preact";
 import s from "./FlameGraph.css";
 import { useStore, useObserver } from "../../../store/react-bindings";
-import {
-	useRef,
-	useState,
-	useCallback,
-	useEffect,
-	useMemo,
-} from "preact/hooks";
+import { useRef, useState, useCallback, useEffect } from "preact/hooks";
 import { formatTime } from "../util";
 import { CommitData, FlamegraphType } from "../data/commits";
 import { createFlameGraphStore } from "./FlamegraphStore";
 import { useInstance, useResize } from "../../utils";
-import { ID } from "../../../store/types";
-
-const ROW_HEIGHT = 21; // Account 1px for border
+import { FlameNode } from "./FlameNode";
 
 const EMTPY: CommitData = {
 	rootId: -1,
@@ -24,12 +16,6 @@ const EMTPY: CommitData = {
 	duration: 0,
 	nodes: new Map(),
 };
-
-export interface TransformData {
-	transform: string;
-	opacity: number;
-	width: number;
-}
 
 export function FlameGraph() {
 	const store = useStore();
@@ -43,25 +29,8 @@ export function FlameGraph() {
 	const nodes = useObserver(() => ref2.nodes.$);
 	const colorMap = useObserver(() => ref2.colors.$);
 	const activeParents = useObserver(() => ref2.activeParents.$);
+	const selectedParents = useObserver(() => ref2.selectedParents.$);
 	const selectedNodeId = useObserver(() => store.profiler.selectedNodeId.$);
-	const selectedIndex = useMemo(
-		() => nodes.findIndex(x => x.id === selectedNodeId),
-		[selectedNodeId, nodes],
-	);
-
-	const cache = useRef(new Map<ID, TransformData>());
-	const oldPosition = useMemo(() => {
-		const cacheNew = new Map<ID, TransformData>();
-		nodes.forEach(node => {
-			if (cache.current.has(node.id)) {
-				cacheNew.set(node.id, cache.current.get(node.id)!);
-			} else {
-				cacheNew.set(node.id, { transform: "", opacity: 0, width: 0 });
-			}
-		});
-		cache.current = cacheNew;
-		return cacheNew;
-	}, [commit.commitRootId]);
 
 	const displayType = useObserver(() => store.profiler.flamegraphType.$);
 	const [canvasWidth, setWidth] = useState(100);
@@ -97,55 +66,28 @@ export function FlameGraph() {
 
 	return (
 		<div class={s.root} ref={ref} data-type={displayType.toLowerCase()}>
-			{nodes.map((meta, i) => {
-				const x = meta.x * scale;
-				const y = meta.row * ROW_HEIGHT;
-				const width = meta.width * scale;
-
+			{nodes.map(meta => {
 				const node = commit.nodes.get(meta.id)!;
-
-				const pos = oldPosition.get(meta.id)!;
-				let property = "opacity";
-				if (
-					activeParents.has(meta.id) ||
-					(x >= 0 && x <= canvasWidth) ||
-					(x + width >= 0 && x + width <= canvasWidth)
-				) {
-					if (pos.opacity > 0) property = "all";
-					pos.transform = `translate3d(${x}px,${y}px,0)`;
-					pos.opacity = 1;
-					pos.width = Math.max(2, width); // 2 for HiDPI screens
-				} else {
-					pos.opacity = 0;
-				}
-
 				const color = colorMap.get(meta.id);
+
 				return (
-					<div
+					<FlameNode
 						key={meta.id}
-						class={s.node}
+						node={meta}
+						canvasWidth={canvasWidth}
+						scale={scale}
 						onClick={() => onSelect(meta.id)}
-						data-weight={
-							color == null && !activeParents.has(meta.id) ? -1 : color
+						weight={
+							color == null && !activeParents.has(meta.id) ? -1 : color || null
 						}
-						data-maximized={i <= selectedIndex}
-						data-selected={selectedNodeId === meta.id}
-						data-overflow={width <= 32}
-						style={{
-							width: pos.width,
-							height: ROW_HEIGHT,
-							opacity: pos.opacity,
-							transform: pos.transform,
-							transitionProperty: property,
-						}}
+						maximized={selectedParents.has(meta.id)}
+						selected={selectedNodeId === meta.id}
 					>
-						<span class={s.text}>
-							{node.name} ({formatTime(node.selfDuration)}
-							{displayType === FlamegraphType.FLAMEGRAPH &&
-								"of " + formatTime(node.treeEndTime - node.treeStartTime)}
-							)
-						</span>
-					</div>
+						{node.name} ({formatTime(node.selfDuration)}
+						{displayType === FlamegraphType.FLAMEGRAPH &&
+							"of " + formatTime(node.treeEndTime - node.treeStartTime)}
+						)
+					</FlameNode>
 				);
 			})}
 		</div>

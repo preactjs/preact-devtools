@@ -127,7 +127,35 @@ export function createFlameGraphStore(profiler: ProfilerState) {
 		return parents;
 	});
 
+	const selectedParents = watch(() => {
+		let current = profiler.selectedNodeId.$;
+		if (profiler.flamegraphType.$ === FlamegraphType.RANKED) {
+			const idx = layoutNodes.$.findIndex(n => n.id === current);
+			console.log(idx);
+			if (idx === -1) {
+				return new Set();
+			}
+			return new Set(layoutNodes.$.slice(0, idx).map(x => x.id));
+		}
+
+		const parents = new Set<ID>();
+		const commit = profiler.activeCommit.$;
+		if (commit !== null) {
+			while (current > -1) {
+				const node = commit.nodes.get(current);
+				if (node && node.parent > -1) {
+					parents.add(node.parent);
+					current = node.parent;
+				} else {
+					break;
+				}
+			}
+		}
+		return parents;
+	});
+
 	return {
+		selectedParents,
 		activeParents,
 		nodes: layoutNodes,
 		colors,

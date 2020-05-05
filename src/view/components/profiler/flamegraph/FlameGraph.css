@@ -36,6 +36,17 @@
 	display: none;
 }
 
+.node[data-visible] {
+	transition-property: all;
+}
+.node:not([data-visible]) {
+	transition-property: opacity;
+	opacity: 0;
+}
+.node[data-visible]:not([data-maximized]) {
+	opacity: 1;
+}
+
 .node[data-weight="-1"]:not([data-overflow]) {
 	color: var(--color-bystander-text);
 }

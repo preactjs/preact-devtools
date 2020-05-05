@@ -35,5 +35,5 @@ export async function run(config: any) {
 		"Display",
 	]);
 
-	await closePage(page);
+	// await closePage(page);
 }
