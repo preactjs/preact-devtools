@@ -1,5 +1,5 @@
 import { h, RefObject } from "preact";
-import { useState, useCallback, useRef, useEffect } from "preact/hooks";
+import { useState, useCallback, useRef } from "preact/hooks";
 import { ArrowBack, ArrowForward } from "../../../icons";
 import s from "./CommitTimeline.css";
 import { getGradient } from "../../data/gradient";
@@ -90,33 +90,23 @@ export function CommitTimeline(props: CommitTimelineProps) {
 	const pane = useRef<HTMLDivElement>();
 	const paneContainerRef = useRef<HTMLDivElement>();
 
-	useEffect(() => {
-		const sizes = calcSize(
-			container,
-			inner,
-			pane,
-			paneContainerRef,
-			items.length,
-			selected,
-		);
-		setPaneWidth(sizes.pane);
-		setViewportWidth(sizes.viewport);
-		setOffset(sizes.offset);
-	}, [pane, inner, pane, paneContainerRef, items.length, selected]);
-
-	useResize(() => {
-		const sizes = calcSize(
-			container,
-			inner,
-			pane,
-			paneContainerRef,
-			items.length,
-			selected,
-		);
-		setPaneWidth(sizes.pane);
-		setViewportWidth(sizes.viewport);
-		setOffset(sizes.offset);
-	}, [pane, container, paneContainerRef, inner, items.length, selected]);
+	useResize(
+		() => {
+			const sizes = calcSize(
+				container,
+				inner,
+				pane,
+				paneContainerRef,
+				items.length,
+				selected,
+			);
+			setPaneWidth(sizes.pane);
+			setViewportWidth(sizes.viewport);
+			setOffset(sizes.offset);
+		},
+		[pane, container, paneContainerRef, inner, items.length, selected],
+		true,
+	);
 
 	const onPrev = useCallback(() => {
 		const next = selected - 1;
