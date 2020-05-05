@@ -21,7 +21,13 @@ export function TimelineBar() {
 
 	const onCommitChange = useCallback(
 		(n: number) => {
-			store.profiler.activeCommitIdx.$ = n;
+			const { activeCommitIdx, selectedNodeId, activeCommit } = store.profiler;
+
+			activeCommitIdx.$ = n;
+
+			if (activeCommit.$ && !activeCommit.$.nodes.has(selectedNodeId.$)) {
+				selectedNodeId.$ = activeCommit.$.rootId;
+			}
 		},
 		[store],
 	);

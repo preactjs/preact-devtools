@@ -63,7 +63,7 @@ describe("FlameGraphStore", () => {
 						Foo **   Bar ***
 				`;
 			profiler.commits.$ = [tree.commit];
-			expect(flame.nodes.$.map(x => x.width)).to.deep.equal([80, 70, 60]);
+			expect(flame.nodes.$.map(x => x.width)).to.deep.equal([600, 525, 450]);
 		});
 
 		it("should rank nodes by selfDuration #2", () => {
@@ -86,7 +86,7 @@ describe("FlameGraphStore", () => {
 			`;
 			profiler.commits.$ = [tree.commit];
 
-			expect(flame.nodes.$.map(x => x.width)).to.deep.equal([100, 80, 60]);
+			expect(flame.nodes.$.map(x => x.width)).to.deep.equal([600, 480, 360]);
 		});
 
 		it("should support maximizing nodes", () => {
@@ -104,9 +104,9 @@ describe("FlameGraphStore", () => {
 			]);
 
 			expect(flame.nodes.$.map(x => x.width)).to.deep.equal([
-				100,
-				100,
-				83.33333333333334,
+				600,
+				600,
+				500.00000000000006,
 			]);
 		});
 	});
@@ -138,21 +138,30 @@ describe("FlameGraphStore", () => {
 					name: "App",
 					x: 0,
 					row: 0,
-					width: 120,
+					width: 600,
+					visible: true,
+					maximized: true,
+					weight: 7,
 				},
 				{
 					id: 2,
 					name: "Foo",
-					x: 20,
+					x: 100,
 					row: 1,
-					width: 80,
+					width: 400,
+					visible: true,
+					maximized: false,
+					weight: 5,
 				},
 				{
 					id: 3,
 					name: "Bar",
-					x: 40,
+					x: 200,
 					row: 2,
-					width: 50,
+					width: 250,
+					visible: true,
+					maximized: false,
+					weight: 9,
 				},
 			]);
 		});
@@ -179,21 +188,30 @@ describe("FlameGraphStore", () => {
 					name: "App",
 					x: 0,
 					row: 0,
-					width: 120,
+					width: 600,
+					visible: true,
+					maximized: true,
+					weight: 7,
 				},
 				{
 					id: 2,
 					name: "Foo",
 					x: 0,
 					row: 1,
-					width: 120,
+					width: 600,
+					visible: true,
+					maximized: true,
+					weight: 5,
 				},
 				{
 					id: 3,
 					name: "Bar",
-					x: 30,
+					x: 150,
 					row: 2,
-					width: 75,
+					width: 375,
+					visible: true,
+					maximized: false,
+					weight: 9,
 				},
 			]);
 		});
@@ -220,35 +238,50 @@ describe("FlameGraphStore", () => {
 					name: "App",
 					x: 0,
 					row: 0,
-					width: 310,
+					width: 600,
+					maximized: true,
+					weight: 9,
+					visible: true,
 				},
 				{
 					id: 2,
 					name: "Foo",
-					x: -516.6666666666667,
+					x: -1000.0000000000002,
 					row: 1,
-					width: 413.33333333333337,
+					width: 800.0000000000001,
+					visible: false,
+					maximized: false,
+					weight: 3,
 				},
 				{
 					id: 4,
 					name: "Bob",
 					x: 0,
 					row: 1,
-					width: 310,
+					width: 600,
+					weight: 6,
+					visible: true,
+					maximized: true,
 				},
 				{
 					id: 5,
 					name: "Boof",
-					x: 465,
+					x: 900,
 					row: 1,
-					width: 413.33333333333337,
+					width: 800.0000000000001,
+					weight: 8,
+					visible: false,
+					maximized: false,
 				},
 				{
 					id: 3,
 					name: "Bar",
-					x: -413.33333333333337,
+					x: -800.0000000000001,
 					row: 2,
-					width: 258.33333333333337,
+					width: 500.0000000000001,
+					visible: false,
+					maximized: false,
+					weight: 5,
 				},
 			]);
 		});

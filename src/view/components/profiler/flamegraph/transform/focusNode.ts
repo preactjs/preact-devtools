@@ -1,10 +1,14 @@
 import { ID } from "../../../../store/types";
+import { deepClone } from "./util";
 
 export interface NodeTransform {
 	id: ID;
 	x: number;
 	row: number;
 	width: number;
+	weight: number;
+	maximized: boolean;
+	visible: boolean;
 }
 
 /**
@@ -12,7 +16,7 @@ export interface NodeTransform {
  * will be maximized too.
  */
 export function focusNode(nodes: NodeTransform[], id: ID) {
-	nodes = nodes.slice();
+	nodes = deepClone(nodes);
 
 	// Populate caches
 	const byId = new Map<ID, NodeTransform>();
@@ -42,7 +46,10 @@ export function focusNode(nodes: NodeTransform[], id: ID) {
 		}
 
 		if (target.x >= node.x && target.x + target.width <= node.x + node.width) {
+			node.maximized = true;
 			parents.push(node);
+		} else {
+			node.maximized = false;
 		}
 
 		rows[node.row].push(node);

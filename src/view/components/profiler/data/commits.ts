@@ -6,6 +6,7 @@ import {
 	RenderReasonMap,
 	RenderReasonData,
 } from "../../../../adapter/10/renderer/renderReasons";
+import { flattenNodeTree } from "../flamegraph/placeNodes";
 
 export interface ProfilerNode extends DevNode {
 	selfDuration: number;
@@ -164,7 +165,7 @@ export function resetProfiler(state: ProfilerState) {
 export function recordProfilerCommit(
 	tree: Map<ID, DevNode>,
 	profiler: ProfilerState,
-	rootId: number,
+	commitRootId: number,
 ) {
 	const nodes = new Map<ID, ProfilerNode>();
 
@@ -174,8 +175,13 @@ export function recordProfilerCommit(
 	// The time of the node that took the longest to render
 	let maxSelfDuration = 0;
 
+	const rootId = getRoot(tree, commitRootId);
+	const items = new Set(flattenNodeTree(tree, rootId).map(x => x.id));
+
 	// Make shallow copies of each node
 	tree.forEach((node, id) => {
+		if (!items.has(id)) return;
+
 		nodes.set(id, {
 			// deep clone
 			...JSON.parse(JSON.stringify(node)),
@@ -216,15 +222,15 @@ export function recordProfilerCommit(
 
 	// Total commit duration
 	let duration = 0;
-	const root = nodes.get(rootId);
+	const root = nodes.get(commitRootId);
 	if (root) {
 		duration = root.treeEndTime - root.treeStartTime;
 	}
 
 	profiler.commits.update(arr => {
 		arr.push({
-			rootId: getRoot(tree, rootId),
-			commitRootId: rootId,
+			rootId: getRoot(tree, commitRootId),
+			commitRootId: commitRootId,
 			nodes,
 			maxDepth,
 			maxSelfDuration,

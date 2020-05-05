@@ -1,6 +1,7 @@
 import { ID, DevNodeType, Tree } from "../../../store/types";
 import { ProfilerNode, CommitData } from "../data/commits";
 import { sortTimeline } from "./FlamegraphStore";
+import { NodeTransform } from "./transform/focusNode";
 
 /**
  * Parse a visual flamegraph DSL into a `ProfilerNode` tree. Each
@@ -168,6 +169,7 @@ export function flames(
 		commit,
 		idMap,
 		nodes,
+		root: nodes[0],
 		byName: (name: string) => nameMap.get(name),
 		byId: (id: ID) => idMap.get(id),
 	};
@@ -175,4 +177,22 @@ export function flames(
 
 export function byName(tree: Tree, name: string) {
 	return Array.from(tree.values()).find(x => x.name === name);
+}
+
+export function visualize(nodes: NodeTransform[]) {
+	const rows = new Array(Math.max(...nodes.map(x => x.row + 1))).fill(
+		" ".repeat(100),
+	);
+
+	nodes.forEach(node => {
+		const w = Math.round(node.width);
+		const x = Math.round(node.x);
+		const s = rows[node.row];
+		rows[node.row] =
+			s.substring(0, x) +
+			(node.id + "*".repeat(w).slice(0, w)) +
+			s.substring(x + w);
+	});
+
+	return rows.join("\n");
 }
