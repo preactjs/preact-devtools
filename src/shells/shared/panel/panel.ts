@@ -35,6 +35,10 @@ async function initDevtools() {
 	store.theme.on(v => storeTheme(v));
 	store.profiler.captureRenderReasons.on(v => storeCaptureRenderReasons(v));
 
+	if (process.env.DEBUG) {
+		(window as any).store = store;
+	}
+
 	// Render our application
 	const root = window.document.getElementById("root")!;
 	render(h(DevTools, { store, window }), root);
@@ -52,14 +56,13 @@ port.onDisconnect.addListener(() => {
 
 // Subscribe to messages from content script
 port.onMessage.addListener(async message => {
-	debug("> message", message);
-
 	if (!initialized) {
 		debug("initialize devtools panel");
 		await initDevtools();
 	}
 
 	if (message.type === "init") {
+		debug("> message", message);
 		port.postMessage({
 			type: "init",
 			tabId: chrome.devtools.inspectedWindow.tabId,
