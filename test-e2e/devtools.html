@@ -26,6 +26,7 @@
 			const { setupInlineDevtools, createStore, applyEvent } = setup;
 
 			const store = setupInlineDevtools(document.getElementById("app"), window);
+			window.parent.store = store;
 			store.subscribe((name, msg) => {
 				window.parent.postMessage(
 					{ type: name, data: msg, source: "preact-devtools-to-client" },
