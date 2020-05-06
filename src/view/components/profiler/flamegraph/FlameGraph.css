@@ -18,6 +18,7 @@
 	transition-property: all;
 	transition-duration: 0.3s;
 	padding-bottom: 1px;
+	border-left: 1px solid var(--color-bg);
 }
 
 .node::after {

@@ -37,7 +37,7 @@ export function FlameNode(props: Props) {
 
 	if (visible) {
 		const y = node.row * ROW_HEIGHT;
-		widthCss.current = `width: ${Math.max(2, width)}px;`;
+		widthCss.current = `width: ${width}px;`;
 		transform.current = `transform: translate3d(${x}px, ${y}px, 0);`;
 	}
 
@@ -45,6 +45,7 @@ export function FlameNode(props: Props) {
 		<div
 			class={s.node}
 			onClick={onClick}
+			data-id={node.id}
 			data-visible={visible}
 			data-weight={node.weight}
 			data-maximized={node.maximized}
