@@ -5,7 +5,7 @@ export function mapParents(
 	id: ID,
 	fn: (parent: DevNode, prevParent: DevNode) => void | boolean,
 ) {
-	const prevParent = tree.get(id)!;
+	let prevParent = tree.get(id)!;
 	if (!prevParent) return;
 
 	let item = tree.get(prevParent.parent);
@@ -19,6 +19,7 @@ export function mapParents(
 			break;
 		}
 
+		prevParent = item;
 		item = tree.get(item.parent);
 	}
 }
@@ -48,16 +49,14 @@ export function adjustNodesToRight(
 		parent.treeEndTime += delta;
 
 		const idx = parent.children.indexOf(prevParent.id);
-		if (idx > -1) {
-			const tasks = parent.children.slice(idx + 1);
+		const tasks = idx > -1 ? parent.children.slice(idx + 1) : parent.children;
 
-			tasks.forEach(childId => {
-				mapChildren(tree, childId, child => {
-					child.treeEndTime += delta;
-					child.treeStartTime += delta;
-				});
+		tasks.forEach(childId => {
+			mapChildren(tree, childId, child => {
+				child.treeEndTime += delta;
+				child.treeStartTime += delta;
 			});
-		}
+		});
 	});
 }
 

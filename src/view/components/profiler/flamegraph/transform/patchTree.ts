@@ -26,9 +26,9 @@ export function patchTree(old: Tree, next: Tree, rootId: ID): Tree {
 
 	const deltaStart = oldRoot.treeStartTime - root.startTime;
 	const deltaEnd =
-		oldRoot.treeStartTime +
-		(root.endTime - root.startTime) -
-		oldRoot.treeEndTime;
+		oldRoot.treeEndTime -
+		oldRoot.treeStartTime -
+		(root.endTime - root.startTime);
 
 	// Move new tree to old tree position.
 	out.set(root.id, {
@@ -48,7 +48,7 @@ export function patchTree(old: Tree, next: Tree, rootId: ID): Tree {
 	});
 
 	// Enlarge parents and move children
-	adjustNodesToRight(out, root.id, deltaEnd);
+	adjustNodesToRight(out, root.id, -deltaEnd);
 
 	return out;
 }
