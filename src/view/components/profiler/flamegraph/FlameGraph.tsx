@@ -67,7 +67,7 @@ export function FlameGraph() {
 					>
 						{node.name} ({formatTime(node.selfDuration)}
 						{displayType === FlamegraphType.FLAMEGRAPH &&
-							"of " + formatTime(node.treeEndTime - node.treeStartTime)}
+							" of " + formatTime(node.treeEndTime - node.treeStartTime)}
 						)
 					</FlameNode>
 				);
