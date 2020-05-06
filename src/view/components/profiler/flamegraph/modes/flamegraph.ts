@@ -22,10 +22,9 @@ export function layoutTimeline(
 				node.treeStartTime > root.treeEndTime
 			) {
 				weight = -2;
-			} else if (
-				node.treeStartTime >= root.treeStartTime &&
-				node.treeEndTime <= root.treeEndTime
-			) {
+			} else if (root.depth > node.depth) {
+				weight = -5;
+			} else {
 				weight = getGradient(maxSelfDuration, node.selfDuration);
 			}
 

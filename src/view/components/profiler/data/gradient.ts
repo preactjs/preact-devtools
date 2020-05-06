@@ -10,5 +10,5 @@ export function getGradient(max: number, n: number) {
 		}
 	}
 
-	return i;
+	return Math.max(i, 0);
 }

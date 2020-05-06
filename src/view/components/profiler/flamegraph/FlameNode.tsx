@@ -1,11 +1,13 @@
 import { h } from "preact";
-import { useState, useRef, useEffect } from "preact/hooks";
+import { useRef } from "preact/hooks";
 import s from "./FlameGraph.css";
 import { NodeTransform } from "./transform/focusNode";
 
 export interface Props {
 	selected: boolean;
 	children: any;
+	parentId: number;
+	commitRootId: number;
 	onClick: () => void;
 	node: NodeTransform;
 }
@@ -17,23 +19,8 @@ export function FlameNode(props: Props) {
 	const { onClick, selected, node } = props;
 	const transform = useRef("");
 	const widthCss = useRef("");
-	const [hidden, setHidden] = useState(false);
 
 	const { visible, width, x } = node;
-
-	useEffect(() => {
-		let timeout = -1;
-		if (!hidden && !visible) {
-			timeout = setTimeout(() => setHidden(true));
-		} else if (hidden) {
-			setHidden(false);
-		}
-		return () => clearTimeout(timeout);
-	}, [visible]);
-
-	if (hidden) {
-		// return null;
-	}
 
 	if (visible) {
 		const y = node.row * ROW_HEIGHT;
@@ -46,6 +33,8 @@ export function FlameNode(props: Props) {
 			class={s.node}
 			onClick={onClick}
 			data-id={node.id}
+			data-commit-root={props.commitRootId}
+			data-parent-id={props.parentId}
 			data-visible={visible}
 			data-weight={node.weight}
 			data-maximized={node.maximized}

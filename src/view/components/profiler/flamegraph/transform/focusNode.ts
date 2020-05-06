@@ -45,7 +45,11 @@ export function focusNode(nodes: NodeTransform[], id: ID) {
 			rows[node.row] = [];
 		}
 
-		if (target.x >= node.x && target.x + target.width <= node.x + node.width) {
+		if (
+			target.row >= node.row &&
+			target.x >= node.x &&
+			target.x + target.width <= node.x + node.width
+		) {
 			node.maximized = true;
 			parents.push(node);
 		} else {

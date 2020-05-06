@@ -7,20 +7,19 @@ import {
 } from "../../../store/react-bindings";
 import { useRef, useCallback, useContext } from "preact/hooks";
 import { formatTime } from "../util";
-import { FlamegraphType } from "../data/commits";
+import { FlamegraphType, ProfilerNode } from "../data/commits";
 import { createFlameGraphStore } from "./FlamegraphStore";
 import { useInstance, useResize } from "../../utils";
 import { FlameNode } from "./FlameNode";
+import { ID } from "../../../store/types";
 
 export function FlameGraph() {
 	const store = useStore();
 
 	const displayType = useObserver(() => store.profiler.flamegraphType.$);
 	const selectedId = useObserver(() => store.profiler.selectedNodeId.$);
-	const nodes = useObserver(() => {
-		const commit = store.profiler.activeCommit.$;
-		return commit ? commit.nodes : new Map();
-	});
+	const commit = useObserver(() => store.profiler.activeCommit.$);
+	const nodes = commit ? commit.nodes : new Map<ID, ProfilerNode>();
 
 	const ref2 = useInstance(() => createFlameGraphStore(store.profiler));
 	const positionData = useObserver(() => {
@@ -61,7 +60,9 @@ export function FlameGraph() {
 				return (
 					<FlameNode
 						key={pos.id}
+						parentId={node.parent}
 						node={pos}
+						commitRootId={commit ? commit.commitRootId : -1}
 						onClick={() => onSelect(pos.id)}
 						selected={selectedId === pos.id}
 					>
