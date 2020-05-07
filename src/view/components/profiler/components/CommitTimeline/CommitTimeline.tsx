@@ -1,5 +1,5 @@
 import { h, RefObject } from "preact";
-import { useState, useCallback, useRef } from "preact/hooks";
+import { useState, useCallback, useRef, useEffect } from "preact/hooks";
 import { ArrowBack, ArrowForward } from "../../../icons";
 import s from "./CommitTimeline.css";
 import { getGradient } from "../../data/gradient";
@@ -89,6 +89,14 @@ export function CommitTimeline(props: CommitTimelineProps) {
 	const inner = useRef<HTMLDivElement>();
 	const pane = useRef<HTMLDivElement>();
 	const paneContainerRef = useRef<HTMLDivElement>();
+
+	useEffect(() => {
+		if (pane.current) {
+			const active = pane.current.querySelector("[data-selected]");
+			// JSDOM doesn't support scrollIntoView
+			if (active && active.scrollIntoView) active.scrollIntoView();
+		}
+	}, [selected]);
 
 	useResize(
 		() => {
