@@ -113,15 +113,16 @@ export default entries.map(data => ({
 				return comment + code;
 			},
 		},
-		alias({
-			entries: [
-				{
-					find: "preact/hooks",
-					replacement: "./node_modules/preact/hooks/src/index.js",
-				},
-				{ find: "preact", replacement: "./node_modules/preact/src/index.js" },
-			],
-		}),
+		process.env.DEBUG === "true" &&
+			alias({
+				entries: [
+					{
+						find: "preact/hooks",
+						replacement: "./node_modules/preact/hooks/src/index.js",
+					},
+					{ find: "preact", replacement: "./node_modules/preact/src/index.js" },
+				],
+			}),
 		resolve(),
 		commonjs(),
 		replace({
