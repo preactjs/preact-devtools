@@ -86,7 +86,7 @@ export function useResize(fn: () => void, args: any[], init = false) {
 	}, []);
 
 	useLayoutEffect(() => {
-		const fn2 = throttle(fn, 100);
+		const fn2 = throttle(fn, 60);
 		win.addEventListener("resize", fn2);
 		return () => {
 			win.removeEventListener("resize", fn2);
