@@ -73,3 +73,7 @@ typings/
 .rts*
 *.pdf
 test-e2e/screenshots
+
+# Browser profiles
+profiles/firefox/*
+profiles/chrome/*
