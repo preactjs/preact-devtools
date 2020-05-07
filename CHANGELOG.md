@@ -1,5 +1,21 @@
 # Changelog
 
+## 0.6.1
+
+This release contains no new features and all time was spent on polishing the existing ones and a bit of housekeeping. Most notably the Profiler will be a lot faster on weak GPUs (like the one in my Dell XPS 13 laptop).
+
+- Profiler refactor Part 1 (#187, thanks @marvinhagemeister)
+- Add support for custom persistent user profiles (#186, thanks @marvinhagemeister)
+- Fix report bug link not working (#185, thanks @marvinhagemeister)
+- Work around chrome monospace bug (#184, thanks @marvinhagemeister)
+- Only show selftime in ranked Flamegraph (#183, thanks @marvinhagemeister)
+- Fix lint-staged config + update pentf (#182, thanks @marvinhagemeister)
+- Make flame graph animations less demanding on GPU (#180, thanks @marvinhagemeister)
+- Refactor DataInput (#179, thanks @marvinhagemeister)
+- Make generated bundles easier to review (#178, thanks @marvinhagemeister)
+- Profiler: Mark unrelated nodes visually (#177, thanks @marvinhagemeister)
+- Fix window resize event never triggered (#176, thanks @marvinhagemeister)
+
 ## 0.6.0
 
 This release hardens the recently introduced hooks inspection and fixes several edge cases. Apart from that it's now possible to properly debug Preact applications that are rendered inside an `iframe`. The highlight overlay will adapt to the `iframe`'s position accordingly :tada:
