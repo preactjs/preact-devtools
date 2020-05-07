@@ -72,7 +72,7 @@ export function useInstance<T>(fn: () => T) {
 	return value;
 }
 
-export function useResize(fn: () => void, args: any[]) {
+export function useResize(fn: () => void, args: any[], init = false) {
 	// If we're running inside the browser extension context
 	// we pull the correct window reference from context. And
 	// yes there are multiple `window` objects to keep track of.
@@ -80,8 +80,13 @@ export function useResize(fn: () => void, args: any[]) {
 	// triggered. For testing scenarios we can fall back to
 	// the global window object instead.
 	const win = useContext(WindowCtx) || window;
-	const fn2 = throttle(fn, 100);
+
+	useEffect(() => {
+		if (init) fn();
+	}, []);
+
 	useLayoutEffect(() => {
+		const fn2 = throttle(fn, 60);
 		win.addEventListener("resize", fn2);
 		return () => {
 			win.removeEventListener("resize", fn2);

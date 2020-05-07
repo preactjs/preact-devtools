@@ -5,6 +5,7 @@ import resolve from "rollup-plugin-node-resolve";
 import postcss from "rollup-plugin-postcss";
 import commonjs from "rollup-plugin-commonjs";
 import replace from "@rollup/plugin-replace";
+import alias from "@rollup/plugin-alias";
 import path from "path";
 
 const BROWSERS = ["chrome", "edge", "firefox", "inline"].filter(x => {
@@ -112,6 +113,16 @@ export default entries.map(data => ({
 				return comment + code;
 			},
 		},
+		process.env.DEBUG === "true" &&
+			alias({
+				entries: [
+					{
+						find: "preact/hooks",
+						replacement: "./node_modules/preact/hooks/src/index.js",
+					},
+					{ find: "preact", replacement: "./node_modules/preact/src/index.js" },
+				],
+			}),
 		resolve(),
 		commonjs(),
 		replace({

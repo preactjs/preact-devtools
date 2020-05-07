@@ -3,30 +3,28 @@ import { useStore, useObserver } from "../../../../store/react-bindings";
 import { SidebarPanel, Empty } from "../../../sidebar/SidebarPanel";
 import s from "./RenderedAt.css";
 import { formatTime } from "../../util";
-import { mapParents } from "../../flamegraph/transform/util";
 
 export function RenderedAt() {
 	const store = useStore();
 	const data = useObserver(() => {
 		const id = store.profiler.selectedNodeId.$;
 
-		return store.profiler.commits.$.filter(x => x.nodes.has(id))
-			.filter(x => {
-				if (id === x.commitRootId) return true;
-				let keep = false;
-				mapParents(x.nodes, id, node => {
-					if (node.id === x.commitRootId) keep = true;
-				});
-				return keep;
-			})
-			.map((commit, commitIdx) => {
-				const node = commit.nodes.get(id)!;
-				return {
-					id: commitIdx,
-					startTime: node.startTime,
-					selfDuration: node.selfDuration,
-				};
-			});
+		return store.profiler.commits.$.filter(x => {
+			if (x.nodes.has(id)) {
+				const node = x.nodes.get(id)!;
+				const root = x.nodes.get(x.commitRootId)!;
+				return node.startTime >= root.startTime && node.endTime <= root.endTime;
+			}
+
+			return false;
+		}).map(commit => {
+			const node = commit.nodes.get(id)!;
+			return {
+				index: store.profiler.commits.$.findIndex(x => x === commit),
+				startTime: node.startTime,
+				selfDuration: node.selfDuration,
+			};
+		});
 	});
 
 	const commitIdx = useObserver(() => store.profiler.activeCommitIdx.$);
@@ -38,14 +36,14 @@ export function RenderedAt() {
 			{data.length <= 0 ? (
 				<Empty>Did not render during this profiling session</Empty>
 			) : (
-				<nav>
+				<nav data-testid="rendered-at">
 					{data.map(node => {
 						return (
 							<button
-								key={node.id}
+								key={node.index}
 								class={s.item}
-								data-active={commitIdx === node.id}
-								onClick={() => (store.profiler.activeCommitIdx.$ = node.id)}
+								data-active={commitIdx === node.index}
+								onClick={() => (store.profiler.activeCommitIdx.$ = node.index)}
 							>
 								<span>
 									{formatTime(node.startTime)} for{" "}

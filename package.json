@@ -29,6 +29,7 @@
 	"devDependencies": {
 		"@babel/core": "^7.9.0",
 		"@babel/plugin-transform-react-jsx": "^7.9.4",
+		"@rollup/plugin-alias": "^3.1.0",
 		"@rollup/plugin-replace": "^2.3.2",
 		"@testing-library/preact": "^1.0.2",
 		"@types/archiver": "^3.1.0",

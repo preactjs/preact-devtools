@@ -24,7 +24,12 @@ export function padNodes(
 
 		nodes.forEach(node => {
 			// Enlarge width of parents
-			if (node.x <= pad.x && node.x + node.width >= pad.x + pad.width) {
+			if (
+				node.x <= pad.x &&
+				(node.x + node.width >= pad.x + pad.width ||
+					(node.x + node.width > pad.x &&
+						node.x + node.width < pad.x + pad.width))
+			) {
 				if (node.id !== pad.id) {
 					node.width += factor;
 				}

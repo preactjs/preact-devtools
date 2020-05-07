@@ -91,32 +91,30 @@ export function CommitTimeline(props: CommitTimelineProps) {
 	const paneContainerRef = useRef<HTMLDivElement>();
 
 	useEffect(() => {
-		const sizes = calcSize(
-			container,
-			inner,
-			pane,
-			paneContainerRef,
-			items.length,
-			selected,
-		);
-		setPaneWidth(sizes.pane);
-		setViewportWidth(sizes.viewport);
-		setOffset(sizes.offset);
-	}, [pane, inner, pane, paneContainerRef, items.length, selected]);
+		if (pane.current) {
+			const active = pane.current.querySelector("[data-selected]");
+			// JSDOM doesn't support scrollIntoView
+			if (active && active.scrollIntoView) active.scrollIntoView();
+		}
+	}, [selected]);
 
-	useResize(() => {
-		const sizes = calcSize(
-			container,
-			inner,
-			pane,
-			paneContainerRef,
-			items.length,
-			selected,
-		);
-		setPaneWidth(sizes.pane);
-		setViewportWidth(sizes.viewport);
-		setOffset(sizes.offset);
-	}, [pane, container, paneContainerRef, inner, items.length, selected]);
+	useResize(
+		() => {
+			const sizes = calcSize(
+				container,
+				inner,
+				pane,
+				paneContainerRef,
+				items.length,
+				selected,
+			);
+			setPaneWidth(sizes.pane);
+			setViewportWidth(sizes.viewport);
+			setOffset(sizes.offset);
+		},
+		[pane, container, paneContainerRef, inner, items.length, selected],
+		true,
+	);
 
 	const onPrev = useCallback(() => {
 		const next = selected - 1;

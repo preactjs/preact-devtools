@@ -26,7 +26,7 @@ export async function run(config: any) {
 
 	const nodes = await getText$$(
 		devtools,
-		'[data-type="flamegraph"] > *:not([data-weight="-1"])',
+		'[data-type="flamegraph"] > *:not([data-weight="-2"])',
 	);
 	expect(nodes.map(n => n.split(" ")[0])).to.deep.equal([
 		"Fragment",

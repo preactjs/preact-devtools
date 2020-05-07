@@ -55,9 +55,14 @@ export function ops2Tree(oldTree: Tree, ops: number[]) {
 				const id = ops[i + 1];
 				if (!pending.has(id)) {
 					const node = oldTree.get(id)!;
-					pending.set(id, deepClone(node));
+					try {
+						pending.set(id, deepClone(node));
+					} catch (err) {
+						// eslint-disable-next-line no-console
+						console.error(`Missing node ${id} detected.`);
+						throw err;
+					}
 				}
-
 				const x = pending.get(id)!;
 				x.startTime = ops[i + 2] / 1000;
 				x.endTime = ops[i + 3] / 1000;
