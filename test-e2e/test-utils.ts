@@ -67,6 +67,11 @@ export async function newTestPage(
 			) &&
 			!mockResponse(
 				req,
+				"preactCompat.js",
+				`./vendor/preact/${preactVersion}/preactCompat.js`,
+			) &&
+			!mockResponse(
+				req,
 				"preactHooks.js",
 				`./vendor/preact/${preactVersion}/preactHooks.js`,
 			) &&
