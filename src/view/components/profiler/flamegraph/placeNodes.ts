@@ -2,7 +2,6 @@ import { ID } from "../../../store/types";
 import { CommitData, FlamegraphType, ProfilerNode } from "../data/commits";
 import { watch, Observable } from "../../../valoo";
 import { layoutTimeline } from "./modes/flamegraph";
-import { layoutRanked } from "./modes/ranked";
 import { focusNode } from "./transform/focusNode";
 import { padNodes } from "./transform/pad";
 
@@ -37,7 +36,16 @@ export function flattenNodeTree<K, T extends { id: K; children: K[] }>(
 	return out;
 }
 
-const EMPTY: ProfilerNode = {
+export const EMPTY_COMMIT: CommitData = {
+	commitRootId: -1,
+	duration: -1,
+	maxDepth: 1,
+	maxSelfDuration: 1,
+	nodes: new Map(),
+	rootId: -1,
+};
+
+export const EMPTY: ProfilerNode = {
 	children: [],
 	depth: 0,
 	duration: 0,
@@ -87,11 +95,7 @@ export function placeNodes(
 		const selected = commit.$.nodes.get(selectedId.$) || root;
 
 		// 2. Sorting (view mode) + coloring
-		const prepared =
-			viewMode.$ === FlamegraphType.FLAMEGRAPH
-				? layoutTimeline(nodes, root, selected, maxDuration)
-				: layoutRanked(nodes, root, maxDuration);
-
+		const prepared = layoutTimeline(nodes, root, selected, maxDuration);
 		return padNodes(prepared, 0.1);
 	});
 

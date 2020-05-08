@@ -1,14 +1,15 @@
 import { h } from "preact";
-import { useRef } from "preact/hooks";
+import { useRef, useCallback } from "preact/hooks";
 import s from "./FlameGraph.css";
 import { NodeTransform } from "./transform/focusNode";
+import { ID } from "../../../store/types";
 
 export interface Props {
 	selected: boolean;
 	children: any;
 	parentId: number;
 	commitRootId: number;
-	onClick: () => void;
+	onClick: (id: ID) => void;
 	node: NodeTransform;
 }
 
@@ -19,6 +20,8 @@ export function FlameNode(props: Props) {
 	const { onClick, selected, node } = props;
 	const transform = useRef("");
 	const widthCss = useRef("");
+
+	const onRawClick = useCallback(() => onClick(node.id), [node.id]);
 
 	const { visible, width, x } = node;
 
@@ -31,7 +34,7 @@ export function FlameNode(props: Props) {
 	return (
 		<div
 			class={s.node}
-			onClick={onClick}
+			onClick={onRawClick}
 			data-id={node.id}
 			data-commit-root={props.commitRootId}
 			data-parent-id={props.parentId}

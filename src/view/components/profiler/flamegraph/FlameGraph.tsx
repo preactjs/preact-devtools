@@ -7,11 +7,12 @@ import {
 } from "../../../store/react-bindings";
 import { useRef, useCallback, useContext } from "preact/hooks";
 import { formatTime } from "../util";
-import { FlamegraphType, ProfilerNode } from "../data/commits";
+import { FlamegraphType } from "../data/commits";
 import { createFlameGraphStore } from "./FlamegraphStore";
 import { useInstance, useResize } from "../../utils";
 import { FlameNode } from "./FlameNode";
-import { ID } from "../../../store/types";
+import { RankedLayout } from "./ranked/RankedLayout";
+import { EMPTY } from "./placeNodes";
 
 export function FlameGraph() {
 	const store = useStore();
@@ -19,12 +20,11 @@ export function FlameGraph() {
 	const displayType = useObserver(() => store.profiler.flamegraphType.$);
 	const selectedId = useObserver(() => store.profiler.selectedNodeId.$);
 	const commit = useObserver(() => store.profiler.activeCommit.$);
-	const nodes = commit ? commit.nodes : new Map<ID, ProfilerNode>();
-
 	const ref2 = useInstance(() => createFlameGraphStore(store.profiler));
 	const positionData = useObserver(() => {
 		return !store.profiler.isRecording.$ ? ref2.nodes.$ : [];
 	});
+	const canvasWidth = useObserver(() => ref2.canvasWidth.$);
 
 	const win = useContext(WindowCtx) || window;
 	if (process.env.DEBUG) {
@@ -53,26 +53,37 @@ export function FlameGraph() {
 		[store],
 	);
 
+	if (!commit || !positionData.length) return null;
+
 	return (
 		<div class={s.root} ref={ref} data-type={displayType.toLowerCase()}>
-			{positionData.map(pos => {
-				const node = nodes.get(pos.id)!;
-				return (
-					<FlameNode
-						key={pos.id}
-						parentId={node.parent}
-						node={pos}
-						commitRootId={commit ? commit.commitRootId : -1}
-						onClick={() => onSelect(pos.id)}
-						selected={selectedId === pos.id}
-					>
-						{node.name} ({formatTime(node.selfDuration)}
-						{displayType === FlamegraphType.FLAMEGRAPH &&
-							" of " + formatTime(node.treeEndTime - node.treeStartTime)}
-						)
-					</FlameNode>
-				);
-			})}
+			{displayType === FlamegraphType.RANKED ? (
+				<RankedLayout
+					canvasWidth={canvasWidth}
+					commit={commit}
+					onSelect={onSelect}
+					selected={store.profiler.selectedNode.$ || EMPTY}
+				/>
+			) : (
+				positionData.map(pos => {
+					const node = commit.nodes.get(pos.id)!;
+					return (
+						<FlameNode
+							key={pos.id}
+							parentId={node.parent}
+							node={pos}
+							commitRootId={commit ? commit.commitRootId : -1}
+							onClick={() => onSelect(pos.id)}
+							selected={selectedId === pos.id}
+						>
+							{node.name} ({formatTime(node.selfDuration)}
+							{displayType === FlamegraphType.FLAMEGRAPH &&
+								" of " + formatTime(node.treeEndTime - node.treeStartTime)}
+							)
+						</FlameNode>
+					);
+				})
+			)}
 		</div>
 	);
 }
