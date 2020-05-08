@@ -29,7 +29,6 @@ function addToTarget(tabId: number, port: chrome.runtime.Port) {
 			source: DevtoolsToClient,
 		});
 		target.off(port.name);
-		setPopupStatus(tabId, false);
 	});
 }
 
@@ -57,12 +56,7 @@ function handleDevtoolsConnection(port: chrome.runtime.Port) {
 		addToTarget(tabId, port);
 		port.onMessage.removeListener(initialListener);
 
-		if (
-			targets
-				.get(tabId)
-				?.connected()
-				.includes(ContentScriptName)
-		) {
+		if (targets.get(tabId)?.connected().includes(ContentScriptName)) {
 			port.postMessage({ type: "init", data: null });
 		}
 	}
