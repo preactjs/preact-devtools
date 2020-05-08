@@ -1,6 +1,6 @@
 import { expect } from "chai";
 import { flames } from "../testHelpers";
-import { layoutTimeline } from "./flamegraph";
+import { placeFlamegraph } from "./flamegraph-utils";
 
 const required = {
 	visible: true,
@@ -15,7 +15,7 @@ describe("layoutTimeline", () => {
             Bar *
       `;
 		expect(
-			layoutTimeline(tree.nodes, tree.root, tree.root, tree.root.selfDuration),
+			placeFlamegraph(tree.nodes, tree.root, tree.root, tree.root.selfDuration),
 		).to.deep.equal([
 			{ ...required, id: 1, width: 140, x: 0, row: 0, weight: 9 },
 			{ ...required, id: 2, width: 80, x: 20, row: 1, weight: 5 },
@@ -30,7 +30,7 @@ describe("layoutTimeline", () => {
             Bar *      Bob **
       `;
 		expect(
-			layoutTimeline(tree.nodes, tree.root, tree.root, tree.root.selfDuration),
+			placeFlamegraph(tree.nodes, tree.root, tree.root, tree.root.selfDuration),
 		).to.deep.equal([
 			{ ...required, id: 1, width: 250, x: 0, row: 0, weight: 9 },
 			{ ...required, id: 2, width: 80, x: 20, row: 1, weight: 4 },
