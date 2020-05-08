@@ -43,9 +43,11 @@ export function FlameNode(props: Props) {
 			data-maximized={node.maximized}
 			data-selected={selected}
 			data-overflow={width < MIN_TEXT_WIDTH}
-			style={`height: ${ROW_HEIGHT}px; ${transform.current} ${widthCss.current};`}
+			style={`height: ${ROW_HEIGHT}px; ${transform.current} ${widthCss.current}`}
 		>
-			<span class={s.text}>{props.children}</span>
+			<span class={s.text} style={widthCss.current}>
+				{props.children}
+			</span>
 		</div>
 	);
 }
