@@ -24,16 +24,16 @@ export async function run(config: any) {
 
 	await click(devtools, recordBtn);
 
-	const nodes = await getText$$(
+	let nodes = await getText$$(
 		devtools,
-		'[data-type="flamegraph"] > *:not([data-weight="-2"])',
+		'[data-type="flamegraph"] > *:not([data-weight="-1"])',
 	);
-	expect(nodes.map(n => n.split(" ")[0])).to.deep.equal([
-		"Fragment",
-		"App",
-		"Counter",
-		"Display",
-	]);
+	expect(nodes.map(n => n.split(" ")[0])).to.deep.equal(["Counter", "Display"]);
+	nodes = await getText$$(
+		devtools,
+		'[data-type="flamegraph"] > [data-active-parent]',
+	);
+	expect(nodes.map(n => n.split(" ")[0])).to.deep.equal(["Fragment"]);
 
 	await closePage(page);
 }
