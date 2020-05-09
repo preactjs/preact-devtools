@@ -1,4 +1,9 @@
-import { newTestPage, click, waitForAttribute } from "../../../test-utils";
+import {
+	newTestPage,
+	click,
+	waitForAttribute,
+	getSize,
+} from "../../../test-utils";
 import { expect } from "chai";
 import { closePage } from "pentf/browser_utils";
 import { Page } from "puppeteer";
@@ -42,6 +47,18 @@ export async function run(config: any) {
 		{ maximized: false, name: "Value", visible: true },
 		{ maximized: false, name: "Value", visible: true },
 	]);
+
+	const memoSize = await getSize(
+		devtools,
+		'[data-type="flamegraph"] *:nth-child(3)',
+	);
+	const staticSize = await getSize(
+		devtools,
+		'[data-type="flamegraph"] *:nth-child(4)',
+	);
+
+	expect(memoSize.x <= staticSize.x).to.equal(true);
+	expect(memoSize.width >= staticSize.width).to.equal(true);
 
 	await closePage(page);
 }
