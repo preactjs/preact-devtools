@@ -40,6 +40,7 @@ export function FlameNode(props: Props) {
 			data-parent-id={props.parentId}
 			data-visible={visible}
 			data-weight={node.weight}
+			data-active-parent={node.activeParent}
 			data-maximized={node.maximized}
 			data-selected={selected}
 			data-overflow={width < MIN_TEXT_WIDTH}

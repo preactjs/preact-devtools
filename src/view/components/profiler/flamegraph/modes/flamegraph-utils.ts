@@ -20,9 +20,10 @@ export function toTransform(commit: CommitData): Map<ID, NodeTransform> {
 			maximized: false,
 			weight:
 				node.startTime < root.startTime
-					? -2
+					? -1
 					: getGradient(commit.maxSelfDuration, node.selfDuration),
 			visible: true,
+			activeParent: false,
 		});
 	});
 
@@ -76,6 +77,7 @@ export function placeFlamegraph(
 			pos.width = canvasWidth;
 			pos.x = 0;
 			pos.visible = true;
+			pos.activeParent = true;
 		}
 		// At this point the node isn't maximized. If we're not inside
 		// the currently zoomed in sub-tree, we must be a node that
@@ -87,6 +89,7 @@ export function placeFlamegraph(
 		// inside the visible canvas.
 		else {
 			pos.maximized = false;
+			pos.activeParent = false;
 			pos.visible = true;
 			pos.x = (item.treeStartTime - offset) * scale;
 			pos.width = (item.treeEndTime - item.treeStartTime) * scale;

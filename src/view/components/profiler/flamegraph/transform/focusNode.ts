@@ -9,6 +9,7 @@ export interface NodeTransform {
 	weight: number;
 	maximized: boolean;
 	visible: boolean;
+	activeParent: boolean;
 }
 
 /**
