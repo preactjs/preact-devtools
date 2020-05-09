@@ -2,8 +2,18 @@ const { h, render } = preact;
 const { useState } = preactHooks;
 const { memo } = preactCompat;
 
+function Value(props) {
+	return html`<p>${props.children}</p>`;
+}
+
 function Display(props) {
-	return html` <div data-testid="result">Counter: ${props.value}</div> `;
+	return html`
+		<div data-testid="result">
+			Counter: <br />
+			<${Value}>${props.value}<//>,
+			<${Value}>${props.value}<//>
+		</div>
+	`;
 }
 
 const MemoDisplay = memo(Display);
