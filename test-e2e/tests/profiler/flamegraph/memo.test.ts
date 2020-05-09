@@ -34,7 +34,6 @@ export async function run(config: any) {
 	await waitForAttribute(devtools, recordBtn, "title", /Stop Recording/);
 
 	await click(page, "button");
-	await click(page, "button");
 
 	await click(devtools, recordBtn);
 

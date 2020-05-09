@@ -58,7 +58,6 @@ export async function run(config: any) {
 	await waitForAttribute(devtools, recordBtn, "title", /Stop Recording/);
 
 	await click(page, "button");
-	await click(page, "button");
 
 	await click(devtools, recordBtn);
 
@@ -66,8 +65,8 @@ export async function run(config: any) {
 	expect(nodes).to.deep.equal([
 		{ maximized: true, name: "Fragment", visible: true },
 		{ maximized: false, name: "Counter", visible: true },
-		{ maximized: false, name: "Value", visible: true },
-		{ maximized: false, name: "Value", visible: true },
+		{ maximized: false, name: "Value1", visible: true },
+		{ maximized: false, name: "Value2", visible: true },
 	]);
 
 	const memoSize = await getSize(

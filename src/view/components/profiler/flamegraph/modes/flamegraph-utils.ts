@@ -51,7 +51,7 @@ export function placeFlamegraph(
 	const root = tree.get(rootId)!;
 	const scale =
 		(canvasWidth || 1) /
-		Math.max(selected.treeEndTime - selected.treeStartTime, 0.01);
+		(selected.treeEndTime - selected.treeStartTime || 0.01);
 	const offset = selected.treeStartTime;
 
 	// Use this value to keep track of when we enter the current
