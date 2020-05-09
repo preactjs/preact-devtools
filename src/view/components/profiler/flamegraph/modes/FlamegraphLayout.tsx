@@ -46,7 +46,7 @@ export function FlamegraphLayout({
 						commitRootId={commit.commitRootId}
 						node={pos}
 						selected={pos.id === selected.id}
-						parentId={selected.parent}
+						parentId={commit.nodes.get(pos.id)!.parent}
 						onClick={onSelect}
 					>
 						{texts[i]}
