@@ -94,6 +94,15 @@ export function createProfiler(): ProfilerState {
 			: null;
 	});
 
+	// Flamegraph
+	const flamegraphType = valoo(FlamegraphType.FLAMEGRAPH);
+	flamegraphType.on(type => {
+		selectedNodeId.$ =
+			type === FlamegraphType.FLAMEGRAPH && activeCommit.$
+				? activeCommit.$.rootId
+				: -1;
+	});
+
 	// Recording
 	const isRecording = valoo(false);
 	isRecording.on(v => {
@@ -107,18 +116,12 @@ export function createProfiler(): ProfilerState {
 			// Reset selection when recording stopped
 			// and new profiling data was collected.
 			if (commits.$.length > 0) {
-				selectedNodeId.$ = commits.$[0].rootId;
+				selectedNodeId.$ =
+					flamegraphType.$ === FlamegraphType.FLAMEGRAPH
+						? commits.$[0].rootId
+						: commits.$[0].commitRootId;
 			}
 		}
-	});
-
-	// Flamegraph
-	const flamegraphType = valoo(FlamegraphType.FLAMEGRAPH);
-	flamegraphType.on(type => {
-		selectedNodeId.$ =
-			type === FlamegraphType.FLAMEGRAPH && activeCommit.$
-				? activeCommit.$.rootId
-				: -1;
 	});
 
 	// Render reasons
