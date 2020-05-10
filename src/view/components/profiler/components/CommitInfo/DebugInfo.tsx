@@ -5,7 +5,7 @@ import { useStore, useObserver } from "../../../../store/react-bindings";
 
 const TimeRange = ({ from, to }: { from: number; to: number }) => (
 	<Fragment>
-		{from.toFixed(2)} -&gt; {to.toFixed(2)}
+		{from.toFixed(2)} -&gt; {to.toFixed(2)} | {(to - from).toFixed(2)}
 	</Fragment>
 );
 

@@ -44,6 +44,11 @@ export interface DevNode {
 }
 
 export type Theme = "auto" | "light" | "dark";
+export enum Panel {
+	ELEMENTS = "ELEMENTS",
+	PROFILER = "PROFILER",
+	SETTINGS = "SETTINGS",
+}
 
 export type Tree = Map<ID, DevNode>;
 
@@ -51,6 +56,7 @@ export interface Store {
 	supports: {
 		hooks: Observable<boolean>;
 	};
+	activePanel: Observable<Panel>;
 	notify: EmitFn;
 	profiler: ProfilerState;
 	isPicking: Observable<boolean>;

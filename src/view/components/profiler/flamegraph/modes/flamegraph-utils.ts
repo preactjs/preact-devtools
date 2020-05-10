@@ -18,16 +18,18 @@ export function toTransform(commit: CommitData): Map<ID, NodeTransform> {
 
 	const out = new Map<ID, NodeTransform>();
 	flattenNodeTree(commit.nodes, commit.rootId).forEach(node => {
+		const weight =
+			node.startTime < root.startTime
+				? -1
+				: getGradient(commit.maxSelfDuration, node.selfDuration);
+
 		out.set(node.id, {
 			id: node.id,
 			width: node.selfDuration,
 			x: 0,
 			row: node.depth,
 			maximized: false,
-			weight:
-				node.startTime < root.startTime
-					? -1
-					: getGradient(commit.maxSelfDuration, node.selfDuration),
+			weight,
 			visible: true,
 			commitParent: commitParents.has(node.id),
 		});

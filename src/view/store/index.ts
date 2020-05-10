@@ -5,7 +5,7 @@ import { flattenChildren } from "../components/tree/windowing";
 import { createSelectionStore } from "./selection";
 import { createCollapser } from "./collapser";
 import { EmitFn } from "../../adapter/hook";
-import { ID, DevNode, Store, Listener, Theme } from "./types";
+import { ID, DevNode, Store, Listener, Theme, Panel } from "./types";
 import { InspectData } from "../../adapter/adapter/adapter";
 import { createProfiler } from "../components/profiler/data/commits";
 import { PropData } from "../components/sidebar/inspect/parseProps";
@@ -108,6 +108,7 @@ export function createStore(): Store {
 		supports: {
 			hooks: supportsHooks,
 		},
+		activePanel: valoo(Panel.ELEMENTS),
 		profiler: createProfiler(),
 		notify,
 		nodeList,

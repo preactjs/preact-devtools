@@ -45,18 +45,31 @@ export function adjustNodesToRight(
 	id: ID,
 	delta: number,
 ) {
+	console.log();
+	console.log("ADJUST", id, delta);
+	console.log("   ROOT", tree.get(id)!.treeEndTime);
 	mapParents(tree, id, (parent, prevParent) => {
+		const old = parent.treeEndTime;
 		parent.treeEndTime += delta;
 
+		console.log("   p", parent.name, old, parent.treeEndTime);
+
 		const idx = parent.children.indexOf(prevParent.id);
+		// TODO: Perf Out of bounds access
 		const tasks = idx > -1 ? parent.children.slice(idx + 1) : parent.children;
 
-		tasks.forEach(childId => {
-			mapChildren(tree, childId, child => {
-				child.treeEndTime += delta;
-				child.treeStartTime += delta;
-			});
-		});
+		// tasks.forEach(childId => {
+		// 	mapChildren(tree, childId, child => {
+		// 		child.treeEndTime += delta;
+		// 		child.treeStartTime += delta;
+		// 		console.log(
+		// 			"   child",
+		// 			child.name,
+		// 			child.treeStartTime,
+		// 			child.treeEndTime,
+		// 		);
+		// 	});
+		// });
 	});
 }
 

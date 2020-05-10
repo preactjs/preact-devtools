@@ -103,7 +103,12 @@ export function applyOperationsV2(store: Store, data: number[]) {
 	// Apply all removals
 	removals.forEach(id => store.nodes.$.delete(id));
 
+	console.log("==== patch tree ====");
 	// Combine old and new tree into a single one
+	console.groupCollapsed();
+	console.log(JSON.stringify(Array.from(store.nodes.$.values())));
+	console.log(JSON.stringify(Array.from(tree.values())));
+	console.groupEnd();
 	const merged = patchTree(store.nodes.$, tree, rootId, "expand");
 
 	// Update roots if necessary

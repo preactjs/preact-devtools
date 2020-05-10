@@ -2,7 +2,12 @@ import { expect } from "chai";
 import { patchTree } from "./patchTree";
 import { flames } from "../testHelpers";
 import { cloneTree } from "./util";
-import { Tree } from "../../../../store/types";
+import { Tree, DevNode } from "../../../../store/types";
+import * as patch1 from "./fixtures/patch1";
+import * as patch2 from "./fixtures/patch2";
+import * as patch3 from "./fixtures/patch3";
+import * as patch4 from "./fixtures/patch4";
+import * as patch5 from "./fixtures/patch5";
 
 export function toTimings(tree: Tree) {
 	return Array.from(tree.values())
@@ -16,7 +21,22 @@ export function toTimings(tree: Tree) {
 		.sort((a, b) => a.id - b.id);
 }
 
-describe("patchTree", () => {
+export function prepareFixture(fixture: {
+	previous: DevNode[];
+	next: DevNode[];
+	expected: ReturnType<typeof toTimings>;
+}) {
+	const { previous, next, expected } = fixture;
+	return {
+		previous: new Map(previous.map(node => [node.id, node])),
+		previousRoot: previous.length ? previous[0].id : -42,
+		next: new Map(next.map(node => [node.id, node])),
+		nextRoot: next[0].id,
+		expected,
+	};
+}
+
+describe.only("patchTree", () => {
 	it("should return old tree when new one is empty", () => {
 		const old = new Map();
 		const res = patchTree(old, new Map(), 1, "expand");
@@ -172,5 +192,35 @@ describe("patchTree", () => {
 
 		const actual = toTimings(patchTree(a.idMap, b.idMap, 2, "expand"));
 		expect(actual).to.deep.equal(expected);
+	});
+
+	it("should patch fixture 1", () => {
+		const { previous, next, nextRoot, expected } = prepareFixture(patch1);
+		const res = patchTree(previous, next, nextRoot, "expand");
+		expect(toTimings(res)).to.deep.equal(expected);
+	});
+
+	it("should patch fixture 2", () => {
+		const { previous, next, nextRoot, expected } = prepareFixture(patch2);
+		const res = patchTree(previous, next, nextRoot, "expand");
+		expect(toTimings(res)).to.deep.equal(expected);
+	});
+
+	it("should mount new nodes fixture 3", () => {
+		const { previous, next, nextRoot, expected } = prepareFixture(patch3);
+		const res = patchTree(previous, next, nextRoot, "expand");
+		expect(toTimings(res)).to.deep.equal(expected);
+	});
+
+	it("should mount new nodes fixture 4", () => {
+		const { previous, next, nextRoot, expected } = prepareFixture(patch4);
+		const res = patchTree(previous, next, nextRoot, "expand");
+		expect(toTimings(res)).to.deep.equal(expected);
+	});
+
+	it.only("should mount new nodes fixture 5", () => {
+		const { previous, next, nextRoot, expected } = prepareFixture(patch5);
+		const res = patchTree(previous, next, nextRoot, "expand");
+		expect(toTimings(res)).to.deep.equal(expected);
 	});
 });
