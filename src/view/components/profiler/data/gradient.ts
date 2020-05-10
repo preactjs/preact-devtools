@@ -10,5 +10,7 @@ export function getGradient(max: number, n: number) {
 		}
 	}
 
+	// i can be NaN at this point
+	if (isNaN(i)) return 0;
 	return Math.max(i, 0);
 }
