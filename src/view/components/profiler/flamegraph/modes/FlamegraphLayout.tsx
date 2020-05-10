@@ -31,6 +31,9 @@ export function FlamegraphLayout({
 	const texts = useMemo(() => {
 		return Array.from(data.values()).map(pos => {
 			const node = commit.nodes.get(pos.id)!;
+			if (pos.commitParent || pos.weight === -1) {
+				return node.name;
+			}
 			const self = formatTime(node.selfDuration);
 			const total = formatTime(node.treeEndTime - node.treeStartTime);
 			return `${node.name} (${self} of ${total})`;
