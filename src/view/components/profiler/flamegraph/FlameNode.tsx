@@ -37,6 +37,7 @@ export function FlameNode(props: Props) {
 			onClick={onRawClick}
 			data-id={node.id}
 			data-commit-root={props.commitRootId}
+			data-active-commit-root={node.id === props.commitRootId}
 			data-parent-id={props.parentId}
 			data-visible={visible}
 			data-weight={node.weight}
