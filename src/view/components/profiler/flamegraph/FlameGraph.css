@@ -73,7 +73,7 @@
 	opacity: 0.5;
 }
 
-.node[data-weight="-1"][data-active-parent]::after {
+.node[data-weight="-1"][data-commit-parent]::after {
 	background: var(--color-profiler-old);
 	color: black;
 }

@@ -27,7 +27,7 @@ export function toTransform(commit: CommitData): NodeTransform[] {
 				maximized: false,
 				weight: getGradient(commit.maxSelfDuration, node.selfDuration),
 				visible: true,
-				activeParent: false,
+				commitParent: false,
 			};
 		});
 }

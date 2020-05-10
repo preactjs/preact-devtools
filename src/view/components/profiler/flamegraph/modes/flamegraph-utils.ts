@@ -10,6 +10,12 @@ import { ID } from "../../../../store/types";
 export function toTransform(commit: CommitData): Map<ID, NodeTransform> {
 	const root = commit.nodes.get(commit.commitRootId)!;
 
+	const commitParents = new Set<ID>();
+	let item: ProfilerNode | undefined = commit.nodes.get(commit.commitRootId)!;
+	while ((item = commit.nodes.get(item.parent))) {
+		commitParents.add(item.id);
+	}
+
 	const out = new Map<ID, NodeTransform>();
 	flattenNodeTree(commit.nodes, commit.rootId).forEach(node => {
 		out.set(node.id, {
@@ -23,7 +29,7 @@ export function toTransform(commit: CommitData): Map<ID, NodeTransform> {
 					? -1
 					: getGradient(commit.maxSelfDuration, node.selfDuration),
 			visible: true,
-			activeParent: false,
+			commitParent: commitParents.has(node.id),
 		});
 	});
 
@@ -77,7 +83,6 @@ export function placeFlamegraph(
 			pos.width = canvasWidth;
 			pos.x = 0;
 			pos.visible = true;
-			pos.activeParent = true;
 		}
 		// At this point the node isn't maximized. If we're not inside
 		// the currently zoomed in sub-tree, we must be a node that
@@ -89,7 +94,6 @@ export function placeFlamegraph(
 		// inside the visible canvas.
 		else {
 			pos.maximized = false;
-			pos.activeParent = false;
 			pos.visible = true;
 			pos.x = (item.treeStartTime - offset) * scale;
 			pos.width = (item.treeEndTime - item.treeStartTime) * scale;
