@@ -9,6 +9,7 @@ import { RenderedAt } from "./RenderedAt/RenderedAt";
 import { ProfilerInfo } from "./ProfilerInfo/ProfilerInfo";
 import { CommitInfo } from "./CommitInfo/CommitInfo";
 import { RenderReasons } from "./RenderReasons";
+import { DebugProfilerInfo } from "./CommitInfo/DebugInfo";
 
 export function Profiler() {
 	return (
@@ -28,6 +29,7 @@ export function Profiler() {
 				<RenderReasons />
 				<RenderedAt />
 				<CommitInfo />
+				{process.env.DEBUG && <DebugProfilerInfo />}
 			</div>
 		</Fragment>
 	);
