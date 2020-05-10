@@ -6,6 +6,7 @@ import { NodeTransform } from "../transform/shared";
 const required: Partial<NodeTransform> = {
 	visible: true,
 	maximized: false,
+	commitParent: false,
 };
 
 describe("toTransform", () => {

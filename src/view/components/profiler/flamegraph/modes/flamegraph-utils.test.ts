@@ -5,6 +5,7 @@ import { toTransform } from "./flamegraph-utils";
 const required = {
 	visible: true,
 	maximized: false,
+	commitParent: false,
 };
 
 describe("toTransform", () => {
