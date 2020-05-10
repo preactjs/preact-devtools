@@ -3,7 +3,7 @@
 	max-width: 100%;
 	height: 100%;
 	position: relative;
-	overflow-x: hidden;
+	/* overflow-x: hidden; */
 }
 
 .node {
@@ -69,7 +69,7 @@
 	opacity: 0.5;
 }
 
-.node[data-maximized]:not([data-selected]) {
+.node[data-maximized][data-visible]:not([data-selected]) {
 	opacity: 0.5;
 }
 
