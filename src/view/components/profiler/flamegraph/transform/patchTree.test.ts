@@ -16,7 +16,7 @@ export function toTimings(tree: Tree) {
 		.sort((a, b) => a.id - b.id);
 }
 
-describe.only("patchTree2", () => {
+describe("patchTree", () => {
 	it("should return old tree when new one is empty", () => {
 		const old = new Map();
 		const res = patchTree(old, new Map(), 1, "expand");

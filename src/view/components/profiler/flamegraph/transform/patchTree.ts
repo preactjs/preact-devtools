@@ -82,7 +82,7 @@ export function patchTree(
 
 			// Check if we have a static sub-tree from a previous render.
 			// We'll process those later.
-			if (mode === "expand" && child.startTime < root.startTime) {
+			if (mode === "expand" && child && child.startTime < root.startTime) {
 				staticChildren.push(childId);
 			} else {
 				stack.push(childId);
