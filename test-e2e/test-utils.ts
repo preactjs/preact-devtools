@@ -67,6 +67,11 @@ export async function newTestPage(
 			) &&
 			!mockResponse(
 				req,
+				"preactCompat.js",
+				`./vendor/preact/${preactVersion}/preactCompat.js`,
+			) &&
+			!mockResponse(
+				req,
 				"preactHooks.js",
 				`./vendor/preact/${preactVersion}/preactHooks.js`,
 			) &&
@@ -254,7 +259,12 @@ export async function clickTab(
 	page: Page,
 	tab: "ELEMENTS" | "PROFILER" | "SETTINGS",
 ) {
-	await click(page, `[name="root-panel"][value="${tab}"]`);
+	await page.evaluate(name => {
+		return document
+			.querySelector(`[name="root-panel"][value="${name}"]`)!
+			.closest("label")!
+			.click();
+	}, tab);
 }
 
 // This injects a box into the page that moves with the mouse;

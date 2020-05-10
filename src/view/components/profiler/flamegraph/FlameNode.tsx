@@ -1,14 +1,15 @@
 import { h } from "preact";
-import { useRef } from "preact/hooks";
+import { useRef, useCallback } from "preact/hooks";
 import s from "./FlameGraph.css";
-import { NodeTransform } from "./transform/focusNode";
+import { NodeTransform } from "./transform/shared";
+import { ID } from "../../../store/types";
 
 export interface Props {
 	selected: boolean;
 	children: any;
 	parentId: number;
 	commitRootId: number;
-	onClick: () => void;
+	onClick: (id: ID) => void;
 	node: NodeTransform;
 }
 
@@ -19,6 +20,8 @@ export function FlameNode(props: Props) {
 	const { onClick, selected, node } = props;
 	const transform = useRef("");
 	const widthCss = useRef("");
+
+	const onRawClick = useCallback(() => onClick(node.id), [node.id]);
 
 	const { visible, width, x } = node;
 
@@ -31,18 +34,22 @@ export function FlameNode(props: Props) {
 	return (
 		<div
 			class={s.node}
-			onClick={onClick}
+			onClick={onRawClick}
 			data-id={node.id}
 			data-commit-root={props.commitRootId}
+			data-active-commit-root={node.id === props.commitRootId}
 			data-parent-id={props.parentId}
 			data-visible={visible}
 			data-weight={node.weight}
+			data-commit-parent={node.commitParent}
 			data-maximized={node.maximized}
 			data-selected={selected}
 			data-overflow={width < MIN_TEXT_WIDTH}
-			style={`height: ${ROW_HEIGHT}px; ${transform.current} ${widthCss.current};`}
+			style={`height: ${ROW_HEIGHT}px; ${transform.current} ${widthCss.current}`}
 		>
-			<span class={s.text}>{props.children}</span>
+			<span class={s.text} style={widthCss.current}>
+				{props.children}
+			</span>
 		</div>
 	);
 }

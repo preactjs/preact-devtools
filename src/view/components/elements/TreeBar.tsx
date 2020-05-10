@@ -108,6 +108,7 @@ export function TreeBar() {
 					<IconBtn
 						title="Filter Components"
 						active={filterVisible}
+						testId="filter-menu-button"
 						onClick={() => setFilterVisible(!filterVisible)}
 					>
 						<FilterList />
@@ -126,7 +127,7 @@ export function FilterPopup() {
 	const filterFragment = useObserver(() => store.filter.filterFragment.$);
 
 	return (
-		<div class={s.filter}>
+		<div class={s.filter} data-testid="filter-popup">
 			<form
 				onSubmit={e => {
 					e.preventDefault();
@@ -202,6 +203,7 @@ export function FilterPopup() {
 					<IconBtn
 						styling="secondary"
 						title="Add new filter"
+						testId="add-filter"
 						onClick={() => store.filter.add()}
 					>
 						<span class={s.filterCheck}>
@@ -209,7 +211,11 @@ export function FilterPopup() {
 						</span>
 						Add filter
 					</IconBtn>
-					<button type="submit" class={s.filterSubmitBtn}>
+					<button
+						type="submit"
+						class={s.filterSubmitBtn}
+						data-testid="filter-update"
+					>
 						Update
 					</button>
 				</div>

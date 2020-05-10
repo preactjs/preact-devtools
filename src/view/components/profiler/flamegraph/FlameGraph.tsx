@@ -1,49 +1,33 @@
 import { h } from "preact";
 import s from "./FlameGraph.css";
-import {
-	useStore,
-	useObserver,
-	WindowCtx,
-} from "../../../store/react-bindings";
-import { useRef, useCallback, useContext } from "preact/hooks";
-import { formatTime } from "../util";
-import { FlamegraphType, ProfilerNode } from "../data/commits";
-import { createFlameGraphStore } from "./FlamegraphStore";
-import { useInstance, useResize } from "../../utils";
-import { FlameNode } from "./FlameNode";
-import { ID } from "../../../store/types";
+import { useStore, useObserver } from "../../../store/react-bindings";
+import { useRef, useCallback, useState, useEffect } from "preact/hooks";
+import { FlamegraphType } from "../data/commits";
+import { useResize } from "../../utils";
+import { RankedLayout } from "./ranked/RankedLayout";
+import { EMPTY } from "./placeNodes";
+import { FlamegraphLayout } from "./modes/FlamegraphLayout";
 
 export function FlameGraph() {
 	const store = useStore();
+	const [canvasWidth, setCanvasWidth] = useState(600);
 
 	const displayType = useObserver(() => store.profiler.flamegraphType.$);
-	const selectedId = useObserver(() => store.profiler.selectedNodeId.$);
+	const selected = useObserver(() => store.profiler.selectedNode.$ || EMPTY);
 	const commit = useObserver(() => store.profiler.activeCommit.$);
-	const nodes = commit ? commit.nodes : new Map<ID, ProfilerNode>();
-
-	const ref2 = useInstance(() => createFlameGraphStore(store.profiler));
-	const positionData = useObserver(() => {
-		return !store.profiler.isRecording.$ ? ref2.nodes.$ : [];
-	});
-
-	const win = useContext(WindowCtx) || window;
-	if (process.env.DEBUG) {
-		(win as any).flamegraph = ref2;
-	}
+	const isRecording = useObserver(() => store.profiler.isRecording.$);
 
 	const ref = useRef<HTMLDivElement>();
-	useResize(
-		() => {
-			if (ref.current) {
-				const width = ref.current.clientWidth;
-				if (ref2.canvasWidth.$ !== width) {
-					ref2.canvasWidth.$ = width;
-				}
-			}
-		},
-		[positionData.length],
-		true,
-	);
+	useEffect(() => {
+		if (ref.current) {
+			setCanvasWidth(ref.current.clientWidth);
+		}
+	}, [isRecording || !commit]);
+	useResize(() => {
+		if (ref.current) {
+			setCanvasWidth(ref.current.clientWidth);
+		}
+	}, []);
 
 	const onSelect = useCallback(
 		(id: number) => {
@@ -53,26 +37,25 @@ export function FlameGraph() {
 		[store],
 	);
 
+	if (isRecording || !commit) return null;
+
 	return (
 		<div class={s.root} ref={ref} data-type={displayType.toLowerCase()}>
-			{positionData.map(pos => {
-				const node = nodes.get(pos.id)!;
-				return (
-					<FlameNode
-						key={pos.id}
-						parentId={node.parent}
-						node={pos}
-						commitRootId={commit ? commit.commitRootId : -1}
-						onClick={() => onSelect(pos.id)}
-						selected={selectedId === pos.id}
-					>
-						{node.name} ({formatTime(node.selfDuration)}
-						{displayType === FlamegraphType.FLAMEGRAPH &&
-							" of " + formatTime(node.treeEndTime - node.treeStartTime)}
-						)
-					</FlameNode>
-				);
-			})}
+			{displayType === FlamegraphType.RANKED ? (
+				<RankedLayout
+					canvasWidth={canvasWidth}
+					commit={commit!}
+					onSelect={onSelect}
+					selected={selected}
+				/>
+			) : (
+				<FlamegraphLayout
+					canvasWidth={canvasWidth}
+					commit={commit!}
+					onSelect={onSelect}
+					selected={selected}
+				/>
+			)}
 		</div>
 	);
 }

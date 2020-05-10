@@ -1,7 +1,7 @@
 import { ID, DevNodeType, Tree } from "../../../store/types";
 import { ProfilerNode, CommitData } from "../data/commits";
 import { sortTimeline } from "./FlamegraphStore";
-import { NodeTransform } from "./transform/focusNode";
+import { NodeTransform } from "./transform/shared";
 
 /**
  * Parse a visual flamegraph DSL into a `ProfilerNode` tree. Each

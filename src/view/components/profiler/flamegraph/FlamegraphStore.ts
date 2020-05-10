@@ -1,20 +1,5 @@
-import { valoo } from "../../../valoo";
-import { ProfilerState, ProfilerNode } from "../data/commits";
+import { ProfilerNode } from "../data/commits";
 import { ID, Tree } from "../../../store/types";
-import { placeNodes } from "./placeNodes";
-
-export function createFlameGraphStore(profiler: ProfilerState) {
-	const canvasWidth = valoo(600);
-
-	const nodes = placeNodes(
-		profiler.activeCommit,
-		profiler.flamegraphType,
-		profiler.selectedNodeId,
-		canvasWidth,
-	);
-
-	return { nodes, canvasWidth };
-}
 
 export function getRoot(tree: Tree, id: ID) {
 	let item = tree.get(id);
