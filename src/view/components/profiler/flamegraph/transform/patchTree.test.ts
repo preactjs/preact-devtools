@@ -1,6 +1,6 @@
 import { expect } from "chai";
-import { flames } from "../testHelpers";
 import { patchTree } from "./patchTree";
+import { flames } from "../testHelpers";
 import { cloneTree } from "./util";
 import { Tree } from "../../../../store/types";
 
@@ -16,10 +16,10 @@ export function toTimings(tree: Tree) {
 		.sort((a, b) => a.id - b.id);
 }
 
-describe("patchTree", () => {
+describe.only("patchTree2", () => {
 	it("should return old tree when new one is empty", () => {
 		const old = new Map();
-		const res = patchTree(old, new Map(), 1);
+		const res = patchTree(old, new Map(), 1, "expand");
 		expect(res).to.equal(old);
 	});
 
@@ -31,10 +31,11 @@ describe("patchTree", () => {
 
 		state.nodes.forEach(x => {
 			x.startTime += 200;
-			x.endTime += 200;
+			x.treeStartTime += 200;
+			x.treeEndTime += 200;
 		});
 
-		const res = patchTree(new Map(), state.idMap, 1);
+		const res = patchTree(new Map(), state.idMap, 1, "expand");
 		expect(res.get(1)!.treeStartTime).to.equal(0);
 		expect(res.get(1)!.treeEndTime < 200).to.equal(true);
 
@@ -52,7 +53,7 @@ describe("patchTree", () => {
 			 Bar ***
 		`;
 
-		const merged = patchTree(a.idMap, b.idMap, 1);
+		const merged = patchTree(a.idMap, b.idMap, 1, "expand");
 
 		const app = merged.get(1)!;
 		const bar = merged.get(2)!;
@@ -74,7 +75,7 @@ describe("patchTree", () => {
 			 	Bob *
 		`;
 
-		const merged = patchTree(a.idMap, b.idMap, 1);
+		const merged = patchTree(a.idMap, b.idMap, 1, "expand");
 
 		const bar = merged.get(2)!;
 		const bob = merged.get(3)!;
@@ -97,10 +98,12 @@ describe("patchTree", () => {
 
 		b.nodes.forEach(x => {
 			x.startTime += 100;
+			x.treeStartTime += 100;
 			x.endTime += 100;
+			x.treeEndTime += 100;
 		});
 
-		patchTree(a.idMap, b.idMap, 1);
+		patchTree(a.idMap, b.idMap, 1, "expand");
 
 		const app = b.byName("App")!;
 		const bar = b.byName("Bar")!;
@@ -128,7 +131,7 @@ describe("patchTree", () => {
 		b.byName("Bob")!.id = 3;
 
 		const expected = toTimings(cloneTree(b.idMap));
-		const actual = toTimings(patchTree(a.idMap, b.idMap, 1));
+		const actual = toTimings(patchTree(a.idMap, b.idMap, 1, "expand"));
 		expect(actual).to.deep.equal(expected);
 	});
 
@@ -149,7 +152,7 @@ describe("patchTree", () => {
 		b.byName("Bob")!.id = 3;
 
 		const expected = toTimings(cloneTree(b.idMap));
-		const actual = toTimings(patchTree(a.idMap, b.idMap, 1));
+		const actual = toTimings(patchTree(a.idMap, b.idMap, 1, "expand"));
 		expect(actual).to.deep.equal(expected);
 	});
 
@@ -167,7 +170,7 @@ describe("patchTree", () => {
 		const expected = toTimings(cloneTree(b.idMap));
 		b.idMap.delete(1);
 
-		const actual = toTimings(patchTree(a.idMap, b.idMap, 2));
+		const actual = toTimings(patchTree(a.idMap, b.idMap, 2, "expand"));
 		expect(actual).to.deep.equal(expected);
 	});
 });

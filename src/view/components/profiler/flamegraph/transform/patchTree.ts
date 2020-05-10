@@ -1,163 +1,136 @@
-import { ID, Tree } from "../../../../store/types";
-import { adjustNodesToRight, deepClone } from "./util";
+import { Tree, ID, DevNodeType, DevNode } from "../../../../store/types";
+import { deepClone, adjustNodesToRight } from "./util";
 
-/**
- * Merge a static (memoized) sub-tree into the current tree. We'll try
- * to fit it into the remaining space of the parent. It's not much,
- * but it's honest work!
- */
-function placeStaticTree(tree: Tree, rootId: ID) {
-	const root = tree.get(rootId)!;
-
-	let offset = 0;
-	let scale = 1;
-
-	// Measure available space to fit the sub-tree into
-	let spaceStart = 0;
-	let spaceEnd = 0;
-
-	const parent = tree.get(root.parent)!;
-	const childIdx = parent.children.indexOf(root.id);
-
-	if (childIdx + 1 < parent.children.length) {
-		const nextChild = tree.get(parent.children[childIdx + 1])!;
-		spaceEnd = nextChild.treeStartTime;
-	} else {
-		spaceEnd = parent.treeEndTime;
-	}
-
-	if (childIdx > 0) {
-		// If the previous child is a static root, we'll continue to
-		// traverse until we find the first sibling that is not static.
-		// We do this to get the total free space and to distribute sibling
-		// static trees accordingly.
-		let staticWidth = root.treeEndTime - root.treeStartTime;
-		let idx = childIdx;
-		let prevChild;
-		while ((prevChild = tree.get(parent.children[--idx])!)) {
-			if (prevChild.startTime >= parent.startTime) {
-				break;
-			}
-			staticWidth += prevChild.treeEndTime - prevChild.treeStartTime;
-		}
-
-		spaceStart = prevChild ? prevChild.treeEndTime : parent.treeStartTime;
-		const available = spaceEnd - spaceStart;
-
-		scale = staticWidth < available ? 1 : available / staticWidth;
-		spaceStart =
-			parent.treeStartTime +
-			(staticWidth - (root.treeEndTime - root.treeStartTime));
-		offset = spaceStart - root.treeStartTime * scale;
-	} else {
-		// If our node was the first child we can just take the
-		// current tree start time of the parent
-		spaceStart = parent.treeStartTime;
-
-		if (spaceEnd - spaceStart < root.treeEndTime - root.treeStartTime) {
-			scale =
-				(spaceEnd - spaceStart) /
-				// This can converge to 0, leading to wonky results
-				(root.treeEndTime - root.treeStartTime || 0.01);
-		}
-
-		offset = spaceStart - root.treeStartTime * scale;
-	}
-
-	const stack = [rootId];
-	let item;
-	while ((item = stack.pop())) {
-		const node = tree.get(item);
-		if (!node) continue;
-
-		tree.set(node.id, {
-			...deepClone(node),
-			// We need to scale down our tree first before moving it to
-			// the new position
-			treeStartTime: node.treeStartTime * scale + offset,
-			treeEndTime: node.treeEndTime * scale + offset,
-		});
-
-		stack.push(...node.children);
-	}
-}
-
-/**
- * Merge the newly rendered tree into the existing one. If the new
- * tree took longer to render than the previous version, we need to
- * expand all parents and push all right-hand nodes further to the
- * right to make room for our new tree.
- */
-export function patchTree(old: Tree, next: Tree, rootId: ID): Tree {
-	const out: Tree = new Map(old);
-	const oldRoot = old.get(rootId);
-	const root = next.get(rootId)!;
-
+export function patchTree(
+	old: Tree,
+	next: Tree,
+	rootId: ID,
+	mode: "expand" | "static",
+) {
 	if (next.size === 0) {
 		return old;
 	}
 
-	// Fast path if tree is new
+	const out: Tree = new Map(old);
+	const oldRoot = old.get(rootId)!;
+	const root = next.get(rootId)!;
+
+	// If we are the very first tree, we can just mount all nodes immediately
 	if (!oldRoot) {
-		const offset = root.startTime;
+		const offset = root.treeStartTime;
 
 		next.forEach(node => {
 			out.set(node.id, {
 				...deepClone(node),
-				treeStartTime: node.startTime - offset,
-				treeEndTime: node.endTime - offset,
+				treeStartTime: node.treeStartTime - offset,
+				treeEndTime: node.treeEndTime - offset,
 			});
 		});
 		return out;
 	}
 
-	const deltaStart = oldRoot.treeStartTime - root.startTime;
-	const deltaEnd =
+	let scale = 1;
+	const available = oldRoot.treeEndTime - oldRoot.treeStartTime;
+	let offset = oldRoot.treeStartTime - root.startTime;
+	const overflow = -(
 		oldRoot.treeEndTime -
 		oldRoot.treeStartTime -
-		(root.endTime - root.startTime);
+		(root.endTime - root.startTime)
+	);
+	if (mode === "static") {
+		// Only resize static tree if necessary
+		if (overflow > 0) {
+			const parent = next.get(root.parent);
+			if (parent) {
+				// Fake root doesn't really exist in tree, get the first child instead
+				const idx = parent.children.indexOf(root.children[0]);
+				const start =
+					idx > 0
+						? next.get(parent.children[idx - 1])!.treeEndTime
+						: parent.treeStartTime;
 
-	// Move new tree to old tree position.
-	out.set(root.id, {
-		...deepClone(root),
-		treeStartTime: oldRoot.treeStartTime,
-		treeEndTime: oldRoot.treeStartTime + (root.endTime - root.startTime),
-	});
-
-	// Move children of newly committed sub-tree
-	const stack = [root.id];
+				scale = available / (root.endTime - root.startTime);
+				offset = start - root.startTime * scale;
+			}
+		}
+	}
 
 	// We need to process all "active" commit nodes before processing
 	// static sub-trees to know how much space we have to place the
 	// sub-tree into. These sub-trees are ususally the result of
 	// memoization via `useMemo` or `memo()`.
-	const staticTrees: ID[] = [];
+	const staticTrees: ID[][] = [];
 
+	const stack = [root.id];
 	let item;
-	while ((item = stack.pop()) !== undefined) {
+	while ((item = stack.pop())) {
 		const node = next.get(item);
 		if (!node) continue;
 
-		// Check if we have a static sub-tree from a previous render.
-		// We'll process those later.
-		if (node.startTime < root.startTime) {
-			staticTrees.push(node.id);
-			continue;
-		}
-
 		out.set(node.id, {
 			...deepClone(node),
-			treeStartTime: node.startTime + deltaStart,
-			treeEndTime: node.endTime + deltaStart,
+			treeStartTime: node.startTime * scale + offset,
+			treeEndTime: node.endTime * scale + offset,
 		});
 		stack.push(...node.children);
+
+		const staticChildren = [];
+
+		for (let i = 0; i < node.children.length; i++) {
+			const childId = node.children[i];
+			const child = next.get(childId)!;
+
+			// Check if we have a static sub-tree from a previous render.
+			// We'll process those later.
+			if (mode === "expand" && child.startTime < root.startTime) {
+				staticChildren.push(childId);
+			} else {
+				stack.push(childId);
+			}
+		}
+
+		if (staticChildren.length > 0) {
+			staticTrees.push(staticChildren);
+		}
 	}
 
-	// Enlarge parents and move children
-	adjustNodesToRight(out, root.id, -deltaEnd);
+	if (mode === "expand") {
+		adjustNodesToRight(out, rootId, overflow);
+	}
 
-	// Process any found static sub-trees
-	staticTrees.forEach(rootId => placeStaticTree(out, rootId));
+	staticTrees.forEach(children => {
+		const first = next.get(children[0]!)!;
+		const last = next.get(children[children.length - 1]!)!;
+
+		// Insert a temporary wrapper around static children so that we can pretend
+		// to always have a single root.
+		const fakeId = -99;
+		const fakeRoot: DevNode = {
+			id: fakeId,
+			name: "static-root-tmp",
+			key: "",
+			parent: first.parent,
+			type: DevNodeType.ClassComponent,
+			children,
+			depth: -1,
+			endTime: last.endTime,
+			startTime: first.startTime,
+			treeStartTime: first.treeStartTime,
+			treeEndTime: last.treeEndTime,
+		};
+		next.set(fakeId, fakeRoot);
+		old.set(fakeId, fakeRoot);
+
+		const patched = patchTree(old, next, fakeId, "static");
+		patched.forEach(node => {
+			if (node.id !== fakeId) {
+				out.set(node.id, node);
+			}
+		});
+
+		next.delete(fakeId);
+		old.delete(fakeId);
+	});
 
 	return out;
 }
