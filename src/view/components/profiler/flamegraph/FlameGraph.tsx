@@ -1,7 +1,7 @@
 import { h } from "preact";
 import s from "./FlameGraph.css";
 import { useStore, useObserver } from "../../../store/react-bindings";
-import { useRef, useCallback, useState } from "preact/hooks";
+import { useRef, useCallback, useState, useEffect } from "preact/hooks";
 import { FlamegraphType } from "../data/commits";
 import { useResize } from "../../utils";
 import { RankedLayout } from "./ranked/RankedLayout";
@@ -18,15 +18,16 @@ export function FlameGraph() {
 	const isRecording = useObserver(() => store.profiler.isRecording.$);
 
 	const ref = useRef<HTMLDivElement>();
-	useResize(
-		() => {
-			if (ref.current) {
-				setCanvasWidth(ref.current.clientWidth);
-			}
-		},
-		[],
-		true,
-	);
+	useEffect(() => {
+		if (ref.current) {
+			setCanvasWidth(ref.current.clientWidth);
+		}
+	}, [isRecording || !commit]);
+	useResize(() => {
+		if (ref.current) {
+			setCanvasWidth(ref.current.clientWidth);
+		}
+	}, []);
 
 	const onSelect = useCallback(
 		(id: number) => {
