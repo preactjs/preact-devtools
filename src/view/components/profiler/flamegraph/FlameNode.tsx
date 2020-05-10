@@ -1,7 +1,7 @@
 import { h } from "preact";
 import { useRef, useCallback } from "preact/hooks";
 import s from "./FlameGraph.css";
-import { NodeTransform } from "./transform/focusNode";
+import { NodeTransform } from "./transform/shared";
 import { ID } from "../../../store/types";
 
 export interface Props {

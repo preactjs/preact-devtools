@@ -1,5 +1,5 @@
 import { ProfilerNode, CommitData } from "../../data/commits";
-import { NodeTransform } from "../transform/focusNode";
+import { NodeTransform } from "../transform/shared";
 import { getGradient } from "../../data/gradient";
 import { flattenNodeTree } from "../placeNodes";
 import { ID } from "../../../../store/types";
