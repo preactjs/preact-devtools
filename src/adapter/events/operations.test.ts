@@ -4,6 +4,16 @@ import { fromSnapshot } from "../debug";
 import { flames } from "../../view/components/profiler/flamegraph/testHelpers";
 
 describe("ops2Tree", () => {
+	it("should copy old nodes", () => {
+		const state = flames`
+        Fragment ***
+			`;
+
+		const res = ops2Tree(state.idMap, []);
+		expect(res.tree).not.to.equal(state.idMap);
+		expect(res.tree.size).to.equal(state.idMap.size);
+	});
+
 	describe("ADD_ROOT", () => {
 		it("should add new roots", () => {
 			const ops = fromSnapshot(["rootId: 1"]);

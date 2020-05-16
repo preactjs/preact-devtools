@@ -12,7 +12,7 @@ import { RenderReasonMap } from "../10/renderer/renderReasons";
  * We currently expect all operations to be in order.
  */
 export function ops2Tree(oldTree: Tree, ops: number[]) {
-	const pending: Tree = new Map();
+	const pending: Tree = new Map(oldTree);
 	const rootId = ops[0];
 	const roots: ID[] = [];
 	const removals: ID[] = [];
@@ -53,16 +53,7 @@ export function ops2Tree(oldTree: Tree, ops: number[]) {
 			}
 			case MsgTypes.UPDATE_VNODE_TIMINGS: {
 				const id = ops[i + 1];
-				if (!pending.has(id)) {
-					const node = oldTree.get(id)!;
-					try {
-						pending.set(id, deepClone(node));
-					} catch (err) {
-						// eslint-disable-next-line no-console
-						console.error(`Missing node ${id} detected.`);
-						throw err;
-					}
-				}
+				pending.set(id, deepClone(pending.get(id)!));
 				const x = pending.get(id)!;
 				x.startTime = ops[i + 2] / 1000;
 				x.endTime = ops[i + 3] / 1000;
@@ -77,18 +68,10 @@ export function ops2Tree(oldTree: Tree, ops: number[]) {
 				for (; i < len; i++) {
 					const nodeId = ops[i];
 					removals.push(nodeId);
-					const node = oldTree.get(nodeId);
+					const node = pending.get(nodeId);
 					if (node) {
 						// Remove node from parent children array
-						const parentId = node.parent;
-						if (!pending.has(parentId)) {
-							const oldParent = oldTree.get(parentId);
-							if (oldParent) {
-								pending.set(oldParent.id, deepClone(oldParent));
-							}
-						}
-
-						const parent = pending.get(parentId);
+						const parent = pending.get(node.parent);
 						if (parent) {
 							const idx = parent.children.indexOf(nodeId);
 							if (idx > -1) parent.children.splice(idx, 1);
@@ -103,13 +86,9 @@ export function ops2Tree(oldTree: Tree, ops: number[]) {
 			case MsgTypes.REORDER_CHILDREN: {
 				const parentId = ops[i + 1];
 				const count = ops[i + 2];
-				if (!pending.has(parentId) && oldTree.has(parentId)) {
-					pending.set(parentId, deepClone(oldTree.get(parentId)!));
-				}
-				const parent = pending.get(parentId);
-				if (parent) {
-					parent.children = ops.slice(i + 3, i + 3 + count);
-				}
+				const parent = deepClone(pending.get(parentId)!);
+				parent.children = ops.slice(i + 3, i + 3 + count);
+				pending.set(parentId, parent);
 				i = i + 2 + count;
 				break;
 			}
