@@ -65,7 +65,6 @@ export interface Store {
 	nodes: Observable<Tree>;
 	nodeList: Observable<ID[]>;
 	theme: Observable<Theme>;
-	treeDepth: Observable<number>;
 	search: ReturnType<typeof createSearchStore>;
 	filter: ReturnType<typeof createFilterStore>;
 	selection: ReturnType<typeof createSelectionStore>;

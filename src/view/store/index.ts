@@ -27,25 +27,15 @@ export function createStore(): Store {
 	// List
 	const collapsed = valoo(new Set<ID>());
 	const collapser = createCollapser<ID>(collapsed);
-	const treeDepth = valoo<number>(0);
 
 	const nodeList = watch(() => {
 		return roots.$.map(root => {
-			const { items, maxDepth } = flattenChildren<ID, DevNode>(
-				nodes.$,
-				root,
-				id => collapser.collapsed.$.has(id),
+			const { items } = flattenChildren<ID, DevNode>(nodes.$, root, id =>
+				collapser.collapsed.$.has(id),
 			);
 
 			if (filterState.filterFragment.$) {
-				if (maxDepth - 1 > treeDepth.$) {
-					treeDepth.$ = maxDepth - 1;
-				}
 				return items.slice(1);
-			}
-
-			if (maxDepth > treeDepth.$) {
-				treeDepth.$ = maxDepth;
 			}
 
 			return items;
@@ -117,7 +107,6 @@ export function createStore(): Store {
 		roots,
 		nodes,
 		collapser,
-		treeDepth,
 		search: createSearchStore(nodes, nodeList),
 		filter: filterState,
 		selection,
