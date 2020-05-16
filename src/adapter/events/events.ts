@@ -1,7 +1,6 @@
 import { flushTable, StringTable } from "../string-table";
 import { Store } from "../../view/store/types";
 import { recordProfilerCommit } from "../../view/components/profiler/data/commits";
-import { patchTree } from "../../view/components/profiler/flamegraph/transform/patchTree";
 import { ops2Tree } from "./operations";
 import { applyOperationsV1 } from "./legacy/operationsV1";
 
@@ -103,14 +102,6 @@ export function applyOperationsV2(store: Store, data: number[]) {
 	// Apply all removals
 	removals.forEach(id => store.nodes.$.delete(id));
 
-	console.log("==== patch tree ====");
-	// Combine old and new tree into a single one
-	console.groupCollapsed();
-	console.log(JSON.stringify(Array.from(store.nodes.$.values())));
-	console.log(JSON.stringify(Array.from(tree.values())));
-	console.groupEnd();
-	const merged = patchTree(store.nodes.$, tree, rootId, "expand");
-
 	// Update roots if necessary
 	if (roots.length > 0) {
 		store.roots.update(arr => {
@@ -118,7 +109,7 @@ export function applyOperationsV2(store: Store, data: number[]) {
 		});
 	}
 
-	store.nodes.$ = merged;
+	store.nodes.$ = tree;
 
 	if (store.inspectData.$) {
 		const id = store.inspectData.$.id;
@@ -130,7 +121,7 @@ export function applyOperationsV2(store: Store, data: number[]) {
 	// If we are profiling, we'll make a frozen copy of the mutable
 	// elements tree because the profiler can step through time
 	if (store.profiler.isRecording.$) {
-		recordProfilerCommit(merged, store.profiler, rootId);
+		recordProfilerCommit(store.nodes.$, store.profiler, rootId);
 		store.profiler.renderReasons.update(m => {
 			m.set(rootId, reasons);
 		});
