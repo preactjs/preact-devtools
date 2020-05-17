@@ -22,17 +22,10 @@ export function CommitInfo() {
 		<SidebarPanel title="Commit Stats">
 			<dl class={s.list}>
 				<dt class={s.title}>Start:</dt>
-				<dd class={s.value}>
-					{formatTime(root.startTime / 1000)} {root.startTime}
-				</dd>
-				<br />
-				<dt class={s.title}>End:</dt>
-				<dd class={s.value}>{root.startTime + commit.duration}</dd>
+				<dd class={s.value}>{formatTime(root.startTime / 1000)}</dd>
 				<br />
 				<dt class={s.title}>Duration:</dt>
-				<dd class={s.value}>
-					{formatTime(commit.duration / 1000)} {commit.duration}
-				</dd>
+				<dd class={s.value}>{formatTime(commit.duration / 1000)} </dd>
 			</dl>
 		</SidebarPanel>
 	);
