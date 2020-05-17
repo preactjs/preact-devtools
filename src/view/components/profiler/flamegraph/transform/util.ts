@@ -47,13 +47,19 @@ export function adjustNodesToRight(
 	id: ID,
 	delta: number,
 	stopParent: ID,
+	ignore: Set<ID>,
 ) {
 	const children: ID[] = [];
 
 	let item = tree.get(id);
+	// console.log("RESIZE", item?.name, delta);
 	let prevParent = item;
 	while (item && (item = tree.get(item.parent))) {
+		if (ignore.has(item.id)) break;
+
 		flame.get(item.id)!.end += delta;
+
+		// console.log("   parent", item.name, item.id);
 
 		const idx = item.children.indexOf(prevParent!.id);
 		if (idx < item.children.length - 1) {
@@ -67,12 +73,15 @@ export function adjustNodesToRight(
 	}
 
 	let childId;
-	while (childId && (childId = children.pop())) {
+	while ((childId = children.pop())) {
+		if (ignore.has(childId)) continue;
+
 		const pos = flame.get(childId)!;
 		pos.start += delta;
 		pos.end += delta;
 
 		const node = tree.get(childId)!;
+		// console.log("     child", node.name, node.id);
 		children.push(...node.children);
 	}
 }

@@ -95,7 +95,6 @@ export function moveToEnd(tree: Tree, flame: FlameTree, item: DevNode) {
 export function placeStaticTrees(
 	tree: Tree,
 	flame: FlameTree,
-	commit: CommitData,
 	staticRoots: DevNode[],
 ) {
 	for (let i = staticRoots.length - 1; i >= 0; i--) {
@@ -150,7 +149,7 @@ export function placeStaticTrees(
 		needsResize.forEach(node => {
 			const delta =
 				flame.get(node.id)!.end - getEndPosition(tree, flame, node.id);
-			adjustNodesToRight(tree, flame, node.id, delta, root.id);
+			adjustNodesToRight(tree, flame, node.id, delta, root.id, new Set());
 
 			// Move nodes to end for a less jarring visual experience
 			if (delta < 0) {
@@ -183,11 +182,14 @@ export function placeStaticTrees(
 		if (parent) {
 			const idx = parent.children.indexOf(root.id);
 			let j = 1;
+			const i2 = i;
 			while (idx + j < parent.children.length) {
-				if (i + j > staticRoots.length - 1) break;
+				if (i2 + j > staticRoots.length - 1) {
+					break;
+				}
 
-				if (staticRoots[i + j].parent === parent.id) {
-					group.children.push(staticRoots[i + j].id);
+				if (staticRoots[i2 + j].parent === parent.id) {
+					group.children.push(staticRoots[i2 + j].id);
 					i++;
 				}
 				j++;
@@ -196,6 +198,12 @@ export function placeStaticTrees(
 
 		groups.push(group);
 	}
+
+	console.log(
+		groups.map(x =>
+			x.children.map(y => tree.get(y)!.name + " #" + tree.get(y)!.id),
+		),
+	);
 
 	// Move siblings next to each other
 	groups.forEach(group => {
@@ -211,8 +219,9 @@ export function placeStaticTrees(
 			let item;
 			while ((item = stack.pop())) {
 				const childPos = flame.get(item)!;
-				childPos.start += offset;
-				childPos.end += offset;
+				const oldStart = childPos.start;
+				childPos.start = offset;
+				childPos.end = offset + (childPos.end - oldStart);
 
 				const node = tree.get(item)!;
 				stack.push(...node.children);
@@ -304,6 +313,9 @@ export function patchTree(
 	const offsetStack = [-root.startTime];
 	const subtreeLevels = [-1];
 
+	// console.log("=== COMMIT");
+	// console.log("   commitRoot", commitRoot.name);
+	// console.log("   offset", offsetStack[0]);
 	const stack = [rootId];
 	let item;
 	while ((item = stack.pop())) {
@@ -328,11 +340,12 @@ export function patchTree(
 			const idx = parent.children.indexOf(commitRootId);
 			const start =
 				idx > 0
-					? tree.get(parent.children[idx - 1])!.endTime
-					: parent.startTime;
+					? flame.get(parent.children[idx - 1])!.end
+					: flame.get(parent.id)!.start;
 
-			const commitOffset = -(commitRoot.startTime - start);
+			const commitOffset = start - commitRoot.startTime;
 
+			// console.log("  commit offset", commitOffset);
 			offsetStack.push(commitOffset);
 			subtreeLevels.push(node.depth);
 		}
@@ -345,15 +358,23 @@ export function patchTree(
 
 		const parent = tree.get(node.parent);
 		// Check if node is root of a re-queued sub-tree
-		if (
-			parent &&
-			(node.startTime >= parent.endTime || node.endTime >= parent.endTime)
-		) {
+		if (node.id !== commitRootId && parent) {
 			const start = getStartPosition(tree, flame, node);
 
-			offsetStack.push(-(node.startTime - start));
-			subtreeLevels.push(node.depth);
-			maybeGrow.push(node);
+			const offset = offsetStack[offsetStack.length - 1];
+			if (node.startTime + offset < start) {
+				offsetStack.push(start - node.startTime);
+				subtreeLevels.push(node.depth);
+				// console.log("Start", start, node.startTime);
+			} else if (
+				node.startTime >= parent.endTime ||
+				node.endTime >= parent.endTime
+			) {
+				offsetStack.push(start - node.startTime);
+				subtreeLevels.push(node.depth);
+				// console.log(" --> resize #1", node.name, node.id);
+				maybeGrow.push(node);
+			}
 		}
 
 		const offset = offsetStack[offsetStack.length - 1];
@@ -361,8 +382,11 @@ export function patchTree(
 		const end = node.endTime + offset;
 
 		const flameParent = flame.get(node.parent);
-		if (flameParent && flameParent.end < end) {
-			maybeGrow.push(node);
+		if (flameParent) {
+			if (flameParent.end < end) {
+				// console.log(" --> resize", node.name, node.id, parent!.name);
+				maybeGrow.push(node);
+			}
 		}
 
 		const pos = createTransform();
@@ -375,6 +399,15 @@ export function patchTree(
 		pos.start = start;
 		pos.end = end;
 		flame.set(node.id, pos);
+
+		if (start < 0) {
+			console.warn(
+				`< 0 ${node.name} #${node.id} ${end} ${offset} ${node.startTime}`,
+			);
+
+			pos.start += -start;
+			pos.end += -start;
+		}
 
 		// Push children to stack in reverse to ensure that we
 		// always traverse the tree in pre-order
@@ -394,7 +427,15 @@ export function patchTree(
 				delta = item.endTime - item.startTime - (prev.endTime - prev.startTime);
 			}
 		}
-		adjustNodesToRight(tree, flame, item.id, delta, rootId);
+		// console.log("TO RESIZE", item.name, item.id, delta);
+		adjustNodesToRight(
+			tree,
+			flame,
+			item.id,
+			delta,
+			rootId,
+			new Set(staticRoots.map(node => node.id)),
+		);
 
 		// Move nodes to end for a less jarring visual experience
 		if (delta < 0) {
@@ -402,7 +443,7 @@ export function patchTree(
 		}
 	}
 
-	placeStaticTrees(tree, flame, commit, staticRoots);
+	placeStaticTrees(tree, flame, staticRoots);
 
 	return flame;
 }

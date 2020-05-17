@@ -145,6 +145,10 @@ export function createProfiler(): ProfilerState {
 
 		let prevCommit = null;
 		for (let i = activeCommitIdx.$ - 1; i >= 0; i--) {
+			if (i >= commits.$.length) {
+				return new Map();
+			}
+
 			const search = commits.$[i];
 			if (search.rootId === commit.rootId) {
 				prevCommit = search;
@@ -251,6 +255,14 @@ export function recordProfilerCommit(
 	// in high performance timers because of spectre CPU attack vectors.
 	// We'll assign a minimum width to those nodes.
 	// resizeToMin(nodes, 0.01);
+
+	// Very useful to grab test cases from live websites
+	console.groupCollapsed("patch");
+	console.log("====", commitRoot.name, commitRootId);
+	console.log(JSON.stringify(Array.from(tree.values())));
+	console.log("=====");
+	console.log(JSON.stringify(Array.from(nodes.values())));
+	console.groupEnd();
 
 	profiler.commits.update(arr => {
 		arr.push({

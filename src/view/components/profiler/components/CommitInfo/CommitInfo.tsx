@@ -9,8 +9,6 @@ export function CommitInfo() {
 	const commit = useObserver(() => store.profiler.activeCommit.$);
 	const isRecording = useObserver(() => store.profiler.isRecording.$);
 
-	console.log(commit);
-
 	if (commit === null || isRecording) {
 		return null;
 	}

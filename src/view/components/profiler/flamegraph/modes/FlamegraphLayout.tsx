@@ -35,22 +35,19 @@ export function FlamegraphLayout({
 		[commit, data, selected, canvasWidth],
 	);
 
-	// Cache text content to avoid calling `Intl`-API repeatedly
-	const texts = useMemo(() => {
-		return Array.from(data.values()).map(pos => {
-			const node = commit.nodes.get(pos.id)!;
-			if (pos.commitParent || pos.weight === -1) {
-				return node.name;
-			}
-			const self = formatTime(commit.selfDurations.get(node.id)!);
-			const total = formatTime(node.endTime - node.startTime);
-			return `${node.name} (${self} of ${total})`;
-		});
-	}, [commit, data]);
-
 	return (
 		<Fragment>
-			{placed.map((pos, i) => {
+			{placed.map(pos => {
+				const node = commit.nodes.get(pos.id)!;
+				let text = "";
+				if (pos.commitParent || pos.weight === -1) {
+					text = node.name;
+				} else {
+					const self = formatTime(commit.selfDurations.get(node.id)!);
+					const total = formatTime(node.endTime - node.startTime);
+					text = `${node.name} (${self} of ${total})`;
+				}
+
 				return (
 					<FlameNode
 						key={pos.id}
@@ -60,7 +57,7 @@ export function FlamegraphLayout({
 						parentId={commit.nodes.get(pos.id)!.parent}
 						onClick={onSelect}
 					>
-						{texts[i]}
+						{text}
 					</FlameNode>
 				);
 			})}

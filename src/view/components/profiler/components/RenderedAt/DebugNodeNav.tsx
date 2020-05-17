@@ -50,9 +50,9 @@ export function DebugNodeNav() {
 								<span style="display: flex; justify-content: space-between; width: 100%">
 									<span>
 										{node.name}
-										{commit && node.id === commit.commitRootId
-											? ` (commitRoot)`
-											: ""}
+										{commit && node.id === commit.commitRootId ? (
+											<b> (R)</b>
+										) : null}
 									</span>
 									<span>{node.id}</span>
 								</span>

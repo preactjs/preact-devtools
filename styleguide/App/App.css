@@ -1,6 +1,11 @@
+body {
+	margin: 0;
+}
+
 .root {
 	display: grid;
-	grid-template-columns: 14rem auto;
+	grid-template-columns: 12rem auto;
+	grid-template-rows: 3rem calc(100vh - 3rem);
 	grid-template-areas:
 		"header header"
 		"sidebar content";
@@ -25,6 +30,7 @@ a {
 
 .sidebar {
 	grid-area: sidebar;
+	padding-left: 1rem;
 }
 
 .main {
