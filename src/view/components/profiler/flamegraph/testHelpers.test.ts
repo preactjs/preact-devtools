@@ -23,7 +23,7 @@ describe("FlameGraph DSL", () => {
 				treeEndTime: 130,
 				duration: 130,
 				children: [2],
-				parent: 0,
+				parent: -1,
 				depth: 0,
 				selfDuration: 30,
 			},
@@ -81,7 +81,7 @@ describe("FlameGraph DSL", () => {
 				treeEndTime: 130,
 				duration: 130,
 				children: [2],
-				parent: 0,
+				parent: -1,
 				depth: 0,
 				selfDuration: 30,
 			},
@@ -141,13 +141,24 @@ describe("FlameGraph DSL", () => {
 		expect(tree.byName("Bar")).to.not.be.undefined;
 	});
 
-	it("should throw if child duration is longer than parent duration", () => {
-		expect(
-			() => flames`
-      Parent ***
-      Child ******
-    `,
-		).to.throw();
+	it("should search for parent on offset nodes", () => {
+		const tree = flames`
+			Parent ***
+			            Child ******
+		`;
+
+		expect(tree.byName("Child")!.parent).to.equal(1);
+		expect(tree.byName("Parent")!.children).to.deep.equal([2]);
+	});
+
+	it("should search for parent on offset nodes #2", () => {
+		const tree = flames`
+			              Parent ***
+			Child ******
+		`;
+
+		expect(tree.byName("Child")!.parent).to.equal(1);
+		expect(tree.byName("Parent")!.children).to.deep.equal([2]);
 	});
 
 	it("should support simple sibling children", () => {
@@ -169,7 +180,7 @@ describe("FlameGraph DSL", () => {
 				duration: 220,
 				selfDuration: 50,
 				children: [2, 3],
-				parent: 0,
+				parent: -1,
 				depth: 0,
 			},
 			{
@@ -228,7 +239,7 @@ describe("FlameGraph DSL", () => {
 				selfDuration: 50,
 				children: [2, 4],
 				depth: 0,
-				parent: 0,
+				parent: -1,
 			},
 			{
 				id: 2,
@@ -305,7 +316,6 @@ describe("FlameGraph DSL", () => {
 			commitRootId: 1,
 			rootId: 1,
 			duration: 110,
-			maxDepth: 1,
 			maxSelfDuration: 60,
 			nodes: tree.idMap,
 		});

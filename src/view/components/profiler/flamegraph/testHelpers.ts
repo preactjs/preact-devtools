@@ -2,6 +2,7 @@ import { ID, DevNodeType, Tree } from "../../../store/types";
 import { ProfilerNode, CommitData } from "../data/commits";
 import { sortTimeline } from "./FlamegraphStore";
 import { NodeTransform } from "./transform/shared";
+import { FlameNodeTransform } from "./modes/flamegraph-utils";
 
 /**
  * Parse a visual flamegraph DSL into a `ProfilerNode` tree. Each
@@ -35,11 +36,16 @@ export function flames(
 
 	const lines = res
 		.split(/(\r\n|\r|\n)/)
-		.map(line => line.slice(indent))
+		.map(line => {
+			const match = line.match(/^(\s+)/);
+			const localIndent = match ? match[0].length : 0;
+			return line.slice(localIndent < indent ? localIndent : indent);
+		})
 		.filter(Boolean);
 
 	const nodes: ProfilerNode[] = [];
 	const nameMap = new Map<string, ProfilerNode>();
+	const transformMap = new Map<ID, FlameNodeTransform>();
 
 	let id = 1;
 
@@ -73,7 +79,7 @@ export function flames(
 			const node: ProfilerNode = {
 				depth: i,
 				key: "",
-				parent: 0,
+				parent: -1,
 				type:
 					name[0].toUpperCase() === name[0]
 						? DevNodeType.FunctionComponent
@@ -133,16 +139,41 @@ export function flames(
 			return acc + idMap.get(id)!.duration;
 		}, 0);
 
-		if (childDurations > node.duration) {
-			throw new Error(
-				`Child durations was longer than of parent "${node.name}"`,
-			);
-		}
-
 		node.selfDuration = node.duration - childDurations;
 
 		// Update parent pointer
 		node.children.forEach(childId => (idMap.get(childId)!.parent = node.id));
+	});
+
+	// Correct dangling children
+	nodes.forEach(node => {
+		if (node.depth > 0 && node.parent === -1) {
+			const parents = Array.from(nodes.values()).filter(
+				x => x.depth === node.depth - 1,
+			);
+
+			let found = false;
+			for (let i = parents.length - 1; i >= 0; i--) {
+				const parent = parents[i];
+				if (
+					parent.endTime > node.endTime &&
+					parent.startTime > node.startTime
+				) {
+					found = true;
+					parent.children.unshift(node.id);
+					node.parent = parent.id;
+					break;
+				} else if (parent.endTime < node.endTime) {
+					found = true;
+					parent.children.push(node.id);
+					node.parent = parent.id;
+				}
+			}
+
+			if (!found) {
+				throw new Error(`Could not find parent for ${node.name}`);
+			}
+		}
 	});
 
 	// Convert units to 10ms
@@ -153,6 +184,19 @@ export function flames(
 		node.treeEndTime = node.treeEndTime * 10;
 		node.duration = node.duration * 10;
 		node.selfDuration = node.selfDuration * 10;
+
+		transformMap.set(node.id, {
+			commitParent: false,
+			end: node.endTime,
+			id: node.id,
+			maximized: false,
+			row: node.depth,
+			start: node.startTime,
+			visible: true,
+			weight: 0,
+			width: node.duration,
+			x: node.startTime,
+		});
 	});
 
 	// Create commit out of tree
@@ -160,7 +204,6 @@ export function flames(
 		rootId: 1,
 		commitRootId: 1,
 		duration: nodes.length > 0 ? nodes[0].duration : 0,
-		maxDepth: Math.max(0, ...nodes.map(x => x.depth)),
 		maxSelfDuration: Math.max(0, ...nodes.map(x => x.selfDuration)),
 		nodes: idMap,
 	};
@@ -168,6 +211,7 @@ export function flames(
 	return {
 		commit,
 		idMap,
+		transformMap,
 		nodes,
 		root: nodes[0],
 		byName: (name: string) => nameMap.get(name),
