@@ -5,8 +5,8 @@ import { useRef, useCallback, useState, useEffect } from "preact/hooks";
 import { FlamegraphType } from "../data/commits";
 import { useResize } from "../../utils";
 import { RankedLayout } from "./ranked/RankedLayout";
-import { EMPTY } from "./placeNodes";
 import { FlamegraphLayout } from "./modes/FlamegraphLayout";
+import { EMPTY } from "./placeNodes";
 
 export function FlameGraph() {
 	const store = useStore();

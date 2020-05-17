@@ -94,7 +94,7 @@ export function flush(commit: Commit) {
  * We currently expect all operations to be in order.
  */
 export function applyOperationsV2(store: Store, data: number[]) {
-	const { rootId, removals, roots, tree, reasons } = ops2Tree(
+	const { rootId: commitRootId, removals, roots, tree, reasons } = ops2Tree(
 		store.nodes.$,
 		data,
 	);
@@ -121,9 +121,9 @@ export function applyOperationsV2(store: Store, data: number[]) {
 	// If we are profiling, we'll make a frozen copy of the mutable
 	// elements tree because the profiler can step through time
 	if (store.profiler.isRecording.$) {
-		recordProfilerCommit(store.nodes.$, store.profiler, rootId);
+		recordProfilerCommit(store.nodes.$, store.profiler, commitRootId);
 		store.profiler.renderReasons.update(m => {
-			m.set(rootId, reasons);
+			m.set(commitRootId, reasons);
 		});
 	}
 }

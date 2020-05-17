@@ -1,14 +1,14 @@
 import { h, Fragment } from "preact";
 import { useMemo } from "preact/hooks";
 import { placeRanked, toTransform } from "./ranked-utils";
-import { ProfilerNode, CommitData } from "../../data/commits";
-import { ID } from "../../../../store/types";
+import { CommitData } from "../../data/commits";
+import { ID, DevNode } from "../../../../store/types";
 import { FlameNode } from "../FlameNode";
 import { formatTime } from "../../util";
 
 export interface RankedLayoutProps {
 	commit: CommitData;
-	selected: ProfilerNode;
+	selected: DevNode;
 	canvasWidth: number;
 	onSelect: (id: ID) => void;
 }
@@ -29,7 +29,14 @@ export function RankedLayout({
 
 	// Update node positions and mutate `data` to avoid allocations
 	const placed = useMemo(
-		() => placeRanked(commit.nodes, data, selected, canvasWidth),
+		() =>
+			placeRanked(
+				commit.nodes,
+				commit.selfDurations,
+				data,
+				selected,
+				canvasWidth,
+			),
 		[canvasWidth, selected, commit, data],
 	);
 
@@ -37,7 +44,8 @@ export function RankedLayout({
 	const texts = useMemo(() => {
 		return data.map(pos => {
 			const node = commit.nodes.get(pos.id)!;
-			return `${node.name} (${formatTime(node.selfDuration)})`;
+			const selfDuration = commit.selfDurations.get(node.id) || 0;
+			return `${node.name} (${formatTime(selfDuration)})`;
 		});
 	}, [commit, data]);
 

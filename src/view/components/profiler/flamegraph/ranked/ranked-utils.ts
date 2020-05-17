@@ -1,7 +1,7 @@
 import { NodeTransform } from "../transform/shared";
-import { ProfilerNode, CommitData } from "../../data/commits";
+import { CommitData } from "../../data/commits";
 import { getGradient } from "../../data/gradient";
-import { ID } from "../../../../store/types";
+import { ID, DevNode } from "../../../../store/types";
 import { flattenNodeTree, EMPTY } from "../placeNodes";
 
 const MIN_WIDTH = 4;
@@ -12,20 +12,24 @@ const MIN_WIDTH = 4;
 export function toTransform(commit: CommitData): NodeTransform[] {
 	const nodes = flattenNodeTree(commit.nodes, commit.rootId);
 	const root = commit.nodes.get(commit.commitRootId) || EMPTY;
+	const s = commit.selfDurations;
 
 	return nodes
 		.filter(
 			node => node.startTime >= root.startTime && node.endTime <= root.endTime,
 		)
-		.sort((a, b) => b.selfDuration - a.selfDuration)
+		.sort((a, b) => {
+			return (s.get(b.id) || 0) - (s.get(a.id) || 0);
+		})
 		.map((node, i) => {
+			const selfDuration = s.get(node.id) || 0;
 			return {
 				id: node.id,
-				width: node.selfDuration,
+				width: selfDuration || 4,
 				x: 0,
 				row: i,
 				maximized: false,
-				weight: getGradient(commit.maxSelfDuration, node.selfDuration),
+				weight: getGradient(commit.maxSelfDuration, selfDuration),
 				visible: true,
 				commitParent: false,
 			};
@@ -37,19 +41,21 @@ export function toTransform(commit: CommitData): NodeTransform[] {
  * MUTATES position nodes to avoid many allocations for each node.
  */
 export function placeRanked(
-	tree: Map<ID, ProfilerNode>,
+	tree: Map<ID, DevNode>,
+	selfDurations: Map<ID, number>,
 	sorted: NodeTransform[],
-	selected: ProfilerNode,
+	selected: DevNode,
 	canvasWidth: number,
 ) {
-	const scale = (canvasWidth || 1) / Math.max(selected.selfDuration, 0.01);
+	const selectedDuration = selfDurations.get(selected.id) || 0;
+	const scale = (canvasWidth || 1) / Math.max(selectedDuration, 0.01);
 	let maximized = true;
 
 	sorted.forEach(pos => {
 		const node = tree.get(pos.id);
 		if (!node) return;
 
-		const selfDuration = node.selfDuration;
+		const selfDuration = selfDurations.get(node.id) || 0;
 
 		// Ensure nodes are always visible
 		pos.width = maximized

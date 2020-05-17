@@ -1,14 +1,15 @@
 import { h, Fragment } from "preact";
-import { CommitData, ProfilerNode } from "../../data/commits";
-import { ID } from "../../../../store/types";
+import { CommitData } from "../../data/commits";
+import { ID, DevNode } from "../../../../store/types";
 import { FlameNode } from "../FlameNode";
 import { useMemo } from "preact/hooks";
-import { toTransform, placeFlamegraph } from "./flamegraph-utils";
+import { placeFlamegraph } from "./flamegraph-utils";
 import { formatTime } from "../../util";
+import { useObserver, useStore } from "../../../../store/react-bindings";
 
 export interface FlamegraphLayoutProps {
 	commit: CommitData;
-	selected: ProfilerNode;
+	selected: DevNode;
 	canvasWidth: number;
 	onSelect: (id: ID) => void;
 }
@@ -19,11 +20,18 @@ export function FlamegraphLayout({
 	canvasWidth,
 	onSelect,
 }: FlamegraphLayoutProps) {
-	const data = useMemo(() => toTransform(commit), [commit]);
+	const store = useStore();
+	const data = useObserver(() => store.profiler.flamegraphNodes.$);
 
 	const placed = useMemo(
 		() =>
-			placeFlamegraph(commit.nodes, data, commit.rootId, selected, canvasWidth),
+			placeFlamegraph(
+				commit.nodes,
+				data,
+				commit.rootId,
+				selected.id,
+				canvasWidth,
+			),
 		[commit, data, selected, canvasWidth],
 	);
 
@@ -34,8 +42,8 @@ export function FlamegraphLayout({
 			if (pos.commitParent || pos.weight === -1) {
 				return node.name;
 			}
-			const self = formatTime(node.selfDuration);
-			const total = formatTime(node.treeEndTime - node.treeStartTime);
+			const self = formatTime(commit.selfDurations.get(node.id)!);
+			const total = formatTime(node.endTime - node.startTime);
 			return `${node.name} (${self} of ${total})`;
 		});
 	}, [commit, data]);

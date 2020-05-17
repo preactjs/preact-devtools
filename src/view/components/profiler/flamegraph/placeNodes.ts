@@ -1,4 +1,5 @@
-import { CommitData, ProfilerNode } from "../data/commits";
+import { CommitData } from "../data/commits";
+import { DevNode } from "../../../store/types";
 
 /**
  * Flatten profiler node tree into a flat list
@@ -34,25 +35,21 @@ export function flattenNodeTree<K, T extends { id: K; children: K[] }>(
 export const EMPTY_COMMIT: CommitData = {
 	commitRootId: -1,
 	duration: -1,
-	maxDepth: 1,
 	maxSelfDuration: 1,
 	nodes: new Map(),
+	selfDurations: new Map(),
 	rootId: -1,
 };
 
-export const EMPTY: ProfilerNode = {
+export const EMPTY: DevNode = {
 	children: [],
 	depth: 0,
-	duration: 0,
 	endTime: 0,
 	id: -1,
 	key: "",
 	name: "",
 	parent: -1,
-	selfDuration: 0,
 	startTime: 0,
-	treeEndTime: 0,
-	treeStartTime: 0,
 	type: 0,
 };
 

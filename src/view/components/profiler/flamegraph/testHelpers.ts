@@ -1,11 +1,10 @@
-import { ID, DevNodeType, Tree } from "../../../store/types";
-import { ProfilerNode, CommitData } from "../data/commits";
-import { sortTimeline } from "./FlamegraphStore";
+import { ID, DevNodeType, Tree, DevNode } from "../../../store/types";
+import { CommitData } from "../data/commits";
 import { NodeTransform } from "./transform/shared";
 import { FlameNodeTransform } from "./modes/flamegraph-utils";
 
 /**
- * Parse a visual flamegraph DSL into a `ProfilerNode` tree. Each
+ * Parse a visual flamegraph DSL into a `DevNode` tree. Each
  * character represents a timing of 10ms, including the component
  * names.
  *
@@ -43,20 +42,20 @@ export function flames(
 		})
 		.filter(Boolean);
 
-	const nodes: ProfilerNode[] = [];
-	const nameMap = new Map<string, ProfilerNode>();
+	const nodes: DevNode[] = [];
+	const nameMap = new Map<string, DevNode>();
 	const transformMap = new Map<ID, FlameNodeTransform>();
 
 	let id = 1;
 
-	let lastSiblingsNodes: ProfilerNode[] = [];
+	let lastSiblingsNodes: DevNode[] = [];
 
 	// Iterate backwards, so that all children are known
 	for (let i = lines.length - 1; i >= 0; i--) {
 		const line = lines[i];
 		const siblings = line.match(/\s+\w+\s\*+/g) || [line];
 
-		const lineNodes: ProfilerNode[] = [];
+		const lineNodes: DevNode[] = [];
 
 		// Iterate backwards to ensure correct ordering
 		for (let j = siblings.length - 1; j >= 0; j--) {
@@ -76,7 +75,7 @@ export function flames(
 
 			const duration = sib.length - indent;
 
-			const node: ProfilerNode = {
+			const node: DevNode = {
 				depth: i,
 				key: "",
 				parent: -1,
@@ -86,10 +85,6 @@ export function flames(
 						: DevNodeType.Element,
 				startTime,
 				endTime: startTime + duration,
-				treeStartTime: startTime,
-				treeEndTime: startTime + duration,
-				duration,
-				selfDuration: duration,
 				children: [],
 				id: id++,
 				name,
@@ -120,29 +115,39 @@ export function flames(
 		lastSiblingsNodes = lineNodes.reverse();
 	}
 
-	nodes.sort(sortTimeline);
+	nodes.sort((a, b) => {
+		const time = a.startTime - b.startTime;
+		// Use depth as fallback if startTime is equal
+		return time === 0 ? a.depth - b.depth : time;
+	});
 
 	// Rebuild ids based on sort order
 	const ids = new Map<number, number>();
 	nodes.forEach((node, i) => ids.set(node.id, i + 1));
 
-	const idMap = new Map<ID, ProfilerNode>();
+	const idMap = new Map<ID, DevNode>();
 	nodes.forEach(node => {
 		node.id = ids.get(node.id)!;
 		node.children = node.children.map(childId => ids.get(childId)!);
 		idMap.set(node.id, node);
 	});
 
+	const selfDurations = new Map<ID, number>();
+
 	// Add self durations (basically: duration - child durations)
 	nodes.forEach(node => {
-		const childDurations = node.children.reduce((acc, id) => {
-			return acc + idMap.get(id)!.duration;
-		}, 0);
+		let selfDuration = node.endTime - node.startTime;
 
-		node.selfDuration = node.duration - childDurations;
+		node.children.forEach(childId => {
+			const child = idMap.get(childId)!;
 
-		// Update parent pointer
-		node.children.forEach(childId => (idMap.get(childId)!.parent = node.id));
+			selfDuration -= child.endTime - child.startTime;
+
+			// Update parent pointer
+			child.parent = node.id;
+		});
+
+		selfDurations.set(node.id, selfDuration);
 	});
 
 	// Correct dangling children
@@ -180,10 +185,8 @@ export function flames(
 	nodes.forEach(node => {
 		node.startTime = node.startTime * 10;
 		node.endTime = node.endTime * 10;
-		node.treeStartTime = node.treeStartTime * 10;
-		node.treeEndTime = node.treeEndTime * 10;
-		node.duration = node.duration * 10;
-		node.selfDuration = node.selfDuration * 10;
+
+		selfDurations.set(node.id, (selfDurations.get(node.id) || 0) * 10);
 
 		transformMap.set(node.id, {
 			commitParent: false,
@@ -194,7 +197,7 @@ export function flames(
 			start: node.startTime,
 			visible: true,
 			weight: 0,
-			width: node.duration,
+			width: selfDurations.get(node.id) || 0,
 			x: node.startTime,
 		});
 	});
@@ -203,9 +206,13 @@ export function flames(
 	const commit: CommitData = {
 		rootId: 1,
 		commitRootId: 1,
-		duration: nodes.length > 0 ? nodes[0].duration : 0,
-		maxSelfDuration: Math.max(0, ...nodes.map(x => x.selfDuration)),
+		duration: nodes.length > 0 ? nodes[0]!.endTime - nodes[0]!.startTime : 0,
+		maxSelfDuration: Math.max(
+			0,
+			...nodes.map(x => selfDurations.get(x.id) || 0),
+		),
 		nodes: idMap,
+		selfDurations,
 	};
 
 	return {

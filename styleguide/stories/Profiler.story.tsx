@@ -2,24 +2,18 @@ import { h } from "preact";
 import { createStore } from "../../src/view/store";
 import { DevTools } from "../../src/view/components/Devtools";
 import { Panel, DevNode } from "../../src/view/store/types";
-import * as fixture from "../../src/view/components/profiler/flamegraph/transform/fixtures/patch5";
+import * as fixture from "../../src/view/components/profiler/flamegraph/modes/fixtures/patch5";
 import { recordProfilerCommit } from "../../src/view/components/profiler/data/commits";
-import { patchTree } from "../../src/view/components/profiler/flamegraph/transform/patchTree";
 
 function toTree(arr: DevNode[]) {
 	return new Map(arr.map(x => [x.id, x]));
 }
 
 const store = createStore();
-const rootId = fixture.previous[0].id;
+let rootId = fixture.previous[0].id;
 store.profiler.isSupported.$ = true;
 store.activePanel.$ = Panel.PROFILER;
-store.nodes.$ = patchTree(
-	new Map(),
-	toTree(fixture.previous),
-	rootId,
-	"expand",
-);
+store.nodes.$ = toTree(fixture.previous);
 store.roots.update(arr => {
 	arr.push(rootId);
 });
@@ -27,12 +21,11 @@ store.roots.update(arr => {
 store.profiler.isRecording.$ = true;
 recordProfilerCommit(store.nodes.$, store.profiler, rootId);
 
-store.nodes.$ = patchTree(
-	store.nodes.$,
-	toTree(fixture.next),
-	fixture.next[0].id,
-	"expand",
-);
+const next = new Map(store.nodes.$);
+fixture.next.forEach(node => next.set(node.id, node));
+rootId = fixture.next[0].id;
+store.nodes.$ = next;
+
 recordProfilerCommit(store.nodes.$, store.profiler, rootId);
 store.profiler.isRecording.$ = false;
 

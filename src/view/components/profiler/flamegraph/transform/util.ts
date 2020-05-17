@@ -1,9 +1,10 @@
-import { ID, DevNode } from "../../../../store/types";
+import { ID, DevNode, Tree } from "../../../../store/types";
+import { FlameTree } from "../modes/patchTree";
 
-export function mapParents(
-	tree: Map<ID, DevNode>,
+export function mapParents<T extends DevNode>(
+	tree: Map<ID, T>,
 	id: ID,
-	fn: (parent: DevNode, prevParent: DevNode) => void | boolean,
+	fn: (parent: T, prevParent: T) => void | boolean,
 ) {
 	let prevParent = tree.get(id)!;
 	if (!prevParent) return;
@@ -19,15 +20,15 @@ export function mapParents(
 			break;
 		}
 
-		prevParent = item;
+		prevParent = item!;
 		item = tree.get(item.parent);
 	}
 }
 
-export function mapChildren(
-	tree: Map<ID, DevNode>,
+export function mapChildren<T extends DevNode>(
+	tree: Map<ID, T>,
 	id: ID,
-	fn: (node: DevNode) => void,
+	fn: (node: T) => void,
 ) {
 	const stack = [id];
 	let item;
@@ -41,36 +42,39 @@ export function mapChildren(
 }
 
 export function adjustNodesToRight(
-	tree: Map<ID, DevNode>,
+	tree: Tree,
+	flame: FlameTree,
 	id: ID,
 	delta: number,
+	stopParent: ID,
 ) {
-	console.log();
-	console.log("ADJUST", id, delta);
-	console.log("   ROOT", tree.get(id)!.treeEndTime);
-	mapParents(tree, id, (parent, prevParent) => {
-		const old = parent.treeEndTime;
-		parent.treeEndTime += delta;
+	const children: ID[] = [];
 
-		console.log("   p", parent.name, old, parent.treeEndTime);
+	let item = tree.get(id);
+	let prevParent = item;
+	while (item && (item = tree.get(item.parent))) {
+		flame.get(item.id)!.end += delta;
 
-		const idx = parent.children.indexOf(prevParent.id);
-		// TODO: Perf Out of bounds access
-		const tasks = idx > -1 ? parent.children.slice(idx + 1) : parent.children;
+		const idx = item.children.indexOf(prevParent!.id);
+		if (idx < item.children.length - 1) {
+			children.push(...item.children.slice(idx + 1));
+		}
 
-		// tasks.forEach(childId => {
-		// 	mapChildren(tree, childId, child => {
-		// 		child.treeEndTime += delta;
-		// 		child.treeStartTime += delta;
-		// 		console.log(
-		// 			"   child",
-		// 			child.name,
-		// 			child.treeStartTime,
-		// 			child.treeEndTime,
-		// 		);
-		// 	});
-		// });
-	});
+		// Stop traversing upwards if we reach the user defined limit
+		if (item.id === stopParent) break;
+
+		prevParent = item;
+	}
+
+	let childId;
+	while (childId && (childId = children.pop())) {
+		const pos = flame.get(childId)!;
+		pos.start += delta;
+		pos.end += delta;
+
+		const node = tree.get(childId)!;
+		children.push(...node.children);
+	}
 }
 
 export function cloneTree(tree: Map<ID, DevNode>) {

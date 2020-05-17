@@ -45,8 +45,6 @@ export function ops2Tree(oldTree: Tree, ops: number[]) {
 					key: ops[i + 6] > 0 ? strings[ops[i + 6] - 1] : "",
 					startTime: ops[i + 7] / 1000,
 					endTime: ops[i + 8] / 1000,
-					treeStartTime: -1,
-					treeEndTime: -1,
 				});
 				i += 8;
 				break;

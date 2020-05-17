@@ -17,12 +17,4 @@ describe("flattenChildren", () => {
 			flattenChildren(tree, 1, id => collapsed.has(id)).items,
 		).to.deep.equal([1, 2, 4, 3, 5, 6]);
 	});
-
-	it("should return maxDepth", () => {
-		const collapsed = new Set<ID>();
-
-		expect(flattenChildren(tree, 1, id => collapsed.has(id)).maxDepth).to.equal(
-			3,
-		);
-	});
 });
