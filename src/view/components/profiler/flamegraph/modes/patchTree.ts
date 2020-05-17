@@ -445,5 +445,21 @@ export function patchTree(
 
 	placeStaticTrees(tree, flame, staticRoots);
 
+	// Prettify: We'll expand the commitRoot tree to fit available space
+	if (commitRoot.parent > -1) {
+		const end = getEndPosition(tree, flame, commitRootId);
+		const pos = flame.get(commitRootId)!;
+		if (end > pos.end) {
+			adjustNodesToRight(
+				tree,
+				flame,
+				commitRootId,
+				pos.end - end,
+				-1,
+				new Set(),
+			);
+		}
+	}
+
 	return flame;
 }
