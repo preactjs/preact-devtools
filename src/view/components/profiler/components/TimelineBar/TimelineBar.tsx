@@ -80,7 +80,8 @@ export function TimelineBar() {
 				<CommitTimeline
 					items={commits.map(commit => {
 						const percent =
-							((commit.duration - stats.min) * 100) / (stats.max - stats.min);
+							((commit.duration - stats.min) * 100) /
+							(stats.max - stats.min || 0.1);
 						return percent;
 					})}
 					selected={selectedCommit}
