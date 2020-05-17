@@ -2,7 +2,6 @@ import { NodeTransform } from "../transform/shared";
 import { CommitData } from "../../data/commits";
 import { getGradient } from "../../data/gradient";
 import { ID, DevNode } from "../../../../store/types";
-import { flattenNodeTree, EMPTY } from "../placeNodes";
 
 const MIN_WIDTH = 4;
 
@@ -10,22 +9,19 @@ const MIN_WIDTH = 4;
  * Convert commit data into an array of position data to operate on.
  */
 export function toTransform(commit: CommitData): NodeTransform[] {
-	const nodes = flattenNodeTree(commit.nodes, commit.rootId);
-	const root = commit.nodes.get(commit.commitRootId) || EMPTY;
-	const s = commit.selfDurations;
+	const commitRoot = commit.nodes.get(commit.commitRootId)!;
 
-	return nodes
-		.filter(
-			node => node.startTime >= root.startTime && node.endTime <= root.endTime,
-		)
-		.sort((a, b) => {
-			return (s.get(b.id) || 0) - (s.get(a.id) || 0);
+	return Array.from(commit.selfDurations.entries())
+		.filter(data => {
+			const node = commit.nodes.get(data[0])!;
+			return node.startTime >= commitRoot.startTime;
 		})
-		.map((node, i) => {
-			const selfDuration = s.get(node.id) || 0;
+		.sort((a, b) => b[1] - a[1])
+		.map((data, i) => {
+			const selfDuration = data[1];
 			return {
-				id: node.id,
-				width: selfDuration || 4,
+				id: data[0],
+				width: selfDuration,
 				x: 0,
 				row: i,
 				maximized: false,

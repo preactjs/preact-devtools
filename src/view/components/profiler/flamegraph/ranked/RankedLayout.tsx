@@ -1,10 +1,11 @@
 import { h, Fragment } from "preact";
-import { useMemo } from "preact/hooks";
-import { placeRanked, toTransform } from "./ranked-utils";
+import { useMemo, useEffect } from "preact/hooks";
+import { placeRanked } from "./ranked-utils";
 import { CommitData } from "../../data/commits";
 import { ID, DevNode } from "../../../../store/types";
 import { FlameNode } from "../FlameNode";
 import { formatTime } from "../../util";
+import { useObserver, useStore } from "../../../../store/react-bindings";
 
 export interface RankedLayoutProps {
 	commit: CommitData;
@@ -25,7 +26,8 @@ export function RankedLayout({
 	onSelect,
 }: RankedLayoutProps) {
 	// Convert node tree to position data
-	const data = useMemo(() => toTransform(commit), [commit]);
+	const store = useStore();
+	const data = useObserver(() => store.profiler.rankedNodes.$);
 
 	// Update node positions and mutate `data` to avoid allocations
 	const placed = useMemo(
@@ -40,18 +42,19 @@ export function RankedLayout({
 		[canvasWidth, selected, commit, data],
 	);
 
-	// Cache text content to avoid calling `Intl`-API repeatedly
-	const texts = useMemo(() => {
-		return data.map(pos => {
-			const node = commit.nodes.get(pos.id)!;
-			const selfDuration = commit.selfDurations.get(node.id) || 0;
-			return `${node.name} (${formatTime(selfDuration)})`;
-		});
-	}, [commit, data]);
+	// Hacky
+	useEffect(() => {
+		if (store.profiler.selectedNodeId.$ === -1 && data.length > 0) {
+			store.profiler.selectedNodeId.$ = data[0].id;
+		}
+	}, [data]);
 
 	return (
 		<Fragment>
-			{placed.map((pos, i) => {
+			{placed.map(pos => {
+				const node = commit.nodes.get(pos.id)!;
+				const selfDuration = commit.selfDurations.get(node.id) || 0;
+				const text = `${node.name} (${formatTime(selfDuration)})`;
 				return (
 					<FlameNode
 						key={pos.id}
@@ -61,7 +64,7 @@ export function RankedLayout({
 						parentId={selected.parent}
 						onClick={onSelect}
 					>
-						{texts[i]}
+						{text}
 					</FlameNode>
 				);
 			})}

@@ -8,6 +8,8 @@ import {
 } from "../../../../adapter/10/renderer/renderReasons";
 import { FlameNodeTransform } from "../flamegraph/modes/flamegraph-utils";
 import { FlameTree, patchTree } from "../flamegraph/modes/patchTree";
+import { NodeTransform } from "../flamegraph/transform/shared";
+import { toTransform } from "../flamegraph/ranked/ranked-utils";
 
 export interface CommitData {
 	/** Id of the tree's root node */
@@ -63,6 +65,7 @@ export interface ProfilerState {
 
 	// Flamegraph mode
 	flamegraphNodes: Observable<Map<ID, FlameNodeTransform>>;
+	rankedNodes: Observable<NodeTransform[]>;
 }
 
 /**
@@ -159,6 +162,15 @@ export function createProfiler(): ProfilerState {
 		return patchTree(prevCommit, commit);
 	});
 
+	const rankedNodes = watch<NodeTransform[]>(() => {
+		const commit = activeCommit.$;
+		if (!commit || flamegraphType.$ !== FlamegraphType.RANKED) {
+			return [];
+		}
+
+		return toTransform(commit);
+	});
+
 	return {
 		supportsRenderReasons,
 		captureRenderReasons,
@@ -172,8 +184,11 @@ export function createProfiler(): ProfilerState {
 		activeReason,
 		selectedNodeId,
 		selectedNode,
+
+		// Rendering
 		flamegraphType,
 		flamegraphNodes,
+		rankedNodes,
 	};
 }
 
