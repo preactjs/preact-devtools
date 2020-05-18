@@ -41,8 +41,6 @@ describe("ops2Tree", () => {
 					key: "",
 					startTime: 42,
 					endTime: 42,
-					treeStartTime: -1,
-					treeEndTime: -1,
 				},
 			]);
 		});
@@ -66,8 +64,6 @@ describe("ops2Tree", () => {
 					key: "",
 					startTime: 42,
 					endTime: 42,
-					treeStartTime: -1,
-					treeEndTime: -1,
 				},
 				{
 					children: [],
@@ -79,8 +75,6 @@ describe("ops2Tree", () => {
 					key: "",
 					startTime: 42,
 					endTime: 42,
-					treeStartTime: -1,
-					treeEndTime: -1,
 				},
 			]);
 		});

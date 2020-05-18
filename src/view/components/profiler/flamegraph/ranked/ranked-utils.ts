@@ -1,4 +1,4 @@
-import { NodeTransform } from "../transform/shared";
+import { NodeTransform } from "../shared";
 import { CommitData } from "../../data/commits";
 import { getGradient } from "../../data/gradient";
 import { ID, DevNode } from "../../../../store/types";

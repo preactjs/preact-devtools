@@ -1,4 +1,4 @@
-import { NodeTransform } from "../transform/shared";
+import { NodeTransform } from "../shared";
 import { ID, DevNodeType, DevNode } from "../../../../store/types";
 import { FlameTree } from "./patchTree";
 

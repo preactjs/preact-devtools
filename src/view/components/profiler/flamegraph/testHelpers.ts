@@ -1,6 +1,6 @@
 import { ID, DevNodeType, Tree, DevNode } from "../../../store/types";
 import { CommitData } from "../data/commits";
-import { NodeTransform } from "./transform/shared";
+import { NodeTransform } from "./shared";
 import { FlameNodeTransform } from "./modes/flamegraph-utils";
 
 /**

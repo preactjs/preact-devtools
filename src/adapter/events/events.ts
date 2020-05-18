@@ -94,13 +94,10 @@ export function flush(commit: Commit) {
  * We currently expect all operations to be in order.
  */
 export function applyOperationsV2(store: Store, data: number[]) {
-	const { rootId: commitRootId, removals, roots, tree, reasons } = ops2Tree(
+	const { rootId: commitRootId, roots, tree, reasons } = ops2Tree(
 		store.nodes.$,
 		data,
 	);
-
-	// Apply all removals
-	removals.forEach(id => store.nodes.$.delete(id));
 
 	// Update roots if necessary
 	if (roots.length > 0) {

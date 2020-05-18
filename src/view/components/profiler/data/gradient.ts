@@ -1,7 +1,4 @@
 export function getGradient(max: number, n: number) {
-	if (n > max) {
-		console.warn(`max > n`);
-	}
 	const maxColor = 9; // Amount of colors, see css variables
 	let i = 0;
 	if (!isNaN(n)) {

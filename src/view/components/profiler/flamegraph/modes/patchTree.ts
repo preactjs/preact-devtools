@@ -1,5 +1,5 @@
 import { Tree, ID, DevNode, DevNodeType } from "../../../../store/types";
-import { adjustNodesToRight } from "../transform/util";
+import { adjustNodesToRight } from "./adjustNodesToRight";
 import { FlameNodeTransform } from "./flamegraph-utils";
 import { getGradient } from "../../data/gradient";
 import { CommitData } from "../../data/commits";
@@ -199,12 +199,6 @@ export function placeStaticTrees(
 		groups.push(group);
 	}
 
-	console.log(
-		groups.map(x =>
-			x.children.map(y => tree.get(y)!.name + " #" + tree.get(y)!.id),
-		),
-	);
-
 	// Move siblings next to each other
 	groups.forEach(group => {
 		const root = tree.get(group.children[0])!;
@@ -313,9 +307,6 @@ export function patchTree(
 	const offsetStack = [-root.startTime];
 	const subtreeLevels = [-1];
 
-	// console.log("=== COMMIT");
-	// console.log("   commitRoot", commitRoot.name);
-	// console.log("   offset", offsetStack[0]);
 	const stack = [rootId];
 	let item;
 	while ((item = stack.pop())) {
@@ -345,7 +336,6 @@ export function patchTree(
 
 			const commitOffset = start - commitRoot.startTime;
 
-			// console.log("  commit offset", commitOffset);
 			offsetStack.push(commitOffset);
 			subtreeLevels.push(node.depth);
 		}
@@ -365,15 +355,20 @@ export function patchTree(
 			if (node.startTime + offset < start) {
 				offsetStack.push(start - node.startTime);
 				subtreeLevels.push(node.depth);
-				// console.log("Start", start, node.startTime);
 			} else if (
 				node.startTime >= parent.endTime ||
 				node.endTime >= parent.endTime
 			) {
 				offsetStack.push(start - node.startTime);
 				subtreeLevels.push(node.depth);
-				// console.log(" --> resize #1", node.name, node.id);
-				maybeGrow.push(node);
+
+				const nextOffset = offsetStack[offsetStack.length - 1];
+				if (
+					node.startTime + nextOffset >= parent.endTime ||
+					node.endTime + nextOffset >= parent.endTime
+				) {
+					maybeGrow.push(node);
+				}
 			}
 		}
 
@@ -384,7 +379,6 @@ export function patchTree(
 		const flameParent = flame.get(node.parent);
 		if (flameParent) {
 			if (flameParent.end < end) {
-				// console.log(" --> resize", node.name, node.id, parent!.name);
 				maybeGrow.push(node);
 			}
 		}
@@ -401,6 +395,7 @@ export function patchTree(
 		flame.set(node.id, pos);
 
 		if (start < 0) {
+			// eslint-disable-next-line no-console
 			console.warn(
 				`< 0 ${node.name} #${node.id} ${end} ${offset} ${node.startTime}`,
 			);
@@ -427,7 +422,6 @@ export function patchTree(
 				delta = item.endTime - item.startTime - (prev.endTime - prev.startTime);
 			}
 		}
-		// console.log("TO RESIZE", item.name, item.id, delta);
 		adjustNodesToRight(
 			tree,
 			flame,

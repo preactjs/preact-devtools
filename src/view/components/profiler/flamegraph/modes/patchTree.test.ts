@@ -2,11 +2,6 @@ import { expect } from "chai";
 import { patchTree, FlameTree } from "./patchTree";
 import { flames } from "../testHelpers";
 import { Tree, DevNode, ID } from "../../../../store/types";
-import * as patch1 from "./fixtures/patch1";
-import * as patch2 from "./fixtures/patch2";
-import * as patch3 from "./fixtures/patch3";
-import * as patch4 from "./fixtures/patch4";
-import * as patch5 from "./fixtures/patch5";
 
 export function toTimings(tree: Tree, flame: FlameTree) {
 	return Array.from(flame.values())
@@ -56,7 +51,7 @@ export function prepareFixture(fixture: {
 	};
 }
 
-describe.only("patchTree", () => {
+describe("patchTree", () => {
 	it("should return work with no data", () => {
 		const res = patch(new Map(), 1, 1);
 		expect(res.length).to.equal(0);
@@ -89,9 +84,9 @@ describe.only("patchTree", () => {
 
 		const actual = patch(tree.idMap, 1, 2);
 		expect(actual).to.deep.equal([
-			{ name: "App", id: 1, start: 0, end: 80, children: [2] },
-			{ name: "Bar", id: 2, start: 10, end: 80, children: [3] },
-			{ name: "Bob", id: 3, start: 20, end: 70, children: [] },
+			{ name: "App", id: 1, start: 0, end: 70, children: [2] },
+			{ name: "Bar", id: 2, start: 0, end: 70, children: [3] },
+			{ name: "Bob", id: 3, start: 10, end: 60, children: [] },
 		]);
 	});
 
@@ -111,70 +106,14 @@ describe.only("patchTree", () => {
 
 		const actual = patch(b.idMap, 1, 1);
 		expect(actual).to.deep.equal([
+			// TODO: App is detected as a static tree
 			{ name: "App", id: 1, start: 0, end: 90, children: [2] },
 			{ name: "Bar", id: 2, start: 0, end: 70, children: [3] },
 			{ name: "Bob", id: 3, start: 10, end: 60, children: [] },
 		]);
 	});
 
-	it("should mount with filtered parent", () => {
-		const a = flames`
-			App ******
-		`;
-
-		const b = flames`
-			App *****
-			 Bar ***
-			  Bob *
-		`;
-
-		// Children are fixed during ops parsing
-		a.nodes[0].children = [2];
-
-		b.nodes.forEach(x => {
-			x.startTime += 100;
-			x.endTime += 100;
-		});
-
-		const actual = patch(a.idMap, 1, 2);
-		expect(actual).to.deep.equal([
-			{ name: "App", id: 1, start: 0, end: 90, children: [2] },
-			{ name: "Bar", id: 2, start: 10, end: 80, children: [3] },
-			{ name: "Bob", id: 3, start: 20, end: 70, children: [] },
-		]);
-	});
-
 	it("should move siblings to the right", () => {
-		const a = flames`
-			App ***********
-			 Bar **
-		`;
-
-		const b = flames`
-			App ***********
-			 Bob *  Bar **
-		`;
-
-		// Correct ids to simulate update
-		b.byName("App")!.children = [3, 2];
-		b.byName("Bar")!.id = 2;
-		b.byName("Bob")!.id = 3;
-
-		const actual = patch(a.idMap, 1, 1);
-		expect(actual).to.deep.equal([
-			{
-				name: "App",
-				id: 1,
-				start: 0,
-				end: 150,
-				children: [3, 2],
-			},
-			{ name: "Bar", id: 2, start: 80, end: 140, children: [] },
-			{ name: "Bob", id: 3, start: 10, end: 60, children: [] },
-		]);
-	});
-
-	it.only("should move siblings to the right #2", () => {
 		const b = flames`
 			App *************
 			 Bar ****  Bob **
@@ -195,11 +134,11 @@ describe.only("patchTree", () => {
 			{
 				name: "Bar",
 				id: 2,
-				start: 10,
-				end: 90,
+				start: 0,
+				end: 80,
 				children: [],
 			},
-			{ name: "Bob", id: 3, start: 110, end: 170, children: [] },
+			{ name: "Bob", id: 3, start: 80, end: 140, children: [] },
 		]);
 	});
 
@@ -211,8 +150,8 @@ describe.only("patchTree", () => {
 
 		const actual = patch(a.idMap, 1, 2);
 		expect(actual).to.deep.equal([
-			{ name: "App", id: 1, start: 0, end: 100, children: [2] },
-			{ name: "Bar", id: 2, start: 10, end: 100, children: [] },
+			{ name: "App", id: 1, start: 0, end: 90, children: [2] },
+			{ name: "Bar", id: 2, start: 0, end: 90, children: [] },
 		]);
 	});
 
@@ -237,36 +176,4 @@ describe.only("patchTree", () => {
 			{ name: "Bob", id: 3, start: 10, end: 60, children: [] },
 		]);
 	});
-
-	// describe.skip("fixtures", () => {
-	// 	it("should patch fixture 1", () => {
-	// 		const { previous, next, nextRoot, expected } = prepareFixture(patch1);
-	// 		const res = patchTree(previous, next, nextRoot);
-	// 		expect(toTimings(res)).to.deep.equal(expected);
-	// 	});
-
-	// 	it("should patch fixture 2", () => {
-	// 		const { previous, next, nextRoot, expected } = prepareFixture(patch2);
-	// 		const res = patchTree(previous, next, nextRoot);
-	// 		expect(toTimings(res)).to.deep.equal(expected);
-	// 	});
-
-	// 	it("should mount new nodes fixture 3", () => {
-	// 		const { previous, next, nextRoot, expected } = prepareFixture(patch3);
-	// 		const res = patchTree(previous, next, nextRoot);
-	// 		expect(toTimings(res)).to.deep.equal(expected);
-	// 	});
-
-	// 	it("should mount new nodes fixture 4", () => {
-	// 		const { previous, next, nextRoot, expected } = prepareFixture(patch4);
-	// 		const res = patchTree(previous, next, nextRoot);
-	// 		expect(toTimings(res)).to.deep.equal(expected);
-	// 	});
-
-	// 	it("should mount new nodes fixture 5", () => {
-	// 		const { previous, next, nextRoot, expected } = prepareFixture(patch5);
-	// 		const res = patchTree(previous, next, nextRoot);
-	// 		expect(toTimings(res)).to.deep.equal(expected);
-	// 	});
-	// });
 });

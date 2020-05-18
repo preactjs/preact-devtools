@@ -1,7 +1,7 @@
 import { ID, Tree } from "../../view/store/types";
 import { parseTable } from "../string-table";
 import { MsgTypes } from "./events";
-import { deepClone } from "../../view/components/profiler/flamegraph/transform/util";
+import { deepClone } from "../../view/components/profiler/flamegraph/modes/adjustNodesToRight";
 import { RenderReasonMap } from "../10/renderer/renderReasons";
 
 /**
@@ -74,6 +74,10 @@ export function ops2Tree(oldTree: Tree, ops: number[]) {
 							const idx = parent.children.indexOf(nodeId);
 							if (idx > -1) parent.children.splice(idx, 1);
 						}
+
+						pending.delete(nodeId);
+
+						// TODO: Remove recursively
 					}
 				}
 

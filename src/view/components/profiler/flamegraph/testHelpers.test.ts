@@ -261,6 +261,7 @@ describe("FlameGraph DSL", () => {
 			duration: 110,
 			maxSelfDuration: 60,
 			nodes: tree.idMap,
+			selfDurations: tree.commit.selfDurations,
 		});
 	});
 });

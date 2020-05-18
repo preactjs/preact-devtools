@@ -1,4 +1,4 @@
-import { ID } from "../../../../store/types";
+import { ID } from "../../../store/types";
 
 export interface NodeTransform {
 	id: ID;

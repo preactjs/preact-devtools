@@ -1,6 +1,5 @@
 import { ID, DevNode } from "../../../store/types";
 import { Observable, valoo, watch } from "../../../valoo";
-import { resizeToMin } from "../flamegraph/transform/resizeToMin";
 import { getRoot } from "../flamegraph/FlamegraphStore";
 import {
 	RenderReasonMap,
@@ -8,7 +7,7 @@ import {
 } from "../../../../adapter/10/renderer/renderReasons";
 import { FlameNodeTransform } from "../flamegraph/modes/flamegraph-utils";
 import { FlameTree, patchTree } from "../flamegraph/modes/patchTree";
-import { NodeTransform } from "../flamegraph/transform/shared";
+import { NodeTransform } from "../flamegraph/shared";
 import { toTransform } from "../flamegraph/ranked/ranked-utils";
 
 export interface CommitData {
@@ -266,18 +265,11 @@ export function recordProfilerCommit(
 		stack.push(...node.children);
 	}
 
-	// Nodes may have a timing duration of 0 due to lack of precision
-	// in high performance timers because of spectre CPU attack vectors.
-	// We'll assign a minimum width to those nodes.
-	// resizeToMin(nodes, 0.01);
-
 	// Very useful to grab test cases from live websites
-	console.groupCollapsed("patch");
-	console.log("====", commitRoot.name, commitRootId);
-	console.log(JSON.stringify(Array.from(tree.values())));
-	console.log("=====");
-	console.log(JSON.stringify(Array.from(nodes.values())));
-	console.groupEnd();
+	// console.groupCollapsed("patch");
+	// console.log("====", commitRoot.name, commitRootId);
+	// console.log(JSON.stringify(Array.from(nodes.values())));
+	// console.groupEnd();
 
 	profiler.commits.update(arr => {
 		arr.push({
