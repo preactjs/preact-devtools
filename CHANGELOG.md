@@ -1,5 +1,16 @@
 # Changelog
 
+## 0.6.2
+
+This release completes the Profiler rewrite. The flamegraph can now display memoized trees and displays timings in a lot more polished way.
+
+- Fix symbol values not supported (#196, thanks @marvinhagemeister)
+- Make debug views toggle-able via setting (#195, thanks @marvinhagemeister)
+- Profiler: Add support for displaying memoized children (#194, thanks @marvinhagemeister)
+- Debug panels (#192, thanks @marvinhagemeister)
+- Profiler refactor Part 2 (#191, thanks @marvinhagemeister)
+- Fix trying to set popup on closed tab (#189, thanks @marvinhagemeister)
+
 ## 0.6.1
 
 This release contains no new features and all time was spent on polishing the existing ones and a bit of housekeeping. Most notably the Profiler will be a lot faster on weak GPUs (like the one in my Dell XPS 13 laptop).
