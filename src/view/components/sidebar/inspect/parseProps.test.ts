@@ -297,4 +297,23 @@ describe("parseProps", () => {
 			},
 		]);
 	});
+
+	it("should not mark Symbols as editable", () => {
+		const tree = parseProps({ type: "symbol", name: "Symbol(foo)" }, "", 2);
+		expect(serialize(tree)).to.deep.equal([
+			{
+				editable: false,
+				depth: 0,
+				id: "",
+				name: "",
+				type: "symbol",
+				value: {
+					type: "symbol",
+					name: "Symbol(foo)",
+				},
+				children: [],
+				meta: null,
+			},
+		]);
+	});
 });

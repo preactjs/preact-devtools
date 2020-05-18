@@ -66,6 +66,10 @@ describe("genPreview", () => {
 		expect(genPreview([1, 2, { a: 3 }])).to.equal("[1, 2, {a: 3}]");
 		expect(genPreview({ a: 123, b: [1, 2] })).to.equal("{a: 123, b: [1, 2]}");
 
+		expect(genPreview({ type: "symbol", name: "Symbol(foo)" })).to.equal(
+			"Symbol(foo)",
+		);
+
 		// Special values
 		expect(genPreview("__preact_empty__")).to.equal("");
 	});

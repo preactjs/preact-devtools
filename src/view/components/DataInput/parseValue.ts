@@ -57,6 +57,7 @@ export function genPreview(v: any): string {
 				return `ƒ ${v.name === "anonymous" ? "" : truncate(v.name)}()`;
 			}
 			if (v.type === "blob") return "Blob {}";
+			if (v.type === "symbol") return v.name;
 		}
 
 		const obj = Object.entries(v).map(x => {
