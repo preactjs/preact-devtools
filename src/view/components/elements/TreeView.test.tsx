@@ -18,8 +18,6 @@ describe("TreeItem", () => {
 			name: "foo",
 			parent: -1,
 			startTime: 0,
-			treeEndTime: 0,
-			treeStartTime: 0,
 			type: DevNodeType.ClassComponent,
 		});
 		const { container, rerender } = render(

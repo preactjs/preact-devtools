@@ -69,7 +69,7 @@
 	opacity: 0.5;
 }
 
-.node[data-maximized]:not([data-selected]) {
+.node[data-maximized][data-visible]:not([data-selected]) {
 	opacity: 0.5;
 }
 

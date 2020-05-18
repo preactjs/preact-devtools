@@ -50,8 +50,6 @@ export function applyOperationsV1(store: Store, data: number[]) {
 						key,
 						startTime: -1,
 						endTime: -1,
-						treeStartTime: -1,
-						treeEndTime: -1,
 					});
 				}
 				i += 6;

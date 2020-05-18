@@ -383,6 +383,24 @@
     "@nodelib/fs.scandir" "2.1.1"
     fastq "^1.6.0"
 
+"@prefresh/core@0.6.0":
+  version "0.6.0"
+  resolved "https://registry.yarnpkg.com/@prefresh/core/-/core-0.6.0.tgz#b7801ad3d16de9d21ed0824db6c85707f93cf93c"
+  integrity sha512-xhhBgQeMmyoSYEr8F27oypxRTWysIKPnc+Ed6U5OmEwPtLeKsccI3UCpSQyrcv5/HmPNPjAYHPqNC0uH57rIkw==
+
+"@prefresh/utils@0.1.0":
+  version "0.1.0"
+  resolved "https://registry.yarnpkg.com/@prefresh/utils/-/utils-0.1.0.tgz#9b69c9ecd6002e72e096e5e72f4bd4f88d15284c"
+  integrity sha512-xtUsQMJIHwBuiXu1E1iiXNVfn60N6zpVUo67ZvQVA6OMlslQzWtbdnTXRT+iplBBgfLmQvXR0bKsNz1+ZYSMgw==
+
+"@prefresh/webpack@^0.6.0":
+  version "0.6.0"
+  resolved "https://registry.yarnpkg.com/@prefresh/webpack/-/webpack-0.6.0.tgz#fec281c8b94e5455646686eb4c123a7b22004dd3"
+  integrity sha512-z9S1jknJZsc9xmMsX/3nNae8CxKavlOH0YydDjdld41WYB4A2UkC7+rl4P+XH7www9HpGcXzmqgDfFKGGJnNEg==
+  dependencies:
+    "@prefresh/core" "0.6.0"
+    "@prefresh/utils" "0.1.0"
+
 "@rollup/plugin-alias@^3.1.0":
   version "3.1.0"
   resolved "https://registry.yarnpkg.com/@rollup/plugin-alias/-/plugin-alias-3.1.0.tgz#4f7bc9d15e030d75da9224aaa5105129c54a3ffd"
@@ -8071,10 +8089,10 @@ pend@~1.2.0:
   resolved "https://registry.yarnpkg.com/pend/-/pend-1.2.0.tgz#7a57eb550a6783f9115331fcf4663d5c8e007a50"
   integrity sha1-elfrVQpng/kRUzH89GY9XI4AelA=
 
-pentf@^1.0.61:
-  version "1.0.61"
-  resolved "https://registry.yarnpkg.com/pentf/-/pentf-1.0.61.tgz#8f8a474e7cf6eb74b089b78f19eab52d5fa5929f"
-  integrity sha512-wLb6dCn5ZY8NOmJl3Jlw10WBTIe7MWmFjffaGyvm9MkArJA50sp6zuSgA2pRUuO+kpLCwITeYTqYcjuRIAzy+Q==
+pentf@^1.0.64:
+  version "1.0.64"
+  resolved "https://registry.yarnpkg.com/pentf/-/pentf-1.0.64.tgz#74a6068ad214d0920430eaddac49c4468a7332da"
+  integrity sha512-HTGXNJSYk8rY6oJVDqd4w/KoQwbj0GQoWew82UheY8ocLU5sX67OyGXWaVMqrVqH2HHF8JwpRH5X42fkQJB4zg==
   dependencies:
     "@types/glob" "^7.1.1"
     "@types/puppeteer" "^2.0.1"

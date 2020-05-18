@@ -23,7 +23,9 @@ const highlightNode = debounce(
 export function TreeView() {
 	const store = useStore();
 	const nodeList = useObserver(() => store.nodeList.$);
-	const treeDepth = useObserver(() => store.treeDepth.$);
+	const treeDepth = useObserver(() => {
+		return Math.max(...Array.from(store.nodes.$.values()).map(x => x.depth));
+	});
 	const { collapseNode, collapsed } = useCollapser();
 	const { selected, selectNext, selectPrev } = useSelection();
 

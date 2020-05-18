@@ -19,6 +19,12 @@ export enum DevNodeType {
 	Context,
 	Consumer,
 	Suspense,
+	/**
+	 * Groups are virtual nodes inserted by the devtools
+	 * to make certain operations easier. They are not
+	 * created by Preact.
+	 */
+	Group,
 }
 
 export interface DevNode {
@@ -35,15 +41,14 @@ export interface DevNode {
 	// Raw absolute timing data.
 	startTime: number;
 	endTime: number;
-	// Normalized timing data to keep the timings
-	// of the whole tree consistent across future
-	// commits. These timings are relative to the
-	// very first node.
-	treeStartTime: number;
-	treeEndTime: number;
 }
 
 export type Theme = "auto" | "light" | "dark";
+export enum Panel {
+	ELEMENTS = "ELEMENTS",
+	PROFILER = "PROFILER",
+	SETTINGS = "SETTINGS",
+}
 
 export type Tree = Map<ID, DevNode>;
 
@@ -51,6 +56,7 @@ export interface Store {
 	supports: {
 		hooks: Observable<boolean>;
 	};
+	activePanel: Observable<Panel>;
 	notify: EmitFn;
 	profiler: ProfilerState;
 	isPicking: Observable<boolean>;
@@ -59,7 +65,6 @@ export interface Store {
 	nodes: Observable<Tree>;
 	nodeList: Observable<ID[]>;
 	theme: Observable<Theme>;
-	treeDepth: Observable<number>;
 	search: ReturnType<typeof createSearchStore>;
 	filter: ReturnType<typeof createFilterStore>;
 	selection: ReturnType<typeof createSelectionStore>;

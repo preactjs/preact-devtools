@@ -1,22 +1,20 @@
 import { h, Fragment } from "preact";
-import { AppCtx, EmitCtx, WindowCtx } from "../store/react-bindings";
-import { Store } from "../store/types";
+import {
+	AppCtx,
+	EmitCtx,
+	WindowCtx,
+	useObserver,
+} from "../store/react-bindings";
+import { Store, Panel } from "../store/types";
 import { Elements } from "./elements/Elements";
 import { Profiler } from "./profiler/components/Profiler";
-import { useState } from "preact/hooks";
 import { SmallTab, SmallTabGroup } from "./profiler/components/Tabs/Tabs";
 import s from "./Devtools.css";
 import { ThemeSwitcher } from "./ThemeSwitcher";
 import { Settings } from "./settings/Settings";
 
-export enum Panel {
-	ELEMENTS = "ELEMENTS",
-	PROFILER = "PROFILER",
-	SETTINGS = "SETTINGS",
-}
-
 export function DevTools(props: { store: Store; window: Window }) {
-	const [panel, setPanel] = useState<Panel>(Panel.ELEMENTS);
+	const panel = useObserver(() => props.store.activePanel.$);
 
 	const showElements = panel === Panel.ELEMENTS;
 	const showProfiler = panel === Panel.PROFILER;
@@ -32,7 +30,7 @@ export function DevTools(props: { store: Store; window: Window }) {
 							<SmallTabGroup class={s.switcher}>
 								<div class={s.switcherInner}>
 									<SmallTab
-										onClick={setPanel as any}
+										onClick={() => (props.store.activePanel.$ = Panel.ELEMENTS)}
 										checked={showElements}
 										name="root-panel"
 										value={Panel.ELEMENTS}
@@ -40,7 +38,7 @@ export function DevTools(props: { store: Store; window: Window }) {
 										Elements
 									</SmallTab>
 									<SmallTab
-										onClick={setPanel as any}
+										onClick={() => (props.store.activePanel.$ = Panel.PROFILER)}
 										checked={showProfiler}
 										name="root-panel"
 										value={Panel.PROFILER}
@@ -48,7 +46,7 @@ export function DevTools(props: { store: Store; window: Window }) {
 										Profiler
 									</SmallTab>
 									<SmallTab
-										onClick={setPanel as any}
+										onClick={() => (props.store.activePanel.$ = Panel.SETTINGS)}
 										checked={showSettings}
 										name="root-panel"
 										value={Panel.SETTINGS}

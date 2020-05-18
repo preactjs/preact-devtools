@@ -19,10 +19,12 @@ export function RenderedAt() {
 			return false;
 		}).map(commit => {
 			const node = commit.nodes.get(id)!;
+
+			const selfDuration = commit.selfDurations.get(id) || 0;
 			return {
 				index: store.profiler.commits.$.findIndex(x => x === commit),
 				startTime: node.startTime,
-				selfDuration: node.selfDuration,
+				selfDuration,
 			};
 		});
 	});
@@ -46,7 +48,7 @@ export function RenderedAt() {
 								onClick={() => (store.profiler.activeCommitIdx.$ = node.index)}
 							>
 								<span>
-									{formatTime(node.startTime)} for{" "}
+									{formatTime(node.startTime / 1000)} for{" "}
 									{formatTime(node.selfDuration)}
 								</span>
 							</button>

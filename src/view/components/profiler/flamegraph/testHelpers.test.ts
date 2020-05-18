@@ -1,7 +1,6 @@
 import { expect } from "chai";
 import { flames } from "./testHelpers";
-import { ProfilerNode } from "../data/commits";
-import { DevNodeType } from "../../../store/types";
+import { DevNodeType, DevNode } from "../../../store/types";
 
 describe("FlameGraph DSL", () => {
 	it("should convert flat flamegraph", () => {
@@ -11,7 +10,7 @@ describe("FlameGraph DSL", () => {
          Bar ***
     `;
 
-		const expected: ProfilerNode[] = [
+		const expected: DevNode[] = [
 			{
 				id: 1,
 				name: "App",
@@ -19,13 +18,9 @@ describe("FlameGraph DSL", () => {
 				type: DevNodeType.FunctionComponent,
 				startTime: 0,
 				endTime: 130,
-				treeStartTime: 0,
-				treeEndTime: 130,
-				duration: 130,
 				children: [2],
-				parent: 0,
+				parent: -1,
 				depth: 0,
-				selfDuration: 30,
 			},
 			{
 				id: 2,
@@ -34,10 +29,6 @@ describe("FlameGraph DSL", () => {
 				type: DevNodeType.FunctionComponent,
 				startTime: 10,
 				endTime: 110,
-				treeStartTime: 10,
-				treeEndTime: 110,
-				duration: 100,
-				selfDuration: 30,
 				children: [3],
 				parent: 1,
 				depth: 1,
@@ -49,10 +40,6 @@ describe("FlameGraph DSL", () => {
 				type: DevNodeType.FunctionComponent,
 				startTime: 30,
 				endTime: 100,
-				treeStartTime: 30,
-				treeEndTime: 100,
-				duration: 70,
-				selfDuration: 70,
 				depth: 2,
 				children: [],
 				parent: 2,
@@ -69,7 +56,7 @@ describe("FlameGraph DSL", () => {
       Bar ***
     `;
 
-		const expected: ProfilerNode[] = [
+		const expected: DevNode[] = [
 			{
 				id: 1,
 				name: "App",
@@ -77,13 +64,9 @@ describe("FlameGraph DSL", () => {
 				type: DevNodeType.FunctionComponent,
 				startTime: 0,
 				endTime: 130,
-				treeStartTime: 0,
-				treeEndTime: 130,
-				duration: 130,
 				children: [2],
-				parent: 0,
+				parent: -1,
 				depth: 0,
-				selfDuration: 30,
 			},
 			{
 				id: 2,
@@ -92,10 +75,6 @@ describe("FlameGraph DSL", () => {
 				type: DevNodeType.FunctionComponent,
 				startTime: 0,
 				endTime: 100,
-				treeStartTime: 0,
-				treeEndTime: 100,
-				duration: 100,
-				selfDuration: 30,
 				children: [3],
 				parent: 1,
 				depth: 1,
@@ -107,10 +86,6 @@ describe("FlameGraph DSL", () => {
 				type: DevNodeType.FunctionComponent,
 				startTime: 0,
 				endTime: 70,
-				treeStartTime: 0,
-				treeEndTime: 70,
-				duration: 70,
-				selfDuration: 70,
 				parent: 2,
 				depth: 2,
 				children: [],
@@ -141,13 +116,24 @@ describe("FlameGraph DSL", () => {
 		expect(tree.byName("Bar")).to.not.be.undefined;
 	});
 
-	it("should throw if child duration is longer than parent duration", () => {
-		expect(
-			() => flames`
-      Parent ***
-      Child ******
-    `,
-		).to.throw();
+	it("should search for parent on offset nodes", () => {
+		const tree = flames`
+			Parent ***
+			            Child ******
+		`;
+
+		expect(tree.byName("Child")!.parent).to.equal(1);
+		expect(tree.byName("Parent")!.children).to.deep.equal([2]);
+	});
+
+	it("should search for parent on offset nodes #2", () => {
+		const tree = flames`
+			              Parent ***
+			Child ******
+		`;
+
+		expect(tree.byName("Child")!.parent).to.equal(1);
+		expect(tree.byName("Parent")!.children).to.deep.equal([2]);
 	});
 
 	it("should support simple sibling children", () => {
@@ -156,7 +142,7 @@ describe("FlameGraph DSL", () => {
      Foo ******  Bar ***
   `;
 
-		const expected: ProfilerNode[] = [
+		const expected: DevNode[] = [
 			{
 				id: 1,
 				name: "App",
@@ -164,12 +150,8 @@ describe("FlameGraph DSL", () => {
 				type: DevNodeType.FunctionComponent,
 				startTime: 0,
 				endTime: 220,
-				treeStartTime: 0,
-				treeEndTime: 220,
-				duration: 220,
-				selfDuration: 50,
 				children: [2, 3],
-				parent: 0,
+				parent: -1,
 				depth: 0,
 			},
 			{
@@ -179,10 +161,6 @@ describe("FlameGraph DSL", () => {
 				type: DevNodeType.FunctionComponent,
 				startTime: 10,
 				endTime: 110,
-				treeStartTime: 10,
-				treeEndTime: 110,
-				duration: 100,
-				selfDuration: 100,
 				children: [],
 				parent: 1,
 				depth: 1,
@@ -194,10 +172,6 @@ describe("FlameGraph DSL", () => {
 				type: DevNodeType.FunctionComponent,
 				startTime: 130,
 				endTime: 200,
-				treeStartTime: 130,
-				treeEndTime: 200,
-				duration: 70,
-				selfDuration: 70,
 				depth: 1,
 				children: [],
 				parent: 1,
@@ -214,7 +188,7 @@ describe("FlameGraph DSL", () => {
        Bar ***    Bob **
 	`;
 
-		const expected: ProfilerNode[] = [
+		const expected: DevNode[] = [
 			{
 				id: 1,
 				name: "App",
@@ -222,13 +196,9 @@ describe("FlameGraph DSL", () => {
 				type: DevNodeType.FunctionComponent,
 				startTime: 0,
 				endTime: 220,
-				treeStartTime: 0,
-				treeEndTime: 220,
-				duration: 220,
-				selfDuration: 50,
 				children: [2, 4],
 				depth: 0,
-				parent: 0,
+				parent: -1,
 			},
 			{
 				id: 2,
@@ -237,10 +207,6 @@ describe("FlameGraph DSL", () => {
 				type: DevNodeType.FunctionComponent,
 				startTime: 10,
 				endTime: 110,
-				treeStartTime: 10,
-				treeEndTime: 110,
-				duration: 100,
-				selfDuration: 30,
 				children: [3],
 				parent: 1,
 				depth: 1,
@@ -252,10 +218,6 @@ describe("FlameGraph DSL", () => {
 				type: DevNodeType.FunctionComponent,
 				startTime: 30,
 				endTime: 100,
-				treeStartTime: 30,
-				treeEndTime: 100,
-				duration: 70,
-				selfDuration: 70,
 				depth: 2,
 				children: [],
 				parent: 2,
@@ -267,10 +229,6 @@ describe("FlameGraph DSL", () => {
 				type: DevNodeType.FunctionComponent,
 				startTime: 130,
 				endTime: 200,
-				treeStartTime: 130,
-				treeEndTime: 200,
-				duration: 70,
-				selfDuration: 10,
 				depth: 1,
 				children: [5],
 				parent: 1,
@@ -282,10 +240,6 @@ describe("FlameGraph DSL", () => {
 				type: DevNodeType.FunctionComponent,
 				startTime: 140,
 				endTime: 200,
-				treeStartTime: 140,
-				treeEndTime: 200,
-				duration: 60,
-				selfDuration: 60,
 				depth: 2,
 				children: [],
 				parent: 4,
@@ -305,9 +259,9 @@ describe("FlameGraph DSL", () => {
 			commitRootId: 1,
 			rootId: 1,
 			duration: 110,
-			maxDepth: 1,
 			maxSelfDuration: 60,
 			nodes: tree.idMap,
+			selfDurations: tree.commit.selfDurations,
 		});
 	});
 });

@@ -57,6 +57,11 @@ export async function run(config: any) {
 	reasons = await getText(devtools, '[data-testid="render-reasons"');
 	expect(reasons).to.equal("Hooks changed");
 
+	await clickText(devtools, "Fragment", {
+		elementXPath: "//*",
+		timeout: 2000,
+	});
+
 	// Force update
 	await click(devtools, '[data-testid="next-commit"]');
 

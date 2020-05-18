@@ -5,8 +5,8 @@ import { useRef, useCallback, useState, useEffect } from "preact/hooks";
 import { FlamegraphType } from "../data/commits";
 import { useResize } from "../../utils";
 import { RankedLayout } from "./ranked/RankedLayout";
-import { EMPTY } from "./placeNodes";
 import { FlamegraphLayout } from "./modes/FlamegraphLayout";
+import { EMPTY } from "./placeNodes";
 
 export function FlameGraph() {
 	const store = useStore();
@@ -40,7 +40,12 @@ export function FlameGraph() {
 	if (isRecording || !commit) return null;
 
 	return (
-		<div class={s.root} ref={ref} data-type={displayType.toLowerCase()}>
+		<div
+			class={s.root}
+			ref={ref}
+			data-type={displayType.toLowerCase()}
+			style={process.env.DEBUG ? "overflow-x: auto" : ""}
+		>
 			{displayType === FlamegraphType.RANKED ? (
 				<RankedLayout
 					canvasWidth={canvasWidth}

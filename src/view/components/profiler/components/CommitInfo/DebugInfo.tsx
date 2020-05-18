@@ -2,10 +2,11 @@ import { h, Fragment } from "preact";
 import { SidebarPanel } from "../../../sidebar/SidebarPanel";
 import s from "./CommitInfo.css";
 import { useStore, useObserver } from "../../../../store/react-bindings";
+import { getRoot } from "../../flamegraph/FlamegraphStore";
 
 const TimeRange = ({ from, to }: { from: number; to: number }) => (
 	<Fragment>
-		{from.toFixed(2)} -&gt; {to.toFixed(2)}
+		{from.toFixed(2)} -&gt; {to.toFixed(2)} | {(to - from).toFixed(2)}
 	</Fragment>
 );
 
@@ -14,8 +15,12 @@ export function DebugProfilerInfo() {
 	const commit = useObserver(() => store.profiler.activeCommit.$);
 	const selected = useObserver(() => store.profiler.selectedNode.$);
 	const isRecording = useObserver(() => store.profiler.isRecording.$);
+	const pos = useObserver(() => {
+		const s = store.profiler.selectedNodeId.$;
+		return store.profiler.flamegraphNodes.$.get(s);
+	})!;
 
-	if (commit === null || isRecording || !selected) {
+	if (commit === null || isRecording || !selected || !pos) {
 		return null;
 	}
 
@@ -28,9 +33,12 @@ export function DebugProfilerInfo() {
 				<dt class={s.title}>parentId:</dt>
 				<dd class={s.value}>{selected.parent}</dd>
 				<br />
+				<dt class={s.title}>rootId:</dt>
+				<dd class={s.value}>{getRoot(commit.nodes, selected.id)}</dd>
+				<br />
 				<dt class={s.title}>tree:</dt>
 				<dd class={s.value}>
-					<TimeRange from={selected.treeStartTime} to={selected.treeEndTime} />
+					<TimeRange from={pos.start} to={pos.end} />
 				</dd>
 				<br />
 				<dt class={s.title}>real:</dt>

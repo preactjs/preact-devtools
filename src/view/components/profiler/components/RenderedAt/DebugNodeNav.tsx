@@ -2,11 +2,31 @@ import { h } from "preact";
 import { useStore, useObserver } from "../../../../store/react-bindings";
 import { SidebarPanel, Empty } from "../../../sidebar/SidebarPanel";
 import s from "./RenderedAt.css";
+import { DevNode } from "../../../../store/types";
 
 export function DebugNodeNav() {
 	const store = useStore();
 	const selected = useObserver(() => store.profiler.selectedNodeId.$);
 	const commit = useObserver(() => store.profiler.activeCommit.$);
+	const nodes = useObserver(() => {
+		const commit = store.profiler.activeCommit.$;
+		if (!commit) return [];
+
+		const out: DevNode[] = [];
+		const stack = [commit.rootId];
+		let item;
+		while ((item = stack.pop())) {
+			const node = commit.nodes.get(item);
+			if (!node) continue;
+
+			out.push(node);
+			for (let i = node.children.length - 1; i >= 0; i--) {
+				stack.push(node.children[i]);
+			}
+		}
+
+		return out;
+	});
 	const isRecording = useObserver(() => store.profiler.isRecording.$);
 
 	if (isRecording) {
@@ -15,11 +35,11 @@ export function DebugNodeNav() {
 
 	return (
 		<SidebarPanel title="Debug Node Navigation:">
-			{!commit ? (
+			{nodes.length === 0 ? (
 				<Empty>No nodes found inside commmit</Empty>
 			) : (
-				<nav data-testid="rendered-at">
-					{Array.from(commit.nodes.values()).map(node => {
+				<nav data-testid="debug-nav">
+					{nodes.map(node => {
 						return (
 							<button
 								key={node.id}
@@ -28,7 +48,12 @@ export function DebugNodeNav() {
 								onClick={() => (store.profiler.selectedNodeId.$ = node.id)}
 							>
 								<span style="display: flex; justify-content: space-between; width: 100%">
-									<span>{node.name}</span>
+									<span>
+										{node.name}
+										{commit && node.id === commit.commitRootId ? (
+											<b> (R)</b>
+										) : null}
+									</span>
 									<span>{node.id}</span>
 								</span>
 							</button>

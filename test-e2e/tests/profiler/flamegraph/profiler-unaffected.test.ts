@@ -31,9 +31,9 @@ export async function run(config: any) {
 	expect(nodes.map(n => n.split(" ")[0])).to.deep.equal(["Counter", "Display"]);
 	nodes = await getText$$(
 		devtools,
-		'[data-type="flamegraph"] > [data-active-parent]',
+		'[data-type="flamegraph"] > [data-commit-parent]',
 	);
-	expect(nodes.map(n => n.split(" ")[0])).to.deep.equal(["Fragment"]);
+	expect(nodes.map(n => n.split(" ")[0])).to.deep.equal(["Fragment", "App"]);
 
 	await closePage(page);
 }

@@ -1,8 +1,7 @@
-import { NodeTransform } from "../transform/shared";
-import { ProfilerNode, CommitData } from "../../data/commits";
+import { NodeTransform } from "../shared";
+import { CommitData } from "../../data/commits";
 import { getGradient } from "../../data/gradient";
-import { ID } from "../../../../store/types";
-import { flattenNodeTree, EMPTY } from "../placeNodes";
+import { ID, DevNode } from "../../../../store/types";
 
 const MIN_WIDTH = 4;
 
@@ -10,22 +9,23 @@ const MIN_WIDTH = 4;
  * Convert commit data into an array of position data to operate on.
  */
 export function toTransform(commit: CommitData): NodeTransform[] {
-	const nodes = flattenNodeTree(commit.nodes, commit.rootId);
-	const root = commit.nodes.get(commit.commitRootId) || EMPTY;
+	const commitRoot = commit.nodes.get(commit.commitRootId)!;
 
-	return nodes
-		.filter(
-			node => node.startTime >= root.startTime && node.endTime <= root.endTime,
-		)
-		.sort((a, b) => b.selfDuration - a.selfDuration)
-		.map((node, i) => {
+	return Array.from(commit.selfDurations.entries())
+		.filter(data => {
+			const node = commit.nodes.get(data[0])!;
+			return node.startTime >= commitRoot.startTime;
+		})
+		.sort((a, b) => b[1] - a[1])
+		.map((data, i) => {
+			const selfDuration = data[1];
 			return {
-				id: node.id,
-				width: node.selfDuration,
+				id: data[0],
+				width: selfDuration,
 				x: 0,
 				row: i,
 				maximized: false,
-				weight: getGradient(commit.maxSelfDuration, node.selfDuration),
+				weight: getGradient(commit.maxSelfDuration, selfDuration),
 				visible: true,
 				commitParent: false,
 			};
@@ -37,19 +37,21 @@ export function toTransform(commit: CommitData): NodeTransform[] {
  * MUTATES position nodes to avoid many allocations for each node.
  */
 export function placeRanked(
-	tree: Map<ID, ProfilerNode>,
+	tree: Map<ID, DevNode>,
+	selfDurations: Map<ID, number>,
 	sorted: NodeTransform[],
-	selected: ProfilerNode,
+	selected: DevNode,
 	canvasWidth: number,
 ) {
-	const scale = (canvasWidth || 1) / Math.max(selected.selfDuration, 0.01);
+	const selectedDuration = selfDurations.get(selected.id) || 0;
+	const scale = (canvasWidth || 1) / Math.max(selectedDuration, 0.01);
 	let maximized = true;
 
 	sorted.forEach(pos => {
 		const node = tree.get(pos.id);
 		if (!node) return;
 
-		const selfDuration = node.selfDuration;
+		const selfDuration = selfDurations.get(node.id) || 0;
 
 		// Ensure nodes are always visible
 		pos.width = maximized

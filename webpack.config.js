@@ -1,9 +1,11 @@
 const HtmlWebpackPlugin = require("html-webpack-plugin");
 const ForkTsCheckerWebpackPlugin = require("fork-ts-checker-webpack-plugin");
+const webpack = require("webpack");
+const PreactRefreshPlugin = require("@prefresh/webpack");
 
 module.exports = {
 	entry: {
-		app: "./src/index.tsx",
+		app: "./styleguide/index.tsx",
 	},
 	resolve: {
 		extensions: [".tsx", ".ts", ".js", ".json"],
@@ -55,6 +57,16 @@ module.exports = {
 						options: {
 							plugins: [
 								[
+									"babel-plugin-transform-jsx-to-htm",
+									{
+										tag: "$$html",
+										import: {
+											module: "htm/preact",
+											export: "html",
+										},
+									},
+								],
+								[
 									"babel-plugin-transform-rename-properties",
 									{
 										rename: {
@@ -102,5 +114,16 @@ module.exports = {
 	devServer: {
 		hot: true,
 	},
-	plugins: [new HtmlWebpackPlugin(), new ForkTsCheckerWebpackPlugin()],
+	plugins: [
+		new webpack.HotModuleReplacementPlugin(),
+		new PreactRefreshPlugin(),
+		new HtmlWebpackPlugin(),
+		new ForkTsCheckerWebpackPlugin(),
+		new webpack.DefinePlugin({
+			"process.env.NODE_ENV": JSON.stringify(
+				process.env.NODE_ENV || "development",
+			),
+			"process.env.DEBUG": JSON.stringify(true),
+		}),
+	],
 };
