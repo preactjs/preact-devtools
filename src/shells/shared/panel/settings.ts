@@ -10,7 +10,10 @@ export async function loadSettings(window: Window, store: Store) {
 	doc.body.classList.add((chrome.devtools.panels as any).themeName || "light");
 	try {
 		const settings: any = await new Promise(res => {
-			chrome.storage.sync.get(["theme", "captureRenderReasons"], res);
+			chrome.storage.sync.get(
+				["theme", "captureRenderReasons", "debugMode"],
+				res,
+			);
 		});
 
 		if (settings) {
@@ -18,6 +21,7 @@ export async function loadSettings(window: Window, store: Store) {
 				store.theme.$ = settings.theme;
 			}
 			store.profiler.captureRenderReasons.$ = !!settings.captureRenderReasons;
+			store.debugMode.$ = !!settings.debugMode;
 		}
 	} catch (e) {
 		// We don't really care if we couldn't load the settings
@@ -49,4 +53,12 @@ export function storeTheme(theme: string) {
  */
 export function storeCaptureRenderReasons(enabled: boolean) {
 	store({ captureRenderReasons: enabled });
+}
+
+/**
+ * Enables some additional debug views that's useful when
+ * working on this extension.
+ */
+export function storeDebugMode(enabled: boolean) {
+	store({ debugMode: enabled });
 }

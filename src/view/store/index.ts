@@ -17,6 +17,8 @@ export function createStore(): Store {
 		listeners.forEach(fn => fn && fn(name, data));
 	};
 
+	const debugMode = valoo(process.env.DEBUG === "true");
+
 	const nodes = valoo<Map<ID, DevNode>>(new Map());
 	const roots = valoo<ID[]>([]);
 
@@ -98,6 +100,7 @@ export function createStore(): Store {
 		supports: {
 			hooks: supportsHooks,
 		},
+		debugMode,
 		activePanel: valoo(Panel.ELEMENTS),
 		profiler: createProfiler(),
 		notify,

@@ -25,7 +25,7 @@ export function DebugProfilerInfo() {
 	}
 
 	return (
-		<SidebarPanel title="Debug Stats">
+		<SidebarPanel title="Debug Stats" testId="profiler-debug-stats">
 			<dl class={s.list}>
 				<dt class={s.title}>id:</dt>
 				<dd class={s.value}>{selected.id}</dd>

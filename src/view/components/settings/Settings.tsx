@@ -13,6 +13,7 @@ export function Settings() {
 	const renderReasons = useObserver(
 		() => store.profiler.captureRenderReasons.$,
 	);
+	const debugMode = useObserver(() => store.debugMode.$);
 
 	const setTheme = useCallback((v: Theme) => (store.theme.$ = v), []);
 
@@ -45,6 +46,15 @@ export function Settings() {
 						may be less accurate because of that.
 					</Message>
 				</div>
+
+				<h2>Experimental</h2>
+				<Checkbox
+					checked={debugMode}
+					onChange={() => (store.debugMode.$ = !store.debugMode.$)}
+					testId="toggle-debug-mode"
+				>
+					Toggle debug mode
+				</Checkbox>
 			</form>
 		</div>
 	);

@@ -34,7 +34,7 @@ export function DebugNodeNav() {
 	}
 
 	return (
-		<SidebarPanel title="Debug Node Navigation:">
+		<SidebarPanel title="Debug Node Navigation:" testId="profiler-debug-nav">
 			{nodes.length === 0 ? (
 				<Empty>No nodes found inside commmit</Empty>
 			) : (

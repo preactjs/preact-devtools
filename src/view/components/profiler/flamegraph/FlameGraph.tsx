@@ -16,6 +16,7 @@ export function FlameGraph() {
 	const selected = useObserver(() => store.profiler.selectedNode.$ || EMPTY);
 	const commit = useObserver(() => store.profiler.activeCommit.$);
 	const isRecording = useObserver(() => store.profiler.isRecording.$);
+	const showDebug = useObserver(() => store.debugMode.$);
 
 	const ref = useRef<HTMLDivElement>();
 	useEffect(() => {
@@ -44,7 +45,7 @@ export function FlameGraph() {
 			class={s.root}
 			ref={ref}
 			data-type={displayType.toLowerCase()}
-			style={process.env.DEBUG ? "overflow-x: auto" : ""}
+			style={showDebug ? "overflow-x: auto" : ""}
 		>
 			{displayType === FlamegraphType.RANKED ? (
 				<RankedLayout
