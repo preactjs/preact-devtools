@@ -49,6 +49,12 @@ export function jsonify(
 				name: data.displayName || data.name || "anonymous",
 			};
 		}
+		case "symbol": {
+			return {
+				type: "symbol",
+				name: data.toString(),
+			};
+		}
 		case "object": {
 			if (data === null) return null;
 			else if (data instanceof window.Blob) {

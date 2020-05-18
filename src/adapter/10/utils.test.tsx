@@ -117,6 +117,14 @@ describe("jsonify", () => {
 			bar: { foo: 123 },
 		});
 	});
+
+	it("should parse symbols", () => {
+		const data: any = Symbol("foo");
+		expect(jsonify(data, () => null, new Set())).to.deep.equal({
+			type: "symbol",
+			name: "Symbol(foo)",
+		});
+	});
 });
 
 describe("setInCopy", () => {

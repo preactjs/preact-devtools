@@ -170,6 +170,22 @@ export function parseProps(
 					children: [],
 					meta: null,
 				});
+			} else if (
+				// Same for Symbols
+				maybeCustom &&
+				typeof data.name === "string" &&
+				data.type === "symbol"
+			) {
+				out.set(path, {
+					depth,
+					name,
+					id: path,
+					type: "symbol",
+					editable: false,
+					value: data,
+					children: [],
+					meta: null,
+				});
 			} else {
 				const node: PropData = {
 					depth,
