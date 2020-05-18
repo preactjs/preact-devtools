@@ -11,8 +11,12 @@ import { CommitInfo } from "./CommitInfo/CommitInfo";
 import { RenderReasons } from "./RenderReasons";
 import { DebugProfilerInfo } from "./CommitInfo/DebugInfo";
 import { DebugNodeNav } from "./RenderedAt/DebugNodeNav";
+import { useStore, useObserver } from "../../../store/react-bindings";
 
 export function Profiler() {
+	const store = useStore();
+	const showDebug = useObserver(() => store.debugMode.$);
+
 	return (
 		<Fragment>
 			<ThemeSwitcher />
@@ -30,8 +34,8 @@ export function Profiler() {
 				<RenderReasons />
 				<RenderedAt />
 				<CommitInfo />
-				{process.env.DEBUG && <DebugProfilerInfo />}
-				{process.env.DEBUG && <DebugNodeNav />}
+				{showDebug && <DebugProfilerInfo />}
+				{showDebug && <DebugNodeNav />}
 			</div>
 		</Fragment>
 	);

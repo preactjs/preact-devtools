@@ -56,6 +56,7 @@ export interface Store {
 	supports: {
 		hooks: Observable<boolean>;
 	};
+	debugMode: Observable<boolean>;
 	activePanel: Observable<Panel>;
 	notify: EmitFn;
 	profiler: ProfilerState;
