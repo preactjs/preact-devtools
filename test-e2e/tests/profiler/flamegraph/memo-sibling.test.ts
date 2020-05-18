@@ -8,20 +8,7 @@ import {
 } from "../../../test-utils";
 import { expect } from "chai";
 import { closePage, clickTestId, waitForTestId } from "pentf/browser_utils";
-import { Page } from "puppeteer";
-
-async function getFlameNodes(page: Page) {
-	return await page.$$eval('[data-type="flamegraph"] > *', els => {
-		return els.map(el => {
-			const text = el.textContent!;
-			return {
-				maximized: el.hasAttribute("data-maximized"),
-				name: text.slice(0, text.lastIndexOf("(") - 1),
-				visible: el.hasAttribute("data-visible"),
-			};
-		});
-	});
-}
+import { getFlameNodes } from "./utils";
 
 export const description = "Correctly position memoized sibling sub-trees";
 
@@ -65,8 +52,8 @@ export async function run(config: any) {
 	expect(nodes).to.deep.equal([
 		{ maximized: true, name: "Fragment", visible: true },
 		{ maximized: false, name: "Counter", visible: true },
-		{ maximized: false, name: "Value1", visible: true },
 		{ maximized: false, name: "Value2", visible: true },
+		{ maximized: false, name: "Value1", visible: true },
 	]);
 
 	const memoSize = await getSize(

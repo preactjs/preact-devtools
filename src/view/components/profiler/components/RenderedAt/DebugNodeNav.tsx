@@ -38,7 +38,7 @@ export function DebugNodeNav() {
 			{nodes.length === 0 ? (
 				<Empty>No nodes found inside commmit</Empty>
 			) : (
-				<nav data-testid="rendered-at">
+				<nav data-testid="debug-nav">
 					{nodes.map(node => {
 						return (
 							<button

@@ -7,7 +7,7 @@ import {
 	getAttribute$$,
 } from "../../test-utils";
 import { expect } from "chai";
-import { closePage, waitForTestId } from "pentf/browser_utils";
+import { closePage } from "pentf/browser_utils";
 
 export const description = "Show in which commit a node rendered";
 
@@ -29,7 +29,7 @@ export async function run(config: any) {
 	await click(devtools, recordBtn);
 
 	await clickNestedText(devtools, "Counter");
-	await waitForTestId(devtools, "rendered-at");
+	await devtools.waitForSelector('[data-testid="rendered-at"]');
 
 	const items = await getCount(devtools, '[data-testid="rendered-at"] button');
 	expect(items).to.equal(2);

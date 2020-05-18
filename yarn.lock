@@ -8089,10 +8089,10 @@ pend@~1.2.0:
   resolved "https://registry.yarnpkg.com/pend/-/pend-1.2.0.tgz#7a57eb550a6783f9115331fcf4663d5c8e007a50"
   integrity sha1-elfrVQpng/kRUzH89GY9XI4AelA=
 
-pentf@^1.0.61:
-  version "1.0.61"
-  resolved "https://registry.yarnpkg.com/pentf/-/pentf-1.0.61.tgz#8f8a474e7cf6eb74b089b78f19eab52d5fa5929f"
-  integrity sha512-wLb6dCn5ZY8NOmJl3Jlw10WBTIe7MWmFjffaGyvm9MkArJA50sp6zuSgA2pRUuO+kpLCwITeYTqYcjuRIAzy+Q==
+pentf@^1.0.64:
+  version "1.0.64"
+  resolved "https://registry.yarnpkg.com/pentf/-/pentf-1.0.64.tgz#74a6068ad214d0920430eaddac49c4468a7332da"
+  integrity sha512-HTGXNJSYk8rY6oJVDqd4w/KoQwbj0GQoWew82UheY8ocLU5sX67OyGXWaVMqrVqH2HHF8JwpRH5X42fkQJB4zg==
   dependencies:
     "@types/glob" "^7.1.1"
     "@types/puppeteer" "^2.0.1"

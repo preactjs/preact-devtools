@@ -54,7 +54,7 @@
 		"lint-staged": "^10.1.6",
 		"mkdirp": "^1.0.4",
 		"mochette": "^1.0.0",
-		"pentf": "^1.0.61",
+		"pentf": "^1.0.64",
 		"preact": "^10.4.1",
 		"prettier": "^2.0.4",
 		"puppeteer": "^3.0.0",
