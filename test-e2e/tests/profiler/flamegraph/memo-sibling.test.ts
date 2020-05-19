@@ -1,10 +1,10 @@
 import {
 	newTestPage,
 	click,
-	waitForAttribute,
 	getSize,
 	typeText,
 	clickTab,
+	clickRecordButton,
 } from "../../../test-utils";
 import { expect } from "chai";
 import { closePage, clickTestId, waitForTestId } from "pentf/browser_utils";
@@ -39,14 +39,9 @@ export async function run(config: any) {
 
 	await clickTab(devtools, "PROFILER");
 
-	const recordBtn = '[data-testid="record-btn"]';
-	await click(devtools, recordBtn);
-
-	await waitForAttribute(devtools, recordBtn, "title", /Stop Recording/);
-
+	await clickRecordButton(devtools);
 	await click(page, "button");
-
-	await click(devtools, recordBtn);
+	await clickRecordButton(devtools);
 
 	const nodes = await getFlameNodes(devtools);
 	expect(nodes).to.deep.equal([

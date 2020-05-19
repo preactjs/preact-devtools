@@ -1,8 +1,9 @@
 import {
 	newTestPage,
 	click,
-	waitForAttribute,
 	clickNestedText,
+	clickTab,
+	clickRecordButton,
 } from "../../../test-utils";
 import { expect } from "chai";
 import { closePage } from "pentf/browser_utils";
@@ -25,18 +26,15 @@ export const description = "Focus nodes in ranked layout";
 export async function run(config: any) {
 	const { page, devtools } = await newTestPage(config, "profiler-3");
 
-	await click(devtools, '[name="root-panel"][value="PROFILER"]');
+	await clickTab(devtools, "PROFILER");
 	await click(devtools, '[name="flamegraph_mode"][value="RANKED"]');
 
-	const recordBtn = '[data-testid="record-btn"]';
-	await click(devtools, recordBtn);
-
-	await waitForAttribute(devtools, recordBtn, "title", /Stop Recording/);
+	await clickRecordButton(devtools);
 
 	await click(page, "button");
 	await click(page, "button");
 
-	await click(devtools, recordBtn);
+	await clickRecordButton(devtools);
 
 	// Initially only the top node should be focused.
 	expect(await getFlameNodes(devtools)).to.deep.equal([

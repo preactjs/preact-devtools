@@ -2,7 +2,9 @@ const { h, render, Component } = preact;
 const { useMemo, useState } = preactHooks;
 
 function Display(props) {
-	return html` <div data-testid="result">Counter: ${props.value}</div> `;
+	return html`
+		<div data-testid="${props.testid}">Counter: ${props.value}</div>
+	`;
 }
 
 function Memoed() {
@@ -20,7 +22,7 @@ class ComponentState extends Component {
 		const v = this.state.value;
 		return html`
 			<div style="padding: 2rem;">
-				<${Display} value=${v} />
+				<${Display} value=${v} testid="result-1" />
 				<${MemoParent} />
 				<button
 					data-testid="counter-1"
@@ -38,7 +40,7 @@ function HookState() {
 
 	return html`
 		<div style="padding: 2rem;">
-			<${Display} value=${v} />
+			<${Display} value=${v} testid="result-2" />
 			<${MemoParent} />
 			<button data-testid="counter-2" onClick=${() => set(v + 1)}>
 				Increment hook state

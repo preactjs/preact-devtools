@@ -1,8 +1,9 @@
 import {
 	newTestPage,
 	click,
-	waitForAttribute,
 	getText,
+	clickTab,
+	clickRecordButton,
 } from "../../../test-utils";
 import { expect } from "chai";
 import { closePage } from "pentf/browser_utils";
@@ -13,18 +14,13 @@ export const description =
 export async function run(config: any) {
 	const { page, devtools } = await newTestPage(config, "profiler-1");
 
-	await click(devtools, '[name="root-panel"][value="PROFILER"]');
+	await clickTab(devtools, "PROFILER");
 	await click(devtools, '[name="flamegraph_mode"][value="RANKED"]');
 
-	const recordBtn = '[data-testid="record-btn"]';
-	await click(devtools, recordBtn);
-
-	await waitForAttribute(devtools, recordBtn, "title", /Stop Recording/);
-
+	await clickRecordButton(devtools);
 	await click(page, "button");
 	await click(page, "button");
-
-	await click(devtools, recordBtn);
+	await clickRecordButton(devtools);
 
 	const nodes = await devtools.$$(
 		'[data-type="ranked"] > *:not([data-weight])',
