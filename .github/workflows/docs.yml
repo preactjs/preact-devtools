@@ -1,0 +1,31 @@
+name: Generate documentation
+
+on:
+  create:
+    tags:
+      - v*
+
+jobs:
+  doc:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v2
+        with:
+          persist-credentials: false
+          ref: gh-pages
+        env:
+          GIT_TRACE: 1
+          GIT_CURL_VERBOSE: 1
+
+      - name: Build documentation
+        run: |
+          PKG_VERSION=$(curl -s https://api.github.com/repos/preactjs/preact-devtools/releases/latest | jq -r '.tag_name')
+          echo $PKG_VERSION
+          sed -i -- "s/PKG_VERSION/$PKG_VERSION/g" index.html
+
+      - name: Upload to gh-pages
+        uses: peaceiris/actions-gh-pages@v3
+        with:
+          github_token: ${{ secrets.GITHUB_TOKEN }}
+          publish_dir: .
