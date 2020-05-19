@@ -7,6 +7,14 @@ import { useResize } from "../../utils";
 import { RankedLayout } from "./ranked/RankedLayout";
 import { FlamegraphLayout } from "./modes/FlamegraphLayout";
 import { EMPTY } from "./placeNodes";
+import { debounce } from "../../../../shells/shared/utils";
+import { EmitFn } from "../../../../adapter/hook";
+import { ID } from "../../../store/types";
+
+const highlightNode = debounce(
+	(notify: EmitFn, id: ID | null) => notify("highlight", id),
+	100,
+);
 
 export function FlameGraph() {
 	const store = useStore();
@@ -38,6 +46,14 @@ export function FlameGraph() {
 		[store],
 	);
 
+	const onMouseEnter = useCallback((id: ID) => {
+		highlightNode(store.notify, id);
+	}, []);
+
+	const onMouseLeave = useCallback(() => {
+		highlightNode(store.notify, null);
+	}, []);
+
 	if (isRecording || !commit) return null;
 
 	return (
@@ -53,6 +69,8 @@ export function FlameGraph() {
 					commit={commit!}
 					onSelect={onSelect}
 					selected={selected}
+					onMouseEnter={onMouseEnter}
+					onMouseLeave={onMouseLeave}
 				/>
 			) : (
 				<FlamegraphLayout
@@ -60,6 +78,8 @@ export function FlameGraph() {
 					commit={commit!}
 					onSelect={onSelect}
 					selected={selected}
+					onMouseEnter={onMouseEnter}
+					onMouseLeave={onMouseLeave}
 				/>
 			)}
 		</div>

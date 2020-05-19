@@ -12,6 +12,8 @@ export interface RankedLayoutProps {
 	selected: DevNode;
 	canvasWidth: number;
 	onSelect: (id: ID) => void;
+	onMouseEnter: (id: ID) => void;
+	onMouseLeave: () => void;
 }
 
 /**
@@ -24,6 +26,8 @@ export function RankedLayout({
 	commit,
 	selected,
 	onSelect,
+	onMouseEnter,
+	onMouseLeave,
 }: RankedLayoutProps) {
 	// Convert node tree to position data
 	const store = useStore();
@@ -63,6 +67,9 @@ export function RankedLayout({
 						selected={pos.id === selected.id}
 						parentId={selected.parent}
 						onClick={onSelect}
+						name={node.name}
+						onMouseEnter={onMouseEnter}
+						onMouseLeave={onMouseLeave}
 					>
 						{text}
 					</FlameNode>
