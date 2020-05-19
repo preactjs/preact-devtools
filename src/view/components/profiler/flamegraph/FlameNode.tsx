@@ -9,19 +9,24 @@ export interface Props {
 	children: any;
 	parentId: number;
 	commitRootId: number;
+	name: string;
 	onClick: (id: ID) => void;
 	node: NodeTransform;
+	onMouseEnter: (id: ID) => void;
+	onMouseLeave: () => void;
 }
 
 const ROW_HEIGHT = 21; // Account 1px for border
 const MIN_TEXT_WIDTH = 32; // Don't show text if smaller than this value
 
 export function FlameNode(props: Props) {
-	const { onClick, selected, node } = props;
+	const { onClick, selected, node, onMouseEnter, onMouseLeave, name } = props;
+
 	const transform = useRef("");
 	const widthCss = useRef("");
 
 	const onRawClick = useCallback(() => onClick(node.id), [node.id]);
+	const onRawMouseEnter = useCallback(() => onMouseEnter(node.id), [node.id]);
 
 	const { visible, width, x } = node;
 
@@ -35,6 +40,8 @@ export function FlameNode(props: Props) {
 		<div
 			class={s.node}
 			onClick={onRawClick}
+			onMouseEnter={onRawMouseEnter}
+			onMouseLeave={onMouseLeave}
 			data-id={node.id}
 			data-commit-root={props.commitRootId}
 			data-active-commit-root={node.id === props.commitRootId}
@@ -45,6 +52,7 @@ export function FlameNode(props: Props) {
 			data-maximized={node.maximized}
 			data-selected={selected}
 			data-overflow={width < MIN_TEXT_WIDTH}
+			data-name={name}
 			style={`height: ${ROW_HEIGHT}px; ${transform.current} ${widthCss.current}`}
 		>
 			<span class={s.text} style={widthCss.current}>

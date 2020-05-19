@@ -12,6 +12,8 @@ export interface FlamegraphLayoutProps {
 	selected: DevNode;
 	canvasWidth: number;
 	onSelect: (id: ID) => void;
+	onMouseEnter: (id: ID) => void;
+	onMouseLeave: () => void;
 }
 
 export function FlamegraphLayout({
@@ -19,6 +21,8 @@ export function FlamegraphLayout({
 	selected,
 	canvasWidth,
 	onSelect,
+	onMouseEnter,
+	onMouseLeave,
 }: FlamegraphLayoutProps) {
 	const store = useStore();
 	const data = useObserver(() => store.profiler.flamegraphNodes.$);
@@ -51,8 +55,11 @@ export function FlamegraphLayout({
 				return (
 					<FlameNode
 						key={pos.id}
+						onMouseEnter={onMouseEnter}
+						onMouseLeave={onMouseLeave}
 						commitRootId={commit.commitRootId}
 						node={pos}
+						name={node.name}
 						selected={pos.id === selected.id}
 						parentId={commit.nodes.get(pos.id)!.parent}
 						onClick={onSelect}
