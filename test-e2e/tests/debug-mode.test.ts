@@ -4,6 +4,7 @@ import {
 	clickTab,
 	getAttribute,
 	checkNotPresent,
+	clickRecordButton,
 } from "../test-utils";
 import { expect } from "chai";
 import { closePage, clickText } from "pentf/browser_utils";
@@ -26,13 +27,10 @@ export async function run(config: any) {
 
 	// Start profiling
 	await clickTab(devtools, "PROFILER");
-	const recordBtn = '[data-testid="record-btn"]';
-	await click(devtools, recordBtn);
-
+	await clickRecordButton(devtools);
 	await click(page, "button");
 	await click(page, "button");
-
-	await click(devtools, recordBtn);
+	await clickRecordButton(devtools);
 	await clickText(devtools, "Counter", { elementXPath: "//*" });
 
 	await checkNotPresent(devtools, '[data-testid="profiler-debug-stats"]');

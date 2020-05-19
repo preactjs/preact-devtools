@@ -1,7 +1,6 @@
 import { newTestPage, getAttribute, getText, typeText } from "../test-utils";
 import { expect } from "chai";
 import { clickText, closePage } from "pentf/browser_utils";
-import { wait } from "pentf/utils";
 
 export const description = "Mirror component state to the devtools";
 
@@ -10,10 +9,9 @@ export async function run(config: any) {
 
 	await clickText(devtools, "Display", { elementXPath: "//*" });
 
-	// Wait until inspection result is ready
-	await wait(100);
-
 	const input = '[data-testid="props-row"] input';
+	await devtools.waitForSelector(input, { timeout: 3000 });
+
 	await typeText(devtools, input, "42");
 	await page.keyboard.press("Enter");
 

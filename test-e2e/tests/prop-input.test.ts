@@ -36,6 +36,8 @@ async function enterText(
 	await click(page, "button");
 	await clickNestedText(devtools, "Display");
 	await checkNotPresent(devtools, '[data-testid="undo-btn"]');
+
+	await devtools.waitForSelector(selector, { timeout: 3000 });
 	await typeText(devtools, selector, text);
 	await page.keyboard.press("Enter");
 	await clickNestedText(page, "Counter");

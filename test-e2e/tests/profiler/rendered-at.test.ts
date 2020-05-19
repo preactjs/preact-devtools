@@ -1,10 +1,11 @@
 import {
 	newTestPage,
 	click,
-	waitForAttribute,
 	clickNestedText,
 	getCount,
 	getAttribute$$,
+	clickTab,
+	clickRecordButton,
 } from "../../test-utils";
 import { expect } from "chai";
 import { closePage } from "pentf/browser_utils";
@@ -14,19 +15,16 @@ export const description = "Show in which commit a node rendered";
 export async function run(config: any) {
 	const { page, devtools } = await newTestPage(config, "root-multi");
 
-	await click(devtools, '[name="root-panel"][value="PROFILER"]');
+	await clickTab(devtools, "PROFILER");
 
-	const recordBtn = '[data-testid="record-btn"]';
-	await click(devtools, recordBtn);
-
-	await waitForAttribute(devtools, recordBtn, "title", /Stop Recording/);
+	await clickRecordButton(devtools);
 
 	await click(page, "#app button");
 	await click(page, "#app2 button");
 	await click(page, "#app button");
 	await click(page, "#app2 button");
 
-	await click(devtools, recordBtn);
+	await clickRecordButton(devtools);
 
 	await clickNestedText(devtools, "Counter");
 	await devtools.waitForSelector('[data-testid="rendered-at"]');

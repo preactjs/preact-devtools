@@ -4,6 +4,7 @@ import {
 	getText,
 	clickTab,
 	getAttribute,
+	clickRecordButton,
 } from "../../test-utils";
 import { expect } from "chai";
 import { closePage, clickText } from "pentf/browser_utils";
@@ -26,14 +27,13 @@ export async function run(config: any) {
 
 	// Start profiling
 	await clickTab(devtools, "PROFILER");
-	const recordBtn = '[data-testid="record-btn"]';
-	await click(devtools, recordBtn);
+	await clickRecordButton(devtools);
 
 	await click(page, '[data-testid="counter-1"]');
 	await click(page, '[data-testid="counter-2"]');
 	await wait(1000);
 
-	await click(devtools, recordBtn);
+	await clickRecordButton(devtools);
 
 	await clickText(devtools, "ComponentState", { elementXPath: "//*" });
 	let reasons = await getText(devtools, '[data-testid="render-reasons"');
@@ -51,7 +51,7 @@ export async function run(config: any) {
 	const text = await getText(devtools, '[data-testid="profiler-info"]');
 	expect(text).to.match(/Profiling in progress/);
 
-	await click(devtools, recordBtn);
+	await clickRecordButton(devtools);
 
 	await clickTab(devtools, "SETTINGS");
 	expect(

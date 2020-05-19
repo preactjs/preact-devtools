@@ -1,8 +1,9 @@
 import {
 	newTestPage,
 	click,
-	waitForAttribute,
 	getText$$,
+	clickTab,
+	clickRecordButton,
 } from "../../../test-utils";
 import { expect } from "chai";
 import { closePage } from "pentf/browser_utils";
@@ -13,16 +14,10 @@ export const description =
 export async function run(config: any) {
 	const { page, devtools } = await newTestPage(config, "profiler-2");
 
-	await click(devtools, '[name="root-panel"][value="PROFILER"]');
-
-	const recordBtn = '[data-testid="record-btn"]';
-	await click(devtools, recordBtn);
-
-	await waitForAttribute(devtools, recordBtn, "title", /Stop Recording/);
-
+	await clickTab(devtools, "PROFILER");
+	await clickRecordButton(devtools);
 	await click(page, "button");
-
-	await click(devtools, recordBtn);
+	await clickRecordButton(devtools);
 
 	let nodes = await getText$$(
 		devtools,

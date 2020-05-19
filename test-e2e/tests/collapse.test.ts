@@ -1,4 +1,4 @@
-import { newTestPage, click, getLog, waitFor } from "../test-utils";
+import { newTestPage, click, getLog, waitFor, clickTab } from "../test-utils";
 import { expect } from "chai";
 import { closePage, clickText } from "pentf/browser_utils";
 
@@ -55,9 +55,9 @@ export async function run(config: any) {
 	expect((await devtools.$$(selector)).length).to.equal(0);
 
 	// Switching to Profiler and back should not change collapse state
-	await click(devtools, '[name="root-panel"][value="PROFILER"]');
+	await clickTab(devtools, "PROFILER");
 	await devtools.waitForSelector('[data-testid="record-btn"]');
-	await click(devtools, '[name="root-panel"][value="ELEMENTS"]');
+	await clickTab(devtools, "ELEMENTS");
 
 	// Our input should still be visible
 	expect((await devtools.$$(row)).length > 0).to.equal(true);
