@@ -267,6 +267,19 @@ export async function clickTab(
 	}, tab);
 }
 
+export async function clickRecordButton(page: Page) {
+	const selector = '[data-testid="record-btn"]';
+	const start = /Start/.test(await getAttribute(page, selector, "title"));
+	await click(page, selector);
+
+	await waitForAttribute(
+		page,
+		selector,
+		"title",
+		start ? /Stop Recording/ : /Start Recording/,
+	);
+}
+
 // This injects a box into the page that moves with the mouse;
 // Useful for debugging
 export async function installMouseHelper(page: Page) {
