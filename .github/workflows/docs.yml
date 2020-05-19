@@ -1,6 +1,9 @@
 name: Generate documentation
 
-on: [push]
+on:
+  create:
+    tags:
+      - v*
 
 jobs:
   doc:
