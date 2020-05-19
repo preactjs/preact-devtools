@@ -32,7 +32,9 @@ export function ops2Tree(oldTree: Tree, ops: number[]) {
 				const parentId = ops[i + 3];
 				const parent = pending.get(parentId);
 				if (parent) {
-					parent.children.push(id);
+					const clone = deepClone(parent);
+					pending.set(parent.id, clone);
+					clone.children.push(id);
 				}
 
 				pending.set(id, {
@@ -72,7 +74,11 @@ export function ops2Tree(oldTree: Tree, ops: number[]) {
 						const parent = pending.get(node.parent);
 						if (parent) {
 							const idx = parent.children.indexOf(nodeId);
-							if (idx > -1) parent.children.splice(idx, 1);
+							if (idx > -1) {
+								const clone = deepClone(parent);
+								pending.set(parent.id, clone);
+								clone.children.splice(idx, 1);
+							}
 						}
 
 						pending.delete(nodeId);
