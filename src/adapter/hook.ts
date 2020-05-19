@@ -27,6 +27,8 @@ export interface DevtoolEvents {
 	"start-profiling": ProfilerOptions;
 	"stop-profiling": null;
 	"clear-profiling": null;
+	"start-highlight-updates": null;
+	"stop-highlight-updates": null;
 	"reload-and-profile": ProfilerOptions;
 	"update-filter": RawFilterState;
 	copy: string;

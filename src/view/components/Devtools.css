@@ -62,6 +62,7 @@ input {
 :global(.light) .theme {
 	--color-bg: white;
 	--color-text: #333;
+	--color-text-stronger: #111;
 	--color-disabled: #dedede;
 	--color-panelbar-bg: #f7f7f7;
 	--color-selected-bg: #8058ca;
@@ -138,6 +139,7 @@ input {
 :global(.dark) .theme {
 	--color-bg: #242424;
 	--color-text: #b0b0b0;
+	--color-text-stronger: #dcdcdc;
 	--color-disabled: #575757;
 	--color-panelbar-bg: #373737;
 	--color-selected-bg: #ae80ff;

@@ -40,6 +40,13 @@ import {
 import { logVNode } from "./renderer/logVNode";
 import { inspectVNode } from "./renderer/inspectVNode";
 import { getRenderReason, RenderReason } from "./renderer/renderReasons";
+import {
+	UpdateRects,
+	measureUpdate,
+	draw,
+	createUpdateCanvas,
+	destroyCanvas,
+} from "../adapter/highlightUpdates";
 
 export interface RendererConfig10 {
 	Fragment: FunctionalComponent;
@@ -153,6 +160,13 @@ export function mount(
 			commit.operations.push(MsgTypes.RENDER_REASON, id, RenderReason.MOUNT, 0);
 		}
 
+		if (profiler.highlightUpdates && typeof vnode.type === "function") {
+			const dom = getDom(vnode);
+			if (dom) {
+				measureUpdate(profiler.updateRects, id, dom);
+			}
+		}
+
 		ancestorId = id;
 	}
 
@@ -261,6 +275,13 @@ export function update(
 		}
 	}
 
+	if (profiler.highlightUpdates && typeof vnode.type === "function") {
+		const dom = getDom(vnode);
+		if (dom) {
+			measureUpdate(profiler.updateRects, id, dom);
+		}
+	}
+
 	const oldChildren = oldVNode
 		? getActualChildren(oldVNode).map((v: any) => v && getVNodeId(ids, v))
 		: [];
@@ -341,6 +362,9 @@ export interface Preact10Renderer extends Renderer {
 
 export interface ProfilerState {
 	isProfiling: boolean;
+	highlightUpdates: boolean;
+	updateRects: UpdateRects;
+	container: HTMLDivElement | null;
 	captureRenderReasons: boolean;
 }
 
@@ -366,6 +390,9 @@ export function createRenderer(
 
 	const profiler: ProfilerState = {
 		isProfiling: false,
+		highlightUpdates: false,
+		updateRects: new Map(),
+		container: null,
 		captureRenderReasons: false,
 	};
 
@@ -373,6 +400,18 @@ export function createRenderer(
 		// TODO: Deprecate
 		// eslint-disable-next-line @typescript-eslint/no-empty-function
 		flushInitial() {},
+
+		startHighlightUpdates() {
+			profiler.highlightUpdates = true;
+			profiler.container = createUpdateCanvas();
+			document.body.appendChild(profiler.container);
+		},
+		stopHighlightUpdates() {
+			profiler.highlightUpdates = false;
+			destroyCanvas(profiler.container);
+			if (profiler.container) profiler.container.remove();
+			profiler.updateRects.clear();
+		},
 
 		startProfiling: options => {
 			profiler.isProfiling = true;
@@ -510,6 +549,13 @@ export function createRenderer(
 			currentUnmounts = [];
 			const ev = flush(commit);
 			if (!ev) return;
+
+			if (profiler.updateRects.size > 0 && profiler.container) {
+				const canvas = profiler.container.querySelector("canvas")!;
+				if (canvas) {
+					draw(canvas, profiler.updateRects);
+				}
+			}
 
 			port.send(ev.type as any, ev.data);
 		},

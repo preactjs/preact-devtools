@@ -139,4 +139,15 @@ export function createAdapter(port: PortPageHook, renderer: Renderer) {
 			console.log(err);
 		}
 	});
+
+	listen("start-highlight-updates", () => {
+		if (renderer.startHighlightUpdates) {
+			renderer.startHighlightUpdates();
+		}
+	});
+	listen("stop-highlight-updates", () => {
+		if (renderer.stopHighlightUpdates) {
+			renderer.stopHighlightUpdates();
+		}
+	});
 }

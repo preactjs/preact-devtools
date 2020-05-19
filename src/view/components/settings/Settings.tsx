@@ -13,6 +13,7 @@ export function Settings() {
 	const renderReasons = useObserver(
 		() => store.profiler.captureRenderReasons.$,
 	);
+	const showUpdates = useObserver(() => store.profiler.highlightUpdates.$);
 	const debugMode = useObserver(() => store.debugMode.$);
 
 	const setTheme = useCallback((v: Theme) => (store.theme.$ = v), []);
@@ -32,6 +33,26 @@ export function Settings() {
 					]}
 				/>
 				<h2>Profiler</h2>
+				<Checkbox
+					checked={showUpdates}
+					onChange={() => {
+						const value = !store.profiler.highlightUpdates.$;
+						store.profiler.highlightUpdates.$ = value;
+						store.notify(
+							value ? "start-highlight-updates" : "stop-highlight-updates",
+							null,
+						);
+					}}
+					testId="toggle-show-updates"
+				>
+					Highlight updates
+				</Checkbox>
+				<div>
+					<p class={s.description}>
+						Visualize updates by highlighting each component that updated in the
+						page.
+					</p>
+				</div>
 				<Checkbox
 					checked={renderReasons}
 					onChange={() => store.profiler.setRenderReasonCapture(!renderReasons)}

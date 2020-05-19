@@ -41,6 +41,9 @@ export interface ProfilerState {
 	captureRenderReasons: Observable<boolean>;
 	setRenderReasonCapture: (v: boolean) => void;
 
+	// Highlight updates
+	highlightUpdates: Observable<boolean>;
+
 	/**
 	 * Flag that indicates if we are currently
 	 * recording commits to be displayed in the
@@ -82,6 +85,9 @@ export function createProfiler(): ProfilerState {
 	const setRenderReasonCapture = (v: boolean) => {
 		captureRenderReasons.$ = v;
 	};
+
+	// Highlight updates
+	const showUpdates = valoo(false);
 
 	// Selection
 	const activeCommitIdx = valoo(0);
@@ -174,6 +180,7 @@ export function createProfiler(): ProfilerState {
 		supportsRenderReasons,
 		captureRenderReasons,
 		setRenderReasonCapture,
+		highlightUpdates: showUpdates,
 		isSupported,
 		isRecording,
 		commits,
