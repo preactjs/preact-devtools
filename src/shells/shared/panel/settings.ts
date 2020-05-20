@@ -11,7 +11,7 @@ export async function loadSettings(window: Window, store: Store) {
 	try {
 		const settings: any = await new Promise(res => {
 			chrome.storage.sync.get(
-				["theme", "captureRenderReasons", "debugMode"],
+				["theme", "captureRenderReasons", "debugMode", "highlightUpdates"],
 				res,
 			);
 		});
@@ -21,6 +21,7 @@ export async function loadSettings(window: Window, store: Store) {
 				store.theme.$ = settings.theme;
 			}
 			store.profiler.captureRenderReasons.$ = !!settings.captureRenderReasons;
+			store.profiler.highlightUpdates.$ = !!settings.highlightUpdates;
 			store.debugMode.$ = !!settings.debugMode;
 		}
 	} catch (e) {
@@ -61,4 +62,11 @@ export function storeCaptureRenderReasons(enabled: boolean) {
  */
 export function storeDebugMode(enabled: boolean) {
 	store({ debugMode: enabled });
+}
+
+/**
+ * Visualize updates on the page.
+ */
+export function storeHighlightUpdates(enabled: boolean) {
+	store({ highlightUpdates: enabled });
 }

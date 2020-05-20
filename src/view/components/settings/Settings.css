@@ -18,3 +18,10 @@ h2 {
 	margin-left: 1.25rem;
 	margin-top: 0.5rem;
 }
+
+.description {
+	margin-left: 1.25rem;
+	margin-top: 0.25rem !important;
+	margin-bottom: 2rem;
+	font-size: 0.9rem;
+}

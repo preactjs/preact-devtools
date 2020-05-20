@@ -21,7 +21,7 @@ export function Checkbox(props: CheckboxProps) {
 				/>
 				{props.checked ? <CheckboxChecked /> : <CheckboxUnChecked />}
 			</span>
-			{props.children}
+			<span class={s.content}>{props.children}</span>
 		</label>
 	);
 }

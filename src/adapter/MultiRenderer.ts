@@ -30,6 +30,16 @@ export function createMultiRenderer(
 		stopProfiling() {
 			renderers.forEach(r => r.stopProfiling && r.stopProfiling());
 		},
+		startHighlightUpdates() {
+			renderers.forEach(
+				r => r.startHighlightUpdates && r.startHighlightUpdates(),
+			);
+		},
+		stopHighlightUpdates() {
+			renderers.forEach(
+				r => r.stopHighlightUpdates && r.stopHighlightUpdates(),
+			);
+		},
 		has(id) {
 			return getRendererByVNodeId(renderers, id) !== null;
 		},

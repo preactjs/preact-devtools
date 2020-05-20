@@ -24,3 +24,7 @@
 .checkbox input:checked + svg {
 	color: var(--color-selected-bg);
 }
+
+.content {
+	color: var(--color-text-stronger);
+}

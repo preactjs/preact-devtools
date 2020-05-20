@@ -40,6 +40,11 @@ import {
 import { logVNode } from "./renderer/logVNode";
 import { inspectVNode } from "./renderer/inspectVNode";
 import { getRenderReason, RenderReason } from "./renderer/renderReasons";
+import {
+	UpdateRects,
+	measureUpdate,
+	startDrawing,
+} from "../adapter/highlightUpdates";
 
 export interface RendererConfig10 {
 	Fragment: FunctionalComponent;
@@ -153,6 +158,14 @@ export function mount(
 			commit.operations.push(MsgTypes.RENDER_REASON, id, RenderReason.MOUNT, 0);
 		}
 
+		if (profiler.highlightUpdates && typeof vnode.type === "function") {
+			const dom = getDom(vnode);
+			if (dom && !profiler.pendingHighlightUpdates.has(dom)) {
+				profiler.pendingHighlightUpdates.add(dom);
+				measureUpdate(profiler.updateRects, dom);
+			}
+		}
+
 		ancestorId = id;
 	}
 
@@ -261,6 +274,14 @@ export function update(
 		}
 	}
 
+	if (profiler.highlightUpdates && typeof vnode.type === "function") {
+		const dom = getDom(vnode);
+		if (dom && !profiler.pendingHighlightUpdates.has(dom)) {
+			profiler.pendingHighlightUpdates.add(dom);
+			measureUpdate(profiler.updateRects, dom);
+		}
+	}
+
 	const oldChildren = oldVNode
 		? getActualChildren(oldVNode).map((v: any) => v && getVNodeId(ids, v))
 		: [];
@@ -341,6 +362,9 @@ export interface Preact10Renderer extends Renderer {
 
 export interface ProfilerState {
 	isProfiling: boolean;
+	highlightUpdates: boolean;
+	pendingHighlightUpdates: Set<HTMLElement>;
+	updateRects: UpdateRects;
 	captureRenderReasons: boolean;
 }
 
@@ -366,6 +390,9 @@ export function createRenderer(
 
 	const profiler: ProfilerState = {
 		isProfiling: false,
+		highlightUpdates: false,
+		updateRects: new Map(),
+		pendingHighlightUpdates: new Set(),
 		captureRenderReasons: false,
 	};
 
@@ -373,6 +400,15 @@ export function createRenderer(
 		// TODO: Deprecate
 		// eslint-disable-next-line @typescript-eslint/no-empty-function
 		flushInitial() {},
+
+		startHighlightUpdates() {
+			profiler.highlightUpdates = true;
+		},
+		stopHighlightUpdates() {
+			profiler.highlightUpdates = false;
+			profiler.updateRects.clear();
+			profiler.pendingHighlightUpdates.clear();
+		},
 
 		startProfiling: options => {
 			profiler.isProfiling = true;
@@ -510,6 +546,11 @@ export function createRenderer(
 			currentUnmounts = [];
 			const ev = flush(commit);
 			if (!ev) return;
+
+			if (profiler.updateRects.size > 0) {
+				startDrawing(profiler.updateRects);
+				profiler.pendingHighlightUpdates.clear();
+			}
 
 			port.send(ev.type as any, ev.data);
 		},
