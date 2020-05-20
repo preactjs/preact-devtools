@@ -77,7 +77,7 @@ export function drawRect(ctx: CanvasRenderingContext2D, data: UpdateRect) {
 	// Inset
 	ctx.lineWidth = 1;
 	ctx.strokeStyle = OUTLINE_COLOR;
-	ctx.strokeRect(data.x + 1, data.y + 1, data.width - 1, data.height - 1);
+	ctx.strokeRect(data.x + 1, data.y + 1, data.width - 2, data.height - 2);
 
 	// Border
 	ctx.strokeStyle = COLORS[colorIndex];
