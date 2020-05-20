@@ -1,16 +1,33 @@
-import { ID } from "../../view/store/types";
 import { render, h } from "preact";
 import { CanvasHighlight } from "../../view/components/CanvasHighlight/CanvasHighlight";
+
+const DISPLAY_DURATION = 250;
+const MAX_DISPLAY_DURATION = 3000;
+
+const OUTLINE_COLOR = "#f0f0f0";
+const COLORS = [
+	"#37afa9",
+	"#63b19e",
+	"#80b393",
+	"#97b488",
+	"#abb67d",
+	"#beb771",
+	"#cfb965",
+	"#dfba57",
+	"#efbb49",
+	"#febc38",
+];
 
 export interface UpdateRect {
 	x: number;
 	y: number;
 	width: number;
 	height: number;
-	weight: number;
+	count: number;
+	expirationTime: number;
 }
 
-export type UpdateRects = Map<ID, UpdateRect>;
+export type UpdateRects = Map<HTMLElement, UpdateRect>;
 
 export function createUpdateCanvas() {
 	const div = document.createElement("div");
@@ -27,42 +44,69 @@ export function destroyCanvas(container: HTMLDivElement | null) {
 	}
 }
 
-export function measureUpdate(
-	updates: UpdateRects,
-	id: ID,
-	dom: HTMLElement,
-): UpdateRect {
-	if (!updates.has(id)) {
-		updates.set(id, {
-			height: 0,
-			width: 0,
-			x: 0,
-			y: 0,
-			weight: 0,
-		});
-	}
-
-	const data = updates.get(id)!;
+export function measureUpdate(updates: UpdateRects, dom: HTMLElement) {
+	const data = updates.get(dom);
 	const rect = dom.getBoundingClientRect();
 
-	data.height = rect.height;
-	data.width = rect.width;
-	data.x = rect.x;
-	data.y = rect.y;
-	data.weight += 1;
+	const now = performance.now();
+	const expirationTime = data
+		? Math.min(
+				now + MAX_DISPLAY_DURATION,
+				data.expirationTime + DISPLAY_DURATION,
+		  )
+		: now + DISPLAY_DURATION;
 
-	return data;
+	updates.set(dom, {
+		expirationTime,
+		height: rect.height,
+		width: rect.width,
+		x: rect.x,
+		y: rect.y,
+		count: data ? data.count + 1 : 1,
+	});
 }
 
+export function drawRect(ctx: CanvasRenderingContext2D, data: UpdateRect) {
+	const colorIndex = Math.min(COLORS.length - 1, data.count - 1);
+
+	// Outline
+	ctx.lineWidth = 1;
+	ctx.strokeStyle = OUTLINE_COLOR;
+	ctx.strokeRect(data.x - 1, data.y - 1, data.width + 2, data.height + 2);
+
+	// Inset
+	ctx.lineWidth = 1;
+	ctx.strokeStyle = OUTLINE_COLOR;
+	ctx.strokeRect(data.x + 1, data.y + 1, data.width - 1, data.height - 1);
+
+	// Border
+	ctx.strokeStyle = COLORS[colorIndex];
+	ctx.lineWidth = 1;
+	ctx.strokeRect(data.x, data.y, data.width, data.height);
+}
+
+let timer: NodeJS.Timeout;
 export function draw(canvas: HTMLCanvasElement, updates: UpdateRects) {
 	if (!canvas.getContext) return;
+	if (timer) clearTimeout(timer);
 
 	const ctx = canvas.getContext("2d");
 	if (!ctx) return;
 
-	updates.forEach(v => {
-		ctx.strokeStyle = "red";
-		ctx.lineWidth = 2;
-		ctx.strokeRect(v.x, v.y, v.width, v.height);
+	ctx.clearRect(0, 0, canvas.width, canvas.height);
+
+	const now = performance.now();
+	let nextRedraw = Number.MAX_SAFE_INTEGER;
+	updates.forEach((data, key) => {
+		if (data.expirationTime < now) {
+			updates.delete(key);
+		} else {
+			drawRect(ctx, data);
+			nextRedraw = Math.min(nextRedraw, data.expirationTime);
+		}
 	});
+
+	if (nextRedraw !== Number.MAX_SAFE_INTEGER) {
+		timer = setTimeout(() => draw(canvas, updates), nextRedraw - now);
+	}
 }

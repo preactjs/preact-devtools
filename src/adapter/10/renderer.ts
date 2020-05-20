@@ -162,8 +162,9 @@ export function mount(
 
 		if (profiler.highlightUpdates && typeof vnode.type === "function") {
 			const dom = getDom(vnode);
-			if (dom) {
-				measureUpdate(profiler.updateRects, id, dom);
+			if (dom && !profiler.pendingHighlightUpdates.has(dom)) {
+				profiler.pendingHighlightUpdates.add(dom);
+				measureUpdate(profiler.updateRects, dom);
 			}
 		}
 
@@ -277,8 +278,9 @@ export function update(
 
 	if (profiler.highlightUpdates && typeof vnode.type === "function") {
 		const dom = getDom(vnode);
-		if (dom) {
-			measureUpdate(profiler.updateRects, id, dom);
+		if (dom && !profiler.pendingHighlightUpdates.has(dom)) {
+			profiler.pendingHighlightUpdates.add(dom);
+			measureUpdate(profiler.updateRects, dom);
 		}
 	}
 
@@ -363,6 +365,7 @@ export interface Preact10Renderer extends Renderer {
 export interface ProfilerState {
 	isProfiling: boolean;
 	highlightUpdates: boolean;
+	pendingHighlightUpdates: Set<HTMLElement>;
 	updateRects: UpdateRects;
 	container: HTMLDivElement | null;
 	captureRenderReasons: boolean;
@@ -392,6 +395,7 @@ export function createRenderer(
 		isProfiling: false,
 		highlightUpdates: false,
 		updateRects: new Map(),
+		pendingHighlightUpdates: new Set(),
 		container: null,
 		captureRenderReasons: false,
 	};
@@ -411,6 +415,7 @@ export function createRenderer(
 			destroyCanvas(profiler.container);
 			if (profiler.container) profiler.container.remove();
 			profiler.updateRects.clear();
+			profiler.pendingHighlightUpdates.clear();
 		},
 
 		startProfiling: options => {
@@ -555,6 +560,7 @@ export function createRenderer(
 				if (canvas) {
 					draw(canvas, profiler.updateRects);
 				}
+				profiler.pendingHighlightUpdates.clear();
 			}
 
 			port.send(ev.type as any, ev.data);
