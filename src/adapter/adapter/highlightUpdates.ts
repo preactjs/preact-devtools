@@ -29,21 +29,6 @@ export interface UpdateRect {
 
 export type UpdateRects = Map<HTMLElement, UpdateRect>;
 
-export function createUpdateCanvas() {
-	const div = document.createElement("div");
-	div.id = "preact-devtools-highlight-updates";
-
-	render(h(CanvasHighlight, null), div);
-	return div;
-}
-
-export function destroyCanvas(container: HTMLDivElement | null) {
-	if (container) {
-		render(null, container);
-		container.remove();
-	}
-}
-
 export function measureUpdate(updates: UpdateRects, dom: HTMLElement) {
 	const data = updates.get(dom);
 	const rect = dom.getBoundingClientRect();
@@ -86,8 +71,18 @@ export function drawRect(ctx: CanvasRenderingContext2D, data: UpdateRect) {
 }
 
 let timer: NodeJS.Timeout;
-export function draw(canvas: HTMLCanvasElement, updates: UpdateRects) {
-	if (!canvas.getContext) return;
+
+let container: HTMLDivElement | null = null;
+let canvas: HTMLCanvasElement | null = null;
+export function destroyCanvas() {
+	if (container) {
+		render(null, container);
+		container.remove();
+	}
+}
+
+function draw(updates: UpdateRects) {
+	if (!canvas || !canvas.getContext) return;
 	if (timer) clearTimeout(timer);
 
 	const ctx = canvas.getContext("2d");
@@ -107,6 +102,20 @@ export function draw(canvas: HTMLCanvasElement, updates: UpdateRects) {
 	});
 
 	if (nextRedraw !== Number.MAX_SAFE_INTEGER) {
-		timer = setTimeout(() => draw(canvas, updates), nextRedraw - now);
+		timer = setTimeout(() => draw(updates), nextRedraw - now);
+	} else {
+		destroyCanvas();
 	}
+}
+
+export function startDrawing(updateRects: UpdateRects) {
+	if (!canvas) {
+		container = document.createElement("div");
+		container.id = "preact-devtools-highlight-updates";
+		document.body.appendChild(container);
+
+		render(h(CanvasHighlight, null), container);
+		canvas = container.querySelector("canvas")!;
+	}
+	draw(updateRects);
 }

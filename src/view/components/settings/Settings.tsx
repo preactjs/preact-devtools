@@ -13,7 +13,7 @@ export function Settings() {
 	const renderReasons = useObserver(
 		() => store.profiler.captureRenderReasons.$,
 	);
-	const showUpdates = useObserver(() => store.profiler.highlightUpdates.$);
+	const highlightUpdates = useObserver(() => store.profiler.highlightUpdates.$);
 	const debugMode = useObserver(() => store.debugMode.$);
 
 	const setTheme = useCallback((v: Theme) => (store.theme.$ = v), []);
@@ -34,7 +34,7 @@ export function Settings() {
 				/>
 				<h2>Profiler</h2>
 				<Checkbox
-					checked={showUpdates}
+					checked={highlightUpdates}
 					onChange={() => {
 						const value = !store.profiler.highlightUpdates.$;
 						store.profiler.highlightUpdates.$ = value;
@@ -43,7 +43,7 @@ export function Settings() {
 							null,
 						);
 					}}
-					testId="toggle-show-updates"
+					testId="toggle-highlight-updates"
 				>
 					Highlight updates
 				</Checkbox>

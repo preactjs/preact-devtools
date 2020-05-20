@@ -43,9 +43,7 @@ import { getRenderReason, RenderReason } from "./renderer/renderReasons";
 import {
 	UpdateRects,
 	measureUpdate,
-	draw,
-	createUpdateCanvas,
-	destroyCanvas,
+	startDrawing,
 } from "../adapter/highlightUpdates";
 
 export interface RendererConfig10 {
@@ -367,7 +365,6 @@ export interface ProfilerState {
 	highlightUpdates: boolean;
 	pendingHighlightUpdates: Set<HTMLElement>;
 	updateRects: UpdateRects;
-	container: HTMLDivElement | null;
 	captureRenderReasons: boolean;
 }
 
@@ -396,7 +393,6 @@ export function createRenderer(
 		highlightUpdates: false,
 		updateRects: new Map(),
 		pendingHighlightUpdates: new Set(),
-		container: null,
 		captureRenderReasons: false,
 	};
 
@@ -407,13 +403,9 @@ export function createRenderer(
 
 		startHighlightUpdates() {
 			profiler.highlightUpdates = true;
-			profiler.container = createUpdateCanvas();
-			document.body.appendChild(profiler.container);
 		},
 		stopHighlightUpdates() {
 			profiler.highlightUpdates = false;
-			destroyCanvas(profiler.container);
-			if (profiler.container) profiler.container.remove();
 			profiler.updateRects.clear();
 			profiler.pendingHighlightUpdates.clear();
 		},
@@ -555,11 +547,8 @@ export function createRenderer(
 			const ev = flush(commit);
 			if (!ev) return;
 
-			if (profiler.updateRects.size > 0 && profiler.container) {
-				const canvas = profiler.container.querySelector("canvas")!;
-				if (canvas) {
-					draw(canvas, profiler.updateRects);
-				}
+			if (profiler.updateRects.size > 0) {
+				startDrawing(profiler.updateRects);
 				profiler.pendingHighlightUpdates.clear();
 			}
 
