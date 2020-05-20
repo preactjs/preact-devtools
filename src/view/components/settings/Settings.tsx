@@ -21,18 +21,6 @@ export function Settings() {
 	return (
 		<div class={s.root}>
 			<form>
-				<label class={s.label}>Theme:</label>
-				<RadioBar
-					name="theme"
-					value={theme}
-					onChange={setTheme}
-					items={[
-						{ label: "Auto", value: "auto" },
-						{ label: "Light", value: "light" },
-						{ label: "Dark", value: "dark" },
-					]}
-				/>
-				<h2>Profiler</h2>
 				<Checkbox
 					checked={highlightUpdates}
 					onChange={() => {
@@ -67,6 +55,19 @@ export function Settings() {
 						may be less accurate because of that.
 					</Message>
 				</div>
+
+				<h2>Common</h2>
+				<label class={s.label}>Theme:</label>
+				<RadioBar
+					name="theme"
+					value={theme}
+					onChange={setTheme}
+					items={[
+						{ label: "Auto", value: "auto" },
+						{ label: "Light", value: "light" },
+						{ label: "Dark", value: "dark" },
+					]}
+				/>
 
 				<h2>Experimental</h2>
 				<Checkbox
