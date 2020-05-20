@@ -15,17 +15,19 @@ export async function run(config: any) {
 	await page.waitForSelector("button");
 
 	await clickTab(devtools, "SETTINGS");
-
 	await click(devtools, '[data-testId="toggle-highlight-updates"]');
 
-	await typeText(page, "input", "foo");
-	await page.keyboard.press("Enter");
+	// Run twice to check if canvas is re-created
+	for (let i = 0; i < 2; i++) {
+		await typeText(page, "input", "foo");
+		await page.keyboard.press("Enter");
 
-	const id = "#preact-devtools-highlight-updates";
-	await page.waitForSelector(id);
+		const id = "#preact-devtools-highlight-updates";
+		await page.waitForSelector(id);
 
-	await wait(1000);
-	await checkNotPresent(page, id);
+		await wait(1000);
+		await checkNotPresent(page, id);
+	}
 
 	await closePage(page);
 }

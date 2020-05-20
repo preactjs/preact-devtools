@@ -78,6 +78,8 @@ export function destroyCanvas() {
 	if (container) {
 		render(null, container);
 		container.remove();
+		container = null;
+		canvas = null;
 	}
 }
 
