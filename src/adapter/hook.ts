@@ -124,6 +124,30 @@ export function createHook(port: PortPageHook): DevtoolsHook {
 		return uid;
 	};
 
+	// Delete all roots when the current frame unloads
+	window.addEventListener("unload", () => {
+		renderers.forEach(r => {
+			if (r.clear) r.clear();
+		});
+	});
+
+	// TODO: This should be added to codesandbox itself. I'm not too
+	// happy with having site specific code in the extension, but
+	// codesandbox is very popular among the Preact/React community
+	// so this will get us started
+	window.addEventListener("message", e => {
+		if (
+			renderers.size > 0 &&
+			e.data &&
+			e.data.codesandbox &&
+			e.data.type === "compile"
+		) {
+			renderers.forEach(r => {
+				if (r.clear) r.clear();
+			});
+		}
+	});
+
 	return {
 		$0: null,
 		renderers,

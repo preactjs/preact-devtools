@@ -396,10 +396,31 @@ export function createRenderer(
 		captureRenderReasons: false,
 	};
 
+	function onUnmount(vnode: VNode) {
+		if (!shouldFilter(vnode, filters, config)) {
+			if (hasVNodeId(ids, vnode)) {
+				currentUnmounts.push(getVNodeId(ids, vnode));
+			}
+		}
+
+		if (typeof vnode.type !== "function") {
+			const dom = getDom(vnode);
+			if (dom != null) domToVNode.delete(dom);
+		}
+
+		removeVNodeId(ids, vnode);
+	}
+
 	return {
 		// TODO: Deprecate
 		// eslint-disable-next-line @typescript-eslint/no-empty-function
 		flushInitial() {},
+
+		clear() {
+			roots.forEach(vnode => {
+				onUnmount(vnode);
+			});
+		},
 
 		startHighlightUpdates() {
 			profiler.highlightUpdates = true;
@@ -554,20 +575,7 @@ export function createRenderer(
 
 			port.send(ev.type as any, ev.data);
 		},
-		onUnmount(vnode) {
-			if (!shouldFilter(vnode, filters, config)) {
-				if (hasVNodeId(ids, vnode)) {
-					currentUnmounts.push(getVNodeId(ids, vnode));
-				}
-			}
-
-			if (typeof vnode.type !== "function") {
-				const dom = getDom(vnode);
-				if (dom != null) domToVNode.delete(dom);
-			}
-
-			removeVNodeId(ids, vnode);
-		},
+		onUnmount,
 		update(id, type, path, value) {
 			const vnode = getVNodeById(ids, id);
 			if (vnode !== null) {

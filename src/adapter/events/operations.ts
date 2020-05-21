@@ -11,10 +11,10 @@ import { RenderReasonMap } from "../10/renderer/renderReasons";
  *
  * We currently expect all operations to be in order.
  */
-export function ops2Tree(oldTree: Tree, ops: number[]) {
+export function ops2Tree(oldTree: Tree, existingRoots: ID[], ops: number[]) {
 	const pending: Tree = new Map(oldTree);
 	const rootId = ops[0];
-	const roots: ID[] = [];
+	const roots: ID[] = [...existingRoots];
 	const removals: ID[] = [];
 	const reasons: RenderReasonMap = new Map();
 
@@ -81,9 +81,24 @@ export function ops2Tree(oldTree: Tree, ops: number[]) {
 							}
 						}
 
-						pending.delete(nodeId);
+						// Check if node was a root
+						const rootIdx = roots.indexOf(node.id);
+						if (rootIdx > -1) {
+							roots.splice(rootIdx, 1);
+						}
 
-						// TODO: Remove recursively
+						// Delete children recursively
+						const stack = [node.id];
+						let item;
+						while ((item = stack.pop())) {
+							const child = pending.get(item);
+							if (!child) continue;
+
+							pending.delete(child.id);
+							stack.push(...child.children);
+						}
+
+						pending.delete(nodeId);
 					}
 				}
 

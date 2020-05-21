@@ -23,6 +23,7 @@ export interface Renderer {
 	flushInitial(): void;
 	forceUpdate(id: ID): void;
 	update(id: ID, type: UpdateType, path: ObjPath, value: any): void;
+	clear?(): void;
 
 	// Profiler
 	startProfiling?(options: DevtoolEvents["start-profiling"]): void; // V2
