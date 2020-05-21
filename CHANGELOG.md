@@ -1,5 +1,28 @@
 # Changelog
 
+## 0.7.0
+
+This release is packed with features! The star of the show is the "highlight updates" option in the settings page, which when enabled will visualise updates via on overlay on top of the page.
+
+Features:
+
+- Add support for view source (#210, thanks @marvinhagemeister)
+- Add proper support for debugging iframes (#209, thanks @marvinhagemeister)
+- Sync selection (#206, thanks @marvinhagemeister)
+- Add support for highlight updates (#202, #204, #205, #208, thanks @marvinhagemeister)
+- Profiler: Highlight nodes in DOM if present (#199, thanks @marvinhagemeister)
+
+Bug Fixes:
+
+- Fix profiler nodes getting lost due to mutations (#200, thanks @marvinhagemeister)
+
+Maintenance:
+
+- Sidebar cleanup (#211, thanks @marvinhagemeister)
+- Restructure settings page (#203, #212 thanks @marvinhagemeister)
+- Modernize e2e tests (#201, thanks @marvinhagemeister)
+- Action docs (#198, thanks @marvinhagemeister)
+
 ## 0.6.2
 
 This release completes the Profiler rewrite. The flamegraph can now display memoized trees and displays timings in a lot more polished way.
