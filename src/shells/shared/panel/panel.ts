@@ -105,6 +105,23 @@ const destroy = store.subscribe((type, data) => {
 	}
 
 	port.postMessage({ type, data, source: DevtoolsPanelName });
+
+	if (type === "view-source") {
+		// Wait for the content-script to set `__PREACT_DEVTOOLS__.$type`
+		// to the correct function
+		setTimeout(() => {
+			chrome.devtools.inspectedWindow.eval(`
+				(function() {
+					const type = window.__PREACT_DEVTOOLS__
+						&& window.__PREACT_DEVTOOLS__.$type;
+		
+					if (type != null) {
+						inspect(type);
+					}
+				})()
+			`);
+		}, 100);
+	}
 });
 
 port.onDisconnect.addListener(() => {
