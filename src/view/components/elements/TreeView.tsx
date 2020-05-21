@@ -58,6 +58,17 @@ export function TreeView() {
 	const [updateCount, setUpdateCount] = useState(0);
 	useResize(() => setUpdateCount(updateCount + 1), [updateCount]);
 
+	useEffect(() => {
+		if (ref.current) {
+			const selectedNode = ref.current.querySelector(
+				'[data-selected="true"]',
+			) as any;
+			if (selectedNode) {
+				scrollIntoView(selectedNode);
+			}
+		}
+	}, []);
+
 	const [maxIndent, setMaxIndent] = useState(0);
 
 	useEffect(() => {

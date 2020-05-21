@@ -1,4 +1,4 @@
-import { DevtoolEvents } from "../hook";
+import { DevtoolEvents, DevtoolsHook } from "../hook";
 import { Renderer } from "../renderer";
 import { copyToClipboard } from "../../shells/shared/utils";
 import { createPicker } from "./picker";
@@ -148,6 +148,17 @@ export function createAdapter(port: PortPageHook, renderer: Renderer) {
 	listen("stop-highlight-updates", () => {
 		if (renderer.stopHighlightUpdates) {
 			renderer.stopHighlightUpdates();
+		}
+	});
+
+	listen("load-host-selection", () => {
+		const hook: DevtoolsHook = (window as any).__PREACT_DEVTOOLS__;
+		const selected = hook.$0;
+		if (selected) {
+			const id = renderer.findVNodeIdForDom(selected);
+			if (id > -1) {
+				send("select-node", id);
+			}
 		}
 	});
 }

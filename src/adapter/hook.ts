@@ -31,6 +31,7 @@ export interface DevtoolEvents {
 	"stop-highlight-updates": null;
 	"reload-and-profile": ProfilerOptions;
 	"update-filter": RawFilterState;
+	"load-host-selection": null;
 	copy: string;
 	highlight: ID | null;
 	log: { id: ID; children: ID[] };
@@ -50,6 +51,8 @@ export type EmitFn = <K extends keyof DevtoolEvents>(
 ) => void;
 
 export interface DevtoolsHook {
+	/** Currently selected node in the native browser's Elements panel */
+	$0: HTMLElement | null;
 	connected: boolean;
 	emit: EmitFn;
 	listen: (fn: (name: string, cb: any) => any) => void;
@@ -121,6 +124,7 @@ export function createHook(port: PortPageHook): DevtoolsHook {
 	};
 
 	return {
+		$0: null,
 		renderers,
 		get connected() {
 			return status === "connected";
