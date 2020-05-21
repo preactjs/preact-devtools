@@ -6,16 +6,19 @@ import s from "./CanvasHighlight.css";
 export function CanvasHighlight() {
 	const ref = useRef<HTMLCanvasElement>();
 
-	useResize(
-		() => {
-			if (ref.current) {
-				ref.current.width = window.innerWidth;
-				ref.current.height = window.innerHeight;
-			}
-		},
-		[],
-		true,
-	);
+	useResize(() => {
+		if (ref.current) {
+			ref.current.width = window.innerWidth;
+			ref.current.height = window.innerHeight;
+		}
+	}, []);
 
-	return <canvas class={s.root} ref={ref} />;
+	return (
+		<canvas
+			class={s.root}
+			ref={ref}
+			width={window.innerWidth}
+			height={window.innerHeight}
+		/>
+	);
 }
