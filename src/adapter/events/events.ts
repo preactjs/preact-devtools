@@ -139,7 +139,7 @@ export function applyEvent(store: Store, type: string, data: any) {
 				store.supports.hooks.$ = !!data.supportsHooks;
 			}
 
-			if (store.profiler.highlightUpdates) {
+			if (store.profiler.highlightUpdates.$) {
 				store.emit("start-highlight-updates", null);
 			}
 			break;
