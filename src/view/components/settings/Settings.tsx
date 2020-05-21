@@ -48,7 +48,7 @@ export function Settings() {
 				>
 					Capture render reasons
 				</Checkbox>
-				<div class={s.message}>
+				<div class={`${s.message} ${s.settingSpace}`}>
 					<Message type="info">
 						All props, state, and hooks of the current node will be compared to
 						the previous node to determine what changed between renders. Timings
@@ -56,7 +56,6 @@ export function Settings() {
 					</Message>
 				</div>
 
-				<h2>Common</h2>
 				<label class={s.label}>Theme:</label>
 				<RadioBar
 					name="theme"
