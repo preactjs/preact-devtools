@@ -21,6 +21,9 @@ export interface DevtoolEvents {
 	"update-state": { id: ID; path: string; value: any };
 	"update-context": { id: ID; path: string; value: any };
 	"update-hook": { id: ID; value: any; meta: any };
+	/**
+	 * @deprecated
+	 */
 	"force-update": ID;
 	"start-picker": null;
 	"stop-picker": null;

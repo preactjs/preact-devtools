@@ -125,7 +125,6 @@ export function createAdapter(port: PortPageHook, renderer: Renderer) {
 		renderer.applyFilters(parseFilters(data));
 	});
 
-	listen("force-update", id => renderer.forceUpdate(id));
 	listen("refresh", () => {
 		if (renderer.refresh) {
 			renderer.refresh();
