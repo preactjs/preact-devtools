@@ -12,10 +12,20 @@ import {
 	storeHighlightUpdates,
 } from "./settings";
 
-async function showPanel(): Promise<Window> {
+// Updated when the selection in the native elements panel changed.
+let hostSelectionChanged = false;
+
+async function showPanel(): Promise<{
+	window: Window;
+	panel: chrome.devtools.panels.ExtensionPanel;
+}> {
 	return new Promise(resolve => {
 		chrome.devtools.panels.create("Preact", "", "/panel/panel.html", panel => {
-			panel.onShown.addListener(window => resolve(window));
+			const fn = (window: Window) => {
+				resolve({ window, panel });
+				panel.onShown.removeListener(fn);
+			};
+			panel.onShown.addListener(fn);
 		});
 	});
 }
@@ -28,9 +38,45 @@ let initialized = false;
 
 const store = createStore();
 
+// Sync selection from browser to devtools
+chrome.devtools.panels.elements.onSelectionChanged.addListener(() => {
+	store.emit("load-host-selection", null);
+	chrome.devtools.inspectedWindow.eval(
+		`window.__PREACT_DEVTOOLS__ && window.__PREACT_DEVTOOLS__.$0 !== $0
+			? (window.__PREACT_DEVTOOLS__.$0 = $0, true)
+			: false
+		`,
+		(result: boolean) => {
+			hostSelectionChanged = result;
+		},
+	);
+});
+
+// Inspect host node
+function inspectHostNode() {
+	chrome.devtools.inspectedWindow.eval(
+		`window.__PREACT_DEVTOOLS__ && window.__PREACT_DEVTOOLS__.$0 !== $0
+			? (inspect(window.__PREACT_DEVTOOLS__.$0), true)
+			: false
+		`,
+		(_, error) => {
+			if (error) {
+				// eslint-disable-next-line no-console
+				console.error(error);
+			}
+		},
+	);
+}
+
 async function initDevtools() {
 	initialized = true;
-	const window = await showPanel();
+	const { window, panel } = await showPanel();
+	panel.onShown.addListener(() => {
+		if (hostSelectionChanged) {
+			hostSelectionChanged = false;
+			store.emit("load-host-selection", null);
+		}
+	});
 
 	// Settings
 	await loadSettings(window, store);
@@ -51,6 +97,13 @@ async function initDevtools() {
 // Send messages from devtools to the content script
 const destroy = store.subscribe((type, data) => {
 	debug("<- devtools", type, data);
+
+	// We must call it from here to have access to native
+	// devtool-specific functions, like inspect()
+	if (type === "inspect-host-node") {
+		inspectHostNode();
+	}
+
 	port.postMessage({ type, data, source: DevtoolsPanelName });
 });
 

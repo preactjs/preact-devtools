@@ -4,7 +4,7 @@ import { createSearchStore } from "./search";
 import { createFilterStore } from "./filter";
 import { createSelectionStore } from "./selection";
 import { Collapser } from "./collapser";
-import { EmitFn } from "../../adapter/hook";
+import { EmitFn, DevtoolEvents } from "../../adapter/hook";
 import { ProfilerState } from "../components/profiler/data/commits";
 import { PropData } from "../components/sidebar/inspect/parseProps";
 
@@ -93,4 +93,7 @@ export interface Store {
 	subscribe(fn: Listener): () => void;
 }
 
-export type Listener = (name: string, data: any) => void;
+export type Listener = <K extends keyof DevtoolEvents>(
+	name: K,
+	data: DevtoolEvents[K],
+) => void;

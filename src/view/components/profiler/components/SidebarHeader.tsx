@@ -9,7 +9,7 @@ import {
 import { ComponentName } from "../../ComponentName";
 import { useCallback } from "preact/hooks";
 import { IconBtn } from "../../IconBtn";
-import { BugIcon } from "../../icons";
+import { BugIcon, InspectNativeIcon } from "../../icons";
 
 export function SidebarHeader() {
 	const store = useStore();
@@ -18,11 +18,19 @@ export function SidebarHeader() {
 	const log = useCallback(() => {
 		if (selected) emit("log", { id: selected.id, children: selected.children });
 	}, [selected]);
+	const inspectHostNode = useCallback(() => {
+		emit("inspect-host-node", null);
+	}, []);
 
 	return (
 		<Actions class={s.actions}>
 			<ComponentName>{selected && selected.name}</ComponentName>
 			<div class={s.iconActions}>
+				{selected && (
+					<IconBtn title="Show matching DOM element" onClick={inspectHostNode}>
+						<InspectNativeIcon />
+					</IconBtn>
+				)}
 				{selected && (
 					<IconBtn title="Log internal vnode" onClick={log}>
 						<BugIcon />
