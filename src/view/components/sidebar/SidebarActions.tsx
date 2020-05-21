@@ -2,10 +2,11 @@ import { h } from "preact";
 import s from "./Sidebar.css";
 import { Actions } from "../Actions";
 import { IconBtn } from "../IconBtn";
-import { Refresh, BugIcon, InspectNativeIcon } from "../icons";
+import { Refresh, BugIcon, InspectNativeIcon, CodeIcon } from "../icons";
 import { useStore, useEmitter, useObserver } from "../../store/react-bindings";
 import { useCallback } from "preact/hooks";
 import { ComponentName } from "../ComponentName";
+import { DevNodeType } from "../../store/types";
 
 export function SidebarActions() {
 	const store = useStore();
@@ -22,6 +23,16 @@ export function SidebarActions() {
 	const inspectHostNode = useCallback(() => {
 		emit("inspect-host-node", null);
 	}, []);
+	const viewSource = useCallback(() => {
+		if (node) {
+			emit("view-source", node.id);
+		}
+	}, [node]);
+
+	const canViewSource =
+		node &&
+		node.type !== DevNodeType.Group &&
+		node.type !== DevNodeType.Element;
 
 	return (
 		<Actions class={s.actions}>
@@ -41,6 +52,15 @@ export function SidebarActions() {
 				{node && (
 					<IconBtn title="Log internal vnode" onClick={log}>
 						<BugIcon />
+					</IconBtn>
+				)}
+				{node && (
+					<IconBtn
+						title="View Component Source"
+						onClick={viewSource}
+						disabled={!canViewSource}
+					>
+						<CodeIcon />
 					</IconBtn>
 				)}
 			</div>

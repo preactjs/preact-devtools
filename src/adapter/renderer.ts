@@ -34,12 +34,3 @@ export interface Renderer {
 	// Hooks
 	updateHook?(id: ID, index: number, value: any): void; // V3
 }
-
-export enum Elements {
-	HTML_ELEMENT = 1,
-	CLASS_COMPONENT = 2,
-	FUNCTION_COMPONENT = 3,
-	FORWARD_REF = 4,
-	MEMO = 5,
-	SUSPENSE = 6,
-}

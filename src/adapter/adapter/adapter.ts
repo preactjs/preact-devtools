@@ -169,4 +169,19 @@ export function createAdapter(port: PortPageHook, renderer: Renderer) {
 			}
 		}
 	});
+
+	listen("view-source", id => {
+		const vnode = renderer.getVNodeById(id);
+		const hook: DevtoolsHook = (window as any).__PREACT_DEVTOOLS__;
+
+		if (vnode && typeof vnode.type === "function") {
+			const { type } = vnode;
+			hook.$type =
+				type && type.prototype && type.prototype.render
+					? type.prototype.render
+					: type;
+		} else {
+			hook.$type = null;
+		}
+	});
 }

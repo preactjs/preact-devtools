@@ -22,10 +22,10 @@ import {
 	getHookState,
 } from "./vnode";
 import { shouldFilter } from "./filter";
-import { ID } from "../../view/store/types";
+import { ID, DevNodeType } from "../../view/store/types";
 import { traverse, setIn, SerializedVNode, setInCopy } from "./utils";
 import { FilterState } from "../adapter/filter";
-import { Renderer, Elements } from "../renderer";
+import { Renderer } from "../renderer";
 import {
 	createIdMappingState,
 	getVNodeById,
@@ -57,19 +57,19 @@ const forwardRefReg = /^ForwardRef\(/;
  * Get the type of a vnode. The devtools uses these constants to differentiate
  * between the various forms of components.
  */
-export function getDevtoolsType(vnode: VNode): Elements {
+export function getDevtoolsType(vnode: VNode): DevNodeType {
 	if (typeof vnode.type == "function" && vnode.type !== Fragment) {
 		const name = vnode.type.displayName || "";
-		if (memoReg.test(name)) return Elements.MEMO;
-		if (forwardRefReg.test(name)) return Elements.FORWARD_REF;
-		if (isSuspenseVNode(vnode)) return Elements.SUSPENSE;
+		if (memoReg.test(name)) return DevNodeType.Memo;
+		if (forwardRefReg.test(name)) return DevNodeType.ForwardRef;
+		if (isSuspenseVNode(vnode)) return DevNodeType.Suspense;
 
 		// TODO: Provider and Consumer
 		return vnode.type.prototype && vnode.type.prototype.render
-			? Elements.CLASS_COMPONENT
-			: Elements.FUNCTION_COMPONENT;
+			? DevNodeType.ClassComponent
+			: DevNodeType.FunctionComponent;
 	}
-	return Elements.HTML_ELEMENT;
+	return DevNodeType.Element;
 }
 
 export function isVNode(x: any): x is VNode {

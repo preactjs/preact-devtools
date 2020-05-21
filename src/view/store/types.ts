@@ -11,20 +11,20 @@ import { PropData } from "../components/sidebar/inspect/parseProps";
 export type ID = number;
 
 export enum DevNodeType {
-	FunctionComponent,
-	ClassComponent,
-	Element,
-	ForwardRef,
-	Memo,
-	Context,
-	Consumer,
-	Suspense,
 	/**
 	 * Groups are virtual nodes inserted by the devtools
 	 * to make certain operations easier. They are not
 	 * created by Preact.
 	 */
 	Group,
+	Element,
+	ClassComponent,
+	FunctionComponent,
+	ForwardRef,
+	Memo,
+	Suspense,
+	Context,
+	Consumer,
 }
 
 export interface DevNode {
