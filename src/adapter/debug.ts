@@ -1,7 +1,6 @@
 import { MsgTypes } from "./events/events";
 import { parseTable, flushTable } from "./string-table";
-import { Elements } from "./renderer";
-import { ID } from "../view/store/types";
+import { ID, DevNodeType } from "../view/store/types";
 
 export interface ParsedMsg {
 	rootId: number;
@@ -138,8 +137,8 @@ export function fromSnapshot(events: string[]): number[] {
 					MsgTypes.ADD_VNODE,
 					+m[1],
 					m[2][0] !== m[2][0].toLowerCase()
-						? Elements.FUNCTION_COMPONENT
-						: Elements.HTML_ELEMENT,
+						? DevNodeType.FunctionComponent
+						: DevNodeType.Element,
 					+m[3],
 					9999,
 					idx,

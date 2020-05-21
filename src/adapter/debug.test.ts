@@ -1,7 +1,7 @@
 import { expect } from "chai";
 import { fromSnapshot, toStringTable } from "./debug";
 import { MsgTypes } from "./events/events";
-import { Elements } from "./renderer";
+import { DevNodeType } from "../view/store/types";
 
 describe("debug", () => {
 	describe("fromSnapshot", () => {
@@ -26,7 +26,7 @@ describe("debug", () => {
 				root,
 				MsgTypes.ADD_VNODE,
 				2,
-				Elements.HTML_ELEMENT,
+				DevNodeType.Element,
 				1,
 				9999,
 				1,
