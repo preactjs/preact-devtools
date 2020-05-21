@@ -9,6 +9,7 @@ import {
 	storeTheme,
 	storeCaptureRenderReasons,
 	storeDebugMode,
+	storeHighlightUpdates,
 } from "./settings";
 
 async function showPanel(): Promise<Window> {
@@ -35,6 +36,7 @@ async function initDevtools() {
 	await loadSettings(window, store);
 	store.theme.on(v => storeTheme(v));
 	store.profiler.captureRenderReasons.on(v => storeCaptureRenderReasons(v));
+	store.profiler.highlightUpdates.on(v => storeHighlightUpdates(v));
 	store.debugMode.on(v => storeDebugMode(v));
 
 	if (process.env.DEBUG) {
