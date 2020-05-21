@@ -73,12 +73,6 @@ export function createMultiRenderer(
 		flushInitial() {
 			renderers.forEach(r => r.flushInitial());
 		},
-		forceUpdate(id) {
-			const renderer = getRendererByVNodeId(renderers, id);
-			if (renderer) {
-				renderer.forceUpdate(id);
-			}
-		},
 		getDisplayName(vnode) {
 			const arr = Array.from(renderers.values());
 			for (let i = 0; i < arr.length; i++) {

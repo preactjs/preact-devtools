@@ -451,13 +451,6 @@ export function createRenderer(
 			}
 			return "Unknown";
 		},
-		forceUpdate: id => {
-			const vnode = getVNodeById(ids, id);
-			if (vnode) {
-				const c = getComponent(vnode);
-				if (c) c.forceUpdate();
-			}
-		},
 		log: (id, children) => logVNode(ids, config, id, children),
 		inspect: id => inspectVNode(ids, config, options, id, supports.hooks),
 		findDomForVNode(id) {

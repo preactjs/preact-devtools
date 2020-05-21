@@ -21,7 +21,6 @@ export interface Renderer {
 	log(id: ID, children: ID[]): void;
 	inspect(id: ID): InspectData | null;
 	flushInitial(): void;
-	forceUpdate(id: ID): void;
 	update(id: ID, type: UpdateType, path: ObjPath, value: any): void;
 	clear?(): void;
 
