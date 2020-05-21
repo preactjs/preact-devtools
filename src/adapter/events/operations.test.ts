@@ -9,7 +9,7 @@ describe("ops2Tree", () => {
         Fragment ***
 			`;
 
-		const res = ops2Tree(state.idMap, []);
+		const res = ops2Tree(state.idMap, [], []);
 		expect(res.tree).not.to.equal(state.idMap);
 		expect(res.tree.size).to.equal(state.idMap.size);
 	});
@@ -17,7 +17,7 @@ describe("ops2Tree", () => {
 	describe("ADD_ROOT", () => {
 		it("should add new roots", () => {
 			const ops = fromSnapshot(["rootId: 1"]);
-			expect(ops2Tree(new Map(), ops)).to.deep.equal({
+			expect(ops2Tree(new Map(), [], ops)).to.deep.equal({
 				rootId: 1,
 				roots: [1],
 				removals: [],
@@ -30,7 +30,9 @@ describe("ops2Tree", () => {
 	describe("ADD_VNODE", () => {
 		it("should add a vnode", () => {
 			const ops = fromSnapshot(["rootId: 1", "Add 1 <Fragment> to parent -1"]);
-			expect(Array.from(ops2Tree(new Map(), ops).tree.values())).to.deep.equal([
+			expect(
+				Array.from(ops2Tree(new Map(), [], ops).tree.values()),
+			).to.deep.equal([
 				{
 					children: [],
 					depth: 0,
@@ -52,7 +54,7 @@ describe("ops2Tree", () => {
 				"Add 2 <span> to parent 1",
 			]);
 
-			const { tree } = ops2Tree(new Map(), ops);
+			const { tree } = ops2Tree(new Map(), [], ops);
 			expect(Array.from(tree.values())).to.deep.equal([
 				{
 					children: [2],
@@ -87,7 +89,7 @@ describe("ops2Tree", () => {
       `;
 
 			const ops = fromSnapshot(["rootId: 1", "Update timings 1 time 20:40"]);
-			const next = ops2Tree(state.idMap, ops).tree.get(1)!;
+			const next = ops2Tree(state.idMap, [], ops).tree.get(1)!;
 
 			expect(next.startTime).to.equal(20);
 			expect(next.endTime).to.equal(40);
@@ -114,7 +116,7 @@ describe("ops2Tree", () => {
 				"Remove 4",
 			]);
 
-			const next = ops2Tree(state.idMap, ops).tree;
+			const next = ops2Tree(state.idMap, [], ops).tree;
 			const root = next.get(1)!;
 			const span = next.get(2)!;
 
@@ -136,8 +138,24 @@ describe("ops2Tree", () => {
 				"Remove 4",
 			]);
 
-			const next = ops2Tree(state.idMap, ops);
+			const next = ops2Tree(state.idMap, [], ops);
 			expect(next.removals).to.deep.equal([3, 4]);
+		});
+
+		it("should remove nodes recursively", () => {
+			const state = flames`
+        Fragment ********
+          span ***  a **
+            p **
+      `;
+			const ops = fromSnapshot([
+				"rootId: 1",
+				"Update timings 1 time 20:40",
+				"Remove 2",
+			]);
+
+			const next = ops2Tree(state.idMap, [], ops);
+			expect(Array.from(next.tree.keys())).to.deep.equal([1, 4]);
 		});
 	});
 
@@ -156,7 +174,7 @@ describe("ops2Tree", () => {
 				"Reorder 1 [3,2]",
 			]);
 
-			const next = ops2Tree(state.idMap, ops).tree;
+			const next = ops2Tree(state.idMap, [], ops).tree;
 			expect(next.get(1)!.children).to.deep.equal([3, 2]);
 		});
 
@@ -170,8 +188,8 @@ describe("ops2Tree", () => {
 				"Update timings 1 time 20:40",
 			]);
 
-			expect(() => ops2Tree(new Map(), ops)).to.not.throw();
-			expect(ops2Tree(new Map(), ops).tree.get(1)!.startTime).to.equal(20);
+			expect(() => ops2Tree(new Map(), [], ops)).to.not.throw();
+			expect(ops2Tree(new Map(), [], ops).tree.get(1)!.startTime).to.equal(20);
 		});
 	});
 });

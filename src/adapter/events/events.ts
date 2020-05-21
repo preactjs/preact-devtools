@@ -96,16 +96,12 @@ export function flush(commit: Commit) {
 export function applyOperationsV2(store: Store, data: number[]) {
 	const { rootId: commitRootId, roots, tree, reasons } = ops2Tree(
 		store.nodes.$,
+		store.roots.$,
 		data,
 	);
 
-	// Update roots if necessary
-	if (roots.length > 0) {
-		store.roots.update(arr => {
-			arr.push(...roots);
-		});
-	}
-
+	// Update store data
+	store.roots.$ = roots;
 	store.nodes.$ = tree;
 
 	if (store.inspectData.$) {
