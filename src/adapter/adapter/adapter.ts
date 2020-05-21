@@ -77,7 +77,15 @@ export function createAdapter(port: PortPageHook, renderer: Renderer) {
 		}
 	});
 
-	listen("inspect", id => inspect(id));
+	listen("inspect", id => {
+		if (id !== null && renderer.has(id)) {
+			const res = renderer.findDomForVNode(id);
+			if (res && res.length > 0) {
+				(window as any).__PREACT_DEVTOOLS__.$0 = res[0];
+			}
+		}
+		inspect(id);
+	});
 
 	listen("log", e => {
 		if (renderer.has(e.id)) {

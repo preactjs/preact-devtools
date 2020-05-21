@@ -32,6 +32,7 @@ export interface DevtoolEvents {
 	"reload-and-profile": ProfilerOptions;
 	"update-filter": RawFilterState;
 	"load-host-selection": null;
+	"inspect-host-node": null;
 	copy: string;
 	highlight: ID | null;
 	log: { id: ID; children: ID[] };

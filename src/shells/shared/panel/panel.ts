@@ -52,6 +52,22 @@ chrome.devtools.panels.elements.onSelectionChanged.addListener(() => {
 	);
 });
 
+// Inspect host node
+function inspectHostNode() {
+	chrome.devtools.inspectedWindow.eval(
+		`window.__PREACT_DEVTOOLS__ && window.__PREACT_DEVTOOLS__.$0 !== $0
+			? (inspect(window.__PREACT_DEVTOOLS__.$0), true)
+			: false
+		`,
+		(_, error) => {
+			if (error) {
+				// eslint-disable-next-line no-console
+				console.error(error);
+			}
+		},
+	);
+}
+
 async function initDevtools() {
 	initialized = true;
 	const { window, panel } = await showPanel();
@@ -81,6 +97,13 @@ async function initDevtools() {
 // Send messages from devtools to the content script
 const destroy = store.subscribe((type, data) => {
 	debug("<- devtools", type, data);
+
+	// We must call it from here to have access to native
+	// devtool-specific functions, like inspect()
+	if (type === "inspect-host-node") {
+		inspectHostNode();
+	}
+
 	port.postMessage({ type, data, source: DevtoolsPanelName });
 });
 
