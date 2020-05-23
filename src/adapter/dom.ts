@@ -66,7 +66,7 @@ export function measureNode(dom: Element): Measurements {
 		marginRight: px2Int(s.marginRight),
 		marginBottom: px2Int(s.marginBottom),
 		marginLeft: px2Int(s.marginLeft),
-		borderTop: px2Int(s.borderTop),
+		borderTop: px2Int(s.borderTopWidth),
 		borderRight: px2Int(s.borderRightWidth),
 		borderBottom: px2Int(s.borderBottomWidth),
 		borderLeft: px2Int(s.borderLeftWidth),

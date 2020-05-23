@@ -87,6 +87,10 @@ export function createHightlighter(renderer: Renderer) {
 					h(Highlighter, {
 						label,
 						...size,
+						top: size.top - size.marginTop,
+						left: size.left - size.marginLeft,
+						height: size.height + size.marginTop + size.marginBottom,
+						width: size.width + size.marginLeft + size.marginRight,
 					}),
 					highlightRef,
 				);
