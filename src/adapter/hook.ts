@@ -59,6 +59,7 @@ export interface DevtoolsHook {
 	/** Currently selected node in the native browser's Elements panel */
 	$0: HTMLElement | null;
 	/** Function to inspect for view source feature */
+	// eslint-disable-next-line @typescript-eslint/ban-types
 	$type: Function | null;
 	connected: boolean;
 	emit: EmitFn;

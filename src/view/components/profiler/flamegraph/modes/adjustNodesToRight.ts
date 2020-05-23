@@ -48,6 +48,7 @@ export function cloneTree(tree: Map<ID, DevNode>) {
 	return clone;
 }
 
+// eslint-disable-next-line @typescript-eslint/ban-types
 export function deepClone<T extends object>(obj: T): T {
 	return JSON.parse(JSON.stringify(obj));
 }

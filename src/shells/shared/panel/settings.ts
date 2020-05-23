@@ -31,6 +31,7 @@ export async function loadSettings(window: Window, store: Store) {
 	}
 }
 
+// eslint-disable-next-line @typescript-eslint/ban-types
 function store(obj: object) {
 	try {
 		chrome.storage.sync.set(obj);
