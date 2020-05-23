@@ -17,7 +17,7 @@ export function TimelineBar() {
 	const selectedCommit = useObserver(() => store.profiler.activeCommitIdx.$);
 	const stats = useObserver(() => {
 		return {
-			max: Math.max(0, ...store.profiler.commits.$.map(x => x.duration)),
+			max: Math.max(16, ...store.profiler.commits.$.map(x => x.duration)),
 			min: Math.max(
 				0,
 				Math.min(...store.profiler.commits.$.map(x => x.duration)),
