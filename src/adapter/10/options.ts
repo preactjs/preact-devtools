@@ -87,7 +87,7 @@ export function setupOptions(
 				addHookStack(type);
 			}
 
-			if (prevHook) prevHook(c);
+			if (prevHook) prevHook(c, index, type);
 		};
 
 		options.useDebugValue = (value: any) => {
