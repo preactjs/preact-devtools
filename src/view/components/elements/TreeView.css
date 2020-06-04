@@ -24,6 +24,35 @@
 	height: 100%;
 }
 
+.emptyInner {
+	position: relative;
+	display: flex;
+	justify-content: center;
+	align-items: center;
+	flex-direction: column;
+}
+
+.empty p {
+	display: block;
+}
+
+.empty code {
+	font-family: var(--font-monospace);
+	background: var(--color-code);
+	color: var(--color-text);
+	border: 0.0625rem solid var(--color-code-border);
+	padding-left: 0.25rem;
+	padding-right: 0.25rem;
+	border-radius: 0.125rem;
+}
+
+:root .emptyDescription {
+	text-align: center;
+	max-width: 28rem;
+	margin-left: auto;
+	margin-right: auto;
+}
+
 @media (min-width: 37.5rem) {
 	.tree,
 	.empty {
@@ -34,9 +63,9 @@
 .bgLogo {
 	color: var(--color-empty-logo);
 	position: absolute;
-	top: 50%;
+	top: 0;
 	left: 50%;
-	transform: translate3d(-50%, -50%, 0);
+	transform: translate3d(-50%, -42%, 0);
 	z-index: -1;
 	opacity: 0.4;
 }

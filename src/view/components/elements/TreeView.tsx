@@ -111,10 +111,20 @@ export function TreeView() {
 		>
 			{nodeList.length === 0 && (
 				<div class={s.empty}>
-					<BackgroundLogo class={s.bgLogo} />
-					<p>
-						<b>Connected</b>, waiting for nodes to load...
-					</p>
+					<div class={s.emptyInner}>
+						<BackgroundLogo class={s.bgLogo} />
+						<p>
+							<b>Connected</b>, listening for Preact operations...
+						</p>
+						<p class={s.emptyDescription}>
+							<small>
+								If this message doesn&apos;t go away Preact started rendering
+								before devtools was initialized. You can fix this by adding the{" "}
+								<code>preact/debug</code> or <code>preact/devtools</code> import
+								at the <b>top</b> of your entry file.
+							</small>
+						</p>
+					</div>
 				</div>
 			)}
 			<div class={s.pane} ref={paneRef} data-testid="elements-tree">
