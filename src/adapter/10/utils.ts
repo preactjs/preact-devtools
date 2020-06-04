@@ -74,6 +74,7 @@ export function jsonify(
 	}
 }
 
+// eslint-disable-next-line @typescript-eslint/ban-types
 export function serialize(config: RendererConfig10, data: object | null) {
 	return jsonify(data, node => serializeVNode(node, config), new Set());
 }
@@ -89,6 +90,7 @@ export function isEditable(x: any) {
 	}
 }
 
+// eslint-disable-next-line @typescript-eslint/ban-types
 export function cleanProps<T extends object>(
 	props: T,
 ): Exclude<T, "__source" | "__self"> | null {
