@@ -61,6 +61,8 @@ input {
 
 :global(.light) .theme {
 	--color-bg: white;
+	--color-code: #e3e3e3;
+	--color-code-border: #c2c2c2;
 	--color-text: #333;
 	--color-text-stronger: #111;
 	--color-disabled: #dedede;
@@ -90,7 +92,7 @@ input {
 	--color-marker-selected: orange;
 	--color-input-border: #4d4d4d;
 	--color-input-invalid: #ff5722;
-	--color-empty-logo: #dadada;
+	--color-empty-logo: #e0e0e0;
 	--color-key-label: gray;
 	--color-key-label-selected: #dadada;
 	--color-key-value: #ff5722;
@@ -138,6 +140,8 @@ input {
 
 :global(.dark) .theme {
 	--color-bg: #242424;
+	--color-code: black;
+	--color-code-border: #5c5858;
 	--color-text: #b0b0b0;
 	--color-text-stronger: #dcdcdc;
 	--color-disabled: #575757;
@@ -168,7 +172,7 @@ input {
 	--color-marker-selected: orange;
 	--color-input-border: #666;
 	--color-input-invalid: #ff5722;
-	--color-empty-logo: #555;
+	--color-empty-logo: #3d3d3d;
 	--color-key-label: gray;
 	--color-key-label-selected: #dedede;
 	--color-key-value: #ff5722;
