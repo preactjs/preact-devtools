@@ -1,5 +1,20 @@
 # Changelog
 
+## 1.0.0
+
+Bug Fixes:
+
+- Change default connection message to be more clear (#223, thanks @marvinhagemeister)
+- Fix `undefined` component with prefresh (#222, thanks @marvinhagemeister)
+- Fix `options._hook` arguments not forwarded (#221, thanks @marvinhagemeister)
+- Improve Commit-Timeline display (#219, thanks @marvinhagemeister)
+- Fix incorrect highlight offset with margins (#218, thanks @marvinhagemeister)
+
+Maintenance:
+
+- Upgrade all dependencies (#220, thanks @marvinhagemeister)
+- Fix actions workflow not updating version (#214, thanks @marvinhagemeister)
+
 ## 0.7.0
 
 This release is packed with features! The star of the show is the "highlight updates" option in the settings page, which when enabled will visualise updates via on overlay on top of the page.
