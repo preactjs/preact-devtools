@@ -118,6 +118,20 @@ export function getFilteredChildren(
 	return out.reverse();
 }
 
+function updateHighlight(profiler: ProfilerState, vnode: VNode) {
+	if (profiler.highlightUpdates && typeof vnode.type === "function") {
+		let dom = getDom(vnode);
+		if (dom instanceof Text) {
+			dom = dom.parentNode;
+		}
+
+		if (dom && !profiler.pendingHighlightUpdates.has(dom)) {
+			profiler.pendingHighlightUpdates.add(dom);
+			measureUpdate(profiler.updateRects, dom);
+		}
+	}
+}
+
 export function mount(
 	ids: IdMappingState,
 	commit: Commit,
@@ -158,13 +172,7 @@ export function mount(
 			commit.operations.push(MsgTypes.RENDER_REASON, id, RenderReason.MOUNT, 0);
 		}
 
-		if (profiler.highlightUpdates && typeof vnode.type === "function") {
-			const dom = getDom(vnode);
-			if (dom && !profiler.pendingHighlightUpdates.has(dom)) {
-				profiler.pendingHighlightUpdates.add(dom);
-				measureUpdate(profiler.updateRects, dom);
-			}
-		}
+		updateHighlight(profiler, vnode);
 
 		ancestorId = id;
 	}
@@ -274,13 +282,7 @@ export function update(
 		}
 	}
 
-	if (profiler.highlightUpdates && typeof vnode.type === "function") {
-		const dom = getDom(vnode);
-		if (dom && !profiler.pendingHighlightUpdates.has(dom)) {
-			profiler.pendingHighlightUpdates.add(dom);
-			measureUpdate(profiler.updateRects, dom);
-		}
-	}
+	updateHighlight(profiler, vnode);
 
 	const oldChildren = oldVNode
 		? getActualChildren(oldVNode).map((v: any) => v && getVNodeId(ids, v))
