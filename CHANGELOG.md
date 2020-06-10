@@ -1,5 +1,11 @@
 # Changelog
 
+## 1.0.1
+
+Bug Fixes:
+
+- Fix error on highlighting text node (#226, thanks @marvinhagemeister)
+
 ## 1.0.0
 
 Bug Fixes:
