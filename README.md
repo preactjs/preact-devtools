@@ -49,6 +49,14 @@ Firefox:
 4. Click "Load temporary addon"
 5. Select the `manifest.json` in `dist/firefox/`
 
+When you've submitted your PR you can run `yarn changeset` to indicate whether this is:
+
+- a major (breaking change)
+- a minor (new feature)
+- a patch (bugfix)
+
+and describe your changes.
+
 ## For extension reviewers
 
 These commands will build the extension and load it into a browser with a temporary profile. The browser will automatically navigate to [preactjs.com](https://preactjs.com). There you can test the extension.
