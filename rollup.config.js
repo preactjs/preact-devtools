@@ -1,9 +1,9 @@
 import typescript from "rollup-plugin-typescript2";
-import babel from "rollup-plugin-babel";
+import babel from "@rollup/plugin-babel";
 import copy from "rollup-plugin-copy";
-import resolve from "rollup-plugin-node-resolve";
+import resolve from "@rollup/plugin-node-resolve";
 import postcss from "rollup-plugin-postcss";
-import commonjs from "rollup-plugin-commonjs";
+import commonjs from "@rollup/plugin-commonjs";
 import replace from "@rollup/plugin-replace";
 import alias from "@rollup/plugin-alias";
 import path from "path";
@@ -89,6 +89,7 @@ export default entries.map(data => ({
 		}),
 		babel({
 			babelrc: false,
+			babelHelpers: "bundled",
 			extensions: [".ts", ".tsx", ".js", ".jsx"],
 			plugins: [
 				[
