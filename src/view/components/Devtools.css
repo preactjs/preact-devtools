@@ -2,13 +2,10 @@
 	height: 100%;
 	display: grid;
 	grid-template-columns: 1fr;
-	grid-template-rows: 1.625rem 2.25rem 1fr 2.25rem 1fr;
+	grid-template-rows: 1.625rem 1fr;
 	grid-template-areas:
 		"switcher"
-		"treeActions"
-		"tree"
-		"sidebarActions"
-		"sidebar";
+		"content";
 
 	/* Different browsers may have different defaults */
 	font-family: sans-serif;
@@ -24,17 +21,6 @@ input {
 	border: none;
 	font: inherit;
 	padding: 0;
-}
-
-@media (min-width: 37.5rem) {
-	.root {
-		grid-template-columns: minmax(0, 75%) minmax(35%, 15rem);
-		grid-template-rows: 1.625rem 2.25rem 1fr;
-		grid-template-areas:
-			"switcher switcher"
-			"treeActions sidebarActions"
-			"tree sidebar";
-	}
 }
 
 .root p {
@@ -99,6 +85,9 @@ input {
 	--color-key-value-selected: orange;
 	--color-radio: #7245c7;
 	--color-shadow: rgba(0, 0, 0, 0.15);
+
+	/* Table */
+	--table-hover: rgba(174, 128, 255, 0.4);
 
 	/* Props */
 	--color-props-input-bg: #f0f0f0;
@@ -179,6 +168,9 @@ input {
 	--color-key-value-selected: yellow;
 	--color-radio: #d2adff;
 	--color-shadow: rgba(255, 255, 255, 0.15);
+
+	/* Table */
+	--table-hover: rgba(174, 128, 255, 0.4);
 
 	/* Props */
 	--color-props-input-bg: #444;

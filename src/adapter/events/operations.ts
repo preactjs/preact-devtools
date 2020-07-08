@@ -3,6 +3,7 @@ import { parseTable } from "../string-table";
 import { MsgTypes } from "./events";
 import { deepClone } from "../../view/components/profiler/flamegraph/modes/adjustNodesToRight";
 import { RenderReasonMap } from "../10/renderer/renderReasons";
+import { parseStats, ParsedStats } from "../10/stats";
 
 /**
  * This is the heart of the devtools. Here we translate incoming events
@@ -17,6 +18,7 @@ export function ops2Tree(oldTree: Tree, existingRoots: ID[], ops: number[]) {
 	const roots: ID[] = [...existingRoots];
 	const removals: ID[] = [];
 	const reasons: RenderReasonMap = new Map();
+	let stats: ParsedStats | null = null;
 
 	let i = ops[1] + 1;
 	const strings = parseTable(ops.slice(1, i + 1));
@@ -130,10 +132,18 @@ export function ops2Tree(oldTree: Tree, existingRoots: ID[], ops: number[]) {
 				i = i + 3 + count;
 				break;
 			}
+			case MsgTypes.COMMIT_STATS: {
+				const count = ops[i + 1];
+				console.log("ops", ops.slice(i));
+				const statsOps = ops.slice(i + 1, i + 1 + count);
+				stats = parseStats(statsOps);
+				i = i + 1 + count;
+				break;
+			}
 			default:
 				throw new Error("Unknown event: " + ops[i]);
 		}
 	}
 
-	return { rootId, roots, tree: pending, removals, reasons };
+	return { rootId, roots, tree: pending, removals, reasons, stats };
 }

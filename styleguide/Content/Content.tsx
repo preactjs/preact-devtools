@@ -6,6 +6,7 @@ import { ProfilerDemo3 } from "../stories/profiler-3.story";
 import { ProfilerDemo4 } from "../stories/profiler-4.story";
 import { ProfilerDemo5 } from "../stories/profiler-5";
 import { LoadingDemo } from "../stories/loading.story";
+import { StatsDemo } from "../stories/stats.story";
 
 export const stories: Record<string, any> = {
 	loading: LoadingDemo,
@@ -14,6 +15,7 @@ export const stories: Record<string, any> = {
 	profiler3: ProfilerDemo3,
 	profiler4: ProfilerDemo4,
 	profiler5: ProfilerDemo5,
+	stats: StatsDemo,
 };
 
 export function Content() {

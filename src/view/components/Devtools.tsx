@@ -12,6 +12,7 @@ import { SmallTab, SmallTabGroup } from "./profiler/components/Tabs/Tabs";
 import s from "./Devtools.css";
 import { ThemeSwitcher } from "./ThemeSwitcher";
 import { Settings } from "./settings/Settings";
+import { StatsPanel } from "./stats/StatsPanel";
 
 export function DevTools(props: { store: Store; window: Window }) {
 	const panel = useObserver(() => props.store.activePanel.$);
@@ -19,6 +20,7 @@ export function DevTools(props: { store: Store; window: Window }) {
 	const showElements = panel === Panel.ELEMENTS;
 	const showProfiler = panel === Panel.PROFILER;
 	const showSettings = panel === Panel.SETTINGS;
+	const showStats = panel === Panel.STATISTICS;
 
 	return (
 		<WindowCtx.Provider value={props.window}>
@@ -46,6 +48,16 @@ export function DevTools(props: { store: Store; window: Window }) {
 										Profiler
 									</SmallTab>
 									<SmallTab
+										onClick={() =>
+											(props.store.activePanel.$ = Panel.STATISTICS)
+										}
+										checked={showStats}
+										name="root-panel"
+										value={Panel.STATISTICS}
+									>
+										Statistics
+									</SmallTab>
+									<SmallTab
 										onClick={() => (props.store.activePanel.$ = Panel.SETTINGS)}
 										checked={showSettings}
 										name="root-panel"
@@ -65,6 +77,7 @@ export function DevTools(props: { store: Store; window: Window }) {
 							</SmallTabGroup>
 							{showElements && <Elements />}
 							{showProfiler && <Profiler />}
+							{showStats && <StatsPanel />}
 							{showSettings && <Settings />}
 						</div>
 					</Fragment>

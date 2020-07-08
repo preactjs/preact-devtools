@@ -1,0 +1,87 @@
+.root {
+	padding: 1rem;
+}
+
+.label {
+	display: block;
+	margin-bottom: 0.75rem;
+	font-size: 0.9rem;
+}
+
+.intro {
+	margin-top: 1rem;
+}
+
+.heading {
+	margin-top: 1rem;
+	font-size: 1rem;
+	font-weight: lighter;
+}
+
+.message {
+	margin-left: 1.25rem;
+	margin-top: 0.5rem;
+}
+
+.description {
+	margin-left: 1.25rem;
+	margin-top: 0.25rem !important;
+	margin-bottom: 2rem;
+	font-size: 0.9rem;
+}
+
+.cards {
+	display: flex;
+	flex-direction: column;
+}
+
+@media (min-width: 31.5rem) {
+	.cards {
+		flex-direction: row;
+	}
+
+	.card {
+		margin-right: 4rem;
+	}
+
+	.cards .card:last-of-type {
+		margin-right: 0;
+	}
+}
+
+.table {
+	color: var(--color-text);
+}
+
+.table,
+.table td,
+.table th {
+	border: 0.0625rem inset black;
+	border-collapse: collapse;
+	border-spacing: 0;
+}
+
+.table tr:hover td {
+	background: var(--table-hover);
+}
+
+.table td,
+.table th {
+	padding: 0.25rem 0.5rem;
+	border: 0.0625rem solid var(--color-bg);
+}
+
+.table th {
+	text-align: left;
+	font-weight: normal;
+	background: var(--color-selected-bg);
+	color: var(--color-selected-text);
+}
+
+.table tbody tr:nth-child(odd) {
+	background: var(--color-hover);
+}
+
+.alignRight {
+	text-align: right;
+}

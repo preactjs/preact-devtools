@@ -45,6 +45,13 @@ import {
 	measureUpdate,
 	startDrawing,
 } from "../adapter/highlightUpdates";
+import {
+	createStats,
+	DiffType,
+	getDiffType,
+	updateDiffStats,
+	recordComponentStats,
+} from "./stats";
 
 export interface RendererConfig10 {
 	Fragment: FunctionalComponent;
@@ -142,6 +149,8 @@ export function mount(
 	config: RendererConfig10,
 	profiler: ProfilerState,
 ) {
+	commit.stats.mounts++;
+
 	const root = isRoot(vnode, config);
 
 	const skip = shouldFilter(vnode, filters, config);
@@ -182,10 +191,16 @@ export function mount(
 		if (dom) domCache.set(dom, vnode);
 	}
 
+	let diff = DiffType.UNKNOWN;
+	let childCount = 0;
+
 	const children = getActualChildren(vnode);
 	for (let i = 0; i < children.length; i++) {
 		const child = children[i];
 		if (child != null) {
+			diff = getDiffType(child, diff);
+			childCount++;
+
 			mount(
 				ids,
 				commit,
@@ -198,6 +213,9 @@ export function mount(
 			);
 		}
 	}
+
+	updateDiffStats(commit.stats, diff, childCount);
+	recordComponentStats(config, commit.stats, vnode, children.length);
 }
 
 export function resetChildren(
@@ -232,12 +250,20 @@ export function update(
 	config: RendererConfig10,
 	profiler: ProfilerState,
 ) {
+	commit.stats.updates++;
+
+	let diff = DiffType.UNKNOWN;
+
 	const skip = shouldFilter(vnode, filters, config);
 	if (skip) {
+		let childCount = 0;
 		const children = getActualChildren(vnode);
 		for (let i = 0; i < children.length; i++) {
 			const child = children[i];
 			if (child != null) {
+				diff = getDiffType(child, diff);
+				childCount++;
+
 				update(
 					ids,
 					commit,
@@ -250,10 +276,13 @@ export function update(
 				);
 			}
 		}
+
+		updateDiffStats(commit.stats, diff, childCount);
 		return;
 	}
 
 	if (!hasVNodeId(ids, vnode)) {
+		commit.stats.mounts++;
 		mount(ids, commit, vnode, ancestorId, filters, domCache, config, profiler);
 		return true;
 	}
@@ -289,6 +318,7 @@ export function update(
 		: [];
 
 	let shouldReorder = false;
+	let childCount = 0;
 
 	const children = getActualChildren(vnode);
 	for (let i = 0; i < children.length; i++) {
@@ -298,14 +328,20 @@ export function update(
 				commit.unmountIds.push(oldChildren[i]);
 			}
 		} else if (hasVNodeId(ids, child) || shouldFilter(child, filters, config)) {
+			diff = getDiffType(child, diff);
+			childCount++;
 			update(ids, commit, child, id, filters, domCache, config, profiler);
 			// TODO: This is only sometimes necessary
 			shouldReorder = true;
 		} else {
+			diff = getDiffType(child, diff);
+			childCount++;
 			mount(ids, commit, child, id, filters, domCache, config, profiler);
 			shouldReorder = true;
 		}
 	}
+
+	updateDiffStats(commit.stats, diff, childCount);
 
 	if (shouldReorder) {
 		resetChildren(commit, ids, id, vnode, filters, config);
@@ -327,6 +363,7 @@ export function createCommit(
 		strings: new Map(),
 		unmountIds: [],
 		renderReasons: new Map(),
+		stats: createStats(),
 	};
 
 	let parentId = -1;
@@ -334,6 +371,10 @@ export function createCommit(
 	const isNew = !hasVNodeId(ids, vnode);
 
 	if (isRoot(vnode, config)) {
+		if (isNew) {
+			commit.stats.roots++;
+		}
+
 		parentId = -1;
 		roots.add(vnode);
 	} else {
@@ -341,8 +382,10 @@ export function createCommit(
 	}
 
 	if (isNew) {
+		commit.stats.mounts++;
 		mount(ids, commit, vnode, parentId, filters, domCache, config, profiler);
 	} else {
+		commit.stats.updates++;
 		update(ids, commit, vnode, parentId, filters, domCache, config, profiler);
 	}
 
@@ -517,8 +560,10 @@ export function createRenderer(
 					rootId,
 					strings: new Map(),
 					unmountIds: currentUnmounts,
+					stats: createStats(),
 				};
 
+				commit.stats.unmounts += commit.unmountIds.length;
 				const unmounts = flush(commit);
 				if (unmounts) {
 					currentUnmounts = [];
@@ -557,6 +602,8 @@ export function createRenderer(
 				config,
 				profiler,
 			);
+
+			commit.stats.unmounts += currentUnmounts.length;
 
 			commit.unmountIds.push(...currentUnmounts);
 			currentUnmounts = [];

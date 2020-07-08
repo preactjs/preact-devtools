@@ -95,11 +95,13 @@ export function createStore(): Store {
 	});
 
 	const selection = createSelectionStore(nodeList);
+	const stats = valoo(null);
 
 	return {
 		supports: {
 			hooks: supportsHooks,
 		},
+		stats,
 		debugMode,
 		activePanel: valoo(Panel.ELEMENTS),
 		profiler: createProfiler(),
@@ -120,6 +122,7 @@ export function createStore(): Store {
 			nodes.$ = new Map();
 			selection.selected.$ = -1;
 			collapser.collapsed.$ = new Set();
+			stats.$ = null;
 		},
 		subscribe(fn) {
 			const idx = listeners.push(fn);

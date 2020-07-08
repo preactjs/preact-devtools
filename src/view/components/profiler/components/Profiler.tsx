@@ -12,13 +12,14 @@ import { RenderReasons } from "./RenderReasons";
 import { DebugProfilerInfo } from "./CommitInfo/DebugInfo";
 import { DebugNodeNav } from "./RenderedAt/DebugNodeNav";
 import { useStore, useObserver } from "../../../store/react-bindings";
+import { SidebarLayout } from "../../SidebarLayout";
 
 export function Profiler() {
 	const store = useStore();
 	const showDebug = useObserver(() => store.debugMode.$);
 
 	return (
-		<Fragment>
+		<SidebarLayout>
 			<ThemeSwitcher />
 			<div class={s.componentActions}>
 				<TimelineBar />
@@ -37,6 +38,6 @@ export function Profiler() {
 				{showDebug && <DebugProfilerInfo />}
 				{showDebug && <DebugNodeNav />}
 			</div>
-		</Fragment>
+		</SidebarLayout>
 	);
 }

@@ -1,0 +1,31 @@
+.root {
+	height: 100%;
+	display: grid;
+	grid-template-columns: 1fr;
+	grid-template-rows: 2.25rem 1fr 2.25rem 1fr;
+	grid-template-areas:
+		"treeActions"
+		"tree"
+		"sidebarActions"
+		"sidebar";
+
+	/* Different browsers may have different defaults */
+	font-family: sans-serif;
+}
+
+@media (min-width: 37.5rem) {
+	.root {
+		grid-template-columns: minmax(0, 75%) minmax(35%, 15rem);
+		grid-template-rows: 2.25rem 1fr;
+		grid-template-areas:
+			"treeActions sidebarActions"
+			"tree sidebar";
+	}
+}
+
+.rootSingle {
+	height: 100%;
+
+	/* Different browsers may have different defaults */
+	font-family: sans-serif;
+}

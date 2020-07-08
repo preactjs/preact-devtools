@@ -3,6 +3,7 @@ import { Store } from "../../view/store/types";
 import { recordProfilerCommit } from "../../view/components/profiler/data/commits";
 import { ops2Tree } from "./operations";
 import { applyOperationsV1 } from "./legacy/operationsV1";
+import { Stats, stats2ops } from "../10/stats";
 
 export enum MsgTypes {
 	ADD_ROOT = 1,
@@ -11,6 +12,7 @@ export enum MsgTypes {
 	UPDATE_VNODE_TIMINGS = 4, // Used by Preact 10.1.x
 	REORDER_CHILDREN = 5,
 	RENDER_REASON = 6,
+	COMMIT_STATS = 7,
 }
 
 // Event Examples:
@@ -61,12 +63,45 @@ export enum MsgTypes {
 //   stringsCount
 //   ...stringIds
 //
+// COMMIT_STATS
+//   rootId
+//   componentDataCount
+//     component children count #1
+//     component children count #2
+//     component children count #3
+//     ...
+//   fragmentsDataCount
+//     fragment children count #1
+//     fragment children count #2
+//     fragment children count #3
+//     ...
+//   textNodesCount
+//   diffKeyedCount
+//   diffUnkeyedCount
+//   diffMixedCount
+//   mountDataCount
+//     mountDepth #1
+//     mountDepth #2
+//     mountDepth #3
+//     ...
+//   unmountDataCount
+//     unmountDepth #1
+//     unmountDepth #2
+//     unmountDepth #3
+//     ...
+//   updateDepthCount
+//     updateDepth #1
+//     updateDepth #2
+//     updateDepth #3
+//     ...
+//
 
 export interface Commit {
 	rootId: number;
 	strings: StringTable;
 	unmountIds: number[];
 	operations: number[];
+	stats: Stats;
 }
 
 /**
@@ -74,7 +109,7 @@ export interface Commit {
  * the detools can understand
  */
 export function flush(commit: Commit) {
-	const { rootId, unmountIds, operations, strings } = commit;
+	const { rootId, unmountIds, operations, strings, stats } = commit;
 	if (unmountIds.length === 0 && operations.length === 0) return;
 
 	const msg = [rootId, ...flushTable(strings)];
@@ -82,6 +117,7 @@ export function flush(commit: Commit) {
 		msg.push(MsgTypes.REMOVE_VNODE, unmountIds.length, ...unmountIds);
 	}
 	msg.push(...operations);
+	msg.push(...stats2ops(rootId, stats));
 
 	return { type: "operation_v2", data: msg };
 }
@@ -94,7 +130,7 @@ export function flush(commit: Commit) {
  * We currently expect all operations to be in order.
  */
 export function applyOperationsV2(store: Store, data: number[]) {
-	const { rootId: commitRootId, roots, tree, reasons } = ops2Tree(
+	const { rootId: commitRootId, roots, tree, reasons, stats } = ops2Tree(
 		store.nodes.$,
 		store.roots.$,
 		data,
@@ -118,6 +154,28 @@ export function applyOperationsV2(store: Store, data: number[]) {
 		store.profiler.renderReasons.update(m => {
 			m.set(commitRootId, reasons);
 		});
+	}
+
+	if (stats !== null) {
+		if (store.stats.$ === null) {
+			store.stats.$ = stats;
+		} else {
+			store.stats.update(v => {
+				for (const key in stats) {
+					const next = (stats as any)[key];
+					if (next instanceof Map) {
+						const old = (v as any)[key];
+						next.forEach((nextValue, nextKey) => {
+							old.set(nextKey, (old.get(nextKey) || 0) + nextValue);
+						});
+					} else {
+						(v as any)[key] += (stats as any)[key];
+					}
+				}
+
+				return v;
+			});
+		}
 	}
 }
 
