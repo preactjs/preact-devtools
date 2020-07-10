@@ -163,11 +163,13 @@ export function applyOperationsV2(store: Store, data: number[]) {
 			store.stats.update(v => {
 				for (const key in stats) {
 					const next = (stats as any)[key];
-					if (next instanceof Map) {
+					if (typeof next === "object") {
 						const old = (v as any)[key];
-						next.forEach((nextValue, nextKey) => {
-							old.set(nextKey, (old.get(nextKey) || 0) + nextValue);
+						next.children.forEach((nextValue: any, nextKey: any) => {
+							const oldChildren = old.children.get(nextKey) || 0;
+							old.children.set(nextKey, oldChildren + nextValue);
 						});
+						old.total += next.total;
 					} else {
 						(v as any)[key] += (stats as any)[key];
 					}

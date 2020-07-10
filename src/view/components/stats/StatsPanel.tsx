@@ -50,7 +50,7 @@ export function ChildHeadings() {
 export function ChildRow(props: {
 	label: string;
 	total: number;
-	count: Children;
+	count?: Children;
 	testId?: string;
 }) {
 	const { label, total, count, testId = "unknown" } = props;
@@ -61,106 +61,29 @@ export function ChildRow(props: {
 				{total}
 			</td>
 			<td class={s.alignRight} data-testid={testId + "-0"}>
-				{props.total > 0 ? count[0] : "-"}
+				{count ? count[0] : "-"}
 			</td>
 			<td class={s.alignRight} data-testid={testId + "-1"}>
-				{props.total > 0 ? count[1] : "-"}
+				{count ? count[1] : "-"}
 			</td>
 			<td class={s.alignRight} data-testid={testId + "-2"}>
-				{props.total > 0 ? count[2] : "-"}
+				{count ? count[2] : "-"}
 			</td>
 			<td class={s.alignRight} data-testid={testId + "-3"}>
-				{props.total > 0 ? count[3] : "-"}
+				{count ? count[3] : "-"}
 			</td>
 			<td class={s.alignRight} data-testid={testId + "-n"}>
-				{props.total > 0 ? count[4] : "-"}
+				{count ? count[4] : "-"}
 			</td>
 		</tr>
 	);
 }
 
 export function StatsData({ stats }: { stats: ParsedStats }) {
-	console.log("stats", stats);
 	return (
 		<div class={s.cards}>
 			<div class={s.card}>
-				<h2 class={s.heading}>VNode Type</h2>
-
-				<table class={s.table} data-testid="vnode-stats">
-					<thead>
-						<ChildHeadings />
-					</thead>
-					<tbody>
-						<tr>
-							<td>Root</td>
-							<td class={s.alignRight} data-testid="root-count">
-								{stats.roots}
-							</td>
-						</tr>
-						<ChildRow
-							label="Class Component"
-							testId="class-component"
-							total={stats.classComponents.total}
-							count={parseChildrenMap(stats.classComponents.children)}
-						/>
-						<ChildRow
-							label="Function Component"
-							testId="function-component"
-							total={stats.functionComponents.total}
-							count={parseChildrenMap(stats.functionComponents.children)}
-						/>
-						<ChildRow
-							label="Fragment"
-							testId="fragment"
-							total={stats.fragments.total}
-							count={parseChildrenMap(stats.fragments.children)}
-						/>
-						<ChildRow
-							label="Element"
-							testId="element"
-							total={stats.elements.total}
-							count={parseChildrenMap(stats.elements.children)}
-						/>
-
-						<ChildRow
-							label="Text"
-							testId="text"
-							total={stats.text}
-							count={[0, 0, 0, 0, 0]}
-						/>
-					</tbody>
-				</table>
-			</div>
-
-			<div class={s.card}>
-				<h2 class={s.heading}>Diff Type</h2>
-
-				<table class={s.table} data-testid="diff-type">
-					<thead>
-						<ChildHeadings />
-					</thead>
-					<tbody>
-						<ChildRow
-							label="keyed"
-							total={stats.keyedTotal}
-							count={parseChildrenMap(stats.keyed)}
-						/>
-						<ChildRow
-							label="unkeyed"
-							total={stats.unkeyedTotal}
-							count={parseChildrenMap(stats.unkeyed)}
-						/>
-						<ChildRow
-							label="mixed"
-							total={stats.mixedTotal}
-							count={parseChildrenMap(stats.mixed)}
-						/>
-					</tbody>
-				</table>
-			</div>
-
-			<div class={s.card}>
-				<h2 class={s.heading}>Operation Type</h2>
+				<h2 class={s.heading}>Operations</h2>
 
 				<table class={s.table} data-testid="operation-type">
 					<thead>
@@ -182,6 +105,95 @@ export function StatsData({ stats }: { stats: ParsedStats }) {
 							<td>unmount</td>
 							<td class={s.alignRight}>{stats.unmounts}</td>
 						</tr>
+					</tbody>
+				</table>
+			</div>
+
+			<div class={s.card}>
+				<h2 class={s.heading}>Reconciler</h2>
+
+				<table class={s.table} data-testid="diff-type">
+					<thead>
+						<ChildHeadings />
+					</thead>
+					<tbody>
+						<ChildRow
+							label="keyed"
+							total={stats.keyed.total}
+							count={parseChildrenMap(stats.keyed.children)}
+						/>
+						<ChildRow
+							label="unkeyed"
+							total={stats.unkeyed.total}
+							count={parseChildrenMap(stats.unkeyed.children)}
+						/>
+						<ChildRow
+							label="mixed"
+							total={stats.mixed.total}
+							count={parseChildrenMap(stats.mixed.children)}
+						/>
+					</tbody>
+				</table>
+			</div>
+
+			<div class={s.card}>
+				<h2 class={s.heading}>VNode Types</h2>
+
+				<table class={s.table} data-testid="vnode-stats">
+					<thead>
+						<ChildHeadings />
+					</thead>
+					<tbody>
+						<ChildRow
+							label="Root"
+							testId="root"
+							total={stats.roots.total}
+							count={parseChildrenMap(stats.roots.children)}
+						/>
+						<ChildRow
+							label="Class Component"
+							testId="class-component"
+							total={stats.classComponents.total}
+							count={parseChildrenMap(stats.classComponents.children)}
+						/>
+						<ChildRow
+							label="Function Component"
+							testId="function-component"
+							total={stats.functionComponents.total}
+							count={parseChildrenMap(stats.functionComponents.children)}
+						/>
+						<ChildRow
+							label="Fragment"
+							testId="fragment"
+							total={stats.fragments.total}
+							count={parseChildrenMap(stats.fragments.children)}
+						/>
+						<ChildRow
+							label="forwardRef"
+							testId="forwardref"
+							total={stats.forwardRef.total}
+							count={parseChildrenMap(stats.forwardRef.children)}
+						/>
+						<ChildRow
+							label="Memo"
+							testId="memo"
+							total={stats.memo.total}
+							count={parseChildrenMap(stats.memo.children)}
+						/>
+						<ChildRow
+							label="Suspense"
+							testId="suspense"
+							total={stats.suspense.total}
+							count={parseChildrenMap(stats.suspense.children)}
+						/>
+						<ChildRow
+							label="Element"
+							testId="element"
+							total={stats.elements.total}
+							count={parseChildrenMap(stats.elements.children)}
+						/>
+
+						<ChildRow label="Text" testId="text" total={stats.text} />
 					</tbody>
 				</table>
 			</div>

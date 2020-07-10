@@ -33,6 +33,11 @@
 .cards {
 	display: flex;
 	flex-direction: column;
+	flex-wrap: wrap;
+}
+
+.card {
+	margin-bottom: 1rem;
 }
 
 @media (min-width: 31.5rem) {

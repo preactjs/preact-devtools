@@ -1,7 +1,6 @@
 import { BaseEvent, PortPageHook } from "../adapter/port";
 import { Commit, MsgTypes, flush } from "../events/events";
 import {
-	Fragment,
 	VNode,
 	FunctionalComponent,
 	ComponentConstructor,
@@ -65,7 +64,7 @@ const forwardRefReg = /^ForwardRef\(/;
  * between the various forms of components.
  */
 export function getDevtoolsType(vnode: VNode): DevNodeType {
-	if (typeof vnode.type == "function" && vnode.type !== Fragment) {
+	if (typeof vnode.type == "function") {
 		const name = vnode.type.displayName || "";
 		if (memoReg.test(name)) return DevNodeType.Memo;
 		if (forwardRefReg.test(name)) return DevNodeType.ForwardRef;
@@ -372,7 +371,9 @@ export function createCommit(
 
 	if (isRoot(vnode, config)) {
 		if (isNew) {
-			commit.stats.roots++;
+			commit.stats.roots.total++;
+			const children = getActualChildren(vnode);
+			commit.stats.roots.children.push(children.length);
 		}
 
 		parentId = -1;
