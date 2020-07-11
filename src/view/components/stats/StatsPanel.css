@@ -22,8 +22,8 @@
 	padding-right: 0.25rem;
 }
 
-.intro {
-	margin-top: 1rem;
+.intro a {
+	color: var(--name-dynamic);
 }
 
 .heading {

@@ -163,7 +163,13 @@ export function StatsData({ stats }: { stats: ParsedStats }) {
 	return (
 		<Fragment>
 			<div class={s.intro}>
-				<p>Combined statistics of currently active trees.</p>
+				<p>
+					Help us make Preact even faster by sharing these statistics over at{" "}
+					<a href="#" rel="noopener noreferrrer">
+						this GitHub thread
+					</a>
+					.
+				</p>
 			</div>
 			<div class={s.cards}>
 				<div class={s.card}>
