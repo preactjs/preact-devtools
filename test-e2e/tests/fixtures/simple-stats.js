@@ -6,17 +6,16 @@ function FnComponent() {
 
 class ClassComponent extends Component {
 	render() {
-		return html`<div>Class Component</div>`;
+		return html`<div>
+			Class Component
+			<button data-testid="update" onClick=${() => this.setState({})}>
+				update
+			</button>
+			<div>foo</div>
+			<span>bob</span>
+			<${FnComponent} />
+		</div>`;
 	}
 }
 
-render(
-	html`
-		<div>foo</div>
-		bar
-		<span>bob</span>
-		<${FnComponent} />
-		<${ClassComponent} />
-	`,
-	document.getElementById("app"),
-);
+render(html`<${ClassComponent} />`, document.getElementById("app"));
