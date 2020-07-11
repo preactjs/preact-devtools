@@ -182,8 +182,9 @@ export function StatsData({ stats }: { stats: ParsedStats }) {
 				<p>
 					Help us make Preact even faster by sharing these statistics over at{" "}
 					<a
-						href="#"
-						rel="noopener noreferrrer"
+						href="https://github.com/preactjs/preact/issues/2618"
+						rel="noopener noreferrer"
+						target="_blank"
 						data-testid="stats-github-link"
 					>
 						this GitHub thread
