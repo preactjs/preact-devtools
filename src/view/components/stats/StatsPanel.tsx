@@ -281,6 +281,57 @@ export function StatsData({ stats }: { stats: ParsedStats }) {
 						</tbody>
 					</table>
 				</div>
+
+				<div class={s.card}>
+					<h2 class={s.heading}>Single Child Type</h2>
+
+					<table class={s.table} data-testid="sing-child-type">
+						<thead>
+							<tr>
+								<th>Type</th>
+								<th>Total</th>
+							</tr>
+						</thead>
+						<tbody>
+							<tr>
+								<td>Root</td>
+								<td>{stats.singleChildType.roots}</td>
+							</tr>
+							<tr>
+								<td>Class Component</td>
+								<td>{stats.singleChildType.classComponents}</td>
+							</tr>
+							<tr>
+								<td>Function Component</td>
+								<td>{stats.singleChildType.functionComponents}</td>
+							</tr>
+							<tr>
+								<td>Fragment Component</td>
+								<td>{stats.singleChildType.fragments}</td>
+							</tr>
+							<tr>
+								<td>forwardRef</td>
+								<td>{stats.singleChildType.forwardRef}</td>
+							</tr>
+							<tr>
+								<td>Memo</td>
+								<td>{stats.singleChildType.memo}</td>
+							</tr>
+							<tr>
+								<td>Suspense</td>
+								<td>{stats.singleChildType.suspense}</td>
+							</tr>
+							<tr>
+								<td>Element</td>
+								<td>{stats.singleChildType.elements}</td>
+							</tr>
+							<tr>
+								<td>Text</td>
+								<td>{stats.singleChildType.text}</td>
+							</tr>
+						</tbody>
+					</table>
+				</div>
 			</div>
 		</Fragment>
 	);

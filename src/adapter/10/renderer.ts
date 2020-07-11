@@ -219,7 +219,7 @@ export function mount(
 
 	if (commit.stats !== null) {
 		updateDiffStats(commit.stats, diff, childCount);
-		recordComponentStats(config, commit.stats, vnode, children.length);
+		recordComponentStats(config, commit.stats, vnode, children);
 	}
 }
 
@@ -288,7 +288,7 @@ export function update(
 
 		if (commit.stats !== null) {
 			updateDiffStats(commit.stats, diff, childCount);
-			recordComponentStats(config, commit.stats, vnode, children.length);
+			recordComponentStats(config, commit.stats, vnode, children);
 		}
 		return;
 	}
@@ -354,7 +354,7 @@ export function update(
 
 	if (commit.stats !== null) {
 		updateDiffStats(commit.stats, diff, childCount);
-		recordComponentStats(config, commit.stats, vnode, children.length);
+		recordComponentStats(config, commit.stats, vnode, children);
 	}
 
 	if (shouldReorder) {

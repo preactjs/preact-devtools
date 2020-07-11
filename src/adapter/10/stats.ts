@@ -46,6 +46,17 @@ export interface Stats {
 	mounts: number;
 	updates: number;
 	unmounts: number;
+	singleChildType: {
+		roots: number;
+		classComponents: number;
+		functionComponents: number;
+		fragments: number;
+		forwardRef: number;
+		memo: number;
+		suspense: number;
+		elements: number;
+		text: number;
+	};
 }
 
 export function updateDiffStats(
@@ -117,6 +128,17 @@ export function createStats(): Stats {
 		mounts: 0,
 		unmounts: 0,
 		updates: 0,
+		singleChildType: {
+			roots: 0,
+			classComponents: 0,
+			functionComponents: 0,
+			fragments: 0,
+			forwardRef: 0,
+			memo: 0,
+			suspense: 0,
+			elements: 0,
+			text: 0,
+		},
 	};
 }
 
@@ -124,8 +146,9 @@ export function recordComponentStats(
 	config: RendererConfig10,
 	stats: Stats,
 	vnode: VNode,
-	childrenLen: number,
+	children: Array<VNode | null | undefined>,
 ) {
+	const childrenLen = children.length;
 	const type = vnode.type;
 	if (typeof type === "function") {
 		if (type.prototype && type.prototype.render) {
@@ -136,6 +159,9 @@ export function recordComponentStats(
 				stats.fragments.total++;
 				stats.fragments.children.push(childrenLen);
 			}
+
+			stats.functionComponents.total++;
+			stats.functionComponents.children.push(childrenLen);
 		}
 	} else if (type !== null) {
 		stats.elements.total++;
@@ -158,6 +184,39 @@ export function recordComponentStats(
 			stats.suspense.total++;
 			stats.suspense.children.push(childrenLen);
 			break;
+	}
+
+	if (childrenLen === 1) {
+		const child = children[0];
+		if (child != null) {
+			if (typeof child.type === "function") {
+				if (child.type.prototype && child.type.prototype.render) {
+					stats.singleChildType.classComponents++;
+				} else {
+					if (child.type === config.Fragment) {
+						stats.singleChildType.fragments++;
+					} else {
+						const childType = getDevtoolsType(child);
+						switch (childType) {
+							case DevNodeType.ForwardRef:
+								stats.singleChildType.forwardRef++;
+								break;
+							case DevNodeType.Memo:
+								stats.singleChildType.memo++;
+								break;
+							case DevNodeType.Suspense:
+								stats.singleChildType.suspense++;
+								break;
+						}
+					}
+					stats.singleChildType.functionComponents++;
+				}
+			} else if (child.type !== null) {
+				stats.singleChildType.elements++;
+			} else {
+				stats.singleChildType.text++;
+			}
+		}
 	}
 }
 
@@ -213,6 +272,17 @@ export function stats2ops(rootId: ID, stats: Stats): number[] {
 		stats.mounts,
 		stats.updates,
 		stats.unmounts,
+
+		// Single child types
+		stats.singleChildType.roots,
+		stats.singleChildType.classComponents,
+		stats.singleChildType.functionComponents,
+		stats.singleChildType.fragments,
+		stats.singleChildType.forwardRef,
+		stats.singleChildType.memo,
+		stats.singleChildType.suspense,
+		stats.singleChildType.elements,
+		stats.singleChildType.text,
 	];
 }
 
@@ -237,6 +307,17 @@ export interface ParsedStats {
 	mounts: number;
 	updates: number;
 	unmounts: number;
+	singleChildType: {
+		roots: number;
+		classComponents: number;
+		functionComponents: number;
+		fragments: number;
+		forwardRef: number;
+		memo: number;
+		suspense: number;
+		elements: number;
+		text: number;
+	};
 }
 
 export function parseComponentStats(i: number, ops: number[]) {
@@ -301,6 +382,16 @@ export function parseStats(ops: number[]): ParsedStats {
 	const updates = ops[i++];
 	const unmounts = ops[i++];
 
+	const singleRoots = ops[i++];
+	const singleClassComponents = ops[i++];
+	const singleFunctionComponents = ops[i++];
+	const singleFragments = ops[i++];
+	const singleForwardRef = ops[i++];
+	const singleMemo = ops[i++];
+	const singleSuspense = ops[i++];
+	const singleElements = ops[i++];
+	const singleText = ops[i++];
+
 	return {
 		roots,
 		classComponents: klass,
@@ -319,5 +410,16 @@ export function parseStats(ops: number[]): ParsedStats {
 		mounts,
 		updates,
 		unmounts,
+		singleChildType: {
+			roots: singleRoots,
+			classComponents: singleClassComponents,
+			functionComponents: singleFunctionComponents,
+			fragments: singleFragments,
+			forwardRef: singleForwardRef,
+			memo: singleMemo,
+			suspense: singleSuspense,
+			elements: singleElements,
+			text: singleText,
+		},
 	};
 }

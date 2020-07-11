@@ -165,15 +165,29 @@ export function applyOperationsV2(store: Store, data: number[]) {
 			store.stats.data.update(v => {
 				for (const key in stats) {
 					const next = (stats as any)[key];
-					if (typeof next === "object") {
+
+					if (key === "singleChildType") {
 						const old = (v as any)[key];
-						next.children.forEach((nextValue: any, nextKey: any) => {
-							const oldChildren = old.children.get(nextKey) || 0;
-							old.children.set(nextKey, oldChildren + nextValue);
-						});
-						old.total += next.total;
+						old.roots += next.roots;
+						old.classComponents += next.classComponents;
+						old.functionComponents += next.functionComponents;
+						old.fragments += next.fragments;
+						old.forwardRef += next.forwardRef;
+						old.memo += next.memo;
+						old.suspense += next.suspense;
+						old.elements += next.elements;
+						old.text += next.text;
 					} else {
-						(v as any)[key] += (stats as any)[key];
+						if (typeof next === "object") {
+							const old = (v as any)[key];
+							next.children.forEach((nextValue: any, nextKey: any) => {
+								const oldChildren = old.children.get(nextKey) || 0;
+								old.children.set(nextKey, oldChildren + nextValue);
+							});
+							old.total += next.total;
+						} else {
+							(v as any)[key] += (stats as any)[key];
+						}
 					}
 				}
 
