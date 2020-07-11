@@ -1,4 +1,4 @@
-import { h, Fragment } from "preact";
+import { h } from "preact";
 import s from "../../Devtools.css";
 import s2 from "./Profiler.css";
 import { ThemeSwitcher } from "../../ThemeSwitcher";
@@ -12,13 +12,16 @@ import { RenderReasons } from "./RenderReasons";
 import { DebugProfilerInfo } from "./CommitInfo/DebugInfo";
 import { DebugNodeNav } from "./RenderedAt/DebugNodeNav";
 import { useStore, useObserver } from "../../../store/react-bindings";
+import { SidebarLayout } from "../../SidebarLayout";
+import { Message, MessageBtn } from "../../Message/Message";
 
 export function Profiler() {
 	const store = useStore();
 	const showDebug = useObserver(() => store.debugMode.$);
+	const statsRecording = useObserver(() => store.stats.isRecording.$);
 
 	return (
-		<Fragment>
+		<SidebarLayout>
 			<ThemeSwitcher />
 			<div class={s.componentActions}>
 				<TimelineBar />
@@ -31,12 +34,27 @@ export function Profiler() {
 				<SidebarHeader />
 			</div>
 			<div class={s.sidebar}>
+				{statsRecording && (
+					<div class={s2.sidebarItemWrapper}>
+						<Message type="info">
+							Stats recording is enabled. Timings may be less accurate.
+							<MessageBtn
+								onClick={() => {
+									store.stats.isRecording.$ = false;
+								}}
+								testId="disable-stats-recording"
+							>
+								Disable
+							</MessageBtn>
+						</Message>
+					</div>
+				)}
 				<RenderReasons />
 				<RenderedAt />
 				<CommitInfo />
 				{showDebug && <DebugProfilerInfo />}
 				{showDebug && <DebugNodeNav />}
 			</div>
-		</Fragment>
+		</SidebarLayout>
 	);
 }

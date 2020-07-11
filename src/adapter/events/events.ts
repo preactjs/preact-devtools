@@ -3,6 +3,7 @@ import { Store } from "../../view/store/types";
 import { recordProfilerCommit } from "../../view/components/profiler/data/commits";
 import { ops2Tree } from "./operations";
 import { applyOperationsV1 } from "./legacy/operationsV1";
+import { Stats, stats2ops } from "../10/stats";
 
 export enum MsgTypes {
 	ADD_ROOT = 1,
@@ -11,6 +12,7 @@ export enum MsgTypes {
 	UPDATE_VNODE_TIMINGS = 4, // Used by Preact 10.1.x
 	REORDER_CHILDREN = 5,
 	RENDER_REASON = 6,
+	COMMIT_STATS = 7,
 }
 
 // Event Examples:
@@ -61,12 +63,14 @@ export enum MsgTypes {
 //   stringsCount
 //   ...stringIds
 //
-
+// COMMIT_STATS -> Check `stats.ts`
+//
 export interface Commit {
 	rootId: number;
 	strings: StringTable;
 	unmountIds: number[];
 	operations: number[];
+	stats: Stats | null;
 }
 
 /**
@@ -74,7 +78,7 @@ export interface Commit {
  * the detools can understand
  */
 export function flush(commit: Commit) {
-	const { rootId, unmountIds, operations, strings } = commit;
+	const { rootId, unmountIds, operations, strings, stats } = commit;
 	if (unmountIds.length === 0 && operations.length === 0) return;
 
 	const msg = [rootId, ...flushTable(strings)];
@@ -82,6 +86,9 @@ export function flush(commit: Commit) {
 		msg.push(MsgTypes.REMOVE_VNODE, unmountIds.length, ...unmountIds);
 	}
 	msg.push(...operations);
+	if (stats !== null) {
+		msg.push(...stats2ops(rootId, stats));
+	}
 
 	return { type: "operation_v2", data: msg };
 }
@@ -94,7 +101,7 @@ export function flush(commit: Commit) {
  * We currently expect all operations to be in order.
  */
 export function applyOperationsV2(store: Store, data: number[]) {
-	const { rootId: commitRootId, roots, tree, reasons } = ops2Tree(
+	const { rootId: commitRootId, roots, tree, reasons, stats } = ops2Tree(
 		store.nodes.$,
 		store.roots.$,
 		data,
@@ -118,6 +125,44 @@ export function applyOperationsV2(store: Store, data: number[]) {
 		store.profiler.renderReasons.update(m => {
 			m.set(commitRootId, reasons);
 		});
+	}
+
+	if (stats !== null) {
+		if (store.stats.data.$ === null) {
+			store.stats.data.$ = stats;
+		} else {
+			store.stats.data.update(v => {
+				for (const key in stats) {
+					const next = (stats as any)[key];
+
+					if (key === "singleChildType") {
+						const old = (v as any)[key];
+						old.roots += next.roots;
+						old.classComponents += next.classComponents;
+						old.functionComponents += next.functionComponents;
+						old.fragments += next.fragments;
+						old.forwardRef += next.forwardRef;
+						old.memo += next.memo;
+						old.suspense += next.suspense;
+						old.elements += next.elements;
+						old.text += next.text;
+					} else {
+						if (typeof next === "object") {
+							const old = (v as any)[key];
+							next.children.forEach((nextValue: any, nextKey: any) => {
+								const oldChildren = old.children.get(nextKey) || 0;
+								old.children.set(nextKey, oldChildren + nextValue);
+							});
+							old.total += next.total;
+						} else {
+							(v as any)[key] += (stats as any)[key];
+						}
+					}
+				}
+
+				return v;
+			});
+		}
 	}
 }
 

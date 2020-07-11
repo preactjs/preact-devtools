@@ -7,6 +7,7 @@ import { Collapser } from "./collapser";
 import { EmitFn, DevtoolEvents } from "../../adapter/hook";
 import { ProfilerState } from "../components/profiler/data/commits";
 import { PropData } from "../components/sidebar/inspect/parseProps";
+import { ParsedStats } from "../../adapter/10/stats";
 
 export type ID = number;
 
@@ -48,6 +49,7 @@ export enum Panel {
 	ELEMENTS = "ELEMENTS",
 	PROFILER = "PROFILER",
 	SETTINGS = "SETTINGS",
+	STATISTICS = "STATISTICS",
 }
 
 export type Tree = Map<ID, DevNode>;
@@ -55,6 +57,10 @@ export type Tree = Map<ID, DevNode>;
 export interface Store {
 	supports: {
 		hooks: Observable<boolean>;
+	};
+	stats: {
+		isRecording: Observable<boolean>;
+		data: Observable<ParsedStats | null>;
 	};
 	debugMode: Observable<boolean>;
 	activePanel: Observable<Panel>;

@@ -12,6 +12,7 @@ export enum Status {
 }
 
 export const PROFILE_RELOAD = "preact-devtools_profile-and-reload";
+export const STATS_RELOAD = "preact-devtools_stats-and-reload";
 
 export enum HookType {
 	useState = 1,

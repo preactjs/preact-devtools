@@ -53,13 +53,6 @@
 	margin-right: auto;
 }
 
-@media (min-width: 37.5rem) {
-	.tree,
-	.empty {
-		min-height: 15rem;
-	}
-}
-
 .bgLogo {
 	color: var(--color-empty-logo);
 	position: absolute;

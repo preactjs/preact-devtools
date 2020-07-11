@@ -8,7 +8,7 @@ import { setupOptions } from "./10/options";
 import { createMultiRenderer } from "./MultiRenderer";
 import parseSemverish from "./parse-semverish";
 import { PortPageHook } from "./adapter/port";
-import { PROFILE_RELOAD } from "../constants";
+import { PROFILE_RELOAD, STATS_RELOAD } from "../constants";
 
 export type EmitterFn = (event: string, data: any) => void;
 
@@ -30,9 +30,13 @@ export interface DevtoolEvents {
 	"start-profiling": ProfilerOptions;
 	"stop-profiling": null;
 	"clear-profiling": null;
+	"reload-and-profile": ProfilerOptions;
+	"start-stats-recording": null;
+	"stop-stats-recording": null;
+	"clear-stats": null;
+	"reload-and-record-stats": null;
 	"start-highlight-updates": null;
 	"stop-highlight-updates": null;
-	"reload-and-profile": ProfilerOptions;
 	"update-filter": RawFilterState;
 	"load-host-selection": null;
 	"inspect-host-node": null;
@@ -126,6 +130,12 @@ export function createHook(port: PortPageHook): DevtoolsHook {
 		if (profilerOptions !== null) {
 			window.localStorage.removeItem(PROFILE_RELOAD);
 			renderer.startProfiling!(JSON.parse(profilerOptions));
+		}
+
+		const statsOptions = window.localStorage.getItem(STATS_RELOAD);
+		if (statsOptions !== null) {
+			window.localStorage.removeItem(STATS_RELOAD);
+			renderer.startRecordStats!();
 		}
 
 		return uid;

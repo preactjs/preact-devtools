@@ -30,6 +30,10 @@ export interface Renderer {
 	startHighlightUpdates?(): void;
 	stopHighlightUpdates?(): void;
 
+	// Stats
+	startRecordStats?(): void; // V4
+	stopRecordStats?(): void; // V4
+
 	// Hooks
 	updateHook?(id: ID, index: number, value: any): void; // V3
 }

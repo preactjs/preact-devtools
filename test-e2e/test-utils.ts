@@ -257,7 +257,7 @@ export async function getCount(page: Page, selector: string) {
 // Preact Devtools specific functions
 export async function clickTab(
 	page: Page,
-	tab: "ELEMENTS" | "PROFILER" | "SETTINGS",
+	tab: "ELEMENTS" | "PROFILER" | "STATISTICS" | "SETTINGS",
 ) {
 	await page.evaluate(name => {
 		return document

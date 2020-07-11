@@ -1,7 +1,6 @@
 import { BaseEvent, PortPageHook } from "../adapter/port";
 import { Commit, MsgTypes, flush } from "../events/events";
 import {
-	Fragment,
 	VNode,
 	FunctionalComponent,
 	ComponentConstructor,
@@ -45,6 +44,13 @@ import {
 	measureUpdate,
 	startDrawing,
 } from "../adapter/highlightUpdates";
+import {
+	createStats,
+	DiffType,
+	getDiffType,
+	updateDiffStats,
+	recordComponentStats,
+} from "./stats";
 
 export interface RendererConfig10 {
 	Fragment: FunctionalComponent;
@@ -58,7 +64,7 @@ const forwardRefReg = /^ForwardRef\(/;
  * between the various forms of components.
  */
 export function getDevtoolsType(vnode: VNode): DevNodeType {
-	if (typeof vnode.type == "function" && vnode.type !== Fragment) {
+	if (typeof vnode.type == "function") {
 		const name = vnode.type.displayName || "";
 		if (memoReg.test(name)) return DevNodeType.Memo;
 		if (forwardRefReg.test(name)) return DevNodeType.ForwardRef;
@@ -142,6 +148,10 @@ export function mount(
 	config: RendererConfig10,
 	profiler: ProfilerState,
 ) {
+	if (commit.stats !== null) {
+		commit.stats.mounts++;
+	}
+
 	const root = isRoot(vnode, config);
 
 	const skip = shouldFilter(vnode, filters, config);
@@ -182,10 +192,18 @@ export function mount(
 		if (dom) domCache.set(dom, vnode);
 	}
 
+	let diff = DiffType.UNKNOWN;
+	let childCount = 0;
+
 	const children = getActualChildren(vnode);
 	for (let i = 0; i < children.length; i++) {
 		const child = children[i];
 		if (child != null) {
+			if (commit.stats !== null) {
+				diff = getDiffType(child, diff);
+				childCount++;
+			}
+
 			mount(
 				ids,
 				commit,
@@ -197,6 +215,11 @@ export function mount(
 				profiler,
 			);
 		}
+	}
+
+	if (commit.stats !== null) {
+		updateDiffStats(commit.stats, diff, childCount);
+		recordComponentStats(config, commit.stats, vnode, children);
 	}
 }
 
@@ -232,12 +255,24 @@ export function update(
 	config: RendererConfig10,
 	profiler: ProfilerState,
 ) {
+	if (commit.stats !== null) {
+		commit.stats.updates++;
+	}
+
+	let diff = DiffType.UNKNOWN;
+
 	const skip = shouldFilter(vnode, filters, config);
 	if (skip) {
+		let childCount = 0;
 		const children = getActualChildren(vnode);
 		for (let i = 0; i < children.length; i++) {
 			const child = children[i];
 			if (child != null) {
+				if (commit.stats !== null) {
+					diff = getDiffType(child, diff);
+					childCount++;
+				}
+
 				update(
 					ids,
 					commit,
@@ -249,6 +284,11 @@ export function update(
 					profiler,
 				);
 			}
+		}
+
+		if (commit.stats !== null) {
+			updateDiffStats(commit.stats, diff, childCount);
+			recordComponentStats(config, commit.stats, vnode, children);
 		}
 		return;
 	}
@@ -289,6 +329,7 @@ export function update(
 		: [];
 
 	let shouldReorder = false;
+	let childCount = 0;
 
 	const children = getActualChildren(vnode);
 	for (let i = 0; i < children.length; i++) {
@@ -298,13 +339,26 @@ export function update(
 				commit.unmountIds.push(oldChildren[i]);
 			}
 		} else if (hasVNodeId(ids, child) || shouldFilter(child, filters, config)) {
+			if (commit.stats !== null) {
+				diff = getDiffType(child, diff);
+				childCount++;
+			}
 			update(ids, commit, child, id, filters, domCache, config, profiler);
 			// TODO: This is only sometimes necessary
 			shouldReorder = true;
 		} else {
+			if (commit.stats !== null) {
+				diff = getDiffType(child, diff);
+				childCount++;
+			}
 			mount(ids, commit, child, id, filters, domCache, config, profiler);
 			shouldReorder = true;
 		}
+	}
+
+	if (commit.stats !== null) {
+		updateDiffStats(commit.stats, diff, childCount);
+		recordComponentStats(config, commit.stats, vnode, children);
 	}
 
 	if (shouldReorder) {
@@ -320,6 +374,7 @@ export function createCommit(
 	domCache: WeakMap<HTMLElement | Text, VNode>,
 	config: RendererConfig10,
 	profiler: ProfilerState,
+	statState: StatState,
 ): Commit {
 	const commit = {
 		operations: [],
@@ -327,6 +382,7 @@ export function createCommit(
 		strings: new Map(),
 		unmountIds: [],
 		renderReasons: new Map(),
+		stats: statState.isRecording ? createStats() : null,
 	};
 
 	let parentId = -1;
@@ -334,6 +390,12 @@ export function createCommit(
 	const isNew = !hasVNodeId(ids, vnode);
 
 	if (isRoot(vnode, config)) {
+		if (commit.stats !== null) {
+			commit.stats.roots.total++;
+			const children = getActualChildren(vnode);
+			commit.stats.roots.children.push(children.length);
+		}
+
 		parentId = -1;
 		roots.add(vnode);
 	} else {
@@ -370,6 +432,10 @@ export interface ProfilerState {
 	captureRenderReasons: boolean;
 }
 
+export interface StatState {
+	isRecording: boolean;
+}
+
 export interface Supports {
 	renderReasons: boolean;
 	hooks: boolean;
@@ -396,6 +462,10 @@ export function createRenderer(
 		updateRects: new Map(),
 		pendingHighlightUpdates: new Set(),
 		captureRenderReasons: false,
+	};
+
+	const statState: StatState = {
+		isRecording: false,
 	};
 
 	function onUnmount(vnode: VNode) {
@@ -431,6 +501,13 @@ export function createRenderer(
 			profiler.highlightUpdates = false;
 			profiler.updateRects.clear();
 			profiler.pendingHighlightUpdates.clear();
+		},
+
+		startRecordStats: () => {
+			statState.isRecording = true;
+		},
+		stopRecordStats: () => {
+			statState.isRecording = false;
 		},
 
 		startProfiling: options => {
@@ -517,7 +594,12 @@ export function createRenderer(
 					rootId,
 					strings: new Map(),
 					unmountIds: currentUnmounts,
+					stats: statState.isRecording ? createStats() : null,
 				};
+
+				if (commit.stats !== null) {
+					commit.stats.unmounts += commit.unmountIds.length;
+				}
 
 				const unmounts = flush(commit);
 				if (unmounts) {
@@ -538,6 +620,7 @@ export function createRenderer(
 					domToVNode,
 					config,
 					profiler,
+					statState,
 				);
 				const ev = flush(commit);
 				if (!ev) return;
@@ -556,7 +639,12 @@ export function createRenderer(
 				domToVNode,
 				config,
 				profiler,
+				statState,
 			);
+
+			if (commit.stats !== null) {
+				commit.stats.unmounts += currentUnmounts.length;
+			}
 
 			commit.unmountIds.push(...currentUnmounts);
 			currentUnmounts = [];
