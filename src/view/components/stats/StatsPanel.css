@@ -1,4 +1,9 @@
-.root {
+.actions {
+	grid-area: actions;
+}
+
+.content {
+	grid-area: content;
 	padding: 1rem;
 }
 
@@ -6,6 +11,15 @@
 	display: block;
 	margin-bottom: 0.75rem;
 	font-size: 0.9rem;
+}
+
+.btnWrapper {
+	display: flex;
+	justify-content: center;
+	align-items: center;
+	height: 100%;
+	padding-left: 0.25rem;
+	padding-right: 0.25rem;
 }
 
 .intro {

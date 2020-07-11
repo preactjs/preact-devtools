@@ -101,7 +101,7 @@ export interface Commit {
 	strings: StringTable;
 	unmountIds: number[];
 	operations: number[];
-	stats: Stats;
+	stats: Stats | null;
 }
 
 /**
@@ -117,7 +117,9 @@ export function flush(commit: Commit) {
 		msg.push(MsgTypes.REMOVE_VNODE, unmountIds.length, ...unmountIds);
 	}
 	msg.push(...operations);
-	msg.push(...stats2ops(rootId, stats));
+	if (stats !== null) {
+		msg.push(...stats2ops(rootId, stats));
+	}
 
 	return { type: "operation_v2", data: msg };
 }
@@ -157,10 +159,10 @@ export function applyOperationsV2(store: Store, data: number[]) {
 	}
 
 	if (stats !== null) {
-		if (store.stats.$ === null) {
-			store.stats.$ = stats;
+		if (store.stats.data.$ === null) {
+			store.stats.data.$ = stats;
 		} else {
-			store.stats.update(v => {
+			store.stats.data.update(v => {
 				for (const key in stats) {
 					const next = (stats as any)[key];
 					if (typeof next === "object") {

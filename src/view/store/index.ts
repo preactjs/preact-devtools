@@ -101,7 +101,10 @@ export function createStore(): Store {
 		supports: {
 			hooks: supportsHooks,
 		},
-		stats,
+		stats: {
+			isRecording: valoo(false),
+			data: stats,
+		},
 		debugMode,
 		activePanel: valoo(Panel.ELEMENTS),
 		profiler: createProfiler(),

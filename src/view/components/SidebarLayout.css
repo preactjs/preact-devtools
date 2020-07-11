@@ -25,6 +25,10 @@
 
 .rootSingle {
 	height: 100%;
+	display: grid;
+	grid-template-columns: 1fr;
+	grid-template-rows: 2.25rem 1fr;
+	grid-template-areas: "actions" "content";
 
 	/* Different browsers may have different defaults */
 	font-family: sans-serif;

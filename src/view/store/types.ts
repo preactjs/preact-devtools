@@ -58,7 +58,10 @@ export interface Store {
 	supports: {
 		hooks: Observable<boolean>;
 	};
-	stats: Observable<ParsedStats | null>;
+	stats: {
+		isRecording: Observable<boolean>;
+		data: Observable<ParsedStats | null>;
+	};
 	debugMode: Observable<boolean>;
 	activePanel: Observable<Panel>;
 	notify: EmitFn;

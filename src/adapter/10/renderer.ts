@@ -148,7 +148,9 @@ export function mount(
 	config: RendererConfig10,
 	profiler: ProfilerState,
 ) {
-	commit.stats.mounts++;
+	if (commit.stats !== null) {
+		commit.stats.mounts++;
+	}
 
 	const root = isRoot(vnode, config);
 
@@ -197,8 +199,10 @@ export function mount(
 	for (let i = 0; i < children.length; i++) {
 		const child = children[i];
 		if (child != null) {
-			diff = getDiffType(child, diff);
-			childCount++;
+			if (commit.stats !== null) {
+				diff = getDiffType(child, diff);
+				childCount++;
+			}
 
 			mount(
 				ids,
@@ -213,8 +217,10 @@ export function mount(
 		}
 	}
 
-	updateDiffStats(commit.stats, diff, childCount);
-	recordComponentStats(config, commit.stats, vnode, children.length);
+	if (commit.stats !== null) {
+		updateDiffStats(commit.stats, diff, childCount);
+		recordComponentStats(config, commit.stats, vnode, children.length);
+	}
 }
 
 export function resetChildren(
@@ -249,7 +255,9 @@ export function update(
 	config: RendererConfig10,
 	profiler: ProfilerState,
 ) {
-	commit.stats.updates++;
+	if (commit.stats !== null) {
+		commit.stats.updates++;
+	}
 
 	let diff = DiffType.UNKNOWN;
 
@@ -260,8 +268,10 @@ export function update(
 		for (let i = 0; i < children.length; i++) {
 			const child = children[i];
 			if (child != null) {
-				diff = getDiffType(child, diff);
-				childCount++;
+				if (commit.stats !== null) {
+					diff = getDiffType(child, diff);
+					childCount++;
+				}
 
 				update(
 					ids,
@@ -276,12 +286,14 @@ export function update(
 			}
 		}
 
-		updateDiffStats(commit.stats, diff, childCount);
+		if (commit.stats !== null) {
+			updateDiffStats(commit.stats, diff, childCount);
+			recordComponentStats(config, commit.stats, vnode, children.length);
+		}
 		return;
 	}
 
 	if (!hasVNodeId(ids, vnode)) {
-		commit.stats.mounts++;
 		mount(ids, commit, vnode, ancestorId, filters, domCache, config, profiler);
 		return true;
 	}
@@ -340,7 +352,10 @@ export function update(
 		}
 	}
 
-	updateDiffStats(commit.stats, diff, childCount);
+	if (commit.stats !== null) {
+		updateDiffStats(commit.stats, diff, childCount);
+		recordComponentStats(config, commit.stats, vnode, children.length);
+	}
 
 	if (shouldReorder) {
 		resetChildren(commit, ids, id, vnode, filters, config);
@@ -355,6 +370,7 @@ export function createCommit(
 	domCache: WeakMap<HTMLElement | Text, VNode>,
 	config: RendererConfig10,
 	profiler: ProfilerState,
+	statState: StatState,
 ): Commit {
 	const commit = {
 		operations: [],
@@ -362,7 +378,7 @@ export function createCommit(
 		strings: new Map(),
 		unmountIds: [],
 		renderReasons: new Map(),
-		stats: createStats(),
+		stats: statState.isRecording ? createStats() : null,
 	};
 
 	let parentId = -1;
@@ -370,7 +386,7 @@ export function createCommit(
 	const isNew = !hasVNodeId(ids, vnode);
 
 	if (isRoot(vnode, config)) {
-		if (isNew) {
+		if (commit.stats !== null) {
 			commit.stats.roots.total++;
 			const children = getActualChildren(vnode);
 			commit.stats.roots.children.push(children.length);
@@ -383,10 +399,8 @@ export function createCommit(
 	}
 
 	if (isNew) {
-		commit.stats.mounts++;
 		mount(ids, commit, vnode, parentId, filters, domCache, config, profiler);
 	} else {
-		commit.stats.updates++;
 		update(ids, commit, vnode, parentId, filters, domCache, config, profiler);
 	}
 
@@ -412,6 +426,10 @@ export interface ProfilerState {
 	pendingHighlightUpdates: Set<HTMLElement>;
 	updateRects: UpdateRects;
 	captureRenderReasons: boolean;
+}
+
+export interface StatState {
+	isRecording: boolean;
 }
 
 export interface Supports {
@@ -440,6 +458,10 @@ export function createRenderer(
 		updateRects: new Map(),
 		pendingHighlightUpdates: new Set(),
 		captureRenderReasons: false,
+	};
+
+	const statState: StatState = {
+		isRecording: false,
 	};
 
 	function onUnmount(vnode: VNode) {
@@ -475,6 +497,13 @@ export function createRenderer(
 			profiler.highlightUpdates = false;
 			profiler.updateRects.clear();
 			profiler.pendingHighlightUpdates.clear();
+		},
+
+		startRecordStats: () => {
+			statState.isRecording = true;
+		},
+		stopRecordStats: () => {
+			statState.isRecording = false;
 		},
 
 		startProfiling: options => {
@@ -561,10 +590,13 @@ export function createRenderer(
 					rootId,
 					strings: new Map(),
 					unmountIds: currentUnmounts,
-					stats: createStats(),
+					stats: statState.isRecording ? createStats() : null,
 				};
 
-				commit.stats.unmounts += commit.unmountIds.length;
+				if (commit.stats !== null) {
+					commit.stats.unmounts += commit.unmountIds.length;
+				}
+
 				const unmounts = flush(commit);
 				if (unmounts) {
 					currentUnmounts = [];
@@ -584,6 +616,7 @@ export function createRenderer(
 					domToVNode,
 					config,
 					profiler,
+					statState,
 				);
 				const ev = flush(commit);
 				if (!ev) return;
@@ -602,9 +635,12 @@ export function createRenderer(
 				domToVNode,
 				config,
 				profiler,
+				statState,
 			);
 
-			commit.stats.unmounts += currentUnmounts.length;
+			if (commit.stats !== null) {
+				commit.stats.unmounts += currentUnmounts.length;
+			}
 
 			commit.unmountIds.push(...currentUnmounts);
 			currentUnmounts = [];

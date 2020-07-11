@@ -33,6 +33,12 @@ export function createMultiRenderer(
 		stopProfiling() {
 			renderers.forEach(r => r.stopProfiling && r.stopProfiling());
 		},
+		startRecordStats() {
+			renderers.forEach(r => r.startRecordStats && r.startRecordStats());
+		},
+		stopRecordStats() {
+			renderers.forEach(r => r.stopRecordStats && r.stopRecordStats());
+		},
 		startHighlightUpdates() {
 			renderers.forEach(
 				r => r.startHighlightUpdates && r.startHighlightUpdates(),
