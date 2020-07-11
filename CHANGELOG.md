@@ -1,5 +1,9 @@
 # Changelog
 
+## 1.1.0
+
+- Add new "Statistics" tab to collect renderer statistics (#230, thanks @marvinhagemeister)
+
 ## 1.0.1
 
 Bug Fixes:
