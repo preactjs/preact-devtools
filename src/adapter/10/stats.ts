@@ -76,7 +76,6 @@ export function updateDiffStats(
 	}
 }
 
-// TODO: store children count
 // TODO: store update depth
 export function createStats(): Stats {
 	return {

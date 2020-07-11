@@ -63,39 +63,8 @@ export enum MsgTypes {
 //   stringsCount
 //   ...stringIds
 //
-// COMMIT_STATS
-//   rootId
-//   componentDataCount
-//     component children count #1
-//     component children count #2
-//     component children count #3
-//     ...
-//   fragmentsDataCount
-//     fragment children count #1
-//     fragment children count #2
-//     fragment children count #3
-//     ...
-//   textNodesCount
-//   diffKeyedCount
-//   diffUnkeyedCount
-//   diffMixedCount
-//   mountDataCount
-//     mountDepth #1
-//     mountDepth #2
-//     mountDepth #3
-//     ...
-//   unmountDataCount
-//     unmountDepth #1
-//     unmountDepth #2
-//     unmountDepth #3
-//     ...
-//   updateDepthCount
-//     updateDepth #1
-//     updateDepth #2
-//     updateDepth #3
-//     ...
+// COMMIT_STATS -> Check `stats.ts`
 //
-
 export interface Commit {
 	rootId: number;
 	strings: StringTable;
