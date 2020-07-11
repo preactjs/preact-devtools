@@ -5,6 +5,7 @@
 .content {
 	grid-area: content;
 	padding: 1rem;
+	overflow: auto;
 }
 
 .label {

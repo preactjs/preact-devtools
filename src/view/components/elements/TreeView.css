@@ -56,7 +56,7 @@
 @media (min-width: 37.5rem) {
 	.tree,
 	.empty {
-		min-height: 15rem;
+		/* min-height: 15rem; */
 	}
 }
 

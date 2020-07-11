@@ -9,6 +9,7 @@
 
 	/* Different browsers may have different defaults */
 	font-family: sans-serif;
+	overflow: hidden;
 }
 
 .root * {

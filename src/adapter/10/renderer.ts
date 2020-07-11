@@ -339,14 +339,18 @@ export function update(
 				commit.unmountIds.push(oldChildren[i]);
 			}
 		} else if (hasVNodeId(ids, child) || shouldFilter(child, filters, config)) {
-			diff = getDiffType(child, diff);
-			childCount++;
+			if (commit.stats !== null) {
+				diff = getDiffType(child, diff);
+				childCount++;
+			}
 			update(ids, commit, child, id, filters, domCache, config, profiler);
 			// TODO: This is only sometimes necessary
 			shouldReorder = true;
 		} else {
-			diff = getDiffType(child, diff);
-			childCount++;
+			if (commit.stats !== null) {
+				diff = getDiffType(child, diff);
+				childCount++;
+			}
 			mount(ids, commit, child, id, filters, domCache, config, profiler);
 			shouldReorder = true;
 		}
@@ -380,6 +384,7 @@ export function createCommit(
 		renderReasons: new Map(),
 		stats: statState.isRecording ? createStats() : null,
 	};
+	console.log(statState.isRecording, commit.stats);
 
 	let parentId = -1;
 

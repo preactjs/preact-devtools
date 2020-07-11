@@ -72,7 +72,7 @@ export function StatsPanel() {
 					</div>
 					<div class={s.btnWrapper}>
 						<IconBtn
-							title="Reload and profile"
+							title="Reload and record statistic"
 							disabled={isRecording}
 							testId="reload-and-record-stats-btn"
 							onClick={onReloadAndRecordStats}
@@ -82,7 +82,7 @@ export function StatsPanel() {
 					</div>
 					<div class={s.btnWrapper}>
 						<IconBtn
-							title="Clear profiling data"
+							title="Clear statistic data"
 							disabled={stats === null || isRecording}
 							onClick={onReset}
 						>
@@ -94,6 +94,17 @@ export function StatsPanel() {
 			<div class={s.content}>
 				{stats !== null ? (
 					<StatsData stats={stats} />
+				) : isRecording ? (
+					<div class={s2.root} data-testid="stats-info-recording">
+						<p class={s2.title}>Statistic recording in progress...</p>
+						<p class={s2.descr}>
+							Click the record button{" "}
+							<span class={s2.inlineBtn}>
+								<StatsRecordBtn />
+							</span>{" "}
+							to stop recording.
+						</p>
+					</div>
 				) : (
 					<div class={s2.root} data-testid="stats-info">
 						<p class={s2.title}>No statistic data collected</p>
@@ -133,7 +144,12 @@ export function ChildRow(props: {
 	count?: Children;
 	testId?: string;
 }) {
-	const { label, total, count, testId = "unknown" } = props;
+	const {
+		label,
+		total,
+		count,
+		testId = label.toLowerCase().replace(/\s/g, "-"),
+	} = props;
 	return (
 		<tr>
 			<td>{label}</td>
@@ -165,7 +181,11 @@ export function StatsData({ stats }: { stats: ParsedStats }) {
 			<div class={s.intro}>
 				<p>
 					Help us make Preact even faster by sharing these statistics over at{" "}
-					<a href="#" rel="noopener noreferrrer">
+					<a
+						href="#"
+						rel="noopener noreferrrer"
+						data-testid="stats-github-link"
+					>
 						this GitHub thread
 					</a>
 					.
@@ -304,39 +324,51 @@ export function StatsData({ stats }: { stats: ParsedStats }) {
 						<tbody>
 							<tr>
 								<td>Root</td>
-								<td>{stats.singleChildType.roots}</td>
+								<td data-testid="single-root">{stats.singleChildType.roots}</td>
 							</tr>
 							<tr>
 								<td>Class Component</td>
-								<td>{stats.singleChildType.classComponents}</td>
+								<td data-testid="single-class-component">
+									{stats.singleChildType.classComponents}
+								</td>
 							</tr>
 							<tr>
 								<td>Function Component*</td>
-								<td>{stats.singleChildType.functionComponents}</td>
+								<td data-testid="single-function-component">
+									{stats.singleChildType.functionComponents}
+								</td>
 							</tr>
 							<tr>
-								<td>Fragment Component</td>
-								<td>{stats.singleChildType.fragments}</td>
+								<td>Fragment</td>
+								<td data-testid="single-fragment">
+									{stats.singleChildType.fragments}
+								</td>
 							</tr>
 							<tr>
 								<td>forwardRef</td>
-								<td>{stats.singleChildType.forwardRef}</td>
+								<td data-testid="single-forwardref">
+									{stats.singleChildType.forwardRef}
+								</td>
 							</tr>
 							<tr>
 								<td>Memo</td>
-								<td>{stats.singleChildType.memo}</td>
+								<td data-testid="single-memo">{stats.singleChildType.memo}</td>
 							</tr>
 							<tr>
 								<td>Suspense</td>
-								<td>{stats.singleChildType.suspense}</td>
+								<td data-testid="single-suspense">
+									{stats.singleChildType.suspense}
+								</td>
 							</tr>
 							<tr>
 								<td>Element</td>
-								<td>{stats.singleChildType.elements}</td>
+								<td data-testid="single-element">
+									{stats.singleChildType.elements}
+								</td>
 							</tr>
 							<tr>
 								<td>Text</td>
-								<td>{stats.singleChildType.text}</td>
+								<td data-testid="single-text">{stats.singleChildType.text}</td>
 							</tr>
 						</tbody>
 					</table>

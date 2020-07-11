@@ -11,6 +11,7 @@
 
 	/* Different browsers may have different defaults */
 	font-family: sans-serif;
+	overflow: auto;
 }
 
 @media (min-width: 37.5rem) {
@@ -32,4 +33,5 @@
 
 	/* Different browsers may have different defaults */
 	font-family: sans-serif;
+	overflow: hidden;
 }
