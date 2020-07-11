@@ -247,7 +247,7 @@ export function StatsData({ stats }: { stats: ParsedStats }) {
 								count={parseChildrenMap(stats.classComponents.children)}
 							/>
 							<ChildRow
-								label="Function Component"
+								label="Function Component*"
 								testId="function-component"
 								total={stats.functionComponents.total}
 								count={parseChildrenMap(stats.functionComponents.children)}
@@ -283,10 +283,12 @@ export function StatsData({ stats }: { stats: ParsedStats }) {
 								count={parseChildrenMap(stats.elements.children)}
 							/>
 
-							<ChildRow label="Text*" testId="text" total={stats.text} />
+							<ChildRow label="Text**" testId="text" total={stats.text} />
 						</tbody>
 					</table>
-					<small>* Text nodes can&apos;t have children.</small>
+					<small>* includes any component that is built via a function.</small>
+					<br />
+					<small>** Text nodes can&apos;t have children.</small>
 				</div>
 
 				<div class={s.card}>
@@ -309,7 +311,7 @@ export function StatsData({ stats }: { stats: ParsedStats }) {
 								<td>{stats.singleChildType.classComponents}</td>
 							</tr>
 							<tr>
-								<td>Function Component</td>
+								<td>Function Component*</td>
 								<td>{stats.singleChildType.functionComponents}</td>
 							</tr>
 							<tr>
