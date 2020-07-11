@@ -134,7 +134,6 @@ export function ops2Tree(oldTree: Tree, existingRoots: ID[], ops: number[]) {
 			}
 			case MsgTypes.COMMIT_STATS: {
 				const count = ops[i + 1];
-				console.log("ops", ops.slice(i));
 				const statsOps = ops.slice(i + 1, i + 1 + count);
 				stats = parseStats(statsOps);
 				i = i + 1 + count;

@@ -380,7 +380,7 @@ describe("Renderer 10", () => {
 				"Add 7 <span> to parent 4",
 				"Add 8 <span> to parent 4",
 				"Remove 3", // TODO: Seems wrong
-				"Remove 1",
+				"Remove 3", // TODO: Seems wrong
 			]);
 		});
 

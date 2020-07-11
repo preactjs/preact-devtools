@@ -23,6 +23,7 @@ describe("ops2Tree", () => {
 				removals: [],
 				tree: new Map(),
 				reasons: new Map(),
+				stats: null,
 			});
 		});
 	});

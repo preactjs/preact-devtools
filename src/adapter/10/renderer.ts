@@ -384,7 +384,6 @@ export function createCommit(
 		renderReasons: new Map(),
 		stats: statState.isRecording ? createStats() : null,
 	};
-	console.log(statState.isRecording, commit.stats);
 
 	let parentId = -1;
 
