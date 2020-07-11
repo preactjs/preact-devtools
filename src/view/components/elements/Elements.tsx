@@ -1,4 +1,4 @@
-import { h, Fragment } from "preact";
+import { h } from "preact";
 import { TreeBar } from "./TreeBar";
 import { TreeView } from "./TreeView";
 import { SidebarActions } from "../sidebar/SidebarActions";
