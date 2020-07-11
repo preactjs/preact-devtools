@@ -283,9 +283,10 @@ export function StatsData({ stats }: { stats: ParsedStats }) {
 								count={parseChildrenMap(stats.elements.children)}
 							/>
 
-							<ChildRow label="Text" testId="text" total={stats.text} />
+							<ChildRow label="Text*" testId="text" total={stats.text} />
 						</tbody>
 					</table>
+					<small>* Text nodes can&apos;t have children.</small>
 				</div>
 
 				<div class={s.card}>
