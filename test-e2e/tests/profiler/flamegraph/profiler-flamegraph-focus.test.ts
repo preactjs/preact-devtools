@@ -6,7 +6,6 @@ import {
 	clickRecordButton,
 } from "../../../test-utils";
 import { expect } from "chai";
-import { closePage } from "pentf/browser_utils";
 import { getFlameNodes } from "./utils";
 
 export const description = "Focus nodes in flamegraph layout";
@@ -50,6 +49,4 @@ export async function run(config: any) {
 		{ maximized: false, name: "Display", visible: true },
 		{ maximized: false, name: "Value", visible: true },
 	]);
-
-	await closePage(page);
 }

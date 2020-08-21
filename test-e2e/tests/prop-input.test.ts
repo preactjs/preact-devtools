@@ -10,7 +10,7 @@ import {
 	checkNotPresent,
 } from "../test-utils";
 import { expect } from "chai";
-import { closePage, waitForTestId } from "pentf/browser_utils";
+import { waitForTestId } from "pentf/browser_utils";
 import { wait } from "pentf/utils";
 import { Page } from "puppeteer";
 
@@ -166,6 +166,4 @@ export async function run(config: any) {
 		rendered: undefined,
 		type: "non-editable",
 	});
-
-	await closePage(page);
 }

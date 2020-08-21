@@ -6,7 +6,6 @@ import {
 	clickRecordButton,
 } from "../../../test-utils";
 import { expect } from "chai";
-import { closePage } from "pentf/browser_utils";
 
 export const description =
 	"Not rendered nodes that are not parents of the current commit should be striped out";
@@ -29,6 +28,4 @@ export async function run(config: any) {
 		'[data-type="flamegraph"] > [data-commit-parent]',
 	);
 	expect(nodes.map(n => n.split(" ")[0])).to.deep.equal(["Fragment", "App"]);
-
-	await closePage(page);
 }

@@ -4,7 +4,7 @@ import {
 	clickTab,
 	clickRecordButton,
 } from "../../test-utils";
-import { closePage, clickNestedText } from "pentf/browser_utils";
+import { clickNestedText } from "pentf/browser_utils";
 import { wait } from "pentf/utils";
 
 export const description = "Should highlight flamegraph node if present in DOM";
@@ -30,6 +30,4 @@ export async function run(config: any) {
 		'[data-type="flamegraph"] [data-name="Counter"]',
 		{ timeout: 3000 },
 	);
-
-	await closePage(page);
 }

@@ -8,7 +8,6 @@ import {
 	clickRecordButton,
 } from "../../test-utils";
 import { expect } from "chai";
-import { closePage } from "pentf/browser_utils";
 
 export const description = "Show in which commit a node rendered";
 
@@ -57,6 +56,4 @@ export async function run(config: any) {
 		"data-selected",
 	);
 	expect(commits).to.deep.equal([null, null, "true", null]);
-
-	await closePage(page);
 }

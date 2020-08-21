@@ -1,6 +1,5 @@
 import { newTestPage, installMouseHelper, getText } from "../test-utils";
 import { expect } from "chai";
-import { closePage } from "pentf/browser_utils";
 
 export const description = "Clicking at the right of element names #144";
 
@@ -26,6 +25,4 @@ export async function run(config: any) {
 
 	const text = await getText(devtools, '[data-selected="true"]');
 	expect(text).to.equal("ChildItemName");
-
-	await closePage(page);
 }

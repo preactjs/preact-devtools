@@ -1,11 +1,11 @@
 import { newTestPage, getText, getCount } from "../../test-utils";
 import { expect } from "chai";
-import { closePage, clickText } from "pentf/browser_utils";
+import { clickText } from "pentf/browser_utils";
 
 export const description = "Inspect useRef hook";
 
 export async function run(config: any) {
-	const { page, devtools } = await newTestPage(config, "hooks-expand", {
+	const { devtools } = await newTestPage(config, "hooks-expand", {
 		preact: "hook",
 	});
 
@@ -27,6 +27,4 @@ export async function run(config: any) {
 	});
 
 	expect(await getCount(devtools, row)).to.equal(2);
-
-	await closePage(page);
 }

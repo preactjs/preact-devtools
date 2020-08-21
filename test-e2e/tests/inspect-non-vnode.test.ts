@@ -1,11 +1,10 @@
 import { newTestPage, click, getText } from "../test-utils";
 import { expect } from "chai";
-import { closePage } from "pentf/browser_utils";
 
 export const description = "Inspect should only parse vnodes as vnodes #114";
 
 export async function run(config: any) {
-	const { page, devtools } = await newTestPage(config, "non-vnode");
+	const { devtools } = await newTestPage(config, "non-vnode");
 
 	await click(devtools, '[data-testid="tree-item"]');
 	await devtools.waitForSelector('[name="new-prop-name"]');
@@ -24,6 +23,4 @@ export async function run(config: any) {
 		'[data-testid="props-row"]:first-child [data-testid="prop-value"]',
 	);
 	expect(blob).to.equal("Blob {}");
-
-	await closePage(page);
 }

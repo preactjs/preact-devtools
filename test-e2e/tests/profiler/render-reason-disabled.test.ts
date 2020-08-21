@@ -7,7 +7,7 @@ import {
 	clickRecordButton,
 } from "../../test-utils";
 import { expect } from "chai";
-import { closePage, clickText } from "pentf/browser_utils";
+import { clickText } from "pentf/browser_utils";
 import { wait } from "pentf/utils";
 
 export const description = "Disables render reason capturing";
@@ -61,6 +61,4 @@ export async function run(config: any) {
 			"checked",
 		),
 	).to.equal(true);
-
-	await closePage(page);
 }

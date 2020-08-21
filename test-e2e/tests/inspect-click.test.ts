@@ -1,6 +1,5 @@
 import { newTestPage, click, getText } from "../test-utils";
 import { expect } from "chai";
-import { closePage } from "pentf/browser_utils";
 
 export const description = "Don't trigger events on click during inspection";
 
@@ -17,6 +16,4 @@ export async function run(config: any) {
 
 	const text = await getText(page, target);
 	expect(text).to.equal("Counter: 0");
-
-	await closePage(page);
 }

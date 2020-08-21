@@ -6,7 +6,6 @@ import {
 	clickRecordButton,
 } from "../../../test-utils";
 import { expect } from "chai";
-import { closePage } from "pentf/browser_utils";
 
 export const description =
 	"Ranked profile view should only show nodes of the current commit";
@@ -33,6 +32,4 @@ export async function run(config: any) {
 		'[data-type="ranked"] [data-weight]:first-child',
 	);
 	expect(text).to.match(/Counter \([0-9]+(\.[0-9]+)?ms\)/);
-
-	await closePage(page);
 }

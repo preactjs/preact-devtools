@@ -1,11 +1,11 @@
 import { newTestPage } from "../test-utils";
 import { expect } from "chai";
-import { closePage, clickText } from "pentf/browser_utils";
+import { clickText } from "pentf/browser_utils";
 
 export const description = "Format inspected data";
 
 export async function run(config: any) {
-	const { page, devtools } = await newTestPage(config, "truncate");
+	const { devtools } = await newTestPage(config, "truncate");
 
 	await clickText(devtools, "App", { elementXPath: "//*" });
 
@@ -21,6 +21,4 @@ export async function run(config: any) {
 		"vnode<div />",
 		"vnode2<Child />",
 	]);
-
-	await closePage(page);
 }

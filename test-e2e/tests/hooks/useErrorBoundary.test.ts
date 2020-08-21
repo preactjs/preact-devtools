@@ -1,11 +1,11 @@
 import { newTestPage, getText, checkNotPresent } from "../../test-utils";
 import { expect } from "chai";
-import { closePage, clickText } from "pentf/browser_utils";
+import { clickText } from "pentf/browser_utils";
 
 export const description = "Inspect useErrorBoundary hook";
 
 export async function run(config: any) {
-	const { page, devtools } = await newTestPage(config, "hooks", {
+	const { devtools } = await newTestPage(config, "hooks", {
 		preact: "hook",
 	});
 
@@ -41,6 +41,4 @@ export async function run(config: any) {
 
 	expect(name).to.equal("useErrorBoundary");
 	expect(value).to.equal("ƒ ()");
-
-	await closePage(page);
 }

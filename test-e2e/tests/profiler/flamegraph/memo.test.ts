@@ -6,7 +6,6 @@ import {
 	clickRecordButton,
 } from "../../../test-utils";
 import { expect } from "chai";
-import { closePage } from "pentf/browser_utils";
 import { getFlameNodes } from "./utils";
 
 export const description = "Correctly position memoized sub-trees";
@@ -46,6 +45,4 @@ export async function run(config: any) {
 	expect(
 		memoSize.x + memoSize.width >= staticSize.x + staticSize.width,
 	).to.equal(true);
-
-	await closePage(page);
 }

@@ -7,7 +7,7 @@ import {
 	clickRecordButton,
 } from "../../test-utils";
 import { expect } from "chai";
-import { closePage, clickText } from "pentf/browser_utils";
+import { clickText } from "pentf/browser_utils";
 import { wait } from "pentf/utils";
 
 export const description = "Disables render reason capturing";
@@ -44,6 +44,4 @@ export async function run(config: any) {
 	await clickText(devtools, "Fragment", { elementXPath: "//*" });
 	reasons = await getText(devtools, '[data-testid="render-reasons"]');
 	expect(reasons).to.equal("Did not render");
-
-	await closePage(page);
 }

@@ -1,6 +1,5 @@
 import { newTestPage, getText } from "../test-utils";
 import { expect } from "chai";
-import { closePage } from "pentf/browser_utils";
 import { wait } from "pentf/utils";
 
 export const description = "Test keyboard navigation in elements tree";
@@ -28,6 +27,4 @@ export async function run(config: any) {
 
 	expect(selected).to.equal("Counter");
 	expect((await devtools.$$(prop)).length).to.equal(0);
-
-	await closePage(page);
 }

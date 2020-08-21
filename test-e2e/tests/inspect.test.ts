@@ -1,6 +1,5 @@
 import { newTestPage, click, getLog, getText } from "../test-utils";
 import { expect } from "chai";
-import { closePage } from "pentf/browser_utils";
 import { wait } from "pentf/utils";
 
 export const description = "Inspect should select node in elements panel";
@@ -28,5 +27,4 @@ export async function run(config: any) {
 
 	const text = await getText(devtools, '[data-selected="true"]');
 	expect(text).to.equal("Display");
-	await closePage(page);
 }

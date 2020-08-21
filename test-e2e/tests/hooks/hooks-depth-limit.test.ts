@@ -1,12 +1,12 @@
 import { newTestPage, clickNestedText } from "../../test-utils";
-import { closePage, waitForTestId, getText } from "pentf/browser_utils";
+import { waitForTestId, getText } from "pentf/browser_utils";
 import { expect } from "chai";
 
 export const description =
 	"Show a deeply nested hook tree and limit value parsing depth";
 
 export async function run(config: any) {
-	const { page, devtools } = await newTestPage(config, "hooks-depth-limit", {
+	const { devtools } = await newTestPage(config, "hooks-depth-limit", {
 		preact: "hook",
 	});
 
@@ -49,6 +49,4 @@ export async function run(config: any) {
 		'form [data-testid="props-row"]:last-child [data-testid="prop-value"]',
 	);
 	expect(text).to.equal('"…"');
-
-	await closePage(page);
 }

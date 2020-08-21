@@ -1,5 +1,5 @@
 import { newTestPage, typeText } from "../test-utils";
-import { clickText, closePage } from "pentf/browser_utils";
+import { clickText } from "pentf/browser_utils";
 import { Page } from "puppeteer";
 
 async function type(page: Page, devtools: Page, value: string | number) {
@@ -42,6 +42,4 @@ export async function run(config: any) {
 	await clickText(devtools, "LegacyConsumer", { elementXPath: "//*" });
 	await type(page, devtools, "1");
 	await waitForResult(page, "legacy-context-result", "legacy context: 1");
-
-	await closePage(page);
 }

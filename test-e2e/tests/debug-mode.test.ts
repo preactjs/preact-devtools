@@ -7,7 +7,7 @@ import {
 	clickRecordButton,
 } from "../test-utils";
 import { expect } from "chai";
-import { closePage, clickText } from "pentf/browser_utils";
+import { clickText } from "pentf/browser_utils";
 import { wait } from "pentf/utils";
 
 export const description = "Debug mode toggles debug views";
@@ -52,6 +52,4 @@ export async function run(config: any) {
 
 	await devtools.waitForSelector('[data-testid="profiler-debug-stats"]');
 	await devtools.waitForSelector('[data-testid="profiler-debug-nav"]');
-
-	await closePage(page);
 }

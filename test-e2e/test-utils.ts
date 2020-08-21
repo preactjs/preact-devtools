@@ -2,7 +2,7 @@ import { newPage } from "pentf/browser_utils";
 import { wait } from "pentf/utils";
 import fs from "fs";
 import path from "path";
-import { Request, Page } from "puppeteer";
+import { Request, Page, FrameBase } from "puppeteer";
 import assert from "assert";
 
 const readFile = (name: string) => {
@@ -106,7 +106,6 @@ export async function newTestPage(
 		Object.create(Object.getPrototypeOf(page.mouse)),
 		page.mouse,
 	);
-	(devtools as any).mouse._client = (devtools as any)._client;
 
 	return { page, devtools: (devtools as any) as Page };
 }
@@ -202,7 +201,7 @@ export async function typeText(page: Page, selector: string, text: string) {
 	}
 }
 
-export async function getLog(page: Page) {
+export async function getLog(page: FrameBase) {
 	return (await page.evaluate(() => (window as any).log)) as any[];
 }
 

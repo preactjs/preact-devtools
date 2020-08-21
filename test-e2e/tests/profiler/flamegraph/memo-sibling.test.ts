@@ -7,7 +7,7 @@ import {
 	clickRecordButton,
 } from "../../../test-utils";
 import { expect } from "chai";
-import { closePage, clickTestId, waitForTestId } from "pentf/browser_utils";
+import { clickTestId, waitForTestId } from "pentf/browser_utils";
 import { getFlameNodes } from "./utils";
 
 export const description = "Correctly position memoized sibling sub-trees";
@@ -72,6 +72,4 @@ export async function run(config: any) {
 	expect(
 		memoSize.x + memoSize.width >= staticSize2.x + staticSize2.width,
 	).to.equal(true);
-
-	await closePage(page);
 }

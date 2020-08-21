@@ -1,6 +1,6 @@
 import { newTestPage, click, getLog, waitFor, clickTab } from "../test-utils";
 import { expect } from "chai";
-import { closePage, clickText } from "pentf/browser_utils";
+import { clickText } from "pentf/browser_utils";
 
 export const description = "Collapse all the things!";
 
@@ -47,7 +47,7 @@ export async function run(config: any) {
 	await page.keyboard.press("Enter");
 
 	await waitFor(async () => {
-		const log = await getLog(page);
+		const log = await getLog(page as any);
 		return log.filter(x => x.type === "inspect-result").length === 3;
 	});
 
@@ -62,6 +62,4 @@ export async function run(config: any) {
 	// Our input should still be visible
 	expect((await devtools.$$(row)).length > 0).to.equal(true);
 	expect((await devtools.$$(selector)).length).to.equal(0);
-
-	await closePage(page);
 }

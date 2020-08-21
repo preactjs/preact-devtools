@@ -1,10 +1,5 @@
 import { newTestPage, clickTab } from "../../test-utils";
-import {
-	closePage,
-	getText,
-	waitForTestId,
-	clickTestId,
-} from "pentf/browser_utils";
+import { getText, waitForTestId, clickTestId } from "pentf/browser_utils";
 import { expect } from "chai";
 
 export const description = "Display simple stats";
@@ -46,6 +41,4 @@ export async function run(config: any) {
 
 	const textCount = await getText(devtools, '[data-testid="text-total');
 	expect(textCount).to.equal("6");
-
-	await closePage(page);
 }
