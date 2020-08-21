@@ -47,7 +47,7 @@ export async function run(config: any) {
 	await page.keyboard.press("Enter");
 
 	await waitFor(async () => {
-		const log = await getLog(page);
+		const log = await getLog(page as any);
 		return log.filter(x => x.type === "inspect-result").length === 3;
 	});
 
