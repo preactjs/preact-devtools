@@ -5,7 +5,7 @@ import {
 	getText$$,
 } from "../test-utils";
 import { expect } from "chai";
-import { closePage, getAttribute } from "pentf/browser_utils";
+import { getAttribute } from "pentf/browser_utils";
 import { wait } from "pentf/utils";
 
 export const description = "Add new props";
@@ -37,6 +37,4 @@ export async function run(config: any) {
 	// New prop input should be cleared
 	expect(await getAttribute(devtools, propName, "value")).to.equal("");
 	expect(await getAttribute(devtools, propValue, "value")).to.equal("");
-
-	await closePage(page);
 }

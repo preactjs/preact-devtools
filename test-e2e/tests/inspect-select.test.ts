@@ -1,6 +1,5 @@
 import { newTestPage, getLog, getAttribute, getSize } from "../test-utils";
 import { expect } from "chai";
-import { closePage } from "pentf/browser_utils";
 import { wait } from "pentf/utils";
 
 export const description = "Should inspect during picking";
@@ -46,6 +45,4 @@ export async function run(config: any) {
 
 	// ...and display the newly inspected data
 	expect((await devtools.$$(prop)).length).to.equal(1);
-
-	await closePage(page);
 }

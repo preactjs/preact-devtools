@@ -4,7 +4,6 @@ import {
 	clickTab,
 	checkNotPresent,
 } from "../../test-utils";
-import { closePage } from "pentf/browser_utils";
 import { wait } from "pentf/utils";
 
 export const description = "Don't crash on measuring text nodes";
@@ -24,6 +23,4 @@ export async function run(config: any) {
 
 	await wait(1000);
 	await checkNotPresent(page, id);
-
-	await closePage(page);
 }

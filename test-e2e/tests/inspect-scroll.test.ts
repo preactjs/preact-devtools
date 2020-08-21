@@ -1,6 +1,6 @@
 import { newTestPage, getSize, click, hasSelector } from "../test-utils";
 import { expect } from "chai";
-import { closePage, waitForTestId } from "pentf/browser_utils";
+import { waitForTestId } from "pentf/browser_utils";
 import { wait } from "pentf/utils";
 
 export const description = "Highlighting should move with scroll";
@@ -28,6 +28,4 @@ export async function run(config: any) {
 
 	const after = await getSize(page, highlight);
 	expect(before.top).not.to.equal(after.top);
-
-	await closePage(page);
 }

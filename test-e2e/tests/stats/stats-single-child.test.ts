@@ -1,10 +1,5 @@
 import { newTestPage, clickTab } from "../../test-utils";
-import {
-	closePage,
-	getText,
-	waitForTestId,
-	clickTestId,
-} from "pentf/browser_utils";
+import { getText, waitForTestId, clickTestId } from "pentf/browser_utils";
 import { expect } from "chai";
 
 export const description = "Display single child stats";
@@ -39,6 +34,4 @@ export async function run(config: any) {
 	expect(elements).to.equal("2");
 	const texts = await getText(devtools, '[data-testid="single-text"]');
 	expect(texts).to.equal("3");
-
-	await closePage(page);
 }

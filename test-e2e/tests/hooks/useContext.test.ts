@@ -1,11 +1,11 @@
 import { newTestPage, getText, checkNotPresent } from "../../test-utils";
 import { expect } from "chai";
-import { closePage, clickText } from "pentf/browser_utils";
+import { clickText } from "pentf/browser_utils";
 
 export const description = "Inspect useContext hook";
 
 export async function run(config: any) {
-	const { page, devtools } = await newTestPage(config, "hooks", {
+	const { devtools } = await newTestPage(config, "hooks", {
 		preact: "hook",
 	});
 
@@ -41,6 +41,4 @@ export async function run(config: any) {
 
 	expect(name).to.equal("useContext");
 	expect(value).to.equal("0");
-
-	await closePage(page);
 }

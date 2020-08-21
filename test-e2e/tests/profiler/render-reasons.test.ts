@@ -6,7 +6,6 @@ import {
 	clickRecordButton,
 } from "../../test-utils";
 import { expect } from "chai";
-import { closePage } from "pentf/browser_utils";
 import { Page } from "puppeteer";
 import { wait } from "pentf/utils";
 
@@ -79,6 +78,4 @@ export async function run(config: any) {
 	await clickFlameNode(devtools, "ForceUpdate");
 	reasons = await getText(devtools, '[data-testid="render-reasons"');
 	expect(reasons).to.equal("Force update");
-
-	await closePage(page);
 }

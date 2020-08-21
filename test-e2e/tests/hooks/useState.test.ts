@@ -6,7 +6,7 @@ import {
 	getAttribute,
 } from "../../test-utils";
 import { expect } from "chai";
-import { closePage, clickText } from "pentf/browser_utils";
+import { clickText } from "pentf/browser_utils";
 
 export const description = "Inspect useState hook";
 
@@ -45,6 +45,4 @@ export async function run(config: any) {
 
 	const text = await getText(page, '[data-testid="result"]');
 	expect(text).to.equal("Counter: 1");
-
-	await closePage(page);
 }

@@ -1,5 +1,4 @@
 import { newTestPage, click } from "../../test-utils";
-import { closePage } from "pentf/browser_utils";
 
 export const description = "Reload and immediately start profiling";
 // Reloading the whole page breaks our current test setup, and
@@ -29,6 +28,4 @@ export async function run(config: any) {
 		btn.click();
 		btn.click();
 	});
-
-	await closePage(page);
 }

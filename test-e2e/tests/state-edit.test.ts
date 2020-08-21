@@ -1,6 +1,6 @@
 import { newTestPage, getAttribute, getText, typeText } from "../test-utils";
 import { expect } from "chai";
-import { clickText, closePage } from "pentf/browser_utils";
+import { clickText } from "pentf/browser_utils";
 
 export const description = "Mirror component state to the devtools";
 
@@ -20,6 +20,4 @@ export async function run(config: any) {
 
 	expect(value).to.equal("42");
 	expect(text).to.equal("Counter: 42");
-
-	await closePage(page);
 }

@@ -1,6 +1,6 @@
 import { newTestPage, getSize } from "../test-utils";
 import { expect } from "chai";
-import { closePage, waitForTestId } from "pentf/browser_utils";
+import { waitForTestId } from "pentf/browser_utils";
 
 export const description = "Highlighting combined DOM tree of a Fragment";
 
@@ -29,6 +29,4 @@ export async function run(config: any) {
 	highlight = await getSize(page, '[data-testid="highlight"]');
 	expect(size.width).to.equal(highlight.width);
 	expect(size.height).to.equal(highlight.height);
-
-	await closePage(page);
 }

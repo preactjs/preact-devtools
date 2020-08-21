@@ -7,7 +7,6 @@ import {
 	clickRecordButton,
 } from "../test-utils";
 import { expect } from "chai";
-import { closePage } from "pentf/browser_utils";
 
 export const description = "Sync selection from profiler";
 
@@ -30,6 +29,4 @@ export async function run(config: any) {
 
 	const text = await getText(devtools, "[data-selected]");
 	expect(text).to.equal("Display");
-
-	await closePage(page);
 }

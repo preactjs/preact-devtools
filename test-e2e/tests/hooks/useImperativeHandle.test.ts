@@ -1,11 +1,11 @@
 import { newTestPage, getText, checkNotPresent } from "../../test-utils";
 import { expect } from "chai";
-import { closePage, clickText } from "pentf/browser_utils";
+import { clickText } from "pentf/browser_utils";
 
 export const description = "Inspect useImperativeHandle hook";
 
 export async function run(config: any) {
-	const { page, devtools } = await newTestPage(config, "hooks", {
+	const { devtools } = await newTestPage(config, "hooks", {
 		preact: "hook",
 	});
 
@@ -29,6 +29,4 @@ export async function run(config: any) {
 
 	// Should not be editable
 	await checkNotPresent(devtools, '[data-testid="prop-value"] input');
-
-	await closePage(page);
 }

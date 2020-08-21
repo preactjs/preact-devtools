@@ -1,6 +1,6 @@
 import { newTestPage, getText, click } from "../../test-utils";
 import { expect } from "chai";
-import { closePage, clickText } from "pentf/browser_utils";
+import { clickText } from "pentf/browser_utils";
 
 export const description = "Show custom debug value";
 
@@ -28,6 +28,4 @@ export async function run(config: any) {
 
 	value = await getText(devtools, '[data-testid="prop-value"]');
 	expect(value).to.equal('"Online"');
-
-	await closePage(page);
 }

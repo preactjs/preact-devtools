@@ -1,11 +1,11 @@
 import { newTestPage, getAttribute, getCount } from "../../test-utils";
 import { expect } from "chai";
-import { closePage, clickText } from "pentf/browser_utils";
+import { clickText } from "pentf/browser_utils";
 
 export const description = "Inspect custom hooks";
 
 export async function run(config: any) {
-	const { page, devtools } = await newTestPage(config, "hooks", {
+	const { devtools } = await newTestPage(config, "hooks", {
 		preact: "hook",
 	});
 
@@ -44,6 +44,4 @@ export async function run(config: any) {
 		timeout: 2000,
 	});
 	expect(await getCount(devtools, hooksPanel)).to.equal(1);
-
-	await closePage(page);
 }

@@ -1,6 +1,5 @@
 import { newTestPage } from "../test-utils";
 import { expect } from "chai";
-import { closePage } from "pentf/browser_utils";
 
 export const description =
 	"Pressing Enter should scroll marked results into view during search #162";
@@ -18,6 +17,4 @@ export async function run(config: any) {
 
 	const marked = await devtools.$("[data-marked]");
 	expect(await marked!.isIntersectingViewport()).to.equal(true);
-
-	await closePage(page);
 }
