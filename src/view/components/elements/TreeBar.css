@@ -52,7 +52,7 @@
 
 .searchCounter {
 	display: inline-flex;
-	font-size: 0.8rem;
+	font-size: var(--font-small);
 	color: var(--color-text-empty);
 }
 

@@ -6,7 +6,7 @@
 	text-align: start;
 	display: flex;
 	align-items: center;
-	font-size: 0.9rem;
+	font-size: var(--font-small);
 	padding: 0.25rem 0.5rem;
 	cursor: pointer;
 }

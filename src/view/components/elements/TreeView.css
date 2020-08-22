@@ -67,7 +67,7 @@
 	font-size: 0.9rem;
 	font-family: var(--font-monospace);
 	color: var(--color-element-text);
-	height: 1.5rem;
+	height: 1.25rem;
 	position: relative;
 	white-space: nowrap;
 }
@@ -147,7 +147,7 @@
 }
 
 .name {
-	font-size: 0.9rem;
+	font-size: var(--font-xsmall);
 }
 
 .dimmer {
