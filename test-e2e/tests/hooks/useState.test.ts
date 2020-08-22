@@ -1,6 +1,11 @@
-import { newTestPage, checkNotPresent, click } from "../../test-utils";
+import { newTestPage, click } from "../../test-utils";
 import { expect } from "chai";
-import { clickNestedText, getAttribute, getText } from "pentf/browser_utils";
+import {
+	assertNotSelector,
+	clickNestedText,
+	getAttribute,
+	getText,
+} from "pentf/browser_utils";
 
 export const description = "Inspect useState hook";
 
@@ -26,7 +31,7 @@ export async function run(config: any) {
 	expect(value).to.equal("0");
 
 	// Should not be collapsable
-	await checkNotPresent(devtools, '[data-testid="props-row"] > button');
+	await assertNotSelector(devtools, '[data-testid="props-row"] > button');
 
 	// Should be editable
 	await devtools.waitFor('[data-testid="prop-value"] input');

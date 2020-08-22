@@ -1,11 +1,6 @@
-import {
-	newTestPage,
-	click,
-	clickTab,
-	typeText,
-	checkNotPresent,
-} from "../../test-utils";
+import { newTestPage, click, clickTab, typeText } from "../../test-utils";
 import { wait } from "pentf/utils";
+import { assertNotSelector } from "pentf/browser_utils";
 
 export const description = "Check if highlight updates is rendered";
 
@@ -25,6 +20,6 @@ export async function run(config: any) {
 		await page.waitForSelector(id);
 
 		await wait(1000);
-		await checkNotPresent(page, id);
+		await assertNotSelector(page, id);
 	}
 }

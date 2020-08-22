@@ -1,10 +1,6 @@
-import {
-	newTestPage,
-	click,
-	clickTab,
-	checkNotPresent,
-} from "../../test-utils";
+import { newTestPage, click, clickTab } from "../../test-utils";
 import { wait } from "pentf/utils";
+import { assertNotSelector } from "pentf/browser_utils";
 
 export const description = "Don't crash on measuring text nodes";
 
@@ -22,5 +18,5 @@ export async function run(config: any) {
 	await page.waitForSelector(id);
 
 	await wait(1000);
-	await checkNotPresent(page, id);
+	await assertNotSelector(page, id);
 }

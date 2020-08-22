@@ -2,7 +2,6 @@ import { getAttribute, newPage } from "pentf/browser_utils";
 import fs from "fs";
 import path from "path";
 import { Request, Page, FrameBase } from "puppeteer";
-import assert from "assert";
 
 const readFile = (name: string) => {
 	return fs.readFileSync(
@@ -223,15 +222,6 @@ export async function doesExist(page: Page, selector: string) {
 		(s: string) => document.querySelector(s) !== null,
 		selector,
 	);
-}
-
-export async function checkNotPresent(page: Page, selector: string) {
-	const res = await page.evaluate(
-		(s: string) => document.querySelector(s) === null,
-		selector,
-	);
-
-	assert.equal(res, true, `Expected '${selector}' not to exist`);
 }
 
 export async function getCount(page: Page, selector: string) {

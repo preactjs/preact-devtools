@@ -1,12 +1,11 @@
-import {
-	newTestPage,
-	click,
-	clickTab,
-	checkNotPresent,
-	clickRecordButton,
-} from "../test-utils";
+import { newTestPage, click, clickTab, clickRecordButton } from "../test-utils";
 import { expect } from "chai";
-import { clickNestedText, getAttribute } from "pentf/browser_utils";
+import {
+	assertNotTestId,
+	clickNestedText,
+	getAttribute,
+	waitForTestId,
+} from "pentf/browser_utils";
 import { wait } from "pentf/utils";
 
 export const description = "Debug mode toggles debug views";
@@ -32,8 +31,8 @@ export async function run(config: any) {
 	await clickRecordButton(devtools);
 	await clickNestedText(devtools, "Counter");
 
-	await checkNotPresent(devtools, '[data-testid="profiler-debug-stats"]');
-	await checkNotPresent(devtools, '[data-testid="profiler-debug-nav"]');
+	await assertNotTestId(devtools, "profiler-debug-stats");
+	await assertNotTestId(devtools, "profiler-debug-nav");
 
 	await clickTab(devtools, "SETTINGS");
 	await click(devtools, '[data-testid="toggle-debug-mode"]');
@@ -49,6 +48,6 @@ export async function run(config: any) {
 	).to.equal(true);
 	await clickTab(devtools, "PROFILER");
 
-	await devtools.waitForSelector('[data-testid="profiler-debug-stats"]');
-	await devtools.waitForSelector('[data-testid="profiler-debug-nav"]');
+	await waitForTestId(devtools, "profiler-debug-stats");
+	await waitForTestId(devtools, "profiler-debug-nav");
 }

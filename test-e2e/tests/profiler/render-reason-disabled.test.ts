@@ -5,7 +5,7 @@ import {
 	clickRecordButton,
 } from "../../test-utils";
 import { expect } from "chai";
-import { clickNestedText, getAttribute, getText } from "pentf/browser_utils";
+import { clickSelector, getAttribute, getText } from "pentf/browser_utils";
 import { wait } from "pentf/utils";
 
 export const description = "Disables render reason capturing";
@@ -33,12 +33,12 @@ export async function run(config: any) {
 
 	await clickRecordButton(devtools);
 
-	await clickNestedText(devtools, "ComponentState");
+	await clickSelector(devtools, '[data-name="ComponentState"]');
 	let reasons = await getText(devtools, '[data-testid="render-reasons"');
 	expect(reasons).to.equal("-");
 
 	// Reset flamegraph
-	await clickNestedText(devtools, "Fragment");
+	await clickSelector(devtools, '[data-name="Fragment"]');
 	reasons = await getText(devtools, '[data-testid="render-reasons"]');
 	expect(reasons).to.equal("Did not render");
 

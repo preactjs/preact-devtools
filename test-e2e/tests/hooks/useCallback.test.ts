@@ -1,6 +1,10 @@
-import { newTestPage, checkNotPresent } from "../../test-utils";
+import { newTestPage } from "../../test-utils";
 import { expect } from "chai";
-import { clickNestedText, getText } from "pentf/browser_utils";
+import {
+	assertNotSelector,
+	clickNestedText,
+	getText,
+} from "pentf/browser_utils";
 
 export const description = "Inspect useCallback hook";
 
@@ -22,8 +26,8 @@ export async function run(config: any) {
 	expect(value).to.equal("ƒ ()");
 
 	// Should not be collapsable
-	await checkNotPresent(devtools, '[data-testid="props-row"] > button');
+	await assertNotSelector(devtools, '[data-testid="props-row"] > button');
 
 	// Should not be editable
-	await checkNotPresent(devtools, '[data-testid="prop-value"] input');
+	await assertNotSelector(devtools, '[data-testid="prop-value"] input');
 }
