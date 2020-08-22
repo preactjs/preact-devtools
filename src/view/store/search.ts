@@ -24,6 +24,7 @@ export function createSearchStore(
 ) {
 	const value = valoo("");
 	const selected = valoo(0);
+	const selectedIdx = valoo(-1);
 	const regex = valoo<RegExp | null>(null);
 	const match = valoo<number[]>([]);
 	const count = valoo(0);
@@ -58,12 +59,16 @@ export function createSearchStore(
 		match.$ = ids;
 	};
 
-	const reset = () => onChange("");
+	const reset = () => {
+		selectedIdx.$ = -1;
+		onChange("");
+	};
 
 	function go(n: number) {
 		if (n < 0) n = match.$.length - 1;
 		else if (n > match.$.length - 1) n = 0;
 		selected.$ = n;
+		selectedIdx.$ = list.$.findIndex(id => match.$[n] === id);
 	}
 
 	const selectNext = () => go(selected.$ + 1);
@@ -71,6 +76,7 @@ export function createSearchStore(
 
 	return {
 		selected,
+		selectedIdx,
 		regex,
 		count,
 		value,
@@ -91,10 +97,12 @@ export function useSearch() {
 	const count = useObserver(() => s.count.$);
 	const selected = useObserver(() => s.selected.$);
 	const selectedId = useObserver(() => s.match.$[s.selected.$]);
+	const selectedIdx = useObserver(() => s.selectedIdx.$);
 	return {
 		count,
 		selected,
 		selectedId,
+		selectedIdx,
 		marked,
 		regex,
 		match,

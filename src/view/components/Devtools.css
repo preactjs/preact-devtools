@@ -253,7 +253,8 @@ input {
 
 .components {
 	grid-area: tree;
-	overflow: auto;
+	min-height: 0;
+	overflow: hidden;
 }
 
 .sidebarActions {
@@ -266,4 +267,5 @@ input {
 	grid-area: sidebar;
 	border-left: 0.0625rem solid var(--color-border);
 	overflow: auto;
+	min-height: 0;
 }

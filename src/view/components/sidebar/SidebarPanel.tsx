@@ -26,6 +26,6 @@ export function SidebarPanel(props: Props) {
 	);
 }
 
-export function Empty(props: { children: any }) {
+export function Empty(props: { children?: any }) {
 	return <span class={s.empty}>{props.children}</span>;
 }

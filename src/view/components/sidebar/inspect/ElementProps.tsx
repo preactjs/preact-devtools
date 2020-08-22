@@ -93,6 +93,10 @@ export function SingleItem(props: SingleProps) {
 		setValue(initial);
 	}, [initial]);
 
+	const onClick = useCallback(() => {
+		onCollapse && onCollapse(id);
+	}, [onCollapse, id]);
+
 	const preview = useMemo(() => genPreview(initial), [initial]);
 
 	return (
@@ -101,14 +105,16 @@ export function SingleItem(props: SingleProps) {
 			class={s.row}
 			data-testid="props-row"
 			data-depth={depth}
-			style={`padding-left: calc(var(--indent-depth) * ${depth - 1})`}
+			style={`transform: translate3d(calc(var(--indent-depth) * ${
+				depth - 1
+			}), 0, 0);`}
 		>
 			{collapseable && (
 				<button
 					class={s.toggle}
 					type="button"
 					data-collapsed={collapsed}
-					onClick={() => onCollapse && onCollapse(id)}
+					onClick={onClick}
 				>
 					<Arrow />
 					<span

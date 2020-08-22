@@ -8,12 +8,14 @@ import { useSelection } from "../../store/selection";
 import { useCollapser } from "../../store/collapser";
 import { BackgroundLogo } from "./background-logo";
 import { useSearch } from "../../store/search";
-import { scrollIntoView, cssToPx, useResize } from "../utils";
+import { scrollIntoView, useResize } from "../utils";
 import { ID } from "../../store/types";
 import { debounce } from "../../../shells/shared/utils";
 import { EmitFn } from "../../../adapter/hook";
+import { useVirtualizedList } from "./VirtualizedList";
+import { useAutoIndent } from "./useAutoIndent";
 
-const SCROLLBAR_WIDTH = 24;
+const ROW_HEIGHT = 18;
 
 const highlightNode = debounce(
 	(notify: EmitFn, id: ID | null) => notify("highlight", id),
@@ -23,9 +25,6 @@ const highlightNode = debounce(
 export function TreeView() {
 	const store = useStore();
 	const nodeList = useObserver(() => store.nodeList.$);
-	const treeDepth = useObserver(() => {
-		return Math.max(...Array.from(store.nodes.$.values()).map(x => x.depth));
-	});
 	const { collapseNode, collapsed } = useCollapser();
 	const { selected, selectNext, selectPrev } = useSelection();
 
@@ -55,6 +54,18 @@ export function TreeView() {
 	const ref = useRef<HTMLDivElement | null>(null);
 	const paneRef = useRef<HTMLDivElement | null>(null);
 
+	const search = useSearch();
+	useEffect(() => {
+		if (ref.current && search.selectedIdx > -1) {
+			const top = ROW_HEIGHT * search.selectedIdx;
+			const scroll = ref.current.scrollTop;
+			const height = ref.current.clientHeight;
+			if (scroll > top || scroll + height < top) {
+				ref.current.scrollTo({ top });
+			}
+		}
+	}, [search.selectedIdx]);
+
 	const [updateCount, setUpdateCount] = useState(0);
 	useResize(() => setUpdateCount(updateCount + 1), [updateCount]);
 
@@ -69,36 +80,16 @@ export function TreeView() {
 		}
 	}, []);
 
-	const [maxIndent, setMaxIndent] = useState(0);
+	const { children: listItems, containerHeight } = useVirtualizedList({
+		rowHeight: ROW_HEIGHT,
+		bufferCount: 5,
+		container: ref,
+		items: nodeList,
+		// eslint-disable-next-line react/display-name
+		renderRow: (id, _, top) => <TreeItem key={id} id={id} top={top} />,
+	});
 
-	useEffect(() => {
-		if (ref.current && paneRef.current) {
-			const oldDisplay = paneRef.current.style.display;
-			// Hack to get the parent to grow with its children, see:
-			// https://stackoverflow.com/questions/17291514/how-to-force-parent-div-to-expand-by-child-div-width-padding-margin-box
-			paneRef.current.style.display = "inline-block";
-
-			const available = ref.current.offsetWidth - SCROLLBAR_WIDTH;
-			const actual = paneRef.current.offsetWidth;
-			const diff = actual - available;
-			const rawIndent = getComputedStyle(ref.current).getPropertyValue(
-				"--indent-depth",
-			);
-			if (diff !== 0 && rawIndent !== "") {
-				const current = cssToPx(rawIndent);
-				if (maxIndent === 0) {
-					setMaxIndent(current);
-				}
-
-				const indent =
-					current - Math.round((diff / (treeDepth || 1)) * 100) / 100;
-				const clamped = Math.min(maxIndent > 0 ? maxIndent : current, indent);
-
-				ref.current.style.setProperty("--indent-depth", `${clamped}px`);
-			}
-			paneRef.current.style.display = oldDisplay;
-		}
-	}, [nodeList, updateCount]);
+	useAutoIndent(paneRef, [listItems]);
 
 	return (
 		<div
@@ -127,10 +118,13 @@ export function TreeView() {
 					</div>
 				</div>
 			)}
-			<div class={s.pane} ref={paneRef} data-testid="elements-tree">
-				{nodeList.map(id => (
-					<TreeItem key={id} id={id} />
-				))}
+			<div
+				class={s.pane}
+				ref={paneRef}
+				data-testid="elements-tree"
+				style={`height: ${containerHeight}px`}
+			>
+				{listItems}
 				<HighlightPane treeDom={ref.current} />
 			</div>
 		</div>
@@ -170,7 +164,7 @@ export function MarkResult(props: { text: string; id: ID }) {
 	return <span>{text}</span>;
 }
 
-export function TreeItem(props: { key: any; id: ID }) {
+export function TreeItem(props: { key: any; id: ID; top: number }) {
 	const { id } = props;
 	const store = useStore();
 	const as = useSelection();
@@ -203,11 +197,14 @@ export function TreeItem(props: { key: any; id: ID }) {
 			data-selected={isSelected}
 			data-id={id}
 			data-depth={node.depth}
-			style={`padding-left: calc(var(--indent-depth) * ${
-				node.depth - (filterFragments ? 1 : 0)
-			})`}
+			style={`top: ${props.top}px;`}
 		>
-			<div class={s.itemHeader}>
+			<div
+				class={s.itemHeader}
+				style={`transform: translate3d(calc(var(--indent-depth) * ${
+					node.depth - (filterFragments ? 1 : 0)
+				}), 0, 0);`}
+			>
 				{node.children.length > 0 && (
 					<button
 						class={s.toggle}

@@ -22,7 +22,7 @@ describe("TreeItem", () => {
 		});
 		const { container, rerender } = render(
 			<AppCtx.Provider value={store}>
-				<TreeItem id={1} key="" />,
+				<TreeItem id={1} key="" top={0} />,
 			</AppCtx.Provider>,
 		);
 		expect(container.textContent).to.equal('foo key="abcdefghijklmno…",');
@@ -30,7 +30,7 @@ describe("TreeItem", () => {
 		store.nodes.$.get(1)!.key = "foobar";
 		rerender(
 			<AppCtx.Provider value={store}>
-				<TreeItem id={1} key="" />,
+				<TreeItem id={1} key="" top={0} />,
 			</AppCtx.Provider>,
 		);
 
