@@ -1,6 +1,4 @@
 .tree {
-	--indent-depth: 1.5rem;
-
 	width: 100%;
 	position: relative;
 	z-index: 1;
@@ -12,6 +10,11 @@
 	-ms-user-select: none;
 	user-select: none;
 	height: 100%;
+}
+
+.pane {
+	--indent-depth: 1.5rem;
+	position: relative;
 }
 
 .empty {
@@ -77,17 +80,6 @@
 	color: var(--color-selected-text);
 }
 
-.tree:focus-within .item[data-selected]::after,
-.tree .item[data-selected]::after,
-.item:not([data-selected]):hover::after {
-	content: "";
-	position: absolute;
-	left: 100%;
-	top: 0;
-	bottom: 0;
-	width: 100vw;
-}
-
 .tree:focus-within .item[data-selected]::after {
 	background: var(--color-selected-bg);
 }
@@ -110,7 +102,7 @@
 }
 
 .itemHeader {
-	display: flex;
+	display: inline-flex;
 	align-items: center;
 	height: 100%;
 	cursor: default;

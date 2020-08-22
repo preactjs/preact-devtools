@@ -1,5 +1,6 @@
 import { RefObject, VNode } from "preact";
-import { useEffect, useLayoutEffect, useRef, useState } from "preact/hooks";
+import { useEffect, useLayoutEffect, useMemo, useState } from "preact/hooks";
+import { useResize } from "../utils";
 
 export interface VirtualizedListProps<T> {
 	items: T[];
@@ -45,28 +46,25 @@ export function useVirtualizedList<T>({
 		};
 	}, [container.current]);
 
-	useEffect(() => {
-		const fn = () => {
-			if (container.current) {
-				setHeight(container.current.clientHeight);
-			}
-		};
-
-		window.addEventListener("resize", fn);
-		return () => window.removeEventListener("resize", fn);
+	useResize(() => {
+		if (container.current) {
+			setHeight(container.current.clientHeight);
+		}
 	}, []);
 
-	let idx = Math.floor(scroll / rowHeight) - bufferCount;
+	let idx = Math.max(0, Math.floor(scroll / rowHeight) - bufferCount);
 	const max = idx + Math.ceil(height / rowHeight) + bufferCount;
 	let top = idx * rowHeight;
 
-	console.log(top, scroll);
-	const vnodes: VNode[] = [];
-	while (idx <= max) {
-		vnodes.push(renderRow(items[idx], idx, top));
-		top += rowHeight;
-		idx++;
-	}
+	const vnodes = useMemo(() => {
+		const vnodes: VNode[] = [];
+		while (idx < items.length && idx <= max) {
+			vnodes.push(renderRow(items[idx], idx, top));
+			top += rowHeight;
+			idx++;
+		}
+		return vnodes;
+	}, [items, idx, max, top]);
 
 	return {
 		containerHeight: rowHeight * items.length,

@@ -8,13 +8,12 @@ import { useSelection } from "../../store/selection";
 import { useCollapser } from "../../store/collapser";
 import { BackgroundLogo } from "./background-logo";
 import { useSearch } from "../../store/search";
-import { scrollIntoView, cssToPx, useResize } from "../utils";
+import { scrollIntoView, useResize } from "../utils";
 import { ID } from "../../store/types";
 import { debounce } from "../../../shells/shared/utils";
 import { EmitFn } from "../../../adapter/hook";
 import { useVirtualizedList } from "./VirtualizedList";
-
-const SCROLLBAR_WIDTH = 24;
+import { useAutoIndent } from "./useAutoIndent";
 
 const highlightNode = debounce(
 	(notify: EmitFn, id: ID | null) => notify("highlight", id),
@@ -24,9 +23,6 @@ const highlightNode = debounce(
 export function TreeView() {
 	const store = useStore();
 	const nodeList = useObserver(() => store.nodeList.$);
-	const treeDepth = useObserver(() => {
-		return Math.max(...Array.from(store.nodes.$.values()).map(x => x.depth));
-	});
 	const { collapseNode, collapsed } = useCollapser();
 	const { selected, selectNext, selectPrev } = useSelection();
 
@@ -70,45 +66,16 @@ export function TreeView() {
 		}
 	}, []);
 
-	const [maxIndent, setMaxIndent] = useState(0);
-
-	useEffect(() => {
-		if (ref.current && paneRef.current) {
-			const oldDisplay = paneRef.current.style.display;
-			// Hack to get the parent to grow with its children, see:
-			// https://stackoverflow.com/questions/17291514/how-to-force-parent-div-to-expand-by-child-div-width-padding-margin-box
-			paneRef.current.style.display = "inline-block";
-
-			const available = ref.current.offsetWidth - SCROLLBAR_WIDTH;
-			const actual = paneRef.current.offsetWidth;
-			const diff = actual - available;
-			const rawIndent = getComputedStyle(ref.current).getPropertyValue(
-				"--indent-depth",
-			);
-			if (diff !== 0 && rawIndent !== "") {
-				const current = cssToPx(rawIndent);
-				if (maxIndent === 0) {
-					setMaxIndent(current);
-				}
-
-				const indent =
-					current - Math.round((diff / (treeDepth || 1)) * 100) / 100;
-				const clamped = Math.min(maxIndent > 0 ? maxIndent : current, indent);
-
-				ref.current.style.setProperty("--indent-depth", `${clamped}px`);
-			}
-			paneRef.current.style.display = oldDisplay;
-		}
-	}, [nodeList, updateCount]);
-
 	const { children: listItems, containerHeight } = useVirtualizedList({
 		rowHeight: 18,
-		bufferCount: 3,
+		bufferCount: 5,
 		container: ref,
 		items: nodeList,
 		// eslint-disable-next-line react/display-name
 		renderRow: (id, _, top) => <TreeItem key={id} id={id} top={top} />,
 	});
+
+	useAutoIndent(paneRef, [listItems]);
 
 	return (
 		<div
@@ -144,11 +111,6 @@ export function TreeView() {
 				style={`height: ${containerHeight}px`}
 			>
 				{listItems}
-
-				{/* <TreeItem key="dummy" id= /> */}
-				{/* {nodeList.slice(0, 50).map(id => (
-					<TreeItem key={id} id={id} />
-				))} */}
 				<HighlightPane treeDom={ref.current} />
 			</div>
 		</div>
@@ -221,11 +183,14 @@ export function TreeItem(props: { key: any; id: ID; top: number }) {
 			data-selected={isSelected}
 			data-id={id}
 			data-depth={node.depth}
-			style={`padding-left: calc(var(--indent-depth) * ${
-				node.depth - (filterFragments ? 1 : 0)
-			}); top: ${props.top}px`}
+			style={`top: ${props.top}px;`}
 		>
-			<div class={s.itemHeader}>
+			<div
+				class={s.itemHeader}
+				style={`transform: translate3d(calc(var(--indent-depth) * ${
+					node.depth - (filterFragments ? 1 : 0)
+				}), 0, 0);`}
+			>
 				{node.children.length > 0 && (
 					<button
 						class={s.toggle}
