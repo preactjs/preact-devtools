@@ -10,7 +10,7 @@
 	position: absolute;
 	cursor: pointer;
 	color: black;
-	font-size: 0.8rem;
+	font-size: var(--font-small);
 	padding: 0;
 	height: 100%;
 	transition-property: all;

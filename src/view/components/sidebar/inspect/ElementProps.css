@@ -12,9 +12,9 @@
 	display: flex;
 	flex-direction: row;
 	align-items: center;
-	font-size: 0.9rem;
+	font-size: var(--font-small);
 	line-height: 1.4;
-	height: 1.6rem;
+	height: 1.125rem;
 	font-family: var(--font-monospace);
 	--indent-depth: 0.75rem;
 }

@@ -44,6 +44,10 @@ input {
 :root {
 	--font-monospace: "SFMono-Regular", Consolas, "Liberation Mono", Menlo,
 		Courier, monospace;
+	--font-xxsmall: 0.625rem; /* 10px */
+	--font-xsmall: 0.6875rem; /* 11px */
+	--font-small: 0.75rem; /* 12px */
+	--font-xnormal: 0.875rem; /* 12px */
 }
 
 :global(.light) .theme {
@@ -239,7 +243,7 @@ input {
 .bugLink {
 	margin-right: 0.25rem;
 	color: var(--color-element-text);
-	font-size: 0.8rem;
+	font-size: var(--font-small);
 	text-decoration: none;
 }
 

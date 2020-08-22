@@ -4,10 +4,10 @@
 	overflow: hidden;
 	color: var(--color-element-text);
 	font-family: var(--font-monospace);
-	font-size: 1.2rem;
+	font-size: var(--font-xnormal);
 }
 
 .nameCh {
 	color: var(--color-text);
-	font-size: 0.7rem;
+	font-size: var(--font-small);
 }
