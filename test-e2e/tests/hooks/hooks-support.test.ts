@@ -1,5 +1,5 @@
 import { newTestPage } from "../../test-utils";
-import { clickText } from "pentf/browser_utils";
+import { clickNestedText } from "pentf/browser_utils";
 
 export const description =
 	"Show upgrade warning when Preact version is too old";
@@ -10,10 +10,7 @@ export async function run(config: any) {
 	});
 
 	// State update
-	await clickText(devtools, "RefComponent", {
-		elementXPath: "//*",
-		timeout: 2000,
-	});
+	await clickNestedText(devtools, "RefComponent");
 
 	// Should print warning
 	await devtools.waitForSelector('[data-testid="no-hooks-support-warning"]');

@@ -1,6 +1,6 @@
 import { newTestPage, checkNotPresent } from "../../test-utils";
 import { expect } from "chai";
-import { clickText, getText } from "pentf/browser_utils";
+import { clickNestedText, getText } from "pentf/browser_utils";
 
 export const description = "Inspect useCallback hook";
 
@@ -12,10 +12,7 @@ export async function run(config: any) {
 	const hooksPanel = '[data-testid="props-row"]';
 
 	// State update
-	await clickText(devtools, "CallbackOnly", {
-		elementXPath: "//*",
-		timeout: 2000,
-	});
+	await clickNestedText(devtools, "CallbackOnly");
 	await devtools.waitForSelector(hooksPanel);
 
 	const name = await getText(devtools, '[data-testid="prop-name"]');

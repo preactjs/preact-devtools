@@ -1,6 +1,6 @@
 import { newTestPage, checkNotPresent } from "../../test-utils";
 import { expect } from "chai";
-import { clickText, getText } from "pentf/browser_utils";
+import { clickNestedText, getText } from "pentf/browser_utils";
 
 export const description = "Inspect useContext hook";
 
@@ -11,10 +11,7 @@ export async function run(config: any) {
 
 	const hooksPanel = '[data-testid="props-row"]';
 
-	await clickText(devtools, "ContextComponent", {
-		elementXPath: "//*",
-		timeout: 2000,
-	});
+	await clickNestedText(devtools, "ContextComponent");
 	await devtools.waitForSelector(hooksPanel);
 
 	let name = await getText(devtools, '[data-testid="prop-name"]');
@@ -30,10 +27,7 @@ export async function run(config: any) {
 	await checkNotPresent(devtools, '[data-testid="prop-value"] input');
 
 	// Check if default value is read when no Provider is present
-	await clickText(devtools, "ContextNoProvider", {
-		elementXPath: "//*",
-		timeout: 2000,
-	});
+	await clickNestedText(devtools, "ContextNoProvider");
 	await devtools.waitForSelector(hooksPanel, { timeout: 2000 });
 
 	name = await getText(devtools, '[data-testid="prop-name"]');

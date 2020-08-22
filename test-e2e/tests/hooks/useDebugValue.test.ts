@@ -1,6 +1,6 @@
 import { newTestPage, click } from "../../test-utils";
 import { expect } from "chai";
-import { clickText, getText } from "pentf/browser_utils";
+import { clickNestedText, getText } from "pentf/browser_utils";
 
 export const description = "Show custom debug value";
 
@@ -12,10 +12,7 @@ export async function run(config: any) {
 	const hooksPanel = '[data-testid="props-row"]';
 
 	// State update
-	await clickText(devtools, "DebugValue", {
-		elementXPath: "//*",
-		timeout: 2000,
-	});
+	await clickNestedText(devtools, "DebugValue");
 	await devtools.waitForSelector(hooksPanel);
 
 	const name = await getText(devtools, '[data-testid="prop-name"]');

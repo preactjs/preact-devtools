@@ -1,13 +1,13 @@
 import { newTestPage } from "../test-utils";
 import { expect } from "chai";
-import { clickText } from "pentf/browser_utils";
+import { clickNestedText } from "pentf/browser_utils";
 
 export const description = "Format inspected data";
 
 export async function run(config: any) {
 	const { devtools } = await newTestPage(config, "truncate");
 
-	await clickText(devtools, "App", { elementXPath: "//*" });
+	await clickNestedText(devtools, "App");
 
 	const row = '[data-testid="props-row"]';
 	await devtools.waitForSelector(row);

@@ -6,7 +6,7 @@ import {
 	clickRecordButton,
 } from "../test-utils";
 import { expect } from "chai";
-import { clickText, getAttribute } from "pentf/browser_utils";
+import { clickNestedText, getAttribute } from "pentf/browser_utils";
 import { wait } from "pentf/utils";
 
 export const description = "Debug mode toggles debug views";
@@ -30,7 +30,7 @@ export async function run(config: any) {
 	await click(page, "button");
 	await click(page, "button");
 	await clickRecordButton(devtools);
-	await clickText(devtools, "Counter", { elementXPath: "//*" });
+	await clickNestedText(devtools, "Counter");
 
 	await checkNotPresent(devtools, '[data-testid="profiler-debug-stats"]');
 	await checkNotPresent(devtools, '[data-testid="profiler-debug-nav"]');

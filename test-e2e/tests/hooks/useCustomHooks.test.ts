@@ -1,6 +1,6 @@
 import { newTestPage, getCount } from "../../test-utils";
 import { expect } from "chai";
-import { clickText, getAttribute } from "pentf/browser_utils";
+import { clickNestedText, getAttribute } from "pentf/browser_utils";
 
 export const description = "Inspect custom hooks";
 
@@ -12,10 +12,7 @@ export async function run(config: any) {
 	const hooksPanel = '[data-testid="props-row"]';
 
 	// CutomHook
-	await clickText(devtools, "CustomHooks", {
-		elementXPath: "//*",
-		timeout: 2000,
-	});
+	await clickNestedText(devtools, "CustomHooks");
 	await devtools.waitForSelector(hooksPanel);
 
 	const isCollapsed = await getAttribute(
@@ -26,22 +23,13 @@ export async function run(config: any) {
 	expect(isCollapsed).to.equal("true");
 	expect(await getCount(devtools, hooksPanel)).to.equal(1);
 
-	await clickText(devtools, "useFoo", {
-		elementXPath: "//*",
-		timeout: 2000,
-	});
+	await clickNestedText(devtools, "useFoo");
 	expect(await getCount(devtools, hooksPanel)).to.equal(2);
 
-	await clickText(devtools, "useBar", {
-		elementXPath: "//*",
-		timeout: 2000,
-	});
+	await clickNestedText(devtools, "useBar");
 	expect(await getCount(devtools, hooksPanel)).to.equal(4);
 
 	// Collapse all hooks
-	await clickText(devtools, "useFoo", {
-		elementXPath: "//*",
-		timeout: 2000,
-	});
+	await clickNestedText(devtools, "useFoo");
 	expect(await getCount(devtools, hooksPanel)).to.equal(1);
 }
