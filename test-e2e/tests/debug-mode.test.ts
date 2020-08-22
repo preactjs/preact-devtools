@@ -2,12 +2,11 @@ import {
 	newTestPage,
 	click,
 	clickTab,
-	getAttribute,
 	checkNotPresent,
 	clickRecordButton,
 } from "../test-utils";
 import { expect } from "chai";
-import { clickText } from "pentf/browser_utils";
+import { clickText, getAttribute } from "pentf/browser_utils";
 import { wait } from "pentf/utils";
 
 export const description = "Debug mode toggles debug views";

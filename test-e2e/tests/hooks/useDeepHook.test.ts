@@ -1,6 +1,6 @@
-import { newTestPage, getAttribute, getCount } from "../../test-utils";
+import { newTestPage, getCount } from "../../test-utils";
 import { expect } from "chai";
-import { clickText } from "pentf/browser_utils";
+import { clickText, getAttribute } from "pentf/browser_utils";
 
 export const description = "Inspect custom hooks";
 
@@ -16,7 +16,7 @@ export async function run(config: any) {
 		elementXPath: "//*",
 		timeout: 2000,
 	});
-	await devtools.waitForSelector(hooksPanel, { timeout: 2000 });
+	await devtools.waitForSelector(hooksPanel);
 
 	const isCollapsed = await getAttribute(
 		devtools,

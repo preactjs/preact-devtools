@@ -1,12 +1,12 @@
 import {
 	newTestPage,
 	click,
-	clickNestedText,
 	clickTab,
 	clickRecordButton,
 } from "../../../test-utils";
 import { expect } from "chai";
 import { Page } from "puppeteer";
+import { clickNestedText } from "pentf/browser_utils";
 
 async function getFlameNodes(page: Page) {
 	return await page.$$eval('[data-type="ranked"] > *', els => {

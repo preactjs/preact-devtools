@@ -1,12 +1,6 @@
-import {
-	newTestPage,
-	click,
-	getText,
-	clickNestedText,
-	clickTab,
-	clickRecordButton,
-} from "../test-utils";
+import { newTestPage, click, clickTab, clickRecordButton } from "../test-utils";
 import { expect } from "chai";
+import { clickNestedText, getText } from "pentf/browser_utils";
 
 export const description = "Sync selection from profiler";
 

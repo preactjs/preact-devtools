@@ -13,7 +13,7 @@ export async function run(config: any) {
 
 	await page.hover('[data-testid="0"]');
 
-	await waitForTestId(page, "highlight", { timeout: 2000 });
+	await waitForTestId(page, "highlight");
 
 	const highlight = '[data-testid="highlight"]';
 	const before = await getSize(page, highlight);

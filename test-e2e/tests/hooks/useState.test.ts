@@ -1,12 +1,6 @@
-import {
-	newTestPage,
-	getText,
-	checkNotPresent,
-	click,
-	getAttribute,
-} from "../../test-utils";
+import { newTestPage, checkNotPresent, click } from "../../test-utils";
 import { expect } from "chai";
-import { clickText } from "pentf/browser_utils";
+import { clickText, getAttribute, getText } from "pentf/browser_utils";
 
 export const description = "Inspect useState hook";
 
@@ -22,7 +16,7 @@ export async function run(config: any) {
 		elementXPath: "//*",
 		timeout: 2000,
 	});
-	await devtools.waitForSelector(hooksPanel, { timeout: 2000 });
+	await devtools.waitForSelector(hooksPanel);
 
 	const name = await getText(devtools, '[data-testid="prop-name"]');
 	const value = await getAttribute(

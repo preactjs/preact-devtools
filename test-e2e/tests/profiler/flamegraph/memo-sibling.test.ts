@@ -30,12 +30,9 @@ export async function run(config: any) {
 	await clickTestId(devtools, "filter-update");
 	await clickTestId(devtools, "filter-menu-button");
 
-	await devtools.waitForFunction(
-		() => {
-			return document.querySelector('[data-testid="filter-popup"]') === null;
-		},
-		{ timeout: 2000 },
-	);
+	await devtools.waitForFunction(() => {
+		return document.querySelector('[data-testid="filter-popup"]') === null;
+	});
 
 	await clickTab(devtools, "PROFILER");
 

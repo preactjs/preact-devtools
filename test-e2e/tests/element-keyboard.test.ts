@@ -1,6 +1,7 @@
-import { newTestPage, getText } from "../test-utils";
 import { expect } from "chai";
+import { newTestPage } from "../test-utils";
 import { wait } from "pentf/utils";
+import { getText } from "pentf/browser_utils";
 
 export const description = "Test keyboard navigation in elements tree";
 

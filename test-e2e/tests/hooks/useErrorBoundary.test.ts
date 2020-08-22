@@ -1,6 +1,6 @@
-import { newTestPage, getText, checkNotPresent } from "../../test-utils";
+import { newTestPage, checkNotPresent } from "../../test-utils";
 import { expect } from "chai";
-import { clickText } from "pentf/browser_utils";
+import { clickText, getText } from "pentf/browser_utils";
 
 export const description = "Inspect useErrorBoundary hook";
 
@@ -15,7 +15,7 @@ export async function run(config: any) {
 		elementXPath: "//*",
 		timeout: 2000,
 	});
-	await devtools.waitForSelector(hooksPanel, { timeout: 2000 });
+	await devtools.waitForSelector(hooksPanel);
 
 	let name = await getText(devtools, '[data-testid="prop-name"]');
 	let value = await getText(devtools, '[data-testid="prop-value"]');
@@ -34,7 +34,7 @@ export async function run(config: any) {
 		elementXPath: "//*",
 		timeout: 2000,
 	});
-	await devtools.waitForSelector(hooksPanel, { timeout: 2000 });
+	await devtools.waitForSelector(hooksPanel);
 
 	name = await getText(devtools, '[data-testid="prop-name"]');
 	value = await getText(devtools, '[data-testid="prop-value"]');

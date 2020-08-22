@@ -1,5 +1,5 @@
-import { newTestPage, clickNestedText } from "../../test-utils";
-import { waitForTestId, getText } from "pentf/browser_utils";
+import { newTestPage } from "../../test-utils";
+import { waitForTestId, getText, clickNestedText } from "pentf/browser_utils";
 import { expect } from "chai";
 
 export const description =
@@ -16,33 +16,29 @@ export async function run(config: any) {
 	await clickNestedText(devtools, "Hook", {
 		timeout: 4000,
 	});
-	await devtools.waitForSelector('[data-testid="props-row"]', {
-		timeout: 2000,
-	});
+	await devtools.waitForSelector('[data-testid="props-row"]');
 
-	const options = { timeout: 2000 };
-
-	await clickNestedText(devtools, "useBrobba", options);
-	await clickNestedText(devtools, "useBlaBla", options);
-	await clickNestedText(devtools, "useBleb", options);
-	await clickNestedText(devtools, "useBabby", options);
-	await clickNestedText(devtools, "useBubby", options);
-	await clickNestedText(devtools, "useBread", options);
-	await clickNestedText(devtools, "useBlub", options);
-	await clickNestedText(devtools, "useBoof", options);
-	await clickNestedText(devtools, "useBob", options);
-	await clickNestedText(devtools, "useBar", options);
-	await clickNestedText(devtools, "useFoo", options);
+	await clickNestedText(devtools, "useBrobba");
+	await clickNestedText(devtools, "useBlaBla");
+	await clickNestedText(devtools, "useBleb");
+	await clickNestedText(devtools, "useBabby");
+	await clickNestedText(devtools, "useBubby");
+	await clickNestedText(devtools, "useBread");
+	await clickNestedText(devtools, "useBlub");
+	await clickNestedText(devtools, "useBoof");
+	await clickNestedText(devtools, "useBob");
+	await clickNestedText(devtools, "useBar");
+	await clickNestedText(devtools, "useFoo");
 
 	// Native hooks
-	await clickNestedText(devtools, "useState", options);
-	await clickNestedText(devtools, /^key1/, options);
-	await clickNestedText(devtools, /^key2/, options);
-	await clickNestedText(devtools, /^key3/, options);
-	await clickNestedText(devtools, /^key4/, options);
-	await clickNestedText(devtools, /^key5/, options);
-	await clickNestedText(devtools, /^key6/, options);
-	await clickNestedText(devtools, /^key7/, options);
+	await clickNestedText(devtools, "useState");
+	await clickNestedText(devtools, /^key1/);
+	await clickNestedText(devtools, /^key2/);
+	await clickNestedText(devtools, /^key3/);
+	await clickNestedText(devtools, /^key4/);
+	await clickNestedText(devtools, /^key5/);
+	await clickNestedText(devtools, /^key6/);
+	await clickNestedText(devtools, /^key7/);
 
 	const text = await getText(
 		devtools,

@@ -1,6 +1,7 @@
-import { newTestPage, getLog, getAttribute, getSize } from "../test-utils";
+import { newTestPage, getLog, getSize } from "../test-utils";
 import { expect } from "chai";
 import { wait } from "pentf/utils";
+import { getAttribute } from "pentf/browser_utils";
 
 export const description = "Should inspect during picking";
 

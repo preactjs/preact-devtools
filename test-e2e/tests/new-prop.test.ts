@@ -1,11 +1,6 @@
-import {
-	newTestPage,
-	typeText,
-	clickNestedText,
-	getText$$,
-} from "../test-utils";
+import { newTestPage, typeText, getText$$ } from "../test-utils";
 import { expect } from "chai";
-import { getAttribute } from "pentf/browser_utils";
+import { clickNestedText, getAttribute } from "pentf/browser_utils";
 import { wait } from "pentf/utils";
 
 export const description = "Add new props";

@@ -1,6 +1,6 @@
-import { newTestPage, getAttribute, getText, typeText } from "../test-utils";
+import { newTestPage, typeText } from "../test-utils";
 import { expect } from "chai";
-import { clickText } from "pentf/browser_utils";
+import { clickText, getText, getAttribute } from "pentf/browser_utils";
 
 export const description = "Mirror component state to the devtools";
 

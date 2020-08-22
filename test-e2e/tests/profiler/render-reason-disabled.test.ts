@@ -1,13 +1,11 @@
 import {
 	newTestPage,
 	click,
-	getText,
 	clickTab,
-	getAttribute,
 	clickRecordButton,
 } from "../../test-utils";
 import { expect } from "chai";
-import { clickText } from "pentf/browser_utils";
+import { clickText, getAttribute, getText } from "pentf/browser_utils";
 import { wait } from "pentf/utils";
 
 export const description = "Disables render reason capturing";

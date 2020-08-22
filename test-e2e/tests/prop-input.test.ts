@@ -1,16 +1,18 @@
 import {
 	newTestPage,
 	typeText,
-	clickNestedText,
-	getText,
-	getAttribute,
 	getLog,
 	click,
 	doesExist,
 	checkNotPresent,
 } from "../test-utils";
 import { expect } from "chai";
-import { waitForTestId } from "pentf/browser_utils";
+import {
+	clickNestedText,
+	getAttribute,
+	getText,
+	waitForTestId,
+} from "pentf/browser_utils";
 import { wait } from "pentf/utils";
 import { Page } from "puppeteer";
 
