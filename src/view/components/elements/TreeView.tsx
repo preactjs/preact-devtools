@@ -128,7 +128,7 @@ export function TreeView() {
 				</div>
 			)}
 			<div class={s.pane} ref={paneRef} data-testid="elements-tree">
-				{nodeList.map(id => (
+				{nodeList.slice(0, 50).map(id => (
 					<TreeItem key={id} id={id} />
 				))}
 				<HighlightPane treeDom={ref.current} />

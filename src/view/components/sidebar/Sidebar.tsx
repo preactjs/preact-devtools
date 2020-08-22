@@ -2,9 +2,11 @@ import { h, Fragment } from "preact";
 import { useObserver, useStore } from "../../store/react-bindings";
 import { PropsPanel } from "./inspect/PropsPanel";
 import { serializeProps } from "./inspect/serializeProps";
+import { DebugTreeStats } from "./DebugTreeStats";
 
 export function Sidebar() {
 	const store = useStore();
+	const showDebug = useObserver(() => store.debugMode.$);
 	const inspect = useObserver(() => store.inspectData.$);
 	const { props: propData, state, context, hooks } = store.sidebar;
 	const { emit } = store;
@@ -60,6 +62,7 @@ export function Sidebar() {
 					}
 				/>
 			)}
+			{showDebug && <DebugTreeStats />}
 		</Fragment>
 	);
 }
