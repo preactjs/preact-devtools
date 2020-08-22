@@ -1,13 +1,13 @@
 import {
 	newTestPage,
 	click,
-	clickNestedText,
 	getCount,
 	getAttribute$$,
 	clickTab,
 	clickRecordButton,
 } from "../../test-utils";
 import { expect } from "chai";
+import { clickNestedText } from "pentf/browser_utils";
 
 export const description = "Show in which commit a node rendered";
 

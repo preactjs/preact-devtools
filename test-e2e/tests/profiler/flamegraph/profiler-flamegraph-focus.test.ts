@@ -1,12 +1,12 @@
 import {
 	newTestPage,
 	click,
-	clickNestedText,
 	clickTab,
 	clickRecordButton,
 } from "../../../test-utils";
 import { expect } from "chai";
 import { getFlameNodes } from "./utils";
+import { clickNestedText } from "pentf/browser_utils";
 
 export const description = "Focus nodes in flamegraph layout";
 

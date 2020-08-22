@@ -1,6 +1,6 @@
-import { newTestPage, getText, getCount } from "../../test-utils";
+import { newTestPage, getCount } from "../../test-utils";
 import { expect } from "chai";
-import { clickText } from "pentf/browser_utils";
+import { clickNestedText, getText } from "pentf/browser_utils";
 
 export const description = "Inspect useRef hook";
 
@@ -12,19 +12,13 @@ export async function run(config: any) {
 	const row = '[data-testid="props-row"]';
 
 	// State update
-	await clickText(devtools, "Memo", {
-		elementXPath: "//*",
-		timeout: 2000,
-	});
-	await devtools.waitForSelector(row, { timeout: 2000 });
+	await clickNestedText(devtools, "Memo");
+	await devtools.waitForSelector(row);
 
 	const name = await getText(devtools, '[data-testid="prop-name"]');
 	expect(name).to.equal("useMemo");
 
-	await clickText(devtools, "useMemo", {
-		elementXPath: "//*",
-		timeout: 2000,
-	});
+	await clickNestedText(devtools, "useMemo");
 
 	expect(await getCount(devtools, row)).to.equal(2);
 }

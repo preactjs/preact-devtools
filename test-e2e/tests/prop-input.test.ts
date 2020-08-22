@@ -1,16 +1,12 @@
-import {
-	newTestPage,
-	typeText,
-	clickNestedText,
-	getText,
-	getAttribute,
-	getLog,
-	click,
-	doesExist,
-	checkNotPresent,
-} from "../test-utils";
+import { newTestPage, typeText, getLog, click, doesExist } from "../test-utils";
 import { expect } from "chai";
-import { waitForTestId } from "pentf/browser_utils";
+import {
+	assertNotTestId,
+	clickNestedText,
+	getAttribute,
+	getText,
+	waitForTestId,
+} from "pentf/browser_utils";
 import { wait } from "pentf/utils";
 import { Page } from "puppeteer";
 
@@ -35,7 +31,7 @@ async function enterText(
 ) {
 	await click(page, "button");
 	await clickNestedText(devtools, "Display");
-	await checkNotPresent(devtools, '[data-testid="undo-btn"]');
+	await assertNotTestId(devtools, "undo-btn");
 
 	await devtools.waitForSelector(selector, { timeout: 3000 });
 	await typeText(devtools, selector, text);

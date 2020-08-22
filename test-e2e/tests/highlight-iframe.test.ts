@@ -23,9 +23,7 @@ export async function run(config: any) {
 
 	// Display
 	await devtools.hover('[data-name="Display"]');
-	await page.waitForSelector(highlight, {
-		timeout: 2000,
-	});
+	await page.waitForSelector(highlight);
 
 	await wait(100);
 
@@ -39,9 +37,7 @@ export async function run(config: any) {
 
 	// Foobar.Consumer
 	await devtools.hover('[data-name="Foobar.Consumer"]');
-	await page.waitForSelector(highlight, {
-		timeout: 2000,
-	});
+	await page.waitForSelector(highlight);
 
 	await wait(100);
 

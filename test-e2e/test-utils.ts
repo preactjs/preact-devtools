@@ -1,9 +1,7 @@
-import { newPage } from "pentf/browser_utils";
-import { wait } from "pentf/utils";
+import { getAttribute, newPage } from "pentf/browser_utils";
 import fs from "fs";
 import path from "path";
 import { Request, Page, FrameBase } from "puppeteer";
-import assert from "assert";
 
 const readFile = (name: string) => {
 	return fs.readFileSync(
@@ -110,22 +108,12 @@ export async function newTestPage(
 	return { page, devtools: (devtools as any) as Page };
 }
 
-export async function getAttribute(page: Page, selector: string, name: string) {
-	await page.waitForSelector(selector, { timeout: 2000 });
-	return page.$eval(
-		selector,
-		(el, propName) => {
-			return propName in el ? (el as any)[propName] : el.getAttribute(propName);
-		},
-		name,
-	);
-}
 export async function getAttribute$$(
 	page: Page,
 	selector: string,
 	name: string,
 ) {
-	await page.waitForSelector(selector, { timeout: 2000 });
+	await page.waitForSelector(selector);
 	return page.$$eval(
 		selector,
 		(els, propName) => {
@@ -137,10 +125,6 @@ export async function getAttribute$$(
 		},
 		name,
 	);
-}
-
-export async function getText(page: Page, selector: string) {
-	return getAttribute(page, selector, "textContent");
 }
 
 export async function getText$$(page: Page, selector: string) {
@@ -184,7 +168,7 @@ export async function waitForAttribute(
 }
 
 export async function click(page: Page, selector: string) {
-	await page.waitForSelector(selector, { timeout: 2000 });
+	await page.waitForSelector(selector);
 	return page.click(selector);
 }
 
@@ -238,15 +222,6 @@ export async function doesExist(page: Page, selector: string) {
 		(s: string) => document.querySelector(s) !== null,
 		selector,
 	);
-}
-
-export async function checkNotPresent(page: Page, selector: string) {
-	const res = await page.evaluate(
-		(s: string) => document.querySelector(s) === null,
-		selector,
-	);
-
-	assert.equal(res, true, `Expected '${selector}' not to exist`);
 }
 
 export async function getCount(page: Page, selector: string) {
@@ -346,101 +321,4 @@ export async function installMouseHelper(page: Page) {
 		document.addEventListener("click", handleEvent, true);
 		document.addEventListener("mouseup", handleEvent, true);
 	});
-}
-
-// TODO: Remove this once the next version of pentf is released
-export async function clickNestedText(
-	page: Page,
-	textOrRegExp: string | RegExp,
-	{
-		timeout = 30000,
-		checkEvery = 200,
-		extraMessage = undefined,
-		visible = true,
-	} = {},
-) {
-	const serializedMatcher =
-		typeof textOrRegExp !== "string"
-			? { source: textOrRegExp.source, flags: textOrRegExp.flags }
-			: textOrRegExp;
-
-	let remainingTimeout = timeout;
-	// eslint-disable-next-line no-constant-condition
-	while (true) {
-		const found = await page.evaluate(
-			(matcher, visible) => {
-				// eslint-disable-next-line no-undef
-				let matchFunc: (text: string) => boolean;
-				let matchFuncExact: null | ((text: string) => boolean) = null;
-
-				if (typeof matcher == "string") {
-					matchFunc = (text: string) => text.includes(matcher);
-				} else {
-					const regexExact = new RegExp(matcher.source, matcher.flags);
-					matchFuncExact = (text: string) => {
-						// Reset regex state in case global flag was used
-						regexExact.lastIndex = 0;
-						return regexExact.test(text);
-					};
-
-					// Remove leading ^ and ending $, otherwise the traversal
-					// will fail at the first node.
-					const source = matcher.source.replace(/^[^]/, "").replace(/[$]$/, "");
-					const regex = new RegExp(source, matcher.flags);
-					matchFunc = (text: string) => {
-						// Reset regex state in case global flag was used
-						regex.lastIndex = 0;
-						return regex.test(text);
-					};
-				}
-
-				const stack = [document.body];
-				let item = null;
-				let lastFound = null;
-				while ((item = stack.pop())) {
-					// eslint-disable-line no-cond-assign
-					for (let i = 0; i < item.childNodes.length; i++) {
-						const child = item.childNodes[i];
-
-						// Skip text nodes as they are not clickable
-						if (child.nodeType === Node.TEXT_NODE) {
-							continue;
-						}
-
-						const text = child.textContent || "";
-						if (child.childNodes.length > 0 && matchFunc(text)) {
-							if (matchFuncExact === null || matchFuncExact(text)) {
-								lastFound = child as any;
-							}
-							stack.push(child as any);
-						}
-					}
-				}
-
-				if (!lastFound) return false;
-
-				if (visible && lastFound!.offsetParent === null) return null; // invisible)
-
-				lastFound!.click();
-				return true;
-			},
-			serializedMatcher,
-			visible,
-		);
-
-		if (found) {
-			return;
-		}
-
-		if (remainingTimeout <= 0) {
-			const extraMessageRepr = extraMessage ? ` (${extraMessage})` : "";
-			throw new Error(
-				`Unable to find${
-					visible ? " visible" : ""
-				} text "${textOrRegExp}" after ${timeout}ms${extraMessageRepr}`,
-			);
-		}
-		await wait(Math.min(remainingTimeout, checkEvery));
-		remainingTimeout -= checkEvery;
-	}
 }

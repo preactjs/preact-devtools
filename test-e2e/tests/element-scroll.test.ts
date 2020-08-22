@@ -1,5 +1,6 @@
-import { newTestPage, installMouseHelper, getText } from "../test-utils";
+import { newTestPage, installMouseHelper } from "../test-utils";
 import { expect } from "chai";
+import { getText } from "pentf/browser_utils";
 
 export const description = "Clicking at the right of element names #144";
 

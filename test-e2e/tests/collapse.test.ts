@@ -1,6 +1,6 @@
 import { newTestPage, click, getLog, waitFor, clickTab } from "../test-utils";
 import { expect } from "chai";
-import { clickText } from "pentf/browser_utils";
+import { clickNestedText } from "pentf/browser_utils";
 
 export const description = "Collapse all the things!";
 
@@ -29,7 +29,7 @@ export async function run(config: any) {
 	await click(devtools, '[data-testid="tree-item"] button');
 
 	// Props should be collapsed by default
-	await clickText(devtools, "Provider", { elementXPath: "//*" });
+	await clickNestedText(devtools, "Provider");
 	const row = '[data-testid="props-row"]';
 	await devtools.waitForSelector(row, {
 		timeout: 1000,

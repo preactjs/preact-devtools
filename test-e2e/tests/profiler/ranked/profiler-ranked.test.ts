@@ -1,11 +1,11 @@
 import {
 	newTestPage,
 	click,
-	getText,
 	clickTab,
 	clickRecordButton,
 } from "../../../test-utils";
 import { expect } from "chai";
+import { getText } from "pentf/browser_utils";
 
 export const description =
 	"Ranked profile view should only show nodes of the current commit";

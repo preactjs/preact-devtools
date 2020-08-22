@@ -1,13 +1,13 @@
 import {
 	newTestPage,
 	click,
-	getText,
 	clickTab,
 	clickRecordButton,
 } from "../../test-utils";
 import { expect } from "chai";
 import { Page } from "puppeteer";
 import { wait } from "pentf/utils";
+import { getText } from "pentf/browser_utils";
 
 export const description = "Captures render reasons";
 

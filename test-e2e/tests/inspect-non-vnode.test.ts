@@ -1,5 +1,6 @@
-import { newTestPage, click, getText } from "../test-utils";
+import { newTestPage, click } from "../test-utils";
 import { expect } from "chai";
+import { getText } from "pentf/browser_utils";
 
 export const description = "Inspect should only parse vnodes as vnodes #114";
 

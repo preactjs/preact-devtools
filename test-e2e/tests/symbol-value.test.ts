@@ -1,6 +1,6 @@
 import { expect } from "chai";
-import { newTestPage, clickNestedText } from "../test-utils";
-import { getText } from "pentf/browser_utils";
+import { newTestPage } from "../test-utils";
+import { clickNestedText, getText } from "pentf/browser_utils";
 import { wait } from "pentf/utils";
 
 export const description = "Display symbol values";

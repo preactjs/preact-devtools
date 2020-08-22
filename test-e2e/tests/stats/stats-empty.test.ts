@@ -1,5 +1,5 @@
-import { newTestPage, clickTab, checkNotPresent } from "../../test-utils";
-import { waitForTestId } from "pentf/browser_utils";
+import { newTestPage, clickTab } from "../../test-utils";
+import { assertNotSelector, waitForTestId } from "pentf/browser_utils";
 
 export const description = "Display no stats initially";
 
@@ -11,5 +11,5 @@ export async function run(config: any) {
 	await clickTab(devtools, "STATISTICS");
 	await waitForTestId(devtools, "stats-info");
 
-	await checkNotPresent(devtools, '[data-testid="vnode-stats"]');
+	await assertNotSelector(devtools, '[data-testid="vnode-stats"]');
 }

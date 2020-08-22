@@ -1,13 +1,13 @@
-import { newTestPage, getAttribute, getText, typeText } from "../test-utils";
+import { newTestPage, typeText } from "../test-utils";
 import { expect } from "chai";
-import { clickText } from "pentf/browser_utils";
+import { clickNestedText, getText, getAttribute } from "pentf/browser_utils";
 
 export const description = "Mirror component state to the devtools";
 
 export async function run(config: any) {
 	const { page, devtools } = await newTestPage(config, "counter");
 
-	await clickText(devtools, "Display", { elementXPath: "//*" });
+	await clickNestedText(devtools, "Display");
 
 	const input = '[data-testid="props-row"] input';
 	await devtools.waitForSelector(input, { timeout: 3000 });

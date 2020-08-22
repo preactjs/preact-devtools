@@ -1,6 +1,7 @@
-import { newTestPage, getText, getSize } from "../test-utils";
+import { newTestPage, getSize } from "../test-utils";
 import { expect } from "chai";
 import { wait } from "pentf/utils";
+import { getText } from "pentf/browser_utils";
 
 export const description = "Highlighting nested elements affects overlay size";
 
