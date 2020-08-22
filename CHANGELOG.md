@@ -1,5 +1,13 @@
 # Changelog
 
+## 1.1.1
+
+### Patch Changes
+
+- [`6e5ebba`](https://github.com/preactjs/preact-devtools/commit/6e5ebba9c29c04eded51e92996baf82e0de207c9) [#238](https://github.com/preactjs/preact-devtools/pull/238) Thanks [@marvinhagemeister](https://github.com/marvinhagemeister)! - Align font-sizes with native browser devtools and fix component name "pushing" sidebar layout.
+
+* [`74e7edc`](https://github.com/preactjs/preact-devtools/commit/74e7edc6a77234abcb8ae4be5aa469362d899210) [#242](https://github.com/preactjs/preact-devtools/pull/242) Thanks [@marvinhagemeister](https://github.com/marvinhagemeister)! - Improve Tree view performance by using virtualization. This way the Tree view stays smooth, regardless of how many components are rendered of the page. This was tested with 7.000 components in a real world app.
+
 ## 1.1.0
 
 - Add new "Statistics" tab to collect renderer statistics (#230, thanks @marvinhagemeister)
