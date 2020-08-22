@@ -15,6 +15,8 @@ import { EmitFn } from "../../../adapter/hook";
 import { useVirtualizedList } from "./VirtualizedList";
 import { useAutoIndent } from "./useAutoIndent";
 
+const ROW_HEIGHT = 18;
+
 const highlightNode = debounce(
 	(notify: EmitFn, id: ID | null) => notify("highlight", id),
 	100,
@@ -52,6 +54,18 @@ export function TreeView() {
 	const ref = useRef<HTMLDivElement | null>(null);
 	const paneRef = useRef<HTMLDivElement | null>(null);
 
+	const search = useSearch();
+	useEffect(() => {
+		if (ref.current && search.selectedIdx > -1) {
+			const top = ROW_HEIGHT * search.selectedIdx;
+			const scroll = ref.current.scrollTop;
+			const height = ref.current.clientHeight;
+			if (scroll > top || scroll + height < top) {
+				ref.current.scrollTo({ top });
+			}
+		}
+	}, [search.selectedIdx]);
+
 	const [updateCount, setUpdateCount] = useState(0);
 	useResize(() => setUpdateCount(updateCount + 1), [updateCount]);
 
@@ -67,7 +81,7 @@ export function TreeView() {
 	}, []);
 
 	const { children: listItems, containerHeight } = useVirtualizedList({
-		rowHeight: 18,
+		rowHeight: ROW_HEIGHT,
 		bufferCount: 5,
 		container: ref,
 		items: nodeList,
