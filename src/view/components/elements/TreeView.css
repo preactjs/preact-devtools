@@ -12,8 +12,6 @@
 	-ms-user-select: none;
 	user-select: none;
 	height: 100%;
-
-	overflow-x: hidden;
 }
 
 .empty {
@@ -68,7 +66,9 @@
 	font-family: var(--font-monospace);
 	color: var(--color-element-text);
 	height: 1.25rem;
-	position: relative;
+	position: absolute;
+	width: 100%;
+	left: 0;
 	white-space: nowrap;
 }
 

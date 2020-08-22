@@ -3,6 +3,7 @@ import { useObserver, useStore } from "../../store/react-bindings";
 import { PropsPanel } from "./inspect/PropsPanel";
 import { serializeProps } from "./inspect/serializeProps";
 import { DebugTreeStats } from "./DebugTreeStats";
+import { DebugNodeNavTree } from "./DebugNodeNavTree";
 
 export function Sidebar() {
 	const store = useStore();
@@ -62,6 +63,7 @@ export function Sidebar() {
 					}
 				/>
 			)}
+			{showDebug && <DebugNodeNavTree />}
 			{showDebug && <DebugTreeStats />}
 		</Fragment>
 	);

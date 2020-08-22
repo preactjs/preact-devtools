@@ -12,6 +12,7 @@ import { scrollIntoView, cssToPx, useResize } from "../utils";
 import { ID } from "../../store/types";
 import { debounce } from "../../../shells/shared/utils";
 import { EmitFn } from "../../../adapter/hook";
+import { useVirtualizedList } from "./VirtualizedList";
 
 const SCROLLBAR_WIDTH = 24;
 
@@ -100,6 +101,15 @@ export function TreeView() {
 		}
 	}, [nodeList, updateCount]);
 
+	const { children: listItems, containerHeight } = useVirtualizedList({
+		rowHeight: 18,
+		bufferCount: 3,
+		container: ref,
+		items: nodeList,
+		// eslint-disable-next-line react/display-name
+		renderRow: (id, _, top) => <TreeItem key={id} id={id} top={top} />,
+	});
+
 	return (
 		<div
 			ref={ref}
@@ -127,10 +137,18 @@ export function TreeView() {
 					</div>
 				</div>
 			)}
-			<div class={s.pane} ref={paneRef} data-testid="elements-tree">
-				{nodeList.slice(0, 50).map(id => (
+			<div
+				class={s.pane}
+				ref={paneRef}
+				data-testid="elements-tree"
+				style={`height: ${containerHeight}px`}
+			>
+				{listItems}
+
+				{/* <TreeItem key="dummy" id= /> */}
+				{/* {nodeList.slice(0, 50).map(id => (
 					<TreeItem key={id} id={id} />
-				))}
+				))} */}
 				<HighlightPane treeDom={ref.current} />
 			</div>
 		</div>
@@ -170,7 +188,7 @@ export function MarkResult(props: { text: string; id: ID }) {
 	return <span>{text}</span>;
 }
 
-export function TreeItem(props: { key: any; id: ID }) {
+export function TreeItem(props: { key: any; id: ID; top: number }) {
 	const { id } = props;
 	const store = useStore();
 	const as = useSelection();
@@ -205,7 +223,7 @@ export function TreeItem(props: { key: any; id: ID }) {
 			data-depth={node.depth}
 			style={`padding-left: calc(var(--indent-depth) * ${
 				node.depth - (filterFragments ? 1 : 0)
-			})`}
+			}); top: ${props.top}px`}
 		>
 			<div class={s.itemHeader}>
 				{node.children.length > 0 && (
