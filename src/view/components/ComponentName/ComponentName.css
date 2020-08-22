@@ -1,4 +1,7 @@
 .title {
+	text-overflow: ellipsis;
+	white-space: nowrap;
+	overflow: hidden;
 	color: var(--color-element-text);
 	font-family: var(--font-monospace);
 	font-size: 1.2rem;
