@@ -1,5 +1,7 @@
+import { NodeType } from "../constants";
+
 export function getNearestElement(dom: Element | Text): Element {
-	return dom instanceof Text ? (dom.parentNode as any) : dom;
+	return dom.nodeType === NodeType.Text ? (dom.parentNode as any) : dom;
 }
 
 export function px2Int(input: string | null) {

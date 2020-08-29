@@ -51,6 +51,7 @@ import {
 	updateDiffStats,
 	recordComponentStats,
 } from "./stats";
+import { NodeType } from "../../constants";
 
 export interface RendererConfig10 {
 	Fragment: FunctionalComponent;
@@ -127,7 +128,7 @@ export function getFilteredChildren(
 function updateHighlight(profiler: ProfilerState, vnode: VNode) {
 	if (profiler.highlightUpdates && typeof vnode.type === "function") {
 		let dom = getDom(vnode);
-		if (dom instanceof Text) {
+		if (dom.nodeType === NodeType.Text) {
 			dom = dom.parentNode;
 		}
 
