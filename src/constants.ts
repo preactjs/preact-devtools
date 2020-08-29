@@ -29,3 +29,14 @@ export enum HookType {
 	custom = 99,
 	devtoolsParent = 9999,
 }
+
+export enum NodeType {
+	Element = 1,
+	Text = 3,
+	CData = 4,
+	XMLProcessingInstruction = 7,
+	Comment = 8,
+	Document = 9,
+	DocumentType = 10, // like <!DOCTYPE html>
+	DocumentFragment = 11,
+}
