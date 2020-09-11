@@ -1,3 +1,4 @@
+import { RawFilterState } from "../../../adapter/adapter/filter";
 import { Store } from "../../../view/store/types";
 
 /**
@@ -11,7 +12,13 @@ export async function loadSettings(window: Window, store: Store) {
 	try {
 		const settings: any = await new Promise(res => {
 			chrome.storage.sync.get(
-				["theme", "captureRenderReasons", "debugMode", "highlightUpdates"],
+				[
+					"theme",
+					"captureRenderReasons",
+					"debugMode",
+					"highlightUpdates",
+					"componentFilters",
+				],
 				res,
 			);
 		});
@@ -23,12 +30,19 @@ export async function loadSettings(window: Window, store: Store) {
 			store.profiler.captureRenderReasons.$ = !!settings.captureRenderReasons;
 			store.profiler.highlightUpdates.$ = !!settings.highlightUpdates;
 			store.debugMode.$ = !!settings.debugMode;
+			if (settings.componentFilters) {
+				store.filter.restore(settings.componentFilters);
+			}
 		}
 	} catch (e) {
 		// We don't really care if we couldn't load the settings
 		// eslint-disable-next-line no-console
 		console.error(e);
 	}
+}
+
+export function storeFilters(state: RawFilterState) {
+	store({ componentFilters: state });
 }
 
 // eslint-disable-next-line @typescript-eslint/ban-types

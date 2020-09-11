@@ -10,6 +10,7 @@ import {
 	storeCaptureRenderReasons,
 	storeDebugMode,
 	storeHighlightUpdates,
+	storeFilters,
 } from "./settings";
 
 // Updated when the selection in the native elements panel changed.
@@ -121,6 +122,8 @@ const destroy = store.subscribe((type, data) => {
 				})()
 			`);
 		}, 100);
+	} else if (type === "update-filter") {
+		storeFilters(data as any);
 	}
 });
 
