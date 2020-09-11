@@ -23,10 +23,22 @@ export function createFilterStore(
 			},
 		};
 
-		filters.$.filter(x => x.enabled).forEach(x => {
-			s.regex.push(escapeStringRegexp(x.value));
+		filters.$.forEach(x => {
+			s.regex.push({ value: escapeStringRegexp(x.value), enabled: x.enabled });
 		});
 		onSubmit("update-filter", s);
+	};
+
+	const restore = (state: RawFilterState) => {
+		try {
+			filterFragment.$ = !!state.type.fragment;
+			filterDom.$ = !!state.type.dom;
+			filterDom.$ = !!state.type.dom;
+			filters.$ = state.regex;
+		} catch (err) {
+			// eslint-disable-next-line no-console
+			console.log(err);
+		}
 	};
 
 	return {
@@ -66,5 +78,6 @@ export function createFilterStore(
 			}
 		},
 		submit,
+		restore,
 	};
 }

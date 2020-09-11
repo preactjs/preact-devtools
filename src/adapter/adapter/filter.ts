@@ -1,5 +1,7 @@
+import { RawFilter } from "../../view/store/filter";
+
 export interface RawFilterState {
-	regex: string[];
+	regex: RawFilter[];
 	type: {
 		fragment: boolean;
 		dom: boolean;
@@ -19,7 +21,7 @@ export function parseFilters(raw: RawFilterState): FilterState {
 	if (raw.type.dom) type.add("dom");
 
 	return {
-		regex: raw.regex.map(x => new RegExp(x, "gi")),
+		regex: raw.regex.filter(x => x.enabled).map(x => new RegExp(x.value, "gi")),
 		type,
 	};
 }
