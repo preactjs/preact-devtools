@@ -1,5 +1,15 @@
 # Changelog
 
+## 1.1.2
+
+### Patch Changes
+
+- [`f292f4c`](https://github.com/preactjs/preact-devtools/commit/f292f4caf70a63dd13486fd3baec087b53c825ee) [#247](https://github.com/preactjs/preact-devtools/pull/247) Thanks [@marvinhagemeister](https://github.com/marvinhagemeister)! - Save component filters in browser settings and restore them upon opening the devtools panel
+
+* [`081c8e3`](https://github.com/preactjs/preact-devtools/commit/081c8e330829927a5e9b0574d9cf1b47f6e60606) [#243](https://github.com/preactjs/preact-devtools/pull/243) Thanks [@marvinhagemeister](https://github.com/marvinhagemeister)! - Fix inconsistent wrong size in name input
+
+- [`5489540`](https://github.com/preactjs/preact-devtools/commit/548954063ad539195d40536b668de2945b00927b) [#244](https://github.com/preactjs/preact-devtools/pull/244) Thanks [@marvinhagemeister](https://github.com/marvinhagemeister)! - Use more robust `Text` node checks
+
 ## 1.1.1
 
 ### Patch Changes
