@@ -1,4 +1,3 @@
-/* eslint-disable no-mixed-spaces-and-tabs */
 import { Component, VNode } from "preact";
 import { RendererConfig10 } from "./renderer";
 import { HookType } from "../../constants";
@@ -35,7 +34,7 @@ export function getComponent(vnode: VNode | any): Component | null {
 /**
  * Get a `vnode`'s _dom reference.
  */
-export function getDom(vnode: VNode) {
+export function getDom(vnode: VNode): HTMLElement | Text | null {
 	return (vnode as any)._dom || (vnode as any).__e || null;
 }
 
@@ -63,8 +62,8 @@ export function getStatefulHooks(c: Component) {
 	const hooks = getComponentHooks(c);
 	return hooks !== null
 		? hooks._list ||
-		  hooks.__ ||
-		  hooks.i || // Preact 10.1.0
+				hooks.__ ||
+				hooks.i || // Preact 10.1.0
 				null
 		: null;
 }
