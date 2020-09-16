@@ -5,7 +5,7 @@ export const description =
 	"Show upgrade warning when Preact version is too old";
 
 export async function run(config: any) {
-	const { devtools } = await newTestPage(config, "hooks", {
+	const { devtools } = await newTestPage(config, "hooks-support", {
 		preact: "10.3.4",
 	});
 

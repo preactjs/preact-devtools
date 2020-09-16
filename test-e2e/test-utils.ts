@@ -10,8 +10,6 @@ const readFile = (name: string) => {
 	);
 };
 
-const TEST_URL = "http://localhost";
-
 export function mockResponse(req: Request, test: string, file: string) {
 	const mime = file.endsWith(".html")
 		? "text/html"
@@ -50,51 +48,9 @@ export async function newTestPage(
 	// Reset emulation
 	await (page as any)._client.send("Emulation.clearDeviceMetricsOverride");
 
-	await page.setRequestInterception(true);
-	page.on("request", req => {
-		if (
-			!mockResponse(req, "devtools.html", "./devtools.html") &&
-			!mockResponse(req, "devtools.js", "../dist/inline/setup.js") &&
-			!mockResponse(req, "devtools.css", "../dist/inline/setup.css") &&
-			!mockResponse(req, "installHook.js", "../dist/inline/installHook.js") &&
-			!mockResponse(req, "installHook.css", "../dist/inline/installHook.css") &&
-			!mockResponse(
-				req,
-				"preact.js",
-				`./vendor/preact/${preactVersion}/preact.js`,
-			) &&
-			!mockResponse(
-				req,
-				"preactCompat.js",
-				`./vendor/preact/${preactVersion}/preactCompat.js`,
-			) &&
-			!mockResponse(
-				req,
-				"preactHooks.js",
-				`./vendor/preact/${preactVersion}/preactHooks.js`,
-			) &&
-			!mockResponse(
-				req,
-				"preactDevtools.js",
-				`./vendor/preact/${preactVersion}/preactDevtools.js`,
-			) &&
-			!mockResponse(req, "htm.js", "./vendor/htm.js") &&
-			!mockResponse(req, "test-case.js", `./tests/fixtures/${name}.js`) &&
-			!mockResponse(req, "iframe.html", "./iframe.html") &&
-			!mockResponse(req, "iframe2.html", "./iframe2.html") &&
-			!mockResponse(req, "iframe-content.js", "./tests/fixtures/counter.js") &&
-			!mockResponse(
-				req,
-				"iframe-content2.js",
-				"./tests/fixtures/context-displayName.js",
-			) &&
-			!mockResponse(req, TEST_URL, "./index.html")
-		) {
-			req.continue();
-		}
-	});
-
-	await page.goto(TEST_URL);
+	await page.goto(
+		`http://localhost:8100/test?id=${name}&preactVersion=${preactVersion}`,
+	);
 
 	// Grab devtools that's inside the iframe
 	const frames = await page.frames();

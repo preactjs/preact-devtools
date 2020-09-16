@@ -73,6 +73,7 @@ typings/
 .rts*
 *.pdf
 test-e2e/screenshots
+test-e2e/fixtures/extension
 
 # Browser profiles
 profiles/firefox/*
