@@ -563,7 +563,7 @@ export function createRenderer(
 			const vnode = domToVNode.get(node);
 			if (vnode) {
 				if (shouldFilter(vnode, filters, config)) {
-					let p = vnode;
+					let p: VNode | null = vnode;
 					let found = null;
 					while ((p = getVNodeParent(p)) != null) {
 						if (!shouldFilter(p, filters, config)) {
@@ -699,7 +699,8 @@ export function createRenderer(
 				const c = getComponent(vnode);
 				if (c) {
 					const s = getHookState(c, index);
-					s[0] = value;
+					// TODO: How do we know it's okay to assign like this? Hook state varies.
+					(s as any)[0] = value;
 					c.forceUpdate();
 				}
 			}
