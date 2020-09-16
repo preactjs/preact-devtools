@@ -15,10 +15,15 @@ const BROWSERS = ["chrome", "edge", "firefox", "inline"].filter(x => {
 	return true;
 });
 
-const entries = BROWSERS.map(browser => {
-	const dist = `dist/${browser}`;
+if (BROWSERS.length === 0 && process.env.BROWSER) {
+	BROWSERS.push(process.env.BROWSER);
+}
 
-	if (browser === "inline") {
+const entries = BROWSERS.map(browser => {
+	const dist =
+		browser === "test" ? `test-e2e/fixtures/extension` : `dist/${browser}`;
+
+	if (browser === "inline" || browser === "test") {
 		return [
 			{
 				dist: `${dist}/setup.js`,

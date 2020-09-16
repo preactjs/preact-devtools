@@ -1,0 +1,67 @@
+<!DOCTYPE html>
+<html lang="en">
+	<head>
+		<meta charset="utf-8" />
+		<title>Tests Overview</title>
+		<style>
+			.container {
+				padding: 2rem;
+				max-width: 80ch;
+				margin: 0 auto;
+			}
+
+			a {
+				font-size: 1.2rem;
+				margin: 0.2rem;
+				display: inline-block;
+			}
+		</style>
+	</head>
+	<body>
+		<div class="container">
+			<ul id="list"></ul>
+		</div>
+		<script>
+			const tests = [
+				{ name: "context-displayName" },
+				{ name: "counter" },
+				{ name: "data-input" },
+				{ name: "deep-tree" },
+				{ name: "highlight-fragment" },
+				{ name: "highlight-margin" },
+				{ name: "highlight-scroll" },
+				{ name: "highlight-text" },
+				{ name: "hooks-depth-limit" },
+				{ name: "hooks-expand" },
+				{ name: "hooks-support" },
+				{ name: "hooks" },
+				{ name: "memo" },
+				{ name: "memo2" },
+				{ name: "non-vnode" },
+				{ name: "profile-reload" },
+				{ name: "profiler-1" },
+				{ name: "profiler-2" },
+				{ name: "profiler-3" },
+				{ name: "profiler-highlight" },
+				{ name: "render-reasons" },
+				{ name: "root-multi" },
+				{ name: "simple-stats" },
+				{ name: "symbols" },
+				{ name: "todo" },
+				{ name: "truncate" },
+				{ name: "update-all" },
+				{ name: "useCallback" },
+			];
+
+			const list = document.querySelector("#list");
+			tests.forEach(t => {
+				const li = document.createElement("li");
+				const a = document.createElement("a");
+				a.href = `/test?id=${t.name}`;
+				a.textContent = t.name;
+				li.appendChild(a);
+				list.appendChild(li);
+			});
+		</script>
+	</body>
+</html>

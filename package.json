@@ -11,11 +11,13 @@
 		"build:edge": "rimraf dist/edge/ dist/edge.zip && cross-env BROWSER=edge rollup -c && cross-env BROWSER=edge node tools/build.js && npm run archive",
 		"build:firefox": "rimraf dist/firefox/ dist/firefox.zip && cross-env BROWSER=firefox rollup -c && cross-env BROWSER=firefox node tools/build.js && npm run archive",
 		"build:inline": "rimraf dist/inline/ && cross-env BROWSER=inline rollup -c",
+		"build:test": "rimraf test-e2e/fixtures/extension/ && cross-env BROWSER=test rollup -c",
 		"archive": "git archive --format zip --output dist/source-code.zip master",
 		"lint": "eslint 'src/**/*.{ts,tsx}' 'test-e2e/**/*.ts'",
 		"test": "mochette -c tsconfig.cjs.json 'src/**/*.test.{ts,tsx}'",
 		"test-e2e": "TS_NODE_PROJECT=tsconfig.cjs.json yarn ts-node test-e2e/run.ts --default-timeout 2000",
-		"dev": "webpack-dev-server --inline",
+		"dev": "DEBUG=true concurrently 'npm run build:test -- --watch --no-watch.clearScreen' 'wmr start --port 8100 --cwd test-e2e/fixtures/'",
+		"dev:legacy": "webpack-dev-server --inline",
 		"run:chrome": "DEBUG=true npm run build:chrome && mkdir -p ./profiles/chrome && node tools/run-chrome.js",
 		"run:firefox": "DEBUG=true npm run build:firefox && mkdir -p ./profiles/firefox && web-ext run --source-dir ./dist/firefox/ --start-url https://preactjs.com --firefox-profile=./profiles/firefox --keep-profile-changes",
 		"watch": "rollup -c -w"
@@ -47,6 +49,7 @@
 		"babel-loader": "^8.1.0",
 		"babel-plugin-transform-jsx-to-htm": "^2.0.0",
 		"babel-plugin-transform-rename-properties": "^0.0.3",
+		"concurrently": "^5.3.0",
 		"cpy-cli": "^3.1.1",
 		"cross-env": "^7.0.2",
 		"css-loader": "^3.6.0",
@@ -75,7 +78,8 @@
 		"web-ext": "^4.3.0",
 		"webpack": "^4.43.0",
 		"webpack-cli": "^3.3.12",
-		"webpack-dev-server": "^3.11.0"
+		"webpack-dev-server": "^3.11.0",
+		"wmr": "^0.0.8"
 	},
 	"dependencies": {
 		"errorstacks": "^1.3.0",
