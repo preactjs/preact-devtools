@@ -699,8 +699,9 @@ export function createRenderer(
 				const c = getComponent(vnode);
 				if (c) {
 					const s = getHookState(c, index);
-					// TODO: How do we know it's okay to assign like this? Hook state varies.
-					(s as any)[0] = value;
+					// Only useState and useReducer hooks marked as editable so state can
+					// cast to more specific ReducerHookState value.
+					(s as [any, any])[0] = value;
 					c.forceUpdate();
 				}
 			}
