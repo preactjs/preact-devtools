@@ -5,6 +5,7 @@ import { ID } from "../../../view/store/types";
 import { IdMappingState, getVNodeById } from "../IdMapper";
 import { Options } from "preact";
 import { inspectHooks } from "./hooks";
+import { InspectData } from "../../adapter/adapter";
 
 /**
  * Serialize all properties/attributes of a `VNode` like `props`, `context`,
@@ -18,7 +19,7 @@ export function inspectVNode(
 	options: Options,
 	id: ID,
 	supportsHooks: boolean,
-) {
+): InspectData | null {
 	const vnode = getVNodeById(ids, id);
 	if (!vnode) return null;
 
@@ -38,6 +39,7 @@ export function inspectVNode(
 
 	return {
 		context,
+		key: vnode.key || null,
 		hooks: supportsHooks ? hooks : !supportsHooks && hasHooks ? [] : null,
 		id,
 		name: getDisplayName(vnode, config),
