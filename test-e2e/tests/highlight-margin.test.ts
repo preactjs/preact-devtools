@@ -3,7 +3,7 @@ import { expect } from "chai";
 import { wait } from "pentf/utils";
 import { Page } from "puppeteer";
 
-export const description = "Hihglight overlay should account for margin";
+export const description = "Highlight overlay should account for margin";
 
 function getHighlightSize(page: Page) {
 	return getSize(page, "#preact-devtools-highlighter > div");
