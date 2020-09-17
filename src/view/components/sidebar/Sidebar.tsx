@@ -4,6 +4,7 @@ import { PropsPanel } from "./inspect/PropsPanel";
 import { serializeProps } from "./inspect/serializeProps";
 import { DebugTreeStats } from "./DebugTreeStats";
 import { DebugNodeNavTree } from "./DebugNodeNavTree";
+import { KeyPanel } from "./KeyPanel";
 
 export function Sidebar() {
 	const store = useStore();
@@ -14,6 +15,12 @@ export function Sidebar() {
 
 	return (
 		<Fragment>
+			{inspect && inspect.key !== null && (
+				<KeyPanel
+					value={inspect.key}
+					onCopy={() => emit("copy", inspect.key!)}
+				/>
+			)}
 			<PropsPanel
 				label="Props"
 				items={propData.items}

@@ -223,6 +223,7 @@ describe("applyEvent", () => {
 
 		store.inspectData.$ = {
 			id: 2,
+			key: null,
 			context: null,
 			hooks: null,
 			name: "Foo",
@@ -247,6 +248,7 @@ describe("applyEvent", () => {
 
 		store.inspectData.$ = {
 			id: 2,
+			key: null,
 			context: null,
 			hooks: null,
 			name: "Foo",
@@ -262,6 +264,7 @@ describe("applyEvent", () => {
 		applyEvent(store, "inspect-result", {
 			id: 42,
 			name: "foo",
+			key: null,
 			type: "string",
 			context: null,
 			hooks: null,

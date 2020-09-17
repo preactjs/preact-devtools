@@ -28,6 +28,7 @@ export interface InspectData {
 	id: ID;
 	name: string;
 	type: any;
+	key: string | null;
 	context: Record<string, any> | null;
 	hooks: PropData[] | null;
 	props: Record<string, any> | null;
