@@ -44,11 +44,7 @@ export function createHightlighter(renderer: Renderer) {
 			let [first, last] = dom;
 			if (first === null) return;
 
-			if (first.nodeType === Node.TEXT_NODE) {
-				first = first.parentNode as any;
-			}
-
-			const node = getNearestElement(first!);
+			const node = getNearestElement(first);
 			const nodeEnd = last ? getNearestElement(last) : null;
 			if (node != null) {
 				const label = renderer.getDisplayNameById

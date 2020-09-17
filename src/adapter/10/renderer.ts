@@ -125,13 +125,16 @@ export function getFilteredChildren(
 	return out.reverse();
 }
 
+function isTextNode(dom: HTMLElement | Text | null): dom is Text {
+	return dom != null && dom.nodeType === NodeType.Text;
+}
+
 function updateHighlight(profiler: ProfilerState, vnode: VNode) {
 	if (profiler.highlightUpdates && typeof vnode.type === "function") {
 		let dom = getDom(vnode);
-		if (dom.nodeType === NodeType.Text) {
-			dom = dom.parentNode;
+		if (isTextNode(dom)) {
+			dom = dom.parentNode as HTMLElement;
 		}
-
 		if (dom && !profiler.pendingHighlightUpdates.has(dom)) {
 			profiler.pendingHighlightUpdates.add(dom);
 			measureUpdate(profiler.updateRects, dom);
