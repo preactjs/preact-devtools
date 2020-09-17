@@ -160,7 +160,10 @@
 	color: var(--color-key-label);
 }
 
-[data-selected] .keyLabel {
+.tree:not(:focus-within) [data-selected] .keyLabel {
+	color: var(--color-key-label-selected-no-focus);
+}
+.tree:focus-within [data-selected] .keyLabel {
 	color: var(--color-key-label-selected);
 }
 
@@ -168,8 +171,11 @@
 	color: var(--color-key-value);
 }
 
-[data-selected] .key {
+.tree:not(:focus-within) [data-selected] .key {
 	color: var(--color-key-value-selected);
+}
+.tree:focus-within [data-selected] .key {
+	color: var(--color-key-value-selected-focus);
 }
 
 /* Marker */

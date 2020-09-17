@@ -86,8 +86,10 @@ input {
 	--color-empty-logo: #e0e0e0;
 	--color-key-label: gray;
 	--color-key-label-selected: #dadada;
+	--color-key-label-selected-nofocus: #303030;
 	--color-key-value: #ff5722;
-	--color-key-value-selected: orange;
+	--color-key-value-selected-focus: yellow;
+	--color-key-value-selected: #ff5722;
 	--color-radio: #7245c7;
 	--color-shadow: rgba(0, 0, 0, 0.15);
 
@@ -169,7 +171,9 @@ input {
 	--color-empty-logo: #3d3d3d;
 	--color-key-label: gray;
 	--color-key-label-selected: #dedede;
+	--color-key-label-selected-nofocus: #dedede;
 	--color-key-value: #ff5722;
+	--color-key-value-selected-focus: yellow;
 	--color-key-value-selected: yellow;
 	--color-radio: #d2adff;
 	--color-shadow: rgba(255, 255, 255, 0.15);
