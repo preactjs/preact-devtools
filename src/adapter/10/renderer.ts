@@ -563,7 +563,7 @@ export function createRenderer(
 			const vnode = domToVNode.get(node);
 			if (vnode) {
 				if (shouldFilter(vnode, filters, config)) {
-					let p = vnode;
+					let p: VNode | null = vnode;
 					let found = null;
 					while ((p = getVNodeParent(p)) != null) {
 						if (!shouldFilter(p, filters, config)) {
@@ -699,7 +699,9 @@ export function createRenderer(
 				const c = getComponent(vnode);
 				if (c) {
 					const s = getHookState(c, index);
-					s[0] = value;
+					// Only useState and useReducer hooks marked as editable so state can
+					// cast to more specific ReducerHookState value.
+					(s as [any, any])[0] = value;
 					c.forceUpdate();
 				}
 			}

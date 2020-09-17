@@ -5,6 +5,8 @@ import {
 	getStatefulHookValue,
 	isUseReducerOrState,
 	getVNodeParent,
+	getStartTime,
+	getEndTime,
 } from "../vnode";
 import { ID } from "../../../view/store/types";
 
@@ -109,8 +111,8 @@ export function getRenderReason(
 	const parent = getVNodeParent(next);
 	if (
 		parent != null &&
-		(next.startTime || 0) >= parent.startTime &&
-		(next.endTime || 0) <= parent.endTime
+		getStartTime(next) >= getStartTime(parent) &&
+		getEndTime(next) <= getEndTime(parent)
 	) {
 		return createReason(RenderReason.PARENT_UPDATE, null);
 	}
