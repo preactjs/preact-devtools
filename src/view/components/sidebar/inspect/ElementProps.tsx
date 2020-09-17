@@ -105,9 +105,7 @@ export function SingleItem(props: SingleProps) {
 			class={s.row}
 			data-testid="props-row"
 			data-depth={depth}
-			style={`transform: translate3d(calc(var(--indent-depth) * ${
-				depth - 1
-			}), 0, 0);`}
+			style={`padding-left: calc(var(--indent-depth) * ${depth - 1})`}
 		>
 			{collapseable && (
 				<button
