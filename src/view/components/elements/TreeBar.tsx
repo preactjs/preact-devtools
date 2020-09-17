@@ -18,6 +18,7 @@ import { useStore, useObserver } from "../../store/react-bindings";
 import s from "./TreeBar.css";
 import { useSearch } from "../../store/search";
 import { OutsideClick } from "../OutsideClick";
+import { filterHocs } from "../tree/windowing";
 
 export function TreeBar() {
 	const store = useStore();
@@ -124,6 +125,7 @@ export function FilterPopup() {
 	const store = useStore();
 	const filters = useObserver(() => store.filter.filters.$);
 	const filterDom = useObserver(() => store.filter.filterDom.$);
+	const filterHoc = useObserver(() => store.filter.filterHoc.$);
 	const filterFragment = useObserver(() => store.filter.filterFragment.$);
 
 	return (
@@ -147,6 +149,19 @@ export function FilterPopup() {
 						{filterFragment ? <CheckboxChecked /> : <CheckboxUnChecked />}
 					</span>
 					<span class={s.filterValue}>Fragments</span>
+				</label>
+				<label class={s.filterRow}>
+					<span class={s.filterCheck}>
+						<input
+							type="checkbox"
+							checked={filterHoc}
+							onInput={e =>
+								store.filter.setEnabled("hoc", (e.target as any).checked)
+							}
+						/>
+						{filterHoc ? <CheckboxChecked /> : <CheckboxUnChecked />}
+					</span>
+					<span class={s.filterValue}>HOC-Components</span>
 				</label>
 				<label class={s.filterRow}>
 					<span class={s.filterCheck}>

@@ -32,9 +32,11 @@ export interface DevNode {
 	id: ID;
 	type: DevNodeType;
 	name: string;
-	key: string;
+	key: string | null;
 	parent: ID;
 	children: ID[];
+	/** Higher Order Component wrappers */
+	hocs: string[] | null;
 
 	// Display (Elements + Profiler)
 	depth: number;

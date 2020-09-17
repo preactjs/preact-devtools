@@ -87,6 +87,7 @@ export function flames(
 				endTime: startTime + duration,
 				children: [],
 				id: id++,
+				hocs: null,
 				name,
 			};
 

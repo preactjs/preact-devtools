@@ -30,7 +30,7 @@ export function parseObjectState(
 		});
 
 		parseProps(data, "root", PROPS_LIMIT, 0, "root", tree);
-		const { items } = flattenChildren(tree, "root", id => {
+		const items = flattenChildren(tree, "root", id => {
 			return tree.get(id)!.children.length > 0 && isCollapsed(uncollapsed, id);
 		});
 		return items.slice(1).map(id => tree.get(id)!);

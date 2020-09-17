@@ -44,6 +44,7 @@ input {
 :root {
 	--font-monospace: "SFMono-Regular", Consolas, "Liberation Mono", Menlo,
 		Courier, monospace;
+	--font-xxxsmall: 0.5625rem; /* 9px */
 	--font-xxsmall: 0.625rem; /* 10px */
 	--font-xsmall: 0.6875rem; /* 11px */
 	--font-small: 0.75rem; /* 12px */
@@ -92,6 +93,10 @@ input {
 	--color-key-value-selected: #ff5722;
 	--color-radio: #7245c7;
 	--color-shadow: rgba(0, 0, 0, 0.15);
+	--color-hoc-bg: #ddd;
+	--color-hoc-text: #111;
+	--color-hoc-selected-text: #fff;
+	--color-hoc-selected-bg: #4101b3;
 
 	/* Table */
 	--table-hover: rgba(174, 128, 255, 0.4);
@@ -177,6 +182,10 @@ input {
 	--color-key-value-selected: yellow;
 	--color-radio: #d2adff;
 	--color-shadow: rgba(255, 255, 255, 0.15);
+	--color-hoc-bg: #505050;
+	--color-hoc-text: #fff;
+	--color-hoc-selected-text: #fff;
+	--color-hoc-selected-bg: #8251d8;
 
 	/* Table */
 	--table-hover: rgba(174, 128, 255, 0.4);

@@ -49,6 +49,7 @@ export function applyOperationsV1(store: Store, data: number[]) {
 						children: [],
 						depth,
 						id,
+						hocs: null,
 						name,
 						parent: parentId,
 						type,

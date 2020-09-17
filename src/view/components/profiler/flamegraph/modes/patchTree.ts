@@ -29,6 +29,7 @@ function createGroup(): DevNode {
 		type: DevNodeType.Group,
 		children: [],
 		depth: -1,
+		hocs: null,
 		endTime: -1,
 		startTime: -1,
 		name: "__PREACT_GROUP__",

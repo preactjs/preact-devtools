@@ -13,6 +13,7 @@ export enum MsgTypes {
 	REORDER_CHILDREN = 5,
 	RENDER_REASON = 6,
 	COMMIT_STATS = 7,
+	HOC_NODES = 8,
 }
 
 // Event Examples:
@@ -64,6 +65,11 @@ export enum MsgTypes {
 //   ...stringIds
 //
 // COMMIT_STATS -> Check `stats.ts`
+//
+// HOC_NODES
+//  vnodeId
+//  stringsCounts
+//  ...stringIds
 //
 export interface Commit {
 	rootId: number;

@@ -68,7 +68,7 @@
 	font-size: 0.9rem;
 	font-family: var(--font-monospace);
 	color: var(--color-element-text);
-	height: 1.25rem;
+	height: 1.125rem;
 	position: absolute;
 	width: 100%;
 	left: 0;
@@ -78,6 +78,11 @@
 .tree:focus-within .item[data-selected] {
 	background: var(--color-selected-bg);
 	color: var(--color-selected-text);
+}
+
+.tree:focus-within .item[data-selected] :global(.hoc-item) {
+	background: var(--color-hoc-selected-bg);
+	color: var(--color-hoc-selected-text);
 }
 
 .tree:focus-within .item[data-selected]::after {
@@ -184,4 +189,12 @@
 }
 .markSelected {
 	background: var(--color-marker-selected);
+}
+
+.hocs {
+	margin-left: 0.5rem;
+}
+
+.hocs > * + * {
+	margin-left: 0.25rem;
 }
