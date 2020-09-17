@@ -3910,10 +3910,15 @@ error-ex@^1.3.1:
   dependencies:
     is-arrayish "^0.2.1"
 
-errorstacks@^1.1.5, errorstacks@^1.3.0:
+errorstacks@^1.1.5:
   version "1.3.0"
   resolved "https://registry.yarnpkg.com/errorstacks/-/errorstacks-1.3.0.tgz#283d601b31cce3e72fe31ab8f354fa9ca247bac6"
   integrity sha512-FZT3tzJlYsxdq4WMnZYIZWz2wugxiAqrAGKW9lO7FpGg4h/4xS3+eShJT5l/3fkrWG+nN5+KoBV95XoI4v3ihg==
+
+errorstacks@^2.0.0:
+  version "2.0.0"
+  resolved "https://registry.yarnpkg.com/errorstacks/-/errorstacks-2.0.0.tgz#0acdfaed5f83a13ade489a3ac2d19d954b712fa0"
+  integrity sha512-t5ZcfunrgHDQL83nSvpLNVrtrLUmQmiHPPdTUOnScU8y5g5ErBIFC0K7ec/7pbmxfOc8m/hIYB00Xlw8GdubvQ==
 
 es-abstract@^1.17.0, es-abstract@^1.17.0-next.1, es-abstract@^1.17.2, es-abstract@^1.17.5:
   version "1.17.6"
