@@ -47,7 +47,10 @@ export function createSearchStore(
 		const ids: number[] = [];
 		list.$.forEach(id => {
 			const node = items.$.get(id);
-			if (node && reg.test(node.name)) {
+			if (
+				node &&
+				(reg.test(node.name) || (node.hocs && node.hocs.some(h => reg.test(h))))
+			) {
 				ids.push(id);
 			}
 		});

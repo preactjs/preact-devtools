@@ -13,6 +13,7 @@ export function createFilterStore(
 	const filters = valoo<RawFilter[]>([]);
 	const filterFragment = valoo(true);
 	const filterDom = valoo(true);
+	const filterHoc = valoo(true);
 
 	const submit = () => {
 		const s: RawFilterState = {
@@ -20,6 +21,7 @@ export function createFilterStore(
 			type: {
 				fragment: filterFragment.$,
 				dom: filterDom.$,
+				hoc: filterHoc.$,
 			},
 		};
 
@@ -33,7 +35,7 @@ export function createFilterStore(
 		try {
 			filterFragment.$ = !!state.type.fragment;
 			filterDom.$ = !!state.type.dom;
-			filterDom.$ = !!state.type.dom;
+			filterHoc.$ = state.type.hoc !== undefined ? state.type.hoc : true;
 			filters.$ = state.regex;
 		} catch (err) {
 			// eslint-disable-next-line no-console
@@ -45,12 +47,15 @@ export function createFilterStore(
 		filters,
 		filterFragment,
 		filterDom,
+		filterHoc,
 		setEnabled(filter: RawFilter | string, v: boolean) {
 			if (typeof filter === "string") {
 				if (filter === "dom") {
 					filterDom.$ = v;
 				} else if (filter === "fragment") {
 					filterFragment.$ = v;
+				} else if (filter === "hoc") {
+					filterHoc.$ = v;
 				}
 			} else {
 				filter.enabled = v;

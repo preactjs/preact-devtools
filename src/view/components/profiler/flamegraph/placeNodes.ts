@@ -46,6 +46,7 @@ export const EMPTY: DevNode = {
 	depth: 0,
 	endTime: 0,
 	id: -1,
+	hocs: null,
 	key: "",
 	name: "",
 	parent: -1,

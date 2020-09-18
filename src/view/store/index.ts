@@ -32,7 +32,7 @@ export function createStore(): Store {
 
 	const nodeList = watch(() => {
 		return roots.$.map(root => {
-			const { items } = flattenChildren<ID, DevNode>(nodes.$, root, id =>
+			const items = flattenChildren<ID, DevNode>(nodes.$, root, id =>
 				collapser.collapsed.$.has(id),
 			);
 

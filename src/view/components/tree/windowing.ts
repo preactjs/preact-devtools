@@ -3,7 +3,7 @@ import { ID } from "../../store/types";
 export function flattenChildren<
 	K,
 	T extends { id: K; children: K[]; depth: number }
->(tree: Map<K, T>, id: K, isCollapsed: (id: K) => boolean): { items: K[] } {
+>(tree: Map<K, T>, id: K, isCollapsed: (id: K) => boolean): K[] {
 	const out: K[] = [];
 	const visited = new Set<K>();
 	const stack: K[] = [id];
@@ -27,7 +27,7 @@ export function flattenChildren<
 		}
 	}
 
-	return { items: out };
+	return out;
 }
 
 export function clamp(n: number, max: number) {

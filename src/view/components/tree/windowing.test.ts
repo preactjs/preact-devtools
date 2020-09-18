@@ -13,8 +13,13 @@ describe("flattenChildren", () => {
 
 	it("should flatten tree", () => {
 		const collapsed = new Set<ID>();
-		expect(
-			flattenChildren(tree, 1, id => collapsed.has(id)).items,
-		).to.deep.equal([1, 2, 4, 3, 5, 6]);
+		expect(flattenChildren(tree, 1, id => collapsed.has(id))).to.deep.equal([
+			1,
+			2,
+			4,
+			3,
+			5,
+			6,
+		]);
 	});
 });

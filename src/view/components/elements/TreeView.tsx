@@ -14,6 +14,7 @@ import { debounce } from "../../../shells/shared/utils";
 import { EmitFn } from "../../../adapter/hook";
 import { useVirtualizedList } from "./VirtualizedList";
 import { useAutoIndent } from "./useAutoIndent";
+import { Hoc } from "../sidebar/HocPanel";
 
 const ROW_HEIGHT = 18;
 
@@ -228,6 +229,17 @@ export function TreeItem(props: { key: any; id: ID; top: number }) {
 						</span>
 					) : (
 						""
+					)}
+					{node.hocs && node.hocs.length > 0 && (
+						<span class={s.hocs}>
+							{node.hocs.map((hoc, i) => {
+								return (
+									<Hoc key={i} small>
+										<MarkResult text={hoc} id={id} />
+									</Hoc>
+								);
+							})}
+						</span>
 					)}
 				</span>
 			</div>

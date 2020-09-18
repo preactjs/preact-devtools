@@ -1,0 +1,36 @@
+.root {
+	border-bottom: 0.0625rem solid var(--color-border);
+	padding: 0.1875rem 0.6rem;
+	display: flex;
+	flex-wrap: wrap;
+}
+
+.root .hoc {
+	margin-bottom: 0.2rem;
+	margin-top: 0.2rem;
+}
+
+.root .hoc {
+	margin-right: 0.4rem;
+}
+
+.root:last-of-type(.hoc) {
+	margin-right: 0;
+}
+
+.hoc {
+	display: inline-block;
+	background: var(--color-hoc-bg);
+	border-radius: 0.1875rem;
+	font-size: var(--font-small);
+	font-family: var(--font-monospace);
+	padding: 0.2rem 0.4rem;
+	line-height: normal;
+	color: var(--color-hoc-text);
+}
+
+.hoc.small {
+	font-size: var(--font-xxxsmall);
+	border-radius: 0.125rem;
+	padding: 0.125rem 0.25rem;
+}

@@ -15,6 +15,7 @@ describe("TreeItem", () => {
 			endTime: 0,
 			key: "abcdefghijklmnopqrstuvxyz",
 			id: 1,
+			hocs: null,
 			name: "foo",
 			parent: -1,
 			startTime: 0,

@@ -67,7 +67,7 @@ export function TreeBar() {
 					onInput={e => store.search.onChange((e.target as any).value)}
 				/>
 				{searchActive && (
-					<div class={s.searchCounter}>
+					<div class={s.searchCounter} data-testid="search-counter">
 						{count > 0 ? selected + 1 : 0} | {count}
 					</div>
 				)}
@@ -124,6 +124,7 @@ export function FilterPopup() {
 	const store = useStore();
 	const filters = useObserver(() => store.filter.filters.$);
 	const filterDom = useObserver(() => store.filter.filterDom.$);
+	const filterHoc = useObserver(() => store.filter.filterHoc.$);
 	const filterFragment = useObserver(() => store.filter.filterFragment.$);
 
 	return (
@@ -147,6 +148,19 @@ export function FilterPopup() {
 						{filterFragment ? <CheckboxChecked /> : <CheckboxUnChecked />}
 					</span>
 					<span class={s.filterValue}>Fragments</span>
+				</label>
+				<label class={s.filterRow}>
+					<span class={s.filterCheck}>
+						<input
+							type="checkbox"
+							checked={filterHoc}
+							onInput={e =>
+								store.filter.setEnabled("hoc", (e.target as any).checked)
+							}
+						/>
+						{filterHoc ? <CheckboxChecked /> : <CheckboxUnChecked />}
+					</span>
+					<span class={s.filterValue}>HOC-Components</span>
 				</label>
 				<label class={s.filterRow}>
 					<span class={s.filterCheck}>

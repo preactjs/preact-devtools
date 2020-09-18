@@ -43,6 +43,7 @@ export function ops2Tree(oldTree: Tree, existingRoots: ID[], ops: number[]) {
 					children: [],
 					depth: parent ? parent.depth + 1 : 0,
 					id,
+					hocs: null,
 					name: strings[ops[i + 5] - 1],
 					parent: parentId,
 					type: ops[i + 2],
@@ -137,6 +138,20 @@ export function ops2Tree(oldTree: Tree, existingRoots: ID[], ops: number[]) {
 				const statsOps = ops.slice(i + 1, i + 1 + count);
 				stats = parseStats(statsOps);
 				i = i + 1 + count;
+				break;
+			}
+			case MsgTypes.HOC_NODES: {
+				const vnodeId = ops[i + 1];
+				const vnode = pending.get(vnodeId);
+				const count = ops[i + 2];
+				if (vnode) {
+					const hocs = [];
+					for (let j = 0; j < count; j++) {
+						hocs.push(strings[ops[i + 3 + j] - 1]);
+					}
+					vnode.hocs = hocs;
+				}
+				i = i + 2 + count;
 				break;
 			}
 			default:

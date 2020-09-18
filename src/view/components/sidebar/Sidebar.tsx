@@ -5,11 +5,19 @@ import { serializeProps } from "./inspect/serializeProps";
 import { DebugTreeStats } from "./DebugTreeStats";
 import { DebugNodeNavTree } from "./DebugNodeNavTree";
 import { KeyPanel } from "./KeyPanel";
+import { HocPanel } from "./HocPanel";
 
 export function Sidebar() {
 	const store = useStore();
 	const showDebug = useObserver(() => store.debugMode.$);
 	const inspect = useObserver(() => store.inspectData.$);
+	const hocs = useObserver(() => {
+		if (store.inspectData.$) {
+			const node = store.nodes.$.get(store.inspectData.$.id);
+			return node ? node.hocs : null;
+		}
+		return null;
+	});
 	const { props: propData, state, context, hooks } = store.sidebar;
 	const { emit } = store;
 
@@ -21,6 +29,7 @@ export function Sidebar() {
 					onCopy={() => emit("copy", inspect.key!)}
 				/>
 			)}
+			{inspect && hocs !== null && hocs.length > 0 && <HocPanel hocs={hocs} />}
 			<PropsPanel
 				label="Props"
 				items={propData.items}

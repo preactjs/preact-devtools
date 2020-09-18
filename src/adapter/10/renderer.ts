@@ -142,6 +142,24 @@ function updateHighlight(profiler: ProfilerState, vnode: VNode) {
 	}
 }
 
+function getHocName(name: string) {
+	const idx = name.indexOf("(");
+	if (idx === -1) return null;
+
+	const wrapper = name.slice(0, idx);
+	return wrapper ? wrapper : null;
+}
+
+function addHocs(commit: Commit, id: ID, hocs: string[]) {
+	if (hocs.length > 0) {
+		commit.operations.push(MsgTypes.HOC_NODES, id, hocs.length);
+		for (let i = 0; i < hocs.length; i++) {
+			const stringId = getStringId(commit.strings, hocs[i]);
+			commit.operations.push(stringId);
+		}
+	}
+}
+
 export function mount(
 	ids: IdMappingState,
 	commit: Commit,
@@ -151,6 +169,7 @@ export function mount(
 	domCache: WeakMap<HTMLElement | Text, VNode>,
 	config: RendererConfig10,
 	profiler: ProfilerState,
+	hocs: string[],
 ) {
 	if (commit.stats !== null) {
 		commit.stats.mounts++;
@@ -159,36 +178,66 @@ export function mount(
 	const root = isRoot(vnode, config);
 
 	const skip = shouldFilter(vnode, filters, config);
+
 	if (root || !skip) {
-		const id = hasVNodeId(ids, vnode)
-			? getVNodeId(ids, vnode)
-			: createVNodeId(ids, vnode);
-		if (isRoot(vnode, config)) {
-			commit.operations.push(MsgTypes.ADD_ROOT, id);
+		record: {
+			let name = getDisplayName(vnode, config);
+
+			if (filters.type.has("hoc")) {
+				const hocName = getHocName(name);
+
+				// Filter out HOC-Components
+				if (hocName) {
+					if (name.startsWith("ForwardRef")) {
+						hocs = [...hocs, hocName];
+						const idx = name.indexOf("(");
+						name = name.slice(idx + 1, -1) || "Anonymous";
+					} else {
+						hocs = [...hocs, hocName];
+						break record;
+					}
+				}
+			}
+
+			const id = hasVNodeId(ids, vnode)
+				? getVNodeId(ids, vnode)
+				: createVNodeId(ids, vnode);
+			if (isRoot(vnode, config)) {
+				commit.operations.push(MsgTypes.ADD_ROOT, id);
+			}
+			commit.operations.push(
+				MsgTypes.ADD_VNODE,
+				id,
+				getDevtoolsType(vnode), // Type
+				ancestorId,
+				9999, // owner
+				getStringId(commit.strings, name),
+				vnode.key ? getStringId(commit.strings, vnode.key) : 0,
+				// Multiply, because operations array only supports integers
+				// and would otherwise cut off floats
+				(vnode.startTime || 0) * 1000,
+				(vnode.endTime || 0) * 1000,
+			);
+
+			if (hocs.length > 0) {
+				addHocs(commit, id, hocs);
+				hocs = [];
+			}
+
+			// Capture render reason (mount here)
+			if (profiler.isProfiling && profiler.captureRenderReasons) {
+				commit.operations.push(
+					MsgTypes.RENDER_REASON,
+					id,
+					RenderReason.MOUNT,
+					0,
+				);
+			}
+
+			updateHighlight(profiler, vnode);
+
+			ancestorId = id;
 		}
-
-		commit.operations.push(
-			MsgTypes.ADD_VNODE,
-			id,
-			getDevtoolsType(vnode), // Type
-			ancestorId,
-			9999, // owner
-			getStringId(commit.strings, getDisplayName(vnode, config)),
-			vnode.key ? getStringId(commit.strings, vnode.key) : 0,
-			// Multiply, because operations array only supports integers
-			// and would otherwise cut off floats
-			(vnode.startTime || 0) * 1000,
-			(vnode.endTime || 0) * 1000,
-		);
-
-		// Capture render reason (mount here)
-		if (profiler.isProfiling && profiler.captureRenderReasons) {
-			commit.operations.push(MsgTypes.RENDER_REASON, id, RenderReason.MOUNT, 0);
-		}
-
-		updateHighlight(profiler, vnode);
-
-		ancestorId = id;
 	}
 
 	if (skip && typeof vnode.type !== "function") {
@@ -217,6 +266,7 @@ export function mount(
 				domCache,
 				config,
 				profiler,
+				hocs,
 			);
 		}
 	}
@@ -258,6 +308,7 @@ export function update(
 	domCache: WeakMap<HTMLElement | Text, VNode>,
 	config: RendererConfig10,
 	profiler: ProfilerState,
+	hocs: string[],
 ) {
 	if (commit.stats !== null) {
 		commit.stats.updates++;
@@ -286,6 +337,7 @@ export function update(
 					domCache,
 					config,
 					profiler,
+					hocs,
 				);
 			}
 		}
@@ -298,7 +350,17 @@ export function update(
 	}
 
 	if (!hasVNodeId(ids, vnode)) {
-		mount(ids, commit, vnode, ancestorId, filters, domCache, config, profiler);
+		mount(
+			ids,
+			commit,
+			vnode,
+			ancestorId,
+			filters,
+			domCache,
+			config,
+			profiler,
+			hocs,
+		);
 		return true;
 	}
 
@@ -309,6 +371,15 @@ export function update(
 		(vnode.startTime || 0) * 1000,
 		(vnode.endTime || 0) * 1000,
 	);
+
+	const name = getDisplayName(vnode, config);
+	const hoc = getHocName(name);
+	if (hoc) {
+		hocs = [...hocs, hoc];
+	} else {
+		addHocs(commit, id, hocs);
+		hocs = [];
+	}
 
 	const oldVNode = getVNodeById(ids, id);
 	updateVNodeId(ids, id, vnode);
@@ -347,7 +418,7 @@ export function update(
 				diff = getDiffType(child, diff);
 				childCount++;
 			}
-			update(ids, commit, child, id, filters, domCache, config, profiler);
+			update(ids, commit, child, id, filters, domCache, config, profiler, hocs);
 			// TODO: This is only sometimes necessary
 			shouldReorder = true;
 		} else {
@@ -355,7 +426,7 @@ export function update(
 				diff = getDiffType(child, diff);
 				childCount++;
 			}
-			mount(ids, commit, child, id, filters, domCache, config, profiler);
+			mount(ids, commit, child, id, filters, domCache, config, profiler, hocs);
 			shouldReorder = true;
 		}
 	}
@@ -407,9 +478,29 @@ export function createCommit(
 	}
 
 	if (isNew) {
-		mount(ids, commit, vnode, parentId, filters, domCache, config, profiler);
+		mount(
+			ids,
+			commit,
+			vnode,
+			parentId,
+			filters,
+			domCache,
+			config,
+			profiler,
+			[],
+		);
 	} else {
-		update(ids, commit, vnode, parentId, filters, domCache, config, profiler);
+		update(
+			ids,
+			commit,
+			vnode,
+			parentId,
+			filters,
+			domCache,
+			config,
+			profiler,
+			[],
+		);
 	}
 
 	commit.rootId = getVNodeId(ids, vnode);
@@ -419,7 +510,7 @@ export function createCommit(
 
 const DEFAULT_FIlTERS: FilterState = {
 	regex: [],
-	type: new Set(["dom", "fragment"]),
+	type: new Set(["dom", "fragment", "hoc"]),
 };
 
 export interface Preact10Renderer extends Renderer {
