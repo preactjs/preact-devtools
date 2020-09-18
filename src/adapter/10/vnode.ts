@@ -57,8 +57,8 @@ export function hasDom(x: any): boolean {
  */
 export function isSuspenseVNode(vnode: VNode): boolean {
 	const c = getComponent(vnode) as any;
-	// FIXME: Mangling of `_childDidSuspend` is not stable in Preact
-	return c != null && c._childDidSuspend;
+	// In Preact < 10.3.0 was mangling was unstable
+	return c != null && !!(c._childDidSuspend || c.__c);
 }
 
 /**
@@ -185,8 +185,10 @@ export function getDisplayName(vnode: VNode, config: RendererConfig10): string {
 					return `${ctx.displayName}.Provider`;
 				}
 			}
+			if (isSuspenseVNode(vnode)) {
+				return "Suspense";
+			}
 		}
-
 		return type.displayName || type.name || "Anonymous";
 	} else if (typeof type === "string") return type;
 	return "#text";
