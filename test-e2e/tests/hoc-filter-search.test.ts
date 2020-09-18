@@ -1,8 +1,7 @@
 import { newTestPage, typeText } from "../test-utils";
 import { expect } from "chai";
-import { clickNestedText, getText, waitForTestId } from "pentf/browser_utils";
+import { getText } from "pentf/browser_utils";
 import { assertEventually } from "pentf/assert_utils";
-import { wait } from "pentf/utils";
 
 export const description = "HOC-Component labels should be searchable";
 export async function run(config: any) {

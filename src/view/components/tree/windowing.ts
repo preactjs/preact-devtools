@@ -1,4 +1,4 @@
-import { DevNode, ID } from "../../store/types";
+import { ID } from "../../store/types";
 
 export function flattenChildren<
 	K,
@@ -53,8 +53,4 @@ export function getLastChild(nodes: Map<ID, Traversable>, id: ID): ID {
 	}
 
 	return last;
-}
-
-export function filterHocs(nodes: DevNode[]): DevNode[] {
-	return nodes;
 }

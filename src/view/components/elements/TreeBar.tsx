@@ -18,7 +18,6 @@ import { useStore, useObserver } from "../../store/react-bindings";
 import s from "./TreeBar.css";
 import { useSearch } from "../../store/search";
 import { OutsideClick } from "../OutsideClick";
-import { filterHocs } from "../tree/windowing";
 
 export function TreeBar() {
 	const store = useStore();

@@ -1,7 +1,6 @@
 import { valoo } from "../valoo";
 import escapeStringRegexp from "escape-string-regexp";
 import { RawFilterState } from "../../adapter/adapter/filter";
-import { filterHocs } from "../components/tree/windowing";
 
 export interface RawFilter {
 	value: string;
