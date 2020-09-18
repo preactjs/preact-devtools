@@ -68,7 +68,7 @@ export function TreeBar() {
 					onInput={e => store.search.onChange((e.target as any).value)}
 				/>
 				{searchActive && (
-					<div class={s.searchCounter}>
+					<div class={s.searchCounter} data-testid="search-counter">
 						{count > 0 ? selected + 1 : 0} | {count}
 					</div>
 				)}

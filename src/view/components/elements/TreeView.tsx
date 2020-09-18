@@ -235,7 +235,7 @@ export function TreeItem(props: { key: any; id: ID; top: number }) {
 							{node.hocs.map((hoc, i) => {
 								return (
 									<Hoc key={i} small>
-										{hoc}
+										<MarkResult text={hoc} id={id} />
 									</Hoc>
 								);
 							})}
