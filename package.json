@@ -33,6 +33,7 @@
 		"@babel/plugin-transform-react-jsx": "^7.10.4",
 		"@changesets/changelog-github": "^0.2.6",
 		"@changesets/cli": "^2.9.2",
+		"@material-ui/core": "^4.11.0",
 		"@prefresh/webpack": "^0.8.1",
 		"@rollup/plugin-alias": "^3.1.1",
 		"@rollup/plugin-babel": "^5.0.4",
@@ -112,6 +113,7 @@
 		"settings": {
 			"react": {
 				"pragma": "h",
+				"pragmaFrag": "Fragment",
 				"version": "16.13.1"
 			}
 		},
@@ -134,12 +136,19 @@
 			"@typescript-eslint/ban-ts-comment": "off",
 			"@typescript-eslint/no-explicit-any": "off",
 			"@typescript-eslint/no-non-null-assertion": "off",
-			"@typescript-eslint/no-unused-vars": "error",
+			"@typescript-eslint/no-unused-vars": [
+				"error",
+				{
+					"varsIgnorePattern": "(h|Fragment)"
+				}
+			],
 			"@typescript-eslint/no-var-requires": "off",
 			"@typescript-eslint/camelcase": "off",
 			"@typescript-eslint/ban-ts-ignore": "off",
 			"no-console": "error",
 			"no-mixed-spaces-and-tabs": "off",
+			"react/prop-types": "off",
+			"react/display-name": "off",
 			"react/no-unknown-property": [
 				2,
 				{

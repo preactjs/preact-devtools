@@ -1,13 +1,9 @@
-const { h, render } = preact;
+import { h, render } from "preact";
 
 const Child = () => null;
 
 function App() {
-	return html`
-		<div>
-			Element
-		</div>
-	`;
+	return <div>Element</div>;
 }
 
 render(

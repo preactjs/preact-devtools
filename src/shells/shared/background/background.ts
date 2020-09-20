@@ -7,6 +7,8 @@ import {
 } from "../../../constants";
 import { BaseEvent } from "../../../adapter/adapter/port";
 import { BackgroundEmitter, Emitter } from "./emitter";
+import { loadSettings } from "../panel/settings";
+import { isDefaultFilters } from "../../../view/store/filter";
 
 /**
  * Collection of potential targets to connect to by tabId.
@@ -35,11 +37,25 @@ function addToTarget(tabId: number, port: chrome.runtime.Port) {
 /**
  * Handle initial connection from content-script.
  */
-function handleContentScriptConnection(port: chrome.runtime.Port) {
+async function handleContentScriptConnection(port: chrome.runtime.Port) {
 	const tabId = port.sender?.tab?.id;
 	if (tabId) {
 		addToTarget(tabId, port);
 		setPopupStatus(tabId, true);
+
+		// Restore filter on initial load
+		const settings = await loadSettings();
+		if (
+			settings.componentFilters &&
+			!isDefaultFilters(settings.componentFilters)
+		) {
+			// Only trigger update if they differ from initial settings
+			port.postMessage({
+				type: "update-filter",
+				data: settings.componentFilters,
+				source: DevtoolsToClient,
+			});
+		}
 	}
 }
 

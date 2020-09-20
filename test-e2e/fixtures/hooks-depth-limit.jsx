@@ -1,5 +1,5 @@
-const { render } = preact;
-const { useState } = preactHooks;
+import { h, render } from "preact";
+import { useState } from "preact/Hooks";
 
 const useFoo = () =>
 	useState({
@@ -34,7 +34,7 @@ const useBrobba = () => useBlaBla();
 
 function Hook() {
 	const [v] = useBrobba();
-	return html`<p>${JSON.stringify(v)}</p>`;
+	return <p>{JSON.stringify(v)}</p>;
 }
 
-render(html`<${Hook} />`, document.getElementById("app"));
+render(<Hook />, document.getElementById("app"));

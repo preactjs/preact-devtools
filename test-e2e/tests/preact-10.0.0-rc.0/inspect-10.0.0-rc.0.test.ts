@@ -5,9 +5,7 @@ import { wait } from "pentf/utils";
 export const description = "Test inspect highlighting in Preact 10.0.0-rc.0";
 
 export async function run(config: any) {
-	const { page, devtools } = await newTestPage(config, "counter", {
-		preact: "10.0.0-rc.0",
-	});
+	const { page, devtools } = await newTestPage(config, "counter-10.0.0-rc.0");
 
 	const inspect = '[data-testid="inspect-btn"]';
 	const highlight = '[data-testid="highlight"]';

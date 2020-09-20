@@ -1,5 +1,5 @@
-const { render, createContext } = preact;
-const { useMemo, useContext } = preactHooks;
+import { h, Fragment, render, createContext } from "preact";
+import { useMemo, useContext } from "preact/hooks";
 
 function Memo() {
 	const v = useMemo(() => {
@@ -14,22 +14,22 @@ function Memo() {
 		};
 	}, []);
 
-	return html`<p>${JSON.stringify(v)}</p>`;
+	return <p>{JSON.stringify(v)}</p>;
 }
 
 const Ctx = createContext({ foo: 123, bar: 123 });
 
 function Context() {
 	useContext(Ctx);
-	return html`<p>Context</p>`;
+	return <p>Context</p>;
 }
 
 render(
-	html`
-		<${Memo} />
-		<${Ctx.Provider} value="${{ foo: 123, bar: 123 }}">
-			<${Context} />
-		<//>
-	`,
+	<>
+		<Memo />
+		<Ctx.Provider value={{ foo: 123, bar: 123 }}>
+			<Context />
+		</Ctx.Provider>
+	</>,
 	document.getElementById("app"),
 );

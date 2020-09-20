@@ -10,9 +10,10 @@ import { wait } from "pentf/utils";
 export const description = "Should highlight flamegraph node if present in DOM";
 
 export async function run(config: any) {
-	const { page, devtools } = await newTestPage(config, "profiler-highlight", {
-		preact: "10.0.0-rc.0",
-	});
+	const { page, devtools } = await newTestPage(
+		config,
+		"profiler-highlight-10.0.0-rc.0",
+	);
 
 	await clickTab(devtools, "PROFILER");
 

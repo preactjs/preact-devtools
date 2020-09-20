@@ -1,16 +1,18 @@
 import { RawFilterState } from "../../../adapter/adapter/filter";
 import { Store } from "../../../view/store/types";
 
-/**
- * Load the theme from the browser private extension storage. This
- * storage is bound to the user profile and may be synced by the
- * browser.
- */
-export async function loadSettings(window: Window, store: Store) {
-	const doc = window.document;
-	doc.body.classList.add((chrome.devtools.panels as any).themeName || "light");
+export interface Settings {
+	theme: "light" | "dark" | "auto";
+	captureRenderReasons: boolean;
+	debugMode: boolean;
+	highlightUpdates: boolean;
+	componentFilters: RawFilterState;
+}
+
+export async function loadSettings(): Promise<Settings> {
+	let settings: Partial<Settings> = {};
 	try {
-		const settings: any = await new Promise(res => {
+		settings = await new Promise(res => {
 			chrome.storage.sync.get(
 				[
 					"theme",
@@ -22,22 +24,40 @@ export async function loadSettings(window: Window, store: Store) {
 				res,
 			);
 		});
-
-		if (settings) {
-			if (["light", "dark", "auto"].includes(settings.theme)) {
-				store.theme.$ = settings.theme;
-			}
-			store.profiler.captureRenderReasons.$ = !!settings.captureRenderReasons;
-			store.profiler.highlightUpdates.$ = !!settings.highlightUpdates;
-			store.debugMode.$ = !!settings.debugMode;
-			if (settings.componentFilters) {
-				store.filter.restore(settings.componentFilters);
-			}
-		}
-	} catch (e) {
-		// We don't really care if we couldn't load the settings
+	} catch (err) {
+		// Don't throw, we'll simply revert to default values
 		// eslint-disable-next-line no-console
-		console.error(e);
+		console.log(err);
+	}
+
+	// Set defaults if not present or invalid
+	if (!settings.theme || !["light", "dark", "auto"].includes(settings.theme)) {
+		settings.theme = "auto";
+	}
+
+	settings.debugMode = !!settings.debugMode;
+	settings.captureRenderReasons = !!settings.captureRenderReasons;
+	settings.highlightUpdates = !!settings.highlightUpdates;
+
+	return settings as Settings;
+}
+
+/**
+ * Load the theme from the browser private extension storage. This
+ * storage is bound to the user profile and may be synced by the
+ * browser.
+ */
+export async function applySettings(window: Window, store: Store) {
+	const doc = window.document;
+	doc.body.classList.add((chrome.devtools.panels as any).themeName || "light");
+
+	const settings = await loadSettings();
+	store.theme.$ = settings.theme;
+	store.profiler.captureRenderReasons.$ = settings.captureRenderReasons;
+	store.profiler.highlightUpdates.$ = settings.highlightUpdates;
+	store.debugMode.$ = settings.debugMode;
+	if (settings.componentFilters) {
+		store.filter.restore(settings.componentFilters);
 	}
 }
 

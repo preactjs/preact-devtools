@@ -5,7 +5,7 @@ import { applyEvent } from "../../../adapter/events/events";
 import { debug } from "../../../debug";
 import { DevtoolsPanelName } from "../../../constants";
 import {
-	loadSettings,
+	applySettings,
 	storeTheme,
 	storeCaptureRenderReasons,
 	storeDebugMode,
@@ -80,7 +80,7 @@ async function initDevtools() {
 	});
 
 	// Settings
-	await loadSettings(window, store);
+	await applySettings(window, store);
 	store.theme.on(v => storeTheme(v));
 	store.profiler.captureRenderReasons.on(v => storeCaptureRenderReasons(v));
 	store.profiler.highlightUpdates.on(v => storeHighlightUpdates(v));

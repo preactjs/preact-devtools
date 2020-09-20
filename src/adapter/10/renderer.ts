@@ -111,7 +111,13 @@ export function getFilteredChildren(
 	while (stack.length) {
 		child = stack.pop();
 		if (child != null) {
-			if (!shouldFilter(child, filters, config)) {
+			const name = getDisplayName(child, config);
+			const hocName = getHocName(name);
+
+			if (
+				!shouldFilter(child, filters, config) &&
+				(!filters.type.has("hoc") || !hocName || name.startsWith("ForwardRef"))
+			) {
 				out.push(child);
 			} else {
 				const nextChildren = getActualChildren(child);
@@ -189,6 +195,7 @@ export function mount(
 				// Filter out HOC-Components
 				if (hocName) {
 					if (name.startsWith("ForwardRef")) {
+						console.log("RECORD", name);
 						hocs = [...hocs, hocName];
 						const idx = name.indexOf("(");
 						name = name.slice(idx + 1, -1) || "Anonymous";

@@ -1,192 +1,193 @@
-!(function (n, t) {
-	"object" == typeof exports && "undefined" != typeof module
-		? t(exports, require("preact"))
-		: "function" == typeof define && define.amd
-		? define(["exports", "preact"], t)
-		: t((n.preactHooks = {}), n.preact);
-})(this, function (n, t) {
-	var u,
-		i,
-		o,
-		r = 0,
-		f = [],
-		e = t.options.__r,
-		c = t.options.diffed,
-		a = t.options.__c,
-		v = t.options.unmount;
-	function p(n, u) {
-		t.options.__h && t.options.__h(i, n, r || u), (r = 0);
-		var o = i.__H || (i.__H = { __: [], __h: [] });
-		return n >= o.__.length && o.__.push({}), o.__[n];
-	}
-	function d(n) {
-		return (r = 1), y(q, n);
-	}
-	function y(n, t, o) {
-		var r = p(u++, 2);
-		return (
-			r.__c ||
-				((r.__c = i),
-				(r.__ = [
-					o ? o(t) : q(void 0, t),
-					function (t) {
-						var u = n(r.__[0], t);
-						r.__[0] !== u && ((r.__[0] = u), r.__c.setState({}));
-					},
-				])),
-			r.__
+import { options as n } from "preact";
+var t,
+	u,
+	r,
+	o = 0,
+	i = [],
+	c = n.__r,
+	f = n.diffed,
+	e = n.__c,
+	a = n.unmount;
+function v(t, r) {
+	n.__h && n.__h(u, t, o || r), (o = 0);
+	var i = u.__H || (u.__H = { __: [], __h: [] });
+	return t >= i.__.length && i.__.push({}), i.__[t];
+}
+function m(n) {
+	return (o = 1), p(k, n);
+}
+function p(n, r, o) {
+	var i = v(t++, 2);
+	return (
+		(i.t = n),
+		i.__c ||
+			((i.__c = u),
+			(i.__ = [
+				o ? o(r) : k(void 0, r),
+				function (n) {
+					var t = i.t(i.__[0], n);
+					i.__[0] !== t && ((i.__ = [t, i.__[1]]), i.__c.setState({}));
+				},
+			])),
+		i.__
+	);
+}
+function y(r, o) {
+	var i = v(t++, 3);
+	!n.__s && j(i.__H, o) && ((i.__ = r), (i.__H = o), u.__H.__h.push(i));
+}
+function l(r, o) {
+	var i = v(t++, 4);
+	!n.__s && j(i.__H, o) && ((i.__ = r), (i.__H = o), u.__h.push(i));
+}
+function h(n) {
+	return (
+		(o = 5),
+		_(function () {
+			return { current: n };
+		}, [])
+	);
+}
+function s(n, t, u) {
+	(o = 6),
+		l(
+			function () {
+				"function" == typeof n ? n(t()) : n && (n.current = t());
+			},
+			null == u ? u : u.concat(n),
 		);
-	}
-	function s(n, o) {
-		var r = p(u++, 4);
-		!t.options.__s && T(r.__H, o) && ((r.__ = n), (r.__H = o), i.__h.push(r));
-	}
-	function l(n, t) {
-		var i = p(u++, 7);
-		return T(i.__H, t) ? ((i.__H = t), (i.__h = n), (i.__ = n())) : i.__;
-	}
-	function m() {
-		f.some(function (n) {
-			if (n.__P)
-				try {
-					n.__H.__h.forEach(h), n.__H.__h.forEach(x), (n.__H.__h = []);
-				} catch (u) {
-					return (n.__H.__h = []), t.options.__e(u, n.__v), !0;
-				}
-		}),
-			(f = []);
-	}
-	function h(n) {
-		"function" == typeof n.t && n.t();
-	}
-	function x(n) {
-		n.t = n.__();
-	}
-	function T(n, t) {
-		return (
-			!n ||
-			t.some(function (t, u) {
-				return t !== n[u];
-			})
-		);
-	}
-	function q(n, t) {
-		return "function" == typeof t ? t(n) : t;
-	}
-	(t.options.__r = function (n) {
-		e && e(n), (u = 0);
-		var t = (i = n.__c).__H;
-		t && (t.__h.forEach(h), t.__h.forEach(x), (t.__h = []));
-	}),
-		(t.options.diffed = function (n) {
-			c && c(n);
-			var u = n.__c;
-			u &&
-				u.__H &&
-				u.__H.__h.length &&
-				((1 !== f.push(u) && o === t.options.requestAnimationFrame) ||
-					(
-						(o = t.options.requestAnimationFrame) ||
-						function (n) {
-							var t,
-								u = function () {
-									clearTimeout(i), cancelAnimationFrame(t), setTimeout(n);
-								},
-								i = setTimeout(u, 100);
-							"undefined" != typeof window && (t = requestAnimationFrame(u));
-						}
-					)(m));
-		}),
-		(t.options.__c = function (n, u) {
-			u.some(function (n) {
-				try {
-					n.__h.forEach(h),
-						(n.__h = n.__h.filter(function (n) {
-							return !n.__ || x(n);
-						}));
-				} catch (i) {
-					u.some(function (n) {
-						n.__h && (n.__h = []);
-					}),
-						(u = []),
-						t.options.__e(i, n.__v);
-				}
+}
+function _(n, u) {
+	var r = v(t++, 7);
+	return j(r.__H, u) ? ((r.__H = u), (r.__h = n), (r.__ = n())) : r.__;
+}
+function A(n, t) {
+	return (
+		(o = 8),
+		_(function () {
+			return n;
+		}, t)
+	);
+}
+function F(n) {
+	var r = u.context[n.__c],
+		o = v(t++, 9);
+	return (
+		(o.__c = n),
+		r ? (null == o.__ && ((o.__ = !0), r.sub(u)), r.props.value) : n.__
+	);
+}
+function T(t, u) {
+	n.useDebugValue && n.useDebugValue(u ? u(t) : t);
+}
+function d(n) {
+	var r = v(t++, 10),
+		o = m();
+	return (
+		(r.__ = n),
+		u.componentDidCatch ||
+			(u.componentDidCatch = function (n) {
+				r.__ && r.__(n), o[1](n);
 			}),
-				a && a(n, u);
+		[
+			o[0],
+			function () {
+				o[1](void 0);
+			},
+		]
+	);
+}
+function q() {
+	i.some(function (t) {
+		if (t.__P)
+			try {
+				t.__H.__h.forEach(b), t.__H.__h.forEach(g), (t.__H.__h = []);
+			} catch (u) {
+				return (t.__H.__h = []), n.__e(u, t.__v), !0;
+			}
+	}),
+		(i = []);
+}
+(n.__r = function (n) {
+	c && c(n), (t = 0);
+	var r = (u = n.__c).__H;
+	r && (r.__h.forEach(b), r.__h.forEach(g), (r.__h = []));
+}),
+	(n.diffed = function (t) {
+		f && f(t);
+		var u = t.__c;
+		u &&
+			u.__H &&
+			u.__H.__h.length &&
+			((1 !== i.push(u) && r === n.requestAnimationFrame) ||
+				(
+					(r = n.requestAnimationFrame) ||
+					function (n) {
+						var t,
+							u = function () {
+								clearTimeout(r), x && cancelAnimationFrame(t), setTimeout(n);
+							},
+							r = setTimeout(u, 100);
+						x && (t = requestAnimationFrame(u));
+					}
+				)(q));
+	}),
+	(n.__c = function (t, u) {
+		u.some(function (t) {
+			try {
+				t.__h.forEach(b),
+					(t.__h = t.__h.filter(function (n) {
+						return !n.__ || g(n);
+					}));
+			} catch (r) {
+				u.some(function (n) {
+					n.__h && (n.__h = []);
+				}),
+					(u = []),
+					n.__e(r, t.__v);
+			}
 		}),
-		(t.options.unmount = function (n) {
-			v && v(n);
-			var u = n.__c;
-			if (u && u.__H)
-				try {
-					u.__H.__.forEach(function (n) {
-						return n.t && n.t();
-					});
-				} catch (n) {
-					t.options.__e(n, u.__v);
-				}
-		}),
-		(n.useState = d),
-		(n.useReducer = y),
-		(n.useEffect = function (n, o) {
-			var r = p(u++, 3);
-			!t.options.__s &&
-				T(r.__H, o) &&
-				((r.__ = n), (r.__H = o), i.__H.__h.push(r));
-		}),
-		(n.useLayoutEffect = s),
-		(n.useRef = function (n) {
-			return (
-				(r = 5),
-				l(function () {
-					return { current: n };
-				}, [])
-			);
-		}),
-		(n.useImperativeHandle = function (n, t, u) {
-			(r = 6),
-				s(
-					function () {
-						"function" == typeof n ? n(t()) : n && (n.current = t());
-					},
-					null == u ? u : u.concat(n),
-				);
-		}),
-		(n.useMemo = l),
-		(n.useCallback = function (n, t) {
-			return (
-				(r = 8),
-				l(function () {
-					return n;
-				}, t)
-			);
-		}),
-		(n.useContext = function (n) {
-			var t = i.context[n.__c],
-				o = p(u++, 9);
-			return (
-				(o.__c = n),
-				t ? (null == o.__ && ((o.__ = !0), t.sub(i)), t.props.value) : n.__
-			);
-		}),
-		(n.useDebugValue = function (n, u) {
-			t.options.useDebugValue && t.options.useDebugValue(u ? u(n) : n);
-		}),
-		(n.useErrorBoundary = function (n) {
-			var t = p(u++, 10),
-				o = d();
-			return (
-				(t.__ = n),
-				i.componentDidCatch ||
-					(i.componentDidCatch = function (n) {
-						t.__ && t.__(n), o[1](n);
-					}),
-				[
-					o[0],
-					function () {
-						o[1](void 0);
-					},
-				]
-			);
-		});
-});
+			e && e(t, u);
+	}),
+	(n.unmount = function (t) {
+		a && a(t);
+		var u = t.__c;
+		if (u && u.__H)
+			try {
+				u.__H.__.forEach(b);
+			} catch (t) {
+				n.__e(t, u.__v);
+			}
+	});
+var x = "function" == typeof requestAnimationFrame;
+function b(n) {
+	"function" == typeof n.u && n.u();
+}
+function g(n) {
+	n.u = n.__();
+}
+function j(n, t) {
+	return (
+		!n ||
+		n.length !== t.length ||
+		t.some(function (t, u) {
+			return t !== n[u];
+		})
+	);
+}
+function k(n, t) {
+	return "function" == typeof t ? t(n) : t;
+}
+export {
+	m as useState,
+	p as useReducer,
+	y as useEffect,
+	l as useLayoutEffect,
+	h as useRef,
+	s as useImperativeHandle,
+	_ as useMemo,
+	A as useCallback,
+	F as useContext,
+	T as useDebugValue,
+	d as useErrorBoundary,
+};

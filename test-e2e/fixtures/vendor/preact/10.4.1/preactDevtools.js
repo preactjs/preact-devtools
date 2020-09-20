@@ -1,6 +1,7 @@
-function attachToDevtools(preact) {
-	window.__PREACT_DEVTOOLS__.attachPreact("10.4.1", preact.options, {
-		Fragment: preact.Fragment,
-		Component: preact.Component,
+import { options as n, Fragment as o, Component as e } from "preact";
+"undefined" != typeof window &&
+	window.__PREACT_DEVTOOLS__ &&
+	window.__PREACT_DEVTOOLS__.attachPreact("10.4.1", n, {
+		Fragment: o,
+		Component: e,
 	});
-}

@@ -53,13 +53,13 @@
 		</div>
 		<script>
 			const url = new URL(location.href);
-			const preactVersion = url.searchParams.get("preactVersion") || "next";
 
 			async function addScript(src) {
 				const s = document.createElement("script");
 				return new Promise(r => {
 					s.onload = r;
 					s.src = src;
+					s.type = "module";
 					document.body.appendChild(s);
 				});
 			}
@@ -68,18 +68,6 @@
 				const log = (window.log = []);
 				const iframe = document.querySelector("iframe");
 				iframe.addEventListener("load", async () => {
-					await addScript(`./vendor/preact/${preactVersion}/preact.js`);
-					await addScript(`./vendor/preact/${preactVersion}/preactHooks.js`);
-					await addScript(`./vendor/preact/${preactVersion}/preactCompat.js`);
-					await addScript(`./vendor/preact/${preactVersion}/preactDevtools.js`);
-					await addScript(`./vendor/htm.js`);
-					attachToDevtools(preact);
-					window.html = htm.bind(preact.h);
-
-					document
-						.querySelector("iframe")
-						.contentWindow.postMessage("foobar", "*");
-
 					window.addEventListener("message", e => {
 						if (e.data.source === "preact-page-hook") {
 							document
@@ -95,9 +83,7 @@
 						}
 					});
 
-					const s = document.createElement("script");
-					s.src = `./${url.searchParams.get("id")}.js`;
-					document.body.appendChild(s);
+					await addScript(`./${url.searchParams.get("id")}.jsx`);
 				});
 			}
 

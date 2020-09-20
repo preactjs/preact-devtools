@@ -32,25 +32,13 @@ export function mockResponse(req: Request, test: string, file: string) {
 	return false;
 }
 
-export interface TestOptions {
-	preact?: string;
-}
-
-export async function newTestPage(
-	config: any,
-	name: string,
-	options: TestOptions = {},
-) {
+export async function newTestPage(config: any, name: string) {
 	const page = await newPage(config);
-
-	const preactVersion = options.preact ? options.preact : "10.4.1";
 
 	// Reset emulation
 	await (page as any)._client.send("Emulation.clearDeviceMetricsOverride");
 
-	await page.goto(
-		`http://localhost:8100/test?id=${name}&preactVersion=${preactVersion}`,
-	);
+	await page.goto(`http://localhost:8100/test?id=${name}`);
 
 	// Grab devtools that's inside the iframe
 	const frames = await page.frames();

@@ -5,9 +5,7 @@ import { clickNestedText, getText } from "pentf/browser_utils";
 export const description = "Inspect useRef hook";
 
 export async function run(config: any) {
-	const { devtools } = await newTestPage(config, "hooks-expand", {
-		preact: "hook",
-	});
+	const { devtools } = await newTestPage(config, "hooks-expand");
 
 	const row = '[data-testid="props-row"]';
 

@@ -7,6 +7,17 @@ export interface RawFilter {
 	enabled: boolean;
 }
 
+/**
+ * The page will load the user filter settings from `chrome.storage` and
+ * this function is used to che
+ */
+export function isDefaultFilters(stored: RawFilterState) {
+	return (
+		stored.regex.length === 0 &&
+		Object.keys(stored.type).every(key => (stored.type as any)[key] === true)
+	);
+}
+
 export function createFilterStore(
 	onSubmit: (event: "update-filter", filters: RawFilterState) => void,
 ) {

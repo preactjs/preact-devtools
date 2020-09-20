@@ -1,4 +1,4 @@
-const { h, render, Component, createContext } = preact;
+import { h, render, Component, createContext } from "preact";
 
 let lastState;
 class State extends Component {
@@ -10,11 +10,11 @@ class State extends Component {
 	}
 
 	render() {
-		const out = html`
+		const out = (
 			<div data-testid="state-result">
-				state: ${this.state.value}, ${String(lastState !== this.state)}
+				state: {this.state.value}, {String(lastState !== this.state)}
 			</div>
-		`;
+		);
 
 		lastState = this.state;
 		return out;
@@ -23,11 +23,11 @@ class State extends Component {
 
 let lastProps;
 function Props(props) {
-	const out = html`
+	const out = (
 		<div data-testid="props-result">
-			props: ${props.value}, ${String(lastProps !== props)}
+			props: {props.value}, {String(lastProps !== props)}
 		</div>
-	`;
+	);
 
 	lastProps = props;
 	return out;
@@ -37,31 +37,29 @@ const Ctx = createContext({ value: 0 });
 
 let lastContext;
 function Context() {
-	return html`
-		<${Ctx.Provider} value="${{ value: 0 }}">
-			<${Ctx.Consumer}>
-				${v => {
-					const out = html`
+	return (
+		<Ctx.Provider value={{ value: 0 }}>
+			<Ctx.Consumer>
+				{v => {
+					const out = (
 						<div data-testid="context-result">
-							context: ${v.value}, ${String(v !== lastContext)}
+							context: {v.value}, {String(v !== lastContext)}
 						</div>
-					`;
-
+					);
 					lastContext = v;
 					return out;
 				}}
-			<//>
-		<//>
-	`;
+			</Ctx.Consumer>
+		</Ctx.Provider>
+	);
 }
 
-let lastLegacyContext;
 function LegacyConsumer(_, context) {
-	return html`
+	return (
 		<div data-testid="legacy-context-result">
-			legacy context: ${context.value}
+			legacy context: {context.value}
 		</div>
-	`;
+	);
 }
 
 class LegacyContext extends Component {
@@ -70,17 +68,19 @@ class LegacyContext extends Component {
 	}
 
 	render() {
-		return html` <${LegacyConsumer} /> `;
+		return <LegacyConsumer />;
 	}
 }
 
 function App() {
-	return html`
-		<${Props} value=${0} />
-		<${State} />
-		<${Context} />
-		<${LegacyContext} />
-	`;
+	return (
+		<>
+			<Props value={0} />
+			<State />
+			<Context />
+			<LegacyContext />
+		</>
+	);
 }
 
 render(h(App), document.getElementById("app"));

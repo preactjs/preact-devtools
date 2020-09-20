@@ -1,14 +1,12 @@
-const { h, render, Component } = preact;
-const { useMemo, useState } = preactHooks;
+import { h, render, Component } from "preact";
+import { useMemo, useState } from "preact/hooks";
 
 function Display(props) {
-	return html`
-		<div data-testid="${props.testid}">Counter: ${props.value}</div>
-	`;
+	return <div data-testid={props.testid}>Counter: ${props.value}</div>;
 }
 
 function Memoed() {
-	return html`<div data-testid="memoed">Memoed</div>`;
+	return <div data-testid="memoed">Memoed</div>;
 }
 
 function MemoParent() {
@@ -23,45 +21,45 @@ class ComponentState extends Component {
 
 	render() {
 		const v = this.state.value;
-		return html`
+		return (
 			<div style="padding: 2rem;">
-				<${Display} value=${v} testid="result-1" />
-				<${MemoParent} />
+				<Display value={v} testid="result-1" />
+				<MemoParent />
 				<button
 					data-testid="counter-1"
-					onClick=${() => this.setState({ value: v + 1 })}
+					onClick={() => this.setState({ value: v + 1 })}
 				>
 					Increment class state
 				</button>
 			</div>
-		`;
+		);
 	}
 }
 
 function HookState() {
 	const [v, set] = useState(0);
 
-	return html`
+	return (
 		<div style="padding: 2rem;">
-			<${Display} value=${v} testid="result-2" />
-			<${MemoParent} />
-			<button data-testid="counter-2" onClick=${() => set(v + 1)}>
+			<Display value={v} testid="result-2" />
+			<MemoParent />
+			<button data-testid="counter-2" onClick={() => set(v + 1)}>
 				Increment hook state
 			</button>
 		</div>
-	`;
+	);
 }
 
 class ForceUpdate extends Component {
 	render() {
-		return html`
+		return (
 			<div style="padding: 2rem;">
-				<${MemoParent} />
-				<button data-testid="force-update" onClick=${() => this.forceUpdate()}>
+				<MemoParent />
+				<button data-testid="force-update" onClick={() => this.forceUpdate()}>
 					Force Update
 				</button>
 			</div>
-		`;
+		);
 	}
 }
 
@@ -73,27 +71,27 @@ class ComponentMultiState extends Component {
 
 	render() {
 		const v = this.state.counter;
-		return html`
+		return (
 			<div style="padding: 2rem;">
-				<${Display} value=${v} />
-				<${MemoParent} />
+				<Display value={v} />
+				<MemoParent />
 				<button
 					data-testid="class-state-multi"
-					onClick=${() => this.setState({ counter: v + 1, other: v + 2 })}
+					onClick={() => this.setState({ counter: v + 1, other: v + 2 })}
 				>
 					Increment multi class state
 				</button>
 			</div>
-		`;
+		);
 	}
 }
 
 render(
-	html`
-		<${ComponentState} />
-		<${HookState} />
-		<${ForceUpdate} />
-		<${ComponentMultiState} />
-	`,
+	<>
+		<ComponentState />
+		<HookState />
+		<ForceUpdate />
+		<ComponentMultiState />
+	</>,
 	document.getElementById("app"),
 );
