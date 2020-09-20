@@ -1,4 +1,5 @@
 import { h, render } from "preact";
+import "preact/devtools";
 
 function Headline() {
 	return <h1 data-testid="headline">Heading H1</h1>;

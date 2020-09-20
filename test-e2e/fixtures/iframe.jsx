@@ -1,4 +1,5 @@
 import { h, Fragment, render } from "preact";
+import "preact/devtools";
 
 function View() {
 	return (

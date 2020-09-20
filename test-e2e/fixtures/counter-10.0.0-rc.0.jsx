@@ -1,5 +1,6 @@
 import { h, render } from "preact@10.0.0-rc.0";
 import { useState } from "preact@10.0.0-rc.0/hooks";
+import "preact@10.0.0-rc.0/devtools";
 
 function Display(props) {
 	return <div data-testid="result">Counter: {props.value}</div>;

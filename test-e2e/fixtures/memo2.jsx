@@ -1,6 +1,7 @@
 import { h, render } from "preact";
 import { useState } from "preact/hooks";
 import { memo } from "preact/compat";
+import "preact/devtools";
 
 function Value1(props) {
 	return <p>${props.children}</p>;

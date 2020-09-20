@@ -1,5 +1,6 @@
 import { h, Fragment, render } from "preact";
 import { useState } from "preact/hooks";
+import "preact/devtools";
 
 function TodoItem(props) {
 	return (

@@ -1,4 +1,5 @@
 import { h, render } from "preact";
+import "preact/devtools";
 
 const css =
 	"background: peachpuff; padding: 4rem; margin-bottom: 6rem; margin-right: 4rem";

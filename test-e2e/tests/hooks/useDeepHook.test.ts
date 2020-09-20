@@ -1,4 +1,4 @@
-import { newTestPage, getCount } from "../../test-utils";
+import { newTestPage, getCount, typeSearch } from "../../test-utils";
 import { expect } from "chai";
 import { clickNestedText, getAttribute } from "pentf/browser_utils";
 
@@ -10,6 +10,7 @@ export async function run(config: any) {
 	const hooksPanel = '[data-testid="props-row"]';
 
 	// CutomHook
+	await typeSearch(devtools, "CustomHooks3");
 	await clickNestedText(devtools, "CustomHooks3");
 	await devtools.waitForSelector(hooksPanel);
 

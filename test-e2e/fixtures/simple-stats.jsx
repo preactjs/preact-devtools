@@ -1,4 +1,5 @@
 import { h, render, Component } from "preact";
+import "preact/devtools";
 
 function FnComponent() {
 	return <div>Function {"Component"}</div>;

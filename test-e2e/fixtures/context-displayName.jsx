@@ -1,5 +1,5 @@
 import { h, render, createContext } from "preact";
-import "preact/debug";
+import "preact/devtools";
 
 const Ctx = createContext(null);
 Ctx.displayName = "Foobar";

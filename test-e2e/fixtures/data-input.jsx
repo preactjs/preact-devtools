@@ -1,5 +1,6 @@
 import { h, render } from "preact";
 import { useState } from "preact/hooks";
+import "preact/devtools";
 
 function Display({ value }) {
 	const v = value !== null && typeof value === "object" ? "object" : value;

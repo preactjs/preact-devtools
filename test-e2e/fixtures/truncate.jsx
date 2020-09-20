@@ -1,4 +1,5 @@
 import { h, render } from "preact";
+import "preact/devtools";
 
 const Child = () => null;
 

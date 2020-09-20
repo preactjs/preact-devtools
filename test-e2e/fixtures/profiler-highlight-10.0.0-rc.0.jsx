@@ -1,5 +1,6 @@
 import { h, render } from "preact";
-import { useState } from "preact/ooks";
+import { useState } from "preact/hooks";
+import "preact/devtools";
 
 function Display(props) {
 	return <div data-testid="result">Counter: ${props.value}</div>;

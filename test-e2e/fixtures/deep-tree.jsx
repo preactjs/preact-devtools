@@ -1,4 +1,5 @@
 import { h, Fragment, render } from "preact";
+import "preact/devtools";
 
 const css = "border: 1px solid peachpuff; padding: 1rem;";
 

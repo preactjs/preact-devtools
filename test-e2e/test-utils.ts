@@ -198,6 +198,12 @@ export async function clickRecordButton(page: Page) {
 	);
 }
 
+export async function typeSearch(page: Page, search: string) {
+	await page.type('[data-testid="element-search"]', search);
+	await page.keyboard.press("Enter");
+	await page.waitForSelector("mark");
+}
+
 // This injects a box into the page that moves with the mouse;
 // Useful for debugging
 export async function installMouseHelper(page: Page) {

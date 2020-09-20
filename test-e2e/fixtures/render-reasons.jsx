@@ -1,5 +1,6 @@
 import { h, render, Component } from "preact";
 import { useMemo, useState } from "preact/hooks";
+import "preact/devtools";
 
 function Display(props) {
 	return <div data-testid={props.testid}>Counter: ${props.value}</div>;

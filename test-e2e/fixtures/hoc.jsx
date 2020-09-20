@@ -1,5 +1,6 @@
 import { h, Fragment, render, Component } from "preact";
 import { memo, forwardRef } from "preact/compat";
+import "preact/devtools";
 
 function Foo() {
 	return <div>I am foo</div>;

@@ -11,6 +11,7 @@ import {
 	useErrorBoundary,
 	useDebugValue,
 } from "preact/hooks";
+import "preact/devtools";
 
 function Display(props) {
 	return <div data-testid={props.testId}>Counter: {props.value}</div>;
@@ -180,7 +181,7 @@ render(
 		<Memo />
 		<RefComponent />
 		<Effect />
-		<Ctx.Provider value="foobr">
+		<Ctx.Provider value="foobar">
 			<ContextComponent />
 		</Ctx.Provider>
 		<ContextNoProvider />

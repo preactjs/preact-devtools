@@ -2,19 +2,12 @@
 	"help": "This file is used to set up aliases for our dev server",
 	"alias": {
 		"preact@10.0.0-rc.0/compat": "/vendor/preact/10.0.0-rc.0/preactCompat.js",
+		"preact@10.0.0-rc.0/devtools": "/vendor/preact/10.0.0-rc.0/preactDevtools.js",
 		"preact@10.0.0-rc.0/hooks": "/vendor/preact/10.0.0-rc.0/preactHooks.js",
 		"preact@10.0.0-rc.0": "/vendor/preact/10.0.0-rc.0/preact.js",
 		"preact@10.3.4/compat": "/vendor/preact/10.3.4/preactCompat.js",
+		"preact@10.3.4/devtools": "/vendor/preact/10.3.4/preactDevtools.js",
 		"preact@10.3.4/hooks": "/vendor/preact/10.3.4/preactHooks.js",
-		"preact@10.3.4": "/vendor/preact/10.3.4/preact.js",
-		"preact@10.4.1/compat": "/vendor/preact/10.4.1/preactCompat.js",
-		"preact@10.4.1/hooks": "/vendor/preact/10.4.1/preactHooks.js",
-		"preact@10.4.1": "/vendor/preact/10.4.1/preact.js",
-		"preact@hook/compat": "/vendor/preact/hook/preactCompat.js",
-		"preact@hook/hooks": "/vendor/preact/hook/preactHooks.js",
-		"preact@hook": "/vendor/preact/hook/preact.js",
-		"preact@next/compat": "/vendor/preact/next/preactCompat.js",
-		"preact@next/hooks": "/vendor/preact/next/preactHooks.js",
-		"preact@next": "/vendor/preact/next/preact.js"
+		"preact@10.3.4": "/vendor/preact/10.3.4/preact.js"
 	}
 }

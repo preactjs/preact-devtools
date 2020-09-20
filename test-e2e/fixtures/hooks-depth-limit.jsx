@@ -1,5 +1,6 @@
 import { h, render } from "preact";
 import { useState } from "preact/Hooks";
+import "preact/devtools";
 
 const useFoo = () =>
 	useState({

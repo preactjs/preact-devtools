@@ -1,4 +1,5 @@
 import { h, render, Component, createContext } from "preact";
+import "preact/devtools";
 
 let lastState;
 class State extends Component {

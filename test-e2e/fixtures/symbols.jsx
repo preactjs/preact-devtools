@@ -1,5 +1,6 @@
 import { h, Fragment, render, Component } from "preact";
 import { useState } from "preact/hooks";
+import "preact/devtools";
 
 function SymbolComponent() {
 	const [v] = useState(Symbol("foobar"));

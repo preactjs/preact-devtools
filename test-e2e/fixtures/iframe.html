@@ -6,16 +6,7 @@
 	</head>
 	<body>
 		<div id="app"></div>
-		<script src="./vendor/preact/next/preact.js"></script>
-		<script src="./vendor/preact/next/preactHooks.js"></script>
-		<script src="./vendor/preact/next/preactDevtools.js"></script>
-		<script src="./vendor/htm.js"></script>
-		<script>
-			attachToDevtools(preact);
-			window.html = htm.bind(preact.h);
-			const s = document.createElement("script");
-			s.src = "./counter.js";
-			document.body.appendChild(s);
-		</script>
+		<script src="./extension/installHook.js"></script>
+		<script src="./counter.jsx" type="module"></script>
 	</body>
 </html>
