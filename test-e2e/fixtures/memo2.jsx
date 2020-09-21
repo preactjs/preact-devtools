@@ -4,17 +4,18 @@ import { memo } from "preact/compat";
 import "preact/devtools";
 
 function Value1(props) {
-	return <p>${props.children}</p>;
+	return <p>{props.children}</p>;
 }
 function Value2(props) {
-	return <p>${props.children}</p>;
+	return <p>{props.children}</p>;
 }
 
 function Display(props) {
 	return (
 		<div data-testid="result">
 			Counter: <br />
-			<Value1>{props.value}</Value1>, <Value2>{props.value}</Value2>,
+			<Value1>{props.value}</Value1>
+			<Value2>{props.value}</Value2>
 		</div>
 	);
 }

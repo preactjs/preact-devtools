@@ -451,4 +451,3 @@ export {
 	O as SuspenseList,
 	L as lazy,
 };
-//# sourceMappingURL=compat.module.js.map
