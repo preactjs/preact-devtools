@@ -2,7 +2,7 @@ import { h, Fragment } from "preact";
 import s from "./Sidebar.css";
 import { Actions } from "../Actions";
 import { IconBtn } from "../IconBtn";
-import { BugIcon, InspectNativeIcon, CodeIcon } from "../icons";
+import { BugIcon, InspectNativeIcon, CodeIcon, SuspendIcon } from "../icons";
 import { useStore, useEmitter, useObserver } from "../../store/react-bindings";
 import { useCallback } from "preact/hooks";
 import { ComponentName } from "../ComponentName";
@@ -31,6 +31,25 @@ export function SidebarActions() {
 		node.type !== DevNodeType.Group &&
 		node.type !== DevNodeType.Element;
 
+	const suspense = useObserver(() => {
+		const state = {
+			canSuspend: false,
+			suspended: false,
+		};
+
+		if (store.inspectData.$) {
+			state.canSuspend = store.inspectData.$.canSuspend;
+			state.suspended = store.inspectData.$.suspended;
+		}
+
+		return state;
+	});
+	const onSuspend = useCallback(() => {
+		if (node) {
+			emit("suspend", { id: node.id, active: !suspense.suspended });
+		}
+	}, [node, suspense]);
+
 	return (
 		<Actions class={s.actions}>
 			<ComponentName>{node && node.name}</ComponentName>
@@ -38,6 +57,16 @@ export function SidebarActions() {
 			<div class={s.iconActions}>
 				{node && (
 					<Fragment>
+						{suspense.canSuspend && (
+							<IconBtn
+								title="Suspend Tree"
+								testId="suspend-action"
+								active={suspense.suspended}
+								onClick={onSuspend}
+							>
+								<SuspendIcon />
+							</IconBtn>
+						)}
 						<IconBtn
 							title="Show matching DOM element"
 							onClick={inspectHostNode}

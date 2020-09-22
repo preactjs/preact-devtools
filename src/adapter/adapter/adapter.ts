@@ -33,6 +33,9 @@ export interface InspectData {
 	hooks: PropData[] | null;
 	props: Record<string, any> | null;
 	state: Record<string, any> | null;
+	canSuspend: boolean;
+	/** Only Suspense components have this */
+	suspended: boolean;
 }
 
 export function createAdapter(port: PortPageHook, renderer: Renderer) {
@@ -198,6 +201,12 @@ export function createAdapter(port: PortPageHook, renderer: Renderer) {
 					: type;
 		} else {
 			hook.$type = null;
+		}
+	});
+
+	listen("suspend", data => {
+		if (renderer.suspend) {
+			renderer.suspend(data.id, data.active);
 		}
 	});
 }

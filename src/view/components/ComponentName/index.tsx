@@ -3,7 +3,7 @@ import s from "./ComponentName.css";
 
 export function ComponentName(props: { children: any }) {
 	return (
-		<span class={s.title}>
+		<span class={s.title} data-testid="inspect-component-name">
 			{props.children ? (
 				<Fragment>
 					<span class={s.nameCh}>&lt;</span>
