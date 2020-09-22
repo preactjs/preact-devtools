@@ -13,7 +13,10 @@ export function createFilterStore(
 	const filters = valoo<RawFilter[]>([]);
 	const filterFragment = valoo(true);
 	const filterDom = valoo(true);
-	const filterHoc = valoo(true);
+	// TODO: Enable by default when it becomes stable. hoc-filter
+	const filterHoc = valoo(false);
+	/** Enable experimental filters */
+	const experimental = valoo(false);
 
 	const submit = () => {
 		const s: RawFilterState = {
@@ -21,7 +24,8 @@ export function createFilterStore(
 			type: {
 				fragment: filterFragment.$,
 				dom: filterDom.$,
-				hoc: filterHoc.$,
+				// TODO: Remove experimental check when it becomes stable. hoc-filter
+				hoc: experimental.$ && filterHoc.$,
 			},
 		};
 
@@ -35,7 +39,9 @@ export function createFilterStore(
 		try {
 			filterFragment.$ = !!state.type.fragment;
 			filterDom.$ = !!state.type.dom;
-			filterHoc.$ = state.type.hoc !== undefined ? state.type.hoc : true;
+			// TODO: Disable experimental check once stable hoc-filter
+			filterHoc.$ =
+				state.type.hoc !== undefined && experimental.$ ? state.type.hoc : false;
 			filters.$ = state.regex;
 		} catch (err) {
 			// eslint-disable-next-line no-console
@@ -48,6 +54,7 @@ export function createFilterStore(
 		filterFragment,
 		filterDom,
 		filterHoc,
+		experimental,
 		setEnabled(filter: RawFilter | string, v: boolean) {
 			if (typeof filter === "string") {
 				if (filter === "dom") {

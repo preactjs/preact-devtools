@@ -29,3 +29,7 @@ h2 {
 .settingSpace {
 	margin-bottom: 2rem;
 }
+
+.settingsSpaceSmall {
+	margin-bottom: 0.5rem;
+}

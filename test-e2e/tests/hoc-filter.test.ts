@@ -1,4 +1,4 @@
-import { newTestPage } from "../test-utils";
+import { enableHOCFilter, newTestPage } from "../test-utils";
 import { expect } from "chai";
 import { clickNestedText, waitForTestId } from "pentf/browser_utils";
 import { assertEventually } from "pentf/assert_utils";
@@ -7,6 +7,7 @@ export const description = "HOC-Component filter should flatten tree";
 
 export async function run(config: any) {
 	const { devtools } = await newTestPage(config, "hoc");
+	await enableHOCFilter(devtools);
 
 	await devtools.waitForSelector('[data-testid="tree-item"][data-name="Foo"]');
 

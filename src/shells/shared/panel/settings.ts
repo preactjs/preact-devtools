@@ -18,6 +18,7 @@ export async function loadSettings(window: Window, store: Store) {
 					"debugMode",
 					"highlightUpdates",
 					"componentFilters",
+					"experimentalFilters",
 				],
 				res,
 			);
@@ -30,6 +31,7 @@ export async function loadSettings(window: Window, store: Store) {
 			store.profiler.captureRenderReasons.$ = !!settings.captureRenderReasons;
 			store.profiler.highlightUpdates.$ = !!settings.highlightUpdates;
 			store.debugMode.$ = !!settings.debugMode;
+			store.filter.experimental.$ = !!settings.experimentalFilters;
 			if (settings.componentFilters) {
 				store.filter.restore(settings.componentFilters);
 			}
@@ -77,6 +79,13 @@ export function storeCaptureRenderReasons(enabled: boolean) {
  */
 export function storeDebugMode(enabled: boolean) {
 	store({ debugMode: enabled });
+}
+
+/**
+ * Enables experimental filters
+ */
+export function storeExperimentalFilters(enabled: boolean) {
+	store({ experimentalFilters: enabled });
 }
 
 /**

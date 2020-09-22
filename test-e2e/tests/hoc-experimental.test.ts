@@ -1,26 +1,38 @@
-import { enableHOCFilter, newTestPage } from "../test-utils";
+import { clickTab, enableHOCFilter, newTestPage } from "../test-utils";
 import { expect } from "chai";
 import {
-	assertNotTestId,
 	clickNestedText,
 	clickTestId,
 	waitForTestId,
 } from "pentf/browser_utils";
+import { assertEventually } from "pentf/assert_utils";
 
-export const description = "HOC-Component filter should be disabled";
+export const description = "HOC-Component filter should be behind feature flag";
 
 export async function run(config: any) {
 	const { devtools } = await newTestPage(config, "hoc");
-	await enableHOCFilter(devtools);
 
 	await clickTestId(devtools, "filter-menu-button");
 	await waitForTestId(devtools, "filter-popup");
-	await clickNestedText(devtools, "HOC-Components");
-	await clickTestId(devtools, "filter-update");
 
-	await devtools.waitForSelector(
-		'[data-testid="tree-item"][data-name="Memo(Foo)"]',
+	await assertEventually(
+		async () => {
+			try {
+				await clickNestedText(devtools, "HOC-Components");
+				return false;
+			} catch (e) {
+				return true;
+			}
+		},
+		{ timeout: 2000 },
 	);
+
+	await enableHOCFilter(devtools);
+
+	// Disable experimental filters should refresh tree view
+	await clickTab(devtools, "SETTINGS");
+	await clickTestId(devtools, "toggle-experimental-filters");
+	await clickTab(devtools, "ELEMENTS");
 
 	const items = await devtools.evaluate(() => {
 		return Array.from(
@@ -39,6 +51,4 @@ export async function run(config: any) {
 		"Memo(Last)",
 		"Last",
 	]);
-
-	await assertNotTestId(devtools, "hoc-panel");
 }
