@@ -244,6 +244,15 @@ export async function enableHOCFilter(page: Page) {
 	}
 }
 
+// TODO: This might clash with windowing
+export async function getTreeViewItemNames(page: Page) {
+	return await page.evaluate(() => {
+		return Array.from(
+			document.querySelectorAll('[data-testid="tree-item"]'),
+		).map(el => el.getAttribute("data-name"));
+	});
+}
+
 // This injects a box into the page that moves with the mouse;
 // Useful for debugging
 export async function installMouseHelper(page: Page) {
