@@ -15,11 +15,11 @@
 		"archive": "git archive --format zip --output dist/source-code.zip master",
 		"lint": "eslint 'src/**/*.{ts,tsx}' 'test-e2e/**/*.ts'",
 		"test": "mochette -c tsconfig.cjs.json 'src/**/*.test.{ts,tsx}'",
-		"test-e2e": "TS_NODE_PROJECT=tsconfig.cjs.json yarn ts-node test-e2e/run.ts --default-timeout 2000",
-		"dev": "DEBUG=true concurrently 'npm run build:test -- --watch --no-watch.clearScreen' 'wmr start --port 8100 --cwd test-e2e/fixtures/'",
+		"test-e2e": "cross-env TS_NODE_PROJECT=tsconfig.cjs.json yarn ts-node test-e2e/run.ts --default-timeout 2000",
+		"dev": "cross-env DEBUG=true concurrently 'npm run build:test -- --watch --no-watch.clearScreen' 'wmr start --port 8100 --cwd test-e2e/fixtures/'",
 		"dev:legacy": "webpack-dev-server --inline",
-		"run:chrome": "DEBUG=true npm run build:chrome && mkdir -p ./profiles/chrome && node tools/run-chrome.js",
-		"run:firefox": "DEBUG=true npm run build:firefox && mkdir -p ./profiles/firefox && web-ext run --source-dir ./dist/firefox/ --start-url https://preactjs.com --firefox-profile=./profiles/firefox --keep-profile-changes",
+		"run:chrome": "cross-env DEBUG=true npm run build:chrome && mkdir -p ./profiles/chrome && node tools/run-chrome.js",
+		"run:firefox": "cross-env DEBUG=true npm run build:firefox && mkdir -p ./profiles/firefox && web-ext run --source-dir ./dist/firefox/ --start-url https://preactjs.com --firefox-profile=./profiles/firefox --keep-profile-changes",
 		"watch": "rollup -c -w"
 	},
 	"repository": {
