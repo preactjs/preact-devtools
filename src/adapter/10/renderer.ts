@@ -289,7 +289,16 @@ export function resetChildren(
 	if (!children.length) return;
 
 	const next = getFilteredChildren(vnode, filters, config);
-	if (next.length < 2) return;
+
+	// Suspense internals mutate child outside of the standard render cycle.
+	// This leads to stale children on the devtools ends. To work around that
+	// We'll always reset the children of a Suspense vnode.
+	let forceReorder = false;
+	if (isSuspenseVNode(vnode)) {
+		forceReorder = true;
+	}
+
+	if (!forceReorder && next.length < 2) return;
 
 	commit.operations.push(
 		MsgTypes.REORDER_CHILDREN,
