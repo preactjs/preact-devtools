@@ -1,5 +1,32 @@
 # Changelog
 
+## 1.2.0
+
+### Minor Changes
+
+- [`92d7801`](https://github.com/preactjs/preact-devtools/commit/92d78014d228cf0024ec393aae9feae56af02ba0) [#255](https://github.com/preactjs/preact-devtools/pull/255) Thanks [@marvinhagemeister](https://github.com/marvinhagemeister)! - Add support for filtering HOC-Components
+
+### Patch Changes
+
+- [#259](https://github.com/preactjs/preact-devtools/pull/259) Thanks [@bz2](https://github.com/bz2)! - Add `.editorconfig` to match prettier config.
+- [#250](https://github.com/preactjs/preact-devtools/pull/250) Thanks [@bz2](https://github.com/bz2)! - Fix TypeError dom is null in updateHighlight.
+
+- [#258](https://github.com/preactjs/preact-devtools/pull/265) Thanks [@bz2](https://github.com/bz2)! - Refine types on vnode utility functions.
+
+- [`8f361f3`](https://github.com/preactjs/preact-devtools/commit/8f361f384904bf900ebf248213db12314c4c03e8) [#265](https://github.com/preactjs/preact-devtools/pull/265) Thanks [@bz2](https://github.com/bz2) and [@marvinhagemeister](https://github.com/marvinhagemeister)! - Fix Suspense nodes not being detected.
+
+* [`d1581c7`](https://github.com/preactjs/preact-devtools/commit/d1581c71c00a2cf5fac95b1a38a9e12f6c3d0ec2) [#253](https://github.com/preactjs/preact-devtools/pull/253) Thanks [@marvinhagemeister](https://github.com/marvinhagemeister)! - Elements panel: Fix key value hard to read in light theme
+
+- [`3fb4d2a`](https://github.com/preactjs/preact-devtools/commit/3fb4d2a238dda1ad2eb35f7a2ee444c3f53fd6d0) [#252](https://github.com/preactjs/preact-devtools/pull/252) Thanks [@marvinhagemeister](https://github.com/marvinhagemeister)! - Display Component key in the sidebar
+
+* [`72b7964`](https://github.com/preactjs/preact-devtools/commit/72b796461191805c56e756e7b9061fb87c48a46b) [#257](https://github.com/preactjs/preact-devtools/pull/257) Thanks [@marvinhagemeister](https://github.com/marvinhagemeister)! - Fix horizontal sidebar scroll on low depth elements
+
+- [`6e79d7b`](https://github.com/preactjs/preact-devtools/commit/6e79d7b0733f2284b0dd22d96c375f1134530e1c) [#266](https://github.com/preactjs/preact-devtools/pull/266) Thanks [@marvinhagemeister](https://github.com/marvinhagemeister)! - Add support for suspending Suspense components
+
+* [`53b3e20`](https://github.com/preactjs/preact-devtools/commit/53b3e202bcd248ca6ef6c58006d063eb5cae0905) [#261](https://github.com/preactjs/preact-devtools/pull/261) Thanks [@marvinhagemeister](https://github.com/marvinhagemeister)! - Upgrade dependencies
+
+- [`aac0914`](https://github.com/preactjs/preact-devtools/commit/aac0914a2b3a0183ef64c7d8e494747a65975e3f) [#262](https://github.com/preactjs/preact-devtools/pull/262) Thanks [@marvinhagemeister](https://github.com/marvinhagemeister)! - Remove vendored "hook" Preact version
+
 ## 1.1.2
 
 ### Patch Changes
