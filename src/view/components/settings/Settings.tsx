@@ -70,22 +70,27 @@ export function Settings() {
 				/>
 
 				<h2>Experimental</h2>
-				<Checkbox
-					checked={debugMode}
-					onChange={() => (store.debugMode.$ = !store.debugMode.$)}
-					testId="toggle-debug-mode"
-				>
-					Toggle debug mode
-				</Checkbox>
-				<Checkbox
-					checked={experimentalFilters}
-					onChange={() =>
-						(store.filter.experimental.$ = !store.filter.experimental.$)
-					}
-					testId="toggle-experimental-filters"
-				>
-					Enable experimental filters
-				</Checkbox>
+
+				<div class={s.settingsSpaceSmall}>
+					<Checkbox
+						checked={debugMode}
+						onChange={() => (store.debugMode.$ = !store.debugMode.$)}
+						testId="toggle-debug-mode"
+					>
+						Toggle debug mode
+					</Checkbox>
+				</div>
+				<div class={s.settingsSpaceSmall}>
+					<Checkbox
+						checked={experimentalFilters}
+						onChange={() =>
+							(store.filter.experimental.$ = !store.filter.experimental.$)
+						}
+						testId="toggle-experimental-filters"
+					>
+						Enable experimental filters
+					</Checkbox>
+				</div>
 			</form>
 		</div>
 	);
