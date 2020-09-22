@@ -14,7 +14,7 @@ export async function run(config: any) {
 		"Shortly",
 		"Block",
 		"Suspense",
-		"Component",
+		"Component", // <10.4.5, newer versions use a Fragment
 		"Block",
 	]);
 
@@ -25,7 +25,7 @@ export async function run(config: any) {
 				"Shortly",
 				"Block",
 				"Suspense",
-				"Component",
+				"Component", // <10.4.5, newer versions use a Fragment
 				"Delayed",
 				"Block",
 			]);
