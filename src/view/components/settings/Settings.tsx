@@ -83,9 +83,10 @@ export function Settings() {
 				<div class={s.settingsSpaceSmall}>
 					<Checkbox
 						checked={experimentalFilters}
-						onChange={() =>
-							(store.filter.experimental.$ = !store.filter.experimental.$)
-						}
+						onChange={() => {
+							store.filter.experimental.$ = !store.filter.experimental.$;
+							store.filter.submit();
+						}}
 						testId="toggle-experimental-filters"
 					>
 						Enable experimental filters

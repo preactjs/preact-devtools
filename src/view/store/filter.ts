@@ -24,7 +24,8 @@ export function createFilterStore(
 			type: {
 				fragment: filterFragment.$,
 				dom: filterDom.$,
-				hoc: filterHoc.$,
+				// TODO: Remove experimental check when it becomes stable. hoc-filter
+				hoc: experimental.$ && filterHoc.$,
 			},
 		};
 
@@ -38,9 +39,9 @@ export function createFilterStore(
 		try {
 			filterFragment.$ = !!state.type.fragment;
 			filterDom.$ = !!state.type.dom;
-			// TODO: Remove experimental check when it becomes stable. hoc-filter
+			// TODO: Disable experimental check once stable hoc-filter
 			filterHoc.$ =
-				state.type.hoc !== undefined && experimental.$ ? state.type.hoc : true;
+				state.type.hoc !== undefined && experimental.$ ? state.type.hoc : false;
 			filters.$ = state.regex;
 		} catch (err) {
 			// eslint-disable-next-line no-console
