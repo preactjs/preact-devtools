@@ -230,6 +230,8 @@ describe("applyEvent", () => {
 			props: null,
 			state: null,
 			type: "asd",
+			canSuspend: false,
+			suspended: false,
 		};
 
 		const data = fromSnapshot([
@@ -255,6 +257,8 @@ describe("applyEvent", () => {
 			props: null,
 			state: null,
 			type: "asd",
+			canSuspend: false,
+			suspended: false,
 		};
 
 		store.sidebar.props.uncollapsed.$ = ["a", "b", "c"];

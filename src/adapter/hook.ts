@@ -53,6 +53,7 @@ export interface DevtoolEvents {
 	init: null;
 	refresh: null;
 	disconnect: null;
+	suspend: { id: ID; active: boolean };
 }
 export type EmitFn = <K extends keyof DevtoolEvents>(
 	name: K,

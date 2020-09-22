@@ -21,6 +21,9 @@ export function createMultiRenderer(
 	renderers: Map<number, Renderer>,
 ): Renderer {
 	return {
+		suspend(id, active) {
+			renderers.forEach(r => r.suspend && r.suspend(id, active));
+		},
 		refresh() {
 			renderers.forEach(r => r.refresh && r.refresh());
 		},

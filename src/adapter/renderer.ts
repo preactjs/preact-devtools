@@ -36,4 +36,7 @@ export interface Renderer {
 
 	// Hooks
 	updateHook?(id: ID, index: number, value: any): void; // V3
+
+	// Component actions
+	suspend?(id: ID, active: boolean): void; // V4
 }

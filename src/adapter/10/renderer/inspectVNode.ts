@@ -1,9 +1,16 @@
-import { getComponent, getComponentHooks, getDisplayName } from "../vnode";
+import {
+	getComponent,
+	getComponentHooks,
+	getDisplayName,
+	getSuspenseStateKey,
+	getVNodeParent,
+	isSuspenseVNode,
+} from "../vnode";
 import { serialize, cleanContext, cleanProps } from "../utils";
 import { RendererConfig10, getDevtoolsType } from "../renderer";
 import { ID } from "../../../view/store/types";
 import { IdMappingState, getVNodeById } from "../IdMapper";
-import { Options } from "preact";
+import { Options, VNode } from "preact";
 import { inspectHooks } from "./hooks";
 import { InspectData } from "../../adapter/adapter";
 
@@ -37,8 +44,29 @@ export function inspectVNode(
 		vnode.type !== null ? serialize(config, cleanProps(vnode.props)) : null;
 	const state = hasState ? serialize(config, c!.state) : null;
 
+	let suspended = false;
+	let canSuspend = false;
+	let item: VNode | null = vnode;
+	while (item) {
+		if (isSuspenseVNode(item)) {
+			canSuspend = true;
+
+			const c = getComponent(item);
+			if (c) {
+				const key = getSuspenseStateKey(c);
+				if (key) {
+					suspended = !!(c as any)._nextState[key];
+				}
+			}
+			break;
+		}
+
+		item = getVNodeParent(item);
+	}
+
 	return {
 		context,
+		canSuspend,
 		key: vnode.key || null,
 		hooks: supportsHooks ? hooks : !supportsHooks && hasHooks ? [] : null,
 		id,
@@ -47,5 +75,6 @@ export function inspectVNode(
 		state,
 		// TODO: We're not using this information anywhere yet
 		type: getDevtoolsType(vnode),
+		suspended,
 	};
 }

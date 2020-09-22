@@ -217,3 +217,30 @@ export function getNextState<S>(c: Component): S {
 export function setNextState<S>(c: Component, value: S): S {
 	return ((c as IComponent)._nextState = (c as any).__s = value);
 }
+
+export function getSuspenseStateKey(c: Component<any, any>) {
+	if ("_suspended" in c.state) {
+		return "_suspended";
+	} else if ("__e" in c.state) {
+		return "__e";
+	}
+
+	// This is a bit whacky, but property name mangling is unsafe in
+	// Preact <10.4.9
+	const keys = Object.keys(c.state);
+	if (keys.length > 0) {
+		return keys[0];
+	}
+
+	return null;
+}
+
+export function createSuspenseState(vnode: VNode, suspended: boolean) {
+	const c = getComponent(vnode) as Component<any, any>;
+	const key = getSuspenseStateKey(c);
+	if (c && key) {
+		return { [key]: suspended };
+	}
+
+	return {};
+}

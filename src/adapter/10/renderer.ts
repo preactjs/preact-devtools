@@ -19,6 +19,7 @@ import {
 	hasDom,
 	setNextState,
 	getHookState,
+	createSuspenseState,
 } from "./vnode";
 import { shouldFilter } from "./filter";
 import { ID, DevNodeType } from "../../view/store/types";
@@ -588,6 +589,9 @@ export function createRenderer(
 		removeVNodeId(ids, vnode);
 	}
 
+	const inspect = (id: ID) =>
+		inspectVNode(ids, config, options, id, supports.hooks);
+
 	return {
 		// TODO: Deprecate
 		// eslint-disable-next-line @typescript-eslint/no-empty-function
@@ -636,7 +640,7 @@ export function createRenderer(
 			return "Unknown";
 		},
 		log: (id, children) => logVNode(ids, config, id, children),
-		inspect: id => inspectVNode(ids, config, options, id, supports.hooks),
+		inspect,
 		findDomForVNode(id) {
 			const vnode = getVNodeById(ids, id);
 			if (!vnode) return null;
@@ -805,6 +809,38 @@ export function createRenderer(
 					(s as [any, any])[0] = value;
 					c.forceUpdate();
 				}
+			}
+		},
+
+		suspend(id, active) {
+			let vnode = getVNodeById(ids, id);
+			while (vnode !== null) {
+				if (isSuspenseVNode(vnode)) {
+					const c = getComponent(vnode);
+					if (c) {
+						c.setState(createSuspenseState(vnode, active));
+					}
+
+					// Get nearest non-filtered vnode
+					let nearest: VNode | null = vnode;
+					while (nearest && shouldFilter(nearest, filters, config)) {
+						nearest = getVNodeParent(nearest);
+					}
+
+					if (nearest && hasVNodeId(ids, nearest)) {
+						const nearestId = getVNodeId(ids, nearest);
+						if (id !== nearestId) {
+							const inspectData = inspect(nearestId);
+							if (inspectData) {
+								inspectData.suspended = active;
+								port.send("inspect-result", inspectData);
+							}
+						}
+					}
+					break;
+				}
+
+				vnode = getVNodeParent(vnode);
 			}
 		},
 	};
