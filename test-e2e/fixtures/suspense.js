@@ -25,13 +25,13 @@ function Block(props) {
 
 function Delayed(props) {
 	withDelay(props.waitMs);
-	return html` <${Block} id="delayed" background="cadetblue" /> `;
+	return html`<${Block} id="delayed" background="blueviolet" />`;
 }
 
 function Shortly() {
-	const fallback = html` <${Block} id="skeleton" background="grey" /> `;
+	const fallback = html`<${Block} id="skeleton" background="grey" />`;
 	return html`
-		<${Block} id="container" background="black">
+		<${Block} id="container" background="#ccc">
 			<${Suspense} fallback=${fallback}>
 				<${Delayed} waitMs=${500} />
 			<//>
