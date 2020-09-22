@@ -6,9 +6,7 @@ export const description =
 	"Show a deeply nested hook tree and limit value parsing depth";
 
 export async function run(config: any) {
-	const { devtools } = await newTestPage(config, "hooks-depth-limit", {
-		preact: "hook",
-	});
+	const { devtools } = await newTestPage(config, "hooks-depth-limit");
 
 	await waitForTestId(devtools, "tree-item");
 

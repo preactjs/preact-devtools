@@ -9,9 +9,7 @@ import {
 export const description = "Inspect useMemo hook";
 
 export async function run(config: any) {
-	const { devtools } = await newTestPage(config, "hooks", {
-		preact: "hook",
-	});
+	const { devtools } = await newTestPage(config, "hooks");
 
 	const hooksPanel = '[data-testid="props-row"]';
 
