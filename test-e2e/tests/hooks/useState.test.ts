@@ -10,9 +10,7 @@ import {
 export const description = "Inspect useState hook";
 
 export async function run(config: any) {
-	const { page, devtools } = await newTestPage(config, "hooks", {
-		preact: "hook",
-	});
+	const { page, devtools } = await newTestPage(config, "hooks");
 
 	const hooksPanel = '[data-testid="props-row"]';
 
