@@ -1,4 +1,10 @@
-import { getAttribute, newPage } from "pentf/browser_utils";
+import {
+	clickNestedText,
+	clickTestId,
+	getAttribute,
+	newPage,
+	waitForTestId,
+} from "pentf/browser_utils";
 import fs from "fs";
 import path from "path";
 import { Request, Page, FrameBase } from "puppeteer";
@@ -184,17 +190,27 @@ export async function getCount(page: Page, selector: string) {
 	return await (await page.$$(selector)).length;
 }
 
+export type DevtoolsTab = "ELEMENTS" | "PROFILER" | "STATISTICS" | "SETTINGS";
+
 // Preact Devtools specific functions
-export async function clickTab(
-	page: Page,
-	tab: "ELEMENTS" | "PROFILER" | "STATISTICS" | "SETTINGS",
-) {
+export async function clickTab(page: Page, tab: DevtoolsTab) {
 	await page.evaluate(name => {
 		return document
 			.querySelector(`[name="root-panel"][value="${name}"]`)!
 			.closest("label")!
 			.click();
 	}, tab);
+}
+
+export async function getActiveTab(page: Page): Promise<DevtoolsTab> {
+	await page.waitForSelector('input[name="root-panel"]');
+	return await page.evaluate(() => {
+		const input = (Array.from(
+			document.querySelectorAll('input[name="root-panel"]'),
+		) as HTMLInputElement[]).find(el => el.checked);
+
+		return (input ? input.value : "ELEMENTS") as DevtoolsTab;
+	});
 }
 
 export async function clickRecordButton(page: Page) {
@@ -208,6 +224,24 @@ export async function clickRecordButton(page: Page) {
 		"title",
 		start ? /Stop Recording/ : /Start Recording/,
 	);
+}
+
+export async function enableHOCFilter(page: Page) {
+	const activeTab = await getActiveTab(page);
+	await clickTab(page, "SETTINGS");
+	await clickTestId(page, "toggle-experimental-filters");
+	await clickTab(page, "ELEMENTS");
+
+	// Enable filter
+	await clickTestId(page, "filter-menu-button");
+	await waitForTestId(page, "filter-popup");
+	await clickNestedText(page, "HOC-Components");
+	await clickTestId(page, "filter-update");
+
+	await clickTab(page, activeTab);
+	if (activeTab === "ELEMENTS") {
+		await waitForTestId(page, "elements-tree");
+	}
 }
 
 // This injects a box into the page that moves with the mouse;

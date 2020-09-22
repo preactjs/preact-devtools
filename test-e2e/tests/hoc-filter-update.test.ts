@@ -1,4 +1,4 @@
-import { newTestPage } from "../test-utils";
+import { enableHOCFilter, newTestPage } from "../test-utils";
 import { expect } from "chai";
 import { Page } from "puppeteer";
 
@@ -20,6 +20,8 @@ async function getTreeItems(page: Page) {
 export const description = "HOC-Component should work with updates";
 export async function run(config: any) {
 	const { devtools, page } = await newTestPage(config, "hoc-update");
+
+	await enableHOCFilter(devtools);
 	await devtools.waitForSelector(
 		'[data-testid="tree-item"][data-name="Wrapped"]',
 	);

@@ -126,6 +126,7 @@ export function FilterPopup() {
 	const filterDom = useObserver(() => store.filter.filterDom.$);
 	const filterHoc = useObserver(() => store.filter.filterHoc.$);
 	const filterFragment = useObserver(() => store.filter.filterFragment.$);
+	const experimental = useObserver(() => store.filter.experimental.$);
 
 	return (
 		<div class={s.filter} data-testid="filter-popup">
@@ -149,19 +150,22 @@ export function FilterPopup() {
 					</span>
 					<span class={s.filterValue}>Fragments</span>
 				</label>
-				<label class={s.filterRow}>
-					<span class={s.filterCheck}>
-						<input
-							type="checkbox"
-							checked={filterHoc}
-							onInput={e =>
-								store.filter.setEnabled("hoc", (e.target as any).checked)
-							}
-						/>
-						{filterHoc ? <CheckboxChecked /> : <CheckboxUnChecked />}
-					</span>
-					<span class={s.filterValue}>HOC-Components</span>
-				</label>
+				{/* Remove when hoc-filter becomes stable */}
+				{experimental && (
+					<label class={s.filterRow}>
+						<span class={s.filterCheck}>
+							<input
+								type="checkbox"
+								checked={filterHoc}
+								onInput={e =>
+									store.filter.setEnabled("hoc", (e.target as any).checked)
+								}
+							/>
+							{filterHoc ? <CheckboxChecked /> : <CheckboxUnChecked />}
+						</span>
+						<span class={s.filterValue}>HOC-Components</span>
+					</label>
+				)}
 				<label class={s.filterRow}>
 					<span class={s.filterCheck}>
 						<input

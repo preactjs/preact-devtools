@@ -15,6 +15,7 @@ export function Settings() {
 	);
 	const highlightUpdates = useObserver(() => store.profiler.highlightUpdates.$);
 	const debugMode = useObserver(() => store.debugMode.$);
+	const experimentalFilters = useObserver(() => store.filter.experimental.$);
 
 	const setTheme = useCallback((v: Theme) => (store.theme.$ = v), []);
 
@@ -75,6 +76,15 @@ export function Settings() {
 					testId="toggle-debug-mode"
 				>
 					Toggle debug mode
+				</Checkbox>
+				<Checkbox
+					checked={experimentalFilters}
+					onChange={() =>
+						(store.filter.experimental.$ = !store.filter.experimental.$)
+					}
+					testId="toggle-experimental-filters"
+				>
+					Enable experimental filters
 				</Checkbox>
 			</form>
 		</div>

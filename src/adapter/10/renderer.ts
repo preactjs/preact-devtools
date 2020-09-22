@@ -510,7 +510,8 @@ export function createCommit(
 
 const DEFAULT_FIlTERS: FilterState = {
 	regex: [],
-	type: new Set(["dom", "fragment", "hoc"]),
+	// TODO: Add default hoc-filter
+	type: new Set(["dom", "fragment"]),
 };
 
 export interface Preact10Renderer extends Renderer {
