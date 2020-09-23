@@ -1,5 +1,11 @@
 # Changelog
 
+## 1.2.1
+
+### Patch Changes
+
+- [`8dc36a4`](https://github.com/preactjs/preact-devtools/commit/8dc36a46abc3736cc079358c7756d34461d55952) [#267](https://github.com/preactjs/preact-devtools/pull/267) Thanks [@marvinhagemeister](https://github.com/marvinhagemeister)! - Fix Fragments not being filtered with Preact versions other than the devtools was built with
+
 ## 1.2.0
 
 ### Minor Changes
