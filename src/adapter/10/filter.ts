@@ -1,4 +1,4 @@
-import { VNode, Fragment } from "preact";
+import { VNode } from "preact";
 import { getDisplayName, getVNodeParent } from "./vnode";
 import { TypeFilterValue, FilterState } from "../adapter/filter";
 import { RendererConfig10 } from "./renderer";
@@ -25,7 +25,7 @@ export function shouldFilter(
 	if (vnode.type == null) return true;
 
 	if (typeof vnode.type === "function") {
-		if (vnode.type === Fragment && filters.type.has("fragment")) {
+		if (vnode.type === config.Fragment && filters.type.has("fragment")) {
 			const parent = getVNodeParent(vnode);
 			// Only filter non-root nodes
 			if (parent != null) return true;
