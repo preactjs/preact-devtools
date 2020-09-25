@@ -47,9 +47,7 @@ export function createHightlighter(renderer: Renderer) {
 			const node = getNearestElement(first);
 			const nodeEnd = last ? getNearestElement(last) : null;
 			if (node != null) {
-				const label = renderer.getDisplayNameById
-					? renderer.getDisplayNameById(id)
-					: renderer.getDisplayName(vnode);
+				const label = renderer.getDisplayName(vnode);
 
 				let size = measureNode(node);
 				if (nodeEnd !== null) {

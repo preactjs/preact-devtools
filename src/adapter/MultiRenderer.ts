@@ -93,20 +93,6 @@ export function createMultiRenderer(
 			}
 			return "Unknown";
 		},
-		getDisplayNameById(id) {
-			const renderer = getRendererByVNodeId(renderers, id);
-			if (renderer) {
-				if (renderer.getDisplayNameById) {
-					return renderer.getDisplayNameById(id);
-				}
-
-				const vnode = renderer.getVNodeById(id);
-				if (vnode) {
-					return renderer.getDisplayName(vnode);
-				}
-			}
-			return "Unknown";
-		},
 		findVNodeIdForDom(node) {
 			const arr = Array.from(renderers.values());
 			for (let i = 0; i < arr.length; i++) {
