@@ -78,7 +78,6 @@ export function ops2Tree(oldTree: Tree, existingRoots: ID[], ops: number[]) {
 					removals.push(nodeId);
 					const node = pending.get(nodeId);
 					if (node) {
-						console.log("--> REMOVE", node.id, node.name);
 						// Remove node from parent children array
 						const parent = pending.get(node.parent);
 						if (parent) {
