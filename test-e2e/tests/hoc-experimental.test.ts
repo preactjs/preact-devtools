@@ -1,4 +1,9 @@
-import { clickTab, enableHOCFilter, newTestPage } from "../test-utils";
+import {
+	clickTab,
+	enableHOCFilter,
+	getTreeViewItemNames,
+	newTestPage,
+} from "../test-utils";
 import { expect } from "chai";
 import {
 	clickNestedText,
@@ -34,21 +39,22 @@ export async function run(config: any) {
 	await clickTestId(devtools, "toggle-experimental-filters");
 	await clickTab(devtools, "ELEMENTS");
 
-	const items = await devtools.evaluate(() => {
-		return Array.from(
-			document.querySelectorAll('[data-testid="tree-item"]'),
-		).map(el => el.getAttribute("data-name"));
-	});
+	await assertEventually(
+		async () => {
+			const items = await getTreeViewItemNames(devtools);
 
-	expect(items).to.deep.equal([
-		"Memo(Foo)",
-		"Foo",
-		"ForwardRef(Bar)",
-		"ForwardRef()",
-		"withBoof(Foo)",
-		"Foo",
-		"withBoof(Memo(Last))",
-		"Memo(Last)",
-		"Last",
-	]);
+			expect(items).to.deep.equal([
+				"Memo(Foo)",
+				"Foo",
+				"ForwardRef(Bar)",
+				"ForwardRef()",
+				"withBoof(Foo)",
+				"Foo",
+				"withBoof(Memo(Last))",
+				"Memo(Last)",
+				"Last",
+			]);
+		},
+		{ crashOnError: false, timeout: 2000 },
+	);
 }
