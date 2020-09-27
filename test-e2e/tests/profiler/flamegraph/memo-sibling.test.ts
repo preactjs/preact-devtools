@@ -44,8 +44,8 @@ export async function run(config: any) {
 	expect(nodes).to.deep.equal([
 		{ maximized: true, name: "Fragment", visible: true },
 		{ maximized: false, name: "Counter", visible: true },
-		{ maximized: false, name: "Value2", visible: true },
 		{ maximized: false, name: "Value1", visible: true },
+		{ maximized: false, name: "Value2", visible: true },
 	]);
 
 	const memoSize = await getSize(
