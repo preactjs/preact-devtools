@@ -257,20 +257,32 @@ export function update<T>(
 	}
 
 	const id = host.getId(vnode);
-	commit.operations.push(
-		MsgTypes.UPDATE_VNODE_TIMINGS,
-		id,
-		host.getStartTime(vnode) * 1000,
-		host.getEndTime(vnode) * 1000,
-	);
+	let name = host.getDisplayName(vnode);
+	record: {
+		if (filters.type.has("hoc")) {
+			const hocName = getHocName(name);
+			if (hocName) {
+				if (name.startsWith("ForwardRef")) {
+					hocs = [...hocs, hocName];
+					const idx = name.indexOf("(");
+					name = name.slice(idx + 1, -1) || "Anonymous";
+				} else {
+					hocs = [...hocs, hocName];
+					break record;
+				}
+			}
+		}
+		commit.operations.push(
+			MsgTypes.UPDATE_VNODE_TIMINGS,
+			id,
+			host.getStartTime(vnode, id) * 1000,
+			host.getEndTime(vnode, id) * 1000,
+		);
 
-	const name = host.getDisplayName(vnode);
-	const hoc = getHocName(name);
-	if (hoc) {
-		hocs = [...hocs, hoc];
-	} else {
-		addHocs(commit, id, hocs);
-		hocs = [];
+		if (hocs.length > 0) {
+			addHocs(commit, id, hocs);
+			hocs = [];
+		}
 	}
 
 	const oldVNode = host.getById(id);
