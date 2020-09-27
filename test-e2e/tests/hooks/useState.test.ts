@@ -32,7 +32,7 @@ export async function run(config: any) {
 	await assertNotSelector(devtools, '[data-testid="props-row"] > button');
 
 	// Should be editable
-	await devtools.waitFor('[data-testid="prop-value"] input');
+	await devtools.waitForSelector('[data-testid="prop-value"] input');
 	await click(devtools, '[data-testid="prop-value"] input');
 	await page.keyboard.press("ArrowUp");
 	await page.keyboard.press("Enter");
