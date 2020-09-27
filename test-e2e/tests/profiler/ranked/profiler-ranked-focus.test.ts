@@ -6,15 +6,14 @@ import {
 } from "../../../test-utils";
 import { expect } from "chai";
 import { Page } from "puppeteer";
-import { clickNestedText } from "pentf/browser_utils";
+import { clickSelector } from "pentf/browser_utils";
 
 async function getFlameNodes(page: Page) {
 	return await page.$$eval('[data-type="ranked"] > *', els => {
 		return els.map(el => {
-			const text = el.textContent!;
 			return {
 				maximized: el.hasAttribute("data-maximized"),
-				name: text.slice(0, text.indexOf("(") - 1),
+				name: el.getAttribute("data-name"),
 			};
 		});
 	});
@@ -43,7 +42,7 @@ export async function run(config: any) {
 	]);
 
 	// Focus 2nd node manually
-	await clickNestedText(devtools, "Display");
+	await clickSelector(devtools, '[data-type="ranked"] [data-name="Display"]');
 	expect(await getFlameNodes(devtools)).to.deep.equal([
 		{ maximized: true, name: "Counter" },
 		{ maximized: true, name: "Display" },
@@ -51,7 +50,7 @@ export async function run(config: any) {
 	]);
 
 	// Focus 1st node again
-	await clickNestedText(devtools, "Counter");
+	await clickSelector(devtools, '[data-type="ranked"] [data-name="Counter"]');
 	expect(await getFlameNodes(devtools)).to.deep.equal([
 		{ maximized: true, name: "Counter" },
 		{ maximized: false, name: "Display" },
