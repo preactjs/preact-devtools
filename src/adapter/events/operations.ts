@@ -56,10 +56,15 @@ export function ops2Tree(oldTree: Tree, existingRoots: ID[], ops: number[]) {
 			}
 			case MsgTypes.UPDATE_VNODE_TIMINGS: {
 				const id = ops[i + 1];
-				pending.set(id, deepClone(pending.get(id)!));
-				const x = pending.get(id)!;
-				x.startTime = ops[i + 2] / 1000;
-				x.endTime = ops[i + 3] / 1000;
+				const vnode = pending.get(id);
+				if (vnode) {
+					pending.set(id, deepClone(vnode));
+					vnode.startTime = ops[i + 2] / 1000;
+					vnode.endTime = ops[i + 3] / 1000;
+				} else {
+					// eslint-disable-next-line no-console
+					console.error(`Could not find VNode ${id} to update.`);
+				}
 
 				i += 3;
 				break;
@@ -73,6 +78,7 @@ export function ops2Tree(oldTree: Tree, existingRoots: ID[], ops: number[]) {
 					removals.push(nodeId);
 					const node = pending.get(nodeId);
 					if (node) {
+						console.log("--> REMOVE", node.id, node.name);
 						// Remove node from parent children array
 						const parent = pending.get(node.parent);
 						if (parent) {
