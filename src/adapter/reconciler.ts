@@ -1,13 +1,14 @@
-import { VNode } from "preact";
 import { NodeType } from "../constants";
 import { DevNodeType, ID } from "../view/store/types";
-import { ProfilerState } from "./10/renderer";
 import { RenderReason, RenderReasonData } from "./10/renderer/renderReasons";
 import { DiffType, updateDiffStats, createStats, Stats } from "./stats";
-import { getDom } from "./10/vnode";
 import { InspectData, UpdateType } from "./adapter/adapter";
 import { FilterState } from "./adapter/filter";
-import { measureUpdate, startDrawing } from "./adapter/highlightUpdates";
+import {
+	measureUpdate,
+	startDrawing,
+	UpdateRects,
+} from "./adapter/highlightUpdates";
 import { BaseEvent, PortPageHook } from "./adapter/port";
 import { Commit, flush, MsgTypes } from "./events/events";
 import { ProfilerOptions } from "./hook";
@@ -18,9 +19,17 @@ function isTextNode(dom: HTMLElement | Text | null): dom is Text {
 	return dom != null && dom.nodeType === NodeType.Text;
 }
 
-function updateHighlight(profiler: ProfilerState, vnode: VNode) {
-	if (profiler.highlightUpdates && typeof vnode.type === "function") {
-		let dom = getDom(vnode);
+function updateHighlight<T>(
+	host: ReconcilerHost<T>,
+	profiler: ProfilerState,
+	vnode: T,
+) {
+	if (profiler.highlightUpdates) {
+		const id = host.getId(vnode);
+		const range = host.findDomForVNode(id);
+		if (!range || !range.length || range[0] === null) return;
+
+		let dom = range[0];
 		if (isTextNode(dom)) {
 			dom = dom.parentNode as HTMLElement;
 		}
@@ -105,10 +114,11 @@ export function mount<T>(
 			}
 
 			const key = host.getKey(vnode);
+			const type = host.getType(vnode);
 			commit.operations.push(
 				MsgTypes.ADD_VNODE,
 				id,
-				host.getType(vnode),
+				type,
 				ancestorId,
 				9999, // owner
 				getStringId(commit.strings, name),
@@ -135,7 +145,7 @@ export function mount<T>(
 			}
 
 			if (profiler.highlightUpdates) {
-				// updateHighlight(profiler, vnode);
+				updateHighlight(host, profiler, vnode);
 			}
 
 			ancestorId = id;
@@ -301,8 +311,10 @@ export function update<T>(
 		}
 	}
 
-	// FIXME
-	// updateHighlight(profiler, vnode);
+	const type = host.getType(vnode);
+	if (type !== DevNodeType.Element) {
+		updateHighlight(host, profiler, vnode);
+	}
 
 	const oldChildren = oldVNode
 		? host.getChildren(oldVNode).map((v: any) => v && host.getId(v))
@@ -445,12 +457,19 @@ export interface ReconcilerHost<T> {
 	inspect(id: ID): InspectData | null;
 	onViewSource(id: ID): void;
 	log(id: ID, devtoolsChildren: ID[]): void;
-	highlightUpdate(vnode: T): void;
 	getRenderReason(oldVNode: T | null, newVNode: T): RenderReasonData | null;
 }
 
 export interface StatState {
 	isRecording: boolean;
+}
+
+export interface ProfilerState {
+	isProfiling: boolean;
+	highlightUpdates: boolean;
+	pendingHighlightUpdates: Set<HTMLElement>;
+	updateRects: UpdateRects;
+	captureRenderReasons: boolean;
 }
 
 export function createReconciler<T>(

@@ -28,7 +28,14 @@ export function createRendererV11(
 		shouldForceReorder: () => false,
 		inspect: id => null,
 		getType(internal) {
-			return DevNodeType.FunctionComponent;
+			const flags = getFlags(internal);
+			if (flags & InternalFlags.FUNCTION_NODE) {
+				return DevNodeType.FunctionComponent;
+			} else if (flags & InternalFlags.CLASS_NODE) {
+				return DevNodeType.ClassComponent;
+			}
+
+			return DevNodeType.Element;
 		},
 		log(id, children) {
 			const internal = idToInternal.get(id);
@@ -43,7 +50,6 @@ export function createRendererV11(
 		onViewSource(id) {},
 		recordStats(stats, internal) {},
 		updateElementCache(internal) {},
-		highlightUpdate() {},
 		has(id) {
 			return idToInternal.has(id);
 		},
@@ -117,6 +123,8 @@ export function createRendererV11(
 		findVNodeIdForDom(node) {
 			return -1;
 		},
+		update() {},
+		suspend() {},
 	};
 
 	return createReconciler(reconciler, port);

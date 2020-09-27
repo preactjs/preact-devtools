@@ -49,7 +49,7 @@ export function Sidebar() {
 					onChange={(value, path, node) => {
 						const actualPath =
 							node != null && node.meta ? node.meta.index : null;
-						if (!actualPath) {
+						if (actualPath === null) {
 							// eslint-disable-next-line no-console
 							console.error(
 								new Error(

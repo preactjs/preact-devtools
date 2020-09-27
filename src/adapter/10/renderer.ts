@@ -35,7 +35,6 @@ import {
 } from "./IdMapper";
 import { logVNode } from "./renderer/logVNode";
 import { inspectVNode } from "./renderer/inspectVNode";
-import { UpdateRects } from "../adapter/highlightUpdates";
 import { recordComponentStats } from "./stats";
 import { createReconciler } from "../reconciler";
 import { DevtoolsHook } from "../hook";
@@ -94,14 +93,6 @@ const DEFAULT_FIlTERS: FilterState = {
 export interface Preact10Renderer extends Renderer<VNode> {
 	onCommit(vnode: VNode): void;
 	onUnmount(vnode: VNode): void;
-}
-
-export interface ProfilerState {
-	isProfiling: boolean;
-	highlightUpdates: boolean;
-	pendingHighlightUpdates: Set<HTMLElement>;
-	updateRects: UpdateRects;
-	captureRenderReasons: boolean;
 }
 
 export function createRenderer(
@@ -195,7 +186,6 @@ export function createRenderer(
 				return getDevtoolsType(vnode);
 			},
 			getAncestor: getAncestor,
-			highlightUpdate() {},
 			updateId(id, vnode) {
 				updateVNodeId(ids, id, vnode);
 			},
@@ -305,7 +295,13 @@ export function createRenderer(
 						if (nearest && hasVNodeId(ids, nearest)) {
 							const nearestId = getVNodeId(ids, nearest);
 							if (id !== nearestId) {
-								const inspectData = reconciler.inspect(nearestId);
+								const inspectData = inspectVNode(
+									ids,
+									config,
+									options,
+									nearestId,
+									!!supports.hooks,
+								);
 								if (inspectData) {
 									inspectData.suspended = active;
 									port.send("inspect-result", inspectData);
