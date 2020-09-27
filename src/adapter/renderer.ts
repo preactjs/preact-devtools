@@ -1,4 +1,3 @@
-import { VNode } from "preact";
 import { ID } from "../view/store/types";
 import { FilterState } from "./adapter/filter";
 import { InspectData, UpdateType } from "./adapter/adapter";
@@ -6,15 +5,22 @@ import { DevtoolEvents } from "./hook";
 
 export type ObjPath = Array<string | number>;
 
-/**
- * TODO: Deprecate this
- */
-export interface Renderer {
+export interface Supports {
+	renderReasons?: boolean;
+	hooks?: boolean;
+	profiling?: boolean;
+	statistics?: boolean;
+}
+
+export interface Renderer<T = any> {
+	supports?: Supports;
+	onCommit(vnode: T): void;
+	onUnmount(vnode: T): void;
 	refresh?(): void;
-	getVNodeById(id: ID): VNode | null;
-	getDisplayName(vnode: VNode): string;
+	getVNodeById(id: ID): T | null;
+	getDisplayName(vnode: T): string;
 	findDomForVNode(id: ID): Array<HTMLElement | Text | null> | null;
-	findVNodeIdForDom(node: HTMLElement | Text): number;
+	findVNodeIdForDom(node: HTMLElement | Text): number | null;
 	applyFilters(filters: FilterState): void;
 	has(id: ID): boolean;
 	log(id: ID, children: ID[]): void;

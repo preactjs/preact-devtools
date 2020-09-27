@@ -21,6 +21,13 @@ export function createMultiRenderer(
 	renderers: Map<number, Renderer>,
 ): Renderer {
 	return {
+		onCommit() {
+			// Placeholder
+		},
+		onUnmount() {
+			// Placeholder
+		},
+
 		suspend(id, active) {
 			renderers.forEach(r => r.suspend && r.suspend(id, active));
 		},

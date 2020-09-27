@@ -6,6 +6,7 @@ import { DebugTreeStats } from "./DebugTreeStats";
 import { DebugNodeNavTree } from "./DebugNodeNavTree";
 import { KeyPanel } from "./KeyPanel";
 import { HocPanel } from "./HocPanel";
+import { act } from "preact/test-utils";
 
 export function Sidebar() {
 	const store = useStore();
@@ -46,11 +47,24 @@ export function Sidebar() {
 					items={hooks.items}
 					uncollapsed={hooks.uncollapsed}
 					onChange={(value, path, node) => {
-						emit("update-hook", {
-							id: inspect!.id,
-							value,
-							meta: node != null ? node.meta : null,
-						});
+						const actualPath =
+							node != null && node.meta ? node.meta.index : null;
+						if (!actualPath) {
+							// eslint-disable-next-line no-console
+							console.error(
+								new Error(
+									"Invalid data for hook update. Could not find index value.",
+								),
+							);
+							// eslint-disable-next-line no-console
+							console.error(node);
+						} else {
+							emit("update-hook", {
+								id: inspect!.id,
+								value,
+								path: actualPath,
+							});
+						}
 					}}
 					onCopy={() => inspect && emit("copy", serializeProps(inspect.hooks))}
 				/>

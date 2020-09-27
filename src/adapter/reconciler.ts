@@ -1,18 +1,18 @@
 import { VNode } from "preact";
 import { NodeType } from "../constants";
 import { DevNodeType, ID } from "../view/store/types";
-import { updateVNodeId } from "./10/IdMapper";
 import { ProfilerState } from "./10/renderer";
-import { RenderReason, getRenderReason } from "./10/renderer/renderReasons";
+import { RenderReason, RenderReasonData } from "./10/renderer/renderReasons";
 import { DiffType, updateDiffStats, createStats, Stats } from "./stats";
 import { getDom } from "./10/vnode";
-import { InspectData } from "./adapter/adapter";
+import { InspectData, UpdateType } from "./adapter/adapter";
 import { FilterState } from "./adapter/filter";
 import { measureUpdate, startDrawing } from "./adapter/highlightUpdates";
-import { BaseEvent } from "./adapter/port";
+import { BaseEvent, PortPageHook } from "./adapter/port";
 import { Commit, flush, MsgTypes } from "./events/events";
 import { ProfilerOptions } from "./hook";
 import { getStringId } from "./string-table";
+import { ObjPath, Supports } from "./renderer";
 
 function isTextNode(dom: HTMLElement | Text | null): dom is Text {
 	return dom != null && dom.nodeType === NodeType.Text;
@@ -115,8 +115,8 @@ export function mount<T>(
 				key ? getStringId(commit.strings, key) : 0,
 				// Multiply, because operations array only supports integers
 				// and would otherwise cut off floats
-				host.getStartTime(vnode) * 1000,
-				host.getEndTime(vnode) * 1000,
+				host.getStartTime(vnode, id) * 1000,
+				host.getEndTime(vnode, id) * 1000,
 			);
 
 			if (hocs.length > 0) {
@@ -135,7 +135,7 @@ export function mount<T>(
 			}
 
 			if (profiler.highlightUpdates) {
-				updateHighlight(profiler, vnode);
+				// updateHighlight(profiler, vnode);
 			}
 
 			ancestorId = id;
@@ -273,11 +273,11 @@ export function update<T>(
 		hocs = [];
 	}
 
-	const oldVNode = host.getVNode(id);
-	updateVNodeId(ids, id, vnode);
+	const oldVNode = host.getById(id);
+	host.updateId(id, vnode);
 
 	if (profiler.isProfiling && profiler.captureRenderReasons) {
-		const reason = getRenderReason(oldVNode, vnode);
+		const reason = host.getRenderReason(oldVNode, vnode);
 		if (reason !== null) {
 			const count = reason.items ? reason.items.length : 0;
 			commit.operations.push(MsgTypes.RENDER_REASON, id, reason.type, count);
@@ -289,7 +289,8 @@ export function update<T>(
 		}
 	}
 
-	updateHighlight(profiler, vnode);
+	// FIXME
+	// updateHighlight(profiler, vnode);
 
 	const oldChildren = oldVNode
 		? host.getChildren(oldVNode).map((v: any) => v && host.getId(v))
@@ -382,6 +383,8 @@ export function createCommit<T>(
 }
 
 export interface ReconcilerHost<T> {
+	supports?: Supports;
+
 	/** @deprecated */
 	flushInitial?(): void;
 
@@ -394,18 +397,26 @@ export interface ReconcilerHost<T> {
 	updateElementCache(vnode: T): void;
 
 	// ID mapping
+	has(id: ID): boolean;
 	hasId(vnode: T): boolean;
 	getId(vnode: T): ID;
 	createId(vnode: T): ID;
 	removeId(vnode: T): void;
-	updateId(vnode: T): void;
+	updateId(id: ID, vnode: T): void;
+	getById(id: ID): T | null;
 
 	// Data
 	getKey(vnode: T): string | null;
-	getStartTime(vnode: T): number;
-	getEndTime(vnode: T): number;
+	getStartTime(vnode: T, id: number): number;
+	getEndTime(vnode: T, id: number): number;
 	getDisplayName(vnode: T): string;
 	getType(vnode: T): DevNodeType;
+
+	// TODO: Rething those
+	findVNodeIdForDom(node: HTMLElement | Text): number | null;
+	findDomForVNode(
+		id: number,
+	): [HTMLElement | Text | null, HTMLElement | Text | null] | null;
 
 	// Statistics
 	recordStats(
@@ -414,18 +425,26 @@ export interface ReconcilerHost<T> {
 		children: Array<T | null | undefined>,
 	): void;
 
+	// Update
+	update(id: ID, type: UpdateType, path: ObjPath, value: any): void;
+	suspend(id: ID, active: boolean): void;
+
 	// Other
 	inspect(id: ID): InspectData | null;
 	onViewSource(id: ID): void;
 	log(id: ID, devtoolsChildren: ID[]): void;
 	highlightUpdate(vnode: T): void;
+	getRenderReason(oldVNode: T | null, newVNode: T): RenderReasonData | null;
 }
 
 export interface StatState {
 	isRecording: boolean;
 }
 
-export function createReconciler<T>(host: ReconcilerHost<T>) {
+export function createReconciler<T>(
+	host: ReconcilerHost<T>,
+	port: PortPageHook,
+) {
 	const profiler: ProfilerState = {
 		isProfiling: false,
 		highlightUpdates: false,
@@ -462,7 +481,8 @@ export function createReconciler<T>(host: ReconcilerHost<T>) {
 
 		roots.forEach(root => {
 			const rootId = host.getId(root);
-			traverse(root, vnode => onUnmount(vnode));
+
+			onUnmount(root);
 
 			const commit: Commit = {
 				operations: [],
@@ -508,7 +528,9 @@ export function createReconciler<T>(host: ReconcilerHost<T>) {
 	}
 
 	return {
+		supports: host.supports,
 		hasId: host.hasId,
+		has: host.has,
 		log: host.log,
 		flushInitial() {
 			if (host.flushInitial) {
@@ -517,6 +539,11 @@ export function createReconciler<T>(host: ReconcilerHost<T>) {
 		},
 		getDisplayName: host.getDisplayName,
 		inspect: host.inspect,
+		findDomForVNode: host.findDomForVNode,
+		findVNodeIdForDom: host.findVNodeIdForDom,
+		getVNodeById: host.getById,
+		update: host.update,
+		suspend: host.suspend,
 		onCommit(node: T) {
 			const commit = createCommit(
 				host,

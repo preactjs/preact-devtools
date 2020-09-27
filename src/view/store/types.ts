@@ -7,7 +7,7 @@ import { Collapser } from "./collapser";
 import { EmitFn, DevtoolEvents } from "../../adapter/hook";
 import { ProfilerState } from "../components/profiler/data/commits";
 import { PropData } from "../components/sidebar/inspect/parseProps";
-import { ParsedStats } from "../../adapter/10/stats";
+import { ParsedStats } from "../../adapter/stats";
 
 export type ID = number;
 

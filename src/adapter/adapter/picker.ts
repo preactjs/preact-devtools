@@ -22,7 +22,7 @@ export function createPicker(
 		e.preventDefault();
 		e.stopPropagation();
 		if (picking && e.target != null && lastTarget !== e.target) {
-			const id = renderer.findVNodeIdForDom(e.target as any);
+			const id = renderer.findVNodeIdForDom(e.target as any) || -1;
 			if (id > -1 && lastId !== id) {
 				onHover(id);
 			}

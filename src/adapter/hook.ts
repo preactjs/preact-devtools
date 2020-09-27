@@ -1,4 +1,4 @@
-import { Renderer } from "./renderer";
+import { Renderer, Supports } from "./renderer";
 import { ID } from "../view/store/types";
 import { createAdapter, InspectData, UpdateType } from "./adapter/adapter";
 import { RawFilterState } from "./adapter/filter";
@@ -9,6 +9,9 @@ import { createMultiRenderer } from "./MultiRenderer";
 import parseSemverish from "./parse-semverish";
 import { PortPageHook } from "./adapter/port";
 import { PROFILE_RELOAD, STATS_RELOAD } from "../constants";
+import { createRendererV11 } from "./11/renderer-v11";
+import { setupOptionsV11 } from "./11/options-v11";
+import { OptionsV11 } from "./11/shapes-v11";
 
 export type EmitterFn = (event: string, data: any) => void;
 
@@ -20,7 +23,7 @@ export interface DevtoolEvents {
 	"update-prop": { id: ID; path: string; value: any };
 	"update-state": { id: ID; path: string; value: any };
 	"update-context": { id: ID; path: string; value: any };
-	"update-hook": { id: ID; value: any; meta: any };
+	"update-hook": { id: ID; path: number; value: any };
 	/**
 	 * @deprecated
 	 */
@@ -46,7 +49,7 @@ export interface DevtoolEvents {
 	log: { id: ID; children: ID[] };
 	inspect: ID;
 	"select-node": ID;
-	update: { id: ID; type: UpdateType; path: string; value: any };
+	update: { id: ID; type: UpdateType; path: string | number; value: any };
 	"inspect-result": InspectData;
 	attach: { id: ID; supportsProfiling: boolean };
 	initialized: null;
@@ -69,13 +72,13 @@ export interface DevtoolsHook {
 	connected: boolean;
 	emit: EmitFn;
 	listen: (fn: (name: string, cb: any) => any) => void;
-	renderers: Map<number, Renderer>;
+	renderers: Map<number, Renderer<any>>;
 	attachPreact?(
 		version: string,
-		options: Options,
+		options: Options | OptionsV11,
 		config: RendererConfig10,
 	): number;
-	attach(renderer: Renderer): number;
+	attach(renderer: Renderer<any>): number;
 	detach(id: number): void;
 }
 
@@ -103,10 +106,8 @@ export function createHook(port: PortPageHook): DevtoolsHook {
 		});
 	};
 
-	const attachRenderer = (
-		renderer: Renderer,
-		supports: { renderReasons?: boolean; hooks?: boolean },
-	) => {
+	const attachRenderer = (renderer: Renderer) => {
+		const supports = renderer.supports || {};
 		if (status === "disconnected") {
 			init();
 		}
@@ -198,30 +199,49 @@ export function createHook(port: PortPageHook): DevtoolsHook {
 				return -1;
 			}
 
+			// Create an integer-based namespace to avoid clashing ids caused by
+			// multiple connected renderers
+			const namespace = Math.floor(Math.random() * 2 ** 32);
+
 			// currently we only support preact >= 10, later we can add another branch for major === 8
 			if (preactVersionMatch.major == 10) {
-				const supports = {
+				options = options as Options;
+				const supports: Supports = {
 					renderReasons: !!config.Component,
 					hooks: preactVersionMatch.minor >= 4 && preactVersionMatch.patch >= 1,
+					profiling: true,
+					statistics: true,
 				};
 
-				// Create an integer-based namespace to avoid clashing ids caused by
-				// multiple connected renderers
-				const namespace = Math.floor(Math.random() * 2 ** 32);
 				const renderer = createRenderer(
 					port,
 					namespace,
-					config as any,
+					config,
 					options,
 					supports,
 				);
 				setupOptions(options, renderer, config as any);
-				return attachRenderer(renderer, supports);
+				return attachRenderer(renderer);
+			} else if (preactVersionMatch.major === 11) {
+				options = options as OptionsV11;
+				const renderer = createRendererV11(port, namespace);
+				setupOptionsV11(options, renderer);
+				return attachRenderer(renderer);
 			}
 
 			return -1;
 		},
-		attach: renderer => attachRenderer(renderer, { renderReasons: false }),
+		attach: renderer => {
+			if (!renderer.supports) {
+				renderer.supports = {
+					renderReasons: false,
+					profiling: false,
+					hooks: false,
+					statistics: false,
+				};
+			}
+			return attachRenderer(renderer);
+		},
 		detach: id => renderers.delete(id),
 	};
 }

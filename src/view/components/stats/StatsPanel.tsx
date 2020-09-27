@@ -3,7 +3,7 @@ import { useObserver, useStore } from "../../store/react-bindings";
 import s from "./StatsPanel.css";
 import s2 from "../profiler/components/ProfilerInfo/ProfilerInfo.css";
 import { SingleLayout } from "../SidebarLayout";
-import { ParsedStats } from "../../../adapter/10/stats";
+import { ParsedStats } from "../../../adapter/stats";
 import { Actions } from "../Actions";
 import { IconBtn } from "../IconBtn";
 import { RecordIcon, Refresh, NotInterested } from "../icons";

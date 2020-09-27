@@ -3,7 +3,7 @@ import { Store } from "../../view/store/types";
 import { recordProfilerCommit } from "../../view/components/profiler/data/commits";
 import { ops2Tree } from "./operations";
 import { applyOperationsV1 } from "./legacy/operationsV1";
-import { Stats, stats2ops } from "../10/stats";
+import { Stats, stats2ops } from "../stats";
 
 export enum MsgTypes {
 	ADD_ROOT = 1,

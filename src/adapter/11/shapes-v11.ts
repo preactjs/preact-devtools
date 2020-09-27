@@ -12,6 +12,16 @@ export interface VNode {
 	__self?: string;
 }
 
+export enum InternalFlags {
+	TEXT_NODE = 1,
+	ELEMENT_NODE = 1 << 1,
+	CLASS_NODE = 1 << 2,
+	FUNCTION_NODE = 1 << 3,
+	FRAGMENT_NODE = 1 << 4,
+
+	COMPONENT_NODE = CLASS_NODE | FUNCTION_NODE | FRAGMENT_NODE,
+}
+
 export type Children = VNode | VNode[] | Children[] | null;
 
 export interface Props {
@@ -20,7 +30,6 @@ export interface Props {
 }
 
 export enum RenderMode {}
-export enum InternalFlags {}
 
 export interface Component<P = Props, S = any, C = any> {
 	props: P;
@@ -68,4 +77,6 @@ export interface Internal {
 	_currentOffset: number;
 }
 
-export interface Options {}
+export interface OptionsV11 {
+	_commit(internal: Internal): void;
+}

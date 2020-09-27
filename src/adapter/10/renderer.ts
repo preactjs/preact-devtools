@@ -17,12 +17,13 @@ import {
 	getHookState,
 	createSuspenseState,
 	isRoot,
+	getAncestor,
 } from "./vnode";
 import { shouldFilter } from "./filter";
 import { ID, DevNodeType } from "../../view/store/types";
 import { setIn, SerializedVNode, setInCopy } from "./utils";
 import { FilterState } from "../adapter/filter";
-import { Renderer } from "../renderer";
+import { Renderer, Supports } from "../renderer";
 import {
 	createIdMappingState,
 	getVNodeById,
@@ -30,6 +31,7 @@ import {
 	hasVNodeId,
 	removeVNodeId,
 	createVNodeId,
+	updateVNodeId,
 } from "./IdMapper";
 import { logVNode } from "./renderer/logVNode";
 import { inspectVNode } from "./renderer/inspectVNode";
@@ -37,6 +39,7 @@ import { UpdateRects } from "../adapter/highlightUpdates";
 import { recordComponentStats } from "./stats";
 import { createReconciler } from "../reconciler";
 import { DevtoolsHook } from "../hook";
+import { getRenderReason } from "./renderer/renderReasons";
 
 export interface RendererConfig10 {
 	Fragment: FunctionalComponent;
@@ -88,10 +91,9 @@ const DEFAULT_FIlTERS: FilterState = {
 	type: new Set(["dom", "fragment"]),
 };
 
-export interface Preact10Renderer extends Renderer {
+export interface Preact10Renderer extends Renderer<VNode> {
 	onCommit(vnode: VNode): void;
 	onUnmount(vnode: VNode): void;
-	updateHook(id: ID, index: number, value: any): void;
 }
 
 export interface ProfilerState {
@@ -100,11 +102,6 @@ export interface ProfilerState {
 	pendingHighlightUpdates: Set<HTMLElement>;
 	updateRects: UpdateRects;
 	captureRenderReasons: boolean;
-}
-
-export interface Supports {
-	renderReasons: boolean;
-	hooks: boolean;
 }
 
 export function createRenderer(
@@ -118,213 +115,210 @@ export function createRenderer(
 	const ids = createIdMappingState(namespace);
 	const domToVNode = new WeakMap<HTMLElement | Text, VNode>();
 
-	const reconciler = createReconciler<VNode>({
-		isRoot(vnode) {
-			return isRoot(vnode, config);
-		},
-		inspect(id: ID) {
-			return inspectVNode(ids, config, options, id, supports.hooks);
-		},
-		getKey(vnode) {
-			return vnode.key || null;
-		},
-		getDisplayName(vnode) {
-			return getDisplayName(vnode, config);
-		},
-		getStartTime(vnode) {
-			return vnode.startTime || 0;
-		},
-		getEndTime(vnode) {
-			return vnode.endTime || 0;
-		},
-		onViewSource(id) {
-			const vnode = getVNodeById(ids, id);
-			const hook: DevtoolsHook = (window as any).__PREACT_DEVTOOLS__;
+	return createReconciler<VNode>(
+		{
+			supports,
+			isRoot(vnode) {
+				return isRoot(vnode, config);
+			},
+			inspect(id: ID) {
+				return inspectVNode(ids, config, options, id, !!supports.hooks);
+			},
+			getKey(vnode) {
+				return vnode.key || null;
+			},
+			getDisplayName(vnode) {
+				return getDisplayName(vnode, config);
+			},
+			getStartTime(vnode) {
+				return vnode.startTime || 0;
+			},
+			getEndTime(vnode) {
+				return vnode.endTime || 0;
+			},
+			onViewSource(id) {
+				const vnode = getVNodeById(ids, id);
+				const hook: DevtoolsHook = (window as any).__PREACT_DEVTOOLS__;
 
-			if (vnode && typeof vnode.type === "function") {
-				const { type } = vnode;
-				hook.$type =
-					type && type.prototype && type.prototype.render
-						? type.prototype.render
-						: type;
-			} else {
-				hook.$type = null;
-			}
-		},
-		getChildren(vnode) {
-			return getActualChildren(vnode);
-		},
-		log(id, devtoolsChildren) {
-			logVNode(ids, config, id, devtoolsChildren);
-		},
-		shouldFilter(vnode, filters) {
-			return shouldFilter(vnode, filters, config);
-		},
-		shouldForceReorder(vnode) {
-			// Suspense internals mutate child outside of the standard render cycle.
-			// This leads to stale children on the devtools ends. To work around that
-			// We'll always reset the children of a Suspense vnode.
-			return isSuspenseVNode(vnode);
-		},
-		hasId(vnode) {
-			return hasVNodeId(ids, vnode);
-		},
-		getId(vnode) {
-			return getVNodeId(ids, vnode);
-		},
-		createId(vnode) {
-			return createVNodeId(ids, vnode);
-		},
-		removeId(vnode) {
-			if (typeof vnode.type !== "function") {
-				const dom = getDom(vnode);
-				if (dom != null) domToVNode.delete(dom);
-			}
-			return removeVNodeId(ids, vnode);
-		},
-		recordStats(stats, vnode, children) {
-			return recordComponentStats(config, stats, vnode, children);
-		},
-		getType(vnode) {
-			return getDevtoolsType(vnode);
-		},
-		getAncestor() {},
-		highlightUpdate() {},
-		updateId() {},
-		updateElementCache(vnode) {
-			if (typeof vnode.type !== "function") {
-				const dom = getDom(vnode);
-				if (dom) domToVNode.set(dom, vnode);
-			}
-		},
-	});
-
-	return {
-		...reconciler,
-		has(id) {
-			return getVNodeById(ids, id) !== null;
-		},
-		getVNodeById: id => getVNodeById(ids, id),
-		findDomForVNode(id) {
-			const vnode = getVNodeById(ids, id);
-			if (!vnode) return null;
-
-			const first = getDom(vnode);
-			let last = null;
-			if (typeof vnode.type === "function") {
-				const children = getActualChildren(vnode);
-				for (let i = children.length - 1; i >= 0; i--) {
-					const child = children[i];
-					if (child) {
-						const dom = getDom(child);
-						if (dom === first) break;
-						if (dom !== null) {
-							last = dom;
-							break;
-						}
-					}
-				}
-			}
-
-			return [first, last];
-		},
-		findVNodeIdForDom(node) {
-			const vnode = domToVNode.get(node);
-			if (vnode) {
-				if (shouldFilter(vnode, filters, config)) {
-					let p: VNode | null = vnode;
-					let found = null;
-					while ((p = getVNodeParent(p)) != null) {
-						if (!shouldFilter(p, filters, config)) {
-							found = p;
-							break;
-						}
-					}
-
-					if (found != null) {
-						return getVNodeId(ids, found) || -1;
-					}
+				if (vnode && typeof vnode.type === "function") {
+					const { type } = vnode;
+					hook.$type =
+						type && type.prototype && type.prototype.render
+							? type.prototype.render
+							: type;
 				} else {
-					return getVNodeId(ids, vnode) || -1;
+					hook.$type = null;
 				}
-			}
-
-			return -1;
-		},
-		update(id, type, path, value) {
-			const vnode = getVNodeById(ids, id);
-			if (vnode !== null) {
-				if (typeof vnode.type === "function") {
-					const c = getComponent(vnode);
-					if (c) {
-						if (type === "props") {
-							vnode.props = setInCopy(
-								(vnode.props as any) || {},
-								path.slice(),
-								value,
-							);
-						} else if (type === "state") {
-							const res = setInCopy(
-								(c.state as any) || {},
-								path.slice(),
-								value,
-							);
-							setNextState(c, res);
-						} else if (type === "context") {
-							// TODO: Investigate if we should disallow modifying context
-							// from devtools and make it readonly.
-							setIn((c.context as any) || {}, path.slice(), value);
+			},
+			getChildren(vnode) {
+				return getActualChildren(vnode);
+			},
+			log(id, devtoolsChildren) {
+				logVNode(ids, config, id, devtoolsChildren);
+			},
+			shouldFilter(vnode, filters) {
+				return shouldFilter(vnode, filters, config);
+			},
+			shouldForceReorder(vnode) {
+				// Suspense internals mutate child outside of the standard render cycle.
+				// This leads to stale children on the devtools ends. To work around that
+				// We'll always reset the children of a Suspense vnode.
+				return isSuspenseVNode(vnode);
+			},
+			hasId(vnode) {
+				return hasVNodeId(ids, vnode);
+			},
+			getId(vnode) {
+				return getVNodeId(ids, vnode);
+			},
+			createId(vnode) {
+				return createVNodeId(ids, vnode);
+			},
+			has(id) {
+				return getVNodeById(ids, id) !== null;
+			},
+			getRenderReason,
+			getById(id) {
+				return getVNodeById(ids, id);
+			},
+			removeId(vnode) {
+				if (typeof vnode.type !== "function") {
+					const dom = getDom(vnode);
+					if (dom != null) domToVNode.delete(dom);
+				}
+				return removeVNodeId(ids, vnode);
+			},
+			recordStats(stats, vnode, children) {
+				return recordComponentStats(config, stats, vnode, children);
+			},
+			getType(vnode) {
+				return getDevtoolsType(vnode);
+			},
+			getAncestor: getAncestor,
+			highlightUpdate() {},
+			updateId(id, vnode) {
+				updateVNodeId(ids, id, vnode);
+			},
+			updateElementCache(vnode) {
+				if (typeof vnode.type !== "function") {
+					const dom = getDom(vnode);
+					if (dom) domToVNode.set(dom, vnode);
+				}
+			},
+			findVNodeIdForDom(node) {
+				const vnode = domToVNode.get(node);
+				if (vnode) {
+					if (shouldFilter(vnode, filters, config)) {
+						let p: VNode | null = vnode;
+						let found = null;
+						while ((p = getVNodeParent(p)) != null) {
+							if (!shouldFilter(p, filters, config)) {
+								found = p;
+								break;
+							}
 						}
 
-						c.forceUpdate();
+						if (found != null) {
+							return getVNodeId(ids, found) || -1;
+						}
+					} else {
+						return getVNodeId(ids, vnode) || -1;
 					}
 				}
-			}
-		},
-		updateHook(id, index, value) {
-			const vnode = getVNodeById(ids, id);
-			if (vnode !== null && typeof vnode.type === "function") {
-				const c = getComponent(vnode);
-				if (c) {
-					const s = getHookState(c, index);
-					// Only useState and useReducer hooks marked as editable so state can
-					// cast to more specific ReducerHookState value.
-					(s as [any, any])[0] = value;
-					c.forceUpdate();
-				}
-			}
-		},
 
-		suspend(id, active) {
-			let vnode = getVNodeById(ids, id);
-			while (vnode !== null) {
-				if (isSuspenseVNode(vnode)) {
-					const c = getComponent(vnode);
-					if (c) {
-						c.setState(createSuspenseState(vnode, active));
-					}
+				return -1;
+			},
+			findDomForVNode(id) {
+				const vnode = getVNodeById(ids, id);
+				if (!vnode) return null;
 
-					// Get nearest non-filtered vnode
-					let nearest: VNode | null = vnode;
-					while (nearest && shouldFilter(nearest, filters, config)) {
-						nearest = getVNodeParent(nearest);
-					}
-
-					if (nearest && hasVNodeId(ids, nearest)) {
-						const nearestId = getVNodeId(ids, nearest);
-						if (id !== nearestId) {
-							const inspectData = reconciler.inspect(nearestId);
-							if (inspectData) {
-								inspectData.suspended = active;
-								port.send("inspect-result", inspectData);
+				const first = getDom(vnode);
+				let last = null;
+				if (typeof vnode.type === "function") {
+					const children = getActualChildren(vnode);
+					for (let i = children.length - 1; i >= 0; i--) {
+						const child = children[i];
+						if (child) {
+							const dom = getDom(child);
+							if (dom === first) break;
+							if (dom !== null) {
+								last = dom;
+								break;
 							}
 						}
 					}
-					break;
 				}
 
-				vnode = getVNodeParent(vnode);
-			}
+				return [first, last];
+			},
+			update(id, type, path, value) {
+				const vnode = getVNodeById(ids, id);
+				if (vnode !== null) {
+					if (typeof vnode.type === "function") {
+						const c = getComponent(vnode);
+						if (c) {
+							if (type === "props") {
+								vnode.props = setInCopy(
+									(vnode.props as any) || {},
+									path.slice(),
+									value,
+								);
+							} else if (type === "state") {
+								const res = setInCopy(
+									(c.state as any) || {},
+									path.slice(),
+									value,
+								);
+								setNextState(c, res);
+							} else if (type === "context") {
+								// TODO: Investigate if we should disallow modifying context
+								// from devtools and make it readonly.
+								setIn((c.context as any) || {}, path.slice(), value);
+							} else if (type === "hooks") {
+								const s = getHookState(c, +path[0]);
+								// Only useState and useReducer hooks marked as editable so state can
+								// cast to more specific ReducerHookState value.
+								(s as [any, any])[0] = value;
+							}
+
+							c.forceUpdate();
+						}
+					}
+				}
+			},
+
+			suspend(id, active) {
+				let vnode = getVNodeById(ids, id);
+				while (vnode !== null) {
+					if (isSuspenseVNode(vnode)) {
+						const c = getComponent(vnode);
+						if (c) {
+							c.setState(createSuspenseState(vnode, active));
+						}
+
+						// Get nearest non-filtered vnode
+						let nearest: VNode | null = vnode;
+						while (nearest && shouldFilter(nearest, filters, config)) {
+							nearest = getVNodeParent(nearest);
+						}
+
+						if (nearest && hasVNodeId(ids, nearest)) {
+							const nearestId = getVNodeId(ids, nearest);
+							if (id !== nearestId) {
+								const inspectData = reconciler.inspect(nearestId);
+								if (inspectData) {
+									inspectData.suspended = active;
+									port.send("inspect-result", inspectData);
+								}
+							}
+						}
+						break;
+					}
+
+					vnode = getVNodeParent(vnode);
+				}
+			},
 		},
-	};
+		port,
+	);
 }

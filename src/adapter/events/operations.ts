@@ -3,7 +3,7 @@ import { parseTable } from "../string-table";
 import { MsgTypes } from "./events";
 import { deepClone } from "../../view/components/profiler/flamegraph/modes/adjustNodesToRight";
 import { RenderReasonMap } from "../10/renderer/renderReasons";
-import { parseStats, ParsedStats } from "../10/stats";
+import { parseStats, ParsedStats } from "../stats";
 
 /**
  * This is the heart of the devtools. Here we translate incoming events
