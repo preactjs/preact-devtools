@@ -4472,7 +4472,7 @@ fs.realpath@^1.0.0:
   resolved "https://registry.yarnpkg.com/fs.realpath/-/fs.realpath-1.0.0.tgz#1504ad2523158caa40db4a2787cb01411994ea4f"
   integrity sha1-FQStJSMVjKpA20onh8sBQRmU6k8=
 
-fsevents@2.1.3, fsevents@~2.1.2:
+fsevents@2.1.3, fsevents@^2.1.3, fsevents@~2.1.2:
   version "2.1.3"
   resolved "https://registry.yarnpkg.com/fsevents/-/fsevents-2.1.3.tgz#fb738703ae8d2f9fe900c33836ddebee8b97f23e"
   integrity sha512-Auw9a4AxqWpa9GUfj370BMPzzyncfBABW8Mab7BGWBYDj4Isgq+cDKtx0i6u9jcX9pQDnswsaaOTgTmA5pEjuQ==
@@ -10523,10 +10523,10 @@ winreg@0.0.12:
   resolved "https://registry.yarnpkg.com/winreg/-/winreg-0.0.12.tgz#07105554ba1a9d08979251d129475bffae3006b7"
   integrity sha1-BxBVVLoanQiXklHRKUdb/64wBrc=
 
-wmr@^0.0.8:
-  version "0.0.8"
-  resolved "https://registry.yarnpkg.com/wmr/-/wmr-0.0.8.tgz#1b8f2b2c55e11550993a827f7c245601e0a7bf73"
-  integrity sha512-gbrRByihzAavvzokzcv5E5eY7rRwm0o0uTU0nSAglcz9csiXS3px9xcPZylLQy8hWNiCjaHn2fhfDhkgvzRxTw==
+wmr@^0.0.10:
+  version "0.0.10"
+  resolved "https://registry.yarnpkg.com/wmr/-/wmr-0.0.10.tgz#837ce2929e074b9998ea84a26e707b421dd6e4f0"
+  integrity sha512-vDoMJ23YUTWuOK/XVAzpGSA1aQ6RhgggPcK95Q/sjpLW7gLZy53A/Lh28fG9MYEUxL5VgraJ3wAhEvjtsxUqCA==
 
 word-wrap@^1.2.3, word-wrap@~1.2.3:
   version "1.2.3"
