@@ -14,7 +14,7 @@
 	margin-right: 0.4rem;
 }
 
-.root:last-of-type(.hoc) {
+.root .hoc:last-of-type {
 	margin-right: 0;
 }
 

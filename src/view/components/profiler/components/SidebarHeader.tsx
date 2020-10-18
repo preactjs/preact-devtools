@@ -1,6 +1,6 @@
 import { h, Fragment } from "preact";
 import { Actions } from "../../Actions";
-import s from "../../sidebar/Sidebar.css";
+import s from "../../sidebar/Sidebar.module.css";
 import {
 	useStore,
 	useObserver,

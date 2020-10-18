@@ -1,6 +1,6 @@
 import { h } from "preact";
 import { CheckboxChecked, CheckboxUnChecked } from "../icons";
-import s from "./Checkbox.css";
+import s from "./Checkbox.module.css";
 
 export interface CheckboxProps {
 	testId?: string;

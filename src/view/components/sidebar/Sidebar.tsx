@@ -6,7 +6,6 @@ import { DebugTreeStats } from "./DebugTreeStats";
 import { DebugNodeNavTree } from "./DebugNodeNavTree";
 import { KeyPanel } from "./KeyPanel";
 import { HocPanel } from "./HocPanel";
-import { act } from "preact/test-utils";
 
 export function Sidebar() {
 	const store = useStore();

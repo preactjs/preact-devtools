@@ -1,5 +1,5 @@
 import { h, ComponentChildren } from "preact";
-import s from "./SidebarPanel.css";
+import s from "./SidebarPanel.module.css";
 import { IconBtn } from "../IconBtn";
 import { FileCopy } from "../icons";
 

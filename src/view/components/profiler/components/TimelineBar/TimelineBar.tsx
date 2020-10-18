@@ -4,7 +4,7 @@ import { CommitTimeline } from "../CommitTimeline/CommitTimeline";
 import { IconBtn } from "../../../IconBtn";
 import { useStore, useObserver } from "../../../../store/react-bindings";
 import { RecordIcon, NotInterested, Refresh } from "../../../icons";
-import s from "../../../elements/TreeBar.css";
+import s from "../../../elements/TreeBar.module.css";
 import { useCallback } from "preact/hooks";
 import { FlameGraphMode } from "../../flamegraph/FlameGraphMode";
 import { resetProfiler } from "../../data/commits";

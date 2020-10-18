@@ -6,6 +6,7 @@ async function main() {
 		{
 			headless: false,
 			devtools: true,
+			moduleType: "commonjs",
 			extensions: [path.join(__dirname, "..", "dist", "chrome")],
 		},
 		["--user-data-dir=./profiles/chrome"],

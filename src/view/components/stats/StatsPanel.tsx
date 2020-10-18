@@ -1,7 +1,7 @@
 import { h, Fragment } from "preact";
 import { useObserver, useStore } from "../../store/react-bindings";
-import s from "./StatsPanel.css";
-import s2 from "../profiler/components/ProfilerInfo/ProfilerInfo.css";
+import s from "./StatsPanel.module.css";
+import s2 from "../profiler/components/ProfilerInfo/ProfilerInfo.module.css";
 import { SingleLayout } from "../SidebarLayout";
 import { ParsedStats } from "../../../adapter/stats";
 import { Actions } from "../Actions";

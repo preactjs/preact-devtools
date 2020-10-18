@@ -1,7 +1,7 @@
 import { h, RefObject } from "preact";
 import { useState, useCallback, useRef, useEffect } from "preact/hooks";
 import { ArrowBack, ArrowForward } from "../../../icons";
-import s from "./CommitTimeline.css";
+import s from "./CommitTimeline.module.css";
 import { getGradient } from "../../data/gradient";
 import { useResize } from "../../../utils";
 

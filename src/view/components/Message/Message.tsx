@@ -1,5 +1,5 @@
 import { h } from "preact";
-import s from "./Message.css";
+import s from "./Message.module.css";
 
 const infoIcon = (
 	<svg

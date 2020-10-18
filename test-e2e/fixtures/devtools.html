@@ -21,9 +21,12 @@
 	</head>
 	<body>
 		<div id="app"></div>
-		<script src="./extension/setup.js"></script>
-		<script>
-			const { setupInlineDevtools, createStore, applyEvent } = setup;
+		<!-- <script src="./extension/setup.js"></script> -->
+		<script type="module">
+			import {
+				setupInlineDevtools,
+				createStore,
+			} from "./devtools/shells/inline/index.ts";
 
 			const store = setupInlineDevtools(document.getElementById("app"), window);
 			window.parent.store = store;

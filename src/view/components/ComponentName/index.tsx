@@ -1,5 +1,5 @@
 import { h, Fragment } from "preact";
-import s from "./ComponentName.css";
+import s from "./ComponentName.module.css";
 
 export function ComponentName(props: { children: any }) {
 	return (

@@ -1,5 +1,5 @@
 import { h, Fragment } from "preact";
-import s from "./ElementProps.css";
+import s from "./ElementProps.module.css";
 import { Arrow } from "../../elements/TreeView";
 import { PropDataType, PropData } from "./parseProps";
 import { DataInput } from "../../DataInput";

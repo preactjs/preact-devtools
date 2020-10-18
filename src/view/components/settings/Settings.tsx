@@ -3,7 +3,7 @@ import { useStore, useObserver } from "../../store/react-bindings";
 import { useCallback } from "preact/hooks";
 import { Theme } from "../../store/types";
 import { RadioBar } from "../RadioBar";
-import s from "./Settings.css";
+import s from "./Settings.module.css";
 import { Checkbox } from "../Checkbox/Checkbox";
 import { Message } from "../Message/Message";
 

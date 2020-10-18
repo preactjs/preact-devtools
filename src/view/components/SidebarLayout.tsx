@@ -1,5 +1,5 @@
 import { h } from "preact";
-import s from "./SidebarLayout.css";
+import s from "./SidebarLayout.module.css";
 
 export interface ChildProps {
 	children: any;
