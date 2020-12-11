@@ -1,5 +1,15 @@
 # Changelog
 
+## 1.2.1
+
+- Fix Firefox description (#273, thanks @rschristian)
+- Show usage info in the disabled popup (#272, thanks @danieldiekmeier)
+
+### Maintenance
+
+- Upgrade dependencies (#271, thanks @marvinhagemeister)
+- Remove changeset bot (#269, thanks @marvinhagemeister)
+
 ## 1.2.0
 
 ### Minor Changes
