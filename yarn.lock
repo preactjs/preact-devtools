@@ -6891,10 +6891,10 @@ pend@~1.2.0:
   resolved "https://registry.yarnpkg.com/pend/-/pend-1.2.0.tgz#7a57eb550a6783f9115331fcf4663d5c8e007a50"
   integrity sha1-elfrVQpng/kRUzH89GY9XI4AelA=
 
-pentf@^1.6.6:
-  version "1.6.6"
-  resolved "https://registry.yarnpkg.com/pentf/-/pentf-1.6.6.tgz#c1ea03f0d6088a6284cd04752c9fcb4b0c64060f"
-  integrity sha512-YrHOgpWvF17m5wug7y+kBWThm9eWbsG70GtJIwJwa3F7Oz2a1EthyhJswqRlX00N8UZAMidxE+wCqgkUl38fwA==
+pentf@^1.6.10:
+  version "1.6.10"
+  resolved "https://registry.yarnpkg.com/pentf/-/pentf-1.6.10.tgz#0bee2dc3d626a158dcbd5cf3ff28c7f0de84b0d6"
+  integrity sha512-Io/pHTPOJgh8miTtzjhh52ZOAmipE2zMKCLs3tu679M647yghrP5Zx5U6D11L+C7jAZpsKennH5MfjpkhUJ0iA==
   dependencies:
     "@sentry/node" "^5.15.5"
     "@types/glob" "^7.1.1"
