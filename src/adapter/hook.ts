@@ -142,8 +142,8 @@ export function createHook(port: PortPageHook): DevtoolsHook {
 		return uid;
 	};
 
-	// Delete all roots when the current frame unloads
-	window.addEventListener("unload", () => {
+	// Delete all roots when the current frame is closed
+	window.addEventListener("pagehide", () => {
 		renderers.forEach(r => {
 			if (r.clear) r.clear();
 		});
