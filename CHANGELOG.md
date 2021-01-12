@@ -1,5 +1,15 @@
 # Changelog
 
+## 1.2.2
+
+- Fix only first hooks shown if multiple listeners to `options._hook` were present (#279, thanks @marvinhagemeister)
+- Use `pagehide` instead of `unload` (#277, thanks @marvinhagemeister)
+
+### Maintenance
+
+- Upgrade web-ext (#276, thanks @andrewiggins)
+- Bump ini from 1.3.5 to 1.3.7 (#274, thanks @dependabot)
+
 ## 1.2.1
 
 - Fix Firefox description (#273, thanks @rschristian)
