@@ -87,7 +87,12 @@ export function setupOptions(
 				addHookStack(type);
 			}
 
-			if (prevHook) prevHook(c, index, type);
+			// Don't continue the chain while the devtools is inspecting hooks.
+			// Otherwise the next hook will very likely throw as we're only
+			// faking a render and not doing a proper one. #278
+			if (!(options as any)._skipEffects && !(options as any).__s) {
+				if (prevHook) prevHook(c, index, type);
+			}
 		};
 
 		options.useDebugValue = (value: any) => {

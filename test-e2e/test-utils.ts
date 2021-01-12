@@ -49,7 +49,7 @@ export async function newTestPage(
 ) {
 	const page = await newPage(config);
 
-	const preactVersion = options.preact ? options.preact : "10.4.1";
+	const preactVersion = options.preact ? options.preact : "10.5.9";
 
 	// Reset emulation
 	await (page as any)._client.send("Emulation.clearDeviceMetricsOverride");
