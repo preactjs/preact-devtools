@@ -31,6 +31,12 @@ let hookLog: HookData[] = [];
 let inspectingHooks = false;
 let ancestorName = "unknown";
 const debugValues = new Map<string, string>();
+let debugNames: string[] = [];
+
+export function addHookName(name: any) {
+	if (!inspectingHooks) return;
+	debugNames.push(String(name));
+}
 
 export function addDebugValue(value: any) {
 	if (!inspectingHooks) return;
@@ -139,7 +145,14 @@ export function parseHookData(
 				let children: string[] = [];
 				let nodeType: PropDataType = "undefined";
 				const depth = hook.stack.length - i - 1;
-				const name = isNative ? type : frame.name;
+				let name = isNative ? type : frame.name;
+				if (
+					(debugNames.length > 0 && hook.type === HookType.useState) ||
+					hook.type === HookType.useRef ||
+					hook.type === HookType.useReducer
+				) {
+					name = debugNames.pop()!;
+				}
 
 				if (debugValues.has(id)) {
 					value = debugValues.get(id);
@@ -221,6 +234,7 @@ export function inspectHooks(
 	inspectingHooks = true;
 	hookLog = [];
 	debugValues.clear();
+	debugNames = [];
 	ancestorName = parseStackTrace(new Error().stack!)[0].name;
 
 	const c = getComponent(vnode)!;
