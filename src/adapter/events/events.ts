@@ -3,7 +3,7 @@ import { Store } from "../../view/store/types";
 import { recordProfilerCommit } from "../../view/components/profiler/data/commits";
 import { ops2Tree } from "./operations";
 import { applyOperationsV1 } from "./legacy/operationsV1";
-import { Stats, stats2ops } from "../10/stats";
+import { ParsedStats, Stats, stats2ops } from "../10/stats";
 
 export enum MsgTypes {
 	ADD_ROOT = 1,
@@ -152,6 +152,12 @@ export function applyOperationsV2(store: Store, data: number[]) {
 						old.suspense += next.suspense;
 						old.elements += next.elements;
 						old.text += next.text;
+					} else if (key === "depth") {
+						const old = (v as any)[key];
+						next.max.forEach((nextValue: any, nextKey: any) => {
+							const oldDepth = old.get(nextKey) || 0;
+							old.max.set(nextKey, oldDepth + nextValue);
+						});
 					} else {
 						if (typeof next === "object") {
 							const old = (v as any)[key];
@@ -159,6 +165,7 @@ export function applyOperationsV2(store: Store, data: number[]) {
 								const oldChildren = old.children.get(nextKey) || 0;
 								old.children.set(nextKey, oldChildren + nextValue);
 							});
+
 							old.total += next.total;
 						} else {
 							(v as any)[key] += (stats as any)[key];

@@ -2,6 +2,7 @@ import { ID, DevNodeType } from "../../view/store/types";
 import { MsgTypes } from "../events/events";
 import { VNode } from "preact";
 import { RendererConfig10, getDevtoolsType } from "./renderer";
+import { getVNodeDepth } from "./vnode";
 
 export enum DiffType {
 	UNKNOWN = 0,
@@ -57,6 +58,12 @@ export interface Stats {
 		elements: number;
 		text: number;
 	};
+	depth: {
+		max: number;
+		mount: Record<number, number>;
+		update: Record<number, number>;
+		unmount: Record<number, number>;
+	};
 }
 
 export function updateDiffStats(
@@ -76,7 +83,6 @@ export function updateDiffStats(
 	}
 }
 
-// TODO: store update depth
 export function createStats(): Stats {
 	return {
 		roots: {
@@ -138,6 +144,12 @@ export function createStats(): Stats {
 			elements: 0,
 			text: 0,
 		},
+		depth: {
+			max: 0,
+			mount: {},
+			unmount: {},
+			update: {},
+		},
 	};
 }
 
@@ -183,6 +195,11 @@ export function recordComponentStats(
 			stats.suspense.total++;
 			stats.suspense.children.push(childrenLen);
 			break;
+	}
+
+	// Depth tracking
+	if (childrenLen === 0) {
+		stats.depth.max = Math.max(stats.depth.max, getVNodeDepth(vnode));
 	}
 
 	if (childrenLen === 1) {
@@ -282,6 +299,9 @@ export function stats2ops(rootId: ID, stats: Stats): number[] {
 		stats.singleChildType.suspense,
 		stats.singleChildType.elements,
 		stats.singleChildType.text,
+
+		// Depth tracking
+		stats.depth.max,
 	];
 }
 
@@ -316,6 +336,9 @@ export interface ParsedStats {
 		suspense: number;
 		elements: number;
 		text: number;
+	};
+	depth: {
+		max: Map<number, number>;
 	};
 }
 
@@ -390,6 +413,7 @@ export function parseStats(ops: number[]): ParsedStats {
 	const singleSuspense = ops[i++];
 	const singleElements = ops[i++];
 	const singleText = ops[i++];
+	const maxDepth = ops[i++];
 
 	return {
 		roots,
@@ -419,6 +443,9 @@ export function parseStats(ops: number[]): ParsedStats {
 			suspense: singleSuspense,
 			elements: singleElements,
 			text: singleText,
+		},
+		depth: {
+			max: new Map([[maxDepth, 1]]),
 		},
 	};
 }

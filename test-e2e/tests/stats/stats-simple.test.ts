@@ -41,4 +41,6 @@ export async function run(config: any) {
 
 	const textCount = await getText(devtools, '[data-testid="text-total');
 	expect(textCount).to.equal("6");
+
+	throw "poop";
 }

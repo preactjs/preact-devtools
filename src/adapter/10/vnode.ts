@@ -123,6 +123,13 @@ export function getHookState(
 }
 
 /**
+ * Get the depth of a vnode in the tree
+ */
+export function getVNodeDepth(vnode: VNode) {
+	return (vnode as IVNode)._depth || (vnode as any).__b || 0;
+}
+
+/**
  * Get the diffed children of a `vnode`
  */
 export function getActualChildren(

@@ -175,6 +175,67 @@ export function ChildRow(props: {
 	);
 }
 
+export function DepthTable({ stats }: { stats: ParsedStats }) {
+	const columns: number[] = [];
+	stats.depth.max.forEach((_, col) => {
+		const idx = columns.indexOf(col);
+		if (idx === -1) {
+			columns.push(col);
+		}
+	});
+
+	console.log(stats.depth);
+
+	columns.sort();
+
+	console.log(columns);
+
+	return (
+		<div class={s.card}>
+			<h2 class={s.heading}>Tree Depth</h2>
+
+			<table class={s.table} data-testid="tree-depth">
+				<thead>
+					<tr>
+						<th>Type</th>
+						{columns.map(n => {
+							return <th key={n}>{n}</th>;
+						})}
+					</tr>
+				</thead>
+				<tbody>
+					<tr>
+						<td>max</td>
+						{columns.map(n => {
+							return (
+								<td key={n} data-testid="depth-max">
+									{stats.depth.max.get(n) || 0}
+								</td>
+							);
+						})}
+					</tr>
+					<tr>
+						<td>Mount</td>
+						<td data-testid="depth-mount">{stats.singleChildType.roots}</td>
+					</tr>
+					<tr>
+						<td>Update</td>
+						<td data-testid="single-class-component">
+							{stats.singleChildType.classComponents}
+						</td>
+					</tr>
+					<tr>
+						<td>Unmount*</td>
+						<td data-testid="single-function-component">
+							{stats.singleChildType.functionComponents}
+						</td>
+					</tr>
+				</tbody>
+			</table>
+		</div>
+	);
+}
+
 export function StatsData({ stats }: { stats: ParsedStats }) {
 	return (
 		<Fragment>
@@ -374,6 +435,8 @@ export function StatsData({ stats }: { stats: ParsedStats }) {
 						</tbody>
 					</table>
 				</div>
+
+				<DepthTable stats={stats} />
 			</div>
 		</Fragment>
 	);

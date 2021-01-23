@@ -73,7 +73,7 @@
 					await addScript(`./vendor/preact/${preactVersion}/preactHooks.js`);
 					await addScript(`./vendor/preact/${preactVersion}/preactCompat.js`);
 					await addScript(`./vendor/preact/${preactVersion}/preactDevtools.js`);
-					await addScript(`./vendor/preact/${preactVersion}/preactDebug.js`);
+						await addScript(`./vendor/preact/${preactVersion}/preactDebug.js`);
 					await addScript(`./vendor/htm.js`);
 					attachToDevtools(preact);
 					window.html = htm.bind(preact.h);
