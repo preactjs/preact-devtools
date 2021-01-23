@@ -9,7 +9,7 @@ import {
 	getStatefulHookValue,
 	getComponent,
 } from "./vnode";
-import { addHookStack, addDebugValue } from "./renderer/hooks";
+import { addHookStack, addDebugValue, addHookName } from "./renderer/hooks";
 import { HookType } from "../../constants";
 
 /**
@@ -50,7 +50,9 @@ export function setupOptions(
 	const prevBeforeDiff = o._diff || o.__b;
 	const prevAfterDiff = options.diffed;
 	let prevHook = o._hook || o.__h;
-	let prevUseDebug = options.useDebugValue;
+	let prevUseDebugValue = options.useDebugValue;
+	// @ts-ignore
+	let prevHookName = options.useDebugName;
 
 	options.vnode = vnode => {
 		// Tiny performance improvement by initializing fields as doubles
@@ -74,7 +76,9 @@ export function setupOptions(
 	// parsed hooks.
 	setTimeout(() => {
 		prevHook = o._hook || o.__h;
-		prevUseDebug = options.useDebugValue;
+		prevUseDebugValue = options.useDebugValue;
+		// @ts-ignore
+		prevHookName = options._addHookName || options.__a;
 
 		o._hook = o.__h = (c: Component, index: number, type: number) => {
 			const s = getStatefulHooks(c);
@@ -98,7 +102,13 @@ export function setupOptions(
 		options.useDebugValue = (value: any) => {
 			addHookStack(HookType.useDebugValue);
 			addDebugValue(value);
-			if (prevUseDebug) prevUseDebug(value);
+			if (prevUseDebugValue) prevUseDebugValue(value);
+		};
+
+		// @ts-ignore
+		options._addHookName = options.__a = (name: string | number) => {
+			addHookName(name);
+			if (prevHookName) prevHookName(name);
 		};
 	}, 100);
 
@@ -145,6 +155,6 @@ export function setupOptions(
 		o._diff = o.__b = prevBeforeDiff;
 		options.vnode = prevVNodeHook;
 		o._hook = o.__h = prevHook;
-		options.useDebugValue = prevUseDebug;
+		options.useDebugValue = prevUseDebugValue;
 	};
 }

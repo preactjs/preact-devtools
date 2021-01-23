@@ -321,3 +321,25 @@ export async function installMouseHelper(page: Page) {
 		document.addEventListener("mouseup", handleEvent, true);
 	});
 }
+
+export async function getHooks(page: Page): Promise<Array<[string, string]>> {
+	return await page.evaluate(() => {
+		const rows = Array.from(
+			document.querySelectorAll('[data-testid="props-row"]'),
+		);
+
+		return rows.map(item => {
+			const name = item.querySelector('[data-testid="prop-name"]')!.textContent;
+			let value = item.querySelector('[data-testid="prop-value"]')!.textContent;
+
+			// Check if we're dealing with an input
+			if (!value) {
+				value =
+					"" +
+					(item.querySelector('[data-testid="prop-value"] input') as any).value;
+			}
+
+			return [name, value] as [string, string];
+		}, []);
+	});
+}
