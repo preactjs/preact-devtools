@@ -1563,6 +1563,11 @@ aws4@^1.8.0:
   resolved "https://registry.yarnpkg.com/aws4/-/aws4-1.11.0.tgz#d61f46d83b2519250e2784daf5b09479a8b41c59"
   integrity sha512-xh1Rl34h6Fi1DC2WWKfxUTVqRsNnr6LsKz2+hfwDxQJWmrx8+c7ylaqBMcHfl1U1r2dsifOvKX3LQuLNZ+XSvA==
 
+axe-core@^4.1.1:
+  version "4.1.1"
+  resolved "https://registry.yarnpkg.com/axe-core/-/axe-core-4.1.1.tgz#70a7855888e287f7add66002211a423937063eaf"
+  integrity sha512-5Kgy8Cz6LPC9DJcNb3yjAXTu3XihQgEdnIg50c//zOC/MyLP0Clg+Y8Sh9ZjjnvBrDZU4DgXS9C3T9r4/scGZQ==
+
 babel-loader@^8.1.0:
   version "8.2.1"
   resolved "https://registry.yarnpkg.com/babel-loader/-/babel-loader-8.2.1.tgz#e53313254677e86f27536f5071d807e01d24ec00"
@@ -6882,15 +6887,16 @@ pend@~1.2.0:
   resolved "https://registry.yarnpkg.com/pend/-/pend-1.2.0.tgz#7a57eb550a6783f9115331fcf4663d5c8e007a50"
   integrity sha1-elfrVQpng/kRUzH89GY9XI4AelA=
 
-pentf@^1.6.10:
-  version "1.6.10"
-  resolved "https://registry.yarnpkg.com/pentf/-/pentf-1.6.10.tgz#0bee2dc3d626a158dcbd5cf3ff28c7f0de84b0d6"
-  integrity sha512-Io/pHTPOJgh8miTtzjhh52ZOAmipE2zMKCLs3tu679M647yghrP5Zx5U6D11L+C7jAZpsKennH5MfjpkhUJ0iA==
+pentf@^1.8.7:
+  version "1.8.7"
+  resolved "https://registry.yarnpkg.com/pentf/-/pentf-1.8.7.tgz#0386140cbc4fe9036275e6b37e509800dd9c56f0"
+  integrity sha512-+Jsqv1tQrfF25OgzS4/x3junS/Hk/NMA69ezWMs2YTU0CamWk0tlqibYwX59wenLq7L/DDUgWXXSV2dPCS+pOg==
   dependencies:
     "@sentry/node" "^5.15.5"
     "@types/glob" "^7.1.1"
     "@types/puppeteer" "^5.4.0"
     argparse "^1.0.10"
+    axe-core "^4.1.1"
     chokidar "^3.4.2"
     diff "^4.0.2"
     emailjs-imap-client "^3.0.7"
