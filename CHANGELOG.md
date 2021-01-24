@@ -1,5 +1,9 @@
 # Changelog
 
+## 1.3.0
+
+- Add support for custom hook names via `addHookName` from `preact/devtools`. This is supported in Preact >= 10.5.12 (#281, thanks @marvinhagemeister)
+
 ## 1.2.2
 
 - Fix only first hooks shown if multiple listeners to `options._hook` were present (#279, thanks @marvinhagemeister)
