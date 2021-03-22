@@ -5,38 +5,7 @@ import {
 	newPage,
 	waitForTestId,
 } from "pentf/browser_utils";
-import fs from "fs";
-import path from "path";
-import { Request, Page, FrameBase } from "puppeteer";
-
-const readFile = (name: string) => {
-	return fs.readFileSync(
-		path.join(__dirname, ...name.split("/").filter(Boolean)),
-		"utf-8",
-	);
-};
-
-export function mockResponse(req: Request, test: string, file: string) {
-	const mime = file.endsWith(".html")
-		? "text/html"
-		: file.endsWith(".js")
-		? "text/javascript"
-		: file.endsWith(".css")
-		? "text/css"
-		: "text/plain";
-
-	if (req.url().includes(test)) {
-		req.respond({
-			headers: {
-				"Content-Type": mime,
-			},
-			body: readFile(file),
-		});
-		return true;
-	}
-
-	return false;
-}
+import { Page } from "puppeteer";
 
 export interface TestOptions {
 	preact?: string;
@@ -78,7 +47,7 @@ export async function getAttribute$$(
 	await page.waitForSelector(selector);
 	return page.$$eval(
 		selector,
-		(els, propName) => {
+		(els: Element[], propName: any) => {
 			return els.map(el => {
 				return propName in el
 					? (el as any)[propName]
@@ -108,7 +77,11 @@ export async function waitForAttribute(
 	options: any = {},
 ) {
 	await page.waitForFunction(
-		(s, n, v) => {
+		(
+			s: string,
+			n: string,
+			v: string | { source: string; flags: string; type: "regex" },
+		) => {
 			const el = document.querySelector(s);
 			if (el === null) return false;
 			const attr = n in el ? (el as any)[n] : el.getAttribute(n);
@@ -147,7 +120,7 @@ export async function typeText(page: Page, selector: string, text: string) {
 	}
 }
 
-export async function getLog(page: FrameBase) {
+export async function getLog(page: Page) {
 	return (await page.evaluate(() => (window as any).log)) as any[];
 }
 

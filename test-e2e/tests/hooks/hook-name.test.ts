@@ -51,4 +51,12 @@ export async function run(config: any) {
 	await clickNestedText(devtools, /^Effect$/);
 	await devtools.waitForSelector(hooksPanel);
 	expect(await getHooks(devtools)).to.deep.equal([["useEffect", "ƒ ()"]]);
+
+	await clickNestedText(devtools, /^Multiple$/);
+	await devtools.waitForSelector(hooksPanel);
+	expect(await getHooks(devtools)).to.deep.equal([
+		["foo", "0"],
+		["bar", "0"],
+		["baz", "0"],
+	]);
 }
