@@ -58,6 +58,14 @@ function ReducerComponent() {
 	return html`<p>Reducer: ${v}</p>`;
 }
 
+function Multiple() {
+	const [foo, set] = addHookName(useState(0), "foo");
+	const [bar, set2] = addHookName(useState(0), "bar");
+	const [baz, set3] = addHookName(useState(0), "baz");
+
+	return html`<p>multiple: should be valid: ${foo}, ${bar}, ${baz}</p>`;
+}
+
 // Invalid wrappings
 function CallbackOnly() {
 	const cb = addHookName(
@@ -90,14 +98,6 @@ function Effect() {
 	return html`<p>effect: should be invalid</p>`;
 }
 
-function Multiple() {
-	const [foo, set] = addHookName(useState(0), "foo");
-	const [bar, set2] = addHookName(useState(0), "bar");
-	const [baz, set3] = addHookName(useState(0), "baz");
-
-	return html`<p>multiple: should be valid: ${foo}, ${bar}, ${baz}</p>`;
-}
-
 render(
 	html`
 		<${Counter} />
@@ -105,11 +105,11 @@ render(
 		<${ReducerComponent} />
 		<${RefComponent} />
 		<${MemoComponent} />
+		<${Multiple} />
 		<p>Invalid</p>
 		<${CallbackOnly} />
 		<${LayoutEffect} />
 		<${Effect} />
-		<${Multiple} />
 	`,
 	document.getElementById("app"),
 );

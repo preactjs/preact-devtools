@@ -154,7 +154,7 @@ export function parseHookData(
 						hook.type === HookType.useMemo ||
 						hook.type === HookType.useReducer)
 				) {
-					name = userHookNames.pop()!;
+					name = `${name} ${userHookNames.pop()!}`;
 				}
 
 				if (debugValues.has(id)) {
