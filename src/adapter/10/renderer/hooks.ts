@@ -151,6 +151,7 @@ export function parseHookData(
 					userHookNames.length > 0 &&
 					(hook.type === HookType.useState ||
 						hook.type === HookType.useRef ||
+						hook.type === HookType.useMemo ||
 						hook.type === HookType.useReducer)
 				) {
 					name = userHookNames.pop()!;

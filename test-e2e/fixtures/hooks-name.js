@@ -6,6 +6,7 @@ const {
 	useCallback,
 	useRef,
 	useLayoutEffect,
+	useMemo,
 } = preactHooks;
 const { addHookName } = preactDevtools;
 
@@ -39,6 +40,14 @@ function CounterCallback() {
 function RefComponent() {
 	const v = addHookName(useRef(0), "customRef");
 	return html`<p>Ref: ${v.current}</p>`;
+}
+
+function MemoComponent() {
+	const v = addHookName(
+		useMemo(() => 0, []),
+		"customMemo",
+	);
+	return html`<p>Memo: ${v}</p>`;
 }
 
 function ReducerComponent() {
@@ -95,6 +104,7 @@ render(
 		<${CounterCallback} />
 		<${ReducerComponent} />
 		<${RefComponent} />
+		<${MemoComponent} />
 		<p>Invalid</p>
 		<${CallbackOnly} />
 		<${LayoutEffect} />

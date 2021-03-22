@@ -39,6 +39,11 @@ export async function run(config: any) {
 	await devtools.waitForSelector(hooksPanel);
 	expect(await getHooks(devtools)).to.deep.equal([["customRef", "0"]]);
 
+	// useMemo
+	await clickNestedText(devtools, /MemoComponent$/);
+	await devtools.waitForSelector(hooksPanel);
+	expect(await getHooks(devtools)).to.deep.equal([["customMemo", "0"]]);
+
 	// Do nothing for invalid callsites
 	await clickNestedText(devtools, /CallbackOnly$/);
 	await devtools.waitForSelector(hooksPanel);
