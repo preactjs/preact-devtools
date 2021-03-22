@@ -12,7 +12,7 @@ async function type(page: Page, devtools: Page, value: string | number) {
 
 async function waitForResult(page: Page, selector: string, value: string) {
 	await page.waitForFunction(
-		(s, v) => {
+		(s: string, v: string) => {
 			const el = document.querySelector(`[data-testid="${s}"]`);
 			return el !== null ? el.textContent === v : false;
 		},

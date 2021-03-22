@@ -114,6 +114,7 @@ export function parseHookData(
 	config: RendererConfig10,
 	data: HookData[],
 	component: Component,
+	userHookNames: string[],
 ): PropData[] {
 	const tree = new Map<string, PropData>();
 	const root: PropData = {
@@ -147,11 +148,12 @@ export function parseHookData(
 				const depth = hook.stack.length - i - 1;
 				let name = isNative ? type : frame.name;
 				if (
-					(debugNames.length > 0 && hook.type === HookType.useState) ||
-					hook.type === HookType.useRef ||
-					hook.type === HookType.useReducer
+					userHookNames.length > 0 &&
+					(hook.type === HookType.useState ||
+						hook.type === HookType.useRef ||
+						hook.type === HookType.useReducer)
 				) {
-					name = debugNames.pop()!;
+					name = userHookNames.pop()!;
 				}
 
 				if (debugValues.has(id)) {
@@ -301,7 +303,11 @@ export function inspectHooks(
 		(options as any)._skipEffects = (options as any).__s = false;
 	}
 
-	const parsed = hookLog.length ? parseHookData(config, hookLog, c) : null;
+	const parsed = hookLog.length
+		? parseHookData(config, hookLog, c, [...debugNames].reverse())
+		: null;
+
+	debugNames = [];
 
 	inspectingHooks = false;
 	ancestorName = "unknown";
