@@ -9,9 +9,10 @@ import {
 } from "pentf/browser_utils";
 import { assertEventually } from "pentf/assert_utils";
 
-export const description = "Display Suspense in tree view";
-export async function run(config: any) {
-	const { devtools } = await newTestPage(config, "suspense");
+async function runTest(config: any, version: string) {
+	const { devtools } = await newTestPage(config, "suspense", {
+		preact: version,
+	});
 
 	await devtools.waitForSelector(
 		'[data-testid="tree-item"][data-name="Delayed"]',
@@ -27,13 +28,16 @@ export async function run(config: any) {
 	await assertEventually(
 		async () => {
 			const items = await getTreeViewItemNames(devtools);
-			expect(items).to.deep.equal([
-				"Shortly",
-				"Block",
-				"Suspense",
-				"Component", // <10.4.5, newer versions use a Fragment
-				"Block",
-			]);
+			expect(items).to.deep.equal(
+				[
+					"Shortly",
+					"Block",
+					"Suspense",
+					// <10.4.5, newer versions use a Fragment
+					version === "10.4.1" && "Component",
+					"Block",
+				].filter(Boolean),
+			);
 			return true;
 		},
 		{ crashOnError: false, timeout: 2000 },
@@ -66,4 +70,10 @@ export async function run(config: any) {
 	);
 
 	await assertNotTestId(devtools, "suspend-action", { timeout: 2000 });
+}
+
+export const description = "Display Suspense in tree view";
+export async function run(config: any) {
+	await runTest(config, "10.5.9");
+	await runTest(config, "10.4.1");
 }
