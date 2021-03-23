@@ -1,9 +1,9 @@
 const { h, render } = preact;
 const { Suspense } = preactCompat;
-const { useMemo } = preactHooks;
+const { useEffect } = preactHooks;
 
 function withDelay(ms) {
-	useMemo(() => {
+	useEffect(() => {
 		let done = false;
 		const promise = new Promise(resolve => setTimeout(resolve, ms)).then(() => {
 			done = true;
@@ -13,7 +13,9 @@ function withDelay(ms) {
 				throw promise;
 			}
 		};
-	}, [])();
+	}, []);
+
+	return null;
 }
 
 function Block(props) {
