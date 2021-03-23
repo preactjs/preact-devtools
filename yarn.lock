@@ -7016,10 +7016,10 @@ pend@~1.2.0:
   resolved "https://registry.yarnpkg.com/pend/-/pend-1.2.0.tgz#7a57eb550a6783f9115331fcf4663d5c8e007a50"
   integrity sha1-elfrVQpng/kRUzH89GY9XI4AelA=
 
-pentf@^2.4.3:
-  version "2.4.3"
-  resolved "https://registry.yarnpkg.com/pentf/-/pentf-2.4.3.tgz#4dfd258449c159720dc859be9396e2183e7f23ce"
-  integrity sha512-avNLUgGgTEzjd/uQwA8HQV+Lr3Z8/hgXsmFYqvChyFOQig8y0gQkcI+owSGcQzu9KWT7gX6kqe4Ro78fz8KYSg==
+pentf@^2.4.5:
+  version "2.4.5"
+  resolved "https://registry.yarnpkg.com/pentf/-/pentf-2.4.5.tgz#31fe77ccaf7dee61d0b4a9128b88218334dba861"
+  integrity sha512-e/ekxOR6z6axke5lLJcVSqGOa0Zb9PLN9hQ+ab80itdCeYfGBFSJ8dsYwDGQQ2e/AKn631ndtQIJX0l/vUO4Ug==
   dependencies:
     "@sentry/node" "^5.15.5"
     "@types/glob" "^7.1.1"
@@ -9462,10 +9462,10 @@ typedarray@^0.0.6:
   resolved "https://registry.yarnpkg.com/typedarray/-/typedarray-0.0.6.tgz#867ac74e3864187b1d3d47d996a78ec5c8830777"
   integrity sha1-hnrHTjhkGHsdPUfZlqeOxciDB3c=
 
-typescript@^4.0.5:
-  version "4.0.5"
-  resolved "https://registry.yarnpkg.com/typescript/-/typescript-4.0.5.tgz#ae9dddfd1069f1cb5beb3ef3b2170dd7c1332389"
-  integrity sha512-ywmr/VrTVCmNTJ6iV2LwIrfG1P+lv6luD8sUJs+2eI9NLGigaN+nUQc13iHqisq7bra9lnmUSYqbJvegraBOPQ==
+typescript@^4.2.3:
+  version "4.2.3"
+  resolved "https://registry.yarnpkg.com/typescript/-/typescript-4.2.3.tgz#39062d8019912d43726298f09493d598048c1ce3"
+  integrity sha512-qOcYwxaByStAWrBf4x0fibwZvMRG+r4cQoTjbPtUlrWjBHbmCAww1i448U0GJ+3cNNEtebDteo/cHOR3xJ4wEw==
 
 typical@^5.0.0, typical@^5.2.0:
   version "5.2.0"
