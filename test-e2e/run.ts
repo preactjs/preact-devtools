@@ -1,7 +1,7 @@
 import { main } from "pentf";
-import http from "http";
 import child_process from "child_process";
 import path from "path";
+import fetch from "node-fetch";
 import { assertEventually } from "pentf/assert_utils";
 
 (async () => {
@@ -9,19 +9,7 @@ import { assertEventually } from "pentf/assert_utils";
 	const output: string[] = [];
 
 	try {
-		await new Promise<void>((resolve, reject) => {
-			const req = http.request(
-				{
-					href: "http://localhost:8100/",
-					method: "GET",
-				},
-				res => {
-					res.setEncoding("utf-8");
-					res.on("end", resolve);
-				},
-			);
-			req.on("error", err => reject(err));
-		});
+		await fetch("http://localhost:8100", {});
 	} catch (err) {
 		if (/ECONNREFUSED/.test(err.message)) {
 			// eslint-disable-next-line no-console
