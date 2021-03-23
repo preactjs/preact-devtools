@@ -1,4 +1,4 @@
-import { newTestPage } from "../../test-utils";
+import { clickAndWaitForHooks, newTestPage } from "../../test-utils";
 import { expect } from "chai";
 import {
 	assertNotSelector,
@@ -13,8 +13,7 @@ export async function run(config: any) {
 
 	const hooksPanel = '[data-testid="props-row"]';
 
-	await clickNestedText(devtools, "ContextComponent");
-	await devtools.waitForSelector(hooksPanel);
+	await clickAndWaitForHooks(devtools, "ContextComponent");
 
 	let name = await getText(devtools, '[data-testid="prop-name"]');
 	let value = await getText(devtools, '[data-testid="prop-value"]');

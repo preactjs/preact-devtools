@@ -1,4 +1,4 @@
-import { newTestPage, getCount } from "../../test-utils";
+import { newTestPage, getCount, clickAndWaitForHooks } from "../../test-utils";
 import { expect } from "chai";
 import { clickNestedText, getText } from "pentf/browser_utils";
 
@@ -10,8 +10,7 @@ export async function run(config: any) {
 	const row = '[data-testid="props-row"]';
 
 	// State update
-	await clickNestedText(devtools, "Memo");
-	await devtools.waitForSelector(row);
+	await clickAndWaitForHooks(devtools, "Memo");
 
 	const name = await getText(devtools, '[data-testid="prop-name"]');
 	expect(name).to.equal("useMemo");

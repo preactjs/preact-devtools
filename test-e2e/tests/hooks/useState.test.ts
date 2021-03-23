@@ -1,26 +1,14 @@
-import { newTestPage, click } from "../../test-utils";
+import { newTestPage, click, clickAndWaitForHooks } from "../../test-utils";
 import { expect } from "chai";
-import {
-	assertNotSelector,
-	clickNestedText,
-	getAttribute,
-	getText,
-} from "pentf/browser_utils";
+import { assertNotSelector, getAttribute, getText } from "pentf/browser_utils";
 
 export const description = "Inspect useState hook";
 
 export async function run(config: any) {
 	const { page, devtools } = await newTestPage(config, "hooks");
 
-	const hooksPanel = '[data-testid="props-row"]';
-
 	// State update
-	await clickNestedText(devtools, "Counter", {
-		async retryUntil() {
-			return (await devtools.$(hooksPanel)) !== null;
-		},
-	});
-	await devtools.waitForSelector(hooksPanel);
+	await clickAndWaitForHooks(devtools, "Counter");
 
 	const name = await getText(devtools, '[data-testid="prop-name"]');
 	const value = await getAttribute(

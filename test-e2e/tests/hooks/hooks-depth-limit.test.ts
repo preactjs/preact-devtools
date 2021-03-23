@@ -1,4 +1,4 @@
-import { newTestPage } from "../../test-utils";
+import { clickAndWaitForHooks, newTestPage } from "../../test-utils";
 import { waitForTestId, getText, clickNestedText } from "pentf/browser_utils";
 import { expect } from "chai";
 
@@ -11,10 +11,7 @@ export async function run(config: any) {
 	await waitForTestId(devtools, "tree-item");
 
 	// State update
-	await clickNestedText(devtools, "Hook", {
-		timeout: 4000,
-	});
-	await devtools.waitForSelector('[data-testid="props-row"]');
+	await clickAndWaitForHooks(devtools, "Hook");
 
 	await clickNestedText(devtools, "useBrobba");
 	await clickNestedText(devtools, "useBlaBla");

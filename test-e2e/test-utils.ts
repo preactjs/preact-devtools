@@ -322,3 +322,11 @@ export async function getHooks(page: Page): Promise<Array<[string, string]>> {
 		}, []);
 	});
 }
+
+export async function clickAndWaitForHooks(devtools: Page, component: string) {
+	await clickNestedText(devtools, component, {
+		async retryUntil() {
+			return (await devtools.$('[data-testid="props-row"]')) !== null;
+		},
+	});
+}

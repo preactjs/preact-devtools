@@ -1,5 +1,5 @@
-import { newTestPage } from "../../test-utils";
-import { clickNestedText, waitForTestId } from "pentf/browser_utils";
+import { clickAndWaitForHooks, newTestPage } from "../../test-utils";
+import { waitForTestId } from "pentf/browser_utils";
 import { expect } from "chai";
 
 export const description =
@@ -9,13 +9,7 @@ export async function run(config: any) {
 	const { devtools } = await newTestPage(config, "hooks-multiple");
 
 	// State update
-	await clickNestedText(devtools, "App", {
-		retryUntil: async () => {
-			return await devtools.evaluate(
-				() => document.querySelector('[data-testid="Hooks"]') !== null,
-			);
-		},
-	});
+	await clickAndWaitForHooks(devtools, "App");
 
 	await waitForTestId(devtools, "Hooks");
 
