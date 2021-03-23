@@ -4,6 +4,7 @@ import {
 	getAttribute,
 	newPage,
 	waitForTestId,
+	resizePage,
 } from "pentf/browser_utils";
 import { Page } from "puppeteer";
 
@@ -22,6 +23,11 @@ export async function newTestPage(
 
 	// Reset emulation
 	await (page as any)._client.send("Emulation.clearDeviceMetricsOverride");
+
+	await resizePage(config, page, {
+		width: 1280,
+		height: 768,
+	});
 
 	await page.goto(
 		`http://localhost:8100/test?id=${name}&preactVersion=${preactVersion}`,
@@ -314,5 +320,13 @@ export async function getHooks(page: Page): Promise<Array<[string, string]>> {
 
 			return [name, value] as [string, string];
 		}, []);
+	});
+}
+
+export async function clickAndWaitForHooks(devtools: Page, component: string) {
+	await clickNestedText(devtools, component, {
+		async retryUntil() {
+			return (await devtools.$('[data-testid="props-row"]')) !== null;
+		},
 	});
 }

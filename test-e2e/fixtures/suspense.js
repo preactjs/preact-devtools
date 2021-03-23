@@ -1,19 +1,16 @@
 const { h, render } = preact;
 const { Suspense } = preactCompat;
-const { useMemo } = preactHooks;
+
+let loading = true;
 
 function withDelay(ms) {
-	useMemo(() => {
-		let done = false;
-		const promise = new Promise(resolve => setTimeout(resolve, ms)).then(() => {
-			done = true;
-		});
-		return () => {
-			if (!done) {
-				throw promise;
-			}
-		};
-	}, [])();
+	const promise = new Promise(resolve => setTimeout(resolve, ms)).then(() => {
+		loading = false;
+	});
+
+	if (loading) {
+		throw promise;
+	}
 }
 
 function Block(props) {

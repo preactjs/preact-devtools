@@ -1,4 +1,4 @@
-import { newTestPage, getCount } from "../../test-utils";
+import { newTestPage, getCount, clickAndWaitForHooks } from "../../test-utils";
 import { expect } from "chai";
 import { clickNestedText, getAttribute } from "pentf/browser_utils";
 
@@ -10,8 +10,7 @@ export async function run(config: any) {
 	const hooksPanel = '[data-testid="props-row"]';
 
 	// CutomHook
-	await clickNestedText(devtools, "CustomHooks3");
-	await devtools.waitForSelector(hooksPanel);
+	await clickAndWaitForHooks(devtools, "CustomHooks3");
 
 	const isCollapsed = await getAttribute(
 		devtools,
