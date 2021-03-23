@@ -1,10 +1,65 @@
 import { main } from "pentf";
+import http from "http";
+import child_process from "child_process";
+import path from "path";
+import { assertEventually } from "pentf/assert_utils";
 
-// eslint-disable-next-line no-console
-console.log('Be sure to run "yarn dev" in another shell');
+(async () => {
+	let child: child_process.ChildProcess;
+	const output: string[] = [];
 
-main({
-	rootDir: __dirname,
-	testsGlob: "{**/,}*.test.ts",
-	description: "Test my cool application",
-});
+	try {
+		await new Promise<void>((resolve, reject) => {
+			const req = http.request(
+				{
+					href: "http://localhost:8100/",
+					method: "GET",
+				},
+				res => {
+					res.setEncoding("utf-8");
+					res.on("end", resolve);
+				},
+			);
+			req.on("error", err => reject(err));
+		});
+	} catch (err) {
+		if (/ECONNREFUSED/.test(err.message)) {
+			// eslint-disable-next-line no-console
+			console.log("Building extension for tests...");
+			child_process.execSync("npm run build:test", { stdio: "inherit" });
+
+			// eslint-disable-next-line no-console
+			console.log(`No server running at http://localhost:8100/ Starting...`);
+			// eslint-disable-next-line no-console
+			console.log(`(You can start a dev server via "npm run dev")`);
+			child = child_process.spawn("npm", ["run", "serve:tests"], {
+				cwd: path.join(__dirname, ".."),
+				stdio: "pipe",
+			});
+			child.stdout!.on("data", data => output.push(data.toString()));
+			child.stderr!.on("data", data => output.push(data.toString()));
+
+			try {
+				await assertEventually(
+					() => output.some(line => /Listening on/.test(line)),
+					{ timeout: 2000 },
+				);
+			} catch (err) {
+				// eslint-disable-next-line no-console
+				console.log(output);
+				throw err;
+			}
+
+			// eslint-disable-next-line no-console
+			console.log(`Server is ready, starting tests now!`);
+		} else {
+			throw err;
+		}
+	}
+
+	main({
+		rootDir: __dirname,
+		testsGlob: "{**/,}*.test.ts",
+		description: "Test my cool application",
+	});
+})();
