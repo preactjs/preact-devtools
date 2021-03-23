@@ -10,14 +10,26 @@ export async function run(config: any) {
 	});
 
 	const elements = await getText$$(devtools, '[data-testid="tree-item"]');
-	expect(elements).to.deep.equal([
-		"View",
-		"Counter",
-		"Display",
-		"App",
-		"Foobar.Provider",
-		"Foobar.Consumer",
-	]);
+
+	// Ordering is timing sensitive due to iframe loading. We just need
+	// to check that both were loaded, so the order doesn't matter.
+	expect(elements[0]).to.equal("View");
+
+	if (elements[1] === "Counter") {
+		expect(elements.slice(1, 3)).to.deep.equal(["Counter", "Display"]);
+		expect(elements.slice(3)).to.deep.equal([
+			"App",
+			"Foobar.Provider",
+			"Foobar.Consumer",
+		]);
+	} else {
+		expect(elements.slice(1, 4)).to.deep.equal([
+			"App",
+			"Foobar.Provider",
+			"Foobar.Consumer",
+		]);
+		expect(elements.slice(4)).to.deep.equal(["Counter", "Display"]);
+	}
 
 	const highlight = '[data-testid="highlight"]';
 
