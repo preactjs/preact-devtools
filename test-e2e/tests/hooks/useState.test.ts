@@ -15,7 +15,11 @@ export async function run(config: any) {
 	const hooksPanel = '[data-testid="props-row"]';
 
 	// State update
-	await clickNestedText(devtools, "Counter");
+	await clickNestedText(devtools, "Counter", {
+		async retryUntil() {
+			return (await devtools.$(hooksPanel)) !== null;
+		},
+	});
 	await devtools.waitForSelector(hooksPanel);
 
 	const name = await getText(devtools, '[data-testid="prop-name"]');
