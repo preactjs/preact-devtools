@@ -1,5 +1,5 @@
 import { h } from "preact";
-import s from "./Highlighter.css";
+import s from "./Highlighter.module.css";
 import { Measurements } from "../../adapter/dom";
 
 export function css2Border(

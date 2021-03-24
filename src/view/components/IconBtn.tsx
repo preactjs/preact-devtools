@@ -1,5 +1,5 @@
 import { h } from "preact";
-import s from "./IconBtn.css";
+import s from "./IconBtn.module.css";
 import { ComponentChildren } from "preact";
 
 export interface IconBtnProps {

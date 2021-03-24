@@ -1,5 +1,5 @@
 import { h, ComponentChild } from "preact";
-import s from "./Tabs.css";
+import s from "./Tabs.module.css";
 import { useCallback } from "preact/hooks";
 
 export interface TabProps {

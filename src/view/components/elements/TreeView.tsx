@@ -1,5 +1,5 @@
 import { h } from "preact";
-import s from "./TreeView.css";
+import s from "./TreeView.module.css";
 import { useObserver, useStore } from "../../store/react-bindings";
 import { useEffect, useState, useRef, useCallback } from "preact/hooks";
 import { getLastChild } from "../tree/windowing";

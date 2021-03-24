@@ -1,6 +1,6 @@
 import { h, Fragment } from "preact";
 import { SidebarPanel } from "../../../sidebar/SidebarPanel";
-import s from "./CommitInfo.css";
+import s from "./CommitInfo.module.css";
 import { useStore, useObserver } from "../../../../store/react-bindings";
 import { getRoot } from "../../flamegraph/FlamegraphStore";
 

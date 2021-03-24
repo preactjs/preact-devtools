@@ -1,6 +1,6 @@
 import { h } from "preact";
-import s from "../../Devtools.css";
-import s2 from "./Profiler.css";
+import s from "../../Devtools.module.css";
+import s2 from "./Profiler.module.css";
 import { ThemeSwitcher } from "../../ThemeSwitcher";
 import { TimelineBar } from "./TimelineBar/TimelineBar";
 import { FlameGraph } from "../flamegraph/FlameGraph";

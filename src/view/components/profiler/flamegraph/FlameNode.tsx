@@ -1,6 +1,6 @@
 import { h } from "preact";
 import { useRef, useCallback } from "preact/hooks";
-import s from "./FlameGraph.css";
+import s from "./FlameGraph.module.css";
 import { NodeTransform } from "./shared";
 import { ID } from "../../../store/types";
 

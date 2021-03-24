@@ -15,7 +15,7 @@ import {
 	FilterList,
 } from "../icons";
 import { useStore, useObserver } from "../../store/react-bindings";
-import s from "./TreeBar.css";
+import s from "./TreeBar.module.css";
 import { useSearch } from "../../store/search";
 import { OutsideClick } from "../OutsideClick";
 

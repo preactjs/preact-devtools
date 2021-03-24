@@ -1,7 +1,7 @@
 import { h } from "preact";
 import { useStore, useObserver } from "../../../../store/react-bindings";
 import { SidebarPanel, Empty } from "../../../sidebar/SidebarPanel";
-import s from "./RenderedAt.css";
+import s from "./RenderedAt.module.css";
 import { DevNode } from "../../../../store/types";
 
 export function DebugNodeNav() {

@@ -1,5 +1,5 @@
 import { h, Fragment } from "preact";
-import s from "./Sidebar.css";
+import s from "./Sidebar.module.css";
 import { Actions } from "../Actions";
 import { IconBtn } from "../IconBtn";
 import { BugIcon, InspectNativeIcon, CodeIcon, SuspendIcon } from "../icons";

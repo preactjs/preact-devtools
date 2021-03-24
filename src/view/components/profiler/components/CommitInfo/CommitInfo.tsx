@@ -1,7 +1,7 @@
 import { h } from "preact";
 import { SidebarPanel } from "../../../sidebar/SidebarPanel";
 import { formatTime } from "../../util";
-import s from "./CommitInfo.css";
+import s from "./CommitInfo.module.css";
 import { useStore, useObserver } from "../../../../store/react-bindings";
 
 export function CommitInfo() {
