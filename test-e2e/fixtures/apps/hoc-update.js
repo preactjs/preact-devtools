@@ -1,5 +1,7 @@
-const { render, Component } = preact;
-const { memo, forwardRef } = preactCompat;
+import { h, render, Component } from "preact";
+import { memo, forwardRef } from "preact/compat";
+import htm from "htm";
+const html = htm.bind(h);
 
 function Foo() {
 	return html`<div>I am foo</div>`;
