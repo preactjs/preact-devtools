@@ -2,7 +2,7 @@ import { h } from "preact";
 import { useStore, useObserver } from "../../store/react-bindings";
 import { SidebarPanel, Empty } from "./SidebarPanel";
 // @ts-ignore
-import s from "../profiler/components/RenderedAt/RenderedAt.css";
+import s from "../profiler/components/RenderedAt/RenderedAt.module.css";
 
 export function DebugNodeNavTree() {
 	const store = useStore();

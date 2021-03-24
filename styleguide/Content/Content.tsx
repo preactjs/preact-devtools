@@ -1,5 +1,5 @@
 import { h } from "preact";
-import s from "./Content.css";
+import s from "./Content.module.css";
 import { ProfilerDemo } from "../stories/profiler-1.story";
 import { ProfilerDemo2 } from "../stories/profiler-2.story";
 import { ProfilerDemo3 } from "../stories/profiler-3.story";

@@ -1,5 +1,5 @@
 import { h } from "preact";
-import s from "./FlameGraph.css";
+import s from "./FlameGraph.module.css";
 import { useStore, useObserver } from "../../../store/react-bindings";
 import { useRef, useCallback, useState, useEffect } from "preact/hooks";
 import { FlamegraphType } from "../data/commits";

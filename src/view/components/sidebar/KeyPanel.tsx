@@ -1,6 +1,6 @@
 import { h } from "preact";
 import { SidebarPanel } from "./SidebarPanel";
-import s from "./KeyPanel.css";
+import s from "./KeyPanel.module.css";
 
 export interface Props {
 	onCopy: () => void;

@@ -1,5 +1,5 @@
 import { h } from "preact";
-import s from "./HocPanel.css";
+import s from "./HocPanel.module.css";
 
 export interface Props {
 	hocs: string[];

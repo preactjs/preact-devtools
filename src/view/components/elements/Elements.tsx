@@ -3,7 +3,7 @@ import { TreeBar } from "./TreeBar";
 import { TreeView } from "./TreeView";
 import { SidebarActions } from "../sidebar/SidebarActions";
 import { Sidebar } from "../sidebar/Sidebar";
-import s from "../Devtools.css";
+import s from "../Devtools.module.css";
 import { SidebarLayout } from "../SidebarLayout";
 
 export function Elements() {

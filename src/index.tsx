@@ -1,4 +1,4 @@
-import "./global.css";
+import "./global.module.css";
 import { initPreact10, renderExamples10 } from "./examples/10/setup";
 import { DevtoolsHook, createHook } from "./adapter/hook";
 import { setupFrontendStore } from "./examples/inline-devtools/setup";
@@ -6,7 +6,7 @@ import { h, render } from "preact";
 import { useState } from "preact/hooks";
 import { DevTools } from "./view/components/Devtools";
 import { CommitTimeline } from "./view/components/profiler/components/CommitTimeline/CommitTimeline";
-import s from "./view/components/Devtools.css";
+import s from "./view/components/Devtools.module.css";
 import { createPortForHook } from "./adapter/adapter/port";
 
 function div(id: string) {

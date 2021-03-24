@@ -1,5 +1,5 @@
 import { h } from "preact";
-import s from "./App.css";
+import s from "./App.module.css";
 import { ThemeSwitcher } from "../ThemeSwitcher/ThemeSwitcher";
 import { Content, stories } from "../Content/Content";
 import { useState } from "preact/hooks";

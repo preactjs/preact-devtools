@@ -1,5 +1,5 @@
 import { h, ComponentChildren } from "preact";
-import s from "./Actions.css";
+import s from "./Actions.module.css";
 
 export interface Props {
 	class?: string;

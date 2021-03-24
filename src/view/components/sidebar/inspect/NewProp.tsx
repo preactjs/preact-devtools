@@ -1,8 +1,8 @@
 import { h } from "preact";
 import { useState, useCallback } from "preact/hooks";
 import { DataInput } from "../../DataInput";
-import s from "./NewProp.css";
-import s2 from "./ElementProps.css";
+import s from "./NewProp.module.css";
+import s2 from "./ElementProps.module.css";
 
 export interface NewPropProps {
 	onChange: (value: any, path: string) => void;

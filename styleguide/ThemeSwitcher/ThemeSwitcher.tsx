@@ -1,6 +1,6 @@
 import { h } from "preact";
 import { useState } from "preact/hooks";
-import s from "./ThemeSwitcher.css";
+import s from "./ThemeSwitcher.module.css";
 
 export function ThemeSwitcher() {
 	const [theme, setTheme] = useState<"light" | "dark">(

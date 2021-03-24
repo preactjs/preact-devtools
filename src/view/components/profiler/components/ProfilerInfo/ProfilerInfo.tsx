@@ -1,6 +1,6 @@
 import { h } from "preact";
 import { useStore, useObserver } from "../../../../store/react-bindings";
-import s from "./ProfilerInfo.css";
+import s from "./ProfilerInfo.module.css";
 import { RecordBtn } from "../TimelineBar/TimelineBar";
 
 export function ProfilerInfo() {

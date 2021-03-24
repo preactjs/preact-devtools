@@ -1,5 +1,5 @@
 import { h } from "preact";
-import s from "./RadioBar.css";
+import s from "./RadioBar.module.css";
 
 export interface RadioBarProps {
 	value: string;
