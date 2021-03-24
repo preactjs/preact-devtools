@@ -1,5 +1,8 @@
-const { render } = preact;
+import htm from "htm";
+const { render, h } = preact;
 const { useState } = preactHooks;
+
+const html = htm.bind(h);
 
 function TodoItem(props) {
 	return html`
@@ -40,9 +43,7 @@ function TodoList() {
 				value=${value}
 				onChange=${e => setValue(e.target.value)}
 			/>
-			<button type="submit">
-				submit
-			</button>
+			<button type="submit">submit</button>
 			<ul>
 				${todos.map(
 					(item, i) =>

@@ -4,11 +4,7 @@ const { useState } = preactHooks;
 function SymbolComponent() {
 	const [v] = useState(Symbol("foobar"));
 
-	return html`
-		<div style="padding: 2rem;">
-			${v.toString()}
-		</div>
-	`;
+	return html` <div style="padding: 2rem;">${v.toString()}</div> `;
 }
 
 function Child(props) {

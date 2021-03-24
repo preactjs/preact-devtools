@@ -1,0 +1,67 @@
+* {
+	box-sizing: inherit;
+}
+
+html,
+body {
+	padding: 0;
+	margin: 0;
+	font-family: -apple-system, BlinkMacSystemFont, avenir next, avenir, segoe ui,
+		helvetica neue, helvetica, Ubuntu, roboto, noto, arial, sans-serif;
+}
+
+.container {
+	max-width: 80ch;
+	margin: 0 auto;
+}
+
+a {
+	font-size: 1.2rem;
+	margin: 0.2rem;
+	display: inline-block;
+}
+
+.test-header {
+	padding: 0.75rem 0;
+	border-bottom: 0.0625rem solid #aaa;
+}
+
+.test-header-inner {
+	display: grid;
+	grid-gap: 0.5rem;
+	grid-template-columns: repeat(2, minmax(0, max-content));
+}
+
+/* Test area */
+#wrapper {
+	width: 100vw;
+	position: relative;
+	height: 100%;
+	overflow: hidden;
+}
+
+.test-case {
+	height: 50vh;
+	width: 100%;
+	overflow: auto;
+}
+
+#devtools {
+	height: 50vh;
+	/*
+	 * Account for parent window scrollbar, yes there
+	 * will be a gap.
+	 */
+	width: calc(100% - 2rem);
+	padding: 0;
+	margin: 0;
+	border: none;
+	display: block;
+}
+
+@media (min-width: 40rem) {
+	.test-header-inner {
+		grid-gap: 1rem;
+		grid-template-columns: repeat(4, minmax(0, max-content));
+	}
+}

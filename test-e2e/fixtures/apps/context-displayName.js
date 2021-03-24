@@ -7,9 +7,7 @@ Ctx.displayName = "Foobar";
 function App() {
 	return html`
 		<${Ctx.Provider} value="foobar">
-			<${Ctx.Consumer}>
-				${v => `value: ${v}`}
-			<//>
+			<${Ctx.Consumer}> ${v => `value: ${v}`} <//>
 		<//>
 	`;
 }

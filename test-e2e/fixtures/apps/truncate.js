@@ -3,11 +3,7 @@ const { h, render } = preact;
 const Child = () => null;
 
 function App() {
-	return html`
-		<div>
-			Element
-		</div>
-	`;
+	return html` <div>Element</div> `;
 }
 
 render(

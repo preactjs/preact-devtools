@@ -11,9 +11,7 @@ function Wrapped(props) {
 }
 
 const Forward = forwardRef(function Bar(props, ref) {
-	return html`<div ...${props} ref=${ref}>
-		forward
-	</div>`;
+	return html`<div ...${props} ref=${ref}>forward</div>`;
 });
 
 function withBoof(Comp) {

@@ -12,15 +12,11 @@ function Last() {
 const MemoLast = memo(Last);
 
 const Forward = forwardRef(function Bar(props, ref) {
-	return html`<div ...${props} ref=${ref}>
-		forward
-	</div>`;
+	return html`<div ...${props} ref=${ref}>forward</div>`;
 });
 
 const ForwardAnonym = forwardRef((props, ref) => {
-	return html`<div ...${props} ref=${ref}>
-		forward anonymous
-	</div>`;
+	return html`<div ...${props} ref=${ref}>forward anonymous</div>`;
 });
 
 function withBoof(Comp) {

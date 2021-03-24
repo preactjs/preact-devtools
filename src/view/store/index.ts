@@ -17,7 +17,7 @@ export function createStore(): Store {
 		listeners.forEach(fn => fn && fn(name, data));
 	};
 
-	const debugMode = valoo(process.env.DEBUG === "true");
+	const debugMode = valoo(import.meta.env.DEBUG);
 
 	const nodes = valoo<Map<ID, DevNode>>(new Map());
 	const roots = valoo<ID[]>([]);
