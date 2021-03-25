@@ -9,8 +9,8 @@
 		<header class="test-header">
 			<div class="container">
 				<form class="test-header-inner">
-					<label for="test-case">Test</label>
-					<select id="test-case"></select>
+					<label for="fixture">Fixture</label>
+					<select id="fixture"></select>
 					<label for="preact-version">Preact</label>
 					<select id="preact-version"></select>
 				</form>
@@ -18,8 +18,10 @@
 		</header>
 		<div id="wrapper">
 			<div class="test-case">
-				<div id="app"></div>
-				<div id="app2"></div>
+				<div class="test-case-inner">
+					<div id="app"></div>
+					<div id="app2"></div>
+				</div>
 			</div>
 			<iframe id="devtools" src="./devtools.html"></iframe>
 		</div>

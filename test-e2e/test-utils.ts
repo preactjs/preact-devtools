@@ -7,6 +7,7 @@ import {
 	resizePage,
 } from "pentf/browser_utils";
 import { Page } from "puppeteer";
+import { getPreactVersions } from "./fixtures/utils";
 
 export interface TestOptions {
 	preact?: string;
@@ -19,7 +20,9 @@ export async function newTestPage(
 ) {
 	const page = await newPage(config);
 
-	const preactVersion = options.preact ? options.preact : "10.5.9";
+	const preactVersion = options.preact
+		? options.preact
+		: getPreactVersions()[0];
 
 	// Reset emulation
 	await (page as any)._client.send("Emulation.clearDeviceMetricsOverride");
@@ -30,7 +33,7 @@ export async function newTestPage(
 	});
 
 	await page.goto(
-		`http://localhost:8100/test?id=${name}&preactVersion=${preactVersion}`,
+		`http://localhost:8100/?fixtures=${name}&preact=${preactVersion}`,
 	);
 
 	// Grab devtools that's inside the iframe

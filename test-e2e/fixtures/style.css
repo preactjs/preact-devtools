@@ -10,6 +10,25 @@ body {
 		helvetica neue, helvetica, Ubuntu, roboto, noto, arial, sans-serif;
 }
 
+:root {
+	--color-bg: white;
+	--color-text: #222;
+	--color-header-bg: #d6d6d6;
+}
+
+@media (prefers-color-scheme: dark) {
+	:root {
+		--color-bg: #242424;
+		--color-text: #b0b0b0;
+		--color-header-bg: #474747;
+	}
+}
+
+body {
+	background: var(--color-bg);
+	color: var(--color-text);
+}
+
 .container {
 	max-width: 80ch;
 	margin: 0 auto;
@@ -22,8 +41,8 @@ a {
 }
 
 .test-header {
-	padding: 0.75rem 0;
-	border-bottom: 0.0625rem solid #aaa;
+	padding: 0.75rem;
+	background: var(--color-header-bg);
 }
 
 .test-header-inner {
@@ -46,13 +65,13 @@ a {
 	overflow: auto;
 }
 
+.test-case-inner {
+	padding: 2rem;
+}
+
 #devtools {
 	height: 50vh;
-	/*
-	 * Account for parent window scrollbar, yes there
-	 * will be a gap.
-	 */
-	width: calc(100% - 2rem);
+	width: 100%;
 	padding: 0;
 	margin: 0;
 	border: none;
@@ -63,5 +82,6 @@ a {
 	.test-header-inner {
 		grid-gap: 1rem;
 		grid-template-columns: repeat(4, minmax(0, max-content));
+		justify-content: center;
 	}
 }

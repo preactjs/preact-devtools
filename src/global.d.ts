@@ -3,6 +3,10 @@ declare module "*.css" {
 	export default styles;
 }
 
+declare module "@preact-list-versions" {
+	export const preactVersions: string[];
+}
+
 interface ImportMeta {
 	env: {
 		DEBUG: boolean;

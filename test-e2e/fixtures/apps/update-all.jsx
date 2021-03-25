@@ -1,4 +1,4 @@
-import { h, render, Component, createContext } from "preact";
+import { h, Fragment, render, Component, createContext } from "preact";
 
 let lastState;
 class State extends Component {
@@ -74,12 +74,12 @@ class LegacyContext extends Component {
 
 function App() {
 	return (
-		<>
+		<Fragment>
 			<Props value={0} />
 			<State />
 			<Context />
 			<LegacyContext />
-		</>
+		</Fragment>
 	);
 }
 
