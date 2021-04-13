@@ -12,7 +12,7 @@
 		"build:firefox": "rimraf dist/firefox/ dist/firefox.zip && cross-env BROWSER=firefox rollup -c && cross-env BROWSER=firefox node tools/build.js && npm run archive",
 		"build:inline": "rimraf dist/inline/ && cross-env BROWSER=inline rollup -c",
 		"build:test": "rimraf test-e2e/fixtures/extension/ && cross-env BROWSER=test rollup -c",
-		"archive": "git archive --format zip --output dist/source-code.zip master",
+		"archive": "git archive --format zip --output dist/source-code.zip main",
 		"lint": "eslint 'src/**/*.{ts,tsx}' 'test-e2e/**/*.ts'",
 		"test": "mochette -c tsconfig.cjs.json 'src/**/*.test.{ts,tsx}'",
 		"test-e2e": "cross-env TS_NODE_PROJECT=tsconfig.cjs.json ts-node test-e2e/run.ts --default-timeout 2000",
