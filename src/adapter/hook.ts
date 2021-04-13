@@ -97,7 +97,7 @@ export function createHook(port: PortPageHook): DevtoolsHook {
 		status = "pending";
 		send("init", null);
 
-		listen("initialized", () => {
+		listen("init", () => {
 			status = "connected";
 			multi.flushInitial();
 		});
