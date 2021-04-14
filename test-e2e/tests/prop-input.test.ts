@@ -1,4 +1,12 @@
-import { newTestPage, typeText, getLog, click, doesExist } from "../test-utils";
+import {
+	newTestPage,
+	typeText,
+	getLog,
+	click,
+	doesExist,
+	clickTreeItem,
+	moveMouseAbs,
+} from "../test-utils";
 import { expect } from "chai";
 import {
 	assertNotTestId,
@@ -30,12 +38,14 @@ async function enterText(
 	text: string,
 ) {
 	await click(page, "button");
-	await clickNestedText(devtools, "Display");
+	await clickTreeItem(devtools, "Display");
 	await assertNotTestId(devtools, "undo-btn");
 
 	await devtools.waitForSelector(selector, { timeout: 3000 });
 	await typeText(devtools, selector, text);
 	await page.keyboard.press("Enter");
+	await moveMouseAbs(page, 100, 100);
+
 	await clickNestedText(page, "Counter");
 
 	await wait(50);
@@ -55,7 +65,7 @@ async function enterText(
 export async function run(config: any) {
 	const { page, devtools } = await newTestPage(config, "data-input");
 
-	await clickNestedText(devtools, "Display");
+	await clickTreeItem(devtools, "Display");
 	await waitForTestId(devtools, "props-row", { timeout: 2000 });
 
 	const input = 'input[name="root.value"]';

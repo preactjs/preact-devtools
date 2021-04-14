@@ -1,6 +1,7 @@
 import { newTestPage, getCount, clickAndWaitForHooks } from "../../test-utils";
 import { expect } from "chai";
 import { clickNestedText, getAttribute } from "pentf/browser_utils";
+import { waitForPass } from "pentf/assert_utils";
 
 export const description = "Inspect custom hooks";
 
@@ -23,10 +24,14 @@ export async function run(config: any) {
 	await clickNestedText(devtools, "useFoo");
 	expect(await getCount(devtools, hooksPanel)).to.equal(2);
 
-	await clickNestedText(devtools, "useBar");
-	expect(await getCount(devtools, hooksPanel)).to.equal(4);
+	await waitForPass(async () => {
+		await clickNestedText(devtools, "useBar");
+		expect(await getCount(devtools, hooksPanel)).to.equal(4);
+	});
 
 	// Collapse all hooks
-	await clickNestedText(devtools, "useFoo");
-	expect(await getCount(devtools, hooksPanel)).to.equal(1);
+	await waitForPass(async () => {
+		await clickNestedText(devtools, "useFoo");
+		expect(await getCount(devtools, hooksPanel)).to.equal(1);
+	});
 }

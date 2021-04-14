@@ -5,7 +5,7 @@ import {
 	clickTestId,
 	waitForTestId,
 } from "pentf/browser_utils";
-import { assertEventually } from "pentf/assert_utils";
+import { assertEventually, waitForPass } from "pentf/assert_utils";
 
 export const description = "HOC-Component filter should be behind feature flag";
 
@@ -34,26 +34,23 @@ export async function run(config: any) {
 	await clickTestId(devtools, "toggle-experimental-filters");
 	await clickTab(devtools, "ELEMENTS");
 
-	await assertEventually(
-		async () => {
-			const items = await devtools.evaluate(() => {
-				return Array.from(
-					document.querySelectorAll('[data-testid="tree-item"]'),
-				).map(el => el.getAttribute("data-name"));
-			});
+	await waitForPass(async () => {
+		const items = await devtools.evaluate(() => {
+			return Array.from(
+				document.querySelectorAll('[data-testid="tree-item"]'),
+			).map(el => el.getAttribute("data-name"));
+		});
 
-			expect(items).to.deep.equal([
-				"Memo(Foo)",
-				"Foo",
-				"ForwardRef(Bar)",
-				"ForwardRef()",
-				"withBoof(Foo)",
-				"Foo",
-				"withBoof(Memo(Last))",
-				"Memo(Last)",
-				"Last",
-			]);
-		},
-		{ crashOnError: false },
-	);
+		expect(items).to.deep.equal([
+			"Memo(Foo)",
+			"Foo",
+			"ForwardRef(Bar)",
+			"ForwardRef()",
+			"withBoof(Foo)",
+			"Foo",
+			"withBoof(Memo(Last))",
+			"Memo(Last)",
+			"Last",
+		]);
+	});
 }

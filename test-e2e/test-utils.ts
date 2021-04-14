@@ -1,3 +1,5 @@
+import { waitForPass } from "pentf/assert_utils";
+import { expect } from "chai";
 import {
 	clickNestedText,
 	clickTestId,
@@ -10,6 +12,7 @@ import {
 } from "pentf/browser_utils";
 import { Page } from "puppeteer";
 import { getPreactVersions } from "./fixtures/utils";
+import { wait } from "pentf/utils";
 
 export interface TestOptions {
 	preact?: string;
@@ -129,6 +132,8 @@ export async function typeText(page: Page, selector: string, text: string) {
 	} else {
 		await page.keyboard.press("Delete");
 	}
+
+	await wait(500);
 }
 
 export async function getLog(page: Page) {
@@ -330,10 +335,45 @@ export async function getHooks(page: Page): Promise<Array<[string, string]>> {
 	});
 }
 
+export async function clickTreeItem(page: Page, name: string) {
+	await clickSelector(
+		page,
+		`[data-testid="elements-tree"] [data-name="${name}"]`,
+	);
+}
+
 export async function clickAndWaitForHooks(devtools: Page, component: string) {
-	await clickNestedText(devtools, component, {
-		async retryUntil() {
-			return (await devtools.$('[data-testid="props-row"]')) !== null;
-		},
+	await waitForPass(async () => {
+		await clickTreeItem(devtools, component);
+		expect(await devtools.$('[data-testid="props-row"]')).not.to.equal(null);
+	});
+}
+
+export async function moveMouseAbs(page: Page, x: number, y: number) {
+	const { _x, _y } = page.mouse as any;
+	await page.mouse.move(_x - x, _y - y);
+}
+
+export async function getProps(page: Page) {
+	return await page.evaluate(() => {
+		const names = Array.from(
+			document.querySelectorAll(`[data-testid="prop-name"]`),
+		).map(x => x.textContent || "");
+
+		const values = Array.from(
+			document.querySelectorAll(`[data-testid="prop-value"]`),
+		).map(x => x.textContent || "");
+
+		return names.reduce<Record<string, string>>((acc, name, i) => {
+			acc[name] = values[i];
+			return acc;
+		}, {});
+	});
+}
+
+export async function waitForProp(page: Page, name: string, value: string) {
+	await waitForPass(async () => {
+		const props = await getProps(page);
+		expect(props[name]).to.equal(value);
 	});
 }

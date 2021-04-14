@@ -1,7 +1,7 @@
-import { newTestPage, getText$$, getSize } from "../test-utils";
+import { newTestPage, getText$$ } from "../test-utils";
 import { expect } from "chai";
-import { wait } from "pentf/utils";
 import { waitFor } from "pentf/assert_utils";
+import { waitForSelector } from "pentf/browser_utils";
 
 export const description = "Mirror component state to the devtools";
 
@@ -11,7 +11,7 @@ export async function run(config: any) {
 	let elements: string[] = [];
 	await waitFor(async () => {
 		const found = await getText$$(devtools, '[data-testid="tree-item"]');
-		if (found.length > 0) {
+		if (found.length === 6) {
 			elements = found;
 			return true;
 		}
@@ -43,29 +43,13 @@ export async function run(config: any) {
 
 	// Display
 	await devtools.hover('[data-name="Display"]');
-	await page.waitForSelector(highlight);
 
-	await wait(100);
-
-	let size = await getSize(page, highlight);
-	let iframeSize = await getSize(page, 'iframe[src="/iframe.html"]');
-
-	expect(size.top > iframeSize.top).to.equal(true, "top");
-	expect(size.left > iframeSize.left).to.equal(true, "left");
-	expect(size.right < iframeSize.right).to.equal(true, "right");
-	expect(size.bottom < iframeSize.bottom).to.equal(true, "bottom");
+	const frames = await page.frames();
+	const iframe1 = frames.find(frame => frame.url().endsWith("iframe.html"));
+	await waitForSelector(iframe1 as any, highlight, { timeout: 2000 });
 
 	// Foobar.Consumer
 	await devtools.hover('[data-name="Foobar.Consumer"]');
-	await page.waitForSelector(highlight);
-
-	await wait(100);
-
-	size = await getSize(page, highlight);
-	iframeSize = await getSize(page, 'iframe[src="/iframe2.html"]');
-
-	expect(size.top > iframeSize.top).to.equal(true, "top");
-	expect(size.left > iframeSize.left).to.equal(true, "left");
-	expect(size.right < iframeSize.right).to.equal(true, "right");
-	expect(size.bottom < iframeSize.bottom).to.equal(true, "bottom");
+	const iframe2 = frames.find(frame => frame.url().endsWith("iframe.html"));
+	await waitForSelector(iframe2 as any, highlight);
 }

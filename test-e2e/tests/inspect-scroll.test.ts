@@ -1,4 +1,10 @@
-import { newTestPage, getSize, click, hasSelector } from "../test-utils";
+import {
+	newTestPage,
+	getSize,
+	click,
+	hasSelector,
+	moveMouseAbs,
+} from "../test-utils";
 import { expect } from "chai";
 import { waitForTestId } from "pentf/browser_utils";
 import { waitForPass } from "pentf/assert_utils";
@@ -24,9 +30,8 @@ export async function run(config: any) {
 		expect(await hasSelector(page, highlight)).to.equal(false);
 	});
 
+	await moveMouseAbs(page, 100, 100);
 	await waitForPass(async () => {
-		await page.mouse.move(10, 10);
-
 		expect(await hasSelector(page, highlight)).to.equal(true);
 	});
 

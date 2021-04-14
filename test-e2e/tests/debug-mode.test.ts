@@ -6,7 +6,7 @@ import {
 	getAttribute,
 	waitForTestId,
 } from "pentf/browser_utils";
-import { wait } from "pentf/utils";
+import { waitForPass } from "pentf/assert_utils";
 
 export const description = "Debug mode toggles debug views";
 
@@ -37,15 +37,15 @@ export async function run(config: any) {
 	await clickTab(devtools, "SETTINGS");
 	await click(devtools, '[data-testid="toggle-debug-mode"]');
 
-	await wait(100);
-
-	expect(
-		await getAttribute(
-			devtools,
-			'[data-testid="toggle-debug-mode"]',
-			"checked",
-		),
-	).to.equal(true);
+	await waitForPass(async () => {
+		expect(
+			await getAttribute(
+				devtools,
+				'[data-testid="toggle-debug-mode"]',
+				"checked",
+			),
+		).to.equal(true);
+	});
 	await clickTab(devtools, "PROFILER");
 
 	await waitForTestId(devtools, "profiler-debug-stats");

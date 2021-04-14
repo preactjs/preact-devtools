@@ -115,6 +115,14 @@ async function waitForDevtoolsInit() {
 		) {
 			log.push(e.data);
 			window.postMessage({ ...e.data, _forwarded: true }, "*");
+			Array.from(document.querySelectorAll("iframe")).forEach(iframe => {
+				if (iframe.id !== "devtools") {
+					iframe.contentWindow.postMessage(
+						{ ...e.data, _forwarded: true },
+						"*",
+					);
+				}
+			});
 		}
 	});
 
@@ -123,4 +131,5 @@ async function waitForDevtoolsInit() {
 	document.querySelector("iframe").contentWindow.postMessage("foobar", "*");
 
 	await loadFixture();
+	document.querySelector("iframe").contentWindow.postMessage("foobar", "*");
 })();
