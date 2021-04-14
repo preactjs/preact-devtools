@@ -1,5 +1,6 @@
 import { newTestPage } from "../test-utils";
-import { assertEventually } from "pentf/assert_utils";
+import { waitFor } from "pentf/assert_utils";
+import { waitForSelector } from "pentf/browser_utils";
 
 export const description =
 	"Pressing Enter should scroll marked results into view during search #162";
@@ -7,7 +8,7 @@ export const description =
 export async function run(config: any) {
 	const { page, devtools } = await newTestPage(config, "deep-tree");
 
-	await devtools.waitForSelector('[data-name="App"]');
+	await waitForSelector(devtools, '[data-name="App"]');
 	await devtools.type('[data-testid="element-search"]', "Child");
 
 	// Press Enter a bunch of times
@@ -15,7 +16,7 @@ export async function run(config: any) {
 		await page.keyboard.press("Enter");
 	}
 
-	await assertEventually(async () => {
+	await waitFor(async () => {
 		const marked = await devtools.$("[data-marked]");
 		if (!marked) return false;
 		return await marked!.isIntersectingViewport();

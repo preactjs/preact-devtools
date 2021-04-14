@@ -1,0 +1,89 @@
+* {
+	box-sizing: inherit;
+}
+
+html,
+body {
+	padding: 0;
+	margin: 0;
+	font-family: -apple-system, BlinkMacSystemFont, avenir next, avenir, segoe ui,
+		helvetica neue, helvetica, Ubuntu, roboto, noto, arial, sans-serif;
+}
+
+:root {
+	--color-bg: white;
+	--color-text: #222;
+	--color-header-bg: #d6d6d6;
+}
+
+@media (prefers-color-scheme: dark) {
+	:root {
+		--color-bg: #242424;
+		--color-text: #b0b0b0;
+		--color-header-bg: #474747;
+	}
+}
+
+body {
+	background: var(--color-bg);
+	color: var(--color-text);
+	overflow: hidden;
+}
+
+.container {
+	max-width: 80ch;
+	margin: 0 auto;
+}
+
+a {
+	font-size: 1.2rem;
+	margin: 0.2rem;
+	display: inline-block;
+}
+
+.test-header {
+	padding: 0.75rem;
+	background: var(--color-header-bg);
+}
+
+.test-header-inner {
+	display: grid;
+	grid-gap: 0.5rem;
+	grid-template-columns: repeat(2, minmax(0, max-content));
+}
+
+/* Test area */
+#wrapper {
+	width: 100vw;
+	position: relative;
+	height: 100%;
+	overflow: hidden;
+}
+
+.test-case {
+	/* Account for header height */
+	height: calc(50vh - 2.75rem);
+	width: 100%;
+	overflow: auto;
+}
+
+.test-case-inner {
+	padding: 2rem;
+}
+
+#devtools {
+	height: 50vh;
+	width: 100%;
+	padding: 0;
+	margin: 0;
+	border: none;
+	display: block;
+}
+
+@media (min-width: 40rem) {
+	.test-header-inner {
+		grid-gap: 1rem;
+		grid-template-columns: repeat(4, minmax(0, max-content));
+		justify-content: center;
+	}
+}

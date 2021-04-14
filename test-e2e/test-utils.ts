@@ -1,3 +1,5 @@
+import { waitForPass } from "pentf/assert_utils";
+import { expect } from "chai";
 import {
 	clickNestedText,
 	clickTestId,
@@ -5,8 +7,12 @@ import {
 	newPage,
 	waitForTestId,
 	resizePage,
+	clickSelector,
+	waitForSelector,
 } from "pentf/browser_utils";
 import { Page } from "puppeteer";
+import { getPreactVersions } from "./fixtures/utils";
+import { wait } from "pentf/utils";
 
 export interface TestOptions {
 	preact?: string;
@@ -19,7 +25,9 @@ export async function newTestPage(
 ) {
 	const page = await newPage(config);
 
-	const preactVersion = options.preact ? options.preact : "10.5.9";
+	const preactVersion = options.preact
+		? options.preact
+		: getPreactVersions()[0];
 
 	// Reset emulation
 	await (page as any)._client.send("Emulation.clearDeviceMetricsOverride");
@@ -30,7 +38,7 @@ export async function newTestPage(
 	});
 
 	await page.goto(
-		`http://localhost:8100/test?id=${name}&preactVersion=${preactVersion}`,
+		`http://localhost:8100/?fixtures=${name}&preact=${preactVersion}`,
 	);
 
 	// Grab devtools that's inside the iframe
@@ -124,6 +132,8 @@ export async function typeText(page: Page, selector: string, text: string) {
 	} else {
 		await page.keyboard.press("Delete");
 	}
+
+	await wait(500);
 }
 
 export async function getLog(page: Page) {
@@ -131,6 +141,7 @@ export async function getLog(page: Page) {
 }
 
 export async function getSize(page: Page, selector: string) {
+	await waitForSelector(page, selector);
 	return page.$eval(selector, el => {
 		const rect = el.getBoundingClientRect();
 		return {
@@ -194,8 +205,9 @@ export async function getActiveTab(page: Page): Promise<DevtoolsTab> {
 
 export async function clickRecordButton(page: Page) {
 	const selector = '[data-testid="record-btn"]';
+	await waitForSelector(page, selector);
 	const start = /Start/.test(await getAttribute(page, selector, "title"));
-	await click(page, selector);
+	await clickSelector(page, selector);
 
 	await waitForAttribute(
 		page,
@@ -323,10 +335,45 @@ export async function getHooks(page: Page): Promise<Array<[string, string]>> {
 	});
 }
 
+export async function clickTreeItem(page: Page, name: string) {
+	await clickSelector(
+		page,
+		`[data-testid="elements-tree"] [data-name="${name}"]`,
+	);
+}
+
 export async function clickAndWaitForHooks(devtools: Page, component: string) {
-	await clickNestedText(devtools, component, {
-		async retryUntil() {
-			return (await devtools.$('[data-testid="props-row"]')) !== null;
-		},
+	await waitForPass(async () => {
+		await clickTreeItem(devtools, component);
+		expect(await devtools.$('[data-testid="props-row"]')).not.to.equal(null);
+	});
+}
+
+export async function moveMouseAbs(page: Page, x: number, y: number) {
+	const { _x, _y } = page.mouse as any;
+	await page.mouse.move(_x - x, _y - y);
+}
+
+export async function getProps(page: Page) {
+	return await page.evaluate(() => {
+		const names = Array.from(
+			document.querySelectorAll(`[data-testid="prop-name"]`),
+		).map(x => x.textContent || "");
+
+		const values = Array.from(
+			document.querySelectorAll(`[data-testid="prop-value"]`),
+		).map(x => x.textContent || "");
+
+		return names.reduce<Record<string, string>>((acc, name, i) => {
+			acc[name] = values[i];
+			return acc;
+		}, {});
+	});
+}
+
+export async function waitForProp(page: Page, name: string, value: string) {
+	await waitForPass(async () => {
+		const props = await getProps(page);
+		expect(props[name]).to.equal(value);
 	});
 }

@@ -1,22 +1,20 @@
-import { newTestPage, clickTab } from "../../test-utils";
+import { newTestPage, clickTab, clickRecordButton } from "../../test-utils";
 import { getText, waitForTestId, clickTestId } from "pentf/browser_utils";
 import { expect } from "chai";
 
 export const description = "Display single child stats";
 
 export async function run(config: any) {
-	const { page, devtools } = await newTestPage(config, "simple-stats", {
-		preact: "next",
-	});
+	const { page, devtools } = await newTestPage(config, "simple-stats");
 
 	await clickTab(devtools, "STATISTICS");
 	await waitForTestId(devtools, "stats-info");
 
-	await clickTestId(devtools, "record-btn");
+	await clickRecordButton(devtools);
 	await waitForTestId(devtools, "stats-info-recording");
 
 	await clickTestId(page, "update");
-	await clickTestId(devtools, "record-btn");
+	await clickRecordButton(devtools);
 
 	const classComponents = await getText(
 		devtools,

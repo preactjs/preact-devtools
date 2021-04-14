@@ -1,7 +1,7 @@
 import { enableHOCFilter, newTestPage } from "../test-utils";
 import { expect } from "chai";
 import { clickNestedText, waitForTestId } from "pentf/browser_utils";
-import { assertEventually } from "pentf/assert_utils";
+import { waitForPass } from "pentf/assert_utils";
 
 export const description = "HOC-Component filter should flatten tree";
 
@@ -35,11 +35,11 @@ export async function run(config: any) {
 
 	await clickNestedText(devtools, "Last");
 
-	await assertEventually(
+	await waitForPass(
 		async () => {
 			const hocs2 = await getSidebarHocs();
 			expect(hocs2).to.deep.equal(["withBoof", "Memo"]);
 		},
-		{ timeout: 2000, crashOnError: false },
+		{ timeout: 2000 },
 	);
 }

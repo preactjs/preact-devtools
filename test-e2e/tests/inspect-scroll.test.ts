@@ -1,7 +1,13 @@
-import { newTestPage, getSize, click, hasSelector } from "../test-utils";
+import {
+	newTestPage,
+	getSize,
+	click,
+	hasSelector,
+	moveMouseAbs,
+} from "../test-utils";
 import { expect } from "chai";
 import { waitForTestId } from "pentf/browser_utils";
-import { wait } from "pentf/utils";
+import { waitForPass } from "pentf/assert_utils";
 
 export const description = "Highlighting should move with scroll";
 
@@ -20,11 +26,14 @@ export async function run(config: any) {
 	await page.evaluate(() => {
 		document.querySelector(".test-case")!.scrollBy(0, 1000);
 	});
-	await wait(1000);
-	expect(await hasSelector(page, highlight)).to.equal(false);
+	await waitForPass(async () => {
+		expect(await hasSelector(page, highlight)).to.equal(false);
+	});
 
-	await page.mouse.move(10, 10);
-	expect(await hasSelector(page, highlight)).to.equal(true);
+	await moveMouseAbs(page, 100, 100);
+	await waitForPass(async () => {
+		expect(await hasSelector(page, highlight)).to.equal(true);
+	});
 
 	const after = await getSize(page, highlight);
 	expect(before.top).not.to.equal(after.top);

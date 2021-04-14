@@ -1,5 +1,4 @@
-import { newTestPage, typeText } from "../test-utils";
-import { clickNestedText } from "pentf/browser_utils";
+import { clickTreeItem, newTestPage, typeText } from "../test-utils";
 import { Page } from "puppeteer";
 
 async function type(page: Page, devtools: Page, value: string | number) {
@@ -29,17 +28,17 @@ export async function run(config: any) {
 	const { page, devtools } = await newTestPage(config, "update-all");
 
 	// Props
-	await clickNestedText(devtools, "Props");
+	await clickTreeItem(devtools, "Props");
 	await type(page, devtools, "1");
 	await waitForResult(page, "props-result", "props: 1, true");
 
 	// State
-	await clickNestedText(devtools, "State");
+	await clickTreeItem(devtools, "State");
 	await type(page, devtools, "1");
 	await waitForResult(page, "state-result", "state: 1, true");
 
 	// Legacy Context
-	await clickNestedText(devtools, "LegacyConsumer");
+	await clickTreeItem(devtools, "LegacyConsumer");
 	await type(page, devtools, "1");
 	await waitForResult(page, "legacy-context-result", "legacy context: 1");
 }

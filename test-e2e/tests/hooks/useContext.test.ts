@@ -5,6 +5,7 @@ import {
 	clickNestedText,
 	getText,
 } from "pentf/browser_utils";
+import { waitForPass } from "pentf/assert_utils";
 
 export const description = "Inspect useContext hook";
 
@@ -31,9 +32,13 @@ export async function run(config: any) {
 	await clickNestedText(devtools, "ContextNoProvider");
 	await devtools.waitForSelector(hooksPanel, { timeout: 2000 });
 
-	name = await getText(devtools, '[data-testid="prop-name"]');
-	value = await getText(devtools, '[data-testid="prop-value"]');
+	await waitForPass(async () => {
+		name = await getText(devtools, '[data-testid="prop-name"]');
+		expect(name).to.equal("useContext");
+	});
 
-	expect(name).to.equal("useContext");
-	expect(value).to.equal("0");
+	await waitForPass(async () => {
+		value = await getText(devtools, '[data-testid="prop-value"]');
+		expect(value).to.equal("0");
+	});
 }

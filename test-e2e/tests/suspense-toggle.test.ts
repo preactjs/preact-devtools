@@ -1,4 +1,8 @@
-import { newTestPage, getTreeViewItemNames } from "../test-utils";
+import {
+	newTestPage,
+	getTreeViewItemNames,
+	clickTreeItem,
+} from "../test-utils";
 import { expect } from "chai";
 import {
 	assertNotTestId,
@@ -14,14 +18,7 @@ async function runTest(config: any, version: string) {
 		preact: version,
 	});
 
-	await devtools.waitForSelector(
-		'[data-testid="tree-item"][data-name="Delayed"]',
-	);
-
-	await clickSelector(
-		devtools,
-		'[data-testid="tree-item"][data-name="Delayed"]',
-	);
+	await clickTreeItem(devtools, "Delayed");
 
 	await clickTestId(devtools, "suspend-action");
 

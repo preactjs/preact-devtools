@@ -1,17 +1,12 @@
 import { clickAndWaitForHooks, newTestPage } from "../../test-utils";
 import { expect } from "chai";
-import {
-	assertNotSelector,
-	clickNestedText,
-	getText,
-} from "pentf/browser_utils";
+import { assertNotSelector, getText } from "pentf/browser_utils";
+import { waitForPass } from "pentf/assert_utils";
 
 export const description = "Inspect useErrorBoundary hook";
 
 export async function run(config: any) {
 	const { devtools } = await newTestPage(config, "hooks");
-
-	const hooksPanel = '[data-testid="props-row"]';
 
 	await clickAndWaitForHooks(devtools, "ErrorBoundary1");
 
@@ -28,12 +23,13 @@ export async function run(config: any) {
 	await assertNotSelector(devtools, '[data-testid="prop-value"] input');
 
 	// Error boundary with callback
-	await clickNestedText(devtools, "ErrorBoundary2");
-	await devtools.waitForSelector(hooksPanel);
+	await clickAndWaitForHooks(devtools, "ErrorBoundary2");
 
 	name = await getText(devtools, '[data-testid="prop-name"]');
-	value = await getText(devtools, '[data-testid="prop-value"]');
-
 	expect(name).to.equal("useErrorBoundary");
-	expect(value).to.equal("ƒ ()");
+
+	await waitForPass(async () => {
+		value = await getText(devtools, '[data-testid="prop-value"]');
+		expect(value).to.equal("ƒ ()");
+	});
 }

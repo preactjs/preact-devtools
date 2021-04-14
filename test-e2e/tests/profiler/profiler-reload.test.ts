@@ -6,9 +6,7 @@ export const description = "Reload and immediately start profiling";
 export const skip = () => true;
 
 export async function run(config: any) {
-	const { page, devtools } = await newTestPage(config, "profile-reload", {
-		preact: "next",
-	});
+	const { page, devtools } = await newTestPage(config, "profile-reload");
 
 	const iframe = 'iframe[src="/iframe.html"]';
 
