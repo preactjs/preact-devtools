@@ -163,17 +163,17 @@ function DebugValue() {
 	const [v, set] = useMyHook();
 
 	return (
-		<>
+		<Fragment>
 			<p>Is online: {"" + v}</p>
 			<button onClick={() => set(!v)} data-testid="debug-hook-toggle">
 				Toggle online
 			</button>
-		</>
+		</Fragment>
 	);
 }
 
 render(
-	<>
+	<Fragment>
 		<Counter />
 		<CounterCallback />
 		<CallbackOnly />
@@ -192,6 +192,6 @@ render(
 		<CustomHooks />
 		<CustomHooks2 />
 		<CustomHooks3 />
-	</>,
+	</Fragment>,
 	document.getElementById("app"),
 );

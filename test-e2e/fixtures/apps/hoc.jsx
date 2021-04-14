@@ -41,7 +41,7 @@ const Custom = withBoof(Foo);
 const Multiple = withBoof(MemoLast);
 
 render(
-	<>
+	<Fragment>
 		<div>
 			<b>MemoFoo</b>
 		</div>
@@ -62,6 +62,6 @@ render(
 			<b>Multple HOCs</b>
 		</div>
 		<Multiple />
-	</>,
+	</Fragment>,
 	document.getElementById("app"),
 );

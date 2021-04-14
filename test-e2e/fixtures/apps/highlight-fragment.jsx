@@ -13,11 +13,11 @@ function ComponentArray() {
 
 function ComponentFrag() {
 	return (
-		<>
+		<Fragment>
 			<div style={css}>D</div>
 			<div style={css}>E</div>
 			<div style={css}>F</div>
-		</>
+		</Fragment>
 	);
 }
 

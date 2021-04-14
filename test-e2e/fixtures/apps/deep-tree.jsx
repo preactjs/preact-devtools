@@ -8,7 +8,7 @@ function ChildItemName({ children }) {
 
 function App() {
 	return (
-		<>
+		<Fragment>
 			<ChildItemName>
 				<ChildItemName>
 					<ChildItemName>
@@ -59,7 +59,7 @@ function App() {
 					</ChildItemName>
 				</ChildItemName>
 			</ChildItemName>
-		</>
+		</Fragment>
 	);
 }
 

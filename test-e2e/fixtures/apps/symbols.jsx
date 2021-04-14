@@ -1,4 +1,4 @@
-import { h, render, Component } from "preact";
+import { h, Fragment, render, Component } from "preact";
 import { useState } from "preact/hooks";
 
 function SymbolComponent() {
@@ -33,10 +33,10 @@ class ClassComponent extends Component {
 }
 
 render(
-	<>
+	<Fragment>
 		<SymbolComponent />
 		<PropComponent />
 		<ClassComponent />
-	</>,
+	</Fragment>,
 	document.getElementById("app"),
 );

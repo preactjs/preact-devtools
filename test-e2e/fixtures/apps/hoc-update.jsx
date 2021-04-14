@@ -42,11 +42,11 @@ function withBoof(Comp) {
 const Custom = withBoof(Wrapped);
 
 render(
-	<>
+	<Fragment>
 		<div>
 			<b>Custom HOC</b>
 		</div>
 		<Custom />
-	</>,
+	</Fragment>,
 	document.getElementById("app"),
 );

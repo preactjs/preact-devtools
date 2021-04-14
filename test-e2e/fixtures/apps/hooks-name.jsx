@@ -105,7 +105,7 @@ function Effect() {
 }
 
 render(
-	<>
+	<Fragment>
 		<Counter />
 		<CounterCallback />
 		<ReducerComponent />
@@ -116,6 +116,6 @@ render(
 		<CallbackOnly />
 		<LayoutEffect />
 		<Effect />
-	</>,
+	</Fragment>,
 	document.getElementById("app"),
 );

@@ -1,4 +1,4 @@
-import { h, render } from "preact";
+import { h, Fragment, render } from "preact";
 import { useState } from "preact/hooks";
 
 function Display(props) {
@@ -22,10 +22,10 @@ function Foo() {
 
 function App() {
 	return (
-		<>
+		<Fragment>
 			<Counter />
 			<Foo />
-		</>
+		</Fragment>
 	);
 }
 

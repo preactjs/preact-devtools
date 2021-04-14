@@ -1,4 +1,4 @@
-import { h, render, createContext } from "preact";
+import { h, Fragment, render, createContext } from "preact";
 import { useMemo, useContext } from "preact/hooks";
 
 function Memo() {
@@ -25,11 +25,11 @@ function Context() {
 }
 
 render(
-	<>
+	<Fragment>
 		<Memo />
 		<Ctx.Provider value={{ foo: 123, bar: 123 }}>
 			<Context />
 		</Ctx.Provider>
-	</>,
+	</Fragment>,
 	document.getElementById("app"),
 );

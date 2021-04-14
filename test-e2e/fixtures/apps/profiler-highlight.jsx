@@ -1,4 +1,4 @@
-import { h, render } from "preact";
+import { h, Fragment, render } from "preact";
 import { useState } from "preact/hooks";
 
 function Display(props) {
@@ -21,25 +21,25 @@ function Counter() {
 
 function Foo() {
 	return (
-		<>
+		<Fragment>
 			<div>foo</div>
 			<Counter />
-		</>
+		</Fragment>
 	);
 }
 
 function App() {
 	const [enabled, setEnabled] = useState(false);
 	return (
-		<>
+		<Fragment>
 			<button onClick={() => setEnabled(!enabled)}>Toggle</button>
 			{enabled && (
-				<>
+				<Fragment>
 					<Counter />
 					<Foo />
-				</>
+				</Fragment>
 			)}
-		</>
+		</Fragment>
 	);
 }
 

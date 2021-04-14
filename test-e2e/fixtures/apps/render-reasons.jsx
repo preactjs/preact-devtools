@@ -1,4 +1,4 @@
-import { h, render, Component } from "preact";
+import { h, Fragment, render, Component } from "preact";
 import { useMemo, useState } from "preact/hooks";
 
 function Display(props) {
@@ -87,11 +87,11 @@ class ComponentMultiState extends Component {
 }
 
 render(
-	<>
+	<Fragment>
 		<ComponentState />
 		<HookState />
 		<ForceUpdate />
 		<ComponentMultiState />
-	</>,
+	</Fragment>,
 	document.getElementById("app"),
 );
