@@ -131,6 +131,19 @@ port.onDisconnect.addListener(() => {
 	destroy();
 });
 
+/**
+ * To avoid dropping messages on reload that may have already been
+ * sent by us, we keep messages from the content script in memory
+ * until the navigation event has been acknowledged. This is soley
+ * done to work around an issue in Firefox where the `onNavigated`
+ * event is only fired after all resources are loaded. That's too
+ * late for us as the content script likely already sent some events.
+ * See: https://bugzilla.mozilla.org/show_bug.cgi?id=1552686
+ */
+const pending = new Map<number, any[]>();
+
+const IS_FIREFOX = navigator.userAgent.indexOf("Firefox") >= 0;
+
 // Subscribe to messages from content script
 port.onMessage.addListener(async message => {
 	if (!initialized) {
@@ -138,25 +151,59 @@ port.onMessage.addListener(async message => {
 		await initDevtools();
 	}
 
+	const tabId = chrome.devtools.inspectedWindow.tabId;
 	if (message.type === "init") {
 		debug("> message", message);
+
+		if (IS_FIREFOX && pending.has(tabId)) {
+			store.clear();
+		}
+
+		pending.set(tabId, []);
+
 		port.postMessage({
 			type: "init",
-			tabId: chrome.devtools.inspectedWindow.tabId,
+			tabId,
 			source: DevtoolsPanelName,
 		});
 	} else {
 		debug("-> devtools", message);
-		applyEvent(store, message.type, message.data);
+
+		if (IS_FIREFOX) {
+			const backup = pending.get(tabId);
+			if (backup) {
+				backup.push({ ...message });
+			}
+
+			applyEvent(store, message.type, message.data);
+		} else {
+			applyEvent(store, message.type, message.data);
+		}
 	}
 });
 
 // Clear store when we navigate away from the current page.
 // Only fires on "true" navigation events, not when navigation
-// is done via the HTML5 history API
+// is done via the HTML5 history API.
+//
+// Workaround for Firefox: The event only fires *after* all scripts
+// are loaded at which point our content script will have sent
+// events. So for Firefox we need to keep a queue around.
+// See: https://bugzilla.mozilla.org/show_bug.cgi?id=1552686
 chrome.devtools.network.onNavigated.addListener(() => {
-	debug("== Navigation: clear devtools state ==");
+	const tabId = chrome.devtools.inspectedWindow.tabId;
+	const backup = pending.get(tabId) || [];
+	debug(
+		"== Navigation: clear devtools state == pending length: " + backup.length,
+	);
 	store.clear();
+
+	if (backup.length) {
+		backup.forEach(message => {
+			applyEvent(store, message.type, message.data);
+		});
+		pending.delete(tabId);
+	}
 });
 
 // Notify background page of the panel
