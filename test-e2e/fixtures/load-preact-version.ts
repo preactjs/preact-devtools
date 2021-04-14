@@ -8,6 +8,7 @@ import * as tar from "tar";
  * on demand.
  */
 export function loadPreactVersion(): Plugin {
+	const pending = new Map<string, Array<() => void>>();
 	const cache = new Map<string, any>();
 
 	const versionReg = /preact@([^/]+)/;
@@ -27,10 +28,19 @@ export function loadPreactVersion(): Plugin {
 			const match = id.match(versionReg);
 			if (match) {
 				const version = match[1].replace(/_/g, ".");
+
 				const versionDir = path.join(cacheDir, version);
 				if (cache.has(id)) {
 					return cache.get(id);
 				} else {
+					// Check if someone is already resolving
+					const inProgress = pending.get(version);
+					if (inProgress) {
+						return new Promise(r => {
+							inProgress.push(() => r(cache.get(version)!));
+						});
+					}
+
 					// Check for tarball
 					const tarball = path.join(tarDir, `preact-${version}.tgz`);
 					if (fs.existsSync(tarball)) {
@@ -74,10 +84,13 @@ export function loadPreactVersion(): Plugin {
 						};
 
 						cache.set(id, out);
+
+						const fns = pending.get(version) || [];
+						await Promise.all(fns.map(fn => fn()));
 						return out;
 					}
 				}
-				throw new Error(`Preact not found`);
+				throw new Error(`Preact not found ${id}`);
 			}
 		},
 	};
