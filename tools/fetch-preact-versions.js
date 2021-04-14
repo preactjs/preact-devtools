@@ -46,10 +46,10 @@ const streamPipeline = util.promisify(pipeline);
 		);
 		const prettyDest = path.relative(path.join(process.cwd()), dest);
 
-		if (fs.existsSync(dest)) {
-			console.log(`Target ${kl.cyan(prettyDest)} already exists. Skipping...`);
-		} else {
+		if (!fs.existsSync(dest)) {
 			console.log(`Fetching ${kl.cyan(prettyDest)}...`);
+
+			fs.mkdirSync(path.dirname(dest), { recursive: true });
 
 			const res = await fetch(tarball);
 			const out = fs.createWriteStream(dest);
