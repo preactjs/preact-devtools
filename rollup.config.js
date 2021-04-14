@@ -132,7 +132,7 @@ export default entries.map(data => ({
 		resolve(),
 		commonjs(),
 		replace({
-			"import.meta.env.DEBUG": process.env.DEBUG === "true",
+			"process.env.DEBUG": process.env.DEBUG === "true",
 		}),
 		data.copy &&
 			copy({

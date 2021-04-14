@@ -86,7 +86,7 @@ async function initDevtools() {
 	store.profiler.highlightUpdates.on(v => storeHighlightUpdates(v));
 	store.debugMode.on(v => storeDebugMode(v));
 
-	if (import.meta.env.DEBUG) {
+	if (process.env.DEBUG) {
 		(window as any).store = store;
 	}
 
