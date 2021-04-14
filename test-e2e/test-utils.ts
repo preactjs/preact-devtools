@@ -5,6 +5,8 @@ import {
 	newPage,
 	waitForTestId,
 	resizePage,
+	clickSelector,
+	waitForSelector,
 } from "pentf/browser_utils";
 import { Page } from "puppeteer";
 import { getPreactVersions } from "./fixtures/utils";
@@ -134,6 +136,7 @@ export async function getLog(page: Page) {
 }
 
 export async function getSize(page: Page, selector: string) {
+	await waitForSelector(page, selector);
 	return page.$eval(selector, el => {
 		const rect = el.getBoundingClientRect();
 		return {
@@ -197,8 +200,9 @@ export async function getActiveTab(page: Page): Promise<DevtoolsTab> {
 
 export async function clickRecordButton(page: Page) {
 	const selector = '[data-testid="record-btn"]';
+	await waitForSelector(page, selector);
 	const start = /Start/.test(await getAttribute(page, selector, "title"));
-	await click(page, selector);
+	await clickSelector(page, selector);
 
 	await waitForAttribute(
 		page,

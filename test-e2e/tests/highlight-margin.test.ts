@@ -2,8 +2,9 @@ import { newTestPage, getSize } from "../test-utils";
 import { expect } from "chai";
 import { wait } from "pentf/utils";
 import { Page } from "puppeteer";
+import { waitForSelector } from "pentf/browser_utils";
 
-export const description = "Highlight overlay should account for margin";
+export const description = "Highlight overlay should detect memo for margin";
 
 function getHighlightSize(page: Page) {
 	return getSize(page, "#preact-devtools-highlighter > div");
@@ -11,6 +12,11 @@ function getHighlightSize(page: Page) {
 
 export async function run(config: any) {
 	const { page, devtools } = await newTestPage(config, "highlight-margin");
+
+	await waitForSelector(
+		devtools,
+		'[data-testid="tree-item"][data-name="Headline"]',
+	);
 
 	await devtools.hover('[data-testid="tree-item"][data-name="Headline"]');
 	// Wait for possible flickering to occur

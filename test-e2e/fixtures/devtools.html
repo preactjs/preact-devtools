@@ -3,7 +3,6 @@
 		<meta charset="UTF-8" />
 		<meta name="viewport" content="width=device-width, initial-scale=1.0" />
 		<title>Preact Devtools Frame</title>
-		<link rel="stylesheet" href="./extension/setup.css" />
 		<style>
 			html,
 			body {
@@ -22,18 +21,5 @@
 	<body>
 		<div id="app"></div>
 		<script src="./devtools.ts" type="module"></script>
-		<!-- <script src="./extension/setup.js"></script>
-		<script>
-			const { setupInlineDevtools, createStore, applyEvent } = setup;
-
-			const store = setupInlineDevtools(document.getElementById("app"), window);
-			window.parent.store = store;
-			store.subscribe((name, msg) => {
-				window.parent.postMessage(
-					{ type: name, data: msg, source: "preact-devtools-to-client" },
-					"*",
-				);
-			});
-		</script> -->
 	</body>
 </html>

@@ -1,4 +1,4 @@
-import { h, render, Component } from "preact";
+import { h, Fragment, render, Component } from "preact";
 import { memo, forwardRef } from "preact/compat";
 
 function Foo() {

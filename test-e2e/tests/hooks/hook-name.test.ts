@@ -5,9 +5,7 @@ import { clickNestedText } from "pentf/browser_utils";
 export const description = "Show custom hook name";
 
 export async function run(config: any) {
-	const { devtools } = await newTestPage(config, "hooks-name", {
-		preact: "use-debug-name",
-	});
+	const { devtools } = await newTestPage(config, "hooks-name");
 
 	const hooksPanel = '[data-testid="props-row"]';
 

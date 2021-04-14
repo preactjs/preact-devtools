@@ -1,7 +1,8 @@
 import { newTestPage, getLog, getSize } from "../test-utils";
 import { expect } from "chai";
 import { wait } from "pentf/utils";
-import { getAttribute } from "pentf/browser_utils";
+import { clickSelector, getAttribute } from "pentf/browser_utils";
+import { waitForPass } from "pentf/assert_utils";
 
 export const description = "Should inspect during picking";
 
@@ -10,14 +11,15 @@ export async function run(config: any) {
 
 	const elem1 = '[data-testid="tree-item"][data-name="Counter"]';
 	const prop = '[data-testid="Props"] [data-testid="props-row"]';
-	await devtools.click(elem1);
-	await wait(500);
-	expect((await devtools.$$(prop)).length).to.equal(0);
+	await clickSelector(devtools, elem1);
+	await waitForPass(async () => {
+		expect((await devtools.$$(prop)).length).to.equal(0);
+	});
 
 	const target = '[data-testid="result"]';
 	const inspect = '[data-testid="inspect-btn"]';
 
-	await devtools.click(inspect);
+	await clickSelector(devtools, inspect);
 	let active = await getAttribute(devtools, inspect, "data-active");
 	expect(active).to.equal("true");
 

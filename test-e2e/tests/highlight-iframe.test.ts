@@ -1,15 +1,23 @@
 import { newTestPage, getText$$, getSize } from "../test-utils";
 import { expect } from "chai";
 import { wait } from "pentf/utils";
+import { waitFor } from "pentf/assert_utils";
 
 export const description = "Mirror component state to the devtools";
 
 export async function run(config: any) {
-	const { page, devtools } = await newTestPage(config, "iframe", {
-		preact: "next",
-	});
+	const { page, devtools } = await newTestPage(config, "iframe");
 
-	const elements = await getText$$(devtools, '[data-testid="tree-item"]');
+	let elements: string[] = [];
+	await waitFor(async () => {
+		const found = await getText$$(devtools, '[data-testid="tree-item"]');
+		if (found.length > 0) {
+			elements = found;
+			return true;
+		}
+
+		return false;
+	});
 
 	// Ordering is timing sensitive due to iframe loading. We just need
 	// to check that both were loaded, so the order doesn't matter.

@@ -1,6 +1,8 @@
 import { newTestPage, getCount, clickAndWaitForHooks } from "../../test-utils";
 import { expect } from "chai";
 import { clickNestedText, getAttribute } from "pentf/browser_utils";
+import { wait } from "pentf/utils";
+import { waitForPass } from "pentf/assert_utils";
 
 export const description = "Inspect custom hooks";
 
@@ -20,15 +22,23 @@ export async function run(config: any) {
 	expect(isCollapsed).to.equal("true");
 	expect(await getCount(devtools, hooksPanel)).to.equal(2);
 
-	await clickNestedText(devtools, "useBoof");
-	expect(await getCount(devtools, hooksPanel)).to.equal(3);
+	await waitForPass(async () => {
+		await clickNestedText(devtools, "useBoof");
+		expect(await getCount(devtools, hooksPanel)).to.equal(3);
+	});
 
-	await clickNestedText(devtools, "useBob");
-	expect(await getCount(devtools, hooksPanel)).to.equal(4);
+	await waitForPass(async () => {
+		await clickNestedText(devtools, "useBob");
+		expect(await getCount(devtools, hooksPanel)).to.equal(4);
+	});
 
-	await clickNestedText(devtools, "useFoo");
-	expect(await getCount(devtools, hooksPanel)).to.equal(5);
+	await waitForPass(async () => {
+		await clickNestedText(devtools, "useFoo");
+		expect(await getCount(devtools, hooksPanel)).to.equal(5);
+	});
 
-	await clickNestedText(devtools, "useBar");
-	expect(await getCount(devtools, hooksPanel)).to.equal(7);
+	await waitForPass(async () => {
+		await clickNestedText(devtools, "useBar");
+		expect(await getCount(devtools, hooksPanel)).to.equal(7);
+	});
 }

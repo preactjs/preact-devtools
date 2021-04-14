@@ -15,6 +15,9 @@ export default defineConfig({
 						jsxFactory: "h",
 						jsxFragment: "Fragment",
 						jsxInject: "",
+						define: {
+							"process.env.DEBUG": JSON.stringify(true),
+						},
 					},
 
 					resolve: {

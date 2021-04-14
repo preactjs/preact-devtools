@@ -2,7 +2,7 @@ import { main } from "pentf";
 import child_process from "child_process";
 import path from "path";
 import fetch from "node-fetch";
-import { assertEventually } from "pentf/assert_utils";
+import { waitFor } from "pentf/assert_utils";
 
 (async () => {
 	let child: child_process.ChildProcess;
@@ -13,14 +13,10 @@ import { assertEventually } from "pentf/assert_utils";
 	} catch (err) {
 		if (/ECONNREFUSED/.test(err.message)) {
 			// eslint-disable-next-line no-console
-			console.log("Building extension for tests...");
-			child_process.execSync("npm run build:test", { stdio: "inherit" });
-
-			// eslint-disable-next-line no-console
 			console.log(`No server running at http://localhost:8100/ Starting...`);
 			// eslint-disable-next-line no-console
 			console.log(`(You can start a dev server via "npm run dev")`);
-			child = child_process.spawn("npm", ["run", "serve:tests"], {
+			child = child_process.spawn("npm", ["run", "dev:serve"], {
 				cwd: path.join(__dirname, ".."),
 				stdio: "pipe",
 			});
@@ -28,8 +24,8 @@ import { assertEventually } from "pentf/assert_utils";
 			child.stderr!.on("data", data => output.push(data.toString()));
 
 			try {
-				await assertEventually(
-					() => output.some(line => /Listening on/.test(line)),
+				await waitFor(
+					() => output.some(line => /dev server running at/.test(line)),
 					{ timeout: 2000 },
 				);
 			} catch (err) {

@@ -18,9 +18,10 @@ jobs:
           node-version: ${{ matrix.node-version }}
       - name: Run install and tests
         run: |
+          node tools/fetch-preact-versions.js
           yarn
           yarn lint
           yarn test
-          yarn test-e2e
+          yarn test-e2e -C 2
         env:
           CI: true

@@ -1,7 +1,7 @@
 import { expect } from "chai";
 import { newTestPage } from "../test-utils";
 import { wait } from "pentf/utils";
-import { getText } from "pentf/browser_utils";
+import { clickSelector, getText } from "pentf/browser_utils";
 
 export const description = "Test keyboard navigation in elements tree";
 
@@ -11,7 +11,7 @@ export async function run(config: any) {
 	const elem1 = '[data-testid="tree-item"][data-name="Counter"]';
 	const prop = '[data-testid="Props"] [data-testid="props-row"]';
 
-	await devtools.click(elem1);
+	await clickSelector(devtools, elem1);
 	await wait(500);
 	expect((await devtools.$$(prop)).length).to.equal(0);
 

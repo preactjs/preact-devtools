@@ -60,7 +60,8 @@ a {
 }
 
 .test-case {
-	height: 50vh;
+	/* Account for header height */
+	height: calc(50vh - 2.75rem);
 	width: 100%;
 	overflow: auto;
 }

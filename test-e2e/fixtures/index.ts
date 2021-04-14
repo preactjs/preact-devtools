@@ -117,6 +117,7 @@ async function waitForDevtoolsInit() {
 			window.postMessage({ ...e.data, _forwarded: true }, "*");
 		}
 	});
+
 	await waitForDevtoolsInit();
 
 	document.querySelector("iframe").contentWindow.postMessage("foobar", "*");

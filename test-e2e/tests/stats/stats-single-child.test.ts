@@ -5,9 +5,7 @@ import { expect } from "chai";
 export const description = "Display single child stats";
 
 export async function run(config: any) {
-	const { page, devtools } = await newTestPage(config, "simple-stats", {
-		preact: "next",
-	});
+	const { page, devtools } = await newTestPage(config, "simple-stats");
 
 	await clickTab(devtools, "STATISTICS");
 	await waitForTestId(devtools, "stats-info");

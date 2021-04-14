@@ -1,6 +1,6 @@
 /* eslint-disable @typescript-eslint/no-empty-function */
 /* eslint-disable @typescript-eslint/no-unused-vars */
-import { h, render } from "preact";
+import { h, Fragment, render } from "preact";
 import {
 	useState,
 	useEffect,
