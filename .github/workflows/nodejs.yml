@@ -21,6 +21,6 @@ jobs:
           yarn
           yarn lint
           yarn test
-          yarn test-e2e -C 2
+          yarn test-e2e
         env:
           CI: true
