@@ -1,7 +1,6 @@
 import { newTestPage, getCount, clickAndWaitForHooks } from "../../test-utils";
 import { expect } from "chai";
 import { clickNestedText, getAttribute } from "pentf/browser_utils";
-import { wait } from "pentf/utils";
 import { waitForPass } from "pentf/assert_utils";
 
 export const description = "Inspect custom hooks";
