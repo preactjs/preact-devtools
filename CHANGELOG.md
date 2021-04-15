@@ -1,5 +1,27 @@
 # Changelog
 
+## 1.4.0
+
+### Features
+
+- Display hook type before custom name (#289, thanks @marvinhagemeister, @cmlenz)
+- Show custom useMemo hook names (#288, thanks @marvinhagemeister)
+
+### Bug Fixes
+
+- Fix empty panel in Firefox (#294, thanks @marvinhagemeister)
+- Fix hook names being reversed with addHookNames from preact/devtools (#287, thanks @marvinhagemeister, @cmlenz)
+
+### Maintenance
+
+- Port test suite over to vite (#295, thanks @marvinhagemeister)
+- Rename `*.css` -> `*.module.css` (#292, thanks @marvinhagemeister)
+- Improve pre-test server check (#291, thanks @marvinhagemeister)
+- Run end-to-end tests in CI (#104, thanks @marvinhagemeister)
+- Make tests less reliant on timings (#290, thanks @marvinhagemeister)
+- Update dependencies for M1 support (#285, thanks @marvinhagemeister)
+- Update to Node 14 in GH Actions (#286, thanks @marvinhagemeister)
+
 ## 1.3.0
 
 - Add support for custom hook names via `addHookName` from `preact/devtools`. This is supported in Preact >= 10.5.12 (#281, thanks @marvinhagemeister)
