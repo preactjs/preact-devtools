@@ -130,9 +130,47 @@ function isTextNode(dom: HTMLElement | Text | null): dom is Text {
 	return dom != null && dom.nodeType === NodeType.Text;
 }
 
-function updateHighlight(profiler: ProfilerState, vnode: VNode) {
+function updateHighlight(
+	profiler: ProfilerState,
+	vnode: VNode,
+	oldVNode: VNode | null,
+) {
 	if (profiler.highlightUpdates && typeof vnode.type === "function") {
+		// Check if the vnode really updated
 		let dom = getDom(vnode);
+		if (oldVNode != null) {
+			// VNode equality bailout
+			if (vnode === oldVNode) {
+				const r = getRenderReason(oldVNode, vnode);
+				console.log(
+					"Maybe",
+					r,
+					getActualChildren(vnode) === getActualChildren(oldVNode),
+				);
+				if (r && r.type === RenderReason.PARENT_UPDATE) {
+					return;
+				}
+			}
+
+			const c = getComponent(vnode);
+			if (
+				c !== null &&
+				typeof c.shouldComponentUpdate === "function" &&
+				getActualChildren(vnode) === getActualChildren(oldVNode)
+			) {
+				if (isTextNode(dom)) {
+					dom = dom.parentNode as HTMLElement;
+				}
+				if (dom) {
+					profiler.pendingHighlightUpdates.delete(dom);
+					profiler.updateRects.delete(dom);
+				}
+				console.log("skip", dom, new Map(profiler.updateRects));
+				return;
+			}
+		}
+		console.log(" no skip", dom);
+
 		if (isTextNode(dom)) {
 			dom = dom.parentNode as HTMLElement;
 		}
@@ -235,7 +273,7 @@ export function mount(
 				);
 			}
 
-			updateHighlight(profiler, vnode);
+			updateHighlight(profiler, vnode, null);
 
 			ancestorId = id;
 		}
@@ -407,7 +445,7 @@ export function update(
 		}
 	}
 
-	updateHighlight(profiler, vnode);
+	updateHighlight(profiler, vnode, oldVNode);
 
 	const oldChildren = oldVNode
 		? getActualChildren(oldVNode).map((v: any) => v && getVNodeId(ids, v))
