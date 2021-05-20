@@ -26,6 +26,7 @@ const highlightNode = debounce(
 export function TreeView() {
 	const store = useStore();
 	const nodeList = useObserver(() => store.nodeList.$);
+	const roots = useObserver(() => store.roots.$);
 	const { collapseNode, collapsed } = useCollapser();
 	const { selected, selectNext, selectPrev } = useSelection();
 
@@ -92,6 +93,11 @@ export function TreeView() {
 
 	useAutoIndent(paneRef, [listItems]);
 
+	// When the devtools is connected, but nothing has been sent to the panel yet
+	const isOnlyConnected = nodeList.length === 0 && roots.length === 0;
+	// When client sent messages, but no nodes were sent due to filters.
+	const hasNoResults = nodeList.length === 0 && roots.length > 0;
+
 	return (
 		<div
 			ref={ref}
@@ -101,8 +107,8 @@ export function TreeView() {
 			data-tree={true}
 			onMouseLeave={onMouseLeave}
 		>
-			{nodeList.length === 0 && (
-				<div class={s.empty}>
+			{isOnlyConnected && (
+				<div class={s.empty} data-testid="msg-only-connected">
 					<div class={s.emptyInner}>
 						<BackgroundLogo class={s.bgLogo} />
 						<p>
@@ -114,6 +120,22 @@ export function TreeView() {
 								before devtools was initialized. You can fix this by adding the{" "}
 								<code>preact/debug</code> or <code>preact/devtools</code> import
 								at the <b>top</b> of your entry file.
+							</small>
+						</p>
+					</div>
+				</div>
+			)}
+			{hasNoResults && (
+				<div class={s.empty} data-testid="msg-no-results">
+					<div class={s.emptyInner}>
+						<BackgroundLogo class={s.bgLogo} />
+						<p>
+							<b>Nothing to show</b>
+						</p>
+						<p class={s.emptyDescription}>
+							<small>
+								No nodes visible with active filters. To fix this update filters
+								or make sure to render at least one component in your app.
 							</small>
 						</p>
 					</div>
