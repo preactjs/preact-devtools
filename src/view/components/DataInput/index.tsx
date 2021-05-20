@@ -41,6 +41,8 @@ export function DataInput({
 			const parsed = parseValue(value);
 			if (parsed === null) return "null";
 			else if (Array.isArray(parsed)) return "array";
+			else if (parsed.type === "map") return "map";
+			else if (parsed.type === "set") return "set";
 			return typeof parsed;
 		} catch (err) {
 			return "undefined";

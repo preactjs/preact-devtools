@@ -45,14 +45,18 @@ function truncate(s: string) {
 }
 
 export function genPreview(v: any): string {
-	if (Array.isArray(v)) {
-		return `[${v.map(x => genPreview(x)).join(", ")}]`;
-	}
 	if (v !== null && typeof v === "object") {
+		if (v.type === "set") {
+			return `Set(${v.entries.length}) ${truncate(genPreview(v.entries))})`;
+		} else if (v.type === "map") {
+			return `Map(${v.entries.length}) ${truncate(genPreview(v.entries))})`;
+		}
+
+		if (Array.isArray(v)) {
+			return `[${v.map(x => genPreview(x)).join(", ")}]`;
+		}
 		if (Object.keys(v).length === 2) {
 			if (v.type === "vnode") return `<${truncate(v.name)} />`;
-			if (v.type === "set") return `Set<${truncate(v.name)}>`;
-			if (v.type === "map") return `Map<${truncate(v.name)}>`;
 			if (v.type === "function") {
 				return `ƒ ${v.name === "anonymous" ? "" : truncate(v.name)}()`;
 			}

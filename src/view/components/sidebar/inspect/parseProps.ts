@@ -64,18 +64,6 @@ export function parseProps(
 			children.push(childPath);
 			parseProps(item, childPath, limit, depth + 1, "" + i, out);
 		});
-	} else if (data instanceof Set) {
-		// TODO: We're dealing with serialized data here, not a Set object
-		out.set(path, {
-			depth,
-			name,
-			id: path,
-			type: "set",
-			editable: false,
-			value: "Set",
-			children: [],
-			meta: null,
-		});
 	} else if (typeof data === "object") {
 		if (data === null) {
 			out.set(path, {
@@ -89,7 +77,9 @@ export function parseProps(
 				meta: null,
 			});
 		} else {
-			const maybeCustom = Object.keys(data).length === 2;
+			const keys = Object.keys(data);
+			const maybeCustom = keys.length === 2;
+			const maybeCollection = keys.length === 3;
 			// Functions are encoded as objects
 			if (
 				maybeCustom &&
@@ -123,37 +113,49 @@ export function parseProps(
 					meta: null,
 				});
 			} else if (
-				// Same for Set
-				maybeCustom &&
-				typeof data.name === "string" &&
-				data.type === "set"
+				// Same for Set + Map
+				maybeCollection &&
+				typeof data.name === "string"
 			) {
-				out.set(path, {
-					depth,
-					name,
-					id: path,
-					type: "set",
-					editable: false,
-					value: data,
-					children: [],
-					meta: null,
-				});
-			} else if (
-				// Same for Map
-				maybeCustom &&
-				typeof data.name === "string" &&
-				data.type === "map"
-			) {
-				out.set(path, {
-					depth,
-					name,
-					id: path,
-					type: "map",
-					editable: false,
-					value: data,
-					children: [],
-					meta: null,
-				});
+				if (data.type === "set") {
+					const children: any[] = [];
+					const node: PropData = {
+						depth,
+						name,
+						id: path,
+						type: "set",
+						editable: false,
+						value: data,
+						children,
+						meta: null,
+					};
+
+					(data.entries as any[]).forEach((item, i) => {
+						const childPath = `${path}.${i}`;
+						children.push(childPath);
+						parseProps(item, childPath, limit, depth + 1, "" + i, out);
+					});
+					out.set(path, node);
+				} else if (data.type === "map") {
+					const children: any[] = [];
+					const node: PropData = {
+						depth,
+						name,
+						id: path,
+						type: "map",
+						editable: false,
+						value: data,
+						children,
+						meta: null,
+					};
+
+					(data.entries as any[]).forEach((item, i) => {
+						const childPath = `${path}.${i}`;
+						children.push(childPath);
+						parseProps(item, childPath, limit, depth + 1, "" + i, out);
+					});
+					out.set(path, node);
+				}
 			} else if (
 				// Same for Blobs
 				maybeCustom &&
