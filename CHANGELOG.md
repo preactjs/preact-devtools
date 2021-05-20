@@ -1,5 +1,16 @@
 # Changelog
 
+## 1.4.1
+
+## Bug Fixes
+
+- Show custom message if no nodes left after filters (#303, thanks @marvinhagemeister)
+- Show `Map` and `Set` objects properly in sidebar (#302, thanks @marvinhagemeister)
+
+### Maintenance
+
+- Fix preact duplicated across chunks in vite test setup (#301, thanks @marvinhagemeister)
+
 ## 1.4.0
 
 ### Features
