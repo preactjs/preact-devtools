@@ -6,6 +6,9 @@ import { listPreactVersions } from "./list-preact-versions";
 
 // https://vitejs.dev/config/
 export default defineConfig({
+	optimizeDeps: {
+		exclude: ["preact"],
+	},
 	plugins: [
 		{
 			name: "preact:config",
@@ -18,6 +21,7 @@ export default defineConfig({
 						define: {
 							"process.env.DEBUG": JSON.stringify(false),
 						},
+						minify: false,
 					},
 
 					resolve: {
