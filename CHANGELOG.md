@@ -1,5 +1,11 @@
 # Changelog
 
+## 1.4.2
+
+## Bug Fixes
+
+- Update `useContext()` hook state property for preactjs/preact#3165 (#304, thanks @developit)
+
 ## 1.4.1
 
 ## Bug Fixes
