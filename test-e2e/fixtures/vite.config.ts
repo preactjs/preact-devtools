@@ -3,6 +3,7 @@ import { listFixtures } from "./list-fixtures";
 import { rewritePreactVersion } from "./rewrite-preact-version";
 import { loadPreactVersion } from "./load-preact-version";
 import { listPreactVersions } from "./list-preact-versions";
+import path from "path";
 
 // https://vitejs.dev/config/
 export default defineConfig({
@@ -29,6 +30,7 @@ export default defineConfig({
 							"react-dom/test-utils": "preact/test-utils",
 							"react-dom": "preact/compat",
 							react: "preact/compat",
+							goober: path.join(__dirname, "vendor", "goober.js"),
 						},
 					},
 				};
