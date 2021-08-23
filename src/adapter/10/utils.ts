@@ -34,6 +34,13 @@ export function jsonify(
 		seen.add(data);
 	}
 
+	if (typeof Element !== "undefined" && data instanceof Element) {
+		return {
+			type: "html",
+			name: `<${data.localName} />`,
+		};
+	}
+
 	const vnode = getVNode(data);
 	if (vnode != null) return vnode;
 

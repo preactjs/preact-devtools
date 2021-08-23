@@ -12,7 +12,8 @@ export type PropDataType =
 	| "bigint"
 	| "vnode"
 	| "blob"
-	| "symbol";
+	| "symbol"
+	| "html";
 
 export interface PropData {
 	id: string;
@@ -183,6 +184,22 @@ export function parseProps(
 					name,
 					id: path,
 					type: "symbol",
+					editable: false,
+					value: data,
+					children: [],
+					meta: null,
+				});
+			} else if (
+				// Same for HTML elements
+				maybeCustom &&
+				typeof data.name === "string" &&
+				data.type === "html"
+			) {
+				out.set(path, {
+					depth,
+					name,
+					id: path,
+					type: "html",
 					editable: false,
 					value: data,
 					children: [],

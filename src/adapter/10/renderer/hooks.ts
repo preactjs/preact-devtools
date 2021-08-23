@@ -171,7 +171,7 @@ export function parseHookData(
 					// The user should be able to click through the value
 					// properties if the value is an object. We parse it
 					// separately and append it as children to our hook node
-					if (typeof rawValue === "object") {
+					if (typeof rawValue === "object" && !(rawValue instanceof Element)) {
 						const tree = parseProps(value, id, 7, 0, name);
 						children = tree.get(id)!.children;
 						hookValueTree = Array.from(tree.values());
