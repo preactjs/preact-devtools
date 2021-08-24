@@ -1,6 +1,6 @@
 {
 	"name": "preact-devtools",
-	"version": "1.4.2",
+	"version": "1.4.3",
 	"description": "Preact Devtools Extension",
 	"main": "dist/preact-devtools.js",
 	"module": "dist/preact-devtools.module.js",

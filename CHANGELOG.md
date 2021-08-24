@@ -1,5 +1,11 @@
 # Changelog
 
+## 1.4.3
+
+## Bug Fixes
+
+- Fix HTML-Elements not being displayed correctly in sidebar panel (#317, thanks @marvinhagemeister)
+
 ## 1.4.2
 
 ## Bug Fixes
