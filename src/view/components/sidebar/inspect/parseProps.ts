@@ -116,47 +116,51 @@ export function parseProps(
 			} else if (
 				// Same for Set + Map
 				maybeCollection &&
-				typeof data.name === "string"
+				typeof data.name === "string" &&
+				data.type === "set"
 			) {
-				if (data.type === "set") {
-					const children: any[] = [];
-					const node: PropData = {
-						depth,
-						name,
-						id: path,
-						type: "set",
-						editable: false,
-						value: data,
-						children,
-						meta: null,
-					};
+				const children: any[] = [];
+				const node: PropData = {
+					depth,
+					name,
+					id: path,
+					type: "set",
+					editable: false,
+					value: data,
+					children,
+					meta: null,
+				};
 
-					(data.entries as any[]).forEach((item, i) => {
-						const childPath = `${path}.${i}`;
-						children.push(childPath);
-						parseProps(item, childPath, limit, depth + 1, "" + i, out);
-					});
-					out.set(path, node);
-				} else if (data.type === "map") {
-					const children: any[] = [];
-					const node: PropData = {
-						depth,
-						name,
-						id: path,
-						type: "map",
-						editable: false,
-						value: data,
-						children,
-						meta: null,
-					};
+				(data.entries as any[]).forEach((item, i) => {
+					const childPath = `${path}.${i}`;
+					children.push(childPath);
+					parseProps(item, childPath, limit, depth + 1, "" + i, out);
+				});
+				out.set(path, node);
+			} else if (
+				// Same for Map
+				maybeCollection &&
+				typeof data.name === "string" &&
+				data.type === "map"
+			) {
+				const children: any[] = [];
+				const node: PropData = {
+					depth,
+					name,
+					id: path,
+					type: "map",
+					editable: false,
+					value: data,
+					children,
+					meta: null,
+				};
 
-					(data.entries as any[]).forEach((item, i) => {
-						const childPath = `${path}.${i}`;
-						children.push(childPath);
-						parseProps(item, childPath, limit, depth + 1, "" + i, out);
-					});
-					out.set(path, node);
-				}
+				(data.entries as any[]).forEach((item, i) => {
+					const childPath = `${path}.${i}`;
+					children.push(childPath);
+					parseProps(item, childPath, limit, depth + 1, "" + i, out);
+				});
+				out.set(path, node);
 			} else if (
 				// Same for Blobs
 				maybeCustom &&
