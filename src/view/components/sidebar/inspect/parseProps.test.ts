@@ -240,6 +240,56 @@ describe("parseProps", () => {
 		]);
 	});
 
+	it("should flatten plain objects that are read as 'maybeCollections'", () => {
+		const tree = parseProps({ foo: 123, bar: "abc", name: "bob" }, "", 2);
+		expect(serialize(tree)).to.deep.equal([
+			{
+				editable: false,
+				depth: 0,
+				id: "",
+				name: "",
+				type: "object",
+				value: {
+					foo: 123,
+					bar: "abc",
+					name: "bob",
+				},
+				children: [".foo", ".bar", ".name"],
+				meta: null,
+			},
+			{
+				editable: true,
+				depth: 1,
+				id: ".foo",
+				name: "foo",
+				type: "number",
+				value: 123,
+				children: [],
+				meta: null,
+			},
+			{
+				editable: true,
+				depth: 1,
+				id: ".bar",
+				name: "bar",
+				type: "string",
+				value: "abc",
+				children: [],
+				meta: null,
+			},
+			{
+				editable: true,
+				depth: 1,
+				id: ".name",
+				name: "name",
+				type: "string",
+				value: "bob",
+				children: [],
+				meta: null,
+			},
+		]);
+	});
+
 	it("should limit depth", () => {
 		const tree = parseProps({ foo: { bar: { boof: "abc" } } }, "foo", 2);
 		expect(serialize(tree)).to.deep.equal([
