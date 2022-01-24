@@ -109,6 +109,7 @@ async function build(browser) {
 		format: isInline ? "esm" : "iife",
 		define: {
 			"process.env.DEBUG": DEBUG,
+			"process.env.BROWSER": JSON.stringify(browser),
 		},
 		external,
 		entryPoints: isInline
@@ -147,7 +148,7 @@ async function build(browser) {
 				renamePlugin({
 					[`${dist}/installHook.css`]: `${dist}/preact-devtools-page.css`,
 				}),
-			!isInline && inlineHookPlugin(dist),
+			!isInline && browser === "firefox" && inlineHookPlugin(dist),
 
 			spritePlugin(
 				path.join(__dirname, "..", "src", "view", "sprite.svg"),

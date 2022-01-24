@@ -56,3 +56,7 @@ export function copyToClipboard(text: string) {
 
 	document.body.removeChild(dom);
 }
+
+export function isFirefox() {
+	return navigator.userAgent.indexOf("Firefox") >= 0;
+}

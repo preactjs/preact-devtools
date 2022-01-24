@@ -13,6 +13,7 @@ import {
 	storeFilters,
 } from "./settings";
 import { effect } from "@preact/signals";
+import { isFirefox } from "../utils";
 
 // Updated when the selection in the native elements panel changed.
 let hostSelectionChanged = false;
@@ -145,7 +146,7 @@ port.onDisconnect.addListener(() => {
  */
 const pending = new Map<number, any[]>();
 
-const IS_FIREFOX = navigator.userAgent.indexOf("Firefox") >= 0;
+const IS_FIREFOX = isFirefox();
 
 // Subscribe to messages from content script
 port.onMessage.addListener(async message => {

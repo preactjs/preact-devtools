@@ -99,5 +99,8 @@ if (document.contentType === "text/html") {
 	// See: https://github.com/preactjs/preact-devtools/issues/85
 	//
 	// The string "CODE_TO_INJECT" will be replaced by our build tool.
-	inject(`;(${"CODE_TO_INJECT"}(window))`, "code");
+	if (process.env.BROWSER === "firefox") {
+		debug("Firefox injection enabled");
+		inject(`;(${"CODE_TO_INJECT"}(window))`, "code");
+	}
 }
