@@ -96,7 +96,7 @@ export function mergeMeasure(a: Measurements, b: Measurements): Measurements {
 		width,
 		height,
 
-		// Reset all margines for combined nodes. There is no
+		// Reset all margins for combined nodes. There is no
 		// meaningful way to display them.
 		marginTop: 0,
 		marginRight: 0,

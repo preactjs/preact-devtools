@@ -1,6 +1,5 @@
 import { h } from "preact";
 import { useEffect, useRef } from "preact/hooks";
-import { getRootDomNode } from "./utils";
 
 export interface Props {
 	onClick: () => void;
@@ -21,7 +20,7 @@ export function OutsideClick(props: Props) {
 			}
 		};
 
-		const root = getRootDomNode(ref.current!);
+		const root = ref.current!.getRootNode() as HTMLElement;
 		root.addEventListener("click", listener);
 		return () => root.removeEventListener("click", listener);
 	}, [props.children, ref.current]);

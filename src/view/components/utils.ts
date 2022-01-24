@@ -1,4 +1,4 @@
-import { useRef, useEffect, useContext, useLayoutEffect } from "preact/hooks";
+import { useEffect, useContext, useLayoutEffect } from "preact/hooks";
 import { WindowCtx } from "../store/react-bindings";
 import { throttle } from "../../shells/shared/utils";
 
@@ -31,45 +31,6 @@ export function scrollIntoView(el: HTMLElement) {
 			top,
 		});
 	}
-}
-
-export function cssToPx(raw: string) {
-	if (raw.endsWith("rem")) {
-		const rem = parseFloat(raw.slice(0, -3));
-		return (
-			rem * parseFloat(getComputedStyle(document.documentElement).fontSize)
-		);
-	} else if (raw.endsWith("px")) {
-		return parseFloat(raw.slice(0, -2));
-	}
-
-	throw new Error(`Conversion of ${raw} is not supported yet`);
-}
-
-export function getRootDomNode(el: HTMLElement): HTMLElement {
-	let item = el;
-	while (item.parentNode != null) {
-		item = item.parentNode as any;
-	}
-
-	return item;
-}
-
-export function useInstance<T>(fn: () => T) {
-	const ref = useRef<T>(null as any);
-	const value = ref.current || (ref.current = fn());
-
-	useEffect(
-		() => () => {
-			const v = ref.current as any;
-			if (v && typeof v.destroy === "function") {
-				v.destroy();
-			}
-		},
-		[],
-	);
-
-	return value;
 }
 
 export function useResize(fn: () => void, args: any[], init = false) {
