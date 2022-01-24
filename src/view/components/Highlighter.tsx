@@ -23,7 +23,7 @@ export interface Props extends Measurements {
 }
 
 export function Highlighter(props: Props) {
-	const { width, height, top, left, bounds } = props;
+	const { width, height, boxSizing, top, left, bounds } = props;
 
 	const isOutOfBounds =
 		bounds.bottom || bounds.left || bounds.right || bounds.top;
@@ -59,7 +59,15 @@ export function Highlighter(props: Props) {
 							props.paddingRight,
 							props.paddingBottom,
 							props.paddingLeft,
-						)}`}
+						)} ${
+							boxSizing === "content-box"
+								? `height: calc(100% - ${
+										props.paddingTop + props.paddingBottom
+								  }px); width: calc(100% - ${
+										props.paddingLeft + props.paddingRight
+								  }px);`
+								: ""
+						}`}
 					/>
 				</div>
 			</div>
