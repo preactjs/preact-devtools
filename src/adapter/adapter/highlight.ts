@@ -79,14 +79,21 @@ export function createHightlighter(renderer: Renderer) {
 					}
 				}
 
+				let height = size.height;
+				let width = size.width;
+				if (size.boxSizing === "border-box") {
+					height += size.marginTop + size.marginBottom;
+					width += size.marginLeft + size.marginRight;
+				}
+
 				render(
 					h(Highlighter, {
 						label,
 						...size,
 						top: size.top - size.marginTop,
 						left: size.left - size.marginLeft,
-						height: size.height + size.marginTop + size.marginBottom,
-						width: size.width + size.marginLeft + size.marginRight,
+						height,
+						width,
 					}),
 					highlightRef,
 				);

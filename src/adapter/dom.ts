@@ -9,6 +9,7 @@ export function px2Int(input: string | null) {
 }
 
 export interface Measurements {
+	boxSizing: string;
 	top: number;
 	left: number;
 	width: number;
@@ -58,6 +59,7 @@ export function measureNode(dom: Element): Measurements {
 		top,
 		left,
 		bounds: getBoundsState(r),
+		boxSizing: s.boxSizing,
 
 		// Round to at most 2 decimals. This is not 100% accurate,
 		// but good enough for our use case
@@ -85,6 +87,7 @@ export function mergeMeasure(a: Measurements, b: Measurements): Measurements {
 	const height = Math.max(a.top + a.height, b.top + b.height) - top;
 	const width = Math.max(a.left + a.width, b.left + b.width) - left;
 	return {
+		boxSizing: a.boxSizing,
 		top,
 		left,
 		bounds: getBoundsState({
