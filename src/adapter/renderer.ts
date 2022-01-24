@@ -40,3 +40,11 @@ export interface Renderer {
 	// Component actions
 	suspend?(id: ID, active: boolean): void; // V4
 }
+
+export function getRendererByVNodeId(renderers: Map<number, Renderer>, id: ID) {
+	for (const r of renderers.values()) {
+		if (r.has(id)) return r;
+	}
+
+	return null;
+}

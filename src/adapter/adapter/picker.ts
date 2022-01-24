@@ -3,7 +3,7 @@ import { debounce } from "../../shells/shared/utils";
 
 export function createPicker(
 	window: Window,
-	renderer: Renderer,
+	renderers: Map<number, Renderer>,
 	onHover: (id: number) => void,
 	onStop: () => void,
 ) {
@@ -22,10 +22,15 @@ export function createPicker(
 		e.preventDefault();
 		e.stopPropagation();
 		if (picking && e.target != null && lastTarget !== e.target) {
-			const id = renderer.findVNodeIdForDom(e.target as any);
-			if (id > -1 && lastId !== id) {
-				onHover(id);
+			let id = lastId;
+			for (const r of renderers.values()) {
+				id = r.findVNodeIdForDom(e.target as any);
+				if (id > -1 && lastId !== id) {
+					onHover(id);
+					break;
+				}
 			}
+
 			lastTarget = e.target;
 			lastId = id;
 		}
