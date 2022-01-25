@@ -5,7 +5,6 @@ import { RawFilterState } from "./adapter/filter";
 import { Options } from "preact";
 import { createRenderer, RendererConfig10 } from "./10/renderer";
 import { setupOptions } from "./10/options";
-import { createMultiRenderer } from "./MultiRenderer";
 import parseSemverish from "./parse-semverish";
 import { PortPageHook } from "./adapter/port";
 import { PROFILE_RELOAD, STATS_RELOAD } from "../constants";
@@ -91,15 +90,17 @@ export function createHook(port: PortPageHook): DevtoolsHook {
 
 	// Lazily init the adapter when a renderer is attached
 	const init = () => {
-		const multi = createMultiRenderer(renderers);
-		createAdapter(port, multi);
+		createAdapter(port, renderers);
 
 		status = "pending";
 		send("init", null);
 
 		listen("init", () => {
 			status = "connected";
-			multi.flushInitial();
+
+			for (const r of renderers.values()) {
+				r.flushInitial();
+			}
 		});
 	};
 

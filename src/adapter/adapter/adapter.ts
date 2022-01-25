@@ -1,5 +1,5 @@
 import { DevtoolEvents, DevtoolsHook } from "../hook";
-import { Renderer } from "../renderer";
+import { getRendererByVNodeId, Renderer } from "../renderer";
 import { copyToClipboard } from "../../shells/shared/utils";
 import { createPicker } from "./picker";
 import { ID } from "../../view/store/types";
@@ -38,23 +38,32 @@ export interface InspectData {
 	suspended: boolean;
 }
 
-export function createAdapter(port: PortPageHook, renderer: Renderer) {
+export function createAdapter(
+	port: PortPageHook,
+	renderers: Map<number, Renderer>,
+) {
 	const { listen, send } = port;
 
-	const highlight = createHightlighter(renderer);
+	const forAll = (fn: (renderer: Renderer) => void) => {
+		for (const r of renderers.values()) {
+			fn(r);
+		}
+	};
+
+	const highlight = createHightlighter(id =>
+		getRendererByVNodeId(renderers, id),
+	);
 
 	const inspect = (id: ID) => {
-		if (renderer.has(id)) {
-			const data = renderer.inspect(id);
-			if (data) {
-				send("inspect-result", data);
-			}
+		const data = getRendererByVNodeId(renderers, id)?.inspect(id);
+		if (data) {
+			send("inspect-result", data);
 		}
 	};
 
 	const picker = createPicker(
 		window,
-		renderer,
+		renderers,
 		id => {
 			highlight.highlight(id);
 			if (id > -1) {
@@ -82,19 +91,17 @@ export function createAdapter(port: PortPageHook, renderer: Renderer) {
 	});
 
 	listen("inspect", id => {
-		if (id !== null && renderer.has(id)) {
-			const res = renderer.findDomForVNode(id);
-			if (res && res.length > 0) {
-				(window as any).__PREACT_DEVTOOLS__.$0 = res[0];
-			}
+		if (id === null) return;
+		const res = getRendererByVNodeId(renderers, id)?.findDomForVNode(id);
+
+		if (res && res.length > 0) {
+			(window as any).__PREACT_DEVTOOLS__.$0 = res[0];
 		}
 		inspect(id);
 	});
 
 	listen("log", e => {
-		if (renderer.has(e.id)) {
-			renderer.log(e.id, e.children);
-		}
+		getRendererByVNodeId(renderers, e.id)?.log(e.id, e.children);
 	});
 
 	listen("highlight", id => {
@@ -110,7 +117,13 @@ export function createAdapter(port: PortPageHook, renderer: Renderer) {
 
 	const update = (data: DevtoolEvents["update"]) => {
 		const { id, type, path, value } = data;
-		renderer.update(id, type, path.split(".").slice(1), value);
+
+		getRendererByVNodeId(renderers, id)?.update(
+			id,
+			type,
+			path.split(".").slice(1),
+			value,
+		);
 
 		// Notify all frontends that something changed
 		inspect(id);
@@ -120,24 +133,27 @@ export function createAdapter(port: PortPageHook, renderer: Renderer) {
 	listen("update-state", data => update({ ...data, type: "state" }));
 	listen("update-context", data => update({ ...data, type: "context" }));
 	listen("update-hook", data => {
-		if (renderer.updateHook && data.meta) {
-			renderer.updateHook(data.id, data.meta.index, data.value);
-		}
+		if (!data.meta) return;
+
+		getRendererByVNodeId(renderers, data.id)?.updateHook?.(
+			data.id,
+			data.meta.index,
+			data.value,
+		);
 	});
 
 	listen("update-filter", data => {
-		renderer.applyFilters(parseFilters(data));
+		const filters = parseFilters(data);
+		forAll(r => r.applyFilters(filters));
 	});
 
-	listen("refresh", () => {
-		if (renderer.refresh) {
-			renderer.refresh();
-		}
-	});
+	listen("refresh", () => forAll(r => r.refresh?.()));
 
 	// Profiler
-	listen("start-profiling", options => renderer.startProfiling!(options));
-	listen("stop-profiling", () => renderer.stopProfiling!());
+	listen("start-profiling", options =>
+		forAll(r => r.startProfiling?.(options)),
+	);
+	listen("stop-profiling", () => forAll(r => r.stopProfiling?.()));
 	listen("reload-and-profile", options => {
 		window.localStorage.setItem(PROFILE_RELOAD, JSON.stringify(options));
 
@@ -152,8 +168,8 @@ export function createAdapter(port: PortPageHook, renderer: Renderer) {
 	});
 
 	// Stats
-	listen("start-stats-recording", renderer.startRecordStats!);
-	listen("stop-stats-recording", renderer.stopRecordStats!);
+	listen("start-stats-recording", () => forAll(r => r.startRecordStats?.()));
+	listen("stop-stats-recording", () => forAll(r => r.stopRecordStats?.()));
 	listen("reload-and-record-stats", () => {
 		window.localStorage.setItem(STATS_RELOAD, "true");
 
@@ -168,29 +184,27 @@ export function createAdapter(port: PortPageHook, renderer: Renderer) {
 	});
 
 	listen("start-highlight-updates", () => {
-		if (renderer.startHighlightUpdates) {
-			renderer.startHighlightUpdates();
-		}
+		forAll(r => r.startHighlightUpdates?.());
 	});
 	listen("stop-highlight-updates", () => {
-		if (renderer.stopHighlightUpdates) {
-			renderer.stopHighlightUpdates();
-		}
+		forAll(r => r.stopHighlightUpdates?.());
 	});
 
 	listen("load-host-selection", () => {
 		const hook: DevtoolsHook = (window as any).__PREACT_DEVTOOLS__;
 		const selected = hook.$0;
 		if (selected) {
-			const id = renderer.findVNodeIdForDom(selected);
-			if (id > -1) {
-				send("select-node", id);
-			}
+			forAll(r => {
+				const id = r.findVNodeIdForDom(selected);
+				if (id > -1) {
+					send("select-node", id);
+				}
+			});
 		}
 	});
 
 	listen("view-source", id => {
-		const vnode = renderer.getVNodeById(id);
+		const vnode = getRendererByVNodeId(renderers, id)?.getVNodeById(id);
 		const hook: DevtoolsHook = (window as any).__PREACT_DEVTOOLS__;
 
 		if (vnode && typeof vnode.type === "function") {
@@ -205,8 +219,6 @@ export function createAdapter(port: PortPageHook, renderer: Renderer) {
 	});
 
 	listen("suspend", data => {
-		if (renderer.suspend) {
-			renderer.suspend(data.id, data.active);
-		}
+		getRendererByVNodeId(renderers, data.id)?.suspend?.(data.id, data.active);
 	});
 }

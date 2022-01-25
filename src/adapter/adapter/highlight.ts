@@ -8,7 +8,9 @@ import { Highlighter, style } from "../../view/components/Highlighter";
  * This module is responsible for displaying the transparent element overlay
  * inside the user's web page.
  */
-export function createHightlighter(renderer: Renderer) {
+export function createHightlighter(
+	getRendererByVnodeId: (id: ID) => Renderer | null,
+) {
 	/**
 	 * Reference to the DOM element that we'll render the selection highlighter
 	 * into. We'll cache it so that we don't unnecessarily re-create it when the
@@ -25,6 +27,11 @@ export function createHightlighter(renderer: Renderer) {
 	}
 
 	function highlight(id: ID) {
+		const renderer = getRendererByVnodeId(id);
+		if (!renderer) {
+			return destroyHighlight();
+		}
+
 		const vnode = renderer.getVNodeById(id);
 		if (!vnode) {
 			return destroyHighlight();
@@ -47,9 +54,7 @@ export function createHightlighter(renderer: Renderer) {
 			const node = getNearestElement(first);
 			const nodeEnd = last ? getNearestElement(last) : null;
 			if (node != null) {
-				const label = renderer.getDisplayNameById
-					? renderer.getDisplayNameById(id)
-					: renderer.getDisplayName(vnode);
+				const label = renderer.getDisplayName(vnode);
 
 				let size = measureNode(node);
 				if (nodeEnd !== null) {
