@@ -24,7 +24,7 @@ import {
 import { shouldFilter } from "./filter";
 import { ID, DevNodeType } from "../../view/store/types";
 import { traverse } from "./utils";
-import { FilterState } from "../adapter/filter";
+import { DEFAULT_FIlTERS, FilterState } from "../adapter/filter";
 import { Renderer } from "../renderer";
 import {
 	createIdMappingState,
@@ -513,12 +513,6 @@ export function createCommit(
 
 	return commit;
 }
-
-const DEFAULT_FIlTERS: FilterState = {
-	regex: [],
-	// TODO: Add default hoc-filter
-	type: new Set(["dom", "fragment"]),
-};
 
 export interface Preact10Renderer extends Renderer {
 	onCommit(vnode: VNode): void;
