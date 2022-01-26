@@ -537,7 +537,7 @@ export interface Supports {
 	hooks: boolean;
 }
 
-export function createRenderer(
+export function createV10Renderer(
 	port: PortPageHook,
 	namespace: number,
 	config: RendererConfig10,

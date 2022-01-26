@@ -3,11 +3,12 @@ import { ID } from "../view/store/types";
 import { createAdapter, InspectData, UpdateType } from "./adapter/adapter";
 import { RawFilterState } from "./adapter/filter";
 import { Options } from "preact";
-import { createRenderer, RendererConfig10 } from "./10/renderer";
+import { createV10Renderer, RendererConfig10 } from "./10/renderer";
 import { setupOptions } from "./10/options";
 import parseSemverish from "./parse-semverish";
 import { PortPageHook } from "./adapter/port";
 import { PROFILE_RELOAD, STATS_RELOAD } from "../constants";
+import { createV11Renderer } from "./11/renderer";
 
 export type EmitterFn = (event: string, data: any) => void;
 
@@ -199,6 +200,10 @@ export function createHook(port: PortPageHook): DevtoolsHook {
 				return -1;
 			}
 
+			// Create an integer-based namespace to avoid clashing ids caused by
+			// multiple connected renderers
+			const namespace = Math.floor(Math.random() * 2 ** 32);
+
 			// currently we only support preact >= 10, later we can add another branch for major === 8
 			if (preactVersionMatch.major == 10) {
 				const supports = {
@@ -206,10 +211,7 @@ export function createHook(port: PortPageHook): DevtoolsHook {
 					hooks: (preactVersionMatch.minor === 4 && preactVersionMatch.patch >= 1) || preactVersionMatch.minor > 4,
 				};
 
-				// Create an integer-based namespace to avoid clashing ids caused by
-				// multiple connected renderers
-				const namespace = Math.floor(Math.random() * 2 ** 32);
-				const renderer = createRenderer(
+				const renderer = createV10Renderer(
 					port,
 					namespace,
 					config as any,
@@ -217,6 +219,14 @@ export function createHook(port: PortPageHook): DevtoolsHook {
 					supports,
 				);
 				setupOptions(options, renderer, config as any);
+				return attachRenderer(renderer, supports);
+			} else if (preactVersionMatch.major === 11) {
+				const supports = {
+					renderReasons: false,
+					hooks: false,
+				};
+
+				const renderer = createV11Renderer(port, namespace, supports);
 				return attachRenderer(renderer, supports);
 			}
 

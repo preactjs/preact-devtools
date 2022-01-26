@@ -1,6 +1,6 @@
 import { h, render, Options, options, Fragment, Component } from "preact";
 import * as sinon from "sinon";
-import { createRenderer, getFilteredChildren } from "./renderer";
+import { createV10Renderer, getFilteredChildren } from "./renderer";
 import { setupOptions } from "../10/options";
 import { expect } from "chai";
 import { toSnapshot } from "../debug";
@@ -19,7 +19,7 @@ export function setupScratch() {
 
 export function setupMockHook(options: Options) {
 	const spy = sinon.spy();
-	const renderer = createRenderer(
+	const renderer = createV10Renderer(
 		{ send: spy, listen: () => null },
 		1,
 		{ Fragment: Fragment as any },
