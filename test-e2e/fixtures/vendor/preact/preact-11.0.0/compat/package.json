@@ -1,0 +1,20 @@
+{
+	"name": "preact-compat",
+	"amdName": "preactCompat",
+	"version": "4.0.0",
+	"private": true,
+	"description": "A React compatibility layer for Preact",
+	"exports": "./dist/compat.mjs",
+	"module": "dist/compat.mjs",
+	"main": "dist/compat.js",
+	"umd:main": "dist/compat.umd.js",
+	"source": "src/index.js",
+	"types": "src/index.d.ts",
+	"license": "MIT",
+	"mangle": {
+		"regex": "^_"
+	},
+	"peerDependencies": {
+		"preact": "^10.0.0"
+	}
+}
