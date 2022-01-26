@@ -220,6 +220,10 @@ export function createHook(port: PortPageHook): DevtoolsHook {
 				return attachRenderer(renderer, supports);
 			}
 
+			// eslint-disable-next-line no-console
+			console.error(
+				`[PREACT DEVTOOLS] No devtools adapter exists for preact version "${version}". This is likely a bug in devtools.`,
+			);
 			return -1;
 		},
 		attach: renderer => attachRenderer(renderer, { renderReasons: false }),
