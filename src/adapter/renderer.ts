@@ -20,6 +20,9 @@ export interface Renderer {
 	has(id: ID): boolean;
 	log(id: ID, children: ID[]): void;
 	inspect(id: ID): InspectData | null;
+	/**
+	 * @deprecated This method was used in older Devtools bridges.
+	 */
 	flushInitial(): void;
 	update(id: ID, type: UpdateType, path: ObjPath, value: any): void;
 	clear?(): void;
