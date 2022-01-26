@@ -110,8 +110,8 @@ export function loadPreactVersion(): Plugin {
 						);
 						const out = {
 							code: code.replace(
-								/["']preact/g,
-								`"preact@${version.replace(/\./g, "_")}`,
+								/(["'])preact/g,
+								(_, quot) => `${quot}preact@${version.replace(/\./g, "_")}`,
 							),
 							map,
 						};
