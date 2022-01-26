@@ -41,8 +41,9 @@ export function loadPreactVersion(): Plugin {
 						});
 					}
 
-					// Check for tarball
+					// Check for tarball or folder
 					const tarball = path.join(tarDir, `preact-${version}.tgz`);
+					const folder = path.join(tarDir, `preact-${version}`);
 					if (fs.existsSync(tarball)) {
 						if (!fs.existsSync(versionDir)) {
 							fs.mkdirSync(versionDir, { recursive: true });
@@ -73,6 +74,38 @@ export function loadPreactVersion(): Plugin {
 						);
 						const map = fs.readFileSync(
 							path.join(versionDir, importee + ".map"),
+							"utf-8",
+						);
+						const out = {
+							code: code.replace(
+								/["']preact/g,
+								`"preact@${version.replace(/\./g, "_")}`,
+							),
+							map,
+						};
+
+						cache.set(id, out);
+
+						const fns = pending.get(version) || [];
+						await Promise.all(fns.map(fn => fn()));
+						return out;
+					} else if (fs.existsSync(folder)) {
+						let importee = id.replace(/@[^/]+/, "");
+						if (importee === "preact") {
+							importee = "dist/preact.mjs";
+						} else if (importee === "preact/compat") {
+							importee = "compat/dist/compat.mjs";
+						} else if (importee === "preact/hooks") {
+							importee = "hooks/dist/hooks.mjs";
+						} else if (importee === "preact/debug") {
+							importee = "debug/dist/debug.mjs";
+						} else if (importee === "preact/devtools") {
+							importee = "devtools/dist/devtools.mjs";
+						}
+
+						const code = fs.readFileSync(path.join(folder, importee), "utf-8");
+						const map = fs.readFileSync(
+							path.join(folder, importee + ".map"),
 							"utf-8",
 						);
 						const out = {
