@@ -78,3 +78,6 @@ test-e2e/fixtures/extension
 # Browser profiles
 profiles/firefox/*
 profiles/chrome/*
+
+# macOS
+.DS_Store
