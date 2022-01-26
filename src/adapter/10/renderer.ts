@@ -1,12 +1,12 @@
 import { BaseEvent, PortPageHook } from "../adapter/port";
-import { Commit, MsgTypes, flush } from "../events/events";
+import { Commit, MsgTypes, flush } from "../protocol/events";
 import {
 	VNode,
 	FunctionalComponent,
 	ComponentConstructor,
 	Options,
 } from "preact";
-import { getStringId } from "../string-table";
+import { getStringId } from "../protocol/string-table";
 import {
 	isRoot,
 	getAncestor,
@@ -23,7 +23,7 @@ import {
 } from "./vnode";
 import { shouldFilter } from "./filter";
 import { ID, DevNodeType } from "../../view/store/types";
-import { traverse, setIn, SerializedVNode, setInCopy } from "./utils";
+import { traverse } from "./utils";
 import { FilterState } from "../adapter/filter";
 import { Renderer } from "../renderer";
 import {
@@ -45,14 +45,10 @@ import {
 	measureUpdate,
 	startDrawing,
 } from "../adapter/highlightUpdates";
-import {
-	createStats,
-	DiffType,
-	getDiffType,
-	updateDiffStats,
-	recordComponentStats,
-} from "./stats";
+import { getDiffType, updateDiffStats, recordComponentStats } from "./stats";
 import { NodeType } from "../../constants";
+import { SerializedVNode, setIn, setInCopy } from "../shared/serialize";
+import { createStats, DiffType } from "../shared/stats";
 
 export interface RendererConfig10 {
 	Fragment: FunctionalComponent;

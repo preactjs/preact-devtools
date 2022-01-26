@@ -1,5 +1,5 @@
-import { MsgTypes } from "./events/events";
-import { parseTable, flushTable } from "./string-table";
+import { MsgTypes } from "./protocol/events";
+import { parseTable, flushTable } from "./protocol/string-table";
 import { ID, DevNodeType } from "../view/store/types";
 
 export interface ParsedMsg {

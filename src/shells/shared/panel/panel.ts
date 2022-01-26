@@ -1,7 +1,7 @@
 import { render, h } from "preact";
 import { DevTools } from "../../../view/components/Devtools";
 import { createStore } from "../../../view/store";
-import { applyEvent } from "../../../adapter/events/events";
+import { applyEvent } from "../../../adapter/protocol/events";
 import { debug } from "../../../debug";
 import { DevtoolsPanelName } from "../../../constants";
 import {

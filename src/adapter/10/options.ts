@@ -1,6 +1,6 @@
 import { Options, VNode, ComponentConstructor, Component } from "preact";
 import { Preact10Renderer, RendererConfig10 } from "./renderer";
-import { recordMark, endMark } from "./marks";
+import { recordMark, endMark } from "../marks";
 import {
 	getDisplayName,
 	setNextState,

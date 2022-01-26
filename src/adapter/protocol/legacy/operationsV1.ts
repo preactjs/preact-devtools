@@ -1,5 +1,5 @@
 import { MsgTypes } from "../events";
-import { parseTable } from "../../string-table";
+import { parseTable } from "../string-table";
 import { Store } from "../../../view/store/types";
 import { deepClone } from "../../../view/components/profiler/flamegraph/modes/adjustNodesToRight";
 
