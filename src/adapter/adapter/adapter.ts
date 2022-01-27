@@ -173,8 +173,12 @@ export function createAdapter(
 	});
 
 	// Stats
-	listen("start-stats-recording", () => forAll(r => r.startRecordStats?.()));
-	listen("stop-stats-recording", () => forAll(r => r.stopRecordStats?.()));
+	listen("start-stats-recording", () => {
+		profiler.recordStats = true;
+	});
+	listen("stop-stats-recording", () => {
+		profiler.recordStats = false;
+	});
 	listen("reload-and-record-stats", () => {
 		window.localStorage.setItem(STATS_RELOAD, "true");
 

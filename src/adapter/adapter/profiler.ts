@@ -6,6 +6,7 @@ export interface ProfilerState {
 	pendingHighlightUpdates: Set<HTMLElement>;
 	updateRects: UpdateRects;
 	captureRenderReasons: boolean;
+	recordStats: boolean;
 }
 
 export function newProfiler(): ProfilerState {
@@ -15,5 +16,6 @@ export function newProfiler(): ProfilerState {
 		pendingHighlightUpdates: new Set(),
 		captureRenderReasons: false,
 		isProfiling: false,
+		recordStats: false,
 	};
 }

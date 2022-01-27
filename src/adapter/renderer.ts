@@ -22,10 +22,6 @@ export interface Renderer {
 	update(id: ID, type: UpdateType, path: ObjPath, value: any): void;
 	clear?(): void;
 
-	// Stats
-	startRecordStats?(): void; // V4
-	stopRecordStats?(): void; // V4
-
 	// Hooks
 	updateHook?(id: ID, index: number, value: any): void; // V3
 

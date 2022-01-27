@@ -138,7 +138,7 @@ export function createHook(port: PortPageHook): DevtoolsHook {
 		const statsOptions = window.localStorage.getItem(STATS_RELOAD);
 		if (statsOptions !== null) {
 			window.localStorage.removeItem(STATS_RELOAD);
-			renderer.startRecordStats!();
+			profiler.recordStats = true;
 		}
 
 		return uid;

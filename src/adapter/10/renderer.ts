@@ -452,7 +452,6 @@ export function createCommit(
 	domCache: WeakMap<HTMLElement | Text, VNode>,
 	config: RendererConfig10,
 	profiler: ProfilerState,
-	statState: StatState,
 ): Commit {
 	const commit = {
 		operations: [],
@@ -460,7 +459,7 @@ export function createCommit(
 		strings: new Map(),
 		unmountIds: [],
 		renderReasons: new Map(),
-		stats: statState.isRecording ? createStats() : null,
+		stats: profiler.recordStats ? createStats() : null,
 	};
 
 	let parentId = -1;
@@ -517,10 +516,6 @@ export interface Preact10Renderer extends Renderer {
 	updateHook(id: ID, index: number, value: any): void;
 }
 
-export interface StatState {
-	isRecording: boolean;
-}
-
 export interface Supports {
 	renderReasons: boolean;
 	hooks: boolean;
@@ -541,10 +536,6 @@ export function createV10Renderer(
 	let currentUnmounts: number[] = [];
 
 	const domToVNode = new WeakMap<HTMLElement | Text, VNode>();
-
-	const statState: StatState = {
-		isRecording: false,
-	};
 
 	function onUnmount(vnode: VNode) {
 		if (!shouldFilter(vnode, filters, config)) {
@@ -569,13 +560,6 @@ export function createV10Renderer(
 			roots.forEach(vnode => {
 				onUnmount(vnode);
 			});
-		},
-
-		startRecordStats: () => {
-			statState.isRecording = true;
-		},
-		stopRecordStats: () => {
-			statState.isRecording = false;
 		},
 
 		getVNodeById: id => getVNodeById(ids, id),
@@ -654,7 +638,7 @@ export function createV10Renderer(
 					rootId,
 					strings: new Map(),
 					unmountIds: currentUnmounts,
-					stats: statState.isRecording ? createStats() : null,
+					stats: profiler.recordStats ? createStats() : null,
 				};
 
 				if (commit.stats !== null) {
@@ -680,7 +664,6 @@ export function createV10Renderer(
 					domToVNode,
 					config,
 					profiler,
-					statState,
 				);
 				const ev = flush(commit);
 				if (!ev) return;
@@ -698,7 +681,6 @@ export function createV10Renderer(
 				domToVNode,
 				config,
 				profiler,
-				statState,
 			);
 
 			if (commit.stats !== null) {
