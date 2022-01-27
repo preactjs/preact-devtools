@@ -1,6 +1,6 @@
 import { h, Component, Options, VNode } from "preact";
 import { RendererConfig10 } from "../renderer";
-import { serialize, isEditable } from "../utils";
+import { serialize } from "../utils";
 import { getComponent, getHookState, getComponentHooks } from "../vnode";
 import { parseStackTrace } from "errorstacks";
 import { HookType } from "../../../constants";
@@ -9,6 +9,7 @@ import {
 	parseProps,
 	PropDataType,
 } from "../../../view/components/sidebar/inspect/parseProps";
+import { isEditable } from "../../shared/serialize";
 
 /**
  * Throwaway component to render hooks

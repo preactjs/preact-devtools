@@ -20,17 +20,6 @@ export function serialize(config: RendererConfig10, data: object | null) {
 	return jsonify(data, node => serializeVNode(node, config), new Set());
 }
 
-export function isEditable(x: any) {
-	switch (typeof x) {
-		case "string":
-		case "number":
-		case "boolean":
-			return true;
-		default:
-			return false;
-	}
-}
-
 // eslint-disable-next-line @typescript-eslint/ban-types
 export function cleanProps<T extends object>(
 	props: T,
