@@ -102,10 +102,6 @@ export function createHook(port: PortPageHook): DevtoolsHook {
 
 		listen("init", () => {
 			status = "connected";
-
-			for (const r of renderers.values()) {
-				r.flushInitial();
-			}
 		});
 	};
 

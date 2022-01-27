@@ -565,10 +565,6 @@ export function createV10Renderer(
 		inspectVNode(ids, config, options, id, supports.hooks);
 
 	return {
-		// TODO: Deprecate
-		// eslint-disable-next-line @typescript-eslint/no-empty-function
-		flushInitial() {},
-
 		clear() {
 			roots.forEach(vnode => {
 				onUnmount(vnode);
@@ -691,7 +687,6 @@ export function createV10Renderer(
 				queue.push(ev);
 			});
 
-			this.flushInitial();
 			queue.forEach(ev => port.send(ev.type, ev.data));
 		},
 		onCommit(vnode) {
