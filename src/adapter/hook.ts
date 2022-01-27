@@ -10,6 +10,7 @@ import { PortPageHook } from "./adapter/port";
 import { PROFILE_RELOAD, STATS_RELOAD } from "../constants";
 import { createV11Renderer } from "./11/renderer";
 import { setupOptionsV11 } from "./11/options";
+import { newProfiler } from "./adapter/profiler";
 
 export type EmitterFn = (event: string, data: any) => void;
 
@@ -90,9 +91,11 @@ export function createHook(port: PortPageHook): DevtoolsHook {
 	let uid = 0;
 	let status: "connected" | "pending" | "disconnected" = "disconnected";
 
+	const profiler = newProfiler();
+
 	// Lazily init the adapter when a renderer is attached
 	const init = () => {
-		createAdapter(port, renderers);
+		createAdapter(port, profiler, renderers);
 
 		status = "pending";
 		send("init", null);
@@ -108,7 +111,7 @@ export function createHook(port: PortPageHook): DevtoolsHook {
 
 	const attachRenderer = (
 		renderer: Renderer,
-		supports: { renderReasons?: boolean; hooks?: boolean },
+		supports: { renderReasons?: boolean; hooks?: boolean; profiling?: boolean },
 	) => {
 		if (status === "disconnected") {
 			init();
@@ -118,22 +121,22 @@ export function createHook(port: PortPageHook): DevtoolsHook {
 
 		// Content Script is likely not ready at this point, so don't
 		// flush any events here and politely request it to initialize
-		const supportsProfiling =
-			typeof renderer.startProfiling === "function" &&
-			typeof renderer.stopProfiling === "function";
 		send("attach", {
 			id: uid,
-			supportsProfiling,
+			supportsProfiling: !!supports.profiling,
 			supportsRenderReasons: !!supports.renderReasons,
 			supportsHooks: !!supports.hooks,
 		});
 
-		// Feature: Profile and reaload
+		// Feature: Profile and reload
 		// Check if we should immediately start profiling on create
 		const profilerOptions = window.localStorage.getItem(PROFILE_RELOAD);
 		if (profilerOptions !== null) {
 			window.localStorage.removeItem(PROFILE_RELOAD);
-			renderer.startProfiling!(JSON.parse(profilerOptions));
+
+			const options = JSON.parse(profilerOptions);
+			profiler.isProfiling = true;
+			profiler.captureRenderReasons = !!options?.captureRenderReasons;
 		}
 
 		const statsOptions = window.localStorage.getItem(STATS_RELOAD);
@@ -209,7 +212,10 @@ export function createHook(port: PortPageHook): DevtoolsHook {
 			if (preactVersionMatch.major == 10) {
 				const supports = {
 					renderReasons: !!config.Component,
-					hooks: (preactVersionMatch.minor === 4 && preactVersionMatch.patch >= 1) || preactVersionMatch.minor > 4,
+					hooks:
+						(preactVersionMatch.minor === 4 && preactVersionMatch.patch >= 1) ||
+						preactVersionMatch.minor > 4,
+					profiling: true,
 				};
 
 				const renderer = createV10Renderer(
@@ -218,23 +224,23 @@ export function createHook(port: PortPageHook): DevtoolsHook {
 					config as any,
 					options,
 					supports,
+					profiler,
 				);
 				setupOptionsV10(options, renderer, config as any);
 				return attachRenderer(renderer, supports);
 			} else if (preactVersionMatch.major === 11) {
-				const supports = {
-					renderReasons: false,
-					hooks: false,
-				};
-
 				const renderer = createV11Renderer(
 					port,
 					namespace,
 					options as any,
-					supports,
+					profiler,
 				);
 				setupOptionsV11(options as any, renderer, config);
-				return attachRenderer(renderer, supports);
+				return attachRenderer(renderer, {
+					hooks: true,
+					renderReasons: true,
+					profiling: true,
+				});
 			}
 
 			// eslint-disable-next-line no-console

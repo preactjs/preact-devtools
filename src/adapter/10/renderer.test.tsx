@@ -9,6 +9,7 @@ import { act } from "preact/test-utils";
 import { getDisplayName } from "./vnode";
 import { FilterState } from "../adapter/filter";
 import { Renderer } from "../renderer";
+import { newProfiler } from "../adapter/profiler";
 
 export function setupScratch() {
 	const div = document.createElement("div");
@@ -25,6 +26,7 @@ export function setupMockHook(options: Options) {
 		{ Fragment: Fragment as any },
 		{},
 		{ hooks: false, renderReasons: false },
+		newProfiler(),
 		{ type: new Set(), regex: [] },
 	);
 	const destroy = setupOptionsV10(options, renderer, {

@@ -16,6 +16,18 @@ export interface FilterState {
 	type: Set<TypeFilterValue>;
 }
 
+export interface RegexFilter {
+	type: "name";
+	value: string;
+}
+
+export interface TypeFilter {
+	type: "type";
+	value: TypeFilterValue;
+}
+
+export type Filter = RegexFilter | TypeFilter;
+
 export const DEFAULT_FIlTERS: FilterState = {
 	regex: [],
 	// TODO: Add default hoc-filter

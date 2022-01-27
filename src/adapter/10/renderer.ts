@@ -40,15 +40,12 @@ import {
 import { logVNode } from "./renderer/logVNode";
 import { inspectVNode } from "./renderer/inspectVNode";
 import { getRenderReason, RenderReason } from "./renderer/renderReasons";
-import {
-	UpdateRects,
-	measureUpdate,
-	startDrawing,
-} from "../adapter/highlightUpdates";
+import { measureUpdate, startDrawing } from "../adapter/highlightUpdates";
 import { getDiffType, recordComponentStats } from "./stats";
 import { NodeType } from "../../constants";
 import { SerializedVNode, setIn, setInCopy } from "../shared/serialize";
 import { createStats, DiffType, updateDiffStats } from "../shared/stats";
+import { ProfilerState } from "../adapter/profiler";
 
 export interface RendererConfig10 {
 	Fragment: FunctionalComponent;
@@ -520,14 +517,6 @@ export interface Preact10Renderer extends Renderer {
 	updateHook(id: ID, index: number, value: any): void;
 }
 
-export interface ProfilerState {
-	isProfiling: boolean;
-	highlightUpdates: boolean;
-	pendingHighlightUpdates: Set<HTMLElement>;
-	updateRects: UpdateRects;
-	captureRenderReasons: boolean;
-}
-
 export interface StatState {
 	isRecording: boolean;
 }
@@ -543,6 +532,7 @@ export function createV10Renderer(
 	config: RendererConfig10,
 	options: Options,
 	supports: Supports,
+	profiler: ProfilerState,
 	filters: FilterState = DEFAULT_FIlTERS,
 ): Preact10Renderer {
 	const ids = createIdMappingState(namespace);
@@ -551,14 +541,6 @@ export function createV10Renderer(
 	let currentUnmounts: number[] = [];
 
 	const domToVNode = new WeakMap<HTMLElement | Text, VNode>();
-
-	const profiler: ProfilerState = {
-		isProfiling: false,
-		highlightUpdates: false,
-		updateRects: new Map(),
-		pendingHighlightUpdates: new Set(),
-		captureRenderReasons: false,
-	};
 
 	const statState: StatState = {
 		isRecording: false,
@@ -593,15 +575,6 @@ export function createV10Renderer(
 			});
 		},
 
-		startHighlightUpdates() {
-			profiler.highlightUpdates = true;
-		},
-		stopHighlightUpdates() {
-			profiler.highlightUpdates = false;
-			profiler.updateRects.clear();
-			profiler.pendingHighlightUpdates.clear();
-		},
-
 		startRecordStats: () => {
 			statState.isRecording = true;
 		},
@@ -609,14 +582,6 @@ export function createV10Renderer(
 			statState.isRecording = false;
 		},
 
-		startProfiling: options => {
-			profiler.isProfiling = true;
-			profiler.captureRenderReasons =
-				!!options && !!options.captureRenderReasons;
-		},
-		stopProfiling: () => {
-			profiler.isProfiling = false;
-		},
 		getVNodeById: id => getVNodeById(ids, id),
 		has: id => hasId(ids, id),
 		getDisplayName(vnode) {

@@ -2,7 +2,6 @@ import { VNode } from "preact";
 import { ID } from "../view/store/types";
 import { FilterState } from "./adapter/filter";
 import { InspectData, UpdateType } from "./adapter/adapter";
-import { DevtoolEvents } from "./hook";
 
 export type ObjPath = Array<string | number>;
 
@@ -26,12 +25,6 @@ export interface Renderer {
 	flushInitial(): void;
 	update(id: ID, type: UpdateType, path: ObjPath, value: any): void;
 	clear?(): void;
-
-	// Profiler
-	startProfiling?(options: DevtoolEvents["start-profiling"]): void; // V2
-	stopProfiling?(): void; // V2
-	startHighlightUpdates?(): void;
-	stopHighlightUpdates?(): void;
 
 	// Stats
 	startRecordStats?(): void; // V4

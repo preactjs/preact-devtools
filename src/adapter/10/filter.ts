@@ -1,19 +1,7 @@
 import { VNode } from "preact";
 import { getDisplayName, getVNodeParent } from "./vnode";
-import { TypeFilterValue, FilterState } from "../adapter/filter";
+import { FilterState } from "../adapter/filter";
 import { RendererConfig10 } from "./renderer";
-
-export interface RegexFilter {
-	type: "name";
-	value: string;
-}
-
-export interface TypeFilter {
-	type: "type";
-	value: TypeFilterValue;
-}
-
-export type Filter = RegexFilter | TypeFilter;
 
 export function shouldFilter(
 	vnode: VNode,
