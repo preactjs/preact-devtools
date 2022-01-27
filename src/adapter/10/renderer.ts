@@ -45,10 +45,10 @@ import {
 	measureUpdate,
 	startDrawing,
 } from "../adapter/highlightUpdates";
-import { getDiffType, updateDiffStats, recordComponentStats } from "./stats";
+import { getDiffType, recordComponentStats } from "./stats";
 import { NodeType } from "../../constants";
 import { SerializedVNode, setIn, setInCopy } from "../shared/serialize";
-import { createStats, DiffType } from "../shared/stats";
+import { createStats, DiffType, updateDiffStats } from "../shared/stats";
 
 export interface RendererConfig10 {
 	Fragment: FunctionalComponent;

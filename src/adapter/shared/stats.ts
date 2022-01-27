@@ -42,6 +42,23 @@ export interface Stats {
 	};
 }
 
+export function updateDiffStats(
+	stats: Stats,
+	diff: DiffType,
+	childCount: number,
+) {
+	if (diff === DiffType.KEYED) {
+		stats.keyed.total++;
+		stats.keyed.children.push(childCount);
+	} else if (diff === DiffType.UNKEYED) {
+		stats.unkeyed.total++;
+		stats.unkeyed.children.push(childCount);
+	} else if (diff === DiffType.MIXED) {
+		stats.mixed.total++;
+		stats.mixed.children.push(childCount);
+	}
+}
+
 // TODO: store update depth
 export function createStats(): Stats {
 	return {
