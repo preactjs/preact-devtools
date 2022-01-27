@@ -1,5 +1,4 @@
-import { Options, VNode, ComponentConstructor, Component } from "preact";
-import { Preact10Renderer, RendererConfig10 } from "./renderer";
+import { Preact11Renderer, RendererConfig11 } from "./renderer";
 import { recordMark, endMark } from "../marks";
 import {
 	getDisplayName,
@@ -8,14 +7,44 @@ import {
 	getStatefulHooks,
 	getStatefulHookValue,
 	getComponent,
-} from "./vnode";
-import { addHookStack, addDebugValue, addHookName } from "./renderer/hooks";
-import { HookType } from "../../constants";
+	Internal,
+} from "./internal";
+// import { addHookStack, addDebugValue, addHookName } from "./renderer/hooks";
+// import { HookType } from "../../constants";
+
+export interface VNode {
+	foo: any;
+}
+
+export interface OptionsV11 {
+	/** Attach a hook that is invoked immediately before a vnode is unmounted. */
+	unmount?(internal: Internal): void;
+	/** Attach a hook that is invoked after a vnode has rendered. */
+	diffed?(internal: Internal): void;
+	/** Attach a hook that is invoked before render, mainly to check the arguments. */
+	_root?(
+		vnode: ComponentChild,
+		parent: Element | Document | ShadowRoot | DocumentFragment,
+	): void;
+	/** Attach a hook that is invoked before a vnode is diffed. */
+	_diff?(internal: Internal, vnode?: VNode): void;
+	/** Attach a hook that is invoked after a tree was mounted or was updated. */
+	_commit?(internal: Internal, commitQueue: CommitQueue): void;
+	/** Attach a hook that is invoked before a vnode has rendered. */
+	_render?(internal: Internal): void;
+	/** Attach a hook that is invoked before a hook's state is queried. */
+	_hook?(component: Component, index: number, type: HookType): void;
+	/** Bypass effect execution. Currenty only used in devtools for hooks inspection */
+	_skipEffects?: boolean;
+	/** Attach a hook that is invoked after an error is caught in a component but before calling lifecycle hooks */
+	_catchError?(error: any, internal: Internal): void;
+	_internal?(internal: Internal, vnode: VNode | string): void;
+}
 
 /**
  * Inject tracking into setState
  */
-function trackPrevState(Ctor: ComponentConstructor) {
+function trackPrevState(Ctor: any) {
 	const setState = Ctor.prototype.setState;
 	Ctor.prototype.setState = function (update: any, callback: any) {
 		// Duplicated in setState() but doesn't matter due to the guard.
@@ -31,10 +60,10 @@ function trackPrevState(Ctor: ComponentConstructor) {
 	};
 }
 
-export function setupOptionsV10(
-	options: Options,
-	renderer: Preact10Renderer,
-	config: RendererConfig10,
+export function setupOptionsV11(
+	options: OptionsV11,
+	renderer: Preact11Renderer,
+	config: RendererConfig11,
 ) {
 	// Track component state. Only supported in Preact > 10.4.0
 	if (config.Component) {
@@ -44,7 +73,7 @@ export function setupOptionsV10(
 	const o = options as any;
 
 	// Store (possible) previous hooks so that we don't overwrite them
-	const prevVNodeHook = options.vnode;
+	const prevVNodeHook = options._internal;
 	const prevCommitRoot = o._commit || o.__c;
 	const prevBeforeUnmount = options.unmount;
 	const prevBeforeDiff = o._diff || o.__b;
@@ -53,21 +82,6 @@ export function setupOptionsV10(
 	let prevUseDebugValue = options.useDebugValue;
 	// @ts-ignore
 	let prevHookName = options.useDebugName;
-
-	options.vnode = vnode => {
-		// Tiny performance improvement by initializing fields as doubles
-		// from the start. `performance.now()` will always return a double.
-		// See https://github.com/facebook/react/issues/14365
-		// and https://slidr.io/bmeurer/javascript-engine-fundamentals-the-good-the-bad-and-the-ugly
-		vnode.startTime = NaN;
-		vnode.endTime = NaN;
-
-		vnode.startTime = 0;
-		vnode.endTime = -1;
-		if (prevVNodeHook) prevVNodeHook(vnode);
-
-		(vnode as any).old = null;
-	};
 
 	// Make sure that we are always the first `option._hook` to be called.
 	// This is necessary to ensure that our callstack remains consistent.
@@ -88,7 +102,7 @@ export function setupOptionsV10(
 			}
 
 			if (type) {
-				addHookStack(type);
+				// addHookStack(type);
 			}
 
 			// Don't continue the chain while the devtools is inspecting hooks.
@@ -100,27 +114,27 @@ export function setupOptionsV10(
 		};
 
 		options.useDebugValue = (value: any) => {
-			addHookStack(HookType.useDebugValue);
-			addDebugValue(value);
+			// addHookStack(HookType.useDebugValue);
+			// addDebugValue(value);
 			if (prevUseDebugValue) prevUseDebugValue(value);
 		};
 
 		// @ts-ignore
 		options._addHookName = options.__a = (name: string | number) => {
-			addHookName(name);
+			// addHookName(name);
 			if (prevHookName) prevHookName(name);
 		};
 	}, 100);
 
-	o._diff = o.__b = (vnode: VNode) => {
-		vnode.startTime = performance.now();
+	o._diff = o.__b = (internal: Internal) => {
+		internal.startTime = performance.now();
 
-		if (typeof vnode.type === "function") {
-			const name = getDisplayName(vnode, config);
+		if (typeof internal.type === "function") {
+			const name = getDisplayName(internal, config);
 			recordMark(`${name}_diff`);
 		}
 
-		if (prevBeforeDiff != null) prevBeforeDiff(vnode);
+		if (prevBeforeDiff != null) prevBeforeDiff(internal);
 	};
 
 	options.diffed = vnode => {
@@ -133,13 +147,14 @@ export function setupOptionsV10(
 		if (prevAfterDiff) prevAfterDiff(vnode);
 	};
 
-	o._commit = o.__c = (vnode: VNode | null, queue: any[]) => {
-		if (prevCommitRoot) prevCommitRoot(vnode, queue);
+	o._commit = o.__c = (internal: Internal | null, queue: any[]) => {
+		if (prevCommitRoot) prevCommitRoot(internal, queue);
 
+		console.log("COMMIT", internal);
 		// These cases are already handled by `unmount`
-		if (vnode == null) return;
+		if (internal == null) return;
 
-		renderer.onCommit(vnode);
+		renderer.onCommit(internal);
 	};
 
 	options.unmount = vnode => {

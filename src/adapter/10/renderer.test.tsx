@@ -1,7 +1,7 @@
 import { h, render, Options, options, Fragment, Component } from "preact";
 import * as sinon from "sinon";
 import { createV10Renderer, getFilteredChildren } from "./renderer";
-import { setupOptions } from "../10/options";
+import { setupOptionsV10 } from "../10/options";
 import { expect } from "chai";
 import { toSnapshot } from "../debug";
 import { useState } from "preact/hooks";
@@ -27,7 +27,7 @@ export function setupMockHook(options: Options) {
 		{ hooks: false, renderReasons: false },
 		{ type: new Set(), regex: [] },
 	);
-	const destroy = setupOptions(options, renderer, {
+	const destroy = setupOptionsV10(options, renderer, {
 		Fragment: Fragment as any,
 	});
 	return {

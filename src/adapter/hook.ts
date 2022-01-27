@@ -4,11 +4,12 @@ import { createAdapter, InspectData, UpdateType } from "./adapter/adapter";
 import { RawFilterState } from "./adapter/filter";
 import { Options } from "preact";
 import { createV10Renderer, RendererConfig10 } from "./10/renderer";
-import { setupOptions } from "./10/options";
+import { setupOptionsV10 } from "./10/options";
 import parseSemverish from "./parse-semverish";
 import { PortPageHook } from "./adapter/port";
 import { PROFILE_RELOAD, STATS_RELOAD } from "../constants";
 import { createV11Renderer } from "./11/renderer";
+import { setupOptionsV11 } from "./11/options";
 
 export type EmitterFn = (event: string, data: any) => void;
 
@@ -218,7 +219,7 @@ export function createHook(port: PortPageHook): DevtoolsHook {
 					options,
 					supports,
 				);
-				setupOptions(options, renderer, config as any);
+				setupOptionsV10(options, renderer, config as any);
 				return attachRenderer(renderer, supports);
 			} else if (preactVersionMatch.major === 11) {
 				const supports = {
@@ -226,7 +227,13 @@ export function createHook(port: PortPageHook): DevtoolsHook {
 					hooks: false,
 				};
 
-				const renderer = createV11Renderer(port, namespace, supports);
+				const renderer = createV11Renderer(
+					port,
+					namespace,
+					options as any,
+					supports,
+				);
+				setupOptionsV11(options as any, renderer, config);
 				return attachRenderer(renderer, supports);
 			}
 
