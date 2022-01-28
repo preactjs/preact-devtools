@@ -565,13 +565,6 @@ export function createV10Renderer(
 		getDisplayName(vnode) {
 			return getDisplayName(vnode, config);
 		},
-		getDisplayNameById: id => {
-			const vnode = getVNodeById(ids, id);
-			if (vnode) {
-				return getDisplayName(vnode, config);
-			}
-			return "Unknown";
-		},
 		log: (id, children) => logVNode(ids, config, id, children),
 		inspect,
 		findDomForVNode(id) {
