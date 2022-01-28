@@ -29,7 +29,6 @@ import { Renderer } from "../renderer";
 import {
 	createIdMappingState,
 	getVNodeById,
-	hasId,
 	getVNodeId,
 	hasVNodeId,
 	removeVNodeId,
@@ -563,7 +562,6 @@ export function createV10Renderer(
 		},
 
 		getVNodeById: id => getVNodeById(ids, id),
-		has: id => hasId(ids, id),
 		getDisplayName(vnode) {
 			return getDisplayName(vnode, config);
 		},

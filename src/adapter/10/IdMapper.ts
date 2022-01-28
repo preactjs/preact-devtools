@@ -70,7 +70,3 @@ export function createVNodeId(state: IdMappingState, vnode: VNode) {
 	state.idToVNode.set(id, vnode);
 	return id;
 }
-
-export function hasId(state: IdMappingState, id: ID) {
-	return state.idToInst.has(id);
-}

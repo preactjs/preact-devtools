@@ -16,7 +16,6 @@ export interface Renderer {
 	findDomForVNode(id: ID): Array<HTMLElement | Text | null> | null;
 	findVNodeIdForDom(node: HTMLElement | Text): number;
 	applyFilters(filters: FilterState): void;
-	has(id: ID): boolean;
 	log(id: ID, children: ID[]): void;
 	inspect(id: ID): InspectData | null;
 	update(id: ID, type: UpdateType, path: ObjPath, value: any): void;
@@ -31,7 +30,7 @@ export interface Renderer {
 
 export function getRendererByVNodeId(renderers: Map<number, Renderer>, id: ID) {
 	for (const r of renderers.values()) {
-		if (r.has(id)) return r;
+		if (r.getVNodeById(id) !== null) return r;
 	}
 
 	return null;
