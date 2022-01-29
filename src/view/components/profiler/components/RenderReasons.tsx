@@ -1,7 +1,7 @@
 import { h } from "preact";
 import { SidebarPanel, Empty } from "../../sidebar/SidebarPanel";
 import { useStore, useObserver } from "../../../store/react-bindings";
-import { RenderReason } from "../../../../adapter/10/renderer/renderReasons";
+import { RenderReason } from "../../../../adapter/shared/renderReasons";
 import s from "./RenderReason.module.css";
 import { Message, MessageBtn } from "../../Message/Message";
 

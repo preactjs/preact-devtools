@@ -1,8 +1,25 @@
-import { ObjPath } from "../renderer";
+import type { RendererConfig } from "./renderer";
+import type { ObjPath } from "../renderer";
+import type { PreactBindings } from "./bindings";
 
 export interface SerializedVNode {
 	type: "vnode";
 	name: string;
+}
+
+export function serializeVNode(
+	x: any,
+	config: RendererConfig,
+	bindings: PreactBindings,
+): SerializedVNode | null {
+	if (bindings.isVNode(x)) {
+		return {
+			type: "vnode",
+			name: bindings.getDisplayName(x, config),
+		};
+	}
+
+	return null;
 }
 
 export function jsonify(
@@ -139,6 +156,18 @@ export function setInCopy<T = any>(
 	return updated as any;
 }
 
+export function serialize(
+	config: RendererConfig,
+	bindings: PreactBindings,
+	data: unknown | null,
+) {
+	return jsonify(
+		data,
+		node => serializeVNode(node, config, bindings),
+		new Set(),
+	);
+}
+
 /**
  * Deeply mutate a property by walking down an array of property keys
  */
@@ -165,4 +194,30 @@ export function hasIn(obj: Record<string, any>, path: ObjPath) {
 	}
 
 	return true;
+}
+
+// eslint-disable-next-line @typescript-eslint/ban-types
+export function cleanProps<T extends object>(
+	props: T,
+): Exclude<T, "__source" | "__self"> | null {
+	if (typeof props === "string" || !props) return null;
+	const out: any = {};
+	for (const key in props) {
+		if (key === "__source" || key === "__self") continue;
+		out[key] = props[key];
+	}
+	if (!Object.keys(out).length) return null;
+	return out;
+}
+
+const reg = /__cC\d+/;
+export function cleanContext(context: Record<string, any>) {
+	const res: Record<string, any> = {};
+	for (const key in context) {
+		if (reg.test(key)) continue;
+		res[key] = context[key];
+	}
+
+	if (Object.keys(res).length == 0) return null;
+	return res;
 }

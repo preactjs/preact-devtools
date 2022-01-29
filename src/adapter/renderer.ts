@@ -1,17 +1,14 @@
-import { VNode } from "preact";
 import { ID } from "../view/store/types";
 import { FilterState } from "./adapter/filter";
 import { InspectData, UpdateType } from "./adapter/adapter";
+import { SharedVNode } from "./shared/bindings";
 
 export type ObjPath = Array<string | number>;
 
-/**
- * TODO: Deprecate this
- */
-export interface Renderer {
+export interface Renderer<T extends SharedVNode = SharedVNode> {
 	refresh?(): void;
-	getVNodeById(id: ID): VNode | null;
-	getDisplayName(vnode: VNode): string;
+	getVNodeById(id: ID): T | null;
+	getDisplayName(vnode: T): string;
 	findDomForVNode(id: ID): Array<HTMLElement | Text | null> | null;
 	findVNodeIdForDom(node: HTMLElement | Text): number;
 	applyFilters(filters: FilterState): void;
@@ -19,6 +16,8 @@ export interface Renderer {
 	inspect(id: ID): InspectData | null;
 	update(id: ID, type: UpdateType, path: ObjPath, value: any): void;
 	clear?(): void;
+	onCommit(vnode: T): void;
+	onUnmount(vnode: T): void;
 
 	// Hooks
 	updateHook?(id: ID, index: number, value: any): void; // V3
@@ -27,7 +26,10 @@ export interface Renderer {
 	suspend?(id: ID, active: boolean): void; // V4
 }
 
-export function getRendererByVNodeId(renderers: Map<number, Renderer>, id: ID) {
+export function getRendererByVNodeId(
+	renderers: Map<number, Renderer<SharedVNode>>,
+	id: ID,
+) {
 	for (const r of renderers.values()) {
 		if (r.getVNodeById(id) !== null) return r;
 	}

@@ -1,15 +1,16 @@
-import { getDisplayName, getComponent } from "../vnode";
-import { ID } from "../../../view/store/types";
-import { IdMappingState, getVNodeById } from "../IdMapper";
-import { RendererConfig10 } from "../renderer";
+import { getDisplayName, getComponent } from "./bindings";
+import { ID } from "../../view/store/types";
+import { getVNodeById, IdMappingState } from "../shared/idMapper";
+import { SharedVNode } from "../shared/bindings";
+import { RendererConfig } from "../shared/renderer";
 
 /**
  * Pretty print a `VNode` to the browser console. This can be triggered
  * by clicking a button in the devtools ui.
  */
-export function logVNode(
-	ids: IdMappingState,
-	config: RendererConfig10,
+export function logVNode<T extends SharedVNode>(
+	ids: IdMappingState<T>,
+	config: RendererConfig,
 	id: ID,
 	children: ID[],
 ) {

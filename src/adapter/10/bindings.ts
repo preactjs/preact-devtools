@@ -1,16 +1,11 @@
-import { RendererConfig10 } from "./renderer";
-import { HookType } from "../../constants";
-
+import { HookType } from "../shared/hooks";
 import type { Component, VNode } from "preact";
 import type {
 	Component as IComponent,
 	VNode as IVNode,
 } from "preact/src/internal";
-
-// These hook types are declared in "preact/hooks/src/internal" but not very
-// complete, so for now loosely declare locally.
-type ComponentHooks = Record<string, any>;
-type HookState = Record<string, any>;
+import { ComponentHooks, HookState, PreactBindings } from "../shared/bindings";
+import { RendererConfig } from "../shared/renderer";
 
 // Mangle accessors
 
@@ -30,7 +25,7 @@ export function getVNodeParent(vnode: VNode): VNode | null {
 /**
  * Check if a `vnode` is the root of a tree
  */
-export function isRoot(vnode: VNode, config: RendererConfig10): boolean {
+export function isRoot(vnode: VNode, config: RendererConfig): boolean {
 	return getVNodeParent(vnode) == null && vnode.type === config.Fragment;
 }
 
@@ -64,12 +59,14 @@ export function isSuspenseVNode(vnode: VNode): boolean {
 /**
  * Get the internal hooks state of a component
  */
-export function getComponentHooks(c: Component): ComponentHooks | null {
+export function getComponentHooks(vnode: VNode): ComponentHooks | null {
+	const c = getComponent(vnode);
+	if (!c) return null;
 	return (c as any).__hooks || (c as any).__H || null;
 }
 
-export function getStatefulHooks(c: Component): HookState[] | null {
-	const hooks = getComponentHooks(c);
+export function getStatefulHooks(vnode: VNode): HookState[] | null {
+	const hooks = getComponentHooks(vnode);
 	return hooks !== null
 		? hooks._list ||
 				hooks.__ ||
@@ -94,11 +91,14 @@ export function getStatefulHookValue(hookState: HookState): unknown {
 }
 
 export function getHookState(
-	c: Component,
+	vnode: VNode,
 	index: number,
 	type?: HookType,
 ): unknown {
-	const list = getStatefulHooks(c);
+	const c = getComponent(vnode);
+	if (c === null) return null;
+
+	const list = getStatefulHooks(vnode);
 	if (list && list[index]) {
 		// useContext
 		if (type === HookType.useContext) {
@@ -136,7 +136,7 @@ export function getActualChildren(
 /**
  * Get the root of a `vnode`
  */
-export function findRoot(vnode: VNode, config: RendererConfig10): VNode {
+export function findRoot(vnode: VNode, config: RendererConfig): VNode {
 	let next: VNode | null = vnode;
 	while ((next = getVNodeParent(next)) != null) {
 		if (isRoot(next, config)) {
@@ -162,7 +162,7 @@ export function getAncestor(vnode: VNode): VNode | null {
 /**
  * Get human readable name of the component/dom element
  */
-export function getDisplayName(vnode: VNode, config: RendererConfig10): string {
+export function getDisplayName(vnode: VNode, config: RendererConfig): string {
 	const { type } = vnode;
 	if (type === config.Fragment) return "Fragment";
 	else if (typeof type === "function") {
@@ -218,7 +218,7 @@ export function setNextState<S>(c: Component, value: S): S {
 	return ((c as IComponent)._nextState = (c as any).__s = value);
 }
 
-export function getSuspenseStateKey(c: Component<any, any>) {
+function getSuspenseStateKey(c: Component<any, any>) {
 	if ("_suspended" in c.state) {
 		return "_suspended";
 	} else if ("__e" in c.state) {
@@ -235,6 +235,22 @@ export function getSuspenseStateKey(c: Component<any, any>) {
 	return null;
 }
 
+export function getSuspendedState(vnode: VNode) {
+	const c = getComponent(vnode);
+	if (c) {
+		const key = getSuspenseStateKey(c);
+		if (key) {
+			return !!(c as any)._nextState[key];
+		}
+	}
+
+	return null;
+}
+
+export function isTextVNode(vnode: VNode) {
+	return vnode !== null && vnode.type === null;
+}
+
 export function createSuspenseState(vnode: VNode, suspended: boolean) {
 	const c = getComponent(vnode) as Component<any, any>;
 	const key = getSuspenseStateKey(c);
@@ -244,3 +260,46 @@ export function createSuspenseState(vnode: VNode, suspended: boolean) {
 
 	return {};
 }
+
+export function getInstance(vnode: VNode): any {
+	// For components we use the instance to check refs, otherwise
+	// we'll use a dom node
+	if (typeof vnode.type === "function") {
+		return getComponent(vnode);
+	}
+
+	return getDom(vnode);
+}
+
+export function isComponent(vnode: VNode) {
+	return vnode !== null && typeof vnode.type === "function";
+}
+
+export function isVNode(x: any): x is VNode {
+	return x != null && x.type !== undefined && hasDom(x);
+}
+
+export function isElement(vnode: VNode): boolean {
+	return typeof vnode.type === "string";
+}
+
+export const bindingsV10: PreactBindings<VNode> = {
+	isRoot,
+	getDisplayName,
+	getActualChildren,
+	getAncestor,
+	getDom,
+	isTextVNode,
+	getInstance,
+	createSuspenseState,
+	getComponent,
+	getComponentHooks,
+	getHookState,
+	getVNodeParent,
+	isComponent,
+	isElement,
+	isSuspenseVNode,
+	getSuspendedState,
+	isVNode,
+	setNextState,
+};

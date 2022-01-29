@@ -1,12 +1,12 @@
 import { h, render, Options, options, Fragment, Component } from "preact";
 import * as sinon from "sinon";
-import { createV10Renderer, getFilteredChildren } from "./renderer";
+import { createRenderer, getFilteredChildren } from "./renderer";
 import { setupOptionsV10 } from "../10/options";
 import { expect } from "chai";
 import { toSnapshot } from "../debug";
 import { useState } from "preact/hooks";
 import { act } from "preact/test-utils";
-import { getDisplayName } from "./vnode";
+import { getDisplayName } from "../10/bindings";
 import { FilterState } from "../adapter/filter";
 import { Renderer } from "../renderer";
 import { newProfiler } from "../adapter/profiler";
@@ -20,7 +20,7 @@ export function setupScratch() {
 
 export function setupMockHook(options: Options) {
 	const spy = sinon.spy();
-	const renderer = createV10Renderer(
+	const renderer = createRenderer(
 		{ send: spy, listen: () => null },
 		1,
 		{ Fragment: Fragment as any },

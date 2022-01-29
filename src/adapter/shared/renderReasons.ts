@@ -7,8 +7,8 @@ import {
 	getVNodeParent,
 	getStartTime,
 	getEndTime,
-} from "../vnode";
-import { ID } from "../../../view/store/types";
+} from "../10/bindings";
+import { ID } from "../../view/store/types";
 
 export const enum RenderReason {
 	MOUNT = 1,

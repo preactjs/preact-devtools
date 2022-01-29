@@ -1,22 +1,31 @@
-import { h, Component, Options, VNode } from "preact";
-import { RendererConfig10 } from "../renderer";
-import { serialize } from "../utils";
-import { getComponent, getHookState, getComponentHooks } from "../vnode";
 import { parseStackTrace } from "errorstacks";
-import { HookType } from "../../../constants";
+import { h } from "preact";
 import {
-	PropData,
 	parseProps,
+	PropData,
 	PropDataType,
-} from "../../../view/components/sidebar/inspect/parseProps";
-import { isEditable } from "../../shared/serialize";
+} from "../../view/components/sidebar/inspect/parseProps";
+import { RendererConfig } from "./renderer";
+import { isEditable, serialize } from "./serialize";
+import { PreactBindings, SharedVNode } from "./bindings";
+import { OptionsV11 } from "../11/options";
+import { OptionsV10 } from "../10/options";
 
-/**
- * Throwaway component to render hooks
- */
-// eslint-disable-next-line @typescript-eslint/no-empty-function
-function Dummy() {}
-Dummy.prototype = Component.prototype;
+export enum HookType {
+	useState = 1,
+	useReducer = 2,
+	useEffect = 3,
+	useLayoutEffect = 4,
+	useRef = 5,
+	useImperativeHandle = 6,
+	useMemo = 7,
+	useCallback = 8,
+	useContext = 9,
+	useErrorBoundary = 10,
+	useDebugValue = 11,
+	custom = 99,
+	devtoolsParent = 9999,
+}
 
 export interface HookLocation {
 	name: string;
@@ -26,6 +35,14 @@ export interface HookLocation {
 export interface HookData {
 	type: HookType;
 	stack: HookLocation[];
+}
+
+export interface HookItem {
+	name: string;
+	type: HookType;
+	index: number;
+	value: any;
+	children: HookItem[];
 }
 
 let hookLog: HookData[] = [];
@@ -112,10 +129,11 @@ export function addHookStack(type: HookType) {
 }
 
 export function parseHookData(
-	config: RendererConfig10,
+	config: RendererConfig,
 	data: HookData[],
-	component: Component,
+	vnode: SharedVNode,
 	userHookNames: string[],
+	bindings: PreactBindings,
 ): PropData[] {
 	const tree = new Map<string, PropData>();
 	const root: PropData = {
@@ -165,9 +183,9 @@ export function parseHookData(
 				let hookValueTree: PropData[] = [];
 
 				if (isNative) {
-					const s = getHookState(component, hookIdx, hook.type);
+					const s = bindings.getHookState(vnode, hookIdx, hook.type);
 					const rawValue = Array.isArray(s) ? s[0] : s;
-					value = serialize(config, rawValue);
+					value = serialize(config, bindings, rawValue);
 
 					// The user should be able to click through the value
 					// properties if the value is an object. We parse it
@@ -230,10 +248,11 @@ export function parseHookData(
 	return out;
 }
 
-export function inspectHooks(
-	config: RendererConfig10,
-	options: Options,
-	vnode: VNode,
+export function inspectHooks<T extends SharedVNode>(
+	config: RendererConfig,
+	options: OptionsV10 | OptionsV11,
+	vnode: T,
+	helpers: PreactBindings<T>,
 ) {
 	inspectingHooks = true;
 	hookLog = [];
@@ -241,7 +260,7 @@ export function inspectHooks(
 	debugNames = [];
 	ancestorName = parseStackTrace(new Error().stack!)[0].name;
 
-	const c = getComponent(vnode)!;
+	const c = helpers.getComponent(vnode)!;
 	const isClass =
 		(vnode.type as any).prototype && (vnode.type as any).prototype.render;
 
@@ -265,24 +284,26 @@ export function inspectHooks(
 		// Call render on a dummy component, so that any possible
 		// state changes or effect are not written to our original
 		// component.
-		const hooks = getComponentHooks(c);
+		const hooks = helpers.getComponentHooks(vnode);
 		const dummy = {
 			props: c.props,
 			context: c.context,
 			state: {},
 			__hooks: hooks,
 			__H: hooks,
+			__v: null as any,
 		};
 
 		// Force preact to reset internal hooks index
 		const renderHook = (options as any)._render || (options as any).__r;
 		if (renderHook) {
-			const vnode = h("div", null);
+			const dummyVNode = h("div", null);
 			// Note: A "div" normally won't have the _component property set,
 			// but we can get away with that for the devtools
-			(vnode as any)._component = dummy;
-			(vnode as any).__c = dummy;
-			renderHook(vnode);
+			(dummyVNode as any)._component = dummy;
+			(dummyVNode as any).__c = dummy;
+			dummy.__v = dummyVNode;
+			renderHook(dummyVNode);
 		}
 
 		if (isClass) {
@@ -305,8 +326,9 @@ export function inspectHooks(
 		(options as any)._skipEffects = (options as any).__s = false;
 	}
 
+	console.log({ hookLog });
 	const parsed = hookLog.length
-		? parseHookData(config, hookLog, c, [...debugNames].reverse())
+		? parseHookData(config, hookLog, vnode, [...debugNames].reverse(), helpers)
 		: null;
 
 	debugNames = [];
@@ -316,12 +338,4 @@ export function inspectHooks(
 	hookLog = [];
 
 	return parsed;
-}
-
-export interface HookItem {
-	name: string;
-	type: HookType;
-	index: number;
-	value: any;
-	children: HookItem[];
 }

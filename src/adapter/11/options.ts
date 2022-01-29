@@ -1,14 +1,18 @@
-import { Preact11Renderer, RendererConfig11 } from "./renderer";
 import { recordMark, endMark } from "../marks";
 import {
 	getDisplayName,
 	setNextState,
 	getNextState,
-	getStatefulHooks,
-	getStatefulHookValue,
+	// getStatefulHooks,
+	// getStatefulHookValue,
 	getComponent,
 	Internal,
-} from "./internal";
+	getStatefulHooks,
+	getStatefulHookValue,
+} from "./bindings";
+import { RendererConfig } from "../shared/renderer";
+import { Renderer } from "../renderer";
+import { HookType } from "../shared/hooks";
 // import { addHookStack, addDebugValue, addHookName } from "./renderer/hooks";
 // import { HookType } from "../../constants";
 
@@ -17,26 +21,17 @@ export interface VNode {
 }
 
 export interface OptionsV11 {
-	/** Attach a hook that is invoked immediately before a vnode is unmounted. */
 	unmount?(internal: Internal): void;
-	/** Attach a hook that is invoked after a vnode has rendered. */
 	diffed?(internal: Internal): void;
-	/** Attach a hook that is invoked before render, mainly to check the arguments. */
 	_root?(
-		vnode: ComponentChild,
+		vnode: any,
 		parent: Element | Document | ShadowRoot | DocumentFragment,
 	): void;
-	/** Attach a hook that is invoked before a vnode is diffed. */
 	_diff?(internal: Internal, vnode?: VNode): void;
-	/** Attach a hook that is invoked after a tree was mounted or was updated. */
-	_commit?(internal: Internal, commitQueue: CommitQueue): void;
-	/** Attach a hook that is invoked before a vnode has rendered. */
+	_commit?(internal: Internal, commitQueue: any): void;
 	_render?(internal: Internal): void;
-	/** Attach a hook that is invoked before a hook's state is queried. */
-	_hook?(component: Component, index: number, type: HookType): void;
-	/** Bypass effect execution. Currenty only used in devtools for hooks inspection */
+	_hook?(component: any, index: number, type: HookType): void;
 	_skipEffects?: boolean;
-	/** Attach a hook that is invoked after an error is caught in a component but before calling lifecycle hooks */
 	_catchError?(error: any, internal: Internal): void;
 	_internal?(internal: Internal, vnode: VNode | string): void;
 }
@@ -62,8 +57,8 @@ function trackPrevState(Ctor: any) {
 
 export function setupOptionsV11(
 	options: OptionsV11,
-	renderer: Preact11Renderer,
-	config: RendererConfig11,
+	renderer: Renderer,
+	config: RendererConfig,
 ) {
 	// Track component state. Only supported in Preact > 10.4.0
 	if (config.Component) {
@@ -95,7 +90,9 @@ export function setupOptionsV11(
 		prevHookName = options._addHookName || options.__a;
 
 		o._hook = o.__h = (c: Component, index: number, type: number) => {
-			const s = getStatefulHooks(c);
+			console.log("optinos.__hook", c);
+			const vnode = (c as any)._vnode || (c as any).__v;
+			const s = getStatefulHooks(vnode);
 			if (s && Array.isArray(s) && s.length > 0 && getComponent(s[0])) {
 				s[0]._oldValue = getStatefulHookValue(s);
 				s[0]._index = index;
@@ -127,7 +124,7 @@ export function setupOptionsV11(
 	}, 100);
 
 	o._diff = o.__b = (internal: Internal) => {
-		internal.startTime = performance.now();
+		// internal.startTime = performance.now();
 
 		if (typeof internal.type === "function") {
 			const name = getDisplayName(internal, config);
@@ -138,7 +135,7 @@ export function setupOptionsV11(
 	};
 
 	options.diffed = vnode => {
-		vnode.endTime = performance.now();
+		// vnode.endTime = performance.now();
 
 		if (typeof vnode.type === "function") {
 			endMark(getDisplayName(vnode, config));
@@ -150,7 +147,6 @@ export function setupOptionsV11(
 	o._commit = o.__c = (internal: Internal | null, queue: any[]) => {
 		if (prevCommitRoot) prevCommitRoot(internal, queue);
 
-		console.log("COMMIT", internal);
 		// These cases are already handled by `unmount`
 		if (internal == null) return;
 
@@ -168,7 +164,7 @@ export function setupOptionsV11(
 		o._commit = o.__c = prevCommitRoot;
 		options.diffed = prevAfterDiff;
 		o._diff = o.__b = prevBeforeDiff;
-		options.vnode = prevVNodeHook;
+		options._internal = prevVNodeHook;
 		o._hook = o.__h = prevHook;
 		options.useDebugValue = prevUseDebugValue;
 	};

@@ -1,16 +1,19 @@
 import { Renderer } from "./renderer";
 import { ID } from "../view/store/types";
 import { createAdapter, InspectData, UpdateType } from "./adapter/adapter";
-import { RawFilterState } from "./adapter/filter";
+import { DEFAULT_FIlTERS, FilterState, RawFilterState } from "./adapter/filter";
 import { Options } from "preact";
-import { createV10Renderer, RendererConfig10 } from "./10/renderer";
+import { createRenderer, RendererConfig } from "./shared/renderer";
 import { setupOptionsV10 } from "./10/options";
 import parseSemverish from "./parse-semverish";
 import { PortPageHook } from "./adapter/port";
 import { PROFILE_RELOAD, STATS_RELOAD } from "../constants";
-import { createV11Renderer } from "./11/renderer";
 import { setupOptionsV11 } from "./11/options";
 import { newProfiler } from "./adapter/profiler";
+import { createIdMappingState } from "./shared/idMapper";
+import { VNodeTimings } from "./shared/timings";
+import { bindingsV10 } from "./10/bindings";
+import { bindingsV11 } from "./11/bindings";
 
 export type EmitterFn = (event: string, data: any) => void;
 
@@ -75,7 +78,7 @@ export interface DevtoolsHook {
 	attachPreact?(
 		version: string,
 		options: Options,
-		config: RendererConfig10,
+		config: RendererConfig,
 	): number;
 	attach(renderer: Renderer): number;
 	detach(id: number): void;
@@ -92,6 +95,7 @@ export function createHook(port: PortPageHook): DevtoolsHook {
 	let status: "connected" | "pending" | "disconnected" = "disconnected";
 
 	const profiler = newProfiler();
+	const filters: FilterState = DEFAULT_FIlTERS;
 
 	// Lazily init the adapter when a renderer is attached
 	const init = () => {
@@ -204,6 +208,11 @@ export function createHook(port: PortPageHook): DevtoolsHook {
 			// multiple connected renderers
 			const namespace = Math.floor(Math.random() * 2 ** 32);
 
+			const timings: VNodeTimings = {
+				start: new Map(),
+				end: new Map(),
+			};
+
 			// currently we only support preact >= 10, later we can add another branch for major === 8
 			if (preactVersionMatch.major == 10) {
 				const supports = {
@@ -214,22 +223,37 @@ export function createHook(port: PortPageHook): DevtoolsHook {
 					profiling: true,
 				};
 
-				const renderer = createV10Renderer(
-					port,
+				const idMapper = createIdMappingState(
 					namespace,
+					bindingsV10.getInstance,
+				);
+
+				const renderer = createRenderer(
+					port,
 					config as any,
 					options,
 					supports,
 					profiler,
+					filters,
+					idMapper,
+					bindingsV10,
 				);
-				setupOptionsV10(options, renderer, config as any);
+				setupOptionsV10(options, renderer, config as any, idMapper, timings);
 				return attachRenderer(renderer, supports);
 			} else if (preactVersionMatch.major === 11) {
-				const renderer = createV11Renderer(
-					port,
+				const idMapper = createIdMappingState(
 					namespace,
+					bindingsV11.getInstance,
+				);
+				const renderer = createRenderer(
+					port,
+					config,
 					options as any,
+					{ hooks: true, renderReasons: true },
 					profiler,
+					filters,
+					idMapper,
+					bindingsV11,
 				);
 				setupOptionsV11(options as any, renderer, config);
 				return attachRenderer(renderer, {

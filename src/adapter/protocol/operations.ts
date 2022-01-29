@@ -2,7 +2,7 @@ import { ID, Tree } from "../../view/store/types";
 import { parseTable } from "./string-table";
 import { MsgTypes } from "./events";
 import { deepClone } from "../../view/components/profiler/flamegraph/modes/adjustNodesToRight";
-import { RenderReasonMap } from "../10/renderer/renderReasons";
+import { RenderReasonMap } from "../shared/renderReasons";
 import { ParsedStats, parseStats } from "../shared/stats";
 
 /**

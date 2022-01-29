@@ -4,7 +4,7 @@ import { getRoot } from "../flamegraph/FlamegraphStore";
 import {
 	RenderReasonMap,
 	RenderReasonData,
-} from "../../../../adapter/10/renderer/renderReasons";
+} from "../../../../adapter/shared/renderReasons";
 import { FlameNodeTransform } from "../flamegraph/modes/flamegraph-utils";
 import { FlameTree, patchTree } from "../flamegraph/modes/patchTree";
 import { NodeTransform } from "../flamegraph/shared";
