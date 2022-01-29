@@ -12,7 +12,12 @@ import {
 } from "./bindings";
 import { RendererConfig } from "../shared/renderer";
 import { Renderer } from "../renderer";
-import { HookType } from "../shared/hooks";
+import {
+	addDebugValue,
+	addHookName,
+	addHookStack,
+	HookType,
+} from "../shared/hooks";
 // import { addHookStack, addDebugValue, addHookName } from "./renderer/hooks";
 // import { HookType } from "../../constants";
 
@@ -83,42 +88,42 @@ export function setupOptionsV11(
 	// Othwerwise we'll end up with an unknown number of frames in-between
 	// the called hook and `options._hook`. This will lead to wrongly
 	// parsed hooks.
+	console.log("SETUP v11");
 	setTimeout(() => {
 		prevHook = o._hook || o.__h;
 		prevUseDebugValue = options.useDebugValue;
 		// @ts-ignore
 		prevHookName = options._addHookName || options.__a;
 
-		o._hook = o.__h = (c: Component, index: number, type: number) => {
-			console.log("optinos.__hook", c);
-			const vnode = (c as any)._vnode || (c as any).__v;
-			const s = getStatefulHooks(vnode);
+		o._hook = o.__h = (internal: Internal, index: number, type: number) => {
+			const s = getStatefulHooks(internal);
+			console.log({ internal, s, type });
 			if (s && Array.isArray(s) && s.length > 0 && getComponent(s[0])) {
 				s[0]._oldValue = getStatefulHookValue(s);
 				s[0]._index = index;
 			}
 
 			if (type) {
-				// addHookStack(type);
+				addHookStack(type);
 			}
 
 			// Don't continue the chain while the devtools is inspecting hooks.
 			// Otherwise the next hook will very likely throw as we're only
 			// faking a render and not doing a proper one. #278
 			if (!(options as any)._skipEffects && !(options as any).__s) {
-				if (prevHook) prevHook(c, index, type);
+				if (prevHook) prevHook(internal, index, type);
 			}
 		};
 
 		options.useDebugValue = (value: any) => {
-			// addHookStack(HookType.useDebugValue);
-			// addDebugValue(value);
+			addHookStack(HookType.useDebugValue);
+			addDebugValue(value);
 			if (prevUseDebugValue) prevUseDebugValue(value);
 		};
 
 		// @ts-ignore
 		options._addHookName = options.__a = (name: string | number) => {
-			// addHookName(name);
+			addHookName(name);
 			if (prevHookName) prevHookName(name);
 		};
 	}, 100);

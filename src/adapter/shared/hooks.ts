@@ -271,20 +271,21 @@ export function inspectHooks<T extends SharedVNode>(
 
 	// Temporarily disable all console methods to not confuse users
 	// It sucks that we need to do this :/
-	for (const method in console) {
-		try {
-			prevConsole[method] = (console as any)[method];
-			(console as any)[method] = () => undefined;
-		} catch (error) {
-			// Ignore errors here
-		}
-	}
+	// for (const method in console) {
+	// 	try {
+	// 		prevConsole[method] = (console as any)[method];
+	// 		(console as any)[method] = () => undefined;
+	// 	} catch (error) {
+	// 		// Ignore errors here
+	// 	}
+	// }
 
 	try {
 		// Call render on a dummy component, so that any possible
 		// state changes or effect are not written to our original
 		// component.
 		const hooks = helpers.getComponentHooks(vnode);
+		console.log({ hooks });
 		const dummy = {
 			props: c.props,
 			context: c.context,
@@ -303,6 +304,10 @@ export function inspectHooks<T extends SharedVNode>(
 			(dummyVNode as any)._component = dummy;
 			(dummyVNode as any).__c = dummy;
 			dummy.__v = dummyVNode;
+			dummyVNode.data = {
+				__H: hooks,
+				__hooks: hooks,
+			};
 			renderHook(dummyVNode);
 		}
 
