@@ -100,14 +100,12 @@ export function shouldFilter<T extends SharedVNode>(
 		return true;
 	}
 
-	if (bindings.isComponent(vnode)) {
-		if (vnode.type === config.Fragment && filters.type.has("fragment")) {
-			const parent = bindings.getVNodeParent(vnode);
-			// Only filter non-root nodes
-			if (parent != null && !bindings.isRoot(parent, config)) return true;
+	if (vnode.type === config.Fragment && filters.type.has("fragment")) {
+		const parent = bindings.getVNodeParent(vnode);
+		// Only filter non-root nodes
+		if (parent != null) return true;
 
-			return false;
-		}
+		return false;
 	} else if (bindings.isElement(vnode) && filters.type.has("dom")) {
 		return true;
 	}
@@ -119,6 +117,18 @@ export function shouldFilter<T extends SharedVNode>(
 			r.lastIndex = 0;
 			return r.test(name);
 		});
+	}
+
+	// In Preact V11 we use a Portal component to render Suspense
+	// children. Because that is only an implementation detail
+	// we'll hide this component to avoid confusing users.
+	const parent = bindings.getVNodeParent(vnode);
+	if (
+		parent !== null &&
+		bindings.isSuspenseVNode(parent) &&
+		bindings.isPortal(vnode)
+	) {
+		return true;
 	}
 
 	return false;

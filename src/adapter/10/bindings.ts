@@ -283,9 +283,16 @@ export function isElement(vnode: VNode): boolean {
 	return typeof vnode.type === "string";
 }
 
+// eslint-disable-next-line @typescript-eslint/no-unused-vars
+export function isPortal(vnode: VNode) {
+	// TODO: Find a way to detect portals
+	return false;
+}
+
 export const bindingsV10: PreactBindings<VNode> = {
 	isRoot,
 	getDisplayName,
+	getPropsVNodeDisplayName: getDisplayName,
 	getActualChildren,
 	getAncestor,
 	getDom,
@@ -302,4 +309,5 @@ export const bindingsV10: PreactBindings<VNode> = {
 	getSuspendedState,
 	isVNode,
 	setNextState,
+	isPortal,
 };

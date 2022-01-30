@@ -20,6 +20,16 @@ export interface Internal {
 	__v: number;
 }
 
+export interface VNode {
+	type: any;
+	key: any;
+	ref: any;
+	props: any;
+
+	_vnodeId: number;
+	__v: number;
+}
+
 export interface Component {
 	state: any;
 }
@@ -42,7 +52,11 @@ export function isComponent(internal: Internal) {
 }
 
 export function isInternal(x: any): x is Internal {
-	return x !== null && typeof x === "object" && x.type !== undefined;
+	return (
+		x !== null &&
+		typeof x === "object" &&
+		(typeof x.__v === "number" || typeof x._vnodeId === "number")
+	);
 }
 
 export function isTextInternal(internal: Internal): boolean {
@@ -55,7 +69,7 @@ export function getComponentHooks(internal: Internal): ComponentHooks | null {
 	return (data as any).__hooks || (data as any).__H || null;
 }
 
-export function isSuspenseVNode(internal: Internal): boolean {
+export function isSuspenseVNode(internal: Internal | VNode): boolean {
 	const c = getComponent(internal) as any;
 	// FYI: Mangling of `_childDidSuspend` is not stable in Preact < 10.3.0
 	return c != null && !!(c._childDidSuspend || c.__c);
@@ -80,6 +94,44 @@ export function getSuspenseStateKey(c: Component) {
 
 // Mangle accessors
 
+// When serializing props we're dealing with vnodes instead of
+// internal objects
+export function getPropsVNodeDisplayName(vnode: VNode, config: RendererConfig) {
+	const { type } = vnode;
+
+	if (typeof type === "function") {
+		if (type === config.Fragment) return "Fragment";
+		// Context is a special case :((
+		// See: https://reactjs.org/docs/context.html#contextdisplayname
+		// Consumer
+		const ct = (type as any).contextType;
+		if (ct && ct.Consumer === type && ct.displayName) {
+			return `${ct.displayName}.Consumer`;
+		}
+
+		// Provider
+		const ctx = (type as any)._contextRef || (type as any).__;
+		if (ctx && ctx.displayName) {
+			return `${ctx.displayName}.Provider`;
+		}
+
+		if (
+			type.prototype &&
+			(typeof type.prototype.__c === "function" ||
+				typeof type.prototype._childDidSuspend === "function")
+		) {
+			return "Suspense";
+		} else if ("__P" in vnode.props || "_parentDom" in vnode.props) {
+			return "Portal";
+		}
+
+		return type.displayName || type.name || "Anonymous";
+	} else if (typeof type === "string") {
+		return vnode.type;
+	}
+	return "#text";
+}
+
 export function getDisplayName(internal: Internal, config: RendererConfig) {
 	const { flags, type } = internal;
 
@@ -101,6 +153,8 @@ export function getDisplayName(internal: Internal, config: RendererConfig) {
 
 		if (isSuspenseVNode(internal)) {
 			return "Suspense";
+		} else if (isPortal(internal)) {
+			return "Portal";
 		}
 
 		return type.displayName || type.name || "Anonymous";
@@ -238,9 +292,14 @@ export function getSuspendedState(internal: Internal) {
 
 const getInstance = <T>(x: T): T => x;
 
+export function isPortal(internal: Internal): boolean {
+	return "__P" in internal.props || "_parentDom" in internal.props;
+}
+
 export const bindingsV11: PreactBindings<Internal> = {
 	isRoot,
 	getDisplayName,
+	getPropsVNodeDisplayName,
 	getActualChildren,
 	getAncestor,
 	getDom,
@@ -257,4 +316,5 @@ export const bindingsV11: PreactBindings<Internal> = {
 	isVNode: isInternal,
 	getSuspendedState,
 	setNextState,
+	isPortal,
 };

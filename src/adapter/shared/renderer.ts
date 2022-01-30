@@ -43,6 +43,7 @@ export function getDevtoolsType<T extends SharedVNode>(
 		if (memoReg.test(name)) return DevNodeType.Memo;
 		if (forwardRefReg.test(name)) return DevNodeType.ForwardRef;
 		if (bindings.isSuspenseVNode(vnode)) return DevNodeType.Suspense;
+		if (bindings.isPortal(vnode)) return DevNodeType.Portal;
 
 		// TODO: Provider and Consumer
 		return vnode.type.prototype && vnode.type.prototype.render

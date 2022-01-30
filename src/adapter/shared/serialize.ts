@@ -15,7 +15,7 @@ export function serializeVNode(
 	if (bindings.isVNode(x)) {
 		return {
 			type: "vnode",
-			name: bindings.getDisplayName(x, config),
+			name: bindings.getPropsVNodeDisplayName(x, config),
 		};
 	}
 

@@ -10,6 +10,7 @@ export type HookState = Record<string, any>;
 export interface PreactBindings<T extends SharedVNode = SharedVNode> {
 	getAncestor(vnode: T): T | null;
 	getDisplayName(vnode: T, config: RendererConfig): string;
+	getPropsVNodeDisplayName(vnode: any, config: RendererConfig): string;
 	isRoot(vnode: T, config: RendererConfig): boolean;
 	getActualChildren(vnode: T): Array<T | null | undefined>;
 	getVNodeParent(vnode: T): T | null;
@@ -22,6 +23,7 @@ export interface PreactBindings<T extends SharedVNode = SharedVNode> {
 	isComponent(vnode: T): boolean;
 	getInstance(vnode: T): any;
 	isSuspenseVNode(vnode: T): boolean;
+	isPortal(vnode: T): boolean;
 	/**
 	 * Null means that the component is not a true suspense node.
 	 * We do this because a few experiments mess with suspense
