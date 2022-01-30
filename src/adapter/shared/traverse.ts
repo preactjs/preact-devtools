@@ -91,26 +91,28 @@ export function shouldFilter<T extends SharedVNode>(
 	vnode: T,
 	filters: FilterState,
 	config: RendererConfig,
-	helpers: PreactBindings<T>,
+	bindings: PreactBindings<T>,
 ): boolean {
 	// Filter text nodes by default. They are too tricky to match
 	// with the previous one...
-	if (helpers.isTextVNode(vnode)) return true;
+	if (bindings.isTextVNode(vnode)) {
+		return true;
+	}
 
-	if (helpers.getComponent(vnode) !== null) {
+	if (bindings.isComponent(vnode)) {
 		if (vnode.type === config.Fragment && filters.type.has("fragment")) {
-			const parent = helpers.getVNodeParent(vnode);
+			const parent = bindings.getVNodeParent(vnode);
 			// Only filter non-root nodes
-			if (parent != null) return true;
+			if (parent != null && !bindings.isRoot(parent, config)) return true;
 
 			return false;
 		}
-	} else if (helpers.isElement(vnode) && filters.type.has("dom")) {
+	} else if (bindings.isElement(vnode) && filters.type.has("dom")) {
 		return true;
 	}
 
 	if (filters.regex.length > 0) {
-		const name = helpers.getDisplayName(vnode, config);
+		const name = bindings.getDisplayName(vnode, config);
 		return filters.regex.some(r => {
 			// Regexes with a global flag are stateful in JS :((
 			r.lastIndex = 0;
