@@ -84,6 +84,24 @@ export function getDisplayName(internal: Internal, config: RendererConfig) {
 
 	if (flags & TYPE_COMPONENT) {
 		if (type === config.Fragment) return "Fragment";
+		// Context is a special case :((
+		// See: https://reactjs.org/docs/context.html#contextdisplayname
+		// Consumer
+		const ct = (type as any).contextType;
+		if (ct && ct.Consumer === type && ct.displayName) {
+			return `${ct.displayName}.Consumer`;
+		}
+
+		// Provider
+		const ctx = (type as any)._contextRef || (type as any).__;
+		if (ctx && ctx.displayName) {
+			return `${ctx.displayName}.Provider`;
+		}
+
+		if (isSuspenseVNode(internal)) {
+			return "Suspense";
+		}
+
 		return type.displayName || type.name || "Anonymous";
 	} else if (flags & TYPE_ELEMENT) {
 		return internal.type;
