@@ -117,7 +117,6 @@ export function setupOptionsV11(
 
 		o._hook = o.__h = (internal: Internal, index: number, type: number) => {
 			const s = getStatefulHooks(internal);
-			console.log("hook v11", { internal, s, type });
 			if (s && Array.isArray(s) && s.length > 0 && getComponent(s[0])) {
 				s[0]._oldValue = getStatefulHookValue(s);
 				s[0]._index = index;

@@ -271,21 +271,20 @@ export function inspectHooks<T extends SharedVNode>(
 
 	// Temporarily disable all console methods to not confuse users
 	// It sucks that we need to do this :/
-	// for (const method in console) {
-	// 	try {
-	// 		prevConsole[method] = (console as any)[method];
-	// 		(console as any)[method] = () => undefined;
-	// 	} catch (error) {
-	// 		// Ignore errors here
-	// 	}
-	// }
+	for (const method in console) {
+		try {
+			prevConsole[method] = (console as any)[method];
+			(console as any)[method] = () => undefined;
+		} catch (error) {
+			// Ignore errors here
+		}
+	}
 
 	try {
 		// Call render on a dummy component, so that any possible
 		// state changes or effect are not written to our original
 		// component.
 		const hooks = helpers.getComponentHooks(vnode);
-		console.log({ hooks });
 		const dummy = {
 			props: c.props,
 			context: c.context,
@@ -301,20 +300,22 @@ export function inspectHooks<T extends SharedVNode>(
 			const dummyVNode = h("div", null);
 			// Note: A "div" normally won't have the _component property set,
 			// but we can get away with that for the devtools
+			// This is only needed for Preact 10.x
 			(dummyVNode as any)._component = dummy;
 			(dummyVNode as any).__c = dummy;
 			dummy.__v = dummyVNode;
-			dummyVNode.data = {
-				__H: hooks,
-				__hooks: hooks,
-			};
 			renderHook(dummyVNode);
 		}
 
 		if (isClass) {
 			c.render.call(dummy, dummy.props, dummy.state);
 		} else {
-			c.constructor.call(dummy, dummy.props, dummy.context);
+			// Preact V11 doesn't create classes anymore
+			if (c.constructor === Object) {
+				vnode.type.call(dummy, dummy.props, dummy.context);
+			} else {
+				c.constructor.call(dummy, dummy.props, dummy.context);
+			}
 		}
 	} catch (error) {
 		// We don't care about any errors here. We only need
@@ -331,7 +332,6 @@ export function inspectHooks<T extends SharedVNode>(
 		(options as any)._skipEffects = (options as any).__s = false;
 	}
 
-	console.log({ hookLog });
 	const parsed = hookLog.length
 		? parseHookData(config, hookLog, vnode, [...debugNames].reverse(), helpers)
 		: null;
