@@ -304,6 +304,11 @@ export function inspectHooks<T extends SharedVNode>(
 			(dummyVNode as any)._component = dummy;
 			(dummyVNode as any).__c = dummy;
 			dummy.__v = dummyVNode;
+			// Preact V11 for hook names
+			(dummyVNode as any).data = {
+				__hooks: hooks,
+				__H: hooks,
+			};
 			renderHook(dummyVNode);
 		}
 
