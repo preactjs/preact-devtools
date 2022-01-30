@@ -42,7 +42,7 @@ export function isComponent(internal: Internal) {
 }
 
 export function isInternal(x: any): x is Internal {
-	return x !== null && typeof x === "object" && typeof x.flags === "number";
+	return x !== null && typeof x === "object" && x.type !== undefined;
 }
 
 export function isTextInternal(internal: Internal): boolean {
