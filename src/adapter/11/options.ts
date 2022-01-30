@@ -3,12 +3,11 @@ import {
 	getDisplayName,
 	setNextState,
 	getNextState,
-	// getStatefulHooks,
-	// getStatefulHookValue,
 	getComponent,
 	Internal,
 	getStatefulHooks,
 	getStatefulHookValue,
+	TYPE_COMPONENT,
 } from "./bindings";
 import { RendererConfig } from "../shared/renderer";
 import { Renderer } from "../renderer";
@@ -18,8 +17,8 @@ import {
 	addHookStack,
 	HookType,
 } from "../shared/hooks";
-// import { addHookStack, addDebugValue, addHookName } from "./renderer/hooks";
-// import { HookType } from "../../constants";
+import { getVNodeId, IdMappingState } from "../shared/idMapper";
+import { VNodeTimings } from "../shared/timings";
 
 export interface VNode {
 	foo: any;
@@ -32,13 +31,33 @@ export interface OptionsV11 {
 		vnode: any,
 		parent: Element | Document | ShadowRoot | DocumentFragment,
 	): void;
+	__?(
+		vnode: any,
+		parent: Element | Document | ShadowRoot | DocumentFragment,
+	): void;
+
 	_diff?(internal: Internal, vnode?: VNode): void;
-	_commit?(internal: Internal, commitQueue: any): void;
+	__b?(internal: Internal, vnode?: VNode): void;
+
+	_commit?(internal: Internal | null, commitQueue: any): void;
+	__c?(internal: Internal | null, commitQueue: any): void;
+
 	_render?(internal: Internal): void;
+	__r?(internal: Internal): void;
+
 	_hook?(component: any, index: number, type: HookType): void;
+	__h?(component: any, index: number, type: HookType): void;
+
 	_skipEffects?: boolean;
+	__s?: boolean;
+
 	_catchError?(error: any, internal: Internal): void;
+	__e?(error: any, internal: Internal): void;
+
 	_internal?(internal: Internal, vnode: VNode | string): void;
+	__i?(internal: Internal, vnode: VNode | string): void;
+
+	useDebugValue?(value: string | number): void;
 }
 
 /**
@@ -64,13 +83,15 @@ export function setupOptionsV11(
 	options: OptionsV11,
 	renderer: Renderer,
 	config: RendererConfig,
+	ids: IdMappingState<Internal>,
+	timings: VNodeTimings,
 ) {
 	// Track component state. Only supported in Preact > 10.4.0
 	if (config.Component) {
 		trackPrevState(config.Component);
 	}
 
-	const o = options as any;
+	const o = options;
 
 	// Store (possible) previous hooks so that we don't overwrite them
 	const prevVNodeHook = options._internal;
@@ -88,7 +109,6 @@ export function setupOptionsV11(
 	// Othwerwise we'll end up with an unknown number of frames in-between
 	// the called hook and `options._hook`. This will lead to wrongly
 	// parsed hooks.
-	console.log("SETUP v11");
 	setTimeout(() => {
 		prevHook = o._hook || o.__h;
 		prevUseDebugValue = options.useDebugValue;
@@ -97,7 +117,7 @@ export function setupOptionsV11(
 
 		o._hook = o.__h = (internal: Internal, index: number, type: number) => {
 			const s = getStatefulHooks(internal);
-			console.log({ internal, s, type });
+			console.log("hook v11", { internal, s, type });
 			if (s && Array.isArray(s) && s.length > 0 && getComponent(s[0])) {
 				s[0]._oldValue = getStatefulHookValue(s);
 				s[0]._index = index;
@@ -129,9 +149,10 @@ export function setupOptionsV11(
 	}, 100);
 
 	o._diff = o.__b = (internal: Internal) => {
-		// internal.startTime = performance.now();
+		const id = getVNodeId(ids, internal);
+		timings.start.set(id, performance.now());
 
-		if (typeof internal.type === "function") {
+		if (internal.flags & TYPE_COMPONENT) {
 			const name = getDisplayName(internal, config);
 			recordMark(`${name}_diff`);
 		}
@@ -139,14 +160,15 @@ export function setupOptionsV11(
 		if (prevBeforeDiff != null) prevBeforeDiff(internal);
 	};
 
-	options.diffed = vnode => {
-		// vnode.endTime = performance.now();
+	options.diffed = internal => {
+		const id = getVNodeId(ids, internal);
+		timings.end.set(id, performance.now());
 
-		if (typeof vnode.type === "function") {
-			endMark(getDisplayName(vnode, config));
+		if (internal.flags & TYPE_COMPONENT) {
+			endMark(getDisplayName(internal, config));
 		}
 
-		if (prevAfterDiff) prevAfterDiff(vnode);
+		if (prevAfterDiff) prevAfterDiff(internal);
 	};
 
 	o._commit = o.__c = (internal: Internal | null, queue: any[]) => {
@@ -158,9 +180,9 @@ export function setupOptionsV11(
 		renderer.onCommit(internal);
 	};
 
-	options.unmount = vnode => {
-		if (prevBeforeUnmount) prevBeforeUnmount(vnode);
-		renderer.onUnmount(vnode as any);
+	options.unmount = internal => {
+		if (prevBeforeUnmount) prevBeforeUnmount(internal);
+		renderer.onUnmount(internal);
 	};
 
 	// Teardown devtools options. Mainly used for testing

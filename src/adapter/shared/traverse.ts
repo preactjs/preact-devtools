@@ -18,6 +18,7 @@ import { NodeType } from "../../constants";
 import { getDiffType, recordComponentStats } from "./stats";
 import { measureUpdate } from "../adapter/highlightUpdates";
 import { PreactBindings, SharedVNode } from "./bindings";
+import { VNodeTimings } from "./timings";
 
 function getHocName(name: string) {
 	const idx = name.indexOf("(");
@@ -134,6 +135,7 @@ function mount<T extends SharedVNode>(
 	profiler: ProfilerState,
 	hocs: string[],
 	bindings: PreactBindings<T>,
+	timings: VNodeTimings,
 ) {
 	if (commit.stats !== null) {
 		commit.stats.mounts++;
@@ -179,8 +181,8 @@ function mount<T extends SharedVNode>(
 				vnode.key ? getStringId(commit.strings, vnode.key) : 0,
 				// Multiply, because operations array only supports integers
 				// and would otherwise cut off floats
-				(vnode.startTime || 0) * 1000,
-				(vnode.endTime || 0) * 1000,
+				(timings.start.get(id) || 0) * 1000,
+				(timings.end.get(id) || 0) * 1000,
 			);
 
 			if (hocs.length > 0) {
@@ -232,6 +234,7 @@ function mount<T extends SharedVNode>(
 				profiler,
 				hocs,
 				bindings,
+				timings,
 			);
 		}
 	}
@@ -285,6 +288,7 @@ function update<T extends SharedVNode>(
 	profiler: ProfilerState,
 	hocs: string[],
 	bindings: PreactBindings<T>,
+	timings: VNodeTimings,
 ) {
 	if (commit.stats !== null) {
 		commit.stats.updates++;
@@ -315,6 +319,7 @@ function update<T extends SharedVNode>(
 					profiler,
 					hocs,
 					bindings,
+					timings,
 				);
 			}
 		}
@@ -338,6 +343,7 @@ function update<T extends SharedVNode>(
 			profiler,
 			hocs,
 			bindings,
+			timings,
 		);
 		return true;
 	}
@@ -346,8 +352,8 @@ function update<T extends SharedVNode>(
 	commit.operations.push(
 		MsgTypes.UPDATE_VNODE_TIMINGS,
 		id,
-		(vnode.startTime || 0) * 1000,
-		(vnode.endTime || 0) * 1000,
+		(timings.start.get(id) || 0) * 1000,
+		(timings.end.get(id) || 0) * 1000,
 	);
 
 	const name = bindings.getDisplayName(vnode, config);
@@ -412,6 +418,7 @@ function update<T extends SharedVNode>(
 				profiler,
 				hocs,
 				bindings,
+				timings,
 			);
 			// TODO: This is only sometimes necessary
 			shouldReorder = true;
@@ -431,6 +438,7 @@ function update<T extends SharedVNode>(
 				profiler,
 				hocs,
 				bindings,
+				timings,
 			);
 			shouldReorder = true;
 		}
@@ -455,6 +463,7 @@ export function createCommit<T extends SharedVNode>(
 	config: RendererConfig,
 	profiler: ProfilerState,
 	helpers: PreactBindings<T>,
+	timings: VNodeTimings,
 ): Commit {
 	const commit = {
 		operations: [],
@@ -494,6 +503,7 @@ export function createCommit<T extends SharedVNode>(
 			profiler,
 			[],
 			helpers,
+			timings,
 		);
 	} else {
 		update(
@@ -507,6 +517,7 @@ export function createCommit<T extends SharedVNode>(
 			profiler,
 			[],
 			helpers,
+			timings,
 		);
 	}
 

@@ -12,3 +12,7 @@ export interface VNodeTimings {
 export function storeTime(timings: Map<ID, number>, id: ID, time: number) {
 	timings.set(id, time);
 }
+
+export function getTime(timings: Map<ID, number>, id: ID): number {
+	return timings.get(id) || 0;
+}

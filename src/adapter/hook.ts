@@ -237,6 +237,7 @@ export function createHook(port: PortPageHook): DevtoolsHook {
 					filters,
 					idMapper,
 					bindingsV10,
+					timings,
 				);
 				setupOptionsV10(options, renderer, config as any, idMapper, timings);
 				return attachRenderer(renderer, supports);
@@ -245,6 +246,7 @@ export function createHook(port: PortPageHook): DevtoolsHook {
 					namespace,
 					bindingsV11.getInstance,
 				);
+
 				const renderer = createRenderer(
 					port,
 					config,
@@ -254,8 +256,9 @@ export function createHook(port: PortPageHook): DevtoolsHook {
 					filters,
 					idMapper,
 					bindingsV11,
+					timings,
 				);
-				setupOptionsV11(options as any, renderer, config);
+				setupOptionsV11(options as any, renderer, config, idMapper, timings);
 				return attachRenderer(renderer, {
 					hooks: true,
 					renderReasons: true,
