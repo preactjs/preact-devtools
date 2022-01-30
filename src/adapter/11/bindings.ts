@@ -51,6 +51,7 @@ export function isTextInternal(internal: Internal): boolean {
 
 export function getComponentHooks(internal: Internal): ComponentHooks | null {
 	const data = internal.data;
+	if (data == null) return null;
 	return (data as any).__hooks || (data as any).__H || null;
 }
 
