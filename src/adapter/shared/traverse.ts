@@ -45,10 +45,23 @@ function isTextNode(dom: HTMLElement | Text | null): dom is Text {
 function updateHighlight<T extends SharedVNode>(
 	profiler: ProfilerState,
 	vnode: T,
-	helpers: PreactBindings<T>,
+	bindings: PreactBindings<T>,
 ) {
-	if (profiler.highlightUpdates && helpers.isComponent(vnode)) {
-		let dom = helpers.getDom(vnode);
+	if (profiler.highlightUpdates && bindings.isComponent(vnode)) {
+		const stack: any[] = [vnode];
+		let item;
+		let dom;
+		while ((item = stack.shift()) !== undefined) {
+			if (!bindings.isComponent(item)) {
+				dom = bindings.getDom(item);
+				break;
+			}
+
+			stack.push(...bindings.getActualChildren(item));
+		}
+
+		if (dom === null || dom === undefined) return;
+
 		if (isTextNode(dom)) {
 			dom = dom.parentNode as HTMLElement;
 		}
