@@ -111,24 +111,39 @@ export function createRenderer<T extends SharedVNode>(
 			const vnode = getVNodeById(ids, id);
 			if (!vnode) return null;
 
-			const first = bindings.getDom(vnode);
+			let first = null;
 			let last = null;
-			if (bindings.isComponent(vnode)) {
-				const children = bindings.getActualChildren(vnode);
-				for (let i = children.length - 1; i >= 0; i--) {
-					const child = children[i];
-					if (child) {
-						const dom = bindings.getDom(child);
-						if (dom === first) break;
-						if (dom !== null) {
-							last = dom;
-							break;
-						}
+
+			// Traverse tree until we find the first DOM node
+			let stack: any[] = [vnode];
+			let item;
+			while ((item = stack.shift()) !== undefined) {
+				if (!bindings.isComponent(item)) {
+					first = bindings.getDom(item);
+					break;
+				}
+
+				stack.push(...bindings.getActualChildren(item));
+			}
+
+			// If we traversed through every child, then there is
+			// no last child present.
+			if (first !== null) {
+				stack = [vnode];
+				while ((item = stack.pop()) !== undefined) {
+					if (!bindings.isComponent(item)) {
+						last = bindings.getDom(item);
+						break;
 					}
+
+					stack.push(...bindings.getActualChildren(item));
 				}
 			}
 
-			return [first, last];
+			// Only set last if node is different. If both are the same
+			// we assume that we cannot show correct padding, margin and
+			// border visualizations and skip that.
+			return [first, first === last ? null : last];
 		},
 		findVNodeIdForDom(node) {
 			const vnode = domToVNode.get(node);
