@@ -56,31 +56,27 @@ export function loadPreactVersion(): Plugin {
 						});
 
 						let importee = id.replace(/@[^/]+/, "");
-						if (version.startsWith("11")) {
-							if (importee === "preact") {
-								importee = "dist/preact.mjs";
-							} else if (importee === "preact/compat") {
-								importee = "compat/dist/compat.mjs";
-							} else if (importee === "preact/hooks") {
-								importee = "hooks/dist/hooks.mjs";
-							} else if (importee === "preact/debug") {
-								importee = "debug/dist/debug.mjs";
-							} else if (importee === "preact/devtools") {
-								importee = "devtools/dist/devtools.mjs";
-							}
-						} else {
-							if (importee === "preact") {
-								importee = "dist/preact.module.js";
-							} else if (importee === "preact/compat") {
-								importee = "compat/dist/compat.module.js";
-							} else if (importee === "preact/hooks") {
-								importee = "hooks/dist/hooks.module.js";
-							} else if (importee === "preact/debug") {
-								importee = "debug/dist/debug.module.js";
-							} else if (importee === "preact/devtools") {
-								importee = "devtools/dist/devtools.module.js";
-							}
-						}
+
+						const mappings = {
+							"11.x": {
+								preact: "dist/preact.mjs",
+								"preact/compat": "compat/dist/compat.mjs",
+								"preact/hooks": "hooks/dist/hooks.mjs",
+								"preact/debug": "debug/dist/debug.mjs",
+								"preact/devtools": "devtools/dist/devtools.mjs",
+							},
+							"10.x": {
+								preact: "dist/preact.module.js",
+								"preact/compat": "compat/dist/compat.module.js",
+								"preact/hooks": "hooks/dist/hooks.module.js",
+								"preact/debug": "debug/dist/debug.module.js",
+								"preact/devtools": "devtools/dist/devtools.module.js",
+							},
+						};
+
+						importee = version.startsWith("11")
+							? mappings["11.x"][importee]
+							: mappings["10.x"][importee];
 
 						const code = fs.readFileSync(
 							path.join(versionDir, importee),
