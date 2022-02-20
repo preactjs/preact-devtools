@@ -56,16 +56,30 @@ export function loadPreactVersion(): Plugin {
 						});
 
 						let importee = id.replace(/@[^/]+/, "");
-						if (importee === "preact") {
-							importee = "dist/preact.module.js";
-						} else if (importee === "preact/compat") {
-							importee = "compat/dist/compat.module.js";
-						} else if (importee === "preact/hooks") {
-							importee = "hooks/dist/hooks.module.js";
-						} else if (importee === "preact/debug") {
-							importee = "debug/dist/debug.module.js";
-						} else if (importee === "preact/devtools") {
-							importee = "devtools/dist/devtools.module.js";
+						if (version.startsWith("11")) {
+							if (importee === "preact") {
+								importee = "dist/preact.mjs";
+							} else if (importee === "preact/compat") {
+								importee = "compat/dist/compat.mjs";
+							} else if (importee === "preact/hooks") {
+								importee = "hooks/dist/hooks.mjs";
+							} else if (importee === "preact/debug") {
+								importee = "debug/dist/debug.mjs";
+							} else if (importee === "preact/devtools") {
+								importee = "devtools/dist/devtools.mjs";
+							}
+						} else {
+							if (importee === "preact") {
+								importee = "dist/preact.module.js";
+							} else if (importee === "preact/compat") {
+								importee = "compat/dist/compat.module.js";
+							} else if (importee === "preact/hooks") {
+								importee = "hooks/dist/hooks.module.js";
+							} else if (importee === "preact/debug") {
+								importee = "debug/dist/debug.module.js";
+							} else if (importee === "preact/devtools") {
+								importee = "devtools/dist/devtools.module.js";
+							}
 						}
 
 						const code = fs.readFileSync(
