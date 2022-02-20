@@ -118,6 +118,8 @@ export function createRenderer<T extends SharedVNode>(
 			let stack: any[] = [vnode];
 			let item;
 			while ((item = stack.shift()) !== undefined) {
+				if (item === null) continue;
+
 				if (!bindings.isComponent(item)) {
 					first = bindings.getDom(item);
 					break;
@@ -131,6 +133,8 @@ export function createRenderer<T extends SharedVNode>(
 			if (first !== null) {
 				stack = [vnode];
 				while ((item = stack.pop()) !== undefined) {
+					if (item === null) continue;
+
 					if (!bindings.isComponent(item)) {
 						last = bindings.getDom(item);
 						break;
