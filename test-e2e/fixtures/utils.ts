@@ -8,6 +8,7 @@ export function getPreactVersions() {
 	const dir = path.join(__dirname, "vendor", "preact");
 	return fs
 		.readdirSync(dir)
+		.filter(name => !name.startsWith("."))
 		.map(name => {
 			if (name.endsWith(".tgz")) {
 				name = name.slice(0, -".tgz".length);
