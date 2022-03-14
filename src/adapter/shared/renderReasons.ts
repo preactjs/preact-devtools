@@ -19,6 +19,23 @@ export const enum RenderReason {
 	FORCE_UPDATE = 6,
 }
 
+export function renderReasonToStr(reason: RenderReason) {
+	switch (reason) {
+		case RenderReason.MOUNT:
+			return "mount";
+		case RenderReason.PARENT_UPDATE:
+			return "parent update";
+		case RenderReason.PROPS_CHANGED:
+			return "props changed";
+		case RenderReason.STATE_CHANGED:
+			return "state changed";
+		case RenderReason.HOOKS_CHANGED:
+			return "hooks changed";
+		case RenderReason.FORCE_UPDATE:
+			return "force update";
+	}
+}
+
 export interface RenderReasonData {
 	type: RenderReason;
 	items: string[] | null;

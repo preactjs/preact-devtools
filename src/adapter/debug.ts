@@ -1,6 +1,7 @@
 import { MsgTypes } from "./protocol/events";
 import { parseTable, flushTable } from "./protocol/string-table";
 import { ID, DevNodeType } from "../view/store/types";
+import { renderReasonToStr } from "./shared/renderReasons";
 
 export interface ParsedMsg {
 	rootId: number;
@@ -214,20 +215,13 @@ export function printCommit(data: number[]) {
 
 		// String table
 		const len = data[i++];
-		const strings = [];
-		if (len > 0) {
-			for (; i < len + 1; i++) {
-				const strLen = data[i];
-				const start = i + 1;
-				const end = i + strLen + 1;
-				const str = String.fromCodePoint(...data.slice(start, end));
-				strings.push(str);
-				i += strLen;
-			}
-			i += 2;
-			console.log("strings: ", strings);
-		} else {
-			console.log("strings: none");
+		console.log(len);
+		const strings = parseTable(data.slice(i - 1));
+		i += len;
+		console.log("strings: ", strings);
+
+		if (!Number.isInteger(data[i]) || data[i] < 0 || data[i] > 8) {
+			throw new Error("Invalid offset " + data[i]);
 		}
 
 		for (; i < data.length; i++) {
@@ -237,14 +231,20 @@ export function printCommit(data: number[]) {
 					const name = strings[data[i + 5] - 1];
 					const key = data[i + 6] > 0 ? ` key="${strings[i + 6 - 1]}" ` : "";
 					const parentId = data[i + 3];
+					const startTime = data[i + 7];
+					const endTime = data[i + 8];
 					console.log(
-						`Add %c${id} %c<${name}${key}>%c to parent %c${parentId}`,
+						`Add %c${id} %c<${name}${key}>%c to parent %c${parentId}%c, time: %c${startTime}%c - %c${endTime}`,
 						"color: yellow",
 						"color: violet",
 						"color: inherit",
 						"color: green",
+						"color: inherit",
+						"color: peachpuff",
+						"color: inherit",
+						"color: peachpuff",
 					);
-					i += 6;
+					i += 8;
 					break;
 				}
 				case MsgTypes.REMOVE_VNODE: {
@@ -261,7 +261,51 @@ export function printCommit(data: number[]) {
 					const id = data[i + 1];
 					const children = data.slice(i + 3, i + 3 + data[i + 2]);
 					console.log(`Reorder: ${id}, [${children.join(", ")}]`);
+					i += 2 + children.length;
 					break;
+				}
+				case MsgTypes.UPDATE_VNODE_TIMINGS: {
+					const id = data[i + 1];
+					console.log(
+						`Update: %c${id}%c, time: %c${data[i + 2]} %c- %c${data[i + 3]}`,
+						"color: yellow",
+						"color: inherit",
+						"color: peachpuff",
+						"color: inherit",
+						"color: peachpuff",
+					);
+					i += 3;
+					break;
+				}
+				case MsgTypes.RENDER_REASON: {
+					const id = data[i + 1];
+					const type = data[i + 2];
+					const len = data[i + 3];
+					const strs = [];
+
+					for (let j = i + 4; j <= i + 3 + len; j++) {
+						strs.push(strings[data[j] - 1]);
+					}
+
+					console.log(
+						`Render Reason: %c${id}%c ${renderReasonToStr(type)} %c${
+							strs.join(", ") || "none"
+						}`,
+						"color: yellow",
+						"color: aqua",
+						"color: inherit",
+					);
+					i += 3 + len;
+					break;
+				}
+				case MsgTypes.ADD_ROOT: {
+					const id = data[i + 1];
+					console.log(`Add Root: %c${id}`, "color: yellow");
+					i++;
+					break;
+				}
+				default: {
+					console.log("Not implemented", data[i]);
 				}
 			}
 		}
