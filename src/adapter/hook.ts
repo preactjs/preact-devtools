@@ -203,7 +203,7 @@ export function createHook(port: PortPageHook): DevtoolsHook {
 			if (preactVersionMatch.major == 10) {
 				const supports = {
 					renderReasons: !!config.Component,
-					hooks: preactVersionMatch.minor >= 4 && preactVersionMatch.patch >= 1,
+					hooks: (preactVersionMatch.minor === 4 && preactVersionMatch.patch >= 1) || preactVersionMatch.minor > 4,
 				};
 
 				// Create an integer-based namespace to avoid clashing ids caused by
