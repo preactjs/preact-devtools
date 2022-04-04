@@ -1,5 +1,19 @@
 # Changelog
 
+## 1.4.4
+
+### Bug Fixes
+
+- Handle plain objects that look like collections (#322, thanks @r-frederick)
+- Respect `box-sizing: content-box` in highlighter (#327, thanks @marvinhagemeister)
+- Fix hook detection when the patch is under 1 (#335, thanks @JoviDeCroock)
+
+### Maintenance
+
+- Upgrade deps (#321, thanks @andrewiggins)
+- Minor code cleanups (#325, thanks @marvinhagemeister)
+- Remove `MultiRender` abstraction (#326, thanks @marvinhagemeister)
+
 ## 1.4.3
 
 ## Bug Fixes
