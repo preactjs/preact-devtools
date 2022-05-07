@@ -72,7 +72,7 @@ function updateHighlight<T extends SharedVNode>(
 	}
 }
 
-function getFilteredChildren<T extends SharedVNode>(
+export function getFilteredChildren<T extends SharedVNode>(
 	vnode: T,
 	filters: FilterState,
 	config: RendererConfig,
