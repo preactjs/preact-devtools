@@ -21,6 +21,6 @@ jobs:
           yarn
           yarn lint
           yarn test
-          yarn test-e2e --repeat-flaky 3
+          PREACT_VERSION=10 yarn test-e2e --repeat-flaky 3
         env:
           CI: true

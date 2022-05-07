@@ -25,9 +25,23 @@ export async function newTestPage(
 ) {
 	const page = await newPage(config);
 
-	const preactVersion = options.preact
-		? options.preact
-		: getPreactVersions()[0];
+	let preactVersion = options.preact;
+	if (!preactVersion) {
+		const versions = getPreactVersions();
+		const envVersion = process.env.PREACT_VERSION;
+		if (envVersion) {
+			const parsed = versions.find(v => v.startsWith(envVersion));
+			if (!parsed) {
+				throw new Error(
+					`Unknown preact version "${envVersion}" passed into PREACT_VERSION`,
+				);
+			}
+
+			preactVersion = parsed;
+		} else {
+			preactVersion = versions[0];
+		}
+	}
 
 	// Reset emulation
 	await (page as any)._client.send("Emulation.clearDeviceMetricsOverride");

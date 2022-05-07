@@ -24,7 +24,7 @@ const streamPipeline = util.promisify(pipeline);
 		}
 
 		const semver = version.split(".");
-		if (+semver[0] < 10 || +semver[1] < 1) {
+		if (+semver[0] < 10 || (+semver[0] === 10 && +semver[1] < 1)) {
 			return acc;
 		}
 

@@ -14,22 +14,6 @@ export enum Status {
 export const PROFILE_RELOAD = "preact-devtools_profile-and-reload";
 export const STATS_RELOAD = "preact-devtools_stats-and-reload";
 
-export enum HookType {
-	useState = 1,
-	useReducer = 2,
-	useEffect = 3,
-	useLayoutEffect = 4,
-	useRef = 5,
-	useImperativeHandle = 6,
-	useMemo = 7,
-	useCallback = 8,
-	useContext = 9,
-	useErrorBoundary = 10,
-	useDebugValue = 11,
-	custom = 99,
-	devtoolsParent = 9999,
-}
-
 export enum NodeType {
 	Element = 1,
 	Text = 3,

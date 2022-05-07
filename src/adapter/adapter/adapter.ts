@@ -8,6 +8,7 @@ import { parseFilters } from "./filter";
 import { PortPageHook } from "./port";
 import { PropData } from "../../view/components/sidebar/inspect/parseProps";
 import { PROFILE_RELOAD, STATS_RELOAD } from "../../constants";
+import { ProfilerState } from "./profiler";
 
 export type Path = Array<string | number>;
 
@@ -40,6 +41,7 @@ export interface InspectData {
 
 export function createAdapter(
 	port: PortPageHook,
+	profiler: ProfilerState,
 	renderers: Map<number, Renderer>,
 ) {
 	const { listen, send } = port;
@@ -150,10 +152,13 @@ export function createAdapter(
 	listen("refresh", () => forAll(r => r.refresh?.()));
 
 	// Profiler
-	listen("start-profiling", options =>
-		forAll(r => r.startProfiling?.(options)),
-	);
-	listen("stop-profiling", () => forAll(r => r.stopProfiling?.()));
+	listen("start-profiling", options => {
+		profiler.isProfiling = true;
+		profiler.captureRenderReasons = !!options && !!options.captureRenderReasons;
+	});
+	listen("stop-profiling", () => {
+		profiler.isProfiling = false;
+	});
 	listen("reload-and-profile", options => {
 		window.localStorage.setItem(PROFILE_RELOAD, JSON.stringify(options));
 
@@ -168,8 +173,12 @@ export function createAdapter(
 	});
 
 	// Stats
-	listen("start-stats-recording", () => forAll(r => r.startRecordStats?.()));
-	listen("stop-stats-recording", () => forAll(r => r.stopRecordStats?.()));
+	listen("start-stats-recording", () => {
+		profiler.recordStats = true;
+	});
+	listen("stop-stats-recording", () => {
+		profiler.recordStats = false;
+	});
 	listen("reload-and-record-stats", () => {
 		window.localStorage.setItem(STATS_RELOAD, "true");
 
@@ -184,10 +193,12 @@ export function createAdapter(
 	});
 
 	listen("start-highlight-updates", () => {
-		forAll(r => r.startHighlightUpdates?.());
+		profiler.highlightUpdates = true;
 	});
 	listen("stop-highlight-updates", () => {
-		forAll(r => r.stopHighlightUpdates?.());
+		profiler.highlightUpdates = false;
+		profiler.updateRects.clear();
+		profiler.pendingHighlightUpdates.clear();
 	});
 
 	listen("load-host-selection", () => {

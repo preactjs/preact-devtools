@@ -1,6 +1,5 @@
 import { Options, VNode, ComponentConstructor, Component } from "preact";
-import { Preact10Renderer, RendererConfig10 } from "./renderer";
-import { recordMark, endMark } from "./marks";
+import { recordMark, endMark } from "../marks";
 import {
 	getDisplayName,
 	setNextState,
@@ -8,9 +7,18 @@ import {
 	getStatefulHooks,
 	getStatefulHookValue,
 	getComponent,
-} from "./vnode";
-import { addHookStack, addDebugValue, addHookName } from "./renderer/hooks";
-import { HookType } from "../../constants";
+} from "./bindings";
+import {
+	addDebugValue,
+	addHookName,
+	addHookStack,
+	HookType,
+} from "../shared/hooks";
+import { createVNodeTimings } from "../shared/timings";
+import { Renderer } from "../renderer";
+import { RendererConfig } from "../shared/renderer";
+
+export type OptionsV10 = Options;
 
 /**
  * Inject tracking into setState
@@ -31,15 +39,17 @@ function trackPrevState(Ctor: ComponentConstructor) {
 	};
 }
 
-export function setupOptions(
+export function setupOptionsV10(
 	options: Options,
-	renderer: Preact10Renderer,
-	config: RendererConfig10,
+	renderer: Renderer,
+	config: RendererConfig,
 ) {
 	// Track component state. Only supported in Preact > 10.4.0
 	if (config.Component) {
 		trackPrevState(config.Component);
 	}
+
+	let timings = createVNodeTimings<VNode>();
 
 	const o = options as any;
 
@@ -55,18 +65,11 @@ export function setupOptions(
 	let prevHookName = options.useDebugName;
 
 	options.vnode = vnode => {
-		// Tiny performance improvement by initializing fields as doubles
-		// from the start. `performance.now()` will always return a double.
-		// See https://github.com/facebook/react/issues/14365
-		// and https://slidr.io/bmeurer/javascript-engine-fundamentals-the-good-the-bad-and-the-ugly
-		vnode.startTime = NaN;
-		vnode.endTime = NaN;
-
-		vnode.startTime = 0;
-		vnode.endTime = -1;
+		// const id = getVNodeId(ids, vnode);
+		// FIXME: Does the negative end thing screw up the profiler?
+		// storeTime(timings.start, id, 0);
+		// storeTime(timings.end, id, -1);
 		if (prevVNodeHook) prevVNodeHook(vnode);
-
-		(vnode as any).old = null;
 	};
 
 	// Make sure that we are always the first `option._hook` to be called.
@@ -81,7 +84,8 @@ export function setupOptions(
 		prevHookName = options._addHookName || options.__a;
 
 		o._hook = o.__h = (c: Component, index: number, type: number) => {
-			const s = getStatefulHooks(c);
+			const vnode = (c as any)._vnode || (c as any).__v;
+			const s = getStatefulHooks(vnode);
 			if (s && Array.isArray(s) && s.length > 0 && getComponent(s[0])) {
 				s[0]._oldValue = getStatefulHookValue(s);
 				s[0]._index = index;
@@ -113,21 +117,25 @@ export function setupOptions(
 	}, 100);
 
 	o._diff = o.__b = (vnode: VNode) => {
-		vnode.startTime = performance.now();
+		if (vnode.type !== null) {
+			timings.start.set(vnode, performance.now());
 
-		if (typeof vnode.type === "function") {
-			const name = getDisplayName(vnode, config);
-			recordMark(`${name}_diff`);
+			if (typeof vnode.type === "function") {
+				const name = getDisplayName(vnode, config);
+				recordMark(`${name}_diff`);
+			}
 		}
 
 		if (prevBeforeDiff != null) prevBeforeDiff(vnode);
 	};
 
 	options.diffed = vnode => {
-		vnode.endTime = performance.now();
+		if (vnode.type !== null) {
+			timings.end.set(vnode, performance.now());
 
-		if (typeof vnode.type === "function") {
-			endMark(getDisplayName(vnode, config));
+			if (typeof vnode.type === "function") {
+				endMark(getDisplayName(vnode, config));
+			}
 		}
 
 		if (prevAfterDiff) prevAfterDiff(vnode);
@@ -139,7 +147,9 @@ export function setupOptions(
 		// These cases are already handled by `unmount`
 		if (vnode == null) return;
 
-		renderer.onCommit(vnode);
+		const tmp = timings;
+		timings = createVNodeTimings();
+		renderer.onCommit(vnode, tmp, null);
 	};
 
 	options.unmount = vnode => {

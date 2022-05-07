@@ -40,8 +40,8 @@ export async function run(config: any) {
 	await click(page, '[data-testid="counter-2"]');
 	await click(page, '[data-testid="force-update"]');
 
-	// Wait for P
-
+	// Wait for profiler to flush
+	await wait(500);
 	await clickRecordButton(devtools);
 	await clickFlameNode(devtools, "Fragment");
 

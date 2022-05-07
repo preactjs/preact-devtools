@@ -4,7 +4,10 @@ import { expect } from "chai";
 describe("StringTable", () => {
 	describe("flushTable", () => {
 		it("should flush", () => {
-			const table = new Map([["abc", 1], ["foo", 2]]);
+			const table = new Map([
+				["abc", 1],
+				["foo", 2],
+			]);
 			expect(flushTable(table)).to.deep.equal([
 				8,
 				3,

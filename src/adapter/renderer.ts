@@ -1,38 +1,29 @@
-import { VNode } from "preact";
 import { ID } from "../view/store/types";
 import { FilterState } from "./adapter/filter";
 import { InspectData, UpdateType } from "./adapter/adapter";
-import { DevtoolEvents } from "./hook";
+import { SharedVNode } from "./shared/bindings";
+import { VNodeTimings } from "./shared/timings";
+import { RenderReasonData } from "./shared/renderReasons";
 
 export type ObjPath = Array<string | number>;
 
-/**
- * TODO: Deprecate this
- */
-export interface Renderer {
+export interface Renderer<T extends SharedVNode = SharedVNode> {
 	refresh?(): void;
-	getVNodeById(id: ID): VNode | null;
-	getDisplayName(vnode: VNode): string;
-	getDisplayNameById?(id: ID): string;
+	getVNodeById(id: ID): T | null;
+	getDisplayName(vnode: T): string;
 	findDomForVNode(id: ID): Array<HTMLElement | Text | null> | null;
 	findVNodeIdForDom(node: HTMLElement | Text): number;
 	applyFilters(filters: FilterState): void;
-	has(id: ID): boolean;
 	log(id: ID, children: ID[]): void;
 	inspect(id: ID): InspectData | null;
-	flushInitial(): void;
 	update(id: ID, type: UpdateType, path: ObjPath, value: any): void;
 	clear?(): void;
-
-	// Profiler
-	startProfiling?(options: DevtoolEvents["start-profiling"]): void; // V2
-	stopProfiling?(): void; // V2
-	startHighlightUpdates?(): void;
-	stopHighlightUpdates?(): void;
-
-	// Stats
-	startRecordStats?(): void; // V4
-	stopRecordStats?(): void; // V4
+	onCommit(
+		vnode: T,
+		timings: VNodeTimings<T>,
+		renderReasons: Map<T, RenderReasonData> | null,
+	): void;
+	onUnmount(vnode: T): void;
 
 	// Hooks
 	updateHook?(id: ID, index: number, value: any): void; // V3
@@ -41,9 +32,12 @@ export interface Renderer {
 	suspend?(id: ID, active: boolean): void; // V4
 }
 
-export function getRendererByVNodeId(renderers: Map<number, Renderer>, id: ID) {
+export function getRendererByVNodeId(
+	renderers: Map<number, Renderer<SharedVNode>>,
+	id: ID,
+) {
 	for (const r of renderers.values()) {
-		if (r.has(id)) return r;
+		if (r.getVNodeById(id) !== null) return r;
 	}
 
 	return null;

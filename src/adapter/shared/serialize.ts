@@ -1,23 +1,25 @@
-import { getActualChildren } from "./vnode";
-import { VNode } from "preact";
-import { ObjPath } from "../renderer";
-import { RendererConfig10, serializeVNode } from "./renderer";
-
-export function traverse(vnode: VNode, fn: (vnode: VNode) => void) {
-	fn(vnode);
-	const children = getActualChildren(vnode);
-	for (let i = 0; i < children.length; i++) {
-		const child = children[i];
-		if (child != null) {
-			traverse(child, fn);
-			fn(child);
-		}
-	}
-}
+import type { RendererConfig } from "./renderer";
+import type { ObjPath } from "../renderer";
+import type { PreactBindings, SharedVNode } from "./bindings";
 
 export interface SerializedVNode {
 	type: "vnode";
 	name: string;
+}
+
+export function serializeVNode<T extends SharedVNode>(
+	x: any,
+	config: RendererConfig,
+	bindings: PreactBindings<T>,
+): SerializedVNode | null {
+	if (bindings.isVNode(x)) {
+		return {
+			type: "vnode",
+			name: bindings.getPropsVNodeDisplayName(x, config),
+		};
+	}
+
+	return null;
 }
 
 export function jsonify(
@@ -100,11 +102,6 @@ export function jsonify(
 	}
 }
 
-// eslint-disable-next-line @typescript-eslint/ban-types
-export function serialize(config: RendererConfig10, data: object | null) {
-	return jsonify(data, node => serializeVNode(node, config), new Set());
-}
-
 export function isEditable(x: any) {
 	switch (typeof x) {
 		case "string":
@@ -114,32 +111,6 @@ export function isEditable(x: any) {
 		default:
 			return false;
 	}
-}
-
-// eslint-disable-next-line @typescript-eslint/ban-types
-export function cleanProps<T extends object>(
-	props: T,
-): Exclude<T, "__source" | "__self"> | null {
-	if (typeof props === "string" || !props) return null;
-	const out: any = {};
-	for (const key in props) {
-		if (key === "__source" || key === "__self") continue;
-		out[key] = props[key];
-	}
-	if (!Object.keys(out).length) return null;
-	return out;
-}
-
-const reg = /__cC\d+/;
-export function cleanContext(context: Record<string, any>) {
-	const res: Record<string, any> = {};
-	for (const key in context) {
-		if (reg.test(key)) continue;
-		res[key] = context[key];
-	}
-
-	if (Object.keys(res).length == 0) return null;
-	return res;
 }
 
 function clone(value: any) {
@@ -185,6 +156,18 @@ export function setInCopy<T = any>(
 	return updated as any;
 }
 
+export function serialize<T extends SharedVNode>(
+	config: RendererConfig,
+	bindings: PreactBindings<T>,
+	data: unknown | null,
+) {
+	return jsonify(
+		data,
+		node => serializeVNode(node, config, bindings),
+		new Set(),
+	);
+}
+
 /**
  * Deeply mutate a property by walking down an array of property keys
  */
@@ -211,4 +194,30 @@ export function hasIn(obj: Record<string, any>, path: ObjPath) {
 	}
 
 	return true;
+}
+
+// eslint-disable-next-line @typescript-eslint/ban-types
+export function cleanProps<T extends object>(
+	props: T,
+): Exclude<T, "__source" | "__self"> | null {
+	if (typeof props === "string" || !props) return null;
+	const out: any = {};
+	for (const key in props) {
+		if (key === "__source" || key === "__self") continue;
+		out[key] = props[key];
+	}
+	if (!Object.keys(out).length) return null;
+	return out;
+}
+
+const reg = /__cC\d+/;
+export function cleanContext(context: Record<string, any>) {
+	const res: Record<string, any> = {};
+	for (const key in context) {
+		if (reg.test(key)) continue;
+		res[key] = context[key];
+	}
+
+	if (Object.keys(res).length == 0) return null;
+	return res;
 }

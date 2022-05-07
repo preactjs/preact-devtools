@@ -1,14 +1,17 @@
 import { h, render, Options, options, Fragment, Component } from "preact";
 import * as sinon from "sinon";
-import { createRenderer, getFilteredChildren } from "./renderer";
-import { setupOptions } from "../10/options";
+import { createRenderer } from "./renderer";
+import { setupOptionsV10 } from "../10/options";
 import { expect } from "chai";
 import { toSnapshot } from "../debug";
 import { useState } from "preact/hooks";
 import { act } from "preact/test-utils";
-import { getDisplayName } from "./vnode";
+import { bindingsV10 } from "../10/bindings";
 import { FilterState } from "../adapter/filter";
 import { Renderer } from "../renderer";
+import { newProfiler } from "../adapter/profiler";
+import { getFilteredChildren } from "./traverse";
+import { createIdMappingState } from "./idMapper";
 
 export function setupScratch() {
 	const div = document.createElement("div");
@@ -21,13 +24,19 @@ export function setupMockHook(options: Options) {
 	const spy = sinon.spy();
 	const renderer = createRenderer(
 		{ send: spy, listen: () => null },
-		1,
 		{ Fragment: Fragment as any },
 		{},
 		{ hooks: false, renderReasons: false },
+		newProfiler(),
 		{ type: new Set(), regex: [] },
+		createIdMappingState(1, bindingsV10.getInstance),
+		bindingsV10,
+		{
+			start: new Map(),
+			end: new Map(),
+		},
 	);
-	const destroy = setupOptions(options, renderer, {
+	const destroy = setupOptionsV10(options, renderer, {
 		Fragment: Fragment as any,
 	});
 	return {
@@ -484,9 +493,16 @@ describe("Renderer 10", () => {
 			};
 
 			expect(
-				getFilteredChildren(vnode, filters, {
-					Fragment: Fragment as any,
-				}).map(name => getDisplayName(name, { Fragment: Fragment as any })),
+				getFilteredChildren(
+					vnode,
+					filters,
+					{
+						Fragment: Fragment as any,
+					},
+					bindingsV10,
+				).map(name =>
+					bindingsV10.getDisplayName(name, { Fragment: Fragment as any }),
+				),
 			).to.deep.equal(["Foo", "Bar"]);
 		});
 	});

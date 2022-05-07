@@ -8,6 +8,7 @@ export function getPreactVersions() {
 	const dir = path.join(__dirname, "vendor", "preact");
 	return fs
 		.readdirSync(dir)
+		.filter(name => !name.startsWith("."))
 		.map(name => {
 			if (name.endsWith(".tgz")) {
 				name = name.slice(0, -".tgz".length);
@@ -46,6 +47,7 @@ export function getPreactVersions() {
 				return -1;
 			}
 
-			return 0;
+			// Check if is tagged release: 11.0.0-experimental.0
+			return a.localeCompare(b) * -1;
 		});
 }
