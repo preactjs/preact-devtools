@@ -71,18 +71,11 @@ export function TreeView() {
 	const [updateCount, setUpdateCount] = useState(0);
 	useResize(() => setUpdateCount(updateCount + 1), [updateCount]);
 
-	useEffect(() => {
-		if (ref.current) {
-			const selectedNode = ref.current.querySelector(
-				'[data-selected="true"]',
-			) as any;
-			if (selectedNode) {
-				scrollIntoView(selectedNode);
-			}
-		}
-	}, []);
-
-	const { children: listItems, containerHeight } = useVirtualizedList({
+	const {
+		children: listItems,
+		containerHeight,
+		scrollToItem,
+	} = useVirtualizedList({
 		rowHeight: ROW_HEIGHT,
 		bufferCount: 5,
 		container: ref,
@@ -90,6 +83,10 @@ export function TreeView() {
 		// eslint-disable-next-line react/display-name
 		renderRow: (id, _, top) => <TreeItem key={id} id={id} top={top} />,
 	});
+
+	useEffect(() => {
+		scrollToItem(selected);
+	}, [selected]);
 
 	useAutoIndent(paneRef, [listItems]);
 
@@ -197,13 +194,6 @@ export function TreeItem(props: { key: any; id: ID; top: number }) {
 	const onToggle = () => toggle(id);
 	const ref = useRef<HTMLDivElement>();
 
-	const isSelected = as.selected === id;
-	useEffect(() => {
-		if (ref.current && isSelected) {
-			scrollIntoView(ref.current);
-		}
-	}, [ref.current, as.selected, id]);
-
 	if (!node) return null;
 
 	return (
@@ -217,7 +207,7 @@ export function TreeItem(props: { key: any; id: ID; top: number }) {
 				store.notify("inspect", id);
 			}}
 			onMouseEnter={() => highlightNode(store.notify, id)}
-			data-selected={isSelected}
+			data-selected={as.selected === id}
 			data-id={id}
 			data-depth={node.depth}
 			style={`top: ${props.top}px;`}
