@@ -1,5 +1,13 @@
 # Changelog
 
+## 4.0.1
+
+_FYI: The major version number increase is caused by an accidental publish to the Chrome webstore. This release brings the version in sync again. It was caused by human error and parts of the release process have been automated to reduce the likelihood of this happening again. More automation is planned._
+
+### Bug Fixes
+
+- Fix unable to scroll to virtualized elements (#340, thanks @marvinhagemeister )
+
 ## 1.4.4
 
 ### Bug Fixes
