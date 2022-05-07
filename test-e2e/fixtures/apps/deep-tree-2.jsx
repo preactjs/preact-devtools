@@ -19,13 +19,31 @@ function Foo() {
 	);
 }
 
+function Bar() {
+	return (
+		<h1 id="bar" data-testid="bar">
+			BAR
+		</h1>
+	);
+}
+
+function Bar2() {
+	return (
+		<h1 id="bar2" data-testid="bar2">
+			BAR 2
+		</h1>
+	);
+}
+
 function App() {
 	return (
 		<Fragment>
 			<ChildItemName>
+				<Bar />
 				<ChildItemName>
 					<ChildItemName>
 						<ChildItemName>
+							<Bar2 />
 							<ChildItemName>
 								<ChildItemName>
 									<ChildItemName>
