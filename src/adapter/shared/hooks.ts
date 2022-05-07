@@ -128,12 +128,12 @@ export function addHookStack(type: HookType) {
 	Error.stackTraceLimit = oldLimit;
 }
 
-export function parseHookData(
+export function parseHookData<T extends SharedVNode>(
 	config: RendererConfig,
 	data: HookData[],
-	vnode: SharedVNode,
+	vnode: T,
 	userHookNames: string[],
-	bindings: PreactBindings,
+	bindings: PreactBindings<T>,
 ): PropData[] {
 	const tree = new Map<string, PropData>();
 	const root: PropData = {

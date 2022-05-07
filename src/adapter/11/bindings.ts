@@ -32,6 +32,7 @@ export interface VNode {
 
 export interface Component {
 	state: any;
+	context: any;
 }
 
 // Internal.flags bitfield constants
@@ -210,7 +211,7 @@ export function getStatefulHooks(internal: Internal): HookState[] | null {
 }
 
 export function isUseReducerOrState(hookState: HookState): boolean {
-	return !!hookState._component || !!hookState.__c;
+	return !!hookState._internal || !!hookState.__i;
 }
 
 export function getStatefulHookValue(hookState: HookState): unknown {
@@ -245,7 +246,7 @@ export function getHookState(
 		const value = list[index]._value || list[index].__;
 
 		if (type === HookType.useRef) {
-			return value.current;
+			return value[0].current;
 		} else if (type === HookType.useErrorBoundary && !value) {
 			return "__preact_empty__";
 		}
@@ -317,4 +318,10 @@ export const bindingsV11: PreactBindings<Internal> = {
 	getSuspendedState,
 	setNextState,
 	isPortal,
+	getStatefulHookValue,
+	getStatefulHooks,
+	isUseReducerOrState,
+	getRenderReasonPost() {
+		return null;
+	},
 };

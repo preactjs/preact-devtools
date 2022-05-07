@@ -6,6 +6,7 @@ import type {
 } from "preact/src/internal";
 import { ComponentHooks, HookState, PreactBindings } from "../shared/bindings";
 import { RendererConfig } from "../shared/renderer";
+import { getRenderReasonPost } from "./renderReason";
 
 // Mangle accessors
 
@@ -310,4 +311,8 @@ export const bindingsV10: PreactBindings<VNode> = {
 	isVNode,
 	setNextState,
 	isPortal,
+	getStatefulHookValue,
+	getStatefulHooks,
+	isUseReducerOrState,
+	getRenderReasonPost,
 };

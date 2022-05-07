@@ -239,7 +239,7 @@ export function createHook(port: PortPageHook): DevtoolsHook {
 					bindingsV10,
 					timings,
 				);
-				setupOptionsV10(options, renderer, config as any, idMapper, timings);
+				setupOptionsV10(options, renderer, config as any);
 				return attachRenderer(renderer, supports);
 			} else if (preactVersionMatch.major === 11) {
 				const idMapper = createIdMappingState(
@@ -258,7 +258,7 @@ export function createHook(port: PortPageHook): DevtoolsHook {
 					bindingsV11,
 					timings,
 				);
-				setupOptionsV11(options as any, renderer, config, idMapper, timings);
+				setupOptionsV11(options as any, renderer, config, profiler);
 				return attachRenderer(renderer, {
 					hooks: true,
 					renderReasons: true,

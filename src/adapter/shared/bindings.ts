@@ -1,6 +1,9 @@
 import { Component } from "preact";
 import { RendererConfig } from "./renderer";
 import { HookType } from "./hooks";
+import { RenderReasonData } from "./renderReasons";
+import { IdMappingState } from "./idMapper";
+import { VNodeTimings } from "./timings";
 
 // These hook types are declared in "preact/hooks/src/internal" but not very
 // complete, so for now loosely declare locally.
@@ -33,6 +36,20 @@ export interface PreactBindings<T extends SharedVNode = SharedVNode> {
 	createSuspenseState(vnode: T, suspended: boolean): unknown;
 	setNextState<S>(component: Component, value: S): unknown;
 	isVNode(value: any): value is T;
+
+	// Hooks inspection
+	getStatefulHooks(vnode: T): HookState[] | null;
+	isUseReducerOrState(state: HookState): boolean;
+	getStatefulHookValue(state: HookState): unknown;
+
+	// Profiler related
+	getRenderReasonPost(
+		ids: IdMappingState<T>,
+		bindings: PreactBindings<T>,
+		timings: VNodeTimings,
+		old: T | null,
+		next: T | null,
+	): RenderReasonData | null;
 }
 
 /**

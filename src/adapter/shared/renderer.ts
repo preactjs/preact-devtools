@@ -163,10 +163,10 @@ export function createRenderer<T extends SharedVNode>(
 					}
 
 					if (found != null) {
-						return getVNodeId(ids, found) || -1;
+						return getVNodeId(ids, found);
 					}
 				} else {
-					return getVNodeId(ids, vnode) || -1;
+					return getVNodeId(ids, vnode);
 				}
 			}
 
@@ -216,6 +216,8 @@ export function createRenderer<T extends SharedVNode>(
 					profiler,
 					bindings,
 					timings,
+					{ start: new Map(), end: new Map() },
+					null,
 				);
 				const ev = flush(commit);
 				if (!ev) return;
@@ -224,7 +226,7 @@ export function createRenderer<T extends SharedVNode>(
 
 			queue.forEach(ev => port.send(ev.type, ev.data));
 		},
-		onCommit(vnode) {
+		onCommit(vnode, timingsByVNode, renderReasonPre) {
 			const commit = createCommit(
 				ids,
 				roots,
@@ -235,7 +237,12 @@ export function createRenderer<T extends SharedVNode>(
 				profiler,
 				bindings,
 				timings,
+				timingsByVNode,
+				renderReasonPre,
 			);
+
+			timingsByVNode.start.clear();
+			timingsByVNode.end.clear();
 
 			if (commit.stats !== null) {
 				commit.stats.unmounts += currentUnmounts.length;

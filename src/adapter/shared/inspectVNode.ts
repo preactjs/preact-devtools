@@ -1,5 +1,5 @@
 import { RendererConfig, getDevtoolsType } from "./renderer";
-import { Options, VNode } from "preact";
+import { Options } from "preact";
 import { inspectHooks } from "./hooks";
 import { getVNodeById, IdMappingState } from "./idMapper";
 import { cleanContext, cleanProps, serialize } from "./serialize";
@@ -16,7 +16,7 @@ import { ID } from "../../view/store/types";
 export function inspectVNode<T extends SharedVNode>(
 	ids: IdMappingState<T>,
 	config: RendererConfig,
-	bindings: PreactBindings,
+	bindings: PreactBindings<T>,
 	options: Options,
 	id: ID,
 	supportsHooks: boolean,
@@ -47,7 +47,7 @@ export function inspectVNode<T extends SharedVNode>(
 
 	let suspended = false;
 	let canSuspend = false;
-	let item: VNode | null = vnode;
+	let item: T | null = vnode;
 	while (item) {
 		if (bindings.isSuspenseVNode(item)) {
 			canSuspend = true;

@@ -40,6 +40,15 @@ export function getVNodeId<T>(state: IdMappingState<T>, vnode: T) {
 	return state.instToId.get(inst) || -1;
 }
 
+export function getOrCreateVNodeId<T>(
+	state: IdMappingState<T>,
+	vnode: T,
+): number {
+	const id = getVNodeId(state, vnode);
+	if (id !== -1) return id;
+	return createVNodeId(state, vnode);
+}
+
 export function updateVNodeId<T>(state: IdMappingState<T>, id: ID, vnode: T) {
 	const inst = state.getInstance(vnode);
 	state.idToInst.set(id, inst);

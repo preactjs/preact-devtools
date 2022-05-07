@@ -47,6 +47,7 @@ export function getPreactVersions() {
 				return -1;
 			}
 
-			return 0;
+			// Check if is tagged release: 11.0.0-experimental.0
+			return a.localeCompare(b) * -1;
 		});
 }

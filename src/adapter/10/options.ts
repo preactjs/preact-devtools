@@ -14,8 +14,7 @@ import {
 	addHookStack,
 	HookType,
 } from "../shared/hooks";
-import { storeTime, VNodeTimings } from "../shared/timings";
-import { getVNodeId, IdMappingState } from "../shared/idMapper";
+import { createVNodeTimings } from "../shared/timings";
 import { Renderer } from "../renderer";
 import { RendererConfig } from "../shared/renderer";
 
@@ -44,13 +43,13 @@ export function setupOptionsV10(
 	options: Options,
 	renderer: Renderer,
 	config: RendererConfig,
-	ids: IdMappingState<VNode>,
-	timings: VNodeTimings,
 ) {
 	// Track component state. Only supported in Preact > 10.4.0
 	if (config.Component) {
 		trackPrevState(config.Component);
 	}
+
+	let timings = createVNodeTimings<VNode>();
 
 	const o = options as any;
 
@@ -66,10 +65,10 @@ export function setupOptionsV10(
 	let prevHookName = options.useDebugName;
 
 	options.vnode = vnode => {
-		const id = getVNodeId(ids, vnode);
+		// const id = getVNodeId(ids, vnode);
 		// FIXME: Does the negative end thing screw up the profiler?
-		storeTime(timings.start, id, 0);
-		storeTime(timings.end, id, -1);
+		// storeTime(timings.start, id, 0);
+		// storeTime(timings.end, id, -1);
 		if (prevVNodeHook) prevVNodeHook(vnode);
 	};
 
@@ -118,23 +117,25 @@ export function setupOptionsV10(
 	}, 100);
 
 	o._diff = o.__b = (vnode: VNode) => {
-		const id = getVNodeId(ids, vnode);
-		storeTime(timings.start, id, performance.now());
+		if (vnode.type !== null) {
+			timings.start.set(vnode, performance.now());
 
-		if (typeof vnode.type === "function") {
-			const name = getDisplayName(vnode, config);
-			recordMark(`${name}_diff`);
+			if (typeof vnode.type === "function") {
+				const name = getDisplayName(vnode, config);
+				recordMark(`${name}_diff`);
+			}
 		}
 
 		if (prevBeforeDiff != null) prevBeforeDiff(vnode);
 	};
 
 	options.diffed = vnode => {
-		const id = getVNodeId(ids, vnode);
-		storeTime(timings.end, id, performance.now());
+		if (vnode.type !== null) {
+			timings.end.set(vnode, performance.now());
 
-		if (typeof vnode.type === "function") {
-			endMark(getDisplayName(vnode, config));
+			if (typeof vnode.type === "function") {
+				endMark(getDisplayName(vnode, config));
+			}
 		}
 
 		if (prevAfterDiff) prevAfterDiff(vnode);
@@ -146,7 +147,9 @@ export function setupOptionsV10(
 		// These cases are already handled by `unmount`
 		if (vnode == null) return;
 
-		renderer.onCommit(vnode);
+		const tmp = timings;
+		timings = createVNodeTimings();
+		renderer.onCommit(vnode, tmp, null);
 	};
 
 	options.unmount = vnode => {

@@ -3,7 +3,7 @@ import { FilterState } from "../adapter/filter";
 import { Commit, MsgTypes } from "../protocol/events";
 import { getStringId } from "../protocol/string-table";
 import {
-	createVNodeId,
+	getOrCreateVNodeId,
 	getVNodeById,
 	getVNodeId,
 	hasVNodeId,
@@ -12,13 +12,13 @@ import {
 } from "./idMapper";
 import { ProfilerState } from "../adapter/profiler";
 import { getDevtoolsType, RendererConfig } from "./renderer";
-import { getRenderReason, RenderReason } from "./renderReasons";
+import { RenderReason, RenderReasonData } from "./renderReasons";
 import { createStats, DiffType, updateDiffStats } from "./stats";
 import { NodeType } from "../../constants";
 import { getDiffType, recordComponentStats } from "./stats";
 import { measureUpdate } from "../adapter/highlightUpdates";
 import { PreactBindings, SharedVNode } from "./bindings";
-import { VNodeTimings } from "./timings";
+import { removeTime, VNodeTimings } from "./timings";
 
 function getHocName(name: string) {
 	const idx = name.indexOf("(");
@@ -158,7 +158,9 @@ function mount<T extends SharedVNode>(
 	profiler: ProfilerState,
 	hocs: string[],
 	bindings: PreactBindings<T>,
-	timings: VNodeTimings,
+	timings: VNodeTimings<ID>,
+	timingsByVNode: VNodeTimings<T>,
+	renderReasonPre: Map<T, RenderReasonData> | null,
 ) {
 	if (commit.stats !== null) {
 		commit.stats.mounts++;
@@ -188,12 +190,18 @@ function mount<T extends SharedVNode>(
 				}
 			}
 
-			const id = hasVNodeId(ids, vnode)
-				? getVNodeId(ids, vnode)
-				: createVNodeId(ids, vnode);
+			const id = getOrCreateVNodeId(ids, vnode);
 			if (bindings.isRoot(vnode, config)) {
 				commit.operations.push(MsgTypes.ADD_ROOT, id);
 			}
+
+			if (!timings.start.has(id)) {
+				timings.start.set(id, timingsByVNode.start.get(vnode) || 0);
+			}
+			if (!timings.end.has(id)) {
+				timings.end.set(id, timingsByVNode.end.get(vnode) || 0);
+			}
+
 			commit.operations.push(
 				MsgTypes.ADD_VNODE,
 				id,
@@ -258,6 +266,8 @@ function mount<T extends SharedVNode>(
 				hocs,
 				bindings,
 				timings,
+				timingsByVNode,
+				renderReasonPre,
 			);
 		}
 	}
@@ -311,7 +321,9 @@ function update<T extends SharedVNode>(
 	profiler: ProfilerState,
 	hocs: string[],
 	bindings: PreactBindings<T>,
-	timings: VNodeTimings,
+	timings: VNodeTimings<ID>,
+	timingsByVNode: VNodeTimings<T>,
+	renderReasonPre: Map<T, RenderReasonData> | null,
 ) {
 	if (commit.stats !== null) {
 		commit.stats.updates++;
@@ -343,6 +355,8 @@ function update<T extends SharedVNode>(
 					hocs,
 					bindings,
 					timings,
+					timingsByVNode,
+					renderReasonPre,
 				);
 			}
 		}
@@ -367,6 +381,8 @@ function update<T extends SharedVNode>(
 			hocs,
 			bindings,
 			timings,
+			timingsByVNode,
+			renderReasonPre,
 		);
 		return true;
 	}
@@ -392,7 +408,10 @@ function update<T extends SharedVNode>(
 	updateVNodeId(ids, id, vnode);
 
 	if (profiler.isProfiling && profiler.captureRenderReasons) {
-		const reason = getRenderReason(oldVNode, vnode);
+		const reason =
+			renderReasonPre !== null
+				? renderReasonPre.get(vnode) || null
+				: bindings.getRenderReasonPost(ids, bindings, timings, oldVNode, vnode);
 		if (reason !== null) {
 			const count = reason.items ? reason.items.length : 0;
 			commit.operations.push(MsgTypes.RENDER_REASON, id, reason.type, count);
@@ -419,8 +438,10 @@ function update<T extends SharedVNode>(
 	for (let i = 0; i < children.length; i++) {
 		const child = children[i];
 		if (child == null) {
-			if (oldChildren[i] != null) {
-				commit.unmountIds.push(oldChildren[i]);
+			const oldChildId = oldChildren[i];
+			if (oldChildId != null) {
+				removeTime(timings, oldChildId);
+				commit.unmountIds.push(oldChildId);
 			}
 		} else if (
 			hasVNodeId(ids, child) ||
@@ -442,6 +463,8 @@ function update<T extends SharedVNode>(
 				hocs,
 				bindings,
 				timings,
+				timingsByVNode,
+				renderReasonPre,
 			);
 			// TODO: This is only sometimes necessary
 			shouldReorder = true;
@@ -462,6 +485,8 @@ function update<T extends SharedVNode>(
 				hocs,
 				bindings,
 				timings,
+				timingsByVNode,
+				renderReasonPre,
 			);
 			shouldReorder = true;
 		}
@@ -486,7 +511,9 @@ export function createCommit<T extends SharedVNode>(
 	config: RendererConfig,
 	profiler: ProfilerState,
 	helpers: PreactBindings<T>,
-	timings: VNodeTimings,
+	timings: VNodeTimings<ID>,
+	timingsByVNode: VNodeTimings<T>,
+	renderReasonPre: Map<T, RenderReasonData> | null,
 ): Commit {
 	const commit = {
 		operations: [],
@@ -527,6 +554,8 @@ export function createCommit<T extends SharedVNode>(
 			[],
 			helpers,
 			timings,
+			timingsByVNode,
+			renderReasonPre,
 		);
 	} else {
 		update(
@@ -541,6 +570,8 @@ export function createCommit<T extends SharedVNode>(
 			[],
 			helpers,
 			timings,
+			timingsByVNode,
+			renderReasonPre,
 		);
 	}
 

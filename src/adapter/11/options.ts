@@ -17,11 +17,19 @@ import {
 	addHookStack,
 	HookType,
 } from "../shared/hooks";
-import { getVNodeId, IdMappingState } from "../shared/idMapper";
-import { VNodeTimings } from "../shared/timings";
+import { createVNodeTimings } from "../shared/timings";
+import { ProfilerState } from "../adapter/profiler";
+import {
+	createReason,
+	RenderReason,
+	RenderReasonData,
+} from "../shared/renderReasons";
+import { ComponentType } from "preact";
+import { getRenderReasonPre, RenderReasonTmpData } from "./renderReason";
 
-export interface VNode {
-	foo: any;
+export interface VNodeV11<P = Record<string, unknown>> {
+	type: ComponentType<P> | string | null;
+	props: P;
 }
 
 export interface OptionsV11 {
@@ -36,8 +44,8 @@ export interface OptionsV11 {
 		parent: Element | Document | ShadowRoot | DocumentFragment,
 	): void;
 
-	_diff?(internal: Internal, vnode?: VNode): void;
-	__b?(internal: Internal, vnode?: VNode): void;
+	_diff?(internal: Internal, vnode?: VNodeV11): void;
+	__b?(internal: Internal, vnode?: VNodeV11): void;
 
 	_commit?(internal: Internal | null, commitQueue: any): void;
 	__c?(internal: Internal | null, commitQueue: any): void;
@@ -54,8 +62,8 @@ export interface OptionsV11 {
 	_catchError?(error: any, internal: Internal): void;
 	__e?(error: any, internal: Internal): void;
 
-	_internal?(internal: Internal, vnode: VNode | string): void;
-	__i?(internal: Internal, vnode: VNode | string): void;
+	_internal?(internal: Internal, vnode: VNodeV11 | string): void;
+	__i?(internal: Internal, vnode: VNodeV11 | string): void;
 
 	useDebugValue?(value: string | number): void;
 }
@@ -83,13 +91,16 @@ export function setupOptionsV11(
 	options: OptionsV11,
 	renderer: Renderer,
 	config: RendererConfig,
-	ids: IdMappingState<Internal>,
-	timings: VNodeTimings,
+	profiler: ProfilerState,
 ) {
 	// Track component state. Only supported in Preact > 10.4.0
 	if (config.Component) {
 		trackPrevState(config.Component);
 	}
+
+	const timings = createVNodeTimings<Internal>();
+	let renderReasons = new Map<Internal, RenderReasonData>();
+	let reasonTmpData = new Map<Internal, RenderReasonTmpData>();
 
 	const o = options;
 
@@ -116,12 +127,6 @@ export function setupOptionsV11(
 		prevHookName = options._addHookName || options.__a;
 
 		o._hook = o.__h = (internal: Internal, index: number, type: number) => {
-			const s = getStatefulHooks(internal);
-			if (s && Array.isArray(s) && s.length > 0 && getComponent(s[0])) {
-				s[0]._oldValue = getStatefulHookValue(s);
-				s[0]._index = index;
-			}
-
 			if (type) {
 				addHookStack(type);
 			}
@@ -147,24 +152,51 @@ export function setupOptionsV11(
 		};
 	}, 100);
 
-	o._diff = o.__b = (internal: Internal) => {
-		const id = getVNodeId(ids, internal);
-		timings.start.set(id, performance.now());
-
+	o._diff = o.__b = (internal: Internal, vnode: VNodeV11) => {
 		if (internal.flags & TYPE_COMPONENT) {
+			timings.start.set(internal, performance.now());
 			const name = getDisplayName(internal, config);
 			recordMark(`${name}_diff`);
+
+			if (profiler.captureRenderReasons) {
+				if (internal === null) {
+					if (vnode !== null) {
+						renderReasons.set(internal, createReason(RenderReason.MOUNT, null));
+					}
+				} else if (vnode !== null) {
+					reasonTmpData.set(internal, {
+						type: vnode.type,
+						props: internal.props,
+					});
+				}
+			}
 		}
 
 		if (prevBeforeDiff != null) prevBeforeDiff(internal);
 	};
 
 	options.diffed = internal => {
-		const id = getVNodeId(ids, internal);
-		timings.end.set(id, performance.now());
-
 		if (internal.flags & TYPE_COMPONENT) {
+			timings.end.set(internal, performance.now());
 			endMark(getDisplayName(internal, config));
+
+			if (profiler.captureRenderReasons) {
+				const old = reasonTmpData.get(internal);
+				if (old != null) {
+					const reason = getRenderReasonPre(timings, internal, old);
+					if (reason !== null) {
+						renderReasons.set(internal, reason);
+					}
+				}
+
+				const s = getStatefulHooks(internal);
+				if (s && Array.isArray(s) && s.length > 0) {
+					const internal = s[0]._internal || s[0].__i;
+					if (internal !== undefined && getComponent(internal)) {
+						s[0]._oldValue = getStatefulHookValue(s[0]);
+					}
+				}
+			}
 		}
 
 		if (prevAfterDiff) prevAfterDiff(internal);
@@ -176,11 +208,18 @@ export function setupOptionsV11(
 		// These cases are already handled by `unmount`
 		if (internal == null) return;
 
-		renderer.onCommit(internal);
+		renderer.onCommit(internal, timings, renderReasons);
+
+		if (profiler.captureRenderReasons) {
+			renderReasons = new Map();
+			reasonTmpData = new Map();
+		}
 	};
 
 	options.unmount = internal => {
 		if (prevBeforeUnmount) prevBeforeUnmount(internal);
+		timings.start.delete(internal);
+		timings.end.delete(internal);
 		renderer.onUnmount(internal);
 	};
 

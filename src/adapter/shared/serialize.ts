@@ -1,16 +1,16 @@
 import type { RendererConfig } from "./renderer";
 import type { ObjPath } from "../renderer";
-import type { PreactBindings } from "./bindings";
+import type { PreactBindings, SharedVNode } from "./bindings";
 
 export interface SerializedVNode {
 	type: "vnode";
 	name: string;
 }
 
-export function serializeVNode(
+export function serializeVNode<T extends SharedVNode>(
 	x: any,
 	config: RendererConfig,
-	bindings: PreactBindings,
+	bindings: PreactBindings<T>,
 ): SerializedVNode | null {
 	if (bindings.isVNode(x)) {
 		return {
@@ -156,9 +156,9 @@ export function setInCopy<T = any>(
 	return updated as any;
 }
 
-export function serialize(
+export function serialize<T extends SharedVNode>(
 	config: RendererConfig,
-	bindings: PreactBindings,
+	bindings: PreactBindings<T>,
 	data: unknown | null,
 ) {
 	return jsonify(

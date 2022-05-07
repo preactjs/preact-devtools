@@ -2,6 +2,8 @@ import { ID } from "../view/store/types";
 import { FilterState } from "./adapter/filter";
 import { InspectData, UpdateType } from "./adapter/adapter";
 import { SharedVNode } from "./shared/bindings";
+import { VNodeTimings } from "./shared/timings";
+import { RenderReasonData } from "./shared/renderReasons";
 
 export type ObjPath = Array<string | number>;
 
@@ -16,7 +18,11 @@ export interface Renderer<T extends SharedVNode = SharedVNode> {
 	inspect(id: ID): InspectData | null;
 	update(id: ID, type: UpdateType, path: ObjPath, value: any): void;
 	clear?(): void;
-	onCommit(vnode: T): void;
+	onCommit(
+		vnode: T,
+		timings: VNodeTimings<T>,
+		renderReasons: Map<T, RenderReasonData> | null,
+	): void;
 	onUnmount(vnode: T): void;
 
 	// Hooks
