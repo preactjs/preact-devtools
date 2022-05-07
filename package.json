@@ -24,7 +24,8 @@
 		"dev:legacy": "webpack-dev-server --inline",
 		"run:chrome": "cross-env DEBUG=true npm run build:chrome:fast && mkdir -p ./profiles/chrome && node tools/run-chrome.js",
 		"run:firefox": "cross-env DEBUG=true npm run build:firefox && mkdir -p ./profiles/firefox && web-ext run --source-dir ./dist/firefox/ --start-url https://preactjs.com --firefox-profile=./profiles/firefox --keep-profile-changes",
-		"watch": "rollup -c -w"
+		"watch": "rollup -c -w",
+		"release": "node tools/release.js"
 	},
 	"repository": {
 		"type": "git",
