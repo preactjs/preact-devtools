@@ -1,4 +1,8 @@
-import { clickAndWaitForHooks, newTestPage } from "../../test-utils";
+import {
+	clickAndWaitForHooks,
+	newTestPage,
+	waitForSelector,
+} from "../../test-utils";
 import { expect } from "chai";
 import {
 	assertNotSelector,
@@ -30,7 +34,7 @@ export async function run(config: any) {
 
 	// Check if default value is read when no Provider is present
 	await clickNestedText(devtools, "ContextNoProvider");
-	await devtools.waitForSelector(hooksPanel, { timeout: 2000 });
+	await waitForSelector(devtools, hooksPanel, { timeout: 2000 });
 
 	await waitForPass(async () => {
 		name = await getText(devtools, '[data-testid="prop-name"]');

@@ -1,4 +1,9 @@
-import { newTestPage, click, clickAndWaitForHooks } from "../../test-utils";
+import {
+	newTestPage,
+	click,
+	clickAndWaitForHooks,
+	waitForSelector,
+} from "../../test-utils";
 import { expect } from "chai";
 import { assertNotSelector, getAttribute, getText } from "pentf/browser_utils";
 
@@ -24,7 +29,7 @@ export async function run(config: any) {
 	await assertNotSelector(devtools, '[data-testid="props-row"] > button');
 
 	// Should be editable
-	await devtools.waitForSelector('[data-testid="prop-value"] input');
+	await waitForSelector(devtools, '[data-testid="prop-value"] input');
 	await click(devtools, '[data-testid="prop-value"] input');
 	await page.keyboard.press("ArrowUp");
 	await page.keyboard.press("Enter");

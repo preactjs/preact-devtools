@@ -1,4 +1,4 @@
-import { newTestPage, click } from "../../test-utils";
+import { newTestPage, click, waitForSelector } from "../../test-utils";
 
 export const description = "Reload and immediately start profiling";
 // Reloading the whole page breaks our current test setup, and
@@ -10,14 +10,14 @@ export async function run(config: any) {
 
 	const iframe = 'iframe[src="/iframe.html"]';
 
-	await page.waitForSelector(iframe);
+	await waitForSelector(page, iframe);
 
 	await click(devtools, '[name="root-panel"][value="PROFILER"]');
 
 	const btn = '[data-testid="reload-and-profile-btn"]';
 	await click(devtools, btn);
 
-	await page.waitForSelector(iframe);
+	await waitForSelector(page, iframe);
 
 	await page.$eval(iframe, el => {
 		const btn = (el as HTMLIFrameElement).contentWindow!.document.querySelector(

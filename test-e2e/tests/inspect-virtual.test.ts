@@ -1,4 +1,8 @@
-import { newTestPage, installMouseHelper } from "../test-utils";
+import {
+	newTestPage,
+	installMouseHelper,
+	waitForSelector,
+} from "../test-utils";
 import { expect } from "chai";
 import { clickTestId, getText, waitForTestId } from "pentf/browser_utils";
 import { wait } from "pentf/utils";
@@ -10,7 +14,7 @@ export async function run(config: any) {
 	await installMouseHelper(devtools);
 
 	const selector = '[data-name="App"]';
-	await devtools.waitForSelector(selector);
+	await waitForSelector(devtools, selector);
 
 	await clickTestId(devtools, "inspect-btn", {
 		retryUntil: async () => {

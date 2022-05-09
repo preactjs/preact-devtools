@@ -3,6 +3,7 @@ import {
 	click,
 	clickTab,
 	clickRecordButton,
+	waitForSelector,
 } from "../../../test-utils";
 import { clickNestedText } from "pentf/browser_utils";
 import { wait } from "pentf/utils";
@@ -24,7 +25,8 @@ export async function run(config: any) {
 	await wait(1000);
 	await click(devtools, 'input[value="FLAMEGRAPH"]');
 
-	await devtools.waitForSelector(
+	await waitForSelector(
+		devtools,
 		'[data-type="flamegraph"] [data-name="Counter"]',
 		{ timeout: 3000 },
 	);

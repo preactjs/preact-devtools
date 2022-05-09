@@ -1,4 +1,4 @@
-import { newTestPage } from "../test-utils";
+import { newTestPage, waitForSelector } from "../test-utils";
 import { expect } from "chai";
 import { clickNestedText } from "pentf/browser_utils";
 
@@ -10,7 +10,7 @@ export async function run(config: any) {
 	await clickNestedText(devtools, "App");
 
 	const row = '[data-testid="props-row"]';
-	await devtools.waitForSelector(row);
+	await waitForSelector(devtools, row);
 
 	const texts = await devtools.$$eval(row, els => els.map(x => x.textContent));
 	expect(texts).to.deep.equal([

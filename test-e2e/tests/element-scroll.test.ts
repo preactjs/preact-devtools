@@ -1,4 +1,8 @@
-import { newTestPage, installMouseHelper } from "../test-utils";
+import {
+	newTestPage,
+	installMouseHelper,
+	waitForSelector,
+} from "../test-utils";
 import { expect } from "chai";
 import { getText } from "pentf/browser_utils";
 
@@ -14,7 +18,7 @@ export async function run(config: any) {
 	});
 
 	const selector = '[data-name="App"]';
-	await devtools.waitForSelector(selector);
+	await waitForSelector(devtools, selector);
 	const { x, y } = await devtools.evaluate((s: string) => {
 		const rect = document.querySelector(s)!.getBoundingClientRect();
 		return { x: rect.right, y: rect.top };

@@ -5,6 +5,7 @@ import {
 	getAttribute$$,
 	clickTab,
 	clickRecordButton,
+	waitForSelector,
 } from "../../test-utils";
 import { expect } from "chai";
 import { clickNestedText } from "pentf/browser_utils";
@@ -26,7 +27,7 @@ export async function run(config: any) {
 	await clickRecordButton(devtools);
 
 	await clickNestedText(devtools, "Counter");
-	await devtools.waitForSelector('[data-testid="rendered-at"]');
+	await waitForSelector(devtools, '[data-testid="rendered-at"]');
 
 	const items = await getCount(devtools, '[data-testid="rendered-at"] button');
 	expect(items).to.equal(2);

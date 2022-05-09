@@ -1,4 +1,9 @@
-import { newTestPage, installMouseHelper, clickTreeItem } from "../test-utils";
+import {
+	newTestPage,
+	installMouseHelper,
+	clickTreeItem,
+	waitForSelector,
+} from "../test-utils";
 import { expect } from "chai";
 import { wait } from "pentf/utils";
 
@@ -10,7 +15,7 @@ export async function run(config: any) {
 	await installMouseHelper(devtools);
 
 	const selector = '[data-name="App"]';
-	await devtools.waitForSelector(selector);
+	await waitForSelector(devtools, selector);
 
 	await clickTreeItem(devtools, "Bar");
 
