@@ -263,7 +263,7 @@ export function HocLabels({
 	nodeId: number;
 }) {
 	return (
-		<span class={s.hocs}>
+		<span class={s.hocs} data-testid="hoc-labels">
 			{hocs.map((hoc, i) => {
 				return (
 					<Hoc key={i} small>
