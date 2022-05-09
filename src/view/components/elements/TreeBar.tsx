@@ -245,7 +245,9 @@ export function FilterPopup() {
 						styling="secondary"
 						title="Add new filter"
 						testId="add-filter"
-						onClick={() => store.filter.add()}
+						onClick={() =>
+							setFilters([...filters, { enabled: false, value: "" }])
+						}
 					>
 						<span class={s.filterCheck}>
 							<AddCircle />
