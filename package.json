@@ -36,6 +36,7 @@
 	"devDependencies": {
 		"@babel/core": "^7.13.10",
 		"@babel/plugin-transform-react-jsx": "^7.13.12",
+		"@playwright/test": "^1.21.1",
 		"@preact/preset-vite": "^2.0.0",
 		"@prefresh/babel-plugin": "^0.2.2",
 		"@prefresh/webpack": "^2.2.0",
@@ -74,6 +75,7 @@
 		"mochette": "^1.0.1",
 		"node-fetch": "^2.6.1",
 		"pentf": "^3.2.3",
+		"playwright-chromium": "^1.21.1",
 		"preact": "^10.5.7",
 		"prettier": "^2.1.2",
 		"puppeteer": "^10.2.0",
