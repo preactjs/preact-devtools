@@ -1,5 +1,5 @@
 import { expect } from "chai";
-import { newTestPage } from "../test-utils";
+import { newTestPage, waitForSelector } from "../test-utils";
 import { clickNestedText, getText } from "pentf/browser_utils";
 import { wait } from "pentf/utils";
 
@@ -12,19 +12,19 @@ export async function run(config: any) {
 
 	// Hooks
 	await clickNestedText(devtools, "SymbolComponent");
-	await devtools.waitForSelector('[data-testid="Hooks"]');
+	await waitForSelector(devtools, '[data-testid="Hooks"]');
 	let text = await getText(devtools, '[data-testid="prop-value"]');
 	expect(text).to.equal("Symbol(foobar)");
 
 	// Props
 	await clickNestedText(devtools, "Child");
-	await devtools.waitForSelector('[data-testid="Props"]');
+	await waitForSelector(devtools, '[data-testid="Props"]');
 	text = await getText(devtools, '[data-testid="prop-value"]');
 	expect(text).to.equal("Symbol(foobar)");
 
 	// State
 	await clickNestedText(devtools, "ClassComponent");
-	await devtools.waitForSelector('[data-testid="State"]');
+	await waitForSelector(devtools, '[data-testid="State"]');
 	text = await getText(devtools, '[data-testid="prop-value"]');
 	expect(text).to.equal("Symbol(foobar)");
 }

@@ -1,4 +1,4 @@
-import { enableHOCFilter, newTestPage } from "../test-utils";
+import { enableHOCFilter, newTestPage, waitForSelector } from "../test-utils";
 import { expect } from "chai";
 import {
 	assertNotTestId,
@@ -18,7 +18,8 @@ export async function run(config: any) {
 	await clickNestedText(devtools, "HOC-Components");
 	await clickTestId(devtools, "filter-update");
 
-	await devtools.waitForSelector(
+	await waitForSelector(
+		devtools,
 		'[data-testid="tree-item"][data-name="Memo(Foo)"]',
 	);
 

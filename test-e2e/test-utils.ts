@@ -1,5 +1,7 @@
 import { waitForPass } from "pentf/assert_utils";
+import { ignoreError } from "pentf/utils";
 import { expect } from "chai";
+import { strict as assert } from "assert";
 import {
 	clickNestedText,
 	clickTestId,
@@ -8,7 +10,6 @@ import {
 	waitForTestId,
 	resizePage,
 	clickSelector,
-	waitForSelector,
 } from "pentf/browser_utils";
 import { Page } from "puppeteer";
 import { getPreactVersions } from "./fixtures/utils";
@@ -16,6 +17,41 @@ import { wait } from "pentf/utils";
 
 export interface TestOptions {
 	preact?: string;
+}
+
+export async function waitForSelector(
+	page: Page,
+	selector: string,
+	{ timeout = 5000, checkEvery = 200 } = {},
+) {
+	let remainingTimeout = timeout;
+	// eslint-disable-next-line no-constant-condition
+	while (true) {
+		let found = false;
+		let errored = false;
+		try {
+			found = await page.evaluate(selector => {
+				return !!document.querySelector(selector);
+			}, selector);
+		} catch (err) {
+			errored = true;
+			if (!ignoreError(err)) {
+				throw err;
+			}
+		}
+
+		if (!errored && found) {
+			break;
+		}
+
+		if (remainingTimeout <= 0) {
+			assert(found, `Element matching ${selector} is not found.`);
+			break;
+		}
+
+		await wait(Math.min(checkEvery, remainingTimeout));
+		remainingTimeout -= checkEvery;
+	}
 }
 
 export async function newTestPage(
@@ -72,7 +108,7 @@ export async function getAttribute$$(
 	selector: string,
 	name: string,
 ) {
-	await page.waitForSelector(selector);
+	await waitForSelector(page, selector);
 	return page.$$eval(
 		selector,
 		(els: Element[], propName: any) => {
@@ -131,7 +167,7 @@ export async function waitForAttribute(
 }
 
 export async function click(page: Page, selector: string) {
-	await page.waitForSelector(selector);
+	await waitForSelector(page, selector);
 	return page.click(selector);
 }
 
@@ -207,7 +243,7 @@ export async function clickTab(page: Page, tab: DevtoolsTab) {
 }
 
 export async function getActiveTab(page: Page): Promise<DevtoolsTab> {
-	await page.waitForSelector('input[name="root-panel"]');
+	await waitForSelector(page, 'input[name="root-panel"]');
 	return await page.evaluate(() => {
 		const input = (Array.from(
 			document.querySelectorAll('input[name="root-panel"]'),

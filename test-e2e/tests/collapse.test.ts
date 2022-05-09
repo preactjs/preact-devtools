@@ -1,4 +1,11 @@
-import { newTestPage, click, getLog, waitFor, clickTab } from "../test-utils";
+import {
+	newTestPage,
+	click,
+	getLog,
+	waitFor,
+	clickTab,
+	waitForSelector,
+} from "../test-utils";
 import { expect } from "chai";
 import { clickNestedText } from "pentf/browser_utils";
 
@@ -7,7 +14,7 @@ export const description = "Collapse all the things!";
 export async function run(config: any) {
 	const { page, devtools } = await newTestPage(config, "update-all");
 
-	await devtools.waitForSelector('[data-testid="tree-item"]', {
+	await waitForSelector(devtools, '[data-testid="tree-item"]', {
 		timeout: 1000,
 	});
 
@@ -31,7 +38,7 @@ export async function run(config: any) {
 	// Props should be collapsed by default
 	await clickNestedText(devtools, "Provider");
 	const row = '[data-testid="props-row"]';
-	await devtools.waitForSelector(row, {
+	await waitForSelector(devtools, row, {
 		timeout: 1000,
 	});
 
@@ -56,7 +63,7 @@ export async function run(config: any) {
 
 	// Switching to Profiler and back should not change collapse state
 	await clickTab(devtools, "PROFILER");
-	await devtools.waitForSelector('[data-testid="record-btn"]');
+	await waitForSelector(devtools, '[data-testid="record-btn"]');
 	await clickTab(devtools, "ELEMENTS");
 
 	// Our input should still be visible

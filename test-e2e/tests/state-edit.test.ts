@@ -1,4 +1,4 @@
-import { newTestPage, typeText } from "../test-utils";
+import { newTestPage, typeText, waitForSelector } from "../test-utils";
 import { expect } from "chai";
 import { clickNestedText, getText, getAttribute } from "pentf/browser_utils";
 
@@ -10,7 +10,7 @@ export async function run(config: any) {
 	await clickNestedText(devtools, "Display");
 
 	const input = '[data-testid="props-row"] input';
-	await devtools.waitForSelector(input, { timeout: 3000 });
+	await waitForSelector(devtools, input, { timeout: 3000 });
 
 	await typeText(devtools, input, "42");
 	await page.keyboard.press("Enter");

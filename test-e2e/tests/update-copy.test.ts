@@ -1,9 +1,14 @@
-import { clickTreeItem, newTestPage, typeText } from "../test-utils";
+import {
+	clickTreeItem,
+	newTestPage,
+	typeText,
+	waitForSelector,
+} from "../test-utils";
 import { Page } from "puppeteer";
 
 async function type(page: Page, devtools: Page, value: string | number) {
 	const input = '[data-testid="prop-value"] input';
-	await devtools.waitForSelector(input);
+	await waitForSelector(devtools, input);
 
 	await typeText(devtools, input, String(value));
 	await page.keyboard.press("Enter");

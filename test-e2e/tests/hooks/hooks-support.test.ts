@@ -1,4 +1,4 @@
-import { newTestPage } from "../../test-utils";
+import { newTestPage, waitForSelector } from "../../test-utils";
 import { clickNestedText } from "pentf/browser_utils";
 
 export const description =
@@ -13,5 +13,5 @@ export async function run(config: any) {
 	await clickNestedText(devtools, "RefComponent");
 
 	// Should print warning
-	await devtools.waitForSelector('[data-testid="no-hooks-support-warning"]');
+	await waitForSelector(devtools, '[data-testid="no-hooks-support-warning"]');
 }

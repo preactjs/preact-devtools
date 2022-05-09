@@ -1,4 +1,10 @@
-import { newTestPage, click, clickTab, clickRecordButton } from "../test-utils";
+import {
+	newTestPage,
+	click,
+	clickTab,
+	clickRecordButton,
+	waitForSelector,
+} from "../test-utils";
 import { expect } from "chai";
 import { clickNestedText, getText } from "pentf/browser_utils";
 
@@ -15,7 +21,7 @@ export async function run(config: any) {
 	await click(page, "button");
 	await clickRecordButton(devtools);
 
-	await devtools.waitForSelector('[data-type="flamegraph"]');
+	await waitForSelector(devtools, '[data-type="flamegraph"]');
 
 	await clickNestedText(devtools, /^Displ/);
 

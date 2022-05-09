@@ -1,4 +1,9 @@
-import { newTestPage, typeText, getText$$ } from "../test-utils";
+import {
+	newTestPage,
+	typeText,
+	getText$$,
+	waitForSelector,
+} from "../test-utils";
 import { expect } from "chai";
 import { clickNestedText, getAttribute } from "pentf/browser_utils";
 import { wait } from "pentf/utils";
@@ -10,7 +15,7 @@ export async function run(config: any) {
 
 	await clickNestedText(devtools, "Display");
 
-	await devtools.waitForSelector('[data-testid="props-row"]');
+	await waitForSelector(devtools, '[data-testid="props-row"]');
 
 	const propName = 'input[name="new-prop-name"]';
 	const propValue = 'input[name="new-prop-value"]';

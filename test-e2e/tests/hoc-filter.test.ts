@@ -1,4 +1,4 @@
-import { enableHOCFilter, newTestPage } from "../test-utils";
+import { enableHOCFilter, newTestPage, waitForSelector } from "../test-utils";
 import { expect } from "chai";
 import { clickNestedText, waitForTestId } from "pentf/browser_utils";
 import { waitForPass } from "pentf/assert_utils";
@@ -9,7 +9,7 @@ export async function run(config: any) {
 	const { devtools } = await newTestPage(config, "hoc");
 	await enableHOCFilter(devtools);
 
-	await devtools.waitForSelector('[data-testid="tree-item"][data-name="Foo"]');
+	await waitForSelector(devtools, '[data-testid="tree-item"][data-name="Foo"]');
 
 	const items = await devtools.evaluate(() => {
 		return Array.from(

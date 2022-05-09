@@ -1,4 +1,4 @@
-import { newTestPage, click } from "../test-utils";
+import { newTestPage, click, waitForSelector } from "../test-utils";
 import { expect } from "chai";
 import { getText } from "pentf/browser_utils";
 
@@ -8,7 +8,7 @@ export async function run(config: any) {
 	const { devtools } = await newTestPage(config, "non-vnode");
 
 	await click(devtools, '[data-testid="tree-item"]');
-	await devtools.waitForSelector('[name="new-prop-name"]');
+	await waitForSelector(devtools, '[name="new-prop-name"]');
 
 	const values = await devtools.evaluate(() => {
 		const el = Array.from(

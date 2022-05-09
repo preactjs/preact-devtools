@@ -3,6 +3,7 @@ import {
 	click,
 	clickTab,
 	clickRecordButton,
+	waitForSelector,
 } from "../../test-utils";
 import { expect } from "chai";
 import { Page } from "puppeteer";
@@ -13,9 +14,9 @@ export const description = "Captures render reasons";
 
 async function clickFlameNode(page: Page, name: string) {
 	const selector = `[data-name="${name}"]`;
-	await page.waitForSelector(selector, { timeout: 3000 });
+	await waitForSelector(page, selector, { timeout: 3000 });
 	await click(page, selector);
-	await page.waitForSelector(`${selector}[data-selected="true"]`, {
+	await waitForSelector(page, `${selector}[data-selected="true"]`, {
 		timeout: 3000,
 	});
 

@@ -1,4 +1,4 @@
-import { newTestPage, getSize } from "../test-utils";
+import { newTestPage, getSize, waitForSelector } from "../test-utils";
 import { expect } from "chai";
 import { waitForTestId } from "pentf/browser_utils";
 
@@ -9,7 +9,7 @@ export async function run(config: any) {
 
 	// 1st test
 	let size = await getSize(page, '[data-testid="test1"]');
-	await devtools.waitForSelector('[data-testid="tree-item"]');
+	await waitForSelector(devtools, '[data-testid="tree-item"]');
 
 	const items = await devtools.$$('[data-testid="tree-item"]');
 	await items[0]!.click();

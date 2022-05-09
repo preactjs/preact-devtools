@@ -6,6 +6,7 @@ import {
 	doesExist,
 	clickTreeItem,
 	moveMouseAbs,
+	waitForSelector,
 } from "../test-utils";
 import { expect } from "chai";
 import {
@@ -41,7 +42,7 @@ async function enterText(
 	await clickTreeItem(devtools, "Display");
 	await assertNotTestId(devtools, "undo-btn");
 
-	await devtools.waitForSelector(selector, { timeout: 3000 });
+	await waitForSelector(devtools, selector, { timeout: 3000 });
 	await typeText(devtools, selector, text);
 	await page.keyboard.press("Enter");
 	await moveMouseAbs(page, 100, 100);

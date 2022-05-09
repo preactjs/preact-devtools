@@ -1,4 +1,4 @@
-import { enableHOCFilter, newTestPage } from "../test-utils";
+import { enableHOCFilter, newTestPage, waitForSelector } from "../test-utils";
 import { expect } from "chai";
 import { Page } from "puppeteer";
 
@@ -22,7 +22,8 @@ export async function run(config: any) {
 	const { devtools, page } = await newTestPage(config, "hoc-update");
 
 	await enableHOCFilter(devtools);
-	await devtools.waitForSelector(
+	await waitForSelector(
+		devtools,
 		'[data-testid="tree-item"][data-name="Wrapped"]',
 	);
 
