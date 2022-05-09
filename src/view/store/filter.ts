@@ -10,11 +10,19 @@ export interface RawFilter {
 export function createFilterStore(
 	onSubmit: (event: "update-filter", filters: RawFilterState) => void,
 ) {
-	const filters = valoo<RawFilter[]>([]);
-	const filterFragment = valoo(true);
-	const filterDom = valoo(true);
-	const filterHoc = valoo(true);
-	const filterRoot = valoo(true);
+	const defaults = {
+		fragment: true,
+		dom: true,
+		hoc: true,
+		root: true,
+		regex: [] as RawFilter[],
+	};
+
+	const filters = valoo<RawFilter[]>(defaults.regex);
+	const filterFragment = valoo(defaults.fragment);
+	const filterDom = valoo(defaults.dom);
+	const filterHoc = valoo(defaults.hoc);
+	const filterRoot = valoo(defaults.root);
 
 	const submit = () => {
 		const s: RawFilterState = {
@@ -23,6 +31,7 @@ export function createFilterStore(
 				fragment: filterFragment.$,
 				dom: filterDom.$,
 				hoc: filterHoc.$,
+				root: filterRoot.$,
 			},
 		};
 
@@ -39,6 +48,17 @@ export function createFilterStore(
 			filterHoc.$ = !!state.type.hoc;
 			filterRoot.$ = !!state.type.root;
 			filters.$ = state.regex;
+
+			// Refetch component tree if filters are not the default ones
+			if (
+				defaults.fragment !== filterFragment.$ ||
+				defaults.dom !== filterDom.$ ||
+				defaults.hoc !== filterHoc.$ ||
+				defaults.root !== filterRoot.$ ||
+				filters.$.some(f => f.enabled)
+			) {
+				submit();
+			}
 		} catch (err) {
 			// eslint-disable-next-line no-console
 			console.log(err);
