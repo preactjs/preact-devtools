@@ -153,7 +153,6 @@ export function FilterPopup() {
 	const [filterHoc, setFilterHoc] = useState(store.filter.filterHoc.$);
 	const [filterRoot, setFilterRoot] = useState(store.filter.filterRoot.$);
 	const [filters, setFilters] = useState(store.filter.filters.$);
-	const experimental = useObserver(() => store.filter.experimental.$);
 
 	return (
 		<div class={s.filter} data-testid="filter-popup">
@@ -182,20 +181,16 @@ export function FilterPopup() {
 					onInput={checked => setFilterFragment(checked)}
 					checked={filterFragment}
 				/>
-				{/* Remove when hoc-filter becomes stable */}
-				{experimental && (
-					<FilterCheck
-						label="HOC-Components"
-						onInput={checked => setFilterHoc(checked)}
-						checked={filterHoc}
-					/>
-				)}
+				<FilterCheck
+					label="HOC-Components"
+					onInput={checked => setFilterHoc(checked)}
+					checked={filterHoc}
+				/>
 				<FilterCheck
 					label="DOM nodes"
 					onInput={checked => setFilterDom(checked)}
 					checked={filterDom}
 				/>
-
 				{/* Custom user filters */}
 				{filters.map((x, i) => {
 					return (

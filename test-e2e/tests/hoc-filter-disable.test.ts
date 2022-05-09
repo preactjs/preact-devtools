@@ -1,4 +1,4 @@
-import { enableHOCFilter, newTestPage, waitForSelector } from "../test-utils";
+import { newTestPage, waitForSelector } from "../test-utils";
 import { expect } from "chai";
 import {
 	assertNotTestId,
@@ -11,7 +11,6 @@ export const description = "HOC-Component filter should be disabled";
 
 export async function run(config: any) {
 	const { devtools } = await newTestPage(config, "hoc");
-	await enableHOCFilter(devtools);
 
 	await clickTestId(devtools, "filter-menu-button");
 	await waitForTestId(devtools, "filter-popup");

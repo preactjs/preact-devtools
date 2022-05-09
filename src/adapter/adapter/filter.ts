@@ -31,8 +31,7 @@ export type Filter = RegexFilter | TypeFilter;
 
 export const DEFAULT_FIlTERS: FilterState = {
 	regex: [],
-	// TODO: Add default hoc-filter
-	type: new Set(["dom", "fragment", "root"]),
+	type: new Set(["dom", "fragment", "root", "hoc"]),
 };
 
 export function parseFilters(raw: RawFilterState): FilterState {

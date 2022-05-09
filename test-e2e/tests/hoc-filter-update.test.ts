@@ -1,4 +1,4 @@
-import { enableHOCFilter, newTestPage, waitForSelector } from "../test-utils";
+import { newTestPage, waitForSelector } from "../test-utils";
 import { expect } from "chai";
 import { Page } from "puppeteer";
 
@@ -21,7 +21,6 @@ export const description = "HOC-Component should work with updates";
 export async function run(config: any) {
 	const { devtools, page } = await newTestPage(config, "hoc-update");
 
-	await enableHOCFilter(devtools);
 	await waitForSelector(
 		devtools,
 		'[data-testid="tree-item"][data-name="Wrapped"]',
