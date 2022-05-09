@@ -250,11 +250,11 @@ export function printCommit(data: number[]) {
 				case MsgTypes.REMOVE_VNODE: {
 					const unmounts = data[i + 1];
 					i += 2;
-					const len = i + unmounts;
 					console.log(`total unmounts: ${unmounts}`);
-					for (; i < len; i++) {
-						console.log(`  Remove: %c${data[i]}`, "color: red");
+					for (let j = 0; j < unmounts; j++) {
+						console.log(`  Remove: %c${data[i + j]}`, "color: red");
 					}
+					i += unmounts - 1;
 					break;
 				}
 				case MsgTypes.REORDER_CHILDREN: {
@@ -302,6 +302,21 @@ export function printCommit(data: number[]) {
 					const id = data[i + 1];
 					console.log(`Add Root: %c${id}`, "color: yellow");
 					i++;
+					break;
+				}
+				case MsgTypes.HOC_NODES: {
+					const id = data[i + 1];
+					const count = data[i + 2];
+					const hocs = [];
+					for (let j = 0; j < count; j++) {
+						hocs.push(strings[data[i + 3 + j] - 1]);
+					}
+					console.log(
+						`  Add HOCs: %c${id} %c${hocs.join(", ")}`,
+						"color: yellow",
+						"font-size: 10px; color: #ccc; background-color: #444; padding: .1rem .3rem; border-radius: 2px;",
+					);
+					i += 2 + count;
 					break;
 				}
 				default: {
