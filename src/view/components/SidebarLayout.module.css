@@ -35,3 +35,14 @@
 	font-family: sans-serif;
 	overflow: hidden;
 }
+
+.rootPage {
+	height: 100%;
+	display: flex;
+	overflow: hidden;
+}
+
+.rootPageInner {
+	overflow: auto;
+	width: 100%;
+}
