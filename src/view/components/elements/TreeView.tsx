@@ -189,12 +189,15 @@ export function TreeItem(props: { key: any; id: ID; top: number }) {
 	const store = useStore();
 	const as = useSelection();
 	const { collapsed, toggle } = useCollapser();
-	const filterFragments = useObserver(() => store.filter.filterFragment.$);
 	const node = useObserver(() => store.nodes.$.get(id) || null);
+	const filterRoot = useObserver(() => store.filter.filterRoot.$);
+	const roots = useObserver(() => store.roots.$);
 	const onToggle = () => toggle(id);
 	const ref = useRef<HTMLDivElement>();
 
 	if (!node) return null;
+
+	const isRoot = node.parent === -1 && roots.includes(node.id);
 
 	return (
 		<div
@@ -215,7 +218,7 @@ export function TreeItem(props: { key: any; id: ID; top: number }) {
 			<div
 				class={s.itemHeader}
 				style={`transform: translate3d(calc(var(--indent-depth) * ${
-					node.depth - (filterFragments ? 1 : 0)
+					node.depth + (filterRoot ? -1 : 0)
 				}), 0, 0);`}
 			>
 				{node.children.length > 0 && (
@@ -243,19 +246,32 @@ export function TreeItem(props: { key: any; id: ID; top: number }) {
 						""
 					)}
 					{node.hocs && node.hocs.length > 0 && (
-						<span class={s.hocs}>
-							{node.hocs.map((hoc, i) => {
-								return (
-									<Hoc key={i} small>
-										<MarkResult text={hoc} id={id} />
-									</Hoc>
-								);
-							})}
-						</span>
+						<HocLabels hocs={node.hocs} nodeId={id} />
 					)}
+					{isRoot ? <span class={s.rootLabel}>(Root)</span> : ""}
 				</span>
 			</div>
 		</div>
+	);
+}
+
+export function HocLabels({
+	hocs,
+	nodeId,
+}: {
+	hocs: string[];
+	nodeId: number;
+}) {
+	return (
+		<span class={s.hocs}>
+			{hocs.map((hoc, i) => {
+				return (
+					<Hoc key={i} small>
+						<MarkResult text={hoc} id={nodeId} />
+					</Hoc>
+				);
+			})}
+		</span>
 	);
 }
 

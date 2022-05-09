@@ -1,6 +1,6 @@
 import { valoo } from "../valoo";
 import escapeStringRegexp from "escape-string-regexp";
-import { RawFilterState } from "../../adapter/adapter/filter";
+import { RawFilterState, TypeFilterValue } from "../../adapter/adapter/filter";
 
 export interface RawFilter {
 	value: string;
@@ -15,6 +15,7 @@ export function createFilterStore(
 	const filterDom = valoo(true);
 	// TODO: Enable by default when it becomes stable. hoc-filter
 	const filterHoc = valoo(false);
+	const filterRoot = valoo(true);
 	/** Enable experimental filters */
 	const experimental = valoo(false);
 
@@ -42,6 +43,7 @@ export function createFilterStore(
 			// TODO: Disable experimental check once stable hoc-filter
 			filterHoc.$ =
 				state.type.hoc !== undefined && experimental.$ ? state.type.hoc : false;
+			filterRoot.$ = state.type.root === true;
 			filters.$ = state.regex;
 		} catch (err) {
 			// eslint-disable-next-line no-console
@@ -54,8 +56,9 @@ export function createFilterStore(
 		filterFragment,
 		filterDom,
 		filterHoc,
+		filterRoot,
 		experimental,
-		setEnabled(filter: RawFilter | string, v: boolean) {
+		setEnabled(filter: RawFilter | TypeFilterValue, v: boolean) {
 			if (typeof filter === "string") {
 				if (filter === "dom") {
 					filterDom.$ = v;
@@ -63,6 +66,8 @@ export function createFilterStore(
 					filterFragment.$ = v;
 				} else if (filter === "hoc") {
 					filterHoc.$ = v;
+				} else if (filter === "root") {
+					filterRoot.$ = v;
 				}
 			} else {
 				filter.enabled = v;

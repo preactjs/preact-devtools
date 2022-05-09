@@ -6,10 +6,11 @@ export interface RawFilterState {
 		fragment: boolean;
 		dom: boolean;
 		hoc?: boolean;
+		root?: boolean;
 	};
 }
 
-export type TypeFilterValue = "dom" | "fragment" | "hoc";
+export type TypeFilterValue = "dom" | "fragment" | "hoc" | "root";
 
 export interface FilterState {
 	regex: RegExp[];
@@ -31,7 +32,7 @@ export type Filter = RegexFilter | TypeFilter;
 export const DEFAULT_FIlTERS: FilterState = {
 	regex: [],
 	// TODO: Add default hoc-filter
-	type: new Set(["dom", "fragment"]),
+	type: new Set(["dom", "fragment", "root"]),
 };
 
 export function parseFilters(raw: RawFilterState): FilterState {
@@ -39,6 +40,7 @@ export function parseFilters(raw: RawFilterState): FilterState {
 	if (raw.type.fragment) type.add("fragment");
 	if (raw.type.dom) type.add("dom");
 	if (raw.type.hoc) type.add("hoc");
+	if (raw.type.root) type.add("root");
 
 	return {
 		regex: raw.regex.filter(x => x.enabled).map(x => new RegExp(x.value, "gi")),

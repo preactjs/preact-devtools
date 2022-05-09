@@ -36,7 +36,7 @@ export function createStore(): Store {
 				collapser.collapsed.$.has(id),
 			);
 
-			if (filterState.filterFragment.$) {
+			if (filterState.filterRoot.$) {
 				return items.slice(1);
 			}
 

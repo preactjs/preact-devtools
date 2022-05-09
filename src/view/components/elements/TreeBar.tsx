@@ -151,6 +151,7 @@ export function FilterPopup() {
 		store.filter.filterFragment.$,
 	);
 	const [filterHoc, setFilterHoc] = useState(store.filter.filterHoc.$);
+	const [filterRoot, setFilterRoot] = useState(store.filter.filterRoot.$);
 	const [filters, setFilters] = useState(store.filter.filters.$);
 	const experimental = useObserver(() => store.filter.experimental.$);
 
@@ -162,6 +163,7 @@ export function FilterPopup() {
 
 					store.filter.filterDom.$ = filterDom;
 					store.filter.filterFragment.$ = filterFragment;
+					store.filter.filterRoot.$ = filterRoot;
 					store.filter.filterHoc.$ = filterHoc;
 
 					store.filter.filters.$ = filters;
@@ -170,6 +172,11 @@ export function FilterPopup() {
 				}}
 			>
 				{/* Native filters */}
+				<FilterCheck
+					label="Roots"
+					onInput={checked => setFilterRoot(checked)}
+					checked={filterRoot}
+				/>
 				<FilterCheck
 					label="Fragments"
 					onInput={checked => setFilterFragment(checked)}
