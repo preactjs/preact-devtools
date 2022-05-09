@@ -3,11 +3,8 @@ import { ignoreError } from "pentf/utils";
 import { expect } from "chai";
 import { strict as assert } from "assert";
 import {
-	clickNestedText,
-	clickTestId,
 	getAttribute,
 	newPage,
-	waitForTestId,
 	resizePage,
 	clickSelector,
 } from "pentf/browser_utils";
@@ -265,24 +262,6 @@ export async function clickRecordButton(page: Page) {
 		"title",
 		start ? /Stop Recording/ : /Start Recording/,
 	);
-}
-
-export async function enableHOCFilter(page: Page) {
-	const activeTab = await getActiveTab(page);
-	await clickTab(page, "SETTINGS");
-	await clickTestId(page, "toggle-experimental-filters");
-	await clickTab(page, "ELEMENTS");
-
-	// Enable filter
-	await clickTestId(page, "filter-menu-button");
-	await waitForTestId(page, "filter-popup");
-	await clickNestedText(page, "HOC-Components");
-	await clickTestId(page, "filter-update");
-
-	await clickTab(page, activeTab);
-	if (activeTab === "ELEMENTS") {
-		await waitForTestId(page, "elements-tree");
-	}
 }
 
 // TODO: This might clash with windowing

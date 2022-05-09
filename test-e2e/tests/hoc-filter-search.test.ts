@@ -1,9 +1,4 @@
-import {
-	enableHOCFilter,
-	newTestPage,
-	typeText,
-	waitForSelector,
-} from "../test-utils";
+import { newTestPage, typeText, waitForSelector } from "../test-utils";
 import { expect } from "chai";
 import { getText } from "pentf/browser_utils";
 import { assertEventually } from "pentf/assert_utils";
@@ -11,7 +6,6 @@ import { assertEventually } from "pentf/assert_utils";
 export const description = "HOC-Component labels should be searchable";
 export async function run(config: any) {
 	const { devtools } = await newTestPage(config, "hoc");
-	await enableHOCFilter(devtools);
 
 	await waitForSelector(devtools, '[data-testid="tree-item"][data-name="Foo"]');
 	await typeText(devtools, '[data-testid="element-search"]', "forw");

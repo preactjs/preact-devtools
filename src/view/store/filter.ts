@@ -1,6 +1,6 @@
 import { valoo } from "../valoo";
 import escapeStringRegexp from "escape-string-regexp";
-import { RawFilterState } from "../../adapter/adapter/filter";
+import { RawFilterState, TypeFilterValue } from "../../adapter/adapter/filter";
 
 export interface RawFilter {
 	value: string;
@@ -13,10 +13,8 @@ export function createFilterStore(
 	const filters = valoo<RawFilter[]>([]);
 	const filterFragment = valoo(true);
 	const filterDom = valoo(true);
-	// TODO: Enable by default when it becomes stable. hoc-filter
-	const filterHoc = valoo(false);
-	/** Enable experimental filters */
-	const experimental = valoo(false);
+	const filterHoc = valoo(true);
+	const filterRoot = valoo(true);
 
 	const submit = () => {
 		const s: RawFilterState = {
@@ -24,8 +22,7 @@ export function createFilterStore(
 			type: {
 				fragment: filterFragment.$,
 				dom: filterDom.$,
-				// TODO: Remove experimental check when it becomes stable. hoc-filter
-				hoc: experimental.$ && filterHoc.$,
+				hoc: filterHoc.$,
 			},
 		};
 
@@ -39,9 +36,8 @@ export function createFilterStore(
 		try {
 			filterFragment.$ = !!state.type.fragment;
 			filterDom.$ = !!state.type.dom;
-			// TODO: Disable experimental check once stable hoc-filter
-			filterHoc.$ =
-				state.type.hoc !== undefined && experimental.$ ? state.type.hoc : false;
+			filterHoc.$ = !!state.type.hoc;
+			filterRoot.$ = !!state.type.root;
 			filters.$ = state.regex;
 		} catch (err) {
 			// eslint-disable-next-line no-console
@@ -54,8 +50,8 @@ export function createFilterStore(
 		filterFragment,
 		filterDom,
 		filterHoc,
-		experimental,
-		setEnabled(filter: RawFilter | string, v: boolean) {
+		filterRoot,
+		setEnabled(filter: RawFilter | TypeFilterValue, v: boolean) {
 			if (typeof filter === "string") {
 				if (filter === "dom") {
 					filterDom.$ = v;
@@ -63,6 +59,8 @@ export function createFilterStore(
 					filterFragment.$ = v;
 				} else if (filter === "hoc") {
 					filterHoc.$ = v;
+				} else if (filter === "root") {
+					filterRoot.$ = v;
 				}
 			} else {
 				filter.enabled = v;

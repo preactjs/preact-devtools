@@ -6,6 +6,7 @@ import { useMemo } from "preact/hooks";
 import { placeFlamegraph } from "./flamegraph-utils";
 import { formatTime } from "../../util";
 import { useObserver, useStore } from "../../../../store/react-bindings";
+import { HocLabels } from "../../../elements/TreeView";
 
 export interface FlamegraphLayoutProps {
 	commit: CommitData;
@@ -26,6 +27,7 @@ export function FlamegraphLayout({
 }: FlamegraphLayoutProps) {
 	const store = useStore();
 	const data = useObserver(() => store.profiler.flamegraphNodes.$);
+	const filterHoc = useObserver(() => store.filter.filterHoc.$);
 
 	const placed = useMemo(
 		() =>
@@ -43,13 +45,23 @@ export function FlamegraphLayout({
 		<Fragment>
 			{placed.map(pos => {
 				const node = commit.nodes.get(pos.id)!;
-				let text = "";
+				let text: any = "";
 				if (pos.commitParent || pos.weight === -1) {
 					text = node.name;
 				} else {
 					const self = formatTime(commit.selfDurations.get(node.id)!);
 					const total = formatTime(node.endTime - node.startTime);
-					text = `${node.name} (${self} of ${total})`;
+					text = (
+						<>
+							{node.name}
+							{filterHoc && node.hocs ? (
+								<HocLabels hocs={node.hocs} nodeId={node.id} />
+							) : (
+								""
+							)}{" "}
+							({self} of {total})
+						</>
+					);
 				}
 
 				return (

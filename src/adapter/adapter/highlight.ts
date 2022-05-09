@@ -54,7 +54,14 @@ export function createHightlighter(
 			const node = getNearestElement(first);
 			const nodeEnd = last ? getNearestElement(last) : null;
 			if (node != null) {
-				const label = renderer.getDisplayName(vnode);
+				let label = renderer.getDisplayName(vnode);
+
+				// Account for HOCs
+				const lastOpenIdx = label.lastIndexOf("(");
+				const firstCloseIdx = label.indexOf(")");
+				if (lastOpenIdx > -1 && lastOpenIdx < firstCloseIdx) {
+					label = label.slice(lastOpenIdx + 1, firstCloseIdx) || "Anonymous";
+				}
 
 				let size = measureNode(node);
 				if (nodeEnd !== null) {

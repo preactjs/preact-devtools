@@ -6,6 +6,7 @@ import { ID, DevNode } from "../../../../store/types";
 import { FlameNode } from "../FlameNode";
 import { formatTime } from "../../util";
 import { useObserver, useStore } from "../../../../store/react-bindings";
+import { HocLabels } from "../../../elements/TreeView";
 
 export interface RankedLayoutProps {
 	commit: CommitData;
@@ -32,6 +33,7 @@ export function RankedLayout({
 	// Convert node tree to position data
 	const store = useStore();
 	const data = useObserver(() => store.profiler.rankedNodes.$);
+	const filterHoc = useObserver(() => store.filter.filterHoc.$);
 
 	// Update node positions and mutate `data` to avoid allocations
 	const placed = useMemo(
@@ -58,7 +60,18 @@ export function RankedLayout({
 			{placed.map(pos => {
 				const node = commit.nodes.get(pos.id)!;
 				const selfDuration = commit.selfDurations.get(node.id) || 0;
-				const text = `${node.name} (${formatTime(selfDuration)})`;
+				const hocs =
+					filterHoc && node.hocs ? (
+						<HocLabels hocs={node.hocs} nodeId={node.id} />
+					) : (
+						""
+					);
+				const text = (
+					<>
+						{node.name}
+						{hocs} ({formatTime(selfDuration)})
+					</>
+				);
 				return (
 					<FlameNode
 						key={pos.id}

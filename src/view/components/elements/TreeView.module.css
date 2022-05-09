@@ -198,3 +198,9 @@
 .hocs > * + * {
 	margin-left: 0.25rem;
 }
+
+.rootLabel {
+	color: var(--color-key-value);
+	display: inline-block;
+	padding-left: .2rem;
+}
