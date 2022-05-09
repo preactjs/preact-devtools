@@ -191,6 +191,7 @@ export function TreeItem(props: { key: any; id: ID; top: number }) {
 	const { collapsed, toggle } = useCollapser();
 	const node = useObserver(() => store.nodes.$.get(id) || null);
 	const filterRoot = useObserver(() => store.filter.filterRoot.$);
+	const filterHoc = useObserver(() => store.filter.filterHoc.$);
 	const roots = useObserver(() => store.roots.$);
 	const onToggle = () => toggle(id);
 	const ref = useRef<HTMLDivElement>();
@@ -245,7 +246,7 @@ export function TreeItem(props: { key: any; id: ID; top: number }) {
 					) : (
 						""
 					)}
-					{node.hocs && node.hocs.length > 0 && (
+					{filterHoc && node.hocs && node.hocs.length > 0 && (
 						<HocLabels hocs={node.hocs} nodeId={id} />
 					)}
 					{isRoot ? <span class={s.rootLabel}>(Root)</span> : ""}
