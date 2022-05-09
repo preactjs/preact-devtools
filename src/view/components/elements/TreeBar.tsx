@@ -120,12 +120,38 @@ export function TreeBar() {
 	);
 }
 
+function FilterCheck({
+	checked,
+	label,
+	onInput,
+}: {
+	checked: boolean;
+	onInput: (checked: boolean) => void;
+	label: string;
+}) {
+	return (
+		<label class={s.filterRow}>
+			<span class={s.filterCheck}>
+				<input
+					type="checkbox"
+					checked={checked}
+					onInput={e => onInput((e.target as any).checked)}
+				/>
+				{checked ? <CheckboxChecked /> : <CheckboxUnChecked />}
+			</span>
+			<span class={s.filterValue}>{label}</span>
+		</label>
+	);
+}
+
 export function FilterPopup() {
 	const store = useStore();
-	const filters = useObserver(() => store.filter.filters.$);
-	const filterDom = useObserver(() => store.filter.filterDom.$);
-	const filterHoc = useObserver(() => store.filter.filterHoc.$);
-	const filterFragment = useObserver(() => store.filter.filterFragment.$);
+	const [filterDom, setFilterDom] = useState(store.filter.filterDom.$);
+	const [filterFragment, setFilterFragment] = useState(
+		store.filter.filterFragment.$,
+	);
+	const [filterHoc, setFilterHoc] = useState(store.filter.filterHoc.$);
+	const [filters, setFilters] = useState(store.filter.filters.$);
 	const experimental = useObserver(() => store.filter.experimental.$);
 
 	return (
@@ -133,52 +159,36 @@ export function FilterPopup() {
 			<form
 				onSubmit={e => {
 					e.preventDefault();
+
+					store.filter.filterDom.$ = filterDom;
+					store.filter.filterFragment.$ = filterFragment;
+					store.filter.filterHoc.$ = filterHoc;
+
+					store.filter.filters.$ = filters;
+
 					store.filter.submit();
 				}}
 			>
 				{/* Native filters */}
-				<label class={s.filterRow}>
-					<span class={s.filterCheck}>
-						<input
-							type="checkbox"
-							checked={filterFragment}
-							onInput={e =>
-								store.filter.setEnabled("fragment", (e.target as any).checked)
-							}
-						/>
-						{filterFragment ? <CheckboxChecked /> : <CheckboxUnChecked />}
-					</span>
-					<span class={s.filterValue}>Fragments</span>
-				</label>
+				<FilterCheck
+					label="Fragments"
+					onInput={checked => setFilterFragment(checked)}
+					checked={filterFragment}
+				/>
 				{/* Remove when hoc-filter becomes stable */}
 				{experimental && (
-					<label class={s.filterRow}>
-						<span class={s.filterCheck}>
-							<input
-								type="checkbox"
-								checked={filterHoc}
-								onInput={e =>
-									store.filter.setEnabled("hoc", (e.target as any).checked)
-								}
-							/>
-							{filterHoc ? <CheckboxChecked /> : <CheckboxUnChecked />}
-						</span>
-						<span class={s.filterValue}>HOC-Components</span>
-					</label>
+					<FilterCheck
+						label="HOC-Components"
+						onInput={checked => setFilterHoc(checked)}
+						checked={filterHoc}
+					/>
 				)}
-				<label class={s.filterRow}>
-					<span class={s.filterCheck}>
-						<input
-							type="checkbox"
-							checked={filterDom}
-							onInput={e =>
-								store.filter.setEnabled("dom", (e.target as any).checked)
-							}
-						/>
-						{filterDom ? <CheckboxChecked /> : <CheckboxUnChecked />}
-					</span>
-					<span class={s.filterValue}>DOM nodes</span>
-				</label>
+				<FilterCheck
+					label="DOM nodes"
+					onInput={checked => setFilterDom(checked)}
+					checked={filterDom}
+				/>
+
 				{/* Custom user filters */}
 				{filters.map((x, i) => {
 					return (
@@ -188,7 +198,9 @@ export function FilterPopup() {
 									type="checkbox"
 									checked={x.enabled}
 									onInput={e => {
-										store.filter.setEnabled(x, (e.target as any).checked);
+										const copy = [...filters];
+										copy[i].enabled = (e.target as any).checked;
+										setFilters(copy);
 									}}
 								/>
 								{x.enabled ? <CheckboxChecked /> : <CheckboxUnChecked />}
@@ -199,16 +211,25 @@ export function FilterPopup() {
 									type="text"
 									placeholder="MyComponent"
 									value={x.value}
-									onInput={e =>
-										store.filter.setValue(x, (e.target as any).value)
-									}
+									onInput={e => {
+										const copy = [...filters];
+										copy[i].value = (e.target as any).value;
+										setFilters(copy);
+									}}
 								/>
 							</span>
 							<span class={s.removeWrapper}>
 								<IconBtn
 									title="Remove filter"
 									styling="secondary"
-									onClick={() => store.filter.remove(x)}
+									onClick={() => {
+										const idx = filters.indexOf(x);
+										if (idx > -1) {
+											const copy = [...filters];
+											copy.splice(idx, 1);
+											setFilters(copy);
+										}
+									}}
 								>
 									<Remove />
 								</IconBtn>
