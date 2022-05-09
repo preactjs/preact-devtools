@@ -502,6 +502,29 @@ function update<T extends SharedVNode>(
 	}
 }
 
+/**
+ * Crawl upwards through potentially filtered vnodes until
+ * we find a non-filtered node or reach the top of the tree
+ */
+function findClosestNonFilteredParent<T extends SharedVNode>(
+	ids: IdMappingState<T>,
+	helpers: PreactBindings<T>,
+	vnode: T,
+) {
+	let parentId = -1;
+	let ancestor: T | null = helpers.getAncestor(vnode);
+	while (ancestor !== null) {
+		parentId = getVNodeId(ids, ancestor);
+		if (parentId !== -1) {
+			break;
+		}
+
+		ancestor = helpers.getAncestor(ancestor);
+	}
+
+	return parentId;
+}
+
 export function createCommit<T extends SharedVNode>(
 	ids: IdMappingState<T>,
 	roots: Set<T>,
@@ -538,17 +561,7 @@ export function createCommit<T extends SharedVNode>(
 		parentId = -1;
 		roots.add(vnode);
 	} else {
-		// Crawl upwards through potentially filtered vnodes until
-		// we find a non-filtered node or reach the top of the tree
-		let ancestor: T | null = helpers.getAncestor(vnode);
-		while (ancestor !== null) {
-			parentId = getVNodeId(ids, ancestor);
-			if (parentId !== -1) {
-				break;
-			}
-
-			ancestor = helpers.getAncestor(ancestor);
-		}
+		parentId = findClosestNonFilteredParent(ids, helpers, vnode);
 	}
 
 	if (isNew) {
@@ -585,7 +598,11 @@ export function createCommit<T extends SharedVNode>(
 		);
 	}
 
-	commit.rootId = getVNodeId(ids, vnode);
+	let rootId = getVNodeId(ids, vnode);
+	if (rootId === -1) {
+		rootId = findClosestNonFilteredParent(ids, helpers, vnode);
+	}
+	commit.rootId = rootId;
 
 	return commit;
 }
