@@ -538,7 +538,17 @@ export function createCommit<T extends SharedVNode>(
 		parentId = -1;
 		roots.add(vnode);
 	} else {
-		parentId = getVNodeId(ids, helpers.getAncestor(vnode)!);
+		// Crawl upwards through potentially filtered vnodes until
+		// we find a non-filtered node or reach the top of the tree
+		let ancestor: T | null = helpers.getAncestor(vnode);
+		while (ancestor !== null) {
+			parentId = getVNodeId(ids, ancestor);
+			if (parentId !== -1) {
+				break;
+			}
+
+			ancestor = helpers.getAncestor(ancestor);
+		}
 	}
 
 	if (isNew) {
