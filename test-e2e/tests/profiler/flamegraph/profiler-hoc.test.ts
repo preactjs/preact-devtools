@@ -1,4 +1,5 @@
 import {
+	waitForSelectorGone,
 	clickNestedText,
 	clickTestId,
 	getText,
@@ -55,4 +56,25 @@ export async function run(config: any) {
 		devtools,
 		'[data-type="flamegraph"] [data-name="withBoof(Wrapped)"]',
 	);
+
+	// Enabling HOC-filters again should not affect profiler results
+	// from previous run
+	await clickTab(devtools, "ELEMENTS");
+	await clickTestId(devtools, "filter-menu-button");
+	await waitForTestId(devtools, "filter-popup");
+	await clickNestedText(devtools, "HOC-Components");
+	await clickTestId(devtools, "filter-update");
+	await wait(1000);
+
+	await clickTab(devtools, "PROFILER");
+	await waitForSelector(
+		devtools,
+		'[data-type="flamegraph"] [data-name="withBoof(Wrapped)"]',
+	);
+	await waitForSelectorGone(
+		devtools,
+		'[data-type="flamegraph"] [data-name="Wrapped"] [data-testid="hoc-labels"]',
+	);
+
+	throw "poop";
 }
