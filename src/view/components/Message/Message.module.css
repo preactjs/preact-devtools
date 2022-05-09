@@ -1,6 +1,6 @@
 .root {
 	border-radius: 3px;
-	display: flex;
+	display: inline-flex;
 	align-items: center;
 	padding: 0.2rem 0.4rem;
 	border-width: 0.0625rem;
