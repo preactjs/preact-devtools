@@ -237,7 +237,7 @@ function mount<T extends SharedVNode>(
 		}
 	}
 
-	if (skip && typeof vnode.type !== "function") {
+	if (skip && !bindings.isComponent(vnode)) {
 		const dom = bindings.getDom(vnode);
 		if (dom) domCache.set(dom, vnode);
 	}
