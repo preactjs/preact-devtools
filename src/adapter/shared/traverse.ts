@@ -113,6 +113,11 @@ export function shouldFilter<T extends SharedVNode>(
 		return true;
 	}
 
+	// TODO: Add a virtual root node to be able to filter the actual
+	// ones. Currently we have a workaround on the extension side
+	// that filters it there, but we should really do it here to be
+	// consistent with all other filters.
+
 	if (vnode.type === config.Fragment && filters.type.has("fragment")) {
 		const parent = bindings.getVNodeParent(vnode);
 		// Only filter non-root nodes
@@ -121,6 +126,12 @@ export function shouldFilter<T extends SharedVNode>(
 		return false;
 	} else if (bindings.isElement(vnode) && filters.type.has("dom")) {
 		return true;
+	} else if (filters.type.has("hoc")) {
+		const name = bindings.getDisplayName(vnode, config);
+
+		if (name.indexOf("(") > -1 && !name.startsWith("ForwardRef")) {
+			return true;
+		}
 	}
 
 	if (filters.regex.length > 0) {
@@ -169,72 +180,59 @@ function mount<T extends SharedVNode>(
 	const root = bindings.isRoot(vnode, config);
 
 	const skip = shouldFilter(vnode, filters, config, bindings);
+	let name = bindings.getDisplayName(vnode, config);
+
+	if (filters.type.has("hoc")) {
+		const hocName = getHocName(name);
+		if (hocName) {
+			hocs = [...hocs, hocName];
+			if (name.startsWith("ForwardRef")) {
+				const idx = name.indexOf("(");
+				name = name.slice(idx + 1, -1) || "Anonymous";
+			}
+		}
+	}
 
 	if (root || !skip) {
-		record: {
-			let name = bindings.getDisplayName(vnode, config);
-
-			if (filters.type.has("hoc")) {
-				const hocName = getHocName(name);
-
-				// Filter out HOC-Components
-				if (hocName) {
-					if (name.startsWith("ForwardRef")) {
-						hocs = [...hocs, hocName];
-						const idx = name.indexOf("(");
-						name = name.slice(idx + 1, -1) || "Anonymous";
-					} else {
-						hocs = [...hocs, hocName];
-						break record;
-					}
-				}
-			}
-
-			const id = getOrCreateVNodeId(ids, vnode);
-			if (bindings.isRoot(vnode, config)) {
-				commit.operations.push(MsgTypes.ADD_ROOT, id);
-			}
-
-			if (!timings.start.has(id)) {
-				timings.start.set(id, timingsByVNode.start.get(vnode) || 0);
-			}
-			if (!timings.end.has(id)) {
-				timings.end.set(id, timingsByVNode.end.get(vnode) || 0);
-			}
-
-			commit.operations.push(
-				MsgTypes.ADD_VNODE,
-				id,
-				getDevtoolsType(vnode, bindings), // Type
-				ancestorId,
-				9999, // owner
-				getStringId(commit.strings, name),
-				vnode.key ? getStringId(commit.strings, vnode.key) : 0,
-				// Multiply, because operations array only supports integers
-				// and would otherwise cut off floats
-				(timings.start.get(id) || 0) * 1000,
-				(timings.end.get(id) || 0) * 1000,
-			);
-
-			if (hocs.length > 0) {
-				addHocs(commit, id, hocs);
-				hocs = [];
-			}
-
-			// Capture render reason (mount here)
-			if (profiler.isProfiling && profiler.captureRenderReasons) {
-				commit.operations.push(
-					MsgTypes.RENDER_REASON,
-					id,
-					RenderReason.MOUNT,
-					0,
-				);
-			}
-
-			updateHighlight(profiler, vnode, bindings);
-
-			ancestorId = id;
+		const id = getOrCreateVNodeId(ids, vnode);
+		if (bindings.isRoot(vnode, config)) {
+			commit.operations.push(MsgTypes.ADD_ROOT, id);
 		}
+
+		if (!timings.start.has(id)) {
+			timings.start.set(id, timingsByVNode.start.get(vnode) || 0);
+		}
+		if (!timings.end.has(id)) {
+			timings.end.set(id, timingsByVNode.end.get(vnode) || 0);
+		}
+
+		commit.operations.push(
+			MsgTypes.ADD_VNODE,
+			id,
+			getDevtoolsType(vnode, bindings), // Type
+			ancestorId,
+			9999, // owner
+			getStringId(commit.strings, name),
+			vnode.key ? getStringId(commit.strings, vnode.key) : 0,
+			// Multiply, because operations array only supports integers
+			// and would otherwise cut off floats
+			(timings.start.get(id) || 0) * 1000,
+			(timings.end.get(id) || 0) * 1000,
+		);
+
+		if (hocs.length > 0) {
+			addHocs(commit, id, hocs);
+			hocs = [];
+		}
+
+		// Capture render reason (mount here)
+		if (profiler.isProfiling && profiler.captureRenderReasons) {
+			commit.operations.push(MsgTypes.RENDER_REASON, id, RenderReason.MOUNT, 0);
+		}
+
+		updateHighlight(profiler, vnode, bindings);
+
+		ancestorId = id;
 	}
 
 	if (skip && !bindings.isComponent(vnode)) {
