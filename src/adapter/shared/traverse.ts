@@ -388,13 +388,11 @@ function update<T extends SharedVNode>(
 		return true;
 	}
 
+	const didRender = timingsByVNode.end.has(vnode);
+
 	const id = getVNodeId(ids, vnode);
-	commit.operations.push(
-		MsgTypes.UPDATE_VNODE_TIMINGS,
-		id,
-		(timings.start.get(id) || 0) * 1000,
-		(timings.end.get(id) || 0) * 1000,
-	);
+	const oldVNode = getVNodeById(ids, id);
+	updateVNodeId(ids, id, vnode);
 
 	const name = bindings.getDisplayName(vnode, config);
 	const hoc = getHocName(name);
@@ -405,26 +403,41 @@ function update<T extends SharedVNode>(
 		hocs = [];
 	}
 
-	const oldVNode = getVNodeById(ids, id);
-	updateVNodeId(ids, id, vnode);
+	if (didRender) {
+		timings.start.set(id, timingsByVNode.start.get(vnode) || 0);
+		timings.end.set(id, timingsByVNode.end.get(vnode) || 0);
 
-	if (profiler.isProfiling && profiler.captureRenderReasons) {
-		const reason =
-			renderReasonPre !== null
-				? renderReasonPre.get(vnode) || null
-				: bindings.getRenderReasonPost(ids, bindings, timings, oldVNode, vnode);
-		if (reason !== null) {
-			const count = reason.items ? reason.items.length : 0;
-			commit.operations.push(MsgTypes.RENDER_REASON, id, reason.type, count);
-			if (reason.items && count > 0) {
-				commit.operations.push(
-					...reason.items.map(str => getStringId(commit.strings, str)),
-				);
+		commit.operations.push(
+			MsgTypes.UPDATE_VNODE_TIMINGS,
+			id,
+			(timings.start.get(id) || 0) * 1000,
+			(timings.end.get(id) || 0) * 1000,
+		);
+
+		if (profiler.isProfiling && profiler.captureRenderReasons) {
+			const reason =
+				renderReasonPre !== null
+					? renderReasonPre.get(vnode) || null
+					: bindings.getRenderReasonPost(
+							ids,
+							bindings,
+							timings,
+							oldVNode,
+							vnode,
+					  );
+			if (reason !== null) {
+				const count = reason.items ? reason.items.length : 0;
+				commit.operations.push(MsgTypes.RENDER_REASON, id, reason.type, count);
+				if (reason.items && count > 0) {
+					commit.operations.push(
+						...reason.items.map(str => getStringId(commit.strings, str)),
+					);
+				}
 			}
 		}
-	}
 
-	updateHighlight(profiler, vnode, bindings);
+		updateHighlight(profiler, vnode, bindings);
+	}
 
 	const oldChildren = oldVNode
 		? bindings
