@@ -139,7 +139,7 @@ function FilterCheck({
 				/>
 				{checked ? <CheckboxChecked /> : <CheckboxUnChecked />}
 			</span>
-			<span class={s.filterValue}>{label}</span>
+			<span class={`${s.filterValue} ${s.filterValueText}`}>{label}</span>
 		</label>
 	);
 }
@@ -249,10 +249,12 @@ export function FilterPopup() {
 							setFilters([...filters, { enabled: false, value: "" }])
 						}
 					>
-						<span class={s.filterCheck}>
-							<AddCircle />
+						<span class={s.filterAdd}>
+							<span class={s.filterCheck}>
+								<AddCircle />
+							</span>
+							Add filter
 						</span>
-						Add filter
 					</IconBtn>
 					<button
 						type="submit"

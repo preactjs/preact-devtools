@@ -56,6 +56,7 @@ input {
 	--color-code: #e3e3e3;
 	--color-code-border: #c2c2c2;
 	--color-text: #333;
+	--color-text-input: #333;
 	--color-text-stronger: #111;
 	--color-disabled: #dedede;
 	--color-panelbar-bg: #f7f7f7;
@@ -144,6 +145,7 @@ input {
 	--color-code: black;
 	--color-code-border: #5c5858;
 	--color-text: #b0b0b0;
+	--color-text-input: #c9c5c5;
 	--color-text-stronger: #dcdcdc;
 	--color-disabled: #575757;
 	--color-panelbar-bg: #373737;
