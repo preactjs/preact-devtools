@@ -64,14 +64,6 @@ export function setupOptionsV10(
 	// @ts-ignore
 	let prevHookName = options.useDebugName;
 
-	options.vnode = vnode => {
-		// const id = getVNodeId(ids, vnode);
-		// FIXME: Does the negative end thing screw up the profiler?
-		// storeTime(timings.start, id, 0);
-		// storeTime(timings.end, id, -1);
-		if (prevVNodeHook) prevVNodeHook(vnode);
-	};
-
 	// Make sure that we are always the first `option._hook` to be called.
 	// This is necessary to ensure that our callstack remains consistent.
 	// Othwerwise we'll end up with an unknown number of frames in-between
@@ -117,25 +109,19 @@ export function setupOptionsV10(
 	}, 100);
 
 	o._diff = o.__b = (vnode: VNode) => {
-		if (vnode.type !== null) {
+		if (typeof vnode.type === "function") {
 			timings.start.set(vnode, performance.now());
-
-			if (typeof vnode.type === "function") {
-				const name = getDisplayName(vnode, config);
-				recordMark(`${name}_diff`);
-			}
+			const name = getDisplayName(vnode, config);
+			recordMark(`${name}_diff`);
 		}
 
 		if (prevBeforeDiff != null) prevBeforeDiff(vnode);
 	};
 
 	options.diffed = vnode => {
-		if (vnode.type !== null) {
+		if (typeof vnode.type === "function") {
 			timings.end.set(vnode, performance.now());
-
-			if (typeof vnode.type === "function") {
-				endMark(getDisplayName(vnode, config));
-			}
+			endMark(getDisplayName(vnode, config));
 		}
 
 		if (prevAfterDiff) prevAfterDiff(vnode);
