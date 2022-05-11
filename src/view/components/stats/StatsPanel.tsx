@@ -61,6 +61,7 @@ export function StatsPanel() {
 	const onReset = useCallback(() => {
 		store.stats.data.$ = null;
 		store.stats.isRecording.$ = false;
+		store.emit("stop-profiling", null);
 	}, [store]);
 
 	return (

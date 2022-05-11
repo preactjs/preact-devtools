@@ -80,8 +80,12 @@ export function RenderReasons() {
 							: "Capturing disabled. "}
 						<MessageBtn
 							onClick={() => {
-								store.profiler.setRenderReasonCapture(!captureReason);
+								const value = !captureReason;
+								store.profiler.setRenderReasonCapture(value);
 								store.profiler.isRecording.$ = true;
+								store.emit("start-profiling", {
+									captureRenderReasons: value,
+								});
 							}}
 							testId="toggle-render-reason"
 						>

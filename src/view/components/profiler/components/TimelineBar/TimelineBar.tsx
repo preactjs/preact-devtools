@@ -47,6 +47,7 @@ export function TimelineBar() {
 
 	const onReset = useCallback(() => {
 		resetProfiler(store.profiler);
+		store.emit("stop-profiling", null);
 	}, [store]);
 
 	return (
