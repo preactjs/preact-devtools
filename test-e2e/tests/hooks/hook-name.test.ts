@@ -1,6 +1,6 @@
 import { newTestPage, getHooks, waitForSelector } from "../../test-utils";
 import { expect } from "chai";
-import { clickNestedText } from "pentf/browser_utils";
+import { clickNestedText, clickSelector } from "pentf/browser_utils";
 
 export const description = "Show custom hook name";
 
@@ -10,7 +10,7 @@ export async function run(config: any) {
 	const hooksPanel = '[data-testid="props-row"]';
 
 	// Counter
-	await clickNestedText(devtools, /Counter$/, {
+	await clickSelector(devtools, '[data-name="Counter"]', {
 		retryUntil: async () => {
 			return !!(await devtools.$('[data-testid="Hooks"]'));
 		},
