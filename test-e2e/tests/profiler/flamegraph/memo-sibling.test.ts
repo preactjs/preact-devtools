@@ -41,12 +41,14 @@ export async function run(config: any) {
 	await clickRecordButton(devtools);
 
 	const nodes = await getFlameNodes(devtools);
-	expect(nodes).to.deep.equal([
-		{ maximized: true, name: "Fragment", visible: true },
-		{ maximized: false, name: "Counter", visible: true },
-		{ maximized: false, name: "Value1", visible: true },
-		{ maximized: false, name: "Value2", visible: true },
-	]);
+	expect(nodes.sort((a, b) => a.name.localeCompare(b.name))).to.deep.equal(
+		[
+			{ maximized: true, name: "Fragment", visible: true },
+			{ maximized: false, name: "Counter", visible: true },
+			{ maximized: false, name: "Value1", visible: true },
+			{ maximized: false, name: "Value2", visible: true },
+		].sort((a, b) => a.name.localeCompare(b.name)),
+	);
 
 	const memoSize = await getSize(
 		devtools,
