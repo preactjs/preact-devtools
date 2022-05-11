@@ -55,7 +55,7 @@
 		"archiver": "^5.0.2",
 		"babel-loader": "^8.1.0",
 		"babel-plugin-helpers": "^0.1.1",
-		"babel-plugin-transform-jsx-to-htm": "^2.0.0",
+		"babel-plugin-transform-jsx-to-htm": "^2.2.0",
 		"babel-plugin-transform-rename-properties": "^0.1.0",
 		"concurrently": "^5.3.0",
 		"cpy-cli": "^3.1.1",

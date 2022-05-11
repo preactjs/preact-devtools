@@ -1761,10 +1761,10 @@ babel-plugin-helpers@^0.1.1:
   resolved "https://registry.yarnpkg.com/babel-plugin-helpers/-/babel-plugin-helpers-0.1.1.tgz#2a9cce1bc588bd73861ca435fe2c851ed0ebd17d"
   integrity sha512-1Pg2Sg9e2Y2KwUxhLp/13TgZlbTh8sCJqno7vgMZJwQcRwuOWVMskyACfOdRheuVI9+MnG2nBfQPm9dxk+QpbQ==
 
-babel-plugin-transform-jsx-to-htm@^2.0.0:
-  version "2.0.0"
-  resolved "https://registry.yarnpkg.com/babel-plugin-transform-jsx-to-htm/-/babel-plugin-transform-jsx-to-htm-2.0.0.tgz#ab04caf8752a67272c06d6f9786721c105417640"
-  integrity sha512-MuU/RfaTh2i1ar5iiOoce6F263jIHsXjN7SLrm9G80PKHOFZJSfq2F5hAHduVK4dMwA6xeSKK541Ho3LGb5lIg==
+babel-plugin-transform-jsx-to-htm@^2.2.0:
+  version "2.2.0"
+  resolved "https://registry.yarnpkg.com/babel-plugin-transform-jsx-to-htm/-/babel-plugin-transform-jsx-to-htm-2.2.0.tgz#760023cd60a531f439a91df3ba99db831425a1ef"
+  integrity sha512-o98JbDlwdF3z03h+wdO5Ft4XTsJFONOM+XAFF9EH0EK8gYVSIwtp2jXvI7u4esIcQPiVy+ZHyZVy76AgnxnGbQ==
   dependencies:
     "@babel/plugin-syntax-jsx" "^7.2.0"
     htm "^3.0.0"
