@@ -65,6 +65,13 @@
 	background-color: transparent;
 	background-size: 0.25rem 0.25rem;
 }
+
+.node[data-weight="-1"]:not([data-commit-parent])
+	[data-testid="hoc-labels"]
+	> * {
+	background: var(--color-hoc-not-rendered);
+}
+
 :global(.dark) .node[data-weight="-1"]:not([data-commit-parent])::after {
 	opacity: 0.5;
 }

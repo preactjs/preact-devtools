@@ -47,7 +47,16 @@ export function FlamegraphLayout({
 				const node = commit.nodes.get(pos.id)!;
 				let text: any = "";
 				if (pos.commitParent || pos.weight === -1) {
-					text = <span data-testid="node-name">{node.name}</span>;
+					text = (
+						<span data-testid="node-name">
+							{node.name}
+							{filterHoc && node.hocs ? (
+								<HocLabels hocs={node.hocs} nodeId={node.id} canMark={false} />
+							) : (
+								""
+							)}
+						</span>
+					);
 				} else {
 					const self = formatTime(commit.selfDurations.get(node.id)!);
 					const total = formatTime(node.endTime - node.startTime);
@@ -55,7 +64,7 @@ export function FlamegraphLayout({
 						<>
 							<span data-testid="node-name">{node.name}</span>
 							{filterHoc && node.hocs ? (
-								<HocLabels hocs={node.hocs} nodeId={node.id} />
+								<HocLabels hocs={node.hocs} nodeId={node.id} canMark={false} />
 							) : (
 								""
 							)}{" "}

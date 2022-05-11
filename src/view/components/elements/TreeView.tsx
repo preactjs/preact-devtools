@@ -259,16 +259,18 @@ export function TreeItem(props: { key: any; id: ID; top: number }) {
 export function HocLabels({
 	hocs,
 	nodeId,
+	canMark = true,
 }: {
 	hocs: string[];
 	nodeId: number;
+	canMark?: boolean;
 }) {
 	return (
 		<span class={s.hocs} data-testid="hoc-labels">
 			{hocs.map((hoc, i) => {
 				return (
 					<Hoc key={i} small>
-						<MarkResult text={hoc} id={nodeId} />
+						{canMark ? <MarkResult text={hoc} id={nodeId} /> : hoc}
 					</Hoc>
 				);
 			})}
