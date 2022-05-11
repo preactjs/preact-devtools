@@ -48,14 +48,14 @@ export function FlamegraphLayout({
 				let text: any = "";
 				if (pos.commitParent || pos.weight === -1) {
 					text = (
-						<span data-testid="node-name">
-							{node.name}
+						<>
+							<span data-testid="node-name">{node.name}</span>
 							{filterHoc && node.hocs ? (
 								<HocLabels hocs={node.hocs} nodeId={node.id} canMark={false} />
 							) : (
 								""
 							)}
-						</span>
+						</>
 					);
 				} else {
 					const self = formatTime(commit.selfDurations.get(node.id)!);
