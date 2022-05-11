@@ -169,7 +169,7 @@ export function MarkResult(props: { text: string; id: ID }) {
 		const start = idx > 0 ? text.slice(0, idx) : "";
 		const end = idx < text.length ? text.slice(idx + m[0].length) : "";
 		return (
-			<span ref={ref}>
+			<span ref={ref} data-testid="node-name">
 				{start}
 				<mark
 					class={`${s.mark} ${isActive ? s.markSelected : ""}`}
@@ -181,7 +181,7 @@ export function MarkResult(props: { text: string; id: ID }) {
 			</span>
 		);
 	}
-	return <span>{text}</span>;
+	return <span data-testid="node-name">{text}</span>;
 }
 
 export function TreeItem(props: { key: any; id: ID; top: number }) {

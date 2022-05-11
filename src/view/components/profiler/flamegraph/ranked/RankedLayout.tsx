@@ -68,7 +68,7 @@ export function RankedLayout({
 					);
 				const text = (
 					<>
-						{node.name}
+						<span data-testid="node-name">{node.name}</span>
 						{hocs} ({formatTime(selfDuration)})
 					</>
 				);
