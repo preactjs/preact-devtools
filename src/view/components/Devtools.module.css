@@ -95,6 +95,7 @@ input {
 	--color-radio: #7245c7;
 	--color-shadow: rgba(0, 0, 0, 0.15);
 	--color-hoc-bg: #ddd;
+	--color-hoc-not-rendered: #ddd;
 	--color-hoc-text: #111;
 	--color-hoc-selected-text: #fff;
 	--color-hoc-selected-bg: #4101b3;
@@ -185,6 +186,7 @@ input {
 	--color-radio: #d2adff;
 	--color-shadow: rgba(255, 255, 255, 0.15);
 	--color-hoc-bg: #505050;
+	--color-hoc-not-rendered: black;
 	--color-hoc-text: #fff;
 	--color-hoc-selected-text: #fff;
 	--color-hoc-selected-bg: #8251d8;

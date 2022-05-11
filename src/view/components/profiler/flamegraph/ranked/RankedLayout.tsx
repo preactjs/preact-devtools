@@ -62,7 +62,7 @@ export function RankedLayout({
 				const selfDuration = commit.selfDurations.get(node.id) || 0;
 				const hocs =
 					filterHoc && node.hocs ? (
-						<HocLabels hocs={node.hocs} nodeId={node.id} />
+						<HocLabels hocs={node.hocs} nodeId={node.id} canMark={false} />
 					) : (
 						""
 					);
