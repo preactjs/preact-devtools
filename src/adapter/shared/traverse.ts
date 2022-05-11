@@ -48,10 +48,13 @@ function updateHighlight<T extends SharedVNode>(
 	bindings: PreactBindings<T>,
 ) {
 	if (profiler.highlightUpdates && bindings.isComponent(vnode)) {
-		const stack: any[] = [vnode];
+		const stack: Array<T | null | undefined> = [vnode];
 		let item;
 		let dom;
 		while ((item = stack.shift()) !== undefined) {
+			// Account for placholders/holes
+			if (item === null) continue;
+
 			if (!bindings.isComponent(item)) {
 				dom = bindings.getDom(item);
 				break;
