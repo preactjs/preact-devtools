@@ -254,14 +254,19 @@ export async function clickRecordButton(page: Page) {
 	const selector = '[data-testid="record-btn"]';
 	await waitForSelector(page, selector);
 	const start = /Start/.test(await getAttribute(page, selector, "title"));
-	await clickSelector(page, selector);
-
-	await waitForAttribute(
-		page,
-		selector,
-		"title",
-		start ? /Stop Recording/ : /Start Recording/,
-	);
+	await clickSelector(page, selector, {
+		async retryUntil() {
+			await page.evaluate(
+				(s, start) => {
+					return (start ? /Stop Recording/ : /Start Recording/).test(
+						document.querySelector(s).title,
+					);
+				},
+				selector,
+				start,
+			);
+		},
+	});
 }
 
 // TODO: This might clash with windowing
