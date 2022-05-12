@@ -21,6 +21,7 @@ import { PreactBindings, SharedVNode } from "../shared/bindings";
 import { inspectVNode } from "./inspectVNode";
 import { logVNode } from "../10/log";
 import { VNodeTimings } from "./timings";
+import { printCommit } from "../debug";
 
 export interface RendererConfig {
 	Fragment: FunctionalComponent;
@@ -258,6 +259,7 @@ export function createRenderer<T extends SharedVNode>(
 				profiler.pendingHighlightUpdates.clear();
 			}
 
+			printCommit(ev.data);
 			port.send(ev.type as any, ev.data);
 		},
 		onUnmount,

@@ -277,6 +277,8 @@ export function patchTree(
 ): FlameTree {
 	const { nodes: tree, rootId, commitRootId, maxSelfDuration } = commit;
 
+	console.log({ commit, prevCommit });
+
 	const flame: FlameTree = new Map();
 
 	if (tree.size === 0) {
@@ -308,8 +310,8 @@ export function patchTree(
 	const offsetStack = [-root.startTime];
 	const subtreeLevels = [-1];
 
-	const stack = [rootId];
-	let item;
+	const stack: ID[] = [rootId];
+	let item: ID | undefined;
 	while ((item = stack.pop())) {
 		const node = tree.get(item);
 		if (!node) continue;
@@ -350,6 +352,19 @@ export function patchTree(
 		const parent = tree.get(node.parent);
 		// Check if node is root of a re-queued sub-tree
 		if (node.id !== commitRootId && parent) {
+			console.log(
+				`-> subtree <${node.name} /> ${node.id}, ${node.startTime} - ${node.endTime}`,
+			);
+			const idx = parent.children.indexOf(node.id);
+			if (idx > 0) {
+				const childId = parent.children[idx - 1];
+				// Check if the previous sibling is a static tree
+				if (!flame.has(childId)) {
+					console.log("STATIC", childId, staticRoots.slice());
+					continue;
+				}
+			}
+
 			const start = getStartPosition(tree, flame, node);
 
 			const offset = offsetStack[offsetStack.length - 1];
@@ -393,6 +408,9 @@ export function patchTree(
 		pos.row = node.depth;
 		pos.start = start;
 		pos.end = end;
+		console.log(
+			`-> add flame <${node.name} /> ${node.id}, ${node.startTime} - ${node.endTime}`,
+		);
 		flame.set(node.id, pos);
 
 		if (start < 0) {
@@ -414,19 +432,22 @@ export function patchTree(
 
 	// Check if nodes that were flagged for potential enlargement
 	// actually need to be resized
-	while ((item = maybeGrow.pop())) {
-		let delta = flame.get(item.id)!.end - getEndPosition(tree, flame, item.id);
+	let toGrow: DevNode | undefined;
+	while ((toGrow = maybeGrow.pop())) {
+		let delta =
+			flame.get(toGrow.id)!.end - getEndPosition(tree, flame, toGrow.id);
 
-		if (delta < 0 && item.id === commitRootId && prevCommit !== null) {
+		if (delta < 0 && toGrow.id === commitRootId && prevCommit !== null) {
 			const prev = prevCommit.nodes.get(commitRootId);
 			if (prev) {
-				delta = item.endTime - item.startTime - (prev.endTime - prev.startTime);
+				delta =
+					toGrow.endTime - toGrow.startTime - (prev.endTime - prev.startTime);
 			}
 		}
 		adjustNodesToRight(
 			tree,
 			flame,
-			item.id,
+			toGrow.id,
 			delta,
 			rootId,
 			new Set(staticRoots.map(node => node.id)),
@@ -434,7 +455,7 @@ export function patchTree(
 
 		// Move nodes to end for a less jarring visual experience
 		if (delta < 0) {
-			moveToEnd(tree, flame, item);
+			moveToEnd(tree, flame, toGrow);
 		}
 	}
 
