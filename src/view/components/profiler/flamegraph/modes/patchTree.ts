@@ -46,8 +46,7 @@ export function getStartPosition(tree: Tree, flame: FlameTree, node: DevNode) {
 	//  - otherwise: parent start
 	const idx = parent.children.indexOf(node.id);
 	return idx > 0
-		? flame.has(parent.children[idx - 1]) &&
-				flame.get(parent.children[idx - 1])!.end
+		? flame.get(parent.children[idx - 1])?.end
 		: flame.get(parent.id)!.start;
 }
 
