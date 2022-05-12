@@ -46,7 +46,7 @@ export function getStartPosition(tree: Tree, flame: FlameTree, node: DevNode) {
 	//  - otherwise: parent start
 	const idx = parent.children.indexOf(node.id);
 	return idx > 0
-		? flame.get(parent.children[idx - 1])?.end
+		? flame.get(parent.children[idx - 1])!.end
 		: flame.get(parent.id)!.start;
 }
 
@@ -344,6 +344,22 @@ export function patchTree(
 		// Check if we're dealing with a memoized tree
 		if (renderedNodes.has(node.id) && node.startTime < commitRoot.startTime) {
 			staticRoots.push(node);
+
+			// Create placeholder in flame tree for memoized node
+			const pos = createTransform();
+			pos.id = node.id;
+			pos.weight = getGradient(
+				maxSelfDuration,
+				commit.selfDurations.get(node.id) || 0,
+			);
+			pos.row = node.depth;
+
+			// Provide timings to memoized placeholder
+			const offset = offsetStack[offsetStack.length - 1];
+			pos.start = node.startTime + offset;
+			pos.end = node.endTime + offset;
+
+			flame.set(node.id, pos);
 			continue;
 		}
 
