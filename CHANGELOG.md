@@ -1,5 +1,28 @@
 # Changelog
 
+## 4.1.0
+
+### Features
+
+- Add support for HOC-component filters (#347, #351, #357, #354, #360, thanks @marvinhagemeister)
+- Modernize filter panel styling (#349, thanks @marvinhagemeister)
+
+### Bug Fixes
+
+- Fix elements list scrolling even if item is in view (#342, thanks @marvinhagemeister)
+- Fix unable to scroll settings page (#344, thanks @marvinhagemeister)
+- Fix not all filters synced on startup (#348, thanks @marvinhagemeister)
+- Fix highlight error if child is a placeholder (#353, thanks @marvinhagemeister)
+- Fix double parsed commit stats (#356, thanks @marvinhagemeister)
+- Profiler: Only collect timings for components (#357, thanks @marvinhagemeister)
+
+### Maintenance
+
+- Update test deps by (#346, thanks @marvinhagemeister)
+- Update protocol debug printer (#345, thanks @marvinhagemeister)
+- Reduce test flakyness when clicking record (#355, thanks @marvinhagemeister)
+- Improve e2e tests (#358, thanks @marvinhagemeister)
+
 ## 4.0.2
 
 ### Bug Fixes
