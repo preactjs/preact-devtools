@@ -18,7 +18,7 @@ function Bar({ v }) {
 	let innerElements = [];
 
 	for (let i = 0; i < v; i++) {
-		innerElements.push(<BarInner />);
+		innerElements.push(<BarInner key={v} />);
 	}
 	return <div>{innerElements}</div>;
 }
