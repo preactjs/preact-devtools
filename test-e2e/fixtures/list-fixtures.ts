@@ -10,6 +10,20 @@ export function listFixtures(): Plugin {
 	const virtual = "@fixtures";
 	return {
 		name: "preact:fixtures",
+		configureServer(_server) {
+			// Restart the server whenever a fixture file changes.
+			// We currently don't have HMR as the whole fixture needs
+			// to be reloaded anyway for devtools to start with a clean
+			// state.
+			const server = _server;
+			server.watcher.add("test-e2e/fixtures/apps/**/*");
+			server.watcher.on("all", (ev, p) => {
+				if (p.includes("test-e2e/fixtures/apps")) {
+					server.restart();
+				}
+			});
+		},
+
 		resolveId(id) {
 			if (id === virtual) {
 				return id;
