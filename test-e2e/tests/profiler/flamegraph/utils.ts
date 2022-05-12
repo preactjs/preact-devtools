@@ -5,7 +5,7 @@ export async function getFlameNodes(page: Page) {
 		return els.map(el => {
 			return {
 				maximized: el.hasAttribute("data-maximized"),
-				name: el.querySelector('[data-testid="node-name"]')!.textContent || "",
+				name: el.getAttribute("data-name") || "",
 				visible: el.hasAttribute("data-visible"),
 			};
 		});
