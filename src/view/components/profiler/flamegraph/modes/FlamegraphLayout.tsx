@@ -49,7 +49,7 @@ export function FlamegraphLayout({
 				if (pos.commitParent || pos.weight === -1) {
 					text = (
 						<>
-							<span data-testid="node-name">{node.name}</span>
+							{node.name}
 							{filterHoc && node.hocs ? (
 								<HocLabels hocs={node.hocs} nodeId={node.id} canMark={false} />
 							) : (
@@ -62,7 +62,7 @@ export function FlamegraphLayout({
 					const total = formatTime(node.endTime - node.startTime);
 					text = (
 						<>
-							<span data-testid="node-name">{node.name}</span>
+							{node.name}
 							{filterHoc && node.hocs ? (
 								<HocLabels hocs={node.hocs} nodeId={node.id} canMark={false} />
 							) : (
