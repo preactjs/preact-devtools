@@ -7,7 +7,6 @@ import {
 	RenderReason,
 	RenderReasonData,
 } from "../shared/renderReasons";
-import { VNodeTimings } from "../shared/timings";
 
 /**
  * Detect why a VNode updated.
@@ -15,7 +14,7 @@ import { VNodeTimings } from "../shared/timings";
 export function getRenderReasonPost<T extends SharedVNode>(
 	ids: IdMappingState<T>,
 	bindings: PreactBindings,
-	timings: VNodeTimings<ID>,
+	selfDurations: Map<ID, number>,
 	old: T | null,
 	next: T | null,
 ): RenderReasonData | null {
@@ -69,13 +68,8 @@ export function getRenderReasonPost<T extends SharedVNode>(
 
 	const parent = bindings.getVNodeParent(next) as T;
 	if (parent != null) {
-		const parentId = getVNodeId(ids, parent);
 		const nextId = getVNodeId(ids, next);
-		if (
-			parent != null &&
-			(timings.start.get(nextId) || 0) >= (timings.start.get(parentId) || 0) &&
-			(timings.end.get(nextId) || 0) <= (timings.start.get(parentId) || 0)
-		) {
+		if (parent != null && selfDurations.has(nextId)) {
 			return createReason(RenderReason.PARENT_UPDATE, null);
 		}
 	}

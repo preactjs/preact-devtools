@@ -231,20 +231,17 @@ export function printCommit(data: number[]) {
 					const name = strings[data[i + 5] - 1];
 					const key = data[i + 6] > 0 ? ` key="${strings[i + 6 - 1]}" ` : "";
 					const parentId = data[i + 3];
-					const startTime = data[i + 7];
-					const endTime = data[i + 8];
+					const selfDuration = data[i + 7];
 					console.log(
-						`Add %c${id} %c<${name}${key}>%c to parent %c${parentId}%c, time: %c${startTime}%c - %c${endTime}`,
+						`Add %c${id} %c<${name}${key}>%c to parent %c${parentId}%c, selfDuration: %c${selfDuration}`,
 						"color: yellow",
 						"color: violet",
 						"color: inherit",
 						"color: green",
 						"color: inherit",
 						"color: peachpuff",
-						"color: inherit",
-						"color: peachpuff",
 					);
-					i += 8;
+					i += 7;
 					break;
 				}
 				case MsgTypes.REMOVE_VNODE: {
@@ -267,14 +264,12 @@ export function printCommit(data: number[]) {
 				case MsgTypes.UPDATE_VNODE_TIMINGS: {
 					const id = data[i + 1];
 					console.log(
-						`Update: %c${id}%c, time: %c${data[i + 2]} %c- %c${data[i + 3]}`,
+						`Update: %c${id}%c, selfDuration: %c${data[i + 2]}`,
 						"color: yellow",
 						"color: inherit",
 						"color: peachpuff",
-						"color: inherit",
-						"color: peachpuff",
 					);
-					i += 3;
+					i += 2;
 					break;
 				}
 				case MsgTypes.RENDER_REASON: {

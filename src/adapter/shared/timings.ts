@@ -9,19 +9,6 @@ export interface VNodeTimings<T = ID> {
 	end: Map<T, number>;
 }
 
-export function storeTime(timings: Map<ID, number>, id: ID, time: number) {
-	timings.set(id, time);
-}
-
-export function getTime(timings: Map<ID, number>, id: ID): number {
-	return timings.get(id) || 0;
-}
-
-export function removeTime(timings: VNodeTimings, id: ID) {
-	timings.start.delete(id);
-	timings.end.delete(id);
-}
-
 export function createVNodeTimings<T = ID>(): VNodeTimings<T> {
 	return {
 		start: new Map(),

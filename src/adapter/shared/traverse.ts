@@ -18,7 +18,7 @@ import { NodeType } from "../../constants";
 import { getDiffType, recordComponentStats } from "./stats";
 import { measureUpdate } from "../adapter/highlightUpdates";
 import { PreactBindings, SharedVNode } from "./bindings";
-import { removeTime, VNodeTimings } from "./timings";
+import { VNodeTimings } from "./timings";
 
 function getHocName(name: string) {
 	const idx = name.indexOf("(");
@@ -172,7 +172,7 @@ function mount<T extends SharedVNode>(
 	profiler: ProfilerState,
 	hocs: string[],
 	bindings: PreactBindings<T>,
-	timings: VNodeTimings<ID>,
+	selfDurations: Map<ID, number>,
 	timingsByVNode: VNodeTimings<T>,
 	renderReasonPre: Map<T, RenderReasonData> | null,
 ) {
@@ -196,20 +196,20 @@ function mount<T extends SharedVNode>(
 		}
 	}
 
+	let selfDurationIdx = -1;
+	let id = -1;
 	if (root || !skip) {
-		const id = getOrCreateVNodeId(ids, vnode);
+		id = getOrCreateVNodeId(ids, vnode);
 		if (bindings.isRoot(vnode, config)) {
 			commit.operations.push(MsgTypes.ADD_ROOT, id);
 		}
 
-		if (!timings.start.has(id)) {
-			timings.start.set(id, timingsByVNode.start.get(vnode) || 0);
-		}
-		if (!timings.end.has(id)) {
-			timings.end.set(id, timingsByVNode.end.get(vnode) || 0);
-		}
+		const start = timingsByVNode.start.get(vnode) || 0;
+		const end = timingsByVNode.end.get(vnode) || 0;
+		const duration = end - start;
+		selfDurations.set(id, duration);
 
-		commit.operations.push(
+		selfDurationIdx = commit.operations.push(
 			MsgTypes.ADD_VNODE,
 			id,
 			getDevtoolsType(vnode, bindings), // Type
@@ -217,10 +217,9 @@ function mount<T extends SharedVNode>(
 			9999, // owner
 			getStringId(commit.strings, name),
 			vnode.key ? getStringId(commit.strings, vnode.key) : 0,
-			// Multiply, because operations array only supports integers
-			// and would otherwise cut off floats
-			(timings.start.get(id) || 0) * 1000,
-			(timings.end.get(id) || 0) * 1000,
+			// We will be able to measure the `selfDuration` once
+			// children duration are processed
+			-1,
 		);
 
 		if (hocs.length > 0) {
@@ -266,11 +265,21 @@ function mount<T extends SharedVNode>(
 				profiler,
 				hocs,
 				bindings,
-				timings,
+				selfDurations,
 				timingsByVNode,
 				renderReasonPre,
 			);
 		}
+	}
+
+	if (selfDurationIdx !== -1) {
+		// Multiply, because operations array only supports integers
+		// and would otherwise cut off floats. Also use 0.1 as minimum
+		// because due to Spectre CPU mitigations the timings are not
+		// precise. Nodes with a time of 0 are impossible to select
+		// in devtools.
+		commit.operations[selfDurationIdx - 1] =
+			(selfDurations.get(id) || 0.1) * 1000;
 	}
 
 	if (commit.stats !== null) {
@@ -322,7 +331,7 @@ function update<T extends SharedVNode>(
 	profiler: ProfilerState,
 	hocs: string[],
 	bindings: PreactBindings<T>,
-	timings: VNodeTimings<ID>,
+	selfDurations: Map<ID, number>,
 	timingsByVNode: VNodeTimings<T>,
 	renderReasonPre: Map<T, RenderReasonData> | null,
 ) {
@@ -355,7 +364,7 @@ function update<T extends SharedVNode>(
 					profiler,
 					hocs,
 					bindings,
-					timings,
+					selfDurations,
 					timingsByVNode,
 					renderReasonPre,
 				);
@@ -381,18 +390,18 @@ function update<T extends SharedVNode>(
 			profiler,
 			hocs,
 			bindings,
-			timings,
+			selfDurations,
 			timingsByVNode,
 			renderReasonPre,
 		);
 		return true;
 	}
 
-	const didRender = timingsByVNode.end.has(vnode);
-
 	const id = getVNodeId(ids, vnode);
 	const oldVNode = getVNodeById(ids, id);
 	updateVNodeId(ids, id, vnode);
+
+	const didRender = timingsByVNode.end.has(vnode);
 
 	const name = bindings.getDisplayName(vnode, config);
 	const hoc = getHocName(name);
@@ -403,15 +412,24 @@ function update<T extends SharedVNode>(
 		hocs = [];
 	}
 
+	let selfDurationIdx = -1;
 	if (didRender) {
-		timings.start.set(id, timingsByVNode.start.get(vnode) || 0);
-		timings.end.set(id, timingsByVNode.end.get(vnode) || 0);
+		const start = timingsByVNode.start.get(vnode) || 0;
+		const end = timingsByVNode.end.get(vnode) || 0;
+		const duration = end - start;
+		selfDurations.set(id, duration);
 
-		commit.operations.push(
+		// Remove current node timing from ancestor
+		if (selfDurations.has(ancestorId)) {
+			selfDurations.set(ancestorId, selfDurations.get(ancestorId)! - duration);
+		}
+
+		selfDurationIdx = commit.operations.push(
 			MsgTypes.UPDATE_VNODE_TIMINGS,
 			id,
-			(timings.start.get(id) || 0) * 1000,
-			(timings.end.get(id) || 0) * 1000,
+			// We will be able to measure the `selfDuration` once
+			// children duration are processed
+			-1,
 		);
 
 		if (profiler.isProfiling && profiler.captureRenderReasons) {
@@ -421,7 +439,7 @@ function update<T extends SharedVNode>(
 					: bindings.getRenderReasonPost(
 							ids,
 							bindings,
-							timings,
+							selfDurations,
 							oldVNode,
 							vnode,
 					  );
@@ -454,7 +472,6 @@ function update<T extends SharedVNode>(
 		if (child == null) {
 			const oldChildId = oldChildren[i];
 			if (oldChildId != null) {
-				removeTime(timings, oldChildId);
 				commit.unmountIds.push(oldChildId);
 			}
 		} else if (
@@ -476,7 +493,7 @@ function update<T extends SharedVNode>(
 				profiler,
 				hocs,
 				bindings,
-				timings,
+				selfDurations,
 				timingsByVNode,
 				renderReasonPre,
 			);
@@ -498,12 +515,22 @@ function update<T extends SharedVNode>(
 				profiler,
 				hocs,
 				bindings,
-				timings,
+				selfDurations,
 				timingsByVNode,
 				renderReasonPre,
 			);
 			shouldReorder = true;
 		}
+	}
+
+	if (selfDurationIdx !== -1) {
+		// Multiply, because operations array only supports integers
+		// and would otherwise cut off floats. Also use 0.1 as minimum
+		// because due to Spectre CPU mitigations the timings are not
+		// precise. Nodes with a time of 0 are impossible to select
+		// in devtools.
+		commit.operations[selfDurationIdx - 1] =
+			(selfDurations.get(id) || 0.1) * 1000;
 	}
 
 	if (commit.stats !== null) {
@@ -548,7 +575,6 @@ export function createCommit<T extends SharedVNode>(
 	config: RendererConfig,
 	profiler: ProfilerState,
 	helpers: PreactBindings<T>,
-	timings: VNodeTimings<ID>,
 	timingsByVNode: VNodeTimings<T>,
 	renderReasonPre: Map<T, RenderReasonData> | null,
 ): Commit {
@@ -560,6 +586,8 @@ export function createCommit<T extends SharedVNode>(
 		renderReasons: new Map(),
 		stats: profiler.recordStats ? createStats() : null,
 	};
+
+	const selfDurations = new Map<ID, number>();
 
 	let parentId = -1;
 
@@ -590,7 +618,7 @@ export function createCommit<T extends SharedVNode>(
 			profiler,
 			[],
 			helpers,
-			timings,
+			selfDurations,
 			timingsByVNode,
 			renderReasonPre,
 		);
@@ -606,7 +634,7 @@ export function createCommit<T extends SharedVNode>(
 			profiler,
 			[],
 			helpers,
-			timings,
+			selfDurations,
 			timingsByVNode,
 			renderReasonPre,
 		);

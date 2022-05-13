@@ -1,17 +1,21 @@
 import { h } from "preact";
-import { useRef, useCallback } from "preact/hooks";
+import { useRef } from "preact/hooks";
 import s from "./FlameGraph.module.css";
-import { NodeTransform } from "./shared";
 import { ID } from "../../../store/types";
+import { Position } from "../data/flames";
 
 export interface Props {
 	selected: boolean;
 	children: any;
-	parentId: number;
+	weight: number;
 	commitRootId: number;
-	name: string;
+	visible: boolean;
+	maximized: boolean;
+	commitParent: boolean;
+
+	pos: Position;
+
 	onClick: (id: ID) => void;
-	node: NodeTransform;
 	onMouseEnter: (id: ID) => void;
 	onMouseLeave: () => void;
 }
@@ -19,44 +23,44 @@ export interface Props {
 const ROW_HEIGHT = 21; // Account 1px for border
 const MIN_TEXT_WIDTH = 32; // Don't show text if smaller than this value
 
-export function FlameNode(props: Props) {
-	const { onClick, selected, node, onMouseEnter, onMouseLeave, name } = props;
-
+export function FlameNode({
+	onClick,
+	selected,
+	onMouseEnter,
+	onMouseLeave,
+	maximized,
+	visible,
+	commitParent,
+	weight,
+	children,
+	pos,
+}: Props) {
 	const transform = useRef("");
 	const widthCss = useRef("");
 
-	const onRawClick = useCallback(() => onClick(node.id), [node.id]);
-	const onRawMouseEnter = useCallback(() => onMouseEnter(node.id), [node.id]);
-
-	const { visible, width, x } = node;
-
 	if (visible) {
-		const y = node.row * ROW_HEIGHT;
-		widthCss.current = `width: ${Math.max(width, 2)}px;`;
-		transform.current = `transform: translate3d(${x}px, ${y}px, 0);`;
+		const y = pos.row * ROW_HEIGHT;
+		widthCss.current = `width: ${Math.max(pos.width, 2)}px;`;
+		transform.current = `transform: translate3d(${pos.start}px, ${y}px, 0);`;
 	}
 
 	return (
 		<div
 			class={s.node}
-			onClick={onRawClick}
-			onMouseEnter={onRawMouseEnter}
+			onClick={() => onClick(pos.id)}
+			onMouseEnter={() => onMouseEnter(pos.id)}
 			onMouseLeave={onMouseLeave}
-			data-id={node.id}
-			data-commit-root={props.commitRootId}
-			data-active-commit-root={node.id === props.commitRootId}
-			data-parent-id={props.parentId}
+			data-id={pos.id}
 			data-visible={visible}
-			data-weight={node.weight}
-			data-commit-parent={node.commitParent}
-			data-maximized={node.maximized}
+			data-weight={weight}
+			data-commit-parent={commitParent}
+			data-maximized={maximized}
 			data-selected={selected}
-			data-overflow={width < MIN_TEXT_WIDTH}
-			data-name={name}
+			data-overflow={pos.width < MIN_TEXT_WIDTH}
 			style={`height: ${ROW_HEIGHT}px; ${transform.current} ${widthCss.current}`}
 		>
 			<span class={s.text} style={widthCss.current}>
-				{props.children}
+				{children}
 			</span>
 		</div>
 	);

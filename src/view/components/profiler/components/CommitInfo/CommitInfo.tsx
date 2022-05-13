@@ -3,6 +3,7 @@ import { SidebarPanel } from "../../../sidebar/SidebarPanel";
 import { formatTime } from "../../util";
 import s from "./CommitInfo.module.css";
 import { useStore, useObserver } from "../../../../store/react-bindings";
+import { getCommitDuration } from "../TimelineBar/TimelineBar";
 
 export function CommitInfo() {
 	const store = useStore();
@@ -13,19 +14,15 @@ export function CommitInfo() {
 		return null;
 	}
 
-	const root = commit.nodes.get(commit.commitRootId)!;
-	if (!root) {
-		return null;
-	}
+	const duration = getCommitDuration(commit);
+
+	console.log({ duration });
 
 	return (
 		<SidebarPanel title="Commit Stats">
 			<dl class={s.list}>
-				<dt class={s.title}>Start:</dt>
-				<dd class={s.value}>{formatTime(root.startTime)}</dd>
-				<br />
 				<dt class={s.title}>Duration:</dt>
-				<dd class={s.value}>{formatTime(commit.duration)} </dd>
+				<dd class={s.value}>{formatTime(duration)} </dd>
 			</dl>
 		</SidebarPanel>
 	);

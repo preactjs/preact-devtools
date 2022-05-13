@@ -1,16 +1,17 @@
 import { h, Fragment } from "preact";
-import { useMemo, useEffect } from "preact/hooks";
-import { placeRanked } from "./ranked-utils";
-import { CommitData } from "../../data/commits";
-import { ID, DevNode } from "../../../../store/types";
+import { useMemo } from "preact/hooks";
+import { ID } from "../../../../store/types";
 import { FlameNode } from "../FlameNode";
 import { formatTime } from "../../util";
 import { useObserver, useStore } from "../../../../store/react-bindings";
 import { HocLabels } from "../../../elements/TreeView";
+import { layoutRanked, Position } from "../../data/flames";
+import { ProfilerCommit } from "../../data/profiler2";
+import { getGradient } from "../../data/gradient";
 
 export interface RankedLayoutProps {
-	commit: CommitData;
-	selected: DevNode;
+	commit: ProfilerCommit;
+	selected: ID;
 	canvasWidth: number;
 	onSelect: (id: ID) => void;
 	onMouseEnter: (id: ID) => void;
@@ -32,59 +33,74 @@ export function RankedLayout({
 }: RankedLayoutProps) {
 	// Convert node tree to position data
 	const store = useStore();
-	const data = useObserver(() => store.profiler.rankedNodes.$);
-	const filterHoc = useObserver(() => store.filter.filterHoc.$);
+	const selectedId = useObserver(() => store.profiler.selectedNodeId.$);
+	const shared = useObserver(() => store.profiler.nodes.$);
 
-	// Update node positions and mutate `data` to avoid allocations
-	const placed = useMemo(
-		() =>
-			placeRanked(
-				commit.nodes,
-				commit.selfDurations,
-				data,
-				selected,
-				canvasWidth,
-			),
-		[canvasWidth, selected, commit, data],
-	);
+	// Build positions
+	const original = useMemo(() => {
+		return layoutRanked(commit);
+	}, [commit]);
 
-	// Hacky
-	useEffect(() => {
-		if (store.profiler.selectedNodeId.$ === -1 && data.length > 0) {
-			store.profiler.selectedNodeId.$ = data[0].id;
-		}
-	}, [data]);
+	// Apply "zooming"
+	const { maximizedIdx, placed } = useMemo(() => {
+		let idx = 0;
+		let maximized = true;
+		let factor = 1;
+		const placed = original.map((pos, i) => {
+			const width = maximized ? canvasWidth : pos.width * factor;
 
+			if (pos.id === selectedId) {
+				maximized = false;
+				factor = canvasWidth / pos.width;
+				idx = i;
+			}
+
+			return {
+				id: pos.id,
+				start: pos.start,
+				width,
+				row: i,
+			} as Position;
+		});
+
+		return {
+			placed,
+			maximizedIdx: idx,
+		};
+	}, [original, selectedId, canvasWidth]);
+
+	console.log({
+		original,
+		placed,
+		maximizedIdx,
+		selectedId,
+		tree: store.nodes.$,
+		commit,
+	});
 	return (
 		<Fragment>
-			{placed.map(pos => {
+			{placed.map((pos, i) => {
+				const meta = shared.get(pos.id)!;
 				const node = commit.nodes.get(pos.id)!;
-				const selfDuration = commit.selfDurations.get(node.id) || 0;
-				const hocs =
-					filterHoc && node.hocs ? (
-						<HocLabels hocs={node.hocs} nodeId={node.id} canMark={false} />
-					) : (
-						""
-					);
-				const text = (
-					<>
-						<span data-testid="node-name">{node.name}</span>
-						{hocs} ({formatTime(selfDuration)})
-					</>
-				);
+				const selfDuration = commit.selfDurations.get(pos.id) || 0;
+
 				return (
 					<FlameNode
 						key={pos.id}
-						commitRootId={commit.commitRootId}
-						node={pos}
-						selected={pos.id === selected.id}
-						parentId={selected.parent}
+						maximized={i <= maximizedIdx}
+						commitRootId={commit.firstId}
+						commitParent={false}
+						visible={true}
+						weight={getGradient(50, selfDuration)}
+						pos={pos}
+						selected={pos.id === selected}
 						onClick={onSelect}
-						name={node.name}
 						onMouseEnter={onMouseEnter}
 						onMouseLeave={onMouseLeave}
 					>
-						{text}
+						<span data-testid="node-name">{meta.name}</span>
+						<HocLabels hocs={meta.hocs} nodeId={node.id} canMark={false} /> (
+						{formatTime(selfDuration)})
 					</FlameNode>
 				);
 			})}

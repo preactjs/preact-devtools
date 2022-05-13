@@ -76,7 +76,8 @@ export function getRenderReasonPre(
 		if (
 			parent != null &&
 			(timings.start.get(internal) || 0) >= (timings.start.get(parent) || 0) &&
-			(timings.end.get(internal) || 0) <= (timings.end.get(parent) || 0)
+			(timings.selfDurations.get(internal) || 0) <=
+				(timings.selfDurations.get(parent) || 0)
 		) {
 			return createReason(RenderReason.PARENT_UPDATE, null);
 		}

@@ -1,31 +1,10 @@
 import { ID, DevNode } from "../../../store/types";
 import { Observable, valoo, watch } from "../../../valoo";
-import { getRoot } from "../flamegraph/FlamegraphStore";
 import {
 	RenderReasonMap,
 	RenderReasonData,
 } from "../../../../adapter/shared/renderReasons";
-import { FlameNodeTransform } from "../flamegraph/modes/flamegraph-utils";
-import { FlameTree, patchTree } from "../flamegraph/modes/patchTree";
-import { NodeTransform } from "../flamegraph/shared";
-import { toTransform } from "../flamegraph/ranked/ranked-utils";
-import {
-	patchTree2,
-	ProfilerCommit,
-	ProfilerNode,
-	ProfilerSession,
-} from "./profiler2";
-
-export interface CommitData {
-	/** Id of the tree's root node */
-	rootId: ID;
-	/** Id of the node the commit was triggered on */
-	commitRootId: ID;
-	maxSelfDuration: number;
-	duration: number;
-	nodes: Map<ID, DevNode>;
-	selfDurations: Map<ID, number>;
-}
+import { ProfilerCommit, ProfilerNode, ProfilerNodeShared } from "./profiler2";
 
 /**
  * The Flamegraph supports these distinct
@@ -36,7 +15,7 @@ export enum FlamegraphType {
 	RANKED = "RANKED",
 }
 
-export interface ProfilerState {
+export interface ProfilerStore {
 	/**
 	 * Flag to indicate if profiling is supported by the attached renderer.
 	 */
@@ -49,6 +28,7 @@ export interface ProfilerState {
 
 	// Highlight updates
 	highlightUpdates: Observable<boolean>;
+	currentSelfDurations: Map<ID, number>;
 
 	/**
 	 * Flag that indicates if we are currently
@@ -56,11 +36,10 @@ export interface ProfilerState {
 	 * profiler.
 	 */
 	isRecording: Observable<boolean>;
-	commits: Observable<CommitData[]>;
 
 	// Selection
 	activeCommitIdx: Observable<number>;
-	activeCommit: Observable<CommitData | null>;
+	activeCommit: Observable<ProfilerCommit | null>;
 	selectedNodeId: Observable<ID>;
 	selectedNode: Observable<DevNode | null>;
 
@@ -71,27 +50,39 @@ export interface ProfilerState {
 	// View state
 	flamegraphType: Observable<FlamegraphType>;
 
-	// Flamegraph mode
-	flamegraphNodes: Observable<Map<ID, FlameNodeTransform>>;
-	rankedNodes: Observable<NodeTransform[]>;
+	commits: Observable<ProfilerCommit[]>;
+	nodes: Observable<Map<ID, ProfilerNodeShared>>;
+}
 
-	// NEW
-	flamegraphNodes2: Observable<ProfilerCommit>;
-	session: Observable<ProfilerSession>;
+export function getFirstNode(commit: ProfilerCommit, mode: FlamegraphType) {
+	let selId = commit.firstId;
+
+	if (mode === FlamegraphType.RANKED) {
+		let selfDuration = -1;
+		commit.rendered.forEach(id => {
+			const ms = commit.selfDurations.get(id);
+			if (ms === undefined) return;
+
+			if (ms > selfDuration) {
+				selfDuration = ms;
+				selId = id;
+			}
+		});
+	}
+
+	return selId;
 }
 
 /**
  * Create a new profiler instance. It intentiall doesn't have
  * any methods, to not go down the OOP rabbit hole.
  */
-export function createProfiler(): ProfilerState {
-	const commits = valoo<CommitData[]>([]);
-	const isSupported = valoo(false);
+export function createProfiler(): ProfilerStore {
+	const commits = valoo<ProfilerCommit[]>([]);
+	const nodes = valoo<Map<ID, ProfilerNodeShared>>(new Map());
 
-	watch(() => {
-		commits.$;
-		console.trace("COMMIT");
-	});
+	const currentSelfDurations = new Map<ID, number>();
+	const isSupported = valoo(false);
 
 	// Render Reasons
 	const supportsRenderReasons = valoo(false);
@@ -102,29 +93,28 @@ export function createProfiler(): ProfilerState {
 	};
 
 	// Highlight updates
-	const showUpdates = valoo(false);
+	const highlightUpdates = valoo(false);
 
 	// Selection
 	const activeCommitIdx = valoo(0);
-	const selectedNodeId = valoo(0);
 	const activeCommit = watch(() => {
-		return (commits.$.length > 0 && commits.$[activeCommitIdx.$]) || null;
+		return commits.$[activeCommitIdx.$] || null;
 	});
+	const selectedNodeId = valoo(0);
 	const selectedNode = watch(() => {
-		return activeCommit.$ != null
-			? activeCommit.$.nodes.get(selectedNodeId.$) || null
-			: null;
+		return null;
 	});
-
-	const session = valoo<ProfilerSession>({ commits: [], nodes: new Map() });
 
 	// Flamegraph
 	const flamegraphType = valoo(FlamegraphType.FLAMEGRAPH);
-	flamegraphType.on(type => {
-		selectedNodeId.$ =
-			type === FlamegraphType.FLAMEGRAPH && activeCommit.$
-				? activeCommit.$.rootId
-				: -1;
+	flamegraphType.on(mode => {
+		if (mode === FlamegraphType.RANKED) {
+			if (!activeCommit.$.rendered.has(selectedNodeId.$)) {
+				selectedNodeId.$ = getFirstNode(activeCommit.$, mode);
+			}
+		} else if (!activeCommit.$.nodes.has(selectedNodeId.$)) {
+			selectedNodeId.$ = getFirstNode(activeCommit.$, mode);
+		}
 	});
 
 	// Recording
@@ -134,84 +124,37 @@ export function createProfiler(): ProfilerState {
 		// a new recording starts.
 		if (v) {
 			commits.$ = [];
+			nodes.$ = new Map();
 			activeCommitIdx.$ = 0;
-			selectedNodeId.$ = 0;
+			selectedNodeId.$ = -1;
 		} else {
 			// Reset selection when recording stopped
 			// and new profiling data was collected.
 			if (commits.$.length > 0) {
-				selectedNodeId.$ =
-					flamegraphType.$ === FlamegraphType.FLAMEGRAPH
-						? commits.$[0].rootId
-						: commits.$[0].commitRootId;
+				selectedNodeId.$ = getFirstNode(commits.$[0], flamegraphType.$);
 			}
 		}
 	});
 
 	// Render reasons
 	const activeReason = watch(() => {
-		if (activeCommit.$ !== null) {
-			const commitId = activeCommit.$.commitRootId;
-			const reason = renderReasons.$.get(commitId);
-			if (reason) {
-				return reason.get(selectedNodeId.$) || null;
-			}
-		}
-
 		return null;
-	});
-
-	const flamegraphNodes2 = watch(() => {
-		const commit = activeCommit.$;
-		if (!commit || flamegraphType.$ !== FlamegraphType.FLAMEGRAPH) {
-			return [];
-		}
-
-		return patchTree2(session.$, commit);
-	});
-
-	// FlamegraphNode
-	const flamegraphNodes = watch<FlameTree>(() => {
-		const commit = activeCommit.$;
-		if (!commit || flamegraphType.$ !== FlamegraphType.FLAMEGRAPH) {
-			return new Map();
-		}
-
-		let prevCommit = null;
-		for (let i = activeCommitIdx.$ - 1; i >= 0; i--) {
-			if (i >= commits.$.length) {
-				return new Map();
-			}
-
-			const search = commits.$[i];
-			if (search.rootId === commit.rootId) {
-				prevCommit = search;
-				break;
-			}
-		}
-
-		return new Map();
-
-		return patchTree(prevCommit, commit);
-	});
-
-	const rankedNodes = watch<NodeTransform[]>(() => {
-		const commit = activeCommit.$;
-		if (!commit || flamegraphType.$ !== FlamegraphType.RANKED) {
-			return [];
-		}
-
-		return toTransform(commit);
 	});
 
 	return {
 		supportsRenderReasons,
 		captureRenderReasons,
 		setRenderReasonCapture,
-		highlightUpdates: showUpdates,
+		currentSelfDurations,
+		highlightUpdates,
 		isSupported,
 		isRecording,
+
+		// The actual data
 		commits,
+		nodes,
+
+		// Derived data
 		activeCommitIdx,
 		activeCommit,
 		renderReasons,
@@ -221,101 +164,59 @@ export function createProfiler(): ProfilerState {
 
 		// Rendering
 		flamegraphType,
-		flamegraphNodes,
-		flamegraphNodes2,
-		rankedNodes,
-		session,
 	};
 }
 
-export function stopProfiling(state: ProfilerState) {
+export function stopProfiling(state: ProfilerStore) {
 	state.isRecording.$ = false;
 	state.activeCommitIdx.$ = 0;
 	state.selectedNodeId.$ = -1;
 }
 
-export function resetProfiler(state: ProfilerState) {
+export function resetProfiler(state: ProfilerStore) {
 	stopProfiling(state);
 	state.commits.$ = [];
+	state.nodes.$ = new Map();
 }
 
 export function recordProfilerCommit(
 	tree: Map<ID, DevNode>,
-	profiler: ProfilerState,
-	commitRootId: number,
+	profiler: ProfilerStore,
+	rendered: ID[],
+	reasons: RenderReasonMap,
 ) {
-	const commitRoot = tree.get(commitRootId)!;
+	const shared = profiler.nodes.$;
 
-	const nodes = new Map<ID, DevNode>();
+	const pNodes = new Map<ID, ProfilerNode>();
 
-	// The time of the node that took the longest to render
-	let maxSelfDuration = 0;
-	const selfDurations = new Map<ID, number>();
+	for (let i = 0; i < rendered.length; i++) {
+		const id = rendered[i];
 
-	let totalCommitDuration = 0;
-	const start = commitRoot.startTime;
+		const node = tree.get(id);
+		if (!node) continue; // Should never happen
 
-	let stack = [commitRootId];
-	let item;
-	while ((item = stack.pop())) {
-		const node = tree.get(item);
-		if (!node) continue;
-		nodes.set(node.id, node);
-
-		if (node.startTime >= start) {
-			const next = node.endTime - commitRoot.startTime;
-			if (next >= totalCommitDuration) {
-				totalCommitDuration = next;
-			}
+		if (!shared.has(id)) {
+			shared.set(id, {
+				id,
+				hocs: node.hocs,
+				name: node.name,
+			});
 		}
-
-		let selfDuration = node.endTime - node.startTime;
-
-		for (let i = 0; i < node.children.length; i++) {
-			const childId = node.children[i];
-			const child = tree.get(childId)!;
-
-			if (child.startTime > node.startTime) {
-				selfDuration -= child.endTime - child.startTime;
-			}
-
-			stack.push(childId);
-		}
-
-		if (selfDuration > maxSelfDuration) {
-			maxSelfDuration = selfDuration;
-		}
-
-		selfDurations.set(node.id, selfDuration);
+		pNodes.set(id, {
+			id,
+			children: node.children.slice(),
+			parent: node.parent,
+		});
 	}
 
-	// Traverse nodes not part of the current commit
-	const rootId = getRoot(tree, commitRootId);
-	stack = [rootId];
-	while ((item = stack.pop())) {
-		if (item === commitRootId) continue;
-
-		const node = tree.get(item);
-		if (!node) continue;
-		nodes.set(node.id, node);
-
-		stack.push(...node.children);
-	}
-
-	// Very useful to grab test cases from live websites
-	// console.groupCollapsed("patch");
-	// console.log("====", commitRoot.name, commitRootId);
-	// console.log(JSON.stringify(Array.from(nodes.values())));
-	// console.groupEnd();
-
-	profiler.commits.update(arr => {
-		arr.push({
-			rootId: getRoot(tree, commitRootId),
-			commitRootId: commitRootId,
-			nodes,
-			maxSelfDuration,
-			duration: totalCommitDuration,
-			selfDurations,
+	profiler.commits.update(commits => {
+		commits.push({
+			selfDurations: profiler.currentSelfDurations,
+			rendered: new Set(rendered),
+			start: 0, // TODO: For timeline
+			nodes: pNodes,
+			firstId: rendered[0],
+			reasons,
 		});
 	});
 }

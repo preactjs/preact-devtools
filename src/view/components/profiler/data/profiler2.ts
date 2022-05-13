@@ -1,5 +1,5 @@
+import { RenderReasonMap } from "../../../../adapter/shared/renderReasons";
 import { ID } from "../../../store/types";
-import { CommitData } from "./commits";
 
 export interface ProfilerNodeShared {
 	id: ID;
@@ -11,19 +11,15 @@ export type ProfilerNode = {
 	id: ID;
 	parent: ID;
 	children: ID[];
-	start: number;
-	width: number;
-	selfDuration: number;
 };
 
 export interface ProfilerCommit {
 	start: number;
-	timings: Map<ID, ProfilerNode>;
-}
-
-export interface ProfilerSession {
-	nodes: Map<ID, ProfilerNodeShared>;
-	commits: ProfilerCommit[];
+	selfDurations: Map<ID, number>;
+	rendered: Set<ID>;
+	reasons: RenderReasonMap;
+	firstId: ID;
+	nodes: Map<ID, ProfilerNode>;
 }
 
 export function patchTree2(
@@ -62,7 +58,8 @@ export function patchTree2(
 			});
 		}
 
-		const width = node.endTime - node.startTime;
+		// FIXME
+		const width = 0;
 
 		// Get end of previous sibling or parent start
 		let start = 0;
@@ -96,13 +93,6 @@ export function patchTree2(
 			}
 		}
 
-		let selfDuration = width;
-		for (let i = 0; i < node.children.length; i++) {
-			const child = timings.get(node.children[i]);
-			if (!child) continue;
-			selfDuration -= child.width;
-		}
-
 		console.log(
 			`   --> <%c${node.name}%c /> %c${start}ms ${width}ms`,
 			"color: violet",
@@ -112,7 +102,6 @@ export function patchTree2(
 		timings.set(node.id, {
 			id: node.id,
 			width,
-			selfDuration,
 			parent: node.parent,
 			children: node.children.slice(),
 			name: node.name,

@@ -3,7 +3,7 @@ import { RendererConfig } from "./renderer";
 import { HookType } from "./hooks";
 import { RenderReasonData } from "./renderReasons";
 import { IdMappingState } from "./idMapper";
-import { VNodeTimings } from "./timings";
+import { ID } from "../../view/store/types";
 
 // These hook types are declared in "preact/hooks/src/internal" but not very
 // complete, so for now loosely declare locally.
@@ -46,7 +46,7 @@ export interface PreactBindings<T extends SharedVNode = SharedVNode> {
 	getRenderReasonPost(
 		ids: IdMappingState<T>,
 		bindings: PreactBindings<T>,
-		timings: VNodeTimings,
+		selfDurations: Map<ID, number>,
 		old: T | null,
 		next: T | null,
 	): RenderReasonData | null;

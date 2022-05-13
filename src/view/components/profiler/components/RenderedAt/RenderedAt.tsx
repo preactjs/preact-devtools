@@ -9,24 +9,8 @@ export function RenderedAt() {
 	const data = useObserver(() => {
 		const id = store.profiler.selectedNodeId.$;
 
-		return store.profiler.commits.$.filter(x => {
-			if (x.nodes.has(id)) {
-				const node = x.nodes.get(id)!;
-				const root = x.nodes.get(x.commitRootId)!;
-				return node.startTime >= root.startTime && node.endTime <= root.endTime;
-			}
-
-			return false;
-		}).map(commit => {
-			const node = commit.nodes.get(id)!;
-
-			const selfDuration = commit.selfDurations.get(id) || 0;
-			return {
-				index: store.profiler.commits.$.findIndex(x => x === commit),
-				startTime: node.startTime,
-				selfDuration,
-			};
-		});
+		// FIXME:
+		return [];
 	});
 
 	const commitIdx = useObserver(() => store.profiler.activeCommitIdx.$);
@@ -37,25 +21,25 @@ export function RenderedAt() {
 		<SidebarPanel title="Rendered at:">
 			{data.length <= 0 ? (
 				<Empty>Did not render during this profiling session</Empty>
-			) : (
-				<nav data-testid="rendered-at">
-					{data.map(node => {
-						return (
-							<button
-								key={node.index}
-								class={s.item}
-								data-active={commitIdx === node.index}
-								onClick={() => (store.profiler.activeCommitIdx.$ = node.index)}
-							>
-								<span>
-									{formatTime(node.startTime / 1000)} for{" "}
-									{formatTime(node.selfDuration)}
-								</span>
-							</button>
-						);
-					})}
-				</nav>
-			)}
+			) : // <nav data-testid="rendered-at">
+			// 	{data.map((node,i) => {
+			// 		return (
+			// 			<button
+			// 				key={i}
+			// 				class={s.item}
+			// 				data-active={commitIdx === node.index}
+			// 				onClick={() => (store.profiler.activeCommitIdx.$ = node.index)}
+			// 			>
+			// 				<span>
+			// 					{}
+			// 					{formatTime(node.startTime / 1000)} for{" "}
+			// 					{formatTime(node.selfDuration)}
+			// 				</span>
+			// 			</button>
+			// 		);
+			// 	})}
+			// </nav>
+			null}
 		</SidebarPanel>
 	);
 }

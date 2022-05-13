@@ -33,7 +33,7 @@ export function setupMockHook(options: Options) {
 		bindingsV10,
 		{
 			start: new Map(),
-			end: new Map(),
+			selfDurations: new Map(),
 		},
 	);
 	const destroy = setupOptionsV10(options, renderer, {

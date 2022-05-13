@@ -12,13 +12,19 @@ import { ParsedStats, parseStats } from "../shared/stats";
  *
  * We currently expect all operations to be in order.
  */
-export function ops2Tree(oldTree: Tree, existingRoots: ID[], ops: number[]) {
+export function ops2Tree(
+	oldTree: Tree,
+	selfDurations: Map<ID, number>,
+	existingRoots: ID[],
+	ops: number[],
+) {
 	const pending: Tree = new Map(oldTree);
 	const rootId = ops[0];
 	const roots: ID[] = [...existingRoots];
 	const removals: ID[] = [];
 	const reasons: RenderReasonMap = new Map();
 	let stats: ParsedStats | null = null;
+	const rendered: ID[] = [];
 
 	let i = ops[1] + 1;
 	const strings = parseTable(ops.slice(1, i + 1));
@@ -48,20 +54,21 @@ export function ops2Tree(oldTree: Tree, existingRoots: ID[], ops: number[]) {
 					parent: parentId,
 					type: ops[i + 2],
 					key: ops[i + 6] > 0 ? strings[ops[i + 6] - 1] : "",
-					startTime: ops[i + 7] / 1000,
-					endTime: ops[i + 8] / 1000,
 				});
-				i += 8;
+
+				selfDurations.set(id, ops[i + 7] / 1000);
+				rendered.push(id);
+
+				i += 7;
 				break;
 			}
 			case MsgTypes.UPDATE_VNODE_TIMINGS: {
 				const id = ops[i + 1];
-				pending.set(id, deepClone(pending.get(id)!));
-				const x = pending.get(id)!;
-				x.startTime = ops[i + 2] / 1000;
-				x.endTime = ops[i + 3] / 1000;
 
-				i += 3;
+				selfDurations.set(id, ops[i + 2] / 1000);
+				rendered.push(id);
+
+				i += 2;
 				break;
 			}
 			case MsgTypes.REMOVE_VNODE: {
@@ -98,10 +105,12 @@ export function ops2Tree(oldTree: Tree, existingRoots: ID[], ops: number[]) {
 							if (!child) continue;
 
 							pending.delete(child.id);
+							selfDurations.delete(child.id);
 							stack.push(...child.children);
 						}
 
 						pending.delete(nodeId);
+						selfDurations.delete(nodeId);
 					}
 				}
 
@@ -159,5 +168,7 @@ export function ops2Tree(oldTree: Tree, existingRoots: ID[], ops: number[]) {
 		}
 	}
 
-	return { rootId, roots, tree: pending, removals, reasons, stats };
+	console.log({ rendered });
+
+	return { rootId, roots, tree: pending, removals, reasons, stats, rendered };
 }

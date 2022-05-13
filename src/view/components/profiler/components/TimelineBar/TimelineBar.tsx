@@ -7,32 +7,47 @@ import { RecordIcon, NotInterested, Refresh } from "../../../icons";
 import s from "../../../elements/TreeBar.module.css";
 import { useCallback } from "preact/hooks";
 import { FlameGraphMode } from "../../flamegraph/FlameGraphMode";
-import { resetProfiler } from "../../data/commits";
+import { getFirstNode, resetProfiler } from "../../data/commits";
+import { ProfilerCommit } from "../../data/profiler2";
+
+export function getCommitDuration({ rendered, selfDurations }: ProfilerCommit) {
+	return Array.from(rendered).reduce((acc, id) => {
+		if (!selfDurations.has(id)) {
+			console.log({ rendered, selfDurations, id });
+		}
+		return acc + selfDurations.get(id)!;
+	}, 0);
+}
 
 export function TimelineBar() {
 	const store = useStore();
-	const commits = useObserver(() => store.profiler.commits.$);
+	const { durations, max, min } = useObserver(() => {
+		const commits = store.profiler.commits.$;
+		const durations = commits.map(commit => getCommitDuration(commit));
+
+		return {
+			durations,
+			max: Math.max(16, ...durations),
+			min: Math.max(0, Math.min(...durations)),
+		};
+	});
 	const isRecording = useObserver(() => store.profiler.isRecording.$);
 	const isSupported = useObserver(() => store.profiler.isSupported.$);
 	const selectedCommit = useObserver(() => store.profiler.activeCommitIdx.$);
-	const stats = useObserver(() => {
-		return {
-			max: Math.max(16, ...store.profiler.commits.$.map(x => x.duration)),
-			min: Math.max(
-				0,
-				Math.min(...store.profiler.commits.$.map(x => x.duration)),
-			),
-		};
-	});
 
 	const onCommitChange = useCallback(
 		(n: number) => {
-			const { activeCommitIdx, selectedNodeId, activeCommit } = store.profiler;
+			const {
+				activeCommitIdx,
+				selectedNodeId,
+				activeCommit,
+				flamegraphType,
+			} = store.profiler;
 
 			activeCommitIdx.$ = n;
 
 			if (activeCommit.$ && !activeCommit.$.nodes.has(selectedNodeId.$)) {
-				selectedNodeId.$ = activeCommit.$.rootId;
+				selectedNodeId.$ = getFirstNode(activeCommit.$, flamegraphType.$);
 			}
 		},
 		[store],
@@ -68,7 +83,7 @@ export function TimelineBar() {
 			<div class={s.btnWrapper}>
 				<IconBtn
 					title="Clear profiling data"
-					disabled={!isSupported || commits.length === 0 || isRecording}
+					disabled={!isSupported || durations.length === 0 || isRecording}
 					onClick={onReset}
 				>
 					<NotInterested size="s" />
@@ -79,10 +94,8 @@ export function TimelineBar() {
 			<ActionSeparator />
 			{isSupported && !isRecording && (
 				<CommitTimeline
-					items={commits.map(commit => {
-						const percent =
-							((commit.duration - stats.min) * 100) /
-							(stats.max - stats.min || 0.1);
+					items={durations.map(duration => {
+						const percent = ((duration - min) * 100) / (max - min || 0.1);
 						return percent;
 					})}
 					selected={selectedCommit}
@@ -107,8 +120,6 @@ export function RecordBtn() {
 			store.emit("start-profiling", {
 				captureRenderReasons: captureRenderReasons.$,
 			});
-		} else {
-			store.emit("stop-profiling", null);
 		}
 	}, [store]);
 

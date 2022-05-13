@@ -177,7 +177,7 @@ export function setupOptionsV11(
 
 	options.diffed = internal => {
 		if (internal.flags & TYPE_COMPONENT) {
-			timings.end.set(internal, performance.now());
+			timings.selfDurations.set(internal, performance.now());
 			endMark(getDisplayName(internal, config));
 
 			if (profiler.captureRenderReasons) {
@@ -219,7 +219,7 @@ export function setupOptionsV11(
 	options.unmount = internal => {
 		if (prevBeforeUnmount) prevBeforeUnmount(internal);
 		timings.start.delete(internal);
-		timings.end.delete(internal);
+		timings.selfDurations.delete(internal);
 		renderer.onUnmount(internal);
 	};
 

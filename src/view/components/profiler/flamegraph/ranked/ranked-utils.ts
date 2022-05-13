@@ -13,8 +13,7 @@ export function toTransform(commit: CommitData): NodeTransform[] {
 
 	return Array.from(commit.selfDurations.entries())
 		.filter(data => {
-			const node = commit.nodes.get(data[0])!;
-			return node.startTime >= commitRoot.startTime;
+			return 0;
 		})
 		.sort((a, b) => b[1] - a[1])
 		.map((data, i) => {

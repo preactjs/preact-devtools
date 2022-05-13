@@ -5,7 +5,7 @@ import { createFilterStore } from "./filter";
 import { createSelectionStore } from "./selection";
 import { Collapser } from "./collapser";
 import { EmitFn, DevtoolEvents } from "../../adapter/hook";
-import { ProfilerState } from "../components/profiler/data/commits";
+import { ProfilerStore } from "../components/profiler/data/commits";
 import { PropData } from "../components/sidebar/inspect/parseProps";
 import { ParsedStats } from "../../adapter/shared/stats";
 
@@ -41,10 +41,6 @@ export interface DevNode {
 
 	// Display (Elements + Profiler)
 	depth: number;
-
-	// Raw absolute timing data.
-	startTime: number;
-	endTime: number;
 }
 
 export type Theme = "auto" | "light" | "dark";
@@ -68,7 +64,7 @@ export interface Store {
 	debugMode: Observable<boolean>;
 	activePanel: Observable<Panel>;
 	notify: EmitFn;
-	profiler: ProfilerState;
+	profiler: ProfilerStore;
 	isPicking: Observable<boolean>;
 	inspectData: Observable<InspectData | null>;
 	roots: Observable<ID[]>;

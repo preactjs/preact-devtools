@@ -42,9 +42,7 @@ export function DebugProfilerInfo() {
 				</dd>
 				<br />
 				<dt class={s.title}>real:</dt>
-				<dd class={s.value}>
-					<TimeRange from={selected.startTime} to={selected.endTime} />
-				</dd>
+				<dd class={s.value}></dd>
 			</dl>
 		</SidebarPanel>
 	);

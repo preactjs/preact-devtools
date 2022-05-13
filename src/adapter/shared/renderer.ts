@@ -20,7 +20,6 @@ import { createCommit, shouldFilter } from "../shared/traverse";
 import { PreactBindings, SharedVNode } from "../shared/bindings";
 import { inspectVNode } from "./inspectVNode";
 import { logVNode } from "../10/log";
-import { VNodeTimings } from "./timings";
 import { printCommit } from "../debug";
 
 export interface RendererConfig {
@@ -68,7 +67,6 @@ export function createRenderer<T extends SharedVNode>(
 	filters: FilterState,
 	ids: IdMappingState<T>,
 	bindings: PreactBindings<T>,
-	timings: VNodeTimings,
 ): Renderer<T> {
 	const roots = new Set<T>();
 
@@ -216,7 +214,6 @@ export function createRenderer<T extends SharedVNode>(
 					config,
 					profiler,
 					bindings,
-					timings,
 					{ start: new Map(), end: new Map() },
 					null,
 				);
@@ -237,7 +234,6 @@ export function createRenderer<T extends SharedVNode>(
 				config,
 				profiler,
 				bindings,
-				timings,
 				timingsByVNode,
 				renderReasonPre,
 			);

@@ -27,6 +27,8 @@ function getReasonName(reason: RenderReason) {
 export function RenderReasons() {
 	const store = useStore();
 	const isRecording = useObserver(() => store.profiler.isRecording.$);
+	// FIXME
+	return null;
 	const commits = useObserver(() => store.profiler.commits.$);
 	const reason = useObserver(() => store.profiler.activeReason.$);
 	const commit = useObserver(() => store.profiler.activeCommit.$);
@@ -47,9 +49,8 @@ export function RenderReasons() {
 		const root = commit.nodes.get(commit.commitRootId);
 		if (
 			root &&
-			selected &&
-			selected.startTime >= root.startTime &&
-			selected.endTime <= root.endTime
+			selected
+			// FIXME: Get another way to detect if the node rendered
 		) {
 			rendered = true;
 		}

@@ -1,3 +1,4 @@
+import { ID } from "../../view/store/types";
 import { UpdateRects } from "./highlightUpdates";
 
 export interface ProfilerState {
@@ -7,6 +8,7 @@ export interface ProfilerState {
 	updateRects: UpdateRects;
 	captureRenderReasons: boolean;
 	recordStats: boolean;
+	selfDurations: Map<ID, number>;
 }
 
 export function newProfiler(): ProfilerState {
@@ -17,5 +19,6 @@ export function newProfiler(): ProfilerState {
 		captureRenderReasons: false,
 		isProfiling: false,
 		recordStats: false,
+		selfDurations: new Map(),
 	};
 }
