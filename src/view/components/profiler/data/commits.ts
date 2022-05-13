@@ -97,7 +97,7 @@ export function createProfiler(): ProfilerStore {
 
 	// Selection
 	const activeCommitIdx = valoo(0);
-	const activeCommit = watch(() => {
+	const activeCommit = watch<ProfilerCommit | null>(() => {
 		return commits.$[activeCommitIdx.$] || null;
 	});
 	const selectedNodeId = valoo(0);
@@ -108,6 +108,10 @@ export function createProfiler(): ProfilerStore {
 	// Flamegraph
 	const flamegraphType = valoo(FlamegraphType.FLAMEGRAPH);
 	flamegraphType.on(mode => {
+		if (activeCommit.$ === null) {
+			return;
+		}
+
 		if (mode === FlamegraphType.RANKED) {
 			if (!activeCommit.$.rendered.has(selectedNodeId.$)) {
 				selectedNodeId.$ = getFirstNode(activeCommit.$, mode);
