@@ -261,19 +261,20 @@ export function HocLabels({
 	nodeId,
 	canMark = true,
 }: {
-	hocs: string[];
+	hocs: string[] | null;
 	nodeId: number;
 	canMark?: boolean;
 }) {
 	return (
 		<span class={s.hocs} data-testid="hoc-labels">
-			{hocs.map((hoc, i) => {
-				return (
-					<Hoc key={i} small>
-						{canMark ? <MarkResult text={hoc} id={nodeId} /> : hoc}
-					</Hoc>
-				);
-			})}
+			{hocs &&
+				hocs.map((hoc, i) => {
+					return (
+						<Hoc key={i} small>
+							{canMark ? <MarkResult text={hoc} id={nodeId} /> : hoc}
+						</Hoc>
+					);
+				})}
 		</span>
 	);
 }

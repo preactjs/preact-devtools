@@ -9,6 +9,12 @@ import { FlameNodeTransform } from "../flamegraph/modes/flamegraph-utils";
 import { FlameTree, patchTree } from "../flamegraph/modes/patchTree";
 import { NodeTransform } from "../flamegraph/shared";
 import { toTransform } from "../flamegraph/ranked/ranked-utils";
+import {
+	patchTree2,
+	ProfilerCommit,
+	ProfilerNode,
+	ProfilerSession,
+} from "./profiler2";
 
 export interface CommitData {
 	/** Id of the tree's root node */
@@ -68,6 +74,10 @@ export interface ProfilerState {
 	// Flamegraph mode
 	flamegraphNodes: Observable<Map<ID, FlameNodeTransform>>;
 	rankedNodes: Observable<NodeTransform[]>;
+
+	// NEW
+	flamegraphNodes2: Observable<ProfilerCommit>;
+	session: Observable<ProfilerSession>;
 }
 
 /**
@@ -77,6 +87,11 @@ export interface ProfilerState {
 export function createProfiler(): ProfilerState {
 	const commits = valoo<CommitData[]>([]);
 	const isSupported = valoo(false);
+
+	watch(() => {
+		commits.$;
+		console.trace("COMMIT");
+	});
 
 	// Render Reasons
 	const supportsRenderReasons = valoo(false);
@@ -100,6 +115,8 @@ export function createProfiler(): ProfilerState {
 			? activeCommit.$.nodes.get(selectedNodeId.$) || null
 			: null;
 	});
+
+	const session = valoo<ProfilerSession>({ commits: [], nodes: new Map() });
 
 	// Flamegraph
 	const flamegraphType = valoo(FlamegraphType.FLAMEGRAPH);
@@ -144,6 +161,15 @@ export function createProfiler(): ProfilerState {
 		return null;
 	});
 
+	const flamegraphNodes2 = watch(() => {
+		const commit = activeCommit.$;
+		if (!commit || flamegraphType.$ !== FlamegraphType.FLAMEGRAPH) {
+			return [];
+		}
+
+		return patchTree2(session.$, commit);
+	});
+
 	// FlamegraphNode
 	const flamegraphNodes = watch<FlameTree>(() => {
 		const commit = activeCommit.$;
@@ -163,6 +189,8 @@ export function createProfiler(): ProfilerState {
 				break;
 			}
 		}
+
+		return new Map();
 
 		return patchTree(prevCommit, commit);
 	});
@@ -194,7 +222,9 @@ export function createProfiler(): ProfilerState {
 		// Rendering
 		flamegraphType,
 		flamegraphNodes,
+		flamegraphNodes2,
 		rankedNodes,
+		session,
 	};
 }
 
