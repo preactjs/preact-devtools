@@ -6,7 +6,6 @@ import { FlamegraphType } from "../data/commits";
 import { useResize } from "../../utils";
 import { RankedLayout } from "./ranked/RankedLayout";
 import { FlamegraphLayout } from "./modes/FlamegraphLayout";
-import { EMPTY } from "./placeNodes";
 import { debounce } from "../../../../shells/shared/utils";
 import { EmitFn } from "../../../../adapter/hook";
 import { ID } from "../../../store/types";

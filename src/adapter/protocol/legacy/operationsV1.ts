@@ -1,7 +1,7 @@
 import { MsgTypes } from "../events";
 import { parseTable } from "../string-table";
 import { Store } from "../../../view/store/types";
-import { deepClone } from "../../../view/components/profiler/flamegraph/modes/adjustNodesToRight";
+import { deepClone } from "../../shared/utils";
 
 export function applyOperationsV1(store: Store, data: number[]) {
 	const nodes = new Map(store.nodes.$);
@@ -54,8 +54,6 @@ export function applyOperationsV1(store: Store, data: number[]) {
 						parent: parentId,
 						type,
 						key,
-						startTime: -1,
-						endTime: -1,
 					});
 				}
 				i += 6;

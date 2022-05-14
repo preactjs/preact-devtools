@@ -10,9 +10,9 @@ function Foo() {
 	return <FooInner />;
 }
 
-function BarInner() {
+const BarInner = memo(() => {
 	return <p>Bar</p>;
-}
+});
 
 function Bar({ v }) {
 	let innerElements = [];

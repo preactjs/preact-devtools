@@ -208,7 +208,7 @@ export function getNextState<S>(c: Component): S {
 }
 
 export function setNextState<S>(c: Component, value: S): S {
-	return ((c as IComponent)._nextState = (c as any).__s = value);
+	return ((c as any)._nextState = (c as any).__s = value);
 }
 
 function getSuspenseStateKey(c: Component<any, any>) {

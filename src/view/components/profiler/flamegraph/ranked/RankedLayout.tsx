@@ -42,9 +42,10 @@ export function RankedLayout({
 	}, [commit]);
 
 	// Apply "zooming"
-	const { maximizedIdx, placed } = useMemo(() => {
-		let idx = 0;
+	const { maximizedIdx, commitParentIdx, placed } = useMemo(() => {
+		let maximizedIdx = 0;
 		let maximized = true;
+		let commitParentIdx = 0;
 		let factor = 1;
 		const placed = original.map((pos, i) => {
 			const width = maximized ? canvasWidth : pos.width * factor;
@@ -52,7 +53,11 @@ export function RankedLayout({
 			if (pos.id === selectedId) {
 				maximized = false;
 				factor = canvasWidth / pos.width;
-				idx = i;
+				maximizedIdx = i;
+			}
+
+			if (pos.id === commit.firstId) {
+				commitParentIdx = i;
 			}
 
 			return {
@@ -65,17 +70,11 @@ export function RankedLayout({
 
 		return {
 			placed,
-			maximizedIdx: idx,
+			maximizedIdx,
+			commitParentIdx,
 		};
 	}, [original, selectedId, canvasWidth]);
 
-	console.log({
-		original,
-		placed,
-		maximizedIdx,
-		selectedId,
-		commit,
-	});
 	return (
 		<Fragment>
 			{placed.map((pos, i) => {
@@ -87,8 +86,8 @@ export function RankedLayout({
 						key={pos.id}
 						maximized={i <= maximizedIdx}
 						commitRootId={commit.firstId}
-						commitParent={false}
-						visible={true}
+						commitParent={i === commitParentIdx}
+						visible={pos.start >= 0 && pos.start <= canvasWidth}
 						weight={getGradient(50, selfDuration)}
 						pos={pos}
 						selected={pos.id === selected}

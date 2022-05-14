@@ -48,6 +48,14 @@ export function FlamegraphLayout({
 			parentId = node.parent;
 		}
 
+		parentId = commit.nodes.get(selectedId)!.parent;
+		while (parentId !== -1) {
+			const node = commit.nodes.get(parentId);
+			if (node === undefined) break;
+			maximizedIds.add(parentId);
+			parentId = node.parent;
+		}
+
 		let offset = 0;
 		let scale = 1;
 
@@ -59,11 +67,21 @@ export function FlamegraphLayout({
 
 		return {
 			placed: original.pos.map(pos => {
+				let start;
+				let width;
+				if (maximizedIds.has(pos.id)) {
+					start = 0;
+					width = canvasWidth;
+				} else {
+					start = (pos.start - offset) * scale;
+					width = pos.width * scale;
+				}
+
 				return {
 					id: pos.id,
 					row: pos.row,
-					start: (pos.start - offset) * scale,
-					width: pos.width * scale,
+					start,
+					width,
 				};
 			}),
 			maximizedIds,
@@ -71,33 +89,23 @@ export function FlamegraphLayout({
 		};
 	}, [original, selectedId, canvasWidth]);
 
-	console.log({
-		original,
-		placed,
-		maximizedIds,
-		commitParentIds,
-		selectedId,
-		commit,
-	});
-
 	return (
 		<Fragment>
 			{placed.map(pos => {
 				const meta = shared.get(pos.id)!;
 				const node = commit.nodes.get(pos.id)!;
-				const selfDuration = commit.selfDurations.get(pos.id) || 0;
+				const selfDuration = commit.selfDurations.get(pos.id)!;
 
 				let weight = -1;
 				let appendix = "";
-				if (!commitParentIds.has(pos.id)) {
+				if (!commitParentIds.has(pos.id) && commit.rendered.has(pos.id)) {
 					weight = getGradient(50, selfDuration);
 					const totalDuration =
 						selfDuration +
 						node.children.reduce((acc, id) => {
 							return acc + commit.selfDurations.get(id)!;
 						}, 0);
-					commit.selfDurations;
-					const self = formatTime(100);
+					const self = formatTime(selfDuration);
 					const total = formatTime(totalDuration);
 					appendix = ` (${self} of ${total})`;
 				}
@@ -105,10 +113,10 @@ export function FlamegraphLayout({
 				return (
 					<FlameNode
 						key={pos.id}
-						maximized={false}
+						maximized={maximizedIds.has(pos.id)}
 						commitRootId={commit.firstId}
 						commitParent={commitParentIds.has(pos.id)}
-						visible={true}
+						visible={pos.start >= 0 && pos.start <= canvasWidth}
 						weight={weight}
 						pos={pos}
 						selected={pos.id === selected}

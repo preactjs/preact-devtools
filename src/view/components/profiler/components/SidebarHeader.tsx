@@ -14,30 +14,35 @@ import { DevNodeType } from "../../../store/types";
 
 export function SidebarHeader() {
 	const store = useStore();
-	const selected = useObserver(() => store.profiler.selectedNode.$);
+	const selectedId = useObserver(() => store.profiler.derivedSelectedNodeId.$);
+	const selectedNode = useObserver(() => {
+		const id = store.profiler.derivedSelectedNodeId.$;
+		return store.profiler.nodes.$.get(id);
+	});
+
 	const emit = useEmitter();
 	const log = useCallback(() => {
-		if (selected) emit("log", { id: selected.id });
-	}, [selected]);
+		if (selectedId) emit("log", { id: selectedId });
+	}, [selectedId]);
 	const inspectHostNode = useCallback(() => {
 		emit("inspect-host-node", null);
 	}, []);
 	const viewSource = useCallback(() => {
-		if (selected) {
-			emit("view-source", selected.id);
+		if (selectedId) {
+			emit("view-source", selectedId);
 		}
-	}, [selected]);
+	}, [selectedId]);
 
 	const canViewSource =
-		selected &&
-		selected.type !== DevNodeType.Group &&
-		selected.type !== DevNodeType.Element;
+		selectedNode &&
+		selectedNode.type !== DevNodeType.Group &&
+		selectedNode.type !== DevNodeType.Element;
 
 	return (
 		<Actions class={s.actions}>
-			<ComponentName>{selected && selected.name}</ComponentName>
+			<ComponentName>{selectedNode && selectedNode.name}</ComponentName>
 			<div class={s.iconActions}>
-				{selected && (
+				{selectedId && (
 					<Fragment>
 						<IconBtn
 							title="Show matching DOM element"

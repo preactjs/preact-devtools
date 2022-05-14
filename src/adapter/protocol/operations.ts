@@ -1,9 +1,9 @@
 import { ID, Tree } from "../../view/store/types";
 import { parseTable } from "./string-table";
 import { MsgTypes } from "./events";
-import { deepClone } from "../../view/components/profiler/flamegraph/modes/adjustNodesToRight";
 import { RenderReasonMap } from "../shared/renderReasons";
 import { ParsedStats, parseStats } from "../shared/stats";
+import { deepClone } from "../shared/utils";
 
 /**
  * This is the heart of the devtools. Here we translate incoming events

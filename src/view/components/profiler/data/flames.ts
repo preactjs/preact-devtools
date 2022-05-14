@@ -38,7 +38,7 @@ export function layoutFlameGraph(
 
 	const pos: Position[] = [];
 	const idToPos = new Map<ID, Position>();
-	placeNode(commit, pos, idToPos, rootId, 0, 0);
+	placeNode(commit, pos, idToPos, rootId, 0);
 
 	return { pos, idToPos };
 }
@@ -49,33 +49,35 @@ function placeNode(
 	idToPos: Map<ID, Position>,
 	id: ID,
 	depth: number,
-	offset: number,
 ) {
-	const nodeSelfDuration = commit.selfDurations.get(id)!;
-	let duration = nodeSelfDuration;
+	const node = commit.nodes.get(id)!;
+	let start = 0;
+	if (node.parent !== -1) {
+		const parentPos = idToPos.get(node.parent)!;
+		start = parentPos.start + parentPos.width;
+	}
+
 	const nodePos: Position = {
 		id,
 		row: depth,
-		start: offset,
-		width: -1,
+		start,
+		width: commit.selfDurations.get(id)!,
 	};
 	pos.push(nodePos);
 	idToPos.set(id, nodePos);
 
-	const node = commit.nodes.get(id)!;
 	for (let i = 0; i < node.children.length; i++) {
 		const childId = node.children[i];
 		const selfDuration = commit.selfDurations.get(childId)!;
-		duration += selfDuration;
-		placeNode(
-			commit,
-			pos,
-			idToPos,
-			childId,
-			depth + 1,
-			offset + nodeSelfDuration,
-		);
-	}
 
-	nodePos.width = duration;
+		placeNode(commit, pos, idToPos, childId, depth + 1);
+
+		// Expand parents upwards by self duration
+		let parentId = id;
+		while (parentId !== -1) {
+			const parent = commit.nodes.get(parentId)!;
+			idToPos.get(parentId)!.width += selfDuration;
+			parentId = parent.parent;
+		}
+	}
 }

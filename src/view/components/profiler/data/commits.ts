@@ -220,7 +220,6 @@ export function recordProfilerCommit(
 		let id;
 		while ((id = stack.pop()) !== undefined) {
 			const node = tree.get(id)!;
-			console.log(`<${node.name} /> ${id}`);
 			shared.set(id, {
 				id,
 				hocs: node.hocs,

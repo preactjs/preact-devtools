@@ -12,9 +12,6 @@ import { ProfilerCommit } from "../../data/profiler2";
 
 export function getCommitDuration({ rendered, selfDurations }: ProfilerCommit) {
 	return Array.from(rendered).reduce((acc, id) => {
-		if (!selfDurations.has(id)) {
-			console.log("MISSING", { rendered, selfDurations, id });
-		}
 		return acc + selfDurations.get(id)!;
 	}, 0);
 }

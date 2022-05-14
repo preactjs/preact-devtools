@@ -27,8 +27,6 @@ function getReasonName(reason: RenderReason) {
 export function RenderReasons() {
 	const store = useStore();
 	const isRecording = useObserver(() => store.profiler.isRecording.$);
-	// FIXME
-	return null;
 	const commits = useObserver(() => store.profiler.commits.$);
 	const reason = useObserver(() => store.profiler.activeReason.$);
 	const commit = useObserver(() => store.profiler.activeCommit.$);
@@ -46,7 +44,7 @@ export function RenderReasons() {
 
 	let rendered = false;
 	if (!captureReason && commit) {
-		const root = commit.nodes.get(commit.commitRootId);
+		const root = commit.nodes.get(commit.firstId);
 		if (
 			root &&
 			selected
