@@ -249,7 +249,9 @@ export function recordProfilerCommit(
 				const parent = pNodes.get(node.parent)!;
 				const idx = parent.children.indexOf(id);
 				if (idx > -1) {
-					const children = parent.children.slice().splice(idx, 1);
+					const children = parent.children.slice();
+					children.splice(idx, 1);
+
 					pNodes.set(node.parent, {
 						id: parent.id,
 						children,
