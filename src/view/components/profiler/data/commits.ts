@@ -5,6 +5,7 @@ import {
 	RenderReasonData,
 } from "../../../../adapter/shared/renderReasons";
 import { ProfilerCommit, ProfilerNode, ProfilerNodeShared } from "./profiler2";
+import { getRoot } from "../flamegraph/FlamegraphStore";
 
 /**
  * The Flamegraph supports these distinct
@@ -43,7 +44,7 @@ export interface ProfilerStore {
 	/** This should be treated as readonly */
 	selectedNodeId: Observable<ID | -1>;
 	derivedSelectedNodeId: Observable<ID | -1>;
-	selectedNode: Observable<ProfilerNodeShared | null>;
+	selectedNode: Observable<ProfilerNode | null>;
 
 	// Render reasons
 	renderReasons: Observable<Map<ID, RenderReasonMap>>;
@@ -59,8 +60,6 @@ export interface ProfilerStore {
 export function getFirstNode(commit: ProfilerCommit, mode: FlamegraphType) {
 	let selId = commit.firstId;
 
-	console.log("FIRST NODE", selId);
-
 	if (mode === FlamegraphType.RANKED) {
 		let selfDuration = -1;
 		commit.rendered.forEach(id => {
@@ -72,8 +71,6 @@ export function getFirstNode(commit: ProfilerCommit, mode: FlamegraphType) {
 				selId = id;
 			}
 		});
-
-		console.log("RANKED", selId);
 	}
 
 	return selId;
@@ -204,32 +201,82 @@ export function resetProfiler(state: ProfilerStore) {
 export function recordProfilerCommit(
 	tree: Map<ID, DevNode>,
 	profiler: ProfilerStore,
+	commitRootId: ID,
 	rendered: ID[],
+	removals: ID[],
 	reasons: RenderReasonMap,
 ) {
 	const shared = profiler.nodes.$;
 
-	const pNodes = new Map<ID, ProfilerNode>();
+	let pNodes: Map<ID, ProfilerNode>;
 
-	for (let i = 0; i < rendered.length; i++) {
-		const id = rendered[i];
-
-		const node = tree.get(id);
-		if (!node) continue; // Should never happen
-
-		if (!shared.has(id)) {
+	// Initially we need to copy the whole tree
+	const commits = profiler.commits.$;
+	const initial = commits.length === 0;
+	if (initial) {
+		pNodes = new Map<ID, ProfilerNode>();
+		const rootId = getRoot(tree, commitRootId);
+		const stack = [rootId];
+		let id;
+		while ((id = stack.pop()) !== undefined) {
+			const node = tree.get(id)!;
+			console.log(`<${node.name} /> ${id}`);
 			shared.set(id, {
 				id,
 				hocs: node.hocs,
 				name: node.name,
 				type: node.type,
 			});
+			pNodes.set(id, {
+				id,
+				children: node.children,
+				parent: node.parent,
+			});
+
+			stack.push(...node.children);
 		}
-		pNodes.set(id, {
-			id,
-			children: node.children.slice(),
-			parent: node.parent,
-		});
+	} else {
+		pNodes = new Map(commits[commits.length - 1].nodes);
+
+		// Drop removals
+		for (let i = 0; i < removals.length; i++) {
+			const id = removals[i];
+			const node = pNodes.get(id);
+			if (node && node.parent !== -1) {
+				const parent = pNodes.get(node.parent)!;
+				const idx = parent.children.indexOf(id);
+				if (idx > -1) {
+					const children = parent.children.slice().splice(idx, 1);
+					pNodes.set(node.parent, {
+						id: parent.id,
+						children,
+						parent: parent.parent,
+					});
+				}
+			}
+			pNodes.delete(id);
+		}
+
+		for (let i = 0; i < rendered.length; i++) {
+			const id = rendered[i];
+
+			const node = tree.get(id);
+			if (!node) continue; // Should never happen
+
+			if (!shared.has(id)) {
+				shared.set(id, {
+					id,
+					hocs: node.hocs,
+					name: node.name,
+					type: node.type,
+				});
+			}
+			pNodes.set(id, {
+				id,
+				children: node.children,
+				parent: node.parent,
+			});
+		}
 	}
 
 	profiler.commits.update(commits => {

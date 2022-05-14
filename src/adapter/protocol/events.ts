@@ -114,6 +114,7 @@ export function applyOperationsV2(store: Store, data: number[]) {
 		reasons,
 		stats,
 		rendered,
+		removals,
 	} = ops2Tree(
 		store.nodes.$,
 		store.profiler.currentSelfDurations,
@@ -135,7 +136,14 @@ export function applyOperationsV2(store: Store, data: number[]) {
 	// If we are profiling, we'll make a frozen copy of the mutable
 	// elements tree because the profiler can step through time
 	if (store.profiler.isRecording.$) {
-		recordProfilerCommit(store.nodes.$, store.profiler, rendered, reasons);
+		recordProfilerCommit(
+			store.nodes.$,
+			store.profiler,
+			commitRootId,
+			rendered,
+			removals,
+			reasons,
+		);
 		store.profiler.renderReasons.update(m => {
 			m.set(commitRootId, reasons);
 		});

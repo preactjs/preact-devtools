@@ -35,12 +35,37 @@ export function FlamegraphLayout({
 		return layoutFlameGraph(commit);
 	}, [commit]);
 
+	// Apply "zoom"
 	const { maximizedIds, commitParentIds, placed } = useMemo(() => {
 		const maximizedIds = new Set<ID>();
 		const commitParentIds = new Set<ID>();
 
+		let parentId = commit.nodes.get(commit.firstId)!.parent;
+		while (parentId !== -1) {
+			const node = commit.nodes.get(parentId);
+			if (node === undefined) break;
+			commitParentIds.add(parentId);
+			parentId = node.parent;
+		}
+
+		let offset = 0;
+		let scale = 1;
+
+		const selectedPos = original.idToPos.get(selectedId);
+		if (selectedPos !== undefined) {
+			offset = selectedPos.start;
+			scale = canvasWidth / selectedPos.width;
+		}
+
 		return {
-			placed: original,
+			placed: original.pos.map(pos => {
+				return {
+					id: pos.id,
+					row: pos.row,
+					start: (pos.start - offset) * scale,
+					width: pos.width * scale,
+				};
+			}),
 			maximizedIds,
 			commitParentIds,
 		};
@@ -62,9 +87,10 @@ export function FlamegraphLayout({
 				const node = commit.nodes.get(pos.id)!;
 				const selfDuration = commit.selfDurations.get(pos.id) || 0;
 
-				const weight = getGradient(50, selfDuration);
+				let weight = -1;
 				let appendix = "";
-				if (!commitParentIds.has(pos.id) && weight !== -1) {
+				if (!commitParentIds.has(pos.id)) {
+					weight = getGradient(50, selfDuration);
 					const totalDuration =
 						selfDuration +
 						node.children.reduce((acc, id) => {
@@ -81,7 +107,7 @@ export function FlamegraphLayout({
 						key={pos.id}
 						maximized={false}
 						commitRootId={commit.firstId}
-						commitParent={false}
+						commitParent={commitParentIds.has(pos.id)}
 						visible={true}
 						weight={weight}
 						pos={pos}

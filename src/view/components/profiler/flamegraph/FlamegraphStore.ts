@@ -13,7 +13,3 @@ export function getRoot<T extends { id: ID; parent: ID }, U extends Map<ID, T>>(
 
 	return last;
 }
-
-export const normalize = (max: number, min: number, x: number) => {
-	return (x - min) / (max - min);
-};

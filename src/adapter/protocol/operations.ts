@@ -168,7 +168,5 @@ export function ops2Tree(
 		}
 	}
 
-	console.log({ rendered });
-
 	return { rootId, roots, tree: pending, removals, reasons, stats, rendered };
 }
