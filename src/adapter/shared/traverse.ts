@@ -403,13 +403,15 @@ function update<T extends SharedVNode>(
 
 	const didRender = timingsByVNode.end.has(vnode);
 
-	const name = bindings.getDisplayName(vnode, config);
-	const hoc = getHocName(name);
-	if (hoc) {
-		hocs = [...hocs, hoc];
-	} else {
-		addHocs(commit, id, hocs);
-		hocs = [];
+	if (filters.type.has("hoc")) {
+		const name = bindings.getDisplayName(vnode, config);
+		const hoc = getHocName(name);
+		if (hoc) {
+			hocs = [...hocs, hoc];
+		} else {
+			addHocs(commit, id, hocs);
+			hocs = [];
+		}
 	}
 
 	let selfDurationIdx = -1;
