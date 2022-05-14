@@ -235,9 +235,6 @@ function mount<T extends SharedVNode>(
 	let id = -1;
 	if (!skip) {
 		id = getOrCreateVNodeId(ids, vnode);
-		if (bindings.isRoot(vnode, config)) {
-			commit.operations.push(MsgTypes.ADD_ROOT, id);
-		}
 
 		const start = timingsByVNode.start.get(vnode) || 0;
 		const end = timingsByVNode.end.get(vnode) || 0;
