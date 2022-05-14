@@ -71,6 +71,8 @@ export function getFirstNode(commit: ProfilerCommit, mode: FlamegraphType) {
 				selId = id;
 			}
 		});
+	} else {
+		selId = getRoot(commit.nodes, commit.firstId);
 	}
 
 	return selId;
