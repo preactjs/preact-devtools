@@ -14,24 +14,23 @@ import { DevNodeType } from "../../../store/types";
 
 export function SidebarHeader() {
 	const store = useStore();
-	const selectedId = useObserver(() => store.profiler.derivedSelectedNodeId.$);
 	const selectedNode = useObserver(() => {
-		const id = store.profiler.derivedSelectedNodeId.$;
+		const id = store.profiler.selectedNodeId.$;
 		return store.profiler.nodes.$.get(id);
 	});
 
 	const emit = useEmitter();
 	const log = useCallback(() => {
-		if (selectedId) emit("log", { id: selectedId });
-	}, [selectedId]);
+		if (selectedNode) emit("log", { id: selectedNode.id });
+	}, [selectedNode]);
 	const inspectHostNode = useCallback(() => {
 		emit("inspect-host-node", null);
 	}, []);
 	const viewSource = useCallback(() => {
-		if (selectedId) {
-			emit("view-source", selectedId);
+		if (selectedNode) {
+			emit("view-source", selectedNode.id);
 		}
-	}, [selectedId]);
+	}, [selectedNode]);
 
 	const canViewSource =
 		selectedNode &&
@@ -42,7 +41,7 @@ export function SidebarHeader() {
 		<Actions class={s.actions}>
 			<ComponentName>{selectedNode && selectedNode.name}</ComponentName>
 			<div class={s.iconActions}>
-				{selectedId && (
+				{selectedNode && (
 					<Fragment>
 						<IconBtn
 							title="Show matching DOM element"
