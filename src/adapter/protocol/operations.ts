@@ -15,12 +15,14 @@ import { deepClone } from "../shared/utils";
 export function ops2Tree(
 	oldTree: Tree,
 	selfDurations: Map<ID, number>,
-	existingRoots: ID[],
+	existingRoots: Map<ID, ID>,
+	existingNodeToRoot: Map<ID, ID>,
 	ops: number[],
 ) {
 	const pending: Tree = new Map(oldTree);
 	const rootId = ops[0];
-	const roots: ID[] = [...existingRoots];
+	const roots: Map<ID, ID> = new Map(existingRoots);
+	const nodeToRoots: Map<ID, ID> = new Map(existingNodeToRoot);
 	const removals: ID[] = [];
 	const reasons: RenderReasonMap = new Map();
 	let stats: ParsedStats | null = null;
@@ -31,10 +33,14 @@ export function ops2Tree(
 
 	for (i += 1; i < ops.length; i++) {
 		switch (ops[i]) {
-			case MsgTypes.ADD_ROOT:
-				roots.push(ops[i + 1]);
-				i += 1;
+			case MsgTypes.ADD_ROOT: {
+				const rootId = ops[i + 1];
+				const mapped = ops[i + 2];
+				roots.set(rootId, mapped);
+				nodeToRoots.set(mapped, rootId);
+				i += 2;
 				break;
+			}
 			case MsgTypes.ADD_VNODE: {
 				const id = ops[i + 1];
 				const parentId = ops[i + 3];
@@ -92,9 +98,9 @@ export function ops2Tree(
 						}
 
 						// Check if node was a root
-						const rootIdx = roots.indexOf(node.id);
-						if (rootIdx > -1) {
-							roots.splice(rootIdx, 1);
+						if (nodeToRoots.has(node.id)) {
+							roots.delete(node.id);
+							nodeToRoots.delete(node.id);
 						}
 
 						// Delete children recursively
@@ -168,5 +174,14 @@ export function ops2Tree(
 		}
 	}
 
-	return { rootId, roots, tree: pending, removals, reasons, stats, rendered };
+	return {
+		rootId,
+		roots,
+		nodeToRoots,
+		tree: pending,
+		removals,
+		reasons,
+		stats,
+		rendered,
+	};
 }

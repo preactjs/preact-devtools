@@ -110,6 +110,7 @@ export function applyOperationsV2(store: Store, data: number[]) {
 	const {
 		rootId: commitRootId,
 		roots,
+		nodeToRoots,
 		tree,
 		reasons,
 		stats,
@@ -119,11 +120,13 @@ export function applyOperationsV2(store: Store, data: number[]) {
 		store.nodes.$,
 		store.profiler.currentSelfDurations,
 		store.roots.$,
+		store.nodeToRoots.$,
 		data,
 	);
 
 	// Update store data
 	store.roots.$ = roots;
+	store.nodeToRoots.$ = nodeToRoots;
 	store.nodes.$ = tree;
 
 	if (store.inspectData.$) {

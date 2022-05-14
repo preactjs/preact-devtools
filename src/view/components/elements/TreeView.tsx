@@ -91,9 +91,9 @@ export function TreeView() {
 	useAutoIndent(paneRef, [listItems]);
 
 	// When the devtools is connected, but nothing has been sent to the panel yet
-	const isOnlyConnected = nodeList.length === 0 && roots.length === 0;
+	const isOnlyConnected = nodeList.length === 0 && roots.size === 0;
 	// When client sent messages, but no nodes were sent due to filters.
-	const hasNoResults = nodeList.length === 0 && roots.length > 0;
+	const hasNoResults = nodeList.length === 0 && roots.size > 0;
 
 	return (
 		<div
@@ -190,7 +190,6 @@ export function TreeItem(props: { key: any; id: ID; top: number }) {
 	const as = useSelection();
 	const { collapsed, toggle } = useCollapser();
 	const node = useObserver(() => store.nodes.$.get(id) || null);
-	const filterRoot = useObserver(() => store.filter.filterRoot.$);
 	const filterHoc = useObserver(() => store.filter.filterHoc.$);
 	const roots = useObserver(() => store.roots.$);
 	const onToggle = () => toggle(id);
@@ -198,7 +197,7 @@ export function TreeItem(props: { key: any; id: ID; top: number }) {
 
 	if (!node) return null;
 
-	const isRoot = node.parent === -1 && roots.includes(node.id);
+	const isRoot = roots.has(node.id);
 
 	return (
 		<div
@@ -218,9 +217,7 @@ export function TreeItem(props: { key: any; id: ID; top: number }) {
 		>
 			<div
 				class={s.itemHeader}
-				style={`transform: translate3d(calc(var(--indent-depth) * ${
-					node.depth + (filterRoot ? -1 : 0)
-				}), 0, 0);`}
+				style={`transform: translate3d(calc(var(--indent-depth) * ${node.depth}), 0, 0);`}
 			>
 				{node.children.length > 0 && (
 					<button

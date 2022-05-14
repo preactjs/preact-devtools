@@ -20,7 +20,8 @@ export function createStore(): Store {
 	const debugMode = valoo(!!process.env.DEBUG);
 
 	const nodes = valoo<Map<ID, DevNode>>(new Map());
-	const roots = valoo<ID[]>([]);
+	const roots = valoo<Map<ID, ID>>(new Map());
+	const nodeToRoot = valoo<Map<ID, ID>>(new Map());
 
 	// Toggle
 	const isPicking = valoo<boolean>(false);
@@ -31,17 +32,16 @@ export function createStore(): Store {
 	const collapser = createCollapser<ID>(collapsed);
 
 	const nodeList = watch(() => {
-		return roots.$.map(root => {
-			const items = flattenChildren<ID, DevNode>(nodes.$, root, id =>
-				collapser.collapsed.$.has(id),
-			);
+		return Array.from(roots.$.values())
+			.sort()
+			.map(root => {
+				const items = flattenChildren<ID, DevNode>(nodes.$, root, id =>
+					collapser.collapsed.$.has(id),
+				);
 
-			if (filterState.filterRoot.$) {
-				return items.slice(1);
-			}
-
-			return items;
-		}).reduce((acc, val) => acc.concat(val), []);
+				return items;
+			})
+			.reduce((acc, val) => acc.concat(val), []);
 	});
 
 	// Sidebar
@@ -113,6 +113,7 @@ export function createStore(): Store {
 		inspectData,
 		isPicking,
 		roots,
+		nodeToRoots: nodeToRoot,
 		nodes,
 		collapser,
 		search: createSearchStore(nodes, nodeList),
@@ -121,7 +122,7 @@ export function createStore(): Store {
 		theme: valoo<Theme>("auto"),
 		sidebar,
 		clear() {
-			roots.$ = [];
+			roots.$ = new Map();
 			nodes.$ = new Map();
 			selection.selected.$ = -1;
 			collapser.collapsed.$ = new Set();

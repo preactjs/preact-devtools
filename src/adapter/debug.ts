@@ -295,8 +295,14 @@ export function printCommit(data: number[]) {
 				}
 				case MsgTypes.ADD_ROOT: {
 					const id = data[i + 1];
-					console.log(`Add Root: %c${id}`, "color: yellow");
-					i++;
+					const mapped = data[i + 2];
+					console.log(
+						`Add Root: %c${id}%c => %c${mapped}`,
+						"color: yellow",
+						"color: inherit",
+						"color: yellow",
+					);
+					i += 2;
 					break;
 				}
 				case MsgTypes.HOC_NODES: {

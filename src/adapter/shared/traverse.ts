@@ -175,12 +175,47 @@ function mount<T extends SharedVNode>(
 	selfDurations: Map<ID, number>,
 	timingsByVNode: VNodeTimings<T>,
 	renderReasonPre: Map<T, RenderReasonData> | null,
-) {
+): ID {
 	if (commit.stats !== null) {
 		commit.stats.mounts++;
 	}
 
 	const root = bindings.isRoot(vnode, config);
+	if (root) {
+		const rootId = getOrCreateVNodeId(ids, vnode);
+		const mappedRootIdx = commit.operations.push(
+			MsgTypes.ADD_ROOT,
+			rootId,
+			rootId,
+		);
+
+		if (filters.type.has("root")) {
+			const children = bindings.getActualChildren(vnode);
+			if (!children.length || children[0] == null) {
+				return rootId;
+			}
+
+			const child = children[0];
+			const childId = mount(
+				ids,
+				commit,
+				child,
+				ancestorId,
+				filters,
+				domCache,
+				config,
+				profiler,
+				hocs,
+				bindings,
+				selfDurations,
+				timingsByVNode,
+				renderReasonPre,
+			);
+
+			commit.operations[mappedRootIdx - 1] = childId;
+			return childId;
+		}
+	}
 
 	const skip = shouldFilter(vnode, filters, config, bindings);
 	let name = bindings.getDisplayName(vnode, config);
@@ -198,7 +233,7 @@ function mount<T extends SharedVNode>(
 
 	let selfDurationIdx = -1;
 	let id = -1;
-	if (root || !skip) {
+	if (!skip) {
 		id = getOrCreateVNodeId(ids, vnode);
 		if (bindings.isRoot(vnode, config)) {
 			commit.operations.push(MsgTypes.ADD_ROOT, id);
@@ -286,6 +321,8 @@ function mount<T extends SharedVNode>(
 		updateDiffStats(commit.stats, diff, childCount);
 		recordComponentStats(config, bindings, commit.stats, vnode, children);
 	}
+
+	return id;
 }
 
 function resetChildren<T extends SharedVNode>(
