@@ -7,7 +7,7 @@ import { formatTime } from "../../util";
 export function RenderedAt() {
 	const store = useStore();
 	const data = useObserver(() => {
-		const id = store.profiler.selectedNodeId.$;
+		const id = store.profiler.derivedSelectedNodeId.$;
 
 		// FIXME:
 		return [];

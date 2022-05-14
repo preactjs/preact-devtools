@@ -21,7 +21,7 @@ export function FlameGraph() {
 	const [canvasWidth, setCanvasWidth] = useState(600);
 
 	const displayType = useObserver(() => store.profiler.flamegraphType.$);
-	const selected = useObserver(() => store.profiler.selectedNodeId.$);
+	const selected = useObserver(() => store.profiler.derivedSelectedNodeId.$);
 	const commit = useObserver(() => store.profiler.activeCommit.$);
 	const isRecording = useObserver(() => store.profiler.isRecording.$);
 	const showDebug = useObserver(() => store.debugMode.$);
@@ -63,26 +63,25 @@ export function FlameGraph() {
 			data-type={displayType.toLowerCase()}
 			style={showDebug ? "overflow-x: auto" : ""}
 		>
-			{
-				displayType === FlamegraphType.RANKED ? (
-					<RankedLayout
-						canvasWidth={canvasWidth}
-						commit={commit!}
-						onSelect={onSelect}
-						selected={selected}
-						onMouseEnter={onMouseEnter}
-						onMouseLeave={onMouseLeave}
-					/>
-				) : null
-				// <FlamegraphLayout
-				// 	canvasWidth={canvasWidth}
-				// 	commit={commit!}
-				// 	onSelect={onSelect}
-				// 	selected={selected}
-				// 	onMouseEnter={onMouseEnter}
-				// 	onMouseLeave={onMouseLeave}
-				// />
-			}
+			{displayType === FlamegraphType.RANKED ? (
+				<RankedLayout
+					canvasWidth={canvasWidth}
+					commit={commit!}
+					onSelect={onSelect}
+					selected={selected}
+					onMouseEnter={onMouseEnter}
+					onMouseLeave={onMouseLeave}
+				/>
+			) : (
+				<FlamegraphLayout
+					canvasWidth={canvasWidth}
+					commit={commit!}
+					onSelect={onSelect}
+					selected={selected}
+					onMouseEnter={onMouseEnter}
+					onMouseLeave={onMouseLeave}
+				/>
+			)}
 		</div>
 	);
 }

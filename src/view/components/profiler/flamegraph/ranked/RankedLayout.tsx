@@ -33,7 +33,7 @@ export function RankedLayout({
 }: RankedLayoutProps) {
 	// Convert node tree to position data
 	const store = useStore();
-	const selectedId = useObserver(() => store.profiler.selectedNodeId.$);
+	const selectedId = useObserver(() => store.profiler.derivedSelectedNodeId.$);
 	const shared = useObserver(() => store.profiler.nodes.$);
 
 	// Build positions
@@ -74,14 +74,12 @@ export function RankedLayout({
 		placed,
 		maximizedIdx,
 		selectedId,
-		tree: store.nodes.$,
 		commit,
 	});
 	return (
 		<Fragment>
 			{placed.map((pos, i) => {
 				const meta = shared.get(pos.id)!;
-				const node = commit.nodes.get(pos.id)!;
 				const selfDuration = commit.selfDurations.get(pos.id) || 0;
 
 				return (
@@ -99,7 +97,7 @@ export function RankedLayout({
 						onMouseLeave={onMouseLeave}
 					>
 						<span data-testid="node-name">{meta.name}</span>
-						<HocLabels hocs={meta.hocs} nodeId={node.id} canMark={false} /> (
+						<HocLabels hocs={meta.hocs} nodeId={pos.id} canMark={false} /> (
 						{formatTime(selfDuration)})
 					</FlameNode>
 				);

@@ -7,13 +7,13 @@ import { RecordIcon, NotInterested, Refresh } from "../../../icons";
 import s from "../../../elements/TreeBar.module.css";
 import { useCallback } from "preact/hooks";
 import { FlameGraphMode } from "../../flamegraph/FlameGraphMode";
-import { getFirstNode, resetProfiler } from "../../data/commits";
+import { resetProfiler } from "../../data/commits";
 import { ProfilerCommit } from "../../data/profiler2";
 
 export function getCommitDuration({ rendered, selfDurations }: ProfilerCommit) {
 	return Array.from(rendered).reduce((acc, id) => {
 		if (!selfDurations.has(id)) {
-			console.log({ rendered, selfDurations, id });
+			console.log("MISSING", { rendered, selfDurations, id });
 		}
 		return acc + selfDurations.get(id)!;
 	}, 0);
@@ -37,18 +37,7 @@ export function TimelineBar() {
 
 	const onCommitChange = useCallback(
 		(n: number) => {
-			const {
-				activeCommitIdx,
-				selectedNodeId,
-				activeCommit,
-				flamegraphType,
-			} = store.profiler;
-
-			activeCommitIdx.$ = n;
-
-			if (activeCommit.$ && !activeCommit.$.nodes.has(selectedNodeId.$)) {
-				selectedNodeId.$ = getFirstNode(activeCommit.$, flamegraphType.$);
-			}
+			store.profiler.activeCommitIdx.$ = n;
 		},
 		[store],
 	);
@@ -95,7 +84,7 @@ export function TimelineBar() {
 			{isSupported && !isRecording && (
 				<CommitTimeline
 					items={durations.map(duration => {
-						const percent = ((duration - min) * 100) / (max - min || 0.1);
+						const percent = ((duration - min) * 100) / (max - min || 0.05);
 						return percent;
 					})}
 					selected={selectedCommit}

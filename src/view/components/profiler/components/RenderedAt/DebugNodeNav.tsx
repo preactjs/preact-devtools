@@ -6,14 +6,14 @@ import { DevNode } from "../../../../store/types";
 
 export function DebugNodeNav() {
 	const store = useStore();
-	const selected = useObserver(() => store.profiler.selectedNodeId.$);
+	const selected = useObserver(() => store.profiler.derivedSelectedNodeId.$);
 	const commit = useObserver(() => store.profiler.activeCommit.$);
 	const nodes = useObserver(() => {
 		const commit = store.profiler.activeCommit.$;
 		if (!commit) return [];
 
 		const out: DevNode[] = [];
-		const stack = [commit.rootId];
+		const stack = [commit.firstId];
 		let item;
 		while ((item = stack.pop())) {
 			const node = commit.nodes.get(item);
@@ -50,9 +50,7 @@ export function DebugNodeNav() {
 								<span style="display: flex; justify-content: space-between; width: 100%">
 									<span>
 										{node.name}
-										{commit && node.id === commit.commitRootId ? (
-											<b> (R)</b>
-										) : null}
+										{commit && node.id === commit.firstId ? <b> (R)</b> : null}
 									</span>
 									<span>{node.id}</span>
 								</span>

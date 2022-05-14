@@ -1,6 +1,9 @@
-import { ID, Tree } from "../../../store/types";
+import { ID } from "../../../store/types";
 
-export function getRoot(tree: Tree, id: ID) {
+export function getRoot<T extends { id: ID; parent: ID }, U extends Map<ID, T>>(
+	tree: U,
+	id: ID,
+) {
 	let item = tree.get(id);
 	let last = id;
 	while (item !== undefined) {

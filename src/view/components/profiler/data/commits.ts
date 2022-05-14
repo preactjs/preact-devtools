@@ -40,8 +40,10 @@ export interface ProfilerStore {
 	// Selection
 	activeCommitIdx: Observable<number>;
 	activeCommit: Observable<ProfilerCommit | null>;
-	selectedNodeId: Observable<ID>;
-	selectedNode: Observable<DevNode | null>;
+	/** This should be treated as readonly */
+	selectedNodeId: Observable<ID | -1>;
+	derivedSelectedNodeId: Observable<ID | -1>;
+	selectedNode: Observable<ProfilerNodeShared | null>;
 
 	// Render reasons
 	renderReasons: Observable<Map<ID, RenderReasonMap>>;
@@ -57,6 +59,8 @@ export interface ProfilerStore {
 export function getFirstNode(commit: ProfilerCommit, mode: FlamegraphType) {
 	let selId = commit.firstId;
 
+	console.log("FIRST NODE", selId);
+
 	if (mode === FlamegraphType.RANKED) {
 		let selfDuration = -1;
 		commit.rendered.forEach(id => {
@@ -68,6 +72,8 @@ export function getFirstNode(commit: ProfilerCommit, mode: FlamegraphType) {
 				selId = id;
 			}
 		});
+
+		console.log("RANKED", selId);
 	}
 
 	return selId;
@@ -101,25 +107,36 @@ export function createProfiler(): ProfilerStore {
 		return commits.$[activeCommitIdx.$] || null;
 	});
 	const selectedNodeId = valoo(0);
+	const derivedSelectedNodeId = watch(() => {
+		const selected = selectedNodeId.$;
+		const commit = activeCommit.$;
+		if (selected !== -1 || commit === null) {
+			return selected;
+		}
+
+		const mode = flamegraphType.$;
+
+		if (mode === FlamegraphType.RANKED) {
+			if (!commit.rendered.has(selectedNodeId.$)) {
+				return getFirstNode(commit, mode);
+			}
+		} else if (!commit.nodes.has(selectedNodeId.$)) {
+			return getFirstNode(commit, mode);
+		}
+
+		return -1;
+	});
+
 	const selectedNode = watch(() => {
-		return null;
+		const commit = activeCommit.$;
+		const selected = derivedSelectedNodeId.$;
+		if (!commit || selected === -1) return null;
+
+		return commit.nodes.get(selected)!;
 	});
 
 	// Flamegraph
 	const flamegraphType = valoo(FlamegraphType.FLAMEGRAPH);
-	flamegraphType.on(mode => {
-		if (activeCommit.$ === null) {
-			return;
-		}
-
-		if (mode === FlamegraphType.RANKED) {
-			if (!activeCommit.$.rendered.has(selectedNodeId.$)) {
-				selectedNodeId.$ = getFirstNode(activeCommit.$, mode);
-			}
-		} else if (!activeCommit.$.nodes.has(selectedNodeId.$)) {
-			selectedNodeId.$ = getFirstNode(activeCommit.$, mode);
-		}
-	});
 
 	// Recording
 	const isRecording = valoo(false);
@@ -135,7 +152,7 @@ export function createProfiler(): ProfilerStore {
 			// Reset selection when recording stopped
 			// and new profiling data was collected.
 			if (commits.$.length > 0) {
-				selectedNodeId.$ = getFirstNode(commits.$[0], flamegraphType.$);
+				selectedNodeId.$ = -1;
 			}
 		}
 	});
@@ -164,6 +181,7 @@ export function createProfiler(): ProfilerStore {
 		renderReasons,
 		activeReason,
 		selectedNodeId,
+		derivedSelectedNodeId,
 		selectedNode,
 
 		// Rendering
@@ -204,6 +222,7 @@ export function recordProfilerCommit(
 				id,
 				hocs: node.hocs,
 				name: node.name,
+				type: node.type,
 			});
 		}
 		pNodes.set(id, {

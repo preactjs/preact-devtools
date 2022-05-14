@@ -11,7 +11,6 @@ import { PROFILE_RELOAD, STATS_RELOAD } from "../constants";
 import { setupOptionsV11 } from "./11/options";
 import { newProfiler } from "./adapter/profiler";
 import { createIdMappingState } from "./shared/idMapper";
-import { VNodeTimings } from "./shared/timings";
 import { bindingsV10 } from "./10/bindings";
 import { bindingsV11 } from "./11/bindings";
 

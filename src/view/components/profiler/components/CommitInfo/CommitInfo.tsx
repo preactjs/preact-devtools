@@ -16,8 +16,6 @@ export function CommitInfo() {
 
 	const duration = getCommitDuration(commit);
 
-	console.log({ duration });
-
 	return (
 		<SidebarPanel title="Commit Stats">
 			<dl class={s.list}>

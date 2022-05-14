@@ -11,14 +11,12 @@ export interface Position {
 export function layoutRanked(commit: ProfilerCommit): Position[] {
 	const arr: Position[] = [];
 	Array.from(commit.rendered.values()).forEach((id, i) => {
-		if (!commit.selfDurations.has(id)) {
-			console.log("NOOOOO", id);
-		}
-		const selfDuration = commit.selfDurations.get(id) || 0;
+		const selfDuration = commit.selfDurations.get(id)!;
 
 		arr.push({
 			id,
 			start: 0,
+			// FIXME: Is the floating point thing still relevant?
 			width: selfDuration * 100, // Avoid floating point errors
 			row: i,
 		});
@@ -27,4 +25,8 @@ export function layoutRanked(commit: ProfilerCommit): Position[] {
 	arr.sort((a, b) => b.width - a.width);
 
 	return arr;
+}
+
+export function layoutFlameGraph(commit: ProfilerCommit): Position[] {
+	return [];
 }

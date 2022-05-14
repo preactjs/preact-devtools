@@ -1,10 +1,11 @@
 import { RenderReasonMap } from "../../../../adapter/shared/renderReasons";
-import { ID } from "../../../store/types";
+import { DevNodeType, ID } from "../../../store/types";
 
 export interface ProfilerNodeShared {
 	id: ID;
 	name: string;
 	hocs: string[] | null;
+	type: DevNodeType;
 }
 
 export type ProfilerNode = {

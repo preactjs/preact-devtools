@@ -279,7 +279,7 @@ function mount<T extends SharedVNode>(
 		// precise. Nodes with a time of 0 are impossible to select
 		// in devtools.
 		commit.operations[selfDurationIdx - 1] =
-			(selfDurations.get(id) || 0.1) * 1000;
+			(selfDurations.get(id) || 0.05) * 1000;
 	}
 
 	if (commit.stats !== null) {
@@ -530,7 +530,7 @@ function update<T extends SharedVNode>(
 		// precise. Nodes with a time of 0 are impossible to select
 		// in devtools.
 		commit.operations[selfDurationIdx - 1] =
-			(selfDurations.get(id) || 0.1) * 1000;
+			(selfDurations.get(id) || 0.05) * 1000;
 	}
 
 	if (commit.stats !== null) {
