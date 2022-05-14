@@ -156,7 +156,11 @@ export function createProfiler(): ProfilerStore {
 
 	// Render reasons
 	const activeReason = watch(() => {
-		return null;
+		const commit = activeCommit.$;
+		if (commit === null) return null;
+
+		const selectedId = selectedNodeId.$;
+		return commit.reasons.get(selectedId) || null;
 	});
 
 	return {

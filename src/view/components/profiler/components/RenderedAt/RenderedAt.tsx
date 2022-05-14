@@ -7,18 +7,18 @@ import { useMemo } from "preact/hooks";
 
 export function RenderedAt() {
 	const store = useStore();
-	const selectedNode = useObserver(() => store.profiler.selectedNode.$);
+	const selectedId = useObserver(() => store.profiler.selectedNodeId.$);
 	const commits = useObserver(() => store.profiler.commits.$);
 
 	const data = useMemo(() => {
-		if (!selectedNode) return [];
+		if (selectedId === -1) return [];
 
 		const items: { index: number; startTime: number; duration: number }[] = [];
 
 		const commits = store.profiler.commits.$;
 		for (let i = 0; i < commits.length; i++) {
 			const commit = commits[i];
-			if (commit.rendered.has(selectedNode.id)) {
+			if (commit.rendered.has(selectedId)) {
 				const commitDuration = Array.from(commit.selfDurations.values()).reduce(
 					(acc, x) => acc + x,
 					0,
@@ -33,7 +33,7 @@ export function RenderedAt() {
 		}
 
 		return items;
-	}, [selectedNode, commits]);
+	}, [selectedId, commits]);
 
 	const commitIdx = useObserver(() => store.profiler.activeCommitIdx.$);
 
@@ -41,14 +41,14 @@ export function RenderedAt() {
 
 	return (
 		<SidebarPanel title="Rendered at:">
-			{data.length <= 0 ? (
+			{data.length === 0 ? (
 				<Empty>Did not render during this profiling session</Empty>
 			) : (
 				<nav data-testid="rendered-at">
-					{data.map((node, i) => {
+					{data.map(node => {
 						return (
 							<button
-								key={i}
+								key={node.index}
 								class={s.item}
 								data-active={commitIdx === node.index}
 								onClick={() => (store.profiler.activeCommitIdx.$ = node.index)}

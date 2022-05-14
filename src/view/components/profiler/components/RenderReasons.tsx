@@ -42,17 +42,8 @@ export function RenderReasons() {
 
 	const hasReasons = reason !== null && reason.items && reason.items.length > 0;
 
-	let rendered = false;
-	if (!captureReason && commit) {
-		const root = commit.nodes.get(commit.firstId);
-		if (
-			root &&
-			selected
-			// FIXME: Get another way to detect if the node rendered
-		) {
-			rendered = true;
-		}
-	}
+	const rendered =
+		!captureReason && commit && selected && commit.rendered.has(selected.id);
 
 	return (
 		<SidebarPanel title="Render reasons">
