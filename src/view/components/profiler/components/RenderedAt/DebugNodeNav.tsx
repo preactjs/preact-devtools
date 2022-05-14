@@ -2,7 +2,7 @@ import { h } from "preact";
 import { useStore, useObserver } from "../../../../store/react-bindings";
 import { SidebarPanel, Empty } from "../../../sidebar/SidebarPanel";
 import s from "./RenderedAt.module.css";
-import { DevNode } from "../../../../store/types";
+import { ProfilerNodeShared } from "../../data/profiler2";
 
 export function DebugNodeNav() {
 	const store = useStore();
@@ -10,16 +10,18 @@ export function DebugNodeNav() {
 	const commit = useObserver(() => store.profiler.activeCommit.$);
 	const nodes = useObserver(() => {
 		const commit = store.profiler.activeCommit.$;
+		const shared = store.profiler.nodes.$;
 		if (!commit) return [];
 
-		const out: DevNode[] = [];
+		const out: ProfilerNodeShared[] = [];
 		const stack = [commit.firstId];
 		let item;
 		while ((item = stack.pop())) {
 			const node = commit.nodes.get(item);
-			if (!node) continue;
+			const meta = shared.get(item);
+			if (!node || !meta) continue;
 
-			out.push(node);
+			out.push(meta);
 			for (let i = node.children.length - 1; i >= 0; i--) {
 				stack.push(node.children[i]);
 			}

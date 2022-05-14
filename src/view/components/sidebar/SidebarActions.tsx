@@ -15,7 +15,7 @@ export function SidebarActions() {
 		() => store.nodes.$.get(store.selection.selected.$) || null,
 	);
 	const log = useCallback(() => {
-		if (node) emit("log", { id: node.id, children: node.children });
+		if (node) emit("log", { id: node.id });
 	}, [node]);
 	const inspectHostNode = useCallback(() => {
 		emit("inspect-host-node", null);
