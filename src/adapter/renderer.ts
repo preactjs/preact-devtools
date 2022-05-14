@@ -14,7 +14,7 @@ export interface Renderer<T extends SharedVNode = SharedVNode> {
 	findDomForVNode(id: ID): Array<HTMLElement | Text | null> | null;
 	findVNodeIdForDom(node: HTMLElement | Text): number;
 	applyFilters(filters: FilterState): void;
-	log(id: ID, children: ID[]): void;
+	log(id: ID): void;
 	inspect(id: ID): InspectData | null;
 	update(id: ID, type: UpdateType, path: ObjPath, value: any): void;
 	clear?(): void;

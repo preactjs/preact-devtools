@@ -104,7 +104,7 @@ export function createRenderer<T extends SharedVNode>(
 		getDisplayName(vnode) {
 			return bindings.getDisplayName(vnode, config);
 		},
-		log: (id, children) => logVNode(ids, config, id, children),
+		log: id => logVNode(ids, config, id),
 		inspect,
 		findDomForVNode(id) {
 			const vnode = getVNodeById(ids, id);

@@ -17,7 +17,7 @@ export function SidebarHeader() {
 	const selected = useObserver(() => store.profiler.selectedNode.$);
 	const emit = useEmitter();
 	const log = useCallback(() => {
-		if (selected) emit("log", { id: selected.id, children: selected.children });
+		if (selected) emit("log", { id: selected.id });
 	}, [selected]);
 	const inspectHostNode = useCallback(() => {
 		emit("inspect-host-node", null);

@@ -12,7 +12,6 @@ export function logVNode<T extends SharedVNode>(
 	ids: IdMappingState<T>,
 	config: RendererConfig,
 	id: ID,
-	children: ID[],
 ) {
 	const vnode = getVNodeById(ids, id);
 	if (vnode == null) {
@@ -32,7 +31,6 @@ export function logVNode<T extends SharedVNode>(
 	}
 	console.log("vnode:", vnode);
 	console.log("devtools id:", id);
-	console.log("devtools children:", children);
 	console.groupEnd();
 	/* eslint-enable no-console */
 }

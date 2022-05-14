@@ -48,7 +48,7 @@ export interface DevtoolEvents {
 	"view-source": ID;
 	copy: string;
 	highlight: ID | null;
-	log: { id: ID; children: ID[] };
+	log: { id: ID };
 	inspect: ID;
 	"select-node": ID;
 	update: { id: ID; type: UpdateType; path: string; value: any };

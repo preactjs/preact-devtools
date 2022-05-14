@@ -19,7 +19,7 @@ export interface Adapter {
 	inspect(id: ID): void;
 	startPickElement(): void;
 	stopPickElement(): void;
-	log(data: { id: ID; children: ID[] }): void;
+	log(data: { id: ID }): void;
 	copy(value: string): void;
 	update(id: ID, type: UpdateType, path: Path, value: any): void;
 	select(id: ID): void;
@@ -103,7 +103,7 @@ export function createAdapter(
 	});
 
 	listen("log", e => {
-		getRendererByVNodeId(renderers, e.id)?.log(e.id, e.children);
+		getRendererByVNodeId(renderers, e.id)?.log(e.id);
 	});
 
 	listen("highlight", id => {
