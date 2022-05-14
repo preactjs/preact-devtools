@@ -288,7 +288,7 @@ export function recordProfilerCommit(
 
 	profiler.commits.update(commits => {
 		commits.push({
-			selfDurations: profiler.currentSelfDurations,
+			selfDurations: new Map(profiler.currentSelfDurations),
 			rendered: new Set(rendered),
 			start: 0, // TODO: For timeline
 			nodes: pNodes,
