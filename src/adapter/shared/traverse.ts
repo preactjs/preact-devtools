@@ -435,21 +435,22 @@ function update<T extends SharedVNode>(
 	const oldVNode = getVNodeById(ids, id);
 	updateVNodeId(ids, id, vnode);
 
-	const didRender = timingsByVNode.end.has(vnode);
-
-	if (filters.type.has("hoc")) {
-		const name = bindings.getDisplayName(vnode, config);
-		const hoc = getHocName(name);
-		if (hoc) {
-			hocs = [...hocs, hoc];
-		} else {
-			addHocs(commit, id, hocs);
-			hocs = [];
-		}
-	}
-
 	let selfDurationIdx = -1;
+
+	// TODO: Can we use this to bail out of checking?
+	const didRender = timingsByVNode.end.has(vnode);
 	if (didRender) {
+		if (filters.type.has("hoc")) {
+			const name = bindings.getDisplayName(vnode, config);
+			const hoc = getHocName(name);
+			if (hoc) {
+				hocs = [...hocs, hoc];
+			} else {
+				addHocs(commit, id, hocs);
+				hocs = [];
+			}
+		}
+
 		const start = timingsByVNode.start.get(vnode) || 0;
 		const end = timingsByVNode.end.get(vnode) || 0;
 		const duration = end - start;
