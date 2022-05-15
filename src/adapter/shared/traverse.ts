@@ -38,6 +38,24 @@ function addHocs(commit: Commit, id: ID, hocs: string[]) {
 	}
 }
 
+function detectHocs(commit: Commit, name: string, id: ID, hocs: string[]) {
+	const hocName = getHocName(name);
+	if (name.startsWith("ForwardRef")) {
+		const idx = name.indexOf("(");
+		name = name.slice(idx + 1, -1) || "Anonymous";
+		addHocs(commit, id, hocs);
+		hocs = [];
+	} else {
+		if (hocName) {
+			hocs = [...hocs, hocName];
+		} else {
+			addHocs(commit, id, hocs);
+			hocs = [];
+		}
+	}
+	return { name, hocs };
+}
+
 function isTextNode(dom: HTMLElement | Text | null): dom is Text {
 	return dom != null && dom.nodeType === NodeType.Text;
 }
@@ -254,6 +272,7 @@ function mount<T extends SharedVNode>(
 			-1,
 		);
 
+		// Must be done after node is sent to devtools
 		if (hocs.length > 0) {
 			addHocs(commit, id, hocs);
 			hocs = [];
@@ -375,8 +394,15 @@ function update<T extends SharedVNode>(
 
 	let diff = DiffType.UNKNOWN;
 
+	const id = getVNodeId(ids, vnode);
 	const skip = shouldFilter(vnode, filters, config, bindings);
 	if (skip) {
+		if (filters.type.has("hoc")) {
+			const name = bindings.getDisplayName(vnode, config);
+			const res = detectHocs(commit, name, id, hocs);
+			hocs = res.hocs;
+		}
+
 		let childCount = 0;
 		const children = bindings.getActualChildren(vnode);
 		for (let i = 0; i < children.length; i++) {
@@ -431,7 +457,6 @@ function update<T extends SharedVNode>(
 		return true;
 	}
 
-	const id = getVNodeId(ids, vnode);
 	const oldVNode = getVNodeById(ids, id);
 	updateVNodeId(ids, id, vnode);
 
@@ -442,13 +467,8 @@ function update<T extends SharedVNode>(
 	if (didRender) {
 		if (filters.type.has("hoc")) {
 			const name = bindings.getDisplayName(vnode, config);
-			const hoc = getHocName(name);
-			if (hoc) {
-				hocs = [...hocs, hoc];
-			} else {
-				addHocs(commit, id, hocs);
-				hocs = [];
-			}
+			const res = detectHocs(commit, name, id, hocs);
+			hocs = res.hocs;
 		}
 
 		const start = timingsByVNode.start.get(vnode) || 0;
