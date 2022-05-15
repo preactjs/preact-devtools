@@ -15,7 +15,7 @@ export function applyOperationsV1(store: Store, data: number[]) {
 		switch (data[i]) {
 			case MsgTypes.ADD_ROOT: {
 				const id = data[i + 1];
-				store.roots.$.push(id);
+				store.roots.$.set(id, id);
 				i += 1;
 				break;
 			}
