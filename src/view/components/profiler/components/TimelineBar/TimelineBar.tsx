@@ -40,14 +40,20 @@ export function TimelineBar() {
 	);
 
 	const onReloadAndProfile = useCallback(() => {
-		store.profiler.isRecording.$ = true;
+		const profiler = store.profiler;
+
+		resetProfiler(profiler);
+		profiler.isRecording.$ = true;
+		profiler.currentSelfDurations.clear();
 		store.emit("reload-and-profile", {
 			captureRenderReasons: store.profiler.captureRenderReasons.$,
 		});
 	}, []);
 
 	const onReset = useCallback(() => {
-		resetProfiler(store.profiler);
+		const profiler = store.profiler;
+
+		resetProfiler(profiler);
 		store.emit("stop-profiling", null);
 	}, [store]);
 
