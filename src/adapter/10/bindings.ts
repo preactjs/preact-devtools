@@ -203,14 +203,6 @@ export function getDisplayName(vnode: VNode, config: RendererConfig): string {
 	return "#text";
 }
 
-export function getEndTime(vnode: VNode): number {
-	return vnode.endTime || 0;
-}
-
-export function getStartTime(vnode: VNode): number {
-	return vnode.startTime || 0;
-}
-
 export function getNextState<S>(c: Component): S {
 	return (c as IComponent)._nextState || (c as any).__s || null;
 }
