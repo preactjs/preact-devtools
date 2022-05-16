@@ -215,7 +215,6 @@ export function printCommit(data: number[]) {
 
 		// String table
 		const len = data[i++];
-		console.log(len);
 		const strings = parseTable(data.slice(i - 1));
 		i += len;
 		console.log("strings: ", strings);
