@@ -28,6 +28,9 @@ export function DebugProfilerInfo() {
 				<dd class={s.value}>{getRoot(commit.nodes, selected.id)}</dd>
 				<br />
 				<dt class={s.title}>selfDuration:</dt>
+				<dd class={s.value}>{commit.selfDurations.get(selected.id)}</dd>
+				<br />
+				<dt class={s.title}>Commit duration:</dt>
 				<dd class={s.value}>{getCommitDuration(commit)}</dd>
 			</dl>
 		</SidebarPanel>
