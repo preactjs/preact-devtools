@@ -257,18 +257,6 @@ export function getHookState(
 	return [];
 }
 
-/**
- * Get the ancestor component that rendered the current vnode
- */
-export function getAncestor(vnode: Internal): Internal | null {
-	let next: Internal | null = vnode;
-	while ((next = getVNodeParent(next)) != null) {
-		return next;
-	}
-
-	return null;
-}
-
 export function createSuspenseState(vnode: Internal, suspended: boolean) {
 	const c = getComponent(vnode) as Component;
 	const key = getSuspenseStateKey(c);
@@ -302,7 +290,6 @@ export const bindingsV11: PreactBindings<Internal> = {
 	getDisplayName,
 	getPropsVNodeDisplayName,
 	getActualChildren,
-	getAncestor,
 	getDom,
 	isTextVNode: isTextInternal,
 	getInstance,

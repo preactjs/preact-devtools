@@ -22,7 +22,7 @@ export function ops2Tree(
 	const pending: Tree = new Map(oldTree);
 	const rootId = ops[0];
 	const roots: Map<ID, ID> = new Map(existingRoots);
-	const nodeToRoots: Map<ID, ID> = new Map(existingNodeToRoot);
+	const nodeToRoot: Map<ID, ID> = new Map(existingNodeToRoot);
 	const removals: ID[] = [];
 	const reasons: RenderReasonMap = new Map();
 	let stats: ParsedStats | null = null;
@@ -37,7 +37,7 @@ export function ops2Tree(
 				const rootId = ops[i + 1];
 				const mapped = ops[i + 2];
 				roots.set(rootId, mapped);
-				nodeToRoots.set(mapped, rootId);
+				nodeToRoot.set(mapped, rootId);
 				i += 2;
 				break;
 			}
@@ -98,9 +98,9 @@ export function ops2Tree(
 						}
 
 						// Check if node was a root
-						if (nodeToRoots.has(node.id)) {
+						if (nodeToRoot.has(node.id)) {
 							roots.delete(node.id);
-							nodeToRoots.delete(node.id);
+							nodeToRoot.delete(node.id);
 						}
 
 						// Delete children recursively
@@ -177,7 +177,7 @@ export function ops2Tree(
 	return {
 		rootId,
 		roots,
-		nodeToRoots,
+		nodeToRoot,
 		tree: pending,
 		removals,
 		reasons,

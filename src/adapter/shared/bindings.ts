@@ -11,7 +11,6 @@ export type ComponentHooks = Record<string, any>;
 export type HookState = Record<string, any>;
 
 export interface PreactBindings<T extends SharedVNode = SharedVNode> {
-	getAncestor(vnode: T): T | null;
 	getDisplayName(vnode: T, config: RendererConfig): string;
 	getPropsVNodeDisplayName(vnode: any, config: RendererConfig): string;
 	isRoot(vnode: T, config: RendererConfig): boolean;

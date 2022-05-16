@@ -149,18 +149,6 @@ export function findRoot(vnode: VNode, config: RendererConfig): VNode {
 }
 
 /**
- * Get the ancestor component that rendered the current vnode
- */
-export function getAncestor(vnode: VNode): VNode | null {
-	let next: VNode | null = vnode;
-	while ((next = getVNodeParent(next)) != null) {
-		return next;
-	}
-
-	return null;
-}
-
-/**
  * Get human readable name of the component/dom element
  */
 export function getDisplayName(vnode: VNode, config: RendererConfig): string {
@@ -287,7 +275,6 @@ export const bindingsV10: PreactBindings<VNode> = {
 	getDisplayName,
 	getPropsVNodeDisplayName: getDisplayName,
 	getActualChildren,
-	getAncestor,
 	getDom,
 	isTextVNode,
 	getInstance,

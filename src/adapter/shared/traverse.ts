@@ -610,14 +610,14 @@ function findClosestNonFilteredParent<T extends SharedVNode>(
 	vnode: T,
 ) {
 	let parentId = -1;
-	let ancestor: T | null = helpers.getAncestor(vnode);
+	let ancestor: T | null = helpers.getVNodeParent(vnode);
 	while (ancestor !== null) {
 		parentId = getVNodeId(ids, ancestor);
 		if (parentId !== -1) {
 			break;
 		}
 
-		ancestor = helpers.getAncestor(ancestor);
+		ancestor = helpers.getVNodeParent(ancestor);
 	}
 
 	return parentId;
@@ -697,11 +697,19 @@ export function createCommit<T extends SharedVNode>(
 		);
 	}
 
-	let rootId = getVNodeId(ids, vnode);
-	if (rootId === -1) {
-		rootId = findClosestNonFilteredParent(ids, helpers, vnode);
+	// Find actual root node
+
+	if (roots.has(vnode)) {
+		commit.rootId = getVNodeId(ids, vnode);
+	} else {
+		let rootVNode: T | null = vnode;
+		while ((rootVNode = helpers.getVNodeParent(rootVNode)) != null) {
+			if (helpers.isRoot(rootVNode, config)) {
+				commit.rootId = getVNodeId(ids, rootVNode);
+				break;
+			}
+		}
 	}
-	commit.rootId = rootId;
 
 	return commit;
 }

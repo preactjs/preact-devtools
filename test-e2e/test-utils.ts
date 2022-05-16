@@ -376,6 +376,20 @@ export async function clickTreeItem(page: Page, name: string) {
 	);
 }
 
+export async function waitForProfilerItem(page: Page, name: string) {
+	return await waitFor(async () => {
+		return await page.evaluate(name => {
+			const items = Array.from(
+				document.querySelectorAll(
+					`[data-type="flamegraph"] [data-testid="node-name"]`,
+				),
+			);
+
+			return !!items.find(item => item.textContent === name);
+		}, name);
+	});
+}
+
 export async function clickAndWaitForHooks(devtools: Page, component: string) {
 	await waitForPass(async () => {
 		await clickTreeItem(devtools, component);

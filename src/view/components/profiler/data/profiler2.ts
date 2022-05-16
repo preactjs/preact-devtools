@@ -20,5 +20,6 @@ export interface ProfilerCommit {
 	rendered: Set<ID>;
 	reasons: RenderReasonMap;
 	firstId: ID;
+	rootId: ID;
 	nodes: Map<ID, ProfilerNode>;
 }

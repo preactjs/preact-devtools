@@ -105,7 +105,7 @@ export function createProfiler(): ProfilerStore {
 	const activeCommit = watch<ProfilerCommit | null>(() => {
 		return commits.$[activeCommitIdx.$] || null;
 	});
-	const selectedNodeId = valoo(0);
+	const selectedNodeId = valoo(-1);
 	const derivedSelectedNodeId = watch(() => {
 		const selected = selectedNodeId.$;
 		const commit = activeCommit.$;
@@ -207,7 +207,7 @@ export function resetProfiler(state: ProfilerStore) {
 export function recordProfilerCommit(
 	tree: Map<ID, DevNode>,
 	profiler: ProfilerStore,
-	commitRootId: ID,
+	rootId: ID,
 	rendered: ID[],
 	removals: ID[],
 	reasons: RenderReasonMap,
@@ -216,12 +216,19 @@ export function recordProfilerCommit(
 
 	let pNodes: Map<ID, ProfilerNode>;
 
-	// Initially we need to copy the whole tree
+	// Initially, we need to copy the whole tree
 	const commits = profiler.commits.$;
-	const initial = commits.length === 0;
-	if (initial) {
+	let lastCommitSameRoot: ProfilerCommit | undefined;
+	if (commits.length > 0) {
+		for (let i = commits.length - 1; i >= 0; i--) {
+			if (commits[i].rootId === rootId) {
+				lastCommitSameRoot = commits[i];
+			}
+		}
+	}
+
+	if (commits.length === 0 || lastCommitSameRoot === undefined) {
 		pNodes = new Map<ID, ProfilerNode>();
-		const rootId = getRoot(tree, commitRootId);
 		const stack = [rootId];
 		let id;
 		while ((id = stack.pop()) !== undefined) {
@@ -241,7 +248,7 @@ export function recordProfilerCommit(
 			stack.push(...node.children);
 		}
 	} else {
-		pNodes = new Map(commits[commits.length - 1].nodes);
+		pNodes = new Map(lastCommitSameRoot.nodes);
 
 		// Drop removals
 		for (let i = 0; i < removals.length; i++) {
@@ -293,6 +300,7 @@ export function recordProfilerCommit(
 			start: 0, // TODO: For timeline
 			nodes: pNodes,
 			firstId: rendered[0],
+			rootId,
 			reasons,
 		});
 	});

@@ -4,11 +4,12 @@ export function getRoot<T extends { id: ID; parent: ID }, U extends Map<ID, T>>(
 	tree: U,
 	id: ID,
 ) {
-	let item = tree.get(id);
+	let pId = id;
 	let last = id;
-	while (item !== undefined) {
-		last = item.id;
-		item = tree.get(item.parent);
+	while (pId !== -1) {
+		const item = tree.get(pId)!;
+		last = pId;
+		pId = item.parent;
 	}
 
 	return last;

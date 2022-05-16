@@ -113,7 +113,7 @@ export function createStore(): Store {
 		inspectData,
 		isPicking,
 		roots,
-		nodeToRoots: nodeToRoot,
+		nodeToRoot,
 		nodes,
 		collapser,
 		search: createSearchStore(nodes, nodeList),

@@ -108,9 +108,9 @@ export function flush(commit: Commit) {
  */
 export function applyOperationsV2(store: Store, data: number[]) {
 	const {
-		rootId: commitRootId,
+		rootId,
 		roots,
-		nodeToRoots,
+		nodeToRoot,
 		tree,
 		reasons,
 		stats,
@@ -120,13 +120,15 @@ export function applyOperationsV2(store: Store, data: number[]) {
 		store.nodes.$,
 		store.profiler.currentSelfDurations,
 		store.roots.$,
-		store.nodeToRoots.$,
+		store.nodeToRoot.$,
 		data,
 	);
 
+	const mappedRootId = roots.has(rootId) ? roots.get(rootId)! : rootId;
+
 	// Update store data
 	store.roots.$ = roots;
-	store.nodeToRoots.$ = nodeToRoots;
+	store.nodeToRoot.$ = nodeToRoot;
 	store.nodes.$ = tree;
 
 	if (store.inspectData.$) {
@@ -142,13 +144,13 @@ export function applyOperationsV2(store: Store, data: number[]) {
 		recordProfilerCommit(
 			store.nodes.$,
 			store.profiler,
-			commitRootId,
+			mappedRootId,
 			rendered,
 			removals,
 			reasons,
 		);
 		store.profiler.renderReasons.update(m => {
-			m.set(commitRootId, reasons);
+			m.set(mappedRootId, reasons);
 		});
 	}
 
