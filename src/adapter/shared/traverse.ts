@@ -513,14 +513,14 @@ function findClosestNonFilteredParent<T extends SharedVNode>(
 	vnode: T,
 ) {
 	let parentId = -1;
-	let ancestor: T | null = helpers.getAncestor(vnode);
-	while (ancestor !== null) {
-		parentId = getVNodeId(ids, ancestor);
+	let parent: T | null = helpers.getVNodeParent(vnode);
+	while (parent !== null) {
+		parentId = getVNodeId(ids, parent);
 		if (parentId !== -1) {
 			break;
 		}
 
-		ancestor = helpers.getAncestor(ancestor);
+		parent = helpers.getVNodeParent(parent);
 	}
 
 	return parentId;
