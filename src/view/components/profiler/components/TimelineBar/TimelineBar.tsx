@@ -7,14 +7,7 @@ import { RecordIcon, NotInterested, Refresh } from "../../../icons";
 import s from "../../../elements/TreeBar.module.css";
 import { useCallback } from "preact/hooks";
 import { FlameGraphMode } from "../../flamegraph/FlameGraphMode";
-import { resetProfiler } from "../../data/commits";
-import { ProfilerCommit } from "../../data/profiler2";
-
-export function getCommitDuration({ rendered, selfDurations }: ProfilerCommit) {
-	return Array.from(rendered).reduce((acc, id) => {
-		return acc + selfDurations.get(id)!;
-	}, 0);
-}
+import { getCommitDuration, resetProfiler } from "../../data/commits";
 
 export function TimelineBar() {
 	const store = useStore();
@@ -44,7 +37,7 @@ export function TimelineBar() {
 
 		resetProfiler(profiler);
 		profiler.isRecording.$ = true;
-		profiler.currentSelfDurations.clear();
+		profiler.currentDurations.clear();
 		store.emit("reload-and-profile", {
 			captureRenderReasons: store.profiler.captureRenderReasons.$,
 		});

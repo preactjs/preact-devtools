@@ -89,22 +89,20 @@ export function FlamegraphLayout({
 		};
 	}, [original, selectedId, canvasWidth]);
 
+	console.log({ commit });
+
 	return (
 		<Fragment>
 			{placed.map(pos => {
 				const meta = shared.get(pos.id)!;
-				const node = commit.nodes.get(pos.id)!;
-				const selfDuration = commit.selfDurations.get(pos.id)!;
 
 				let weight = -1;
 				let appendix = "";
 				if (!commitParentIds.has(pos.id) && commit.rendered.has(pos.id)) {
+					const selfDuration = commit.selfDurations.get(pos.id)!;
+					const totalDuration = commit.renderedDurations.get(pos.id)!;
 					weight = getGradient(50, selfDuration);
-					const totalDuration =
-						selfDuration +
-						node.children.reduce((acc, id) => {
-							return acc + commit.selfDurations.get(id)!;
-						}, 0);
+
 					const self = formatTime(selfDuration);
 					const total = formatTime(totalDuration);
 					appendix = ` (${self} of ${total})`;

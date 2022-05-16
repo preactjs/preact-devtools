@@ -327,3 +327,12 @@ export function recordProfilerCommit(
 		commits.push(commit);
 	});
 }
+
+export function getCommitDuration({
+	rendered,
+	selfDurations,
+}: ProfilerCommit): number {
+	return Array.from(rendered).reduce((acc, id) => {
+		return acc + selfDurations.get(id)!;
+	}, 0);
+}

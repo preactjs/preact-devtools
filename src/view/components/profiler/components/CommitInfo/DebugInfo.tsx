@@ -3,7 +3,7 @@ import { SidebarPanel } from "../../../sidebar/SidebarPanel";
 import s from "./CommitInfo.module.css";
 import { useStore, useObserver } from "../../../../store/react-bindings";
 import { getRoot } from "../../flamegraph/FlamegraphStore";
-import { getCommitDuration } from "../TimelineBar/TimelineBar";
+import { getCommitDuration } from "../../data/commits";
 
 export function DebugProfilerInfo() {
 	const store = useStore();

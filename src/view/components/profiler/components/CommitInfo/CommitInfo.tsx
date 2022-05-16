@@ -3,7 +3,7 @@ import { SidebarPanel } from "../../../sidebar/SidebarPanel";
 import { formatTime } from "../../util";
 import s from "./CommitInfo.module.css";
 import { useStore, useObserver } from "../../../../store/react-bindings";
-import { getCommitDuration } from "../TimelineBar/TimelineBar";
+import { getCommitDuration } from "../../data/commits";
 
 export function CommitInfo() {
 	const store = useStore();

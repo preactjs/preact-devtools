@@ -17,6 +17,10 @@ export type ProfilerNode = {
 export interface ProfilerCommit {
 	start: number;
 	selfDurations: Map<ID, number>;
+	/**
+	 * Time a vnode took to render including its children
+	 */
+	renderedDurations: Map<ID, number>;
 	rendered: Set<ID>;
 	reasons: RenderReasonMap;
 	firstId: ID;
