@@ -230,9 +230,9 @@ export function printCommit(data: number[]) {
 					const name = strings[data[i + 5] - 1];
 					const key = data[i + 6] > 0 ? ` key="${strings[i + 6 - 1]}" ` : "";
 					const parentId = data[i + 3];
-					const selfDuration = data[i + 7];
+					const duration = data[i + 7];
 					console.log(
-						`Add %c${id} %c<${name}${key}>%c to parent %c${parentId}%c, selfDuration: %c${selfDuration}`,
+						`Add %c${id} %c<${name}${key}>%c to parent %c${parentId}%c, duration: %c${duration}`,
 						"color: yellow",
 						"color: violet",
 						"color: inherit",
@@ -263,7 +263,7 @@ export function printCommit(data: number[]) {
 				case MsgTypes.UPDATE_VNODE_TIMINGS: {
 					const id = data[i + 1];
 					console.log(
-						`Update: %c${id}%c, selfDuration: %c${data[i + 2]}`,
+						`Update: %c${id}%c, duration: %c${data[i + 2]}`,
 						"color: yellow",
 						"color: inherit",
 						"color: peachpuff",

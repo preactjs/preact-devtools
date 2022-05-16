@@ -14,7 +14,7 @@ import { deepClone } from "../shared/utils";
  */
 export function ops2Tree(
 	oldTree: Tree,
-	selfDurations: Map<ID, number>,
+	durations: Map<ID, number>,
 	existingRoots: Map<ID, ID>,
 	existingNodeToRoot: Map<ID, ID>,
 	ops: number[],
@@ -62,7 +62,7 @@ export function ops2Tree(
 					key: ops[i + 6] > 0 ? strings[ops[i + 6] - 1] : "",
 				});
 
-				selfDurations.set(id, ops[i + 7] / 1000);
+				durations.set(id, ops[i + 7] / 1000);
 				rendered.push(id);
 
 				i += 7;
@@ -71,7 +71,7 @@ export function ops2Tree(
 			case MsgTypes.UPDATE_VNODE_TIMINGS: {
 				const id = ops[i + 1];
 
-				selfDurations.set(id, ops[i + 2] / 1000);
+				durations.set(id, ops[i + 2] / 1000);
 				rendered.push(id);
 
 				i += 2;
@@ -111,12 +111,12 @@ export function ops2Tree(
 							if (!child) continue;
 
 							pending.delete(child.id);
-							selfDurations.delete(child.id);
+							durations.delete(child.id);
 							stack.push(...child.children);
 						}
 
 						pending.delete(nodeId);
-						selfDurations.delete(nodeId);
+						durations.delete(nodeId);
 					}
 				}
 

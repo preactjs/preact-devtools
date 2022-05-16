@@ -29,7 +29,7 @@ export interface ProfilerStore {
 
 	// Highlight updates
 	highlightUpdates: Observable<boolean>;
-	currentSelfDurations: Map<ID, number>;
+	currentDurations: Map<ID, number>;
 
 	/**
 	 * Flag that indicates if we are currently
@@ -86,7 +86,7 @@ export function createProfiler(): ProfilerStore {
 	const commits = valoo<ProfilerCommit[]>([]);
 	const nodes = valoo<Map<ID, ProfilerNodeShared>>(new Map());
 
-	const currentSelfDurations = new Map<ID, number>();
+	const currentDurations = new Map<ID, number>();
 	const isSupported = valoo(false);
 
 	// Render Reasons
@@ -169,7 +169,7 @@ export function createProfiler(): ProfilerStore {
 		supportsRenderReasons,
 		captureRenderReasons,
 		setRenderReasonCapture,
-		currentSelfDurations,
+		currentDurations,
 		highlightUpdates,
 		isSupported,
 		isRecording,
@@ -204,6 +204,14 @@ export function resetProfiler(state: ProfilerStore) {
 	state.nodes.$ = new Map();
 }
 
+function getSelfDuration(node: ProfilerNode, durations: Map<ID, number>) {
+	const duration = durations.get(node.id)!;
+	const childrenDurations = node.children.reduce((acc, childId) => {
+		return acc + durations.get(childId)!;
+	}, 0);
+	return duration - childrenDurations;
+}
+
 export function recordProfilerCommit(
 	tree: Map<ID, DevNode>,
 	profiler: ProfilerStore,
@@ -215,6 +223,8 @@ export function recordProfilerCommit(
 	const shared = profiler.nodes.$;
 
 	let pNodes: Map<ID, ProfilerNode>;
+	let selfDurations: Map<ID, number>;
+	const renderedDurations = new Map<ID, number>();
 
 	// Initially, we need to copy the whole tree
 	const commits = profiler.commits.$;
@@ -228,6 +238,7 @@ export function recordProfilerCommit(
 	}
 
 	if (commits.length === 0 || lastCommitSameRoot === undefined) {
+		selfDurations = new Map();
 		pNodes = new Map<ID, ProfilerNode>();
 		const stack = [rootId];
 		let id;
@@ -239,16 +250,20 @@ export function recordProfilerCommit(
 				name: node.name,
 				type: node.type,
 			});
-			pNodes.set(id, {
+			const pNode: ProfilerNode = {
 				id,
 				children: node.children,
 				parent: node.parent,
-			});
+			};
+			pNodes.set(id, pNode);
+			renderedDurations.set(id, profiler.currentDurations.get(id)!);
+			selfDurations.set(id, getSelfDuration(pNode, profiler.currentDurations));
 
 			stack.push(...node.children);
 		}
 	} else {
 		pNodes = new Map(lastCommitSameRoot.nodes);
+		selfDurations = new Map(lastCommitSameRoot.selfDurations);
 
 		// Drop removals
 		for (let i = 0; i < removals.length; i++) {
@@ -268,6 +283,7 @@ export function recordProfilerCommit(
 					});
 				}
 			}
+			selfDurations.delete(id);
 			pNodes.delete(id);
 		}
 
@@ -285,23 +301,29 @@ export function recordProfilerCommit(
 					type: node.type,
 				});
 			}
-			pNodes.set(id, {
+			const pNode: ProfilerNode = {
 				id,
 				children: node.children,
 				parent: node.parent,
-			});
+			};
+			pNodes.set(id, pNode);
+			renderedDurations.set(id, profiler.currentDurations.get(id)!);
+			selfDurations.set(id, getSelfDuration(pNode, profiler.currentDurations));
 		}
 	}
 
+	const commit: ProfilerCommit = {
+		selfDurations,
+		renderedDurations,
+		rendered: new Set(rendered),
+		start: 0, // TODO: For timeline
+		nodes: pNodes,
+		firstId: rendered[0],
+		rootId,
+		reasons,
+	};
+
 	profiler.commits.update(commits => {
-		commits.push({
-			selfDurations: new Map(profiler.currentSelfDurations),
-			rendered: new Set(rendered),
-			start: 0, // TODO: For timeline
-			nodes: pNodes,
-			firstId: rendered[0],
-			rootId,
-			reasons,
-		});
+		commits.push(commit);
 	});
 }

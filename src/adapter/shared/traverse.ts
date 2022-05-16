@@ -249,7 +249,6 @@ function mount<T extends SharedVNode>(
 		}
 	}
 
-	let selfDurationIdx = -1;
 	let id = -1;
 	if (!skip) {
 		id = getOrCreateVNodeId(ids, vnode);
@@ -257,9 +256,8 @@ function mount<T extends SharedVNode>(
 		const start = timingsByVNode.start.get(vnode) || 0;
 		const end = timingsByVNode.end.get(vnode) || 0;
 		const duration = end - start;
-		selfDurations.set(id, duration);
 
-		selfDurationIdx = commit.operations.push(
+		commit.operations.push(
 			MsgTypes.ADD_VNODE,
 			id,
 			getDevtoolsType(vnode, bindings), // Type
@@ -267,9 +265,7 @@ function mount<T extends SharedVNode>(
 			9999, // owner
 			getStringId(commit.strings, name),
 			vnode.key ? getStringId(commit.strings, vnode.key) : 0,
-			// We will be able to measure the `selfDuration` once
-			// children duration are processed
-			-1,
+			(duration || 0.05) * 1000,
 		);
 
 		// Must be done after node is sent to devtools
@@ -323,16 +319,6 @@ function mount<T extends SharedVNode>(
 		}
 	}
 
-	if (selfDurationIdx !== -1) {
-		// Multiply, because operations array only supports integers
-		// and would otherwise cut off floats. Also use 0.1 as minimum
-		// because due to Spectre CPU mitigations the timings are not
-		// precise. Nodes with a time of 0 are impossible to select
-		// in devtools.
-		commit.operations[selfDurationIdx - 1] =
-			(selfDurations.get(id) || 0.05) * 1000;
-	}
-
 	if (commit.stats !== null) {
 		updateDiffStats(commit.stats, diff, childCount);
 		recordComponentStats(config, bindings, commit.stats, vnode, children);
@@ -384,7 +370,7 @@ function update<T extends SharedVNode>(
 	profiler: ProfilerState,
 	hocs: string[],
 	bindings: PreactBindings<T>,
-	selfDurations: Map<ID, number>,
+	durations: Map<ID, number>,
 	timingsByVNode: VNodeTimings<T>,
 	renderReasonPre: Map<T, RenderReasonData> | null,
 ) {
@@ -424,7 +410,7 @@ function update<T extends SharedVNode>(
 					profiler,
 					hocs,
 					bindings,
-					selfDurations,
+					durations,
 					timingsByVNode,
 					renderReasonPre,
 				);
@@ -450,7 +436,7 @@ function update<T extends SharedVNode>(
 			profiler,
 			hocs,
 			bindings,
-			selfDurations,
+			durations,
 			timingsByVNode,
 			renderReasonPre,
 		);
@@ -460,13 +446,11 @@ function update<T extends SharedVNode>(
 	const oldVNode = getVNodeById(ids, id);
 	updateVNodeId(ids, id, vnode);
 
-	let selfDurationIdx = -1;
-
 	// TODO: Can we use this to bail out of checking?
 	const didRender = timingsByVNode.end.has(vnode);
 	if (didRender) {
+		const name = bindings.getDisplayName(vnode, config);
 		if (filters.type.has("hoc")) {
-			const name = bindings.getDisplayName(vnode, config);
 			const res = detectHocs(commit, name, id, hocs);
 			hocs = res.hocs;
 		}
@@ -474,19 +458,11 @@ function update<T extends SharedVNode>(
 		const start = timingsByVNode.start.get(vnode) || 0;
 		const end = timingsByVNode.end.get(vnode) || 0;
 		const duration = end - start;
-		selfDurations.set(id, duration);
 
-		// Remove current node timing from ancestor
-		if (selfDurations.has(ancestorId)) {
-			selfDurations.set(ancestorId, selfDurations.get(ancestorId)! - duration);
-		}
-
-		selfDurationIdx = commit.operations.push(
+		commit.operations.push(
 			MsgTypes.UPDATE_VNODE_TIMINGS,
 			id,
-			// We will be able to measure the `selfDuration` once
-			// children duration are processed
-			-1,
+			(duration || 0.05) * 1000,
 		);
 
 		if (profiler.isProfiling && profiler.captureRenderReasons) {
@@ -496,7 +472,7 @@ function update<T extends SharedVNode>(
 					: bindings.getRenderReasonPost(
 							ids,
 							bindings,
-							selfDurations,
+							durations,
 							oldVNode,
 							vnode,
 					  );
@@ -550,7 +526,7 @@ function update<T extends SharedVNode>(
 				profiler,
 				hocs,
 				bindings,
-				selfDurations,
+				durations,
 				timingsByVNode,
 				renderReasonPre,
 			);
@@ -572,22 +548,12 @@ function update<T extends SharedVNode>(
 				profiler,
 				hocs,
 				bindings,
-				selfDurations,
+				durations,
 				timingsByVNode,
 				renderReasonPre,
 			);
 			shouldReorder = true;
 		}
-	}
-
-	if (selfDurationIdx !== -1) {
-		// Multiply, because operations array only supports integers
-		// and would otherwise cut off floats. Also use 0.1 as minimum
-		// because due to Spectre CPU mitigations the timings are not
-		// precise. Nodes with a time of 0 are impossible to select
-		// in devtools.
-		commit.operations[selfDurationIdx - 1] =
-			(selfDurations.get(id) || 0.05) * 1000;
 	}
 
 	if (commit.stats !== null) {
@@ -644,7 +610,7 @@ export function createCommit<T extends SharedVNode>(
 		stats: profiler.recordStats ? createStats() : null,
 	};
 
-	const selfDurations = new Map<ID, number>();
+	const durations = new Map<ID, number>();
 
 	let parentId = -1;
 
@@ -675,7 +641,7 @@ export function createCommit<T extends SharedVNode>(
 			profiler,
 			[],
 			helpers,
-			selfDurations,
+			durations,
 			timingsByVNode,
 			renderReasonPre,
 		);
@@ -691,7 +657,7 @@ export function createCommit<T extends SharedVNode>(
 			profiler,
 			[],
 			helpers,
-			selfDurations,
+			durations,
 			timingsByVNode,
 			renderReasonPre,
 		);

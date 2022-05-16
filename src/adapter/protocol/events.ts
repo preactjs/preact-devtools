@@ -118,7 +118,7 @@ export function applyOperationsV2(store: Store, data: number[]) {
 		removals,
 	} = ops2Tree(
 		store.nodes.$,
-		store.profiler.currentSelfDurations,
+		store.profiler.currentDurations,
 		store.roots.$,
 		store.nodeToRoot.$,
 		data,
