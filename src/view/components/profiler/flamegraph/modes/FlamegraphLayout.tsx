@@ -45,32 +45,11 @@ export function FlamegraphLayout({
 		<Fragment>
 			{placed.map(pos => {
 				const node = commit.nodes.get(pos.id)!;
-				let text: any = "";
-				if (pos.commitParent || pos.weight === -1) {
-					text = (
-						<>
-							{node.name}
-							{filterHoc && node.hocs ? (
-								<HocLabels hocs={node.hocs} nodeId={node.id} canMark={false} />
-							) : (
-								""
-							)}
-						</>
-					);
-				} else {
+				let appendix = "";
+				if (!pos.commitParent && pos.weight !== -1) {
 					const self = formatTime(commit.selfDurations.get(node.id)!);
 					const total = formatTime(node.endTime - node.startTime);
-					text = (
-						<>
-							{node.name}
-							{filterHoc && node.hocs ? (
-								<HocLabels hocs={node.hocs} nodeId={node.id} canMark={false} />
-							) : (
-								""
-							)}{" "}
-							({self} of {total})
-						</>
-					);
+					appendix = ` (${self} of ${total})`;
 				}
 
 				return (
@@ -85,7 +64,11 @@ export function FlamegraphLayout({
 						parentId={commit.nodes.get(pos.id)!.parent}
 						onClick={onSelect}
 					>
-						{text}
+						{node.name}
+						{filterHoc && node.hocs ? (
+							<HocLabels hocs={node.hocs} nodeId={node.id} canMark={false} />
+						) : null}
+						{appendix}
 					</FlameNode>
 				);
 			})}
