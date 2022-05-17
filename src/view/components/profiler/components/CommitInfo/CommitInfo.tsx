@@ -9,20 +9,17 @@ export function CommitInfo() {
 	const commit = useObserver(() => store.profiler.activeCommit.$);
 	const isRecording = useObserver(() => store.profiler.isRecording.$);
 
-	if (commit === null || isRecording) {
+	if (commit === null || !commit.rendered.length || isRecording) {
 		return null;
 	}
 
-	const root = commit.nodes.get(commit.commitRootId)!;
-	if (!root) {
-		return null;
-	}
+	const startTime = commit.nodes.get(commit.rendered[0])?.startTime || 0;
 
 	return (
 		<SidebarPanel title="Commit Stats">
 			<dl class={s.list}>
 				<dt class={s.title}>Start:</dt>
-				<dd class={s.value}>{formatTime(root.startTime)}</dd>
+				<dd class={s.value}>{formatTime(startTime)}</dd>
 				<br />
 				<dt class={s.title}>Duration:</dt>
 				<dd class={s.value}>{formatTime(commit.duration)} </dd>
