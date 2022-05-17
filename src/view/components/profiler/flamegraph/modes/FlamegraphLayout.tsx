@@ -57,7 +57,6 @@ export function FlamegraphLayout({
 						key={pos.id}
 						onMouseEnter={onMouseEnter}
 						onMouseLeave={onMouseLeave}
-						commitRootId={commit.commitRootId}
 						node={pos}
 						name={node.name}
 						selected={pos.id === selected.id}
