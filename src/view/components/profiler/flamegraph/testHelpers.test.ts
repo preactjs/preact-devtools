@@ -270,7 +270,7 @@ describe("FlameGraph DSL", () => {
 		`;
 
 		expect(tree.commit).to.deep.equal({
-			commitRootId: 1,
+			rendered: [1],
 			rootId: 1,
 			duration: 110,
 			maxSelfDuration: 60,

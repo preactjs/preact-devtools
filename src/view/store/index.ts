@@ -36,10 +36,6 @@ export function createStore(): Store {
 				collapser.collapsed.$.has(id),
 			);
 
-			if (filterState.filterRoot.$) {
-				return items.slice(1);
-			}
-
 			return items;
 		}).reduce((acc, val) => acc.concat(val), []);
 	});

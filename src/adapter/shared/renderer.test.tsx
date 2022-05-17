@@ -77,7 +77,6 @@ describe("Renderer 10", () => {
 		expect(toSnapshot(spy.args[1][1])).to.deep.equal([
 			"rootId: 1",
 			"Update timings 1",
-			"Update timings 2",
 		]);
 	});
 
@@ -111,7 +110,6 @@ describe("Renderer 10", () => {
 			"rootId: 1",
 			"Add 3 <span> to parent 2",
 			"Update timings 1",
-			"Update timings 2",
 		]);
 	});
 
@@ -154,7 +152,6 @@ describe("Renderer 10", () => {
 		expect(toSnapshot(spy.args[1][1])).to.deep.equal([
 			"rootId: 1",
 			"Update timings 1",
-			"Update timings 2",
 		]);
 	});
 
@@ -177,9 +174,6 @@ describe("Renderer 10", () => {
 		expect(toSnapshot(spy.args[1][1])).to.deep.equal([
 			"rootId: 1",
 			"Update timings 1",
-			"Update timings 2",
-			"Update timings 4",
-			"Update timings 3",
 			"Reorder 2 [4, 3]",
 		]);
 	});
@@ -341,9 +335,8 @@ describe("Renderer 10", () => {
 			});
 
 			expect(toSnapshot(spy.args[1][1])).to.deep.equal([
-				"rootId: 2",
+				"rootId: 1",
 				"Update timings 2",
-				"Update timings 3",
 			]);
 		});
 
@@ -383,13 +376,12 @@ describe("Renderer 10", () => {
 
 			expect(toSnapshot(spy.args[2][1])).to.deep.equal([
 				"rootId: 3",
+				"Add 3 <Fragment> to parent -1",
 				"Add 4 <div> to parent 3",
 				"Add 5 <Foo> to parent 4",
 				"Add 6 <div> to parent 5",
 				"Add 7 <span> to parent 4",
 				"Add 8 <span> to parent 4",
-				"Remove 3", // TODO: Seems wrong
-				"Remove 3", // TODO: Seems wrong
 			]);
 		});
 
@@ -434,6 +426,7 @@ describe("Renderer 10", () => {
 			]);
 			expect(toSnapshot(spy.args[2][1])).to.deep.equal([
 				"rootId: 4",
+				"Add 4 <Fragment> to parent -1",
 				"Add 5 <div> to parent 4",
 				"Add 6 <Foo> to parent 5",
 				"Add 7 <div> to parent 6",
@@ -442,7 +435,6 @@ describe("Renderer 10", () => {
 				"Add 10 <div> to parent 9",
 				"Add 11 <span> to parent 5",
 				"Add 12 <span> to parent 5",
-				"Update timings 2",
 			]);
 
 			renderer.applyFilters({

@@ -267,6 +267,20 @@ export function placeStaticTrees(
 	});
 }
 
+export function getCommitRootOrVirtual(commit: CommitData): DevNode | null {
+	if (commit.rendered.length > 1) {
+		const first = commit.nodes.get(commit.rendered[0]);
+		const second = commit.nodes.get(commit.rendered[1]);
+		if (first && second && first.parent === second.parent) {
+			const virtual: DevNode = {
+				id: -9,
+			};
+		}
+	}
+
+	return null;
+}
+
 /**
  * Place commit tree. When a node's children are bigger than it's parent,
  * the parent and all next siblings will be expanded (pushed) to the right.
@@ -275,7 +289,7 @@ export function patchTree(
 	prevCommit: CommitData | null,
 	commit: CommitData,
 ): FlameTree {
-	const { nodes: tree, rootId, commitRootId, maxSelfDuration } = commit;
+	const { nodes: tree, rootId, maxSelfDuration } = commit;
 
 	const flame: FlameTree = new Map();
 
@@ -283,8 +297,10 @@ export function patchTree(
 		return flame;
 	}
 
+	const commitRoot = getCommitRootOrVirtual(commit)!;
+
 	const commitParents = new Set<ID>();
-	let direct: DevNode | undefined = tree.get(commitRootId)!;
+	let direct: DevNode | undefined = commitRoot;
 	while ((direct = tree.get(direct.parent))) {
 		commitParents.add(direct.id);
 	}
@@ -292,7 +308,6 @@ export function patchTree(
 	const renderedNodes = new Set<ID>();
 
 	const root = tree.get(rootId)!;
-	const commitRoot = tree.get(commitRootId)!;
 
 	// Nodes that represent roots of non-static sub-trees that
 	// we inserted. We may need to resize parents and push siblings

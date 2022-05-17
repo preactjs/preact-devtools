@@ -33,7 +33,7 @@ export function flattenNodeTree<K, T extends { id: K; children: K[] }>(
 }
 
 export const EMPTY_COMMIT: CommitData = {
-	commitRootId: -1,
+	rendered: [],
 	duration: -1,
 	maxSelfDuration: 1,
 	nodes: new Map(),

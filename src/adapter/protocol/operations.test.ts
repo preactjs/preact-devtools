@@ -21,6 +21,7 @@ describe("ops2Tree", () => {
 				rootId: 1,
 				roots: [1],
 				removals: [],
+				rendered: [],
 				tree: new Map(),
 				reasons: new Map(),
 				stats: null,

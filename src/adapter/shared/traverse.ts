@@ -129,6 +129,8 @@ export function shouldFilter<T extends SharedVNode>(
 		return false;
 	} else if (bindings.isElement(vnode) && filters.type.has("dom")) {
 		return true;
+	} else if (bindings.isRoot(vnode, config) && filters.type.has("root")) {
+		return true;
 	} else if (filters.type.has("hoc")) {
 		const name = bindings.getDisplayName(vnode, config);
 
@@ -180,7 +182,41 @@ function mount<T extends SharedVNode>(
 		commit.stats.mounts++;
 	}
 
+	// FIXME: Move out of mount() into createCommit()
 	const root = bindings.isRoot(vnode, config);
+	if (root) {
+		const virtualRootId = ids.nextId++;
+		commit.operations.push(MsgTypes.ADD_ROOT, virtualRootId);
+		commit.rootId = virtualRootId;
+
+		let vnodeToMount = vnode;
+		if (filters.type.has("root")) {
+			const children = bindings.getActualChildren(vnode);
+			if (!children.length || children[0] == null) {
+				return;
+			}
+
+			vnodeToMount = children[0];
+		}
+
+		mount(
+			ids,
+			commit,
+			vnodeToMount,
+			virtualRootId,
+			filters,
+			domCache,
+			config,
+			profiler,
+			hocs,
+			bindings,
+			timings,
+			timingsByVNode,
+			renderReasonPre,
+		);
+
+		return;
+	}
 
 	const skip = shouldFilter(vnode, filters, config, bindings);
 	let name = bindings.getDisplayName(vnode, config);
@@ -196,11 +232,8 @@ function mount<T extends SharedVNode>(
 		}
 	}
 
-	if (root || !skip) {
+	if (!skip) {
 		const id = getOrCreateVNodeId(ids, vnode);
-		if (bindings.isRoot(vnode, config)) {
-			commit.operations.push(MsgTypes.ADD_ROOT, id);
-		}
 
 		if (!timings.start.has(id)) {
 			timings.start.set(id, timingsByVNode.start.get(vnode) || 0);
@@ -389,42 +422,51 @@ function update<T extends SharedVNode>(
 	}
 
 	const id = getVNodeId(ids, vnode);
-	commit.operations.push(
-		MsgTypes.UPDATE_VNODE_TIMINGS,
-		id,
-		(timings.start.get(id) || 0) * 1000,
-		(timings.end.get(id) || 0) * 1000,
-	);
-
-	const name = bindings.getDisplayName(vnode, config);
-	const hoc = getHocName(name);
-	if (hoc) {
-		hocs = [...hocs, hoc];
-	} else {
-		addHocs(commit, id, hocs);
-		hocs = [];
-	}
-
 	const oldVNode = getVNodeById(ids, id);
 	updateVNodeId(ids, id, vnode);
 
-	if (profiler.isProfiling && profiler.captureRenderReasons) {
-		const reason =
-			renderReasonPre !== null
-				? renderReasonPre.get(vnode) || null
-				: bindings.getRenderReasonPost(ids, bindings, timings, oldVNode, vnode);
-		if (reason !== null) {
-			const count = reason.items ? reason.items.length : 0;
-			commit.operations.push(MsgTypes.RENDER_REASON, id, reason.type, count);
-			if (reason.items && count > 0) {
-				commit.operations.push(
-					...reason.items.map(str => getStringId(commit.strings, str)),
-				);
+	const didRender = timingsByVNode.end.has(vnode);
+	if (didRender) {
+		commit.operations.push(
+			MsgTypes.UPDATE_VNODE_TIMINGS,
+			id,
+			(timings.start.get(id) || 0) * 1000,
+			(timings.end.get(id) || 0) * 1000,
+		);
+
+		const name = bindings.getDisplayName(vnode, config);
+		const hoc = getHocName(name);
+		if (hoc) {
+			hocs = [...hocs, hoc];
+		} else {
+			addHocs(commit, id, hocs);
+			hocs = [];
+		}
+
+		if (profiler.isProfiling && profiler.captureRenderReasons) {
+			const reason =
+				renderReasonPre !== null
+					? renderReasonPre.get(vnode) || null
+					: bindings.getRenderReasonPost(
+							ids,
+							bindings,
+							timings,
+							oldVNode,
+							vnode,
+					  );
+			if (reason !== null) {
+				const count = reason.items ? reason.items.length : 0;
+				commit.operations.push(MsgTypes.RENDER_REASON, id, reason.type, count);
+				if (reason.items && count > 0) {
+					commit.operations.push(
+						...reason.items.map(str => getStringId(commit.strings, str)),
+					);
+				}
 			}
 		}
-	}
 
-	updateHighlight(profiler, vnode, bindings);
+		updateHighlight(profiler, vnode, bindings);
+	}
 
 	const oldChildren = oldVNode
 		? bindings
@@ -528,7 +570,7 @@ function findClosestNonFilteredParent<T extends SharedVNode>(
 
 export function createCommit<T extends SharedVNode>(
 	ids: IdMappingState<T>,
-	roots: Set<T>,
+	roots: Map<T, ID>,
 	vnode: T,
 	filters: FilterState,
 	domCache: WeakMap<HTMLElement | Text, T>,
@@ -539,7 +581,7 @@ export function createCommit<T extends SharedVNode>(
 	timingsByVNode: VNodeTimings<T>,
 	renderReasonPre: Map<T, RenderReasonData> | null,
 ): Commit {
-	const commit = {
+	const commit: Commit & { renderReasons: Map<any, any> } = {
 		operations: [],
 		rootId: -1,
 		strings: new Map(),
@@ -559,8 +601,12 @@ export function createCommit<T extends SharedVNode>(
 			commit.stats.roots.children.push(children.length);
 		}
 
+		const virtualRootId = roots.get(vnode) || ids.nextId++;
+		commit.operations.push(MsgTypes.ADD_ROOT, virtualRootId);
+		commit.rootId = virtualRootId;
+
 		parentId = -1;
-		roots.add(vnode);
+		roots.set(vnode, virtualRootId);
 	} else {
 		parentId = findClosestNonFilteredParent(ids, helpers, vnode);
 	}
@@ -599,11 +645,16 @@ export function createCommit<T extends SharedVNode>(
 		);
 	}
 
-	let rootId = getVNodeId(ids, vnode);
-	if (rootId === -1) {
-		rootId = findClosestNonFilteredParent(ids, helpers, vnode);
+	// Find actual root node
+	if (commit.rootId === -1) {
+		let rootVNode: T | null = vnode;
+		while ((rootVNode = helpers.getVNodeParent(rootVNode)) != null) {
+			if (helpers.isRoot(rootVNode, config)) {
+				commit.rootId = roots.get(rootVNode)!;
+				break;
+			}
+		}
 	}
-	commit.rootId = rootId;
 
 	return commit;
 }
