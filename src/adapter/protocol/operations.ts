@@ -1,4 +1,4 @@
-import { ID, Tree } from "../../view/store/types";
+import { DevNodeType, ID, Tree } from "../../view/store/types";
 import { parseTable } from "./string-table";
 import { MsgTypes } from "./events";
 import { deepClone } from "../../view/components/profiler/flamegraph/modes/adjustNodesToRight";
@@ -19,16 +19,32 @@ export function ops2Tree(oldTree: Tree, existingRoots: ID[], ops: number[]) {
 	const removals: ID[] = [];
 	const reasons: RenderReasonMap = new Map();
 	let stats: ParsedStats | null = null;
+	const rendered: ID[] = [];
 
 	let i = ops[1] + 1;
 	const strings = parseTable(ops.slice(1, i + 1));
 
 	for (i += 1; i < ops.length; i++) {
 		switch (ops[i]) {
-			case MsgTypes.ADD_ROOT:
-				roots.push(ops[i + 1]);
+			case MsgTypes.ADD_ROOT: {
+				const id = ops[i + 1];
+				roots.push(id);
 				i += 1;
+
+				pending.set(id, {
+					children: [],
+					depth: -1,
+					id,
+					hocs: null,
+					name: "__VIRTUAL__ROOT__",
+					parent: -1,
+					type: DevNodeType.Group,
+					key: "",
+					startTime: -1,
+					endTime: -1,
+				});
 				break;
+			}
 			case MsgTypes.ADD_VNODE: {
 				const id = ops[i + 1];
 				const parentId = ops[i + 3];
@@ -38,6 +54,8 @@ export function ops2Tree(oldTree: Tree, existingRoots: ID[], ops: number[]) {
 					pending.set(parent.id, clone);
 					clone.children.push(id);
 				}
+
+				rendered.push(id);
 
 				pending.set(id, {
 					children: [],
@@ -60,6 +78,8 @@ export function ops2Tree(oldTree: Tree, existingRoots: ID[], ops: number[]) {
 				const x = pending.get(id)!;
 				x.startTime = ops[i + 2] / 1000;
 				x.endTime = ops[i + 3] / 1000;
+
+				rendered.push(id);
 
 				i += 3;
 				break;
@@ -85,7 +105,7 @@ export function ops2Tree(oldTree: Tree, existingRoots: ID[], ops: number[]) {
 						}
 
 						// Check if node was a root
-						const rootIdx = roots.indexOf(node.id);
+						const rootIdx = roots.indexOf(node.parent);
 						if (rootIdx > -1) {
 							roots.splice(rootIdx, 1);
 						}
@@ -159,5 +179,5 @@ export function ops2Tree(oldTree: Tree, existingRoots: ID[], ops: number[]) {
 		}
 	}
 
-	return { rootId, roots, tree: pending, removals, reasons, stats };
+	return { rootId, roots, tree: pending, removals, reasons, stats, rendered };
 }

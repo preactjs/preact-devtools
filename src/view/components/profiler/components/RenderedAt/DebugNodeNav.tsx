@@ -2,7 +2,7 @@ import { h } from "preact";
 import { useStore, useObserver } from "../../../../store/react-bindings";
 import { SidebarPanel, Empty } from "../../../sidebar/SidebarPanel";
 import s from "./RenderedAt.module.css";
-import { DevNode } from "../../../../store/types";
+import { DevNode, DevNodeType } from "../../../../store/types";
 
 export function DebugNodeNav() {
 	const store = useStore();
@@ -50,7 +50,7 @@ export function DebugNodeNav() {
 								<span style="display: flex; justify-content: space-between; width: 100%">
 									<span>
 										{node.name}
-										{commit && node.id === commit.commitRootId ? (
+										{commit && node.type === DevNodeType.Group ? (
 											<b> (R)</b>
 										) : null}
 									</span>

@@ -190,7 +190,6 @@ export function TreeItem(props: { key: any; id: ID; top: number }) {
 	const as = useSelection();
 	const { collapsed, toggle } = useCollapser();
 	const node = useObserver(() => store.nodes.$.get(id) || null);
-	const filterRoot = useObserver(() => store.filter.filterRoot.$);
 	const filterHoc = useObserver(() => store.filter.filterHoc.$);
 	const roots = useObserver(() => store.roots.$);
 	const onToggle = () => toggle(id);
@@ -198,7 +197,8 @@ export function TreeItem(props: { key: any; id: ID; top: number }) {
 
 	if (!node) return null;
 
-	const isRoot = node.parent === -1 && roots.includes(node.id);
+	// FIXME: This seems wrong
+	const isRoot = roots.includes(node.id);
 
 	return (
 		<div
@@ -218,9 +218,7 @@ export function TreeItem(props: { key: any; id: ID; top: number }) {
 		>
 			<div
 				class={s.itemHeader}
-				style={`transform: translate3d(calc(var(--indent-depth) * ${
-					node.depth + (filterRoot ? -1 : 0)
-				}), 0, 0);`}
+				style={`transform: translate3d(calc(var(--indent-depth) * ${node.depth}), 0, 0);`}
 			>
 				{node.children.length > 0 && (
 					<button

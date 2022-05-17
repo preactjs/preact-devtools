@@ -9,18 +9,12 @@ const MIN_WIDTH = 4;
  * Convert commit data into an array of position data to operate on.
  */
 export function toTransform(commit: CommitData): NodeTransform[] {
-	const commitRoot = commit.nodes.get(commit.commitRootId)!;
-
-	return Array.from(commit.selfDurations.entries())
-		.filter(data => {
-			const node = commit.nodes.get(data[0])!;
-			return node.startTime >= commitRoot.startTime;
-		})
-		.sort((a, b) => b[1] - a[1])
-		.map((data, i) => {
-			const selfDuration = data[1];
+	return commit.rendered
+		.sort((a, b) => commit.selfDurations.get(b)! - commit.selfDurations.get(a)!)
+		.map((id, i) => {
+			const selfDuration = commit.selfDurations.get(id)!;
 			return {
-				id: data[0],
+				id,
 				width: selfDuration,
 				x: 0,
 				row: i,

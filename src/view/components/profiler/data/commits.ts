@@ -1,6 +1,5 @@
 import { ID, DevNode } from "../../../store/types";
 import { Observable, valoo, watch } from "../../../valoo";
-import { getRoot } from "../flamegraph/FlamegraphStore";
 import {
 	RenderReasonMap,
 	RenderReasonData,
@@ -13,8 +12,7 @@ import { toTransform } from "../flamegraph/ranked/ranked-utils";
 export interface CommitData {
 	/** Id of the tree's root node */
 	rootId: ID;
-	/** Id of the node the commit was triggered on */
-	commitRootId: ID;
+	rendered: ID[];
 	maxSelfDuration: number;
 	duration: number;
 	nodes: Map<ID, DevNode>;
@@ -126,7 +124,7 @@ export function createProfiler(): ProfilerState {
 				selectedNodeId.$ =
 					flamegraphType.$ === FlamegraphType.FLAMEGRAPH
 						? commits.$[0].rootId
-						: commits.$[0].commitRootId;
+						: commits.$[0].rendered[0];
 			}
 		}
 	});
@@ -134,7 +132,7 @@ export function createProfiler(): ProfilerState {
 	// Render reasons
 	const activeReason = watch(() => {
 		if (activeCommit.$ !== null) {
-			const commitId = activeCommit.$.commitRootId;
+			const commitId = activeCommit.$.rendered[0];
 			const reason = renderReasons.$.get(commitId);
 			if (reason) {
 				return reason.get(selectedNodeId.$) || null;
@@ -212,9 +210,10 @@ export function resetProfiler(state: ProfilerState) {
 export function recordProfilerCommit(
 	tree: Map<ID, DevNode>,
 	profiler: ProfilerState,
-	commitRootId: number,
+	rendered: ID[],
+	rootId: ID,
 ) {
-	const commitRoot = tree.get(commitRootId)!;
+	const root = tree.get(rootId)!;
 
 	const nodes = new Map<ID, DevNode>();
 
@@ -223,9 +222,15 @@ export function recordProfilerCommit(
 	const selfDurations = new Map<ID, number>();
 
 	let totalCommitDuration = 0;
-	const start = commitRoot.startTime;
+	let start = 0;
+	if (root.children.length > 0) {
+		const firstChild = tree.get(root.children[0]);
+		if (firstChild) {
+			start = firstChild.startTime;
+		}
+	}
 
-	let stack = [commitRootId];
+	let stack = [rootId];
 	let item;
 	while ((item = stack.pop())) {
 		const node = tree.get(item);
@@ -233,7 +238,7 @@ export function recordProfilerCommit(
 		nodes.set(node.id, node);
 
 		if (node.startTime >= start) {
-			const next = node.endTime - commitRoot.startTime;
+			const next = node.endTime - start;
 			if (next >= totalCommitDuration) {
 				totalCommitDuration = next;
 			}
@@ -260,10 +265,9 @@ export function recordProfilerCommit(
 	}
 
 	// Traverse nodes not part of the current commit
-	const rootId = getRoot(tree, commitRootId);
 	stack = [rootId];
 	while ((item = stack.pop())) {
-		if (item === commitRootId) continue;
+		if (item === rootId) continue;
 
 		const node = tree.get(item);
 		if (!node) continue;
@@ -272,16 +276,10 @@ export function recordProfilerCommit(
 		stack.push(...node.children);
 	}
 
-	// Very useful to grab test cases from live websites
-	// console.groupCollapsed("patch");
-	// console.log("====", commitRoot.name, commitRootId);
-	// console.log(JSON.stringify(Array.from(nodes.values())));
-	// console.groupEnd();
-
 	profiler.commits.update(arr => {
 		arr.push({
-			rootId: getRoot(tree, commitRootId),
-			commitRootId: commitRootId,
+			rootId,
+			rendered,
 			nodes,
 			maxSelfDuration,
 			duration: totalCommitDuration,

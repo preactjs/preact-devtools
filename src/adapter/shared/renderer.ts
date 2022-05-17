@@ -21,6 +21,7 @@ import { PreactBindings, SharedVNode } from "../shared/bindings";
 import { inspectVNode } from "./inspectVNode";
 import { logVNode } from "../10/log";
 import { VNodeTimings } from "./timings";
+import { printCommit } from "../debug";
 
 export interface RendererConfig {
 	Fragment: FunctionalComponent;
@@ -69,7 +70,7 @@ export function createRenderer<T extends SharedVNode>(
 	bindings: PreactBindings<T>,
 	timings: VNodeTimings,
 ): Renderer<T> {
-	const roots = new Set<T>();
+	const roots = new Map<T, ID>();
 
 	let currentUnmounts: number[] = [];
 
@@ -96,9 +97,10 @@ export function createRenderer<T extends SharedVNode>(
 
 	return {
 		clear() {
-			roots.forEach(vnode => {
+			roots.forEach((id, vnode) => {
 				onUnmount(vnode);
 			});
+			roots.clear();
 		},
 
 		getVNodeById: id => getVNodeById(ids, id),
@@ -179,8 +181,7 @@ export function createRenderer<T extends SharedVNode>(
 			/** Queue events and flush in one go */
 			const queue: BaseEvent<any, any>[] = [];
 
-			roots.forEach(root => {
-				const rootId = getVNodeId(ids, root);
+			roots.forEach((rootId, root) => {
 				traverse(root, vnode => this.onUnmount(vnode), bindings);
 
 				const commit: Commit = {
@@ -258,6 +259,7 @@ export function createRenderer<T extends SharedVNode>(
 				profiler.pendingHighlightUpdates.clear();
 			}
 
+			printCommit(ev.data);
 			port.send(ev.type as any, ev.data);
 		},
 		onUnmount,
