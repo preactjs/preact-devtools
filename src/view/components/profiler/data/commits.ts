@@ -209,61 +209,56 @@ export function recordProfilerCommit(
 	rendered: Set<ID>,
 	commitRootId: number,
 ) {
-	const commitRoot = tree.get(commitRootId)!;
-
 	const nodes = new Map<ID, DevNode>();
 
 	// The time of the node that took the longest to render
 	let maxSelfDuration = 0;
+	let totalCommitDuration = 0;
 	const selfDurations = new Map<ID, number>();
 
-	let totalCommitDuration = 0;
-	const start = commitRoot.startTime;
+	const rootId = getRoot(tree, commitRootId);
 
-	let stack = [commitRootId];
-	let item;
-	while ((item = stack.pop())) {
-		const node = tree.get(item);
-		if (!node) continue;
-		nodes.set(node.id, node);
-
-		if (node.startTime >= start) {
-			const next = node.endTime - commitRoot.startTime;
-			if (next >= totalCommitDuration) {
-				totalCommitDuration = next;
-			}
+	// Find previous commit to copy over timing data later
+	const commits = profiler.commits.$;
+	let prevCommit: CommitData | undefined;
+	for (let i = commits.length - 1; i >= 0; i--) {
+		if (commits[i].rootId === rootId) {
+			prevCommit = commits[i];
+			break;
 		}
-
-		let selfDuration = node.endTime - node.startTime;
-
-		for (let i = 0; i < node.children.length; i++) {
-			const childId = node.children[i];
-			if (!rendered.has(childId)) continue;
-
-			const child = tree.get(childId)!;
-
-			if (child.startTime > node.startTime) {
-				selfDuration -= child.endTime - child.startTime;
-			}
-
-			stack.push(childId);
-		}
-
-		if (selfDuration > maxSelfDuration) {
-			maxSelfDuration = selfDuration;
-		}
-
-		selfDurations.set(node.id, selfDuration);
 	}
 
-	// Traverse nodes not part of the current commit
-	const rootId = getRoot(tree, commitRootId);
-	stack = [rootId];
-	while ((item = stack.pop())) {
-		if (item === commitRootId) continue;
-
-		const node = tree.get(item);
+	// Traverse nodes from the actual root to be able to build
+	// the full tree.
+	const stack = [rootId];
+	let id: ID | undefined;
+	while ((id = stack.pop())) {
+		const node = tree.get(id);
 		if (!node) continue;
+
+		if (rendered.has(node.id)) {
+			// Collect the time a node took to render excluding its children
+			let selfDuration = node.endTime - node.startTime;
+			for (let i = 0; i < node.children.length; i++) {
+				const childId = node.children[i];
+
+				if (rendered.has(childId)) {
+					const child = tree.get(childId)!;
+					selfDuration -= child.endTime - child.startTime;
+				}
+			}
+
+			if (selfDuration > maxSelfDuration) {
+				maxSelfDuration = selfDuration;
+			}
+			totalCommitDuration += selfDuration;
+			selfDurations.set(node.id, selfDuration);
+		} else if (prevCommit) {
+			// Otherwise just copy over the duration from the previous commit
+			// of that root id.
+			selfDurations.set(node.id, prevCommit.selfDurations.get(node.id) || 0);
+		}
+
 		nodes.set(node.id, node);
 
 		stack.push(...node.children);

@@ -32,7 +32,7 @@ export function FlameNode(props: Props) {
 
 	if (visible) {
 		const y = node.row * ROW_HEIGHT;
-		widthCss.current = `width: ${Math.max(width, 2)}px;`;
+		widthCss.current = `width: ${width}px;`;
 		transform.current = `transform: translate3d(${x}px, ${y}px, 0);`;
 	}
 

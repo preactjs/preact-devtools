@@ -4,6 +4,7 @@
 	height: 100%;
 	position: relative;
 	overflow-x: hidden;
+	scrollbar-gutter: stable;
 }
 
 .node {

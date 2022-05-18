@@ -1,6 +1,5 @@
-import { ID } from "../../view/store/types";
 import { PreactBindings, SharedVNode } from "../shared/bindings";
-import { getVNodeId, IdMappingState } from "../shared/idMapper";
+import { IdMappingState } from "../shared/idMapper";
 import {
 	createReason,
 	getChangedKeys,
@@ -15,7 +14,7 @@ import { VNodeTimings } from "../shared/timings";
 export function getRenderReasonPost<T extends SharedVNode>(
 	ids: IdMappingState<T>,
 	bindings: PreactBindings,
-	timings: VNodeTimings<ID>,
+	timings: VNodeTimings<T>,
 	old: T | null,
 	next: T | null,
 ): RenderReasonData | null {
@@ -68,16 +67,12 @@ export function getRenderReasonPost<T extends SharedVNode>(
 	}
 
 	const parent = bindings.getVNodeParent(next) as T;
-	if (parent != null) {
-		const parentId = getVNodeId(ids, parent);
-		const nextId = getVNodeId(ids, next);
-		if (
-			parent != null &&
-			(timings.start.get(nextId) || 0) >= (timings.start.get(parentId) || 0) &&
-			(timings.end.get(nextId) || 0) <= (timings.start.get(parentId) || 0)
-		) {
-			return createReason(RenderReason.PARENT_UPDATE, null);
-		}
+	if (
+		parent != null &&
+		(timings.start.get(next) || 0) >= (timings.start.get(parent) || 0) &&
+		(timings.end.get(next) || 0) <= (timings.end.get(parent) || 0)
+	) {
+		return createReason(RenderReason.PARENT_UPDATE, null);
 	}
 
 	return createReason(RenderReason.FORCE_UPDATE, null);

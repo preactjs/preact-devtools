@@ -148,7 +148,7 @@ export function flames(
 			child.parent = node.id;
 		});
 
-		selfDurations.set(node.id, selfDuration);
+		selfDurations.set(node.id, Math.max(0, selfDuration));
 	});
 
 	// Correct dangling children

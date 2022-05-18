@@ -14,7 +14,7 @@ export function patchTree(commit: CommitData) {
 	const { nodes, commitRootId } = commit;
 
 	const idToTransform = new Map<ID, NodeTransform>();
-	placeNode(commit, idToTransform, commit.rootId);
+	placeNode(commit, idToTransform, commit.rootId, 0);
 
 	let direct: DevNode | undefined = nodes.get(commitRootId);
 	if (direct !== undefined) {
@@ -29,27 +29,11 @@ export function patchTree(commit: CommitData) {
 	return idToTransform;
 }
 
-export function getSelfDuration(commit: CommitData, node: DevNode) {
-	const duration = node.endTime - node.startTime;
-	const children = node.children.reduce((acc, childId) => {
-		if (!commit.rendered.has(childId)) {
-			return acc;
-		}
-
-		const child = commit.nodes.get(childId);
-		if (!child) return 0;
-
-		return acc + (child.endTime - child.startTime);
-	}, 0);
-
-	const selfDuration = duration - children;
-	return selfDuration <= 0 ? 0 : selfDuration;
-}
-
 function placeNode(
 	commit: CommitData,
 	idToTransform: Map<ID, NodeTransform>,
 	id: ID,
+	depth: number,
 ) {
 	const node = commit.nodes.get(id)!;
 	if (!node) return;
@@ -60,11 +44,11 @@ function placeNode(
 		start = parentPos.x + parentPos.width;
 	}
 
-	const selfDuration = getSelfDuration(commit, node);
+	const selfDuration = commit.selfDurations.get(id) || 0;
 
 	const nodePos: NodeTransform = {
 		id,
-		row: node.depth,
+		row: depth,
 		x: start,
 		commitParent: false,
 		maximized: false,
@@ -74,21 +58,34 @@ function placeNode(
 	};
 	idToTransform.set(id, nodePos);
 
+	// Enlarge to make node visible if width == 0
+	if (nodePos.width === 0) {
+		enlargeParents(commit, idToTransform, id, 0.01);
+	}
+
 	for (let i = 0; i < node.children.length; i++) {
 		const childId = node.children[i];
-		const child = commit.nodes.get(childId);
-		if (!child) continue;
 
-		const selfDuration = getSelfDuration(commit, child);
+		// TODO: Handle static trees differently
+		const childSelfDuration = commit.selfDurations.get(childId) || 0;
 
-		placeNode(commit, idToTransform, childId);
+		placeNode(commit, idToTransform, childId, depth + 1);
 
 		// Expand parents upwards by self duration
-		let parentId = id;
-		while (parentId !== -1) {
-			const parent = commit.nodes.get(parentId)!;
-			idToTransform.get(parentId)!.width += selfDuration;
-			parentId = parent.parent;
-		}
+		enlargeParents(commit, idToTransform, id, childSelfDuration);
+	}
+}
+
+function enlargeParents(
+	commit: CommitData,
+	idToTransform: Map<ID, NodeTransform>,
+	id: ID,
+	value: number,
+) {
+	let parentId = id;
+	while (parentId !== -1) {
+		const parent = commit.nodes.get(parentId)!;
+		idToTransform.get(parentId)!.width += value;
+		parentId = parent.parent;
 	}
 }

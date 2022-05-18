@@ -55,20 +55,32 @@ export function placeFlamegraph(
 	return Array.from(idToTransform.values()).map(pos => {
 		let start;
 		let width;
+		let hidden = false;
 		if (maximizedIds.has(pos.id)) {
 			start = 0;
 			width = canvasWidth;
 		} else {
 			start = (pos.x - offset) * scale;
 			width = pos.width * scale;
+
+			// Hide other sibling nodes of maximized nodes
+			const node = tree.get(pos.id)!;
+			if (node && node.parent !== -1 && maximizedIds.has(node.parent)) {
+				const parent = tree.get(node.parent)!;
+				if (parent.children.length > 1) {
+					hidden = parent.children.some(childId => maximizedIds.has(childId));
+				}
+			}
 		}
+
+		const visible = hidden ? false : start >= 0 && start <= canvasWidth;
 
 		return {
 			...pos,
 			x: start,
 			width,
 			maximized: maximizedIds.has(pos.id),
-			visible: start >= 0 && start <= canvasWidth,
+			visible,
 		};
 	});
 }

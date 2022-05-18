@@ -7,7 +7,6 @@ import { placeFlamegraph } from "./flamegraph-utils";
 import { formatTime } from "../../util";
 import { useObserver, useStore } from "../../../../store/react-bindings";
 import { HocLabels } from "../../../elements/TreeView";
-import { getSelfDuration } from "./patchTree";
 
 export interface FlamegraphLayoutProps {
 	commit: CommitData;
@@ -48,7 +47,7 @@ export function FlamegraphLayout({
 				const node = commit.nodes.get(pos.id)!;
 				let appendix = "";
 				if (!pos.commitParent && pos.weight !== -1) {
-					const self = formatTime(getSelfDuration(commit, node));
+					const self = formatTime(commit.selfDurations.get(pos.id) || 0);
 					const total = formatTime(node.endTime - node.startTime);
 					appendix = ` (${self} of ${total})`;
 				}

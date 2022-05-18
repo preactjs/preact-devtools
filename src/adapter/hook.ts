@@ -11,7 +11,6 @@ import { PROFILE_RELOAD, STATS_RELOAD } from "../constants";
 import { setupOptionsV11 } from "./11/options";
 import { newProfiler } from "./adapter/profiler";
 import { createIdMappingState } from "./shared/idMapper";
-import { VNodeTimings } from "./shared/timings";
 import { bindingsV10 } from "./10/bindings";
 import { bindingsV11 } from "./11/bindings";
 
@@ -208,11 +207,6 @@ export function createHook(port: PortPageHook): DevtoolsHook {
 			// multiple connected renderers
 			const namespace = Math.floor(Math.random() * 2 ** 32);
 
-			const timings: VNodeTimings = {
-				start: new Map(),
-				end: new Map(),
-			};
-
 			// currently we only support preact >= 10, later we can add another branch for major === 8
 			if (preactVersionMatch.major == 10) {
 				const supports = {
@@ -237,7 +231,6 @@ export function createHook(port: PortPageHook): DevtoolsHook {
 					filters,
 					idMapper,
 					bindingsV10,
-					timings,
 				);
 				setupOptionsV10(options, renderer, config as any);
 				return attachRenderer(renderer, supports);
@@ -256,7 +249,6 @@ export function createHook(port: PortPageHook): DevtoolsHook {
 					filters,
 					idMapper,
 					bindingsV11,
-					timings,
 				);
 				setupOptionsV11(options as any, renderer, config, profiler);
 				return attachRenderer(renderer, {
