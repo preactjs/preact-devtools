@@ -1,7 +1,10 @@
 import { Page } from "puppeteer";
+import { waitForSelector } from "../../../test-utils";
 
 export async function getFlameNodes(page: Page) {
-	return await page.$$eval('[data-type="flamegraph"] > *', els => {
+	const selector = '[data-type="flamegraph"] > *';
+	await waitForSelector(page, selector);
+	return await page.$$eval(selector, els => {
 		return els.map(el => {
 			return {
 				maximized: el.hasAttribute("data-maximized"),

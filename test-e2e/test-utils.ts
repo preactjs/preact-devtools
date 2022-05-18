@@ -243,6 +243,7 @@ export type DevtoolsTab = "ELEMENTS" | "PROFILER" | "STATISTICS" | "SETTINGS";
 
 // Preact Devtools specific functions
 export async function clickTab(page: Page, tab: DevtoolsTab) {
+	await waitForSelector(page, '[name="root-panel"][value]');
 	await page.evaluate(name => {
 		return document
 			.querySelector(`[name="root-panel"][value="${name}"]`)!
