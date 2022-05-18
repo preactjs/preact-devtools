@@ -29,7 +29,13 @@ export function placeFlamegraph(
 		parentId = node.parent;
 	}
 
-	parentId = tree.get(selectedId)!.parent;
+	// Account for commits not having the currently selected node
+	// TODO: Move this logic elsewhere
+	const selected = !tree.has(selectedId)
+		? tree.get(rootId)!
+		: tree.get(selectedId)!;
+
+	parentId = selected.parent;
 	while (parentId !== -1) {
 		const node = tree.get(parentId);
 		if (node === undefined) break;

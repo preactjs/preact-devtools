@@ -17,6 +17,7 @@ export function ops2Tree(oldTree: Tree, existingRoots: ID[], ops: number[]) {
 	const rootId = ops[0];
 	const roots: ID[] = [...existingRoots];
 	const removals: ID[] = [];
+	const rendered = new Set<ID>();
 	const reasons: RenderReasonMap = new Map();
 	let stats: ParsedStats | null = null;
 
@@ -51,6 +52,9 @@ export function ops2Tree(oldTree: Tree, existingRoots: ID[], ops: number[]) {
 					startTime: ops[i + 7] / 1000,
 					endTime: ops[i + 8] / 1000,
 				});
+
+				rendered.add(id);
+
 				i += 8;
 				break;
 			}
@@ -60,6 +64,8 @@ export function ops2Tree(oldTree: Tree, existingRoots: ID[], ops: number[]) {
 				const x = pending.get(id)!;
 				x.startTime = ops[i + 2] / 1000;
 				x.endTime = ops[i + 3] / 1000;
+
+				rendered.add(id);
 
 				i += 3;
 				break;
@@ -159,5 +165,5 @@ export function ops2Tree(oldTree: Tree, existingRoots: ID[], ops: number[]) {
 		}
 	}
 
-	return { rootId, roots, tree: pending, removals, reasons, stats };
+	return { rootId, roots, tree: pending, removals, rendered, reasons, stats };
 }

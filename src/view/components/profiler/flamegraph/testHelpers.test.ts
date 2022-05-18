@@ -273,6 +273,7 @@ describe("FlameGraph DSL", () => {
 			commitRootId: 1,
 			rootId: 1,
 			duration: 110,
+			rendered: new Set(tree.commit.nodes.keys()),
 			maxSelfDuration: 60,
 			nodes: tree.idMap,
 			selfDurations: tree.commit.selfDurations,

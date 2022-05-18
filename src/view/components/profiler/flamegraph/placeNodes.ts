@@ -1,4 +1,3 @@
-import { CommitData } from "../data/commits";
 import { DevNode } from "../../../store/types";
 
 /**
@@ -31,15 +30,6 @@ export function flattenNodeTree<K, T extends { id: K; children: K[] }>(
 
 	return out;
 }
-
-export const EMPTY_COMMIT: CommitData = {
-	commitRootId: -1,
-	duration: -1,
-	maxSelfDuration: 1,
-	nodes: new Map(),
-	selfDurations: new Map(),
-	rootId: -1,
-};
 
 export const EMPTY: DevNode = {
 	children: [],
