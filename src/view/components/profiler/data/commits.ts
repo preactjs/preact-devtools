@@ -5,8 +5,7 @@ import {
 	RenderReasonMap,
 	RenderReasonData,
 } from "../../../../adapter/shared/renderReasons";
-import { FlameNodeTransform } from "../flamegraph/modes/flamegraph-utils";
-import { FlameTree, patchTree } from "../flamegraph/modes/patchTree";
+import { patchTree } from "../flamegraph/modes/patchTree";
 import { NodeTransform } from "../flamegraph/shared";
 import { toTransform } from "../flamegraph/ranked/ranked-utils";
 
@@ -66,7 +65,7 @@ export interface ProfilerState {
 	flamegraphType: Observable<FlamegraphType>;
 
 	// Flamegraph mode
-	flamegraphNodes: Observable<Map<ID, FlameNodeTransform>>;
+	flamegraphNodes: Observable<Map<ID, NodeTransform>>;
 	rankedNodes: Observable<NodeTransform[]>;
 }
 
@@ -145,26 +144,19 @@ export function createProfiler(): ProfilerState {
 	});
 
 	// FlamegraphNode
-	const flamegraphNodes = watch<FlameTree>(() => {
+	const flamegraphNodes = watch<Map<ID, NodeTransform>>(() => {
 		const commit = activeCommit.$;
 		if (!commit || flamegraphType.$ !== FlamegraphType.FLAMEGRAPH) {
 			return new Map();
 		}
 
-		let prevCommit = null;
 		for (let i = activeCommitIdx.$ - 1; i >= 0; i--) {
 			if (i >= commits.$.length) {
 				return new Map();
 			}
-
-			const search = commits.$[i];
-			if (search.rootId === commit.rootId) {
-				prevCommit = search;
-				break;
-			}
 		}
 
-		return patchTree(prevCommit, commit);
+		return patchTree(commit);
 	});
 
 	const rankedNodes = watch<NodeTransform[]>(() => {
