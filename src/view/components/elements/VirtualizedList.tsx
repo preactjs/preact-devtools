@@ -13,19 +13,24 @@ export interface VirtualizedListProps<T> {
 	items: T[];
 	container: RefObject<Element>;
 	rowHeight: number;
-	bufferCount: number;
+	minBufferCount: number;
 	renderRow: (item: T, idx: number, top: number) => any;
 }
 
 export function useVirtualizedList<T>({
 	rowHeight,
-	bufferCount,
+	minBufferCount,
 	items,
 	container,
 	renderRow,
 }: VirtualizedListProps<T>) {
 	const [height, setHeight] = useState(0);
 	const [scroll, setScroll] = useState(0);
+
+	const bufferCount =
+		height > 0
+			? Math.max(minBufferCount, Math.ceil(height / rowHeight / 2))
+			: minBufferCount;
 
 	let idx = Math.max(0, Math.floor(scroll / rowHeight) - bufferCount);
 	const max = idx + Math.ceil(height / rowHeight) + bufferCount;
