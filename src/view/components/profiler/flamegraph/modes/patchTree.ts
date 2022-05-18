@@ -54,7 +54,8 @@ function placeNode(
 		maximized: false,
 		visible: false,
 		weight: commit.rendered.has(id) ? getGradient(50, selfDuration) : -1,
-		width: selfDuration,
+		// Use a minimum value to make it visible in the flamegraph
+		width: Math.max(selfDuration, 0.01),
 	};
 	idToTransform.set(id, nodePos);
 
