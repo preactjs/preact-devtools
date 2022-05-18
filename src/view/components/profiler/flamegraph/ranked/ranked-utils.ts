@@ -9,18 +9,12 @@ const MIN_WIDTH = 4;
  * Convert commit data into an array of position data to operate on.
  */
 export function toTransform(commit: CommitData): NodeTransform[] {
-	const commitRoot = commit.nodes.get(commit.commitRootId)!;
-
-	return Array.from(commit.selfDurations.entries())
-		.filter(data => {
-			const node = commit.nodes.get(data[0])!;
-			return node.startTime >= commitRoot.startTime;
-		})
-		.sort((a, b) => b[1] - a[1])
-		.map((data, i) => {
-			const selfDuration = data[1];
+	return Array.from(commit.rendered.values())
+		.sort((a, b) => commit.selfDurations.get(b)! - commit.selfDurations.get(a)!)
+		.map((id, i) => {
+			const selfDuration = commit.selfDurations.get(id)!;
 			return {
-				id: data[0],
+				id,
 				width: selfDuration,
 				x: 0,
 				row: i,
@@ -32,37 +26,31 @@ export function toTransform(commit: CommitData): NodeTransform[] {
 		});
 }
 
-/**
- * Place a pre-sorted array of nodes in a linear top to bottom list.
- * MUTATES position nodes to avoid many allocations for each node.
- */
 export function placeRanked(
-	tree: Map<ID, DevNode>,
 	selfDurations: Map<ID, number>,
 	sorted: NodeTransform[],
 	selected: DevNode,
 	canvasWidth: number,
 ) {
-	const selectedDuration = selfDurations.get(selected.id) || 0;
-	const scale = (canvasWidth || 1) / Math.max(selectedDuration, 0.01);
+	const selectedDuration = selfDurations.get(selected.id) || 0.01;
+	const scale = (canvasWidth || 1) / selectedDuration;
 	let maximized = true;
 
-	sorted.forEach(pos => {
-		const node = tree.get(pos.id);
-		if (!node) return;
-
-		const selfDuration = selfDurations.get(node.id) || 0;
-
+	return sorted.map(pos => {
 		// Ensure nodes are always visible
-		pos.width = maximized
+		const width = maximized
 			? canvasWidth
-			: Math.max(Math.max(selfDuration, 0.01) * scale, MIN_WIDTH);
-		pos.maximized = maximized;
+			: Math.max(Math.max(pos.width, 0.01) * scale, MIN_WIDTH);
+		const posMaximized = maximized;
 
 		if (pos.id === selected.id) {
 			maximized = false;
 		}
-	});
 
-	return sorted.slice();
+		return {
+			...pos,
+			width,
+			maximized: posMaximized,
+		};
+	});
 }
