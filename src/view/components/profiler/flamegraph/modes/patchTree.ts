@@ -54,10 +54,14 @@ function placeNode(
 		maximized: false,
 		visible: false,
 		weight: commit.rendered.has(id) ? getGradient(50, selfDuration) : -1,
-		// Use a minimum value to make it visible in the flamegraph
-		width: Math.max(selfDuration, 0.01),
+		width: selfDuration,
 	};
 	idToTransform.set(id, nodePos);
+
+	// Enlarge to make node visible if width == 0
+	if (nodePos.width === 0) {
+		enlargeParents(commit, idToTransform, id, 0.01);
+	}
 
 	for (let i = 0; i < node.children.length; i++) {
 		const childId = node.children[i];
@@ -68,11 +72,20 @@ function placeNode(
 		placeNode(commit, idToTransform, childId, depth + 1);
 
 		// Expand parents upwards by self duration
-		let parentId = id;
-		while (parentId !== -1) {
-			const parent = commit.nodes.get(parentId)!;
-			idToTransform.get(parentId)!.width += childSelfDuration;
-			parentId = parent.parent;
-		}
+		enlargeParents(commit, idToTransform, id, childSelfDuration);
+	}
+}
+
+function enlargeParents(
+	commit: CommitData,
+	idToTransform: Map<ID, NodeTransform>,
+	id: ID,
+	value: number,
+) {
+	let parentId = id;
+	while (parentId !== -1) {
+		const parent = commit.nodes.get(parentId)!;
+		idToTransform.get(parentId)!.width += value;
+		parentId = parent.parent;
 	}
 }
