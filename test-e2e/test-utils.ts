@@ -169,11 +169,23 @@ export async function click(page: Page, selector: string) {
 }
 
 export async function typeText(page: Page, selector: string, text: string) {
-	const input = (await page.$(selector))!;
-	if (!input) {
-		throw new Error(`Could not find selector ${selector}`);
+	const start = Date.now();
+	while (Date.now() - start < 5000) {
+		try {
+			const input = (await page.$(selector))!;
+			if (!input) {
+				throw new Error(`Could not find selector ${selector}`);
+			}
+			await input.click({ clickCount: 3 });
+			break;
+		} catch (err) {
+			if (/Node is detached from document/.test(err.message)) {
+				continue;
+			}
+
+			throw err;
+		}
 	}
-	await input.click({ clickCount: 3 });
 	if (text) {
 		await page.type(selector, text);
 	} else {

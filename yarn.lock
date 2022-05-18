@@ -6223,10 +6223,10 @@ pend@~1.2.0:
   resolved "https://registry.yarnpkg.com/pend/-/pend-1.2.0.tgz#7a57eb550a6783f9115331fcf4663d5c8e007a50"
   integrity sha1-elfrVQpng/kRUzH89GY9XI4AelA=
 
-pentf@^3.3.9:
-  version "3.3.9"
-  resolved "https://registry.yarnpkg.com/pentf/-/pentf-3.3.9.tgz#7f67bdeee522113a8cfb93300d3b05436dd13a0c"
-  integrity sha512-MhRnKof9E9OYJOivBFcPc8IpiTLoqRQIy533lNKm0CoIzyW8s5GOzRzEAGGDUJsuQuYaSJHjrE/4nQo5jdxeMg==
+pentf@^3.3.10:
+  version "3.3.10"
+  resolved "https://registry.yarnpkg.com/pentf/-/pentf-3.3.10.tgz#19281af39e1af98ae8a99d5eaeda89a968ccaf5b"
+  integrity sha512-245vda4TBlYrcOdPU1D5V4CBmXnR4DFh1HOY2NRvxqAJh14MV7MhoykMJSSCCQcmZQqNhuMZoIKyCrILEpwsoQ==
   dependencies:
     "@sentry/node" "^5.15.5"
     "@types/glob" "^7.1.1"
@@ -6833,10 +6833,10 @@ pupa@^2.1.1:
   dependencies:
     escape-goat "^2.0.0"
 
-puppeteer@^14.0.0:
-  version "14.0.0"
-  resolved "https://registry.yarnpkg.com/puppeteer/-/puppeteer-14.0.0.tgz#829e97b70fa81746bb88ec2d72f11a7429cc84ab"
-  integrity sha512-Aj/cySGBMWpUYEWV0YOcwyhq5lOxuuiGScgdj/OvslAm/ydoywiI8OzAIXT4HzKmNTmzm/fKKHHtcsQa/fFgdw==
+puppeteer@^14.1.0:
+  version "14.1.0"
+  resolved "https://registry.yarnpkg.com/puppeteer/-/puppeteer-14.1.0.tgz#319560e20ff451890158d7146c79ab589c6e7031"
+  integrity sha512-T3eB4f6k9HVttYvyy8drGIKb04M+vxhepqM7qqcVCBTNT3T6M9cUaJT4k7P+a6wSonObJSJUP98JkPDQG+3fJw==
   dependencies:
     cross-fetch "3.1.5"
     debug "4.3.4"
