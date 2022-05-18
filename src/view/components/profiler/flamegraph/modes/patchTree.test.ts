@@ -4,6 +4,10 @@ import { flames } from "../testHelpers";
 import { Tree, DevNode, ID } from "../../../../store/types";
 import { NodeTransform } from "../shared";
 
+function round(n: number) {
+	return Math.round((n + Number.EPSILON) * 100) / 100;
+}
+
 export function toTimings(tree: Tree, flame: Map<ID, NodeTransform>) {
 	return Array.from(flame.values())
 		.map(pos => {
@@ -12,24 +16,26 @@ export function toTimings(tree: Tree, flame: Map<ID, NodeTransform>) {
 				id: pos.id,
 				name: node.name,
 				children: node.children,
-				start: pos.x,
-				end: pos.x + pos.width,
+				start: round(pos.x),
+				end: round(pos.x + pos.width),
 			};
 		})
 		.sort((a, b) => a.id - b.id);
 }
 
-export function patch(tree: Tree, rootId: ID, commitRootId: ID) {
+export function patch(
+	data: ReturnType<typeof flames>,
+	rootId: ID,
+	commitRootId: ID,
+) {
 	return toTimings(
-		tree,
+		data.idMap,
 		patchTree({
-			nodes: tree,
+			...data.commit,
 			rootId,
-			rendered: new Set(tree.keys()),
 			commitRootId,
 			duration: 100,
 			maxSelfDuration: 100,
-			selfDurations: new Map(),
 		}),
 	);
 }
@@ -54,11 +60,6 @@ export function prepareFixture(fixture: {
 }
 
 describe("patchTree", () => {
-	it("should return work with no data", () => {
-		const res = patch(new Map(), 1, 1);
-		expect(res.length).to.equal(0);
-	});
-
 	it("should offset timings if tree is new", () => {
 		const b = flames`
 			App *******
@@ -70,7 +71,7 @@ describe("patchTree", () => {
 			x.endTime += 200;
 		});
 
-		const actual = patch(b.idMap, 1, 1);
+		const actual = patch(b, 1, 1);
 		expect(actual).to.deep.equal([
 			{ name: "App", id: 1, start: 0, end: 110, children: [2] },
 			{ name: "Bar", id: 2, start: 50, end: 110, children: [] },
@@ -84,11 +85,11 @@ describe("patchTree", () => {
 			  Bob *
 		`;
 
-		const actual = patch(tree.idMap, 1, 2);
+		const actual = patch(tree, 1, 2);
 		expect(actual).to.deep.equal([
-			{ name: "App", id: 1, start: 0, end: 70, children: [2] },
-			{ name: "Bar", id: 2, start: 0, end: 70, children: [3] },
-			{ name: "Bob", id: 3, start: 20, end: 70, children: [] },
+			{ name: "App", id: 1, start: 0, end: 70.01, children: [2] },
+			{ name: "Bar", id: 2, start: 0.01, end: 70.01, children: [3] },
+			{ name: "Bob", id: 3, start: 20.01, end: 70.01, children: [] },
 		]);
 	});
 
@@ -106,7 +107,7 @@ describe("patchTree", () => {
 			}
 		});
 
-		const actual = patch(b.idMap, 1, 1);
+		const actual = patch(b, 1, 1);
 		expect(actual).to.deep.equal([
 			// TODO: App is detected as a static tree
 			{ name: "App", id: 1, start: 0, end: 90, children: [2] },
@@ -124,7 +125,7 @@ describe("patchTree", () => {
 		b.byName("Bob")!.startTime -= 40;
 		b.byName("Bob")!.endTime -= 40;
 
-		const actual = patch(b.idMap, 1, 2);
+		const actual = patch(b, 1, 2);
 		expect(actual).to.deep.equal([
 			{
 				name: "App",
@@ -150,10 +151,10 @@ describe("patchTree", () => {
 			 Bar *****
 		`;
 
-		const actual = patch(a.idMap, 1, 2);
+		const actual = patch(a, 1, 2);
 		expect(actual).to.deep.equal([
-			{ name: "App", id: 1, start: 0, end: 90, children: [2] },
-			{ name: "Bar", id: 2, start: 0, end: 90, children: [] },
+			{ name: "App", id: 1, start: 0, end: 90.01, children: [2] },
+			{ name: "Bar", id: 2, start: 0.01, end: 90.01, children: [] },
 		]);
 	});
 
@@ -171,7 +172,7 @@ describe("patchTree", () => {
 			}
 		});
 
-		const actual = patch(b.idMap, 1, 1);
+		const actual = patch(b, 1, 1);
 		expect(actual).to.deep.equal([
 			{ name: "App", id: 1, start: 0, end: 90, children: [2] },
 			{ name: "Bar", id: 2, start: 20, end: 90, children: [3] },
