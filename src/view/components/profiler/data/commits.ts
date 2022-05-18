@@ -14,6 +14,8 @@ export interface CommitData {
 	rootId: ID;
 	/** Id of the node the commit was triggered on */
 	commitRootId: ID;
+	/** Nodes that are part of the current commit */
+	rendered: Set<ID>;
 	maxSelfDuration: number;
 	duration: number;
 	nodes: Map<ID, DevNode>;
@@ -204,6 +206,7 @@ export function resetProfiler(state: ProfilerState) {
 export function recordProfilerCommit(
 	tree: Map<ID, DevNode>,
 	profiler: ProfilerState,
+	rendered: Set<ID>,
 	commitRootId: number,
 ) {
 	const commitRoot = tree.get(commitRootId)!;
@@ -274,6 +277,7 @@ export function recordProfilerCommit(
 		arr.push({
 			rootId: getRoot(tree, commitRootId),
 			commitRootId: commitRootId,
+			rendered,
 			nodes,
 			maxSelfDuration,
 			duration: totalCommitDuration,

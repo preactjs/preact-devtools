@@ -20,6 +20,7 @@ describe("ops2Tree", () => {
 			expect(ops2Tree(new Map(), [], ops)).to.deep.equal({
 				rootId: 1,
 				roots: [1],
+				rendered: new Set(),
 				removals: [],
 				tree: new Map(),
 				reasons: new Map(),

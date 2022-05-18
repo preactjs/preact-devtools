@@ -32,6 +32,10 @@ export function patchTree(commit: CommitData) {
 export function getSelfDuration(commit: CommitData, node: DevNode) {
 	const duration = node.endTime - node.startTime;
 	const children = node.children.reduce((acc, childId) => {
+		if (!commit.rendered.has(childId)) {
+			return acc;
+		}
+
 		const child = commit.nodes.get(childId);
 		if (!child) return 0;
 
@@ -65,7 +69,7 @@ function placeNode(
 		commitParent: false,
 		maximized: false,
 		visible: false,
-		weight: commit.selfDurations.has(id) ? getGradient(50, selfDuration) : -1,
+		weight: commit.rendered.has(id) ? getGradient(50, selfDuration) : -1,
 		width: selfDuration,
 	};
 	idToTransform.set(id, nodePos);

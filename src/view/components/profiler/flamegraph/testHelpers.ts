@@ -207,6 +207,7 @@ export function flames(
 	const commit: CommitData = {
 		rootId: 1,
 		commitRootId: 1,
+		rendered: new Set(nodes.map(node => node.id)),
 		duration: nodes.length > 0 ? nodes[0]!.endTime - nodes[0]!.startTime : 0,
 		maxSelfDuration: Math.max(
 			0,

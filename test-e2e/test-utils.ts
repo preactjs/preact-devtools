@@ -256,7 +256,7 @@ export async function clickRecordButton(page: Page) {
 	const start = /Start/.test(await getAttribute(page, selector, "title"));
 	await clickSelector(page, selector, {
 		async retryUntil() {
-			await page.evaluate(
+			return await page.evaluate(
 				(s, start) => {
 					return (start ? /Stop Recording/ : /Start Recording/).test(
 						document.querySelector(s).title,

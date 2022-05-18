@@ -42,18 +42,8 @@ export function RenderReasons() {
 
 	const hasReasons = reason !== null && reason.items && reason.items.length > 0;
 
-	let rendered = false;
-	if (!captureReason && commit) {
-		const root = commit.nodes.get(commit.commitRootId);
-		if (
-			root &&
-			selected &&
-			selected.startTime >= root.startTime &&
-			selected.endTime <= root.endTime
-		) {
-			rendered = true;
-		}
-	}
+	const rendered =
+		!captureReason && commit && selected && commit.rendered.has(selected.id);
 
 	return (
 		<SidebarPanel title="Render reasons">

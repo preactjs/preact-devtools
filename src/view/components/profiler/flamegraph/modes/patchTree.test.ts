@@ -25,6 +25,7 @@ export function patch(tree: Tree, rootId: ID, commitRootId: ID) {
 		patchTree({
 			nodes: tree,
 			rootId,
+			rendered: new Set(tree.keys()),
 			commitRootId,
 			duration: 100,
 			maxSelfDuration: 100,
@@ -146,7 +147,7 @@ describe("patchTree", () => {
 	it("should enlarge parent", () => {
 		const a = flames`
 			App ****
-			 Bar *****	
+			 Bar *****
 		`;
 
 		const actual = patch(a.idMap, 1, 2);
