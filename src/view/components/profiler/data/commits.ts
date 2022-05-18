@@ -238,6 +238,8 @@ export function recordProfilerCommit(
 
 		for (let i = 0; i < node.children.length; i++) {
 			const childId = node.children[i];
+			if (!rendered.has(childId)) continue;
+
 			const child = tree.get(childId)!;
 
 			if (child.startTime > node.startTime) {
