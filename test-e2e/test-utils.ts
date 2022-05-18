@@ -373,6 +373,16 @@ export async function clickTreeItem(page: Page, name: string) {
 	await clickSelector(
 		page,
 		`[data-testid="elements-tree"] [data-name="${name}"]`,
+		{
+			async retryUntil() {
+				return await page.evaluate(name => {
+					return (
+						document.querySelector(`[data-testid="inspect-component-name"]`)
+							?.textContent === `<${name}>`
+					);
+				}, name);
+			},
+		},
 	);
 }
 
