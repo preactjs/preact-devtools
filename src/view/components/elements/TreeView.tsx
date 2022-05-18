@@ -77,7 +77,7 @@ export function TreeView() {
 		scrollToItem,
 	} = useVirtualizedList({
 		rowHeight: ROW_HEIGHT,
-		bufferCount: 5,
+		minBufferCount: 5,
 		container: ref,
 		items: nodeList,
 		// eslint-disable-next-line react/display-name
