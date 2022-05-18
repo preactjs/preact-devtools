@@ -1,4 +1,4 @@
-import { h } from "preact";
+import { Fragment, h } from "preact";
 import s from "./FlameGraph.module.css";
 import { useStore, useObserver } from "../../../store/react-bindings";
 import { useRef, useCallback, useState, useEffect } from "preact/hooks";
@@ -66,7 +66,7 @@ export function FlameGraph() {
 			style={showDebug ? "overflow-x: auto" : ""}
 		>
 			{canvasWidth === -1 ? null : (
-				<>
+				<Fragment>
 					{displayType === FlamegraphType.RANKED ? (
 						<RankedLayout
 							canvasWidth={canvasWidth}
@@ -86,7 +86,7 @@ export function FlameGraph() {
 							onMouseLeave={onMouseLeave}
 						/>
 					)}
-				</>
+				</Fragment>
 			)}
 		</div>
 	);
