@@ -140,6 +140,8 @@ export function setupOptionsV10(
 
 	options.unmount = vnode => {
 		if (prevBeforeUnmount) prevBeforeUnmount(vnode);
+		timings.start.delete(vnode);
+		timings.end.delete(vnode);
 		renderer.onUnmount(vnode as any);
 	};
 

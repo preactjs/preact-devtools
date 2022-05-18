@@ -45,7 +45,7 @@ export interface PreactBindings<T extends SharedVNode = SharedVNode> {
 	getRenderReasonPost(
 		ids: IdMappingState<T>,
 		bindings: PreactBindings<T>,
-		timings: VNodeTimings,
+		timings: VNodeTimings<T>,
 		old: T | null,
 		next: T | null,
 	): RenderReasonData | null;
