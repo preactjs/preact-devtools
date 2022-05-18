@@ -18,7 +18,7 @@ const highlightNode = debounce(
 
 export function FlameGraph() {
 	const store = useStore();
-	const [canvasWidth, setCanvasWidth] = useState(600);
+	const [canvasWidth, setCanvasWidth] = useState(-1);
 
 	const displayType = useObserver(() => store.profiler.flamegraphType.$);
 	const selected = useObserver(() => store.profiler.selectedNode.$ || EMPTY);
@@ -29,14 +29,16 @@ export function FlameGraph() {
 	const ref = useRef<HTMLDivElement>();
 	useEffect(() => {
 		if (ref.current) {
-			setCanvasWidth(ref.current.clientWidth);
+			// Pad for potential rounding issues
+			setCanvasWidth(Math.floor(ref.current.clientWidth) - 4);
 		}
-	}, [isRecording || !commit]);
+	}, [isRecording, commit]);
 	useResize(() => {
 		if (ref.current) {
-			setCanvasWidth(ref.current.clientWidth);
+			// Pad for potential rounding issues
+			setCanvasWidth(Math.floor(ref.current.clientWidth) - 4);
 		}
-	}, []);
+	}, [commit]);
 
 	const onSelect = useCallback(
 		(id: number) => {
@@ -63,24 +65,28 @@ export function FlameGraph() {
 			data-type={displayType.toLowerCase()}
 			style={showDebug ? "overflow-x: auto" : ""}
 		>
-			{displayType === FlamegraphType.RANKED ? (
-				<RankedLayout
-					canvasWidth={canvasWidth}
-					commit={commit!}
-					onSelect={onSelect}
-					selected={selected}
-					onMouseEnter={onMouseEnter}
-					onMouseLeave={onMouseLeave}
-				/>
-			) : (
-				<FlamegraphLayout
-					canvasWidth={canvasWidth}
-					commit={commit!}
-					onSelect={onSelect}
-					selected={selected}
-					onMouseEnter={onMouseEnter}
-					onMouseLeave={onMouseLeave}
-				/>
+			{canvasWidth === -1 ? null : (
+				<>
+					{displayType === FlamegraphType.RANKED ? (
+						<RankedLayout
+							canvasWidth={canvasWidth}
+							commit={commit!}
+							onSelect={onSelect}
+							selected={selected}
+							onMouseEnter={onMouseEnter}
+							onMouseLeave={onMouseLeave}
+						/>
+					) : (
+						<FlamegraphLayout
+							canvasWidth={canvasWidth}
+							commit={commit!}
+							onSelect={onSelect}
+							selected={selected}
+							onMouseEnter={onMouseEnter}
+							onMouseLeave={onMouseLeave}
+						/>
+					)}
+				</>
 			)}
 		</div>
 	);
