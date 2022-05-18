@@ -68,7 +68,7 @@ export function placeFlamegraph(
 			x: start,
 			width,
 			maximized: maximizedIds.has(pos.id),
-			visible: pos.x >= 0 && pos.x <= canvasWidth,
+			visible: start >= 0 && start <= canvasWidth,
 		};
 	});
 }
