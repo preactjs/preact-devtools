@@ -12,6 +12,8 @@ import { getFlameNodes } from "./utils";
 
 export const description = "Correctly position memoized sibling sub-trees";
 
+export const skip = () => true;
+
 export async function run(config: any) {
 	const { page, devtools } = await newTestPage(config, "memo2");
 

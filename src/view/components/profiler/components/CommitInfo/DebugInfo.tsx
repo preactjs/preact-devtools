@@ -38,7 +38,7 @@ export function DebugProfilerInfo() {
 				<br />
 				<dt class={s.title}>tree:</dt>
 				<dd class={s.value}>
-					<TimeRange from={pos.start} to={pos.end} />
+					<TimeRange from={pos.x} to={pos.x + pos.width} />
 				</dd>
 				<br />
 				<dt class={s.title}>real:</dt>

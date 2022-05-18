@@ -1,6 +1,5 @@
 import { NodeTransform } from "../shared";
-import { ID, DevNodeType, DevNode } from "../../../../store/types";
-import { FlameTree } from "./patchTree";
+import { ID, DevNode } from "../../../../store/types";
 
 export interface FlameNodeTransform extends NodeTransform {
 	/** Relative start position to root node (without zoom) */
@@ -14,71 +13,56 @@ export interface FlameNodeTransform extends NodeTransform {
  */
 export function placeFlamegraph(
 	tree: Map<ID, DevNode>,
-	transforms: FlameTree,
+	idToTransform: Map<ID, NodeTransform>,
 	rootId: ID,
 	selectedId: ID,
 	canvasWidth: number,
-): FlameNodeTransform[] {
-	const selectedNode = tree.get(selectedId);
-	// Collect parents upfront, so that we already know which
-	// nodes should be maximized in the next traversal
-	const parents = new Set<ID>([selectedId]);
-	let item: DevNode | undefined = selectedNode;
-	while (item && (item = tree.get(item.parent))) {
-		parents.add(item.id);
+): NodeTransform[] {
+	const maximizedIds = new Set<ID>([selectedId]);
+	const commitParentIds = new Set<ID>();
+
+	let parentId = tree.get(rootId)!.parent;
+	while (parentId !== -1) {
+		const node = tree.get(parentId);
+		if (node === undefined) break;
+		commitParentIds.add(parentId);
+		parentId = node.parent;
 	}
 
-	const selectedPos = transforms.get(selectedId);
-	if (!selectedPos) return [];
-
-	const root = tree.get(rootId)!;
-	const scale =
-		(canvasWidth || 1) / (selectedPos.end - selectedPos.start || 0.01);
-	const offset = selectedPos.start;
-
-	// Use this value to keep track of when we enter the current
-	// sub-tree that we're zoomed in into. Once we processed all
-	// nodes of that we need to reset this value.
-	let visitedSelectedRow = -1;
-
-	const stack = [root];
-	while ((item = stack.pop())) {
-		// Track when we enter and leave the currently focused sub-tree
-		if (item.id === selectedId) {
-			visitedSelectedRow = item.depth;
-		} else if (item.depth <= visitedSelectedRow) {
-			visitedSelectedRow = -1;
-		}
-
-		if (item.type !== DevNodeType.Group) {
-			const pos = transforms.get(item.id)!;
-			// If we are a parent node of the selected node or the selected
-			// node itself, we need to maximize it by stretching it over
-			// the whole canvas.
-			if (parents.has(item.id)) {
-				pos.maximized = true;
-				pos.width = canvasWidth;
-				pos.x = 0;
-				pos.visible = true;
-			}
-			// At this point the node isn't maximized. If we're not inside
-			// the currently zoomed in sub-tree, we must be a node that
-			// should be hidden.
-			else if (visitedSelectedRow === -1) {
-				pos.visible = false;
-			}
-			// Looks like the node is visible and we have to position it
-			// inside the visible canvas.
-			else {
-				pos.maximized = false;
-				pos.visible = true;
-				pos.x = (pos.start - offset) * scale;
-				pos.width = (pos.end - pos.start) * scale;
-			}
-		}
-
-		stack.push(...item.children.map(id => tree.get(id)!));
+	parentId = tree.get(selectedId)!.parent;
+	while (parentId !== -1) {
+		const node = tree.get(parentId);
+		if (node === undefined) break;
+		maximizedIds.add(parentId);
+		parentId = node.parent;
 	}
 
-	return Array.from(transforms.values());
+	let offset = 0;
+	let scale = 1;
+
+	const selectedPos = idToTransform.get(selectedId);
+	if (selectedPos !== undefined) {
+		offset = selectedPos.x;
+		scale = canvasWidth / selectedPos.width;
+	}
+
+	return Array.from(idToTransform.values()).map(pos => {
+		let start;
+		let width;
+		if (maximizedIds.has(pos.id)) {
+			start = 0;
+			width = canvasWidth;
+		} else {
+			start = (pos.x - offset) * scale;
+			width = pos.width * scale;
+		}
+
+		return {
+			...pos,
+			x: start,
+			width,
+			maximized: maximizedIds.has(pos.id),
+			visible: pos.x >= 0 && pos.x <= canvasWidth,
+		};
+	});
 }

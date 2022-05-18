@@ -1,18 +1,19 @@
 import { expect } from "chai";
-import { patchTree, FlameTree } from "./patchTree";
+import { patchTree } from "./patchTree";
 import { flames } from "../testHelpers";
 import { Tree, DevNode, ID } from "../../../../store/types";
+import { NodeTransform } from "../shared";
 
-export function toTimings(tree: Tree, flame: FlameTree) {
+export function toTimings(tree: Tree, flame: Map<ID, NodeTransform>) {
 	return Array.from(flame.values())
-		.map(x => {
-			const node = tree.get(x.id)!;
+		.map(pos => {
+			const node = tree.get(pos.id)!;
 			return {
-				id: x.id,
+				id: pos.id,
 				name: node.name,
 				children: node.children,
-				start: x.start,
-				end: x.end,
+				start: pos.x,
+				end: pos.x + pos.width,
 			};
 		})
 		.sort((a, b) => a.id - b.id);
@@ -21,7 +22,7 @@ export function toTimings(tree: Tree, flame: FlameTree) {
 export function patch(tree: Tree, rootId: ID, commitRootId: ID) {
 	return toTimings(
 		tree,
-		patchTree(null, {
+		patchTree({
 			nodes: tree,
 			rootId,
 			commitRootId,
@@ -71,7 +72,7 @@ describe("patchTree", () => {
 		const actual = patch(b.idMap, 1, 1);
 		expect(actual).to.deep.equal([
 			{ name: "App", id: 1, start: 0, end: 110, children: [2] },
-			{ name: "Bar", id: 2, start: 10, end: 70, children: [] },
+			{ name: "Bar", id: 2, start: 50, end: 110, children: [] },
 		]);
 	});
 
@@ -79,14 +80,14 @@ describe("patchTree", () => {
 		const tree = flames`
 			App **
 			 Bar ***
-			 	Bob *
+			  Bob *
 		`;
 
 		const actual = patch(tree.idMap, 1, 2);
 		expect(actual).to.deep.equal([
 			{ name: "App", id: 1, start: 0, end: 70, children: [2] },
 			{ name: "Bar", id: 2, start: 0, end: 70, children: [3] },
-			{ name: "Bob", id: 3, start: 10, end: 60, children: [] },
+			{ name: "Bob", id: 3, start: 20, end: 70, children: [] },
 		]);
 	});
 
@@ -108,8 +109,8 @@ describe("patchTree", () => {
 		expect(actual).to.deep.equal([
 			// TODO: App is detected as a static tree
 			{ name: "App", id: 1, start: 0, end: 90, children: [2] },
-			{ name: "Bar", id: 2, start: 0, end: 70, children: [3] },
-			{ name: "Bob", id: 3, start: 10, end: 60, children: [] },
+			{ name: "Bar", id: 2, start: 20, end: 90, children: [3] },
+			{ name: "Bob", id: 3, start: 40, end: 90, children: [] },
 		]);
 	});
 
@@ -134,11 +135,11 @@ describe("patchTree", () => {
 			{
 				name: "Bar",
 				id: 2,
-				start: 0,
-				end: 80,
+				start: 30,
+				end: 110,
 				children: [],
 			},
-			{ name: "Bob", id: 3, start: 80, end: 140, children: [] },
+			{ name: "Bob", id: 3, start: 110, end: 170, children: [] },
 		]);
 	});
 
@@ -172,8 +173,8 @@ describe("patchTree", () => {
 		const actual = patch(b.idMap, 1, 1);
 		expect(actual).to.deep.equal([
 			{ name: "App", id: 1, start: 0, end: 90, children: [2] },
-			{ name: "Bar", id: 2, start: 0, end: 70, children: [3] },
-			{ name: "Bob", id: 3, start: 10, end: 60, children: [] },
+			{ name: "Bar", id: 2, start: 20, end: 90, children: [3] },
+			{ name: "Bob", id: 3, start: 40, end: 90, children: [] },
 		]);
 	});
 });
