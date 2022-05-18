@@ -37,14 +37,7 @@ export function RankedLayout({
 
 	// Update node positions and mutate `data` to avoid allocations
 	const placed = useMemo(
-		() =>
-			placeRanked(
-				commit.nodes,
-				commit.selfDurations,
-				data,
-				selected,
-				canvasWidth,
-			),
+		() => placeRanked(commit.selfDurations, data, selected, canvasWidth),
 		[canvasWidth, selected, commit, data],
 	);
 
