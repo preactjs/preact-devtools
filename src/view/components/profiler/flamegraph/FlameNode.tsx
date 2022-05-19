@@ -8,7 +8,6 @@ export interface Props {
 	selected: boolean;
 	children: any;
 	parentId: number;
-	commitRootId: number;
 	name: string;
 	onClick: (id: ID) => void;
 	node: NodeTransform;
@@ -43,8 +42,6 @@ export function FlameNode(props: Props) {
 			onMouseEnter={onRawMouseEnter}
 			onMouseLeave={onMouseLeave}
 			data-id={node.id}
-			data-commit-root={props.commitRootId}
-			data-active-commit-root={node.id === props.commitRootId}
 			data-parent-id={props.parentId}
 			data-visible={visible}
 			data-weight={node.weight}
