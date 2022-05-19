@@ -68,7 +68,6 @@ export function RankedLayout({
 				return (
 					<FlameNode
 						key={pos.id}
-						commitRootId={commit.commitRootId}
 						node={pos}
 						selected={pos.id === selected.id}
 						parentId={selected.parent}
