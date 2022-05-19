@@ -2,7 +2,7 @@ import { h } from "preact";
 import { useStore, useObserver } from "../../../../store/react-bindings";
 import { SidebarPanel, Empty } from "../../../sidebar/SidebarPanel";
 import s from "./RenderedAt.module.css";
-import { DevNode } from "../../../../store/types";
+import { DevNode, DevNodeType } from "../../../../store/types";
 
 export function DebugNodeNav() {
 	const store = useStore();
@@ -29,9 +29,17 @@ export function DebugNodeNav() {
 	});
 	const isRecording = useObserver(() => store.profiler.isRecording.$);
 
-	if (isRecording) {
+	if (isRecording || !commit) {
 		return null;
 	}
+
+	const commitRoot = commit.nodes.get(commit.commitRootId)!;
+
+	const rootIds = new Set(
+		commitRoot.type === DevNodeType.Group
+			? commitRoot.children
+			: [commitRoot.id],
+	);
 
 	return (
 		<SidebarPanel title="Debug Node Navigation:" testId="profiler-debug-nav">
@@ -50,9 +58,7 @@ export function DebugNodeNav() {
 								<span style="display: flex; justify-content: space-between; width: 100%">
 									<span>
 										{node.name}
-										{commit && node.id === commit.commitRootId ? (
-											<b> (R)</b>
-										) : null}
+										{rootIds.has(node.id) && <b> (R)</b>}
 									</span>
 									<span>{node.id}</span>
 								</span>

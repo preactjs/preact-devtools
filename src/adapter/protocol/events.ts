@@ -4,6 +4,7 @@ import { recordProfilerCommit } from "../../view/components/profiler/data/commit
 import { ops2Tree } from "./operations";
 import { applyOperationsV1 } from "./legacy/operationsV1";
 import { Stats, stats2ops } from "../shared/stats";
+import { getRoot } from "../../view/components/profiler/flamegraph/FlamegraphStore";
 
 export enum MsgTypes {
 	ADD_ROOT = 1,
@@ -107,14 +108,11 @@ export function flush(commit: Commit) {
  * We currently expect all operations to be in order.
  */
 export function applyOperationsV2(store: Store, data: number[]) {
-	const {
-		rootId: commitRootId,
-		rendered,
-		roots,
-		tree,
-		reasons,
-		stats,
-	} = ops2Tree(store.nodes.$, store.roots.$, data);
+	const { rootId, rendered, roots, tree, reasons, stats } = ops2Tree(
+		store.nodes.$,
+		store.roots.$,
+		data,
+	);
 
 	// Update store data
 	store.roots.$ = roots;
@@ -130,9 +128,9 @@ export function applyOperationsV2(store: Store, data: number[]) {
 	// If we are profiling, we'll make a frozen copy of the mutable
 	// elements tree because the profiler can step through time
 	if (store.profiler.isRecording.$) {
-		recordProfilerCommit(store.nodes.$, store.profiler, rendered, commitRootId);
+		recordProfilerCommit(store.nodes.$, store.profiler, rendered, rootId);
 		store.profiler.renderReasons.update(m => {
-			m.set(commitRootId, reasons);
+			m.set(rootId, reasons);
 		});
 	}
 

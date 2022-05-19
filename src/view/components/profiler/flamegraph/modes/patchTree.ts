@@ -11,17 +11,21 @@ export type FlameTree = Map<ID, FlameNodeTransform>;
  * the parent and all next siblings will be expanded (pushed) to the right.
  */
 export function patchTree(commit: CommitData) {
-	const { nodes, commitRootId } = commit;
+	const { nodes } = commit;
 
 	const idToTransform = new Map<ID, NodeTransform>();
 	placeNode(commit, idToTransform, commit.rootId, 0);
 
-	let direct: DevNode | undefined = nodes.get(commitRootId);
-	if (direct !== undefined) {
-		while ((direct = nodes.get(direct.parent))) {
-			const transform = idToTransform.get(direct.id);
-			if (transform) {
-				transform.commitParent = true;
+	if (commit.rendered.size > 0) {
+		const firstId = Array.from(commit.rendered)[0];
+
+		let direct: DevNode | undefined = nodes.get(firstId);
+		if (direct !== undefined) {
+			while ((direct = nodes.get(direct.parent))) {
+				const transform = idToTransform.get(direct.id);
+				if (transform) {
+					transform.commitParent = true;
+				}
 			}
 		}
 	}

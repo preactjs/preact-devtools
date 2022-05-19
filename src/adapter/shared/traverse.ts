@@ -538,6 +538,7 @@ export function createCommit<T extends SharedVNode>(
 		strings: new Map(),
 		unmountIds: [],
 		renderReasons: new Map(),
+		startTime: -1,
 		stats: profiler.recordStats ? createStats() : null,
 	};
 
@@ -592,8 +593,15 @@ export function createCommit<T extends SharedVNode>(
 
 	let rootId = getVNodeId(ids, vnode);
 	if (rootId === -1) {
-		rootId = findClosestNonFilteredParent(ids, helpers, vnode);
+		let next: T | null = vnode;
+		while ((next = helpers.getVNodeParent(next)) != null) {
+			if (helpers.isRoot(next, config)) {
+				rootId = getVNodeId(ids, next);
+				break;
+			}
+		}
 	}
+
 	commit.rootId = rootId;
 
 	return commit;

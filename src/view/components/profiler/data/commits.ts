@@ -1,6 +1,5 @@
-import { ID, DevNode } from "../../../store/types";
+import { ID, DevNode, DevNodeType } from "../../../store/types";
 import { Observable, valoo, watch } from "../../../valoo";
-import { getRoot } from "../flamegraph/FlamegraphStore";
 import {
 	RenderReasonMap,
 	RenderReasonData,
@@ -135,8 +134,8 @@ export function createProfiler(): ProfilerState {
 	// Render reasons
 	const activeReason = watch(() => {
 		if (activeCommit.$ !== null) {
-			const commitId = activeCommit.$.commitRootId;
-			const reason = renderReasons.$.get(commitId);
+			const rootId = activeCommit.$.rootId;
+			const reason = renderReasons.$.get(rootId);
 			if (reason) {
 				return reason.get(selectedNodeId.$) || null;
 			}
@@ -207,7 +206,7 @@ export function recordProfilerCommit(
 	tree: Map<ID, DevNode>,
 	profiler: ProfilerState,
 	rendered: Set<ID>,
-	commitRootId: number,
+	rootId: number,
 ) {
 	const nodes = new Map<ID, DevNode>();
 
@@ -215,8 +214,6 @@ export function recordProfilerCommit(
 	let maxSelfDuration = 0;
 	let totalCommitDuration = 0;
 	const selfDurations = new Map<ID, number>();
-
-	const rootId = getRoot(tree, commitRootId);
 
 	// Find previous commit to copy over timing data later
 	const commits = profiler.commits.$;
@@ -264,16 +261,49 @@ export function recordProfilerCommit(
 		stack.push(...node.children);
 	}
 
-	// Very useful to grab test cases from live websites
-	// console.groupCollapsed("patch");
-	// console.log("====", commitRoot.name, commitRootId);
-	// console.log(JSON.stringify(Array.from(nodes.values())));
-	// console.groupEnd();
+	// Get id of node where the commit originated from. If that node
+	// is hidden due to active filters, we'll create a virtual node
+	// if multiple children rendered.
+	let commitRootId = -1;
+	const r = Array.from(rendered.values());
+	if (rendered.size === 1) {
+		commitRootId = r[0];
+	} else if (rendered.size >= 2) {
+		const parentId = nodes.get(r[0])!.parent;
+		const parentId2 = nodes.get(r[1])!.parent;
+
+		if (parentId === parentId2) {
+			const children = [r[0], r[1]];
+
+			for (let i = 2; i < r.length; i++) {
+				const id = r[i];
+				const nextParentId = nodes.get(id)!.parent;
+				if (nextParentId !== parentId) {
+					break;
+				}
+
+				children.push(id);
+			}
+
+			nodes.set(-2, {
+				id: -2,
+				children,
+				depth: -1,
+				hocs: null,
+				key: "",
+				name: "__VIRTUAL__",
+				parent: -1,
+				startTime: nodes.get(children[0])!.startTime,
+				endTime: nodes.get(children[children.length - 1])!.endTime,
+				type: DevNodeType.Group,
+			});
+		}
+	}
 
 	profiler.commits.update(arr => {
 		arr.push({
-			rootId: getRoot(tree, commitRootId),
-			commitRootId: commitRootId,
+			rootId,
+			commitRootId,
 			rendered,
 			nodes,
 			maxSelfDuration,
