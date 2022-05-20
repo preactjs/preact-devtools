@@ -12,9 +12,12 @@ function updateVersion(json, kind) {
 	switch (kind) {
 		case "major":
 			major = Number(major) + 1;
+			minor = 0;
+			patch = 0;
 			break;
 		case "minor":
 			minor = Number(minor) + 1;
+			patch = 0;
 			break;
 		case "patch":
 			patch = Number(patch) + 1;
