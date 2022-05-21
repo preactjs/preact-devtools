@@ -48,7 +48,7 @@ export interface HookItem {
 let hookLog: HookData[] = [];
 let inspectingHooks = false;
 let ancestorName = "unknown";
-const debugValues = new Map<string, string>();
+const debugValues = new Map<string, unknown>();
 let debugNames: string[] = [];
 
 export function addHookName(name: any) {
@@ -66,7 +66,7 @@ export function addDebugValue(value: any) {
 		.map(x => (x.name === "root" ? x.name : `${x.location}.${x.name}`))
 		.join(".");
 
-	debugValues.set(location, "" + value);
+	debugValues.set(location, value);
 }
 
 let ignoreNext = false;
@@ -177,7 +177,7 @@ export function parseHookData<T extends SharedVNode>(
 				}
 
 				if (debugValues.has(id)) {
-					value = debugValues.get(id);
+					value = serialize(config, bindings, debugValues.get(id));
 				}
 
 				let hookValueTree: PropData[] = [];
