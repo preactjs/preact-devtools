@@ -36,9 +36,21 @@ export function useVirtualizedList<T>({
 	const max = idx + Math.ceil(height / rowHeight) + bufferCount;
 	let top = idx * rowHeight;
 
+	// A bit hacky, we bascially want to ensure that `scrollToItem`
+	// is ALWAYS stable
 	const timeoutRef = useRef<any>(null);
+	const scrollRef = useRef(scroll);
+	const itemsRef = useRef(items);
+	const heightRef = useRef(height);
+	scrollRef.current = scroll;
+	itemsRef.current = items;
+	heightRef.current = height;
+
 	const scrollToItem = useCallback(
 		(item: T) => {
+			const scroll = scrollRef.current;
+			const items = itemsRef.current;
+			const height = heightRef.current;
 			if (timeoutRef.current) {
 				clearTimeout(timeoutRef.current);
 			}
@@ -48,10 +60,16 @@ export function useVirtualizedList<T>({
 
 			// Check if the item we want to scroll to is already in view
 			const pos = Math.floor(nextIdx * rowHeight);
-			if (scroll > pos || scroll + height < pos) {
+			const EDGE = rowHeight / 2;
+			const isBefore = scroll + EDGE > pos;
+			const isAfter = scroll + height - EDGE < pos;
+			if (isBefore || isAfter) {
 				// Clamp to available range to avoid overflow
 				const maxScroll = Math.floor(rowHeight * items.length - height);
-				const nextPos = Math.max(0, Math.min(pos, maxScroll));
+				const nextPos = Math.max(
+					0,
+					Math.min(isBefore ? pos : pos - height + rowHeight * 2, maxScroll),
+				);
 
 				// Debounce scroll to avoid flickering when quickly hovering
 				// a bunch of elements
@@ -62,7 +80,7 @@ export function useVirtualizedList<T>({
 				}, 100);
 			}
 		},
-		[items, scroll, rowHeight, height],
+		[rowHeight],
 	);
 
 	useLayoutEffect(() => {

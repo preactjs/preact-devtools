@@ -8,7 +8,7 @@ import { useSelection } from "../../store/selection";
 import { useCollapser } from "../../store/collapser";
 import { BackgroundLogo } from "./background-logo";
 import { useSearch } from "../../store/search";
-import { scrollIntoView, useResize } from "../utils";
+import { useResize } from "../utils";
 import { ID } from "../../store/types";
 import { debounce } from "../../../shells/shared/utils";
 import { EmitFn } from "../../../adapter/hook";
@@ -57,16 +57,6 @@ export function TreeView() {
 	const paneRef = useRef<HTMLDivElement | null>(null);
 
 	const search = useSearch();
-	useEffect(() => {
-		if (ref.current && search.selectedIdx > -1) {
-			const top = ROW_HEIGHT * search.selectedIdx;
-			const scroll = ref.current.scrollTop;
-			const height = ref.current.clientHeight;
-			if (scroll > top || scroll + height < top) {
-				ref.current.scrollTo({ top });
-			}
-		}
-	}, [search.selectedIdx]);
 
 	const [updateCount, setUpdateCount] = useState(0);
 	useResize(() => setUpdateCount(updateCount + 1), [updateCount]);
@@ -75,7 +65,7 @@ export function TreeView() {
 		children: listItems,
 		containerHeight,
 		scrollToItem,
-	} = useVirtualizedList({
+	} = useVirtualizedList<ID>({
 		rowHeight: ROW_HEIGHT,
 		minBufferCount: 5,
 		container: ref,
@@ -84,9 +74,16 @@ export function TreeView() {
 		renderRow: (id, _, top) => <TreeItem key={id} id={id} top={top} />,
 	});
 
+	// Scroll to item on selection change
 	useEffect(() => {
 		scrollToItem(selected);
-	}, [selected]);
+	}, [selected, scrollToItem]);
+
+	// Scroll to item on search value change
+	const searchSelectedId = search.selectedId;
+	useEffect(() => {
+		scrollToItem(searchSelectedId);
+	}, [searchSelectedId, scrollToItem]);
 
 	useAutoIndent(paneRef, [listItems]);
 
@@ -156,20 +153,13 @@ export function MarkResult(props: { text: string; id: ID }) {
 	const { text, id } = props;
 	const isActive = id === selectedId;
 
-	const ref = useRef<HTMLSpanElement>();
-	useEffect(() => {
-		if (ref.current && isActive) {
-			scrollIntoView(ref.current.closest('[data-testid="tree-item"]') as any);
-		}
-	}, [ref.current, selectedId, id]);
-
 	if (regex != null && regex.test(text)) {
 		const m = text.match(regex)!;
 		const idx = m.index || 0;
 		const start = idx > 0 ? text.slice(0, idx) : "";
 		const end = idx < text.length ? text.slice(idx + m[0].length) : "";
 		return (
-			<span ref={ref} data-testid="node-name">
+			<span data-testid="node-name">
 				{start}
 				<mark
 					class={`${s.mark} ${isActive ? s.markSelected : ""}`}
