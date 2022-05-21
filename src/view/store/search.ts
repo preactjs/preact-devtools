@@ -100,12 +100,10 @@ export function useSearch() {
 	const count = useObserver(() => s.count.$);
 	const selected = useObserver(() => s.selected.$);
 	const selectedId = useObserver(() => s.match.$[s.selected.$]);
-	const selectedIdx = useObserver(() => s.selectedIdx.$);
 	return {
 		count,
 		selected,
 		selectedId,
-		selectedIdx,
 		marked,
 		regex,
 		match,
