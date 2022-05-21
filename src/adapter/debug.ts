@@ -8,16 +8,25 @@ export interface ParsedMsg {
 	mounts: Array<{ id: ID; key: string; name: string; parentId: ID }>;
 	unmounts: ID[];
 	reorders: Array<{ id: ID; children: ID[] }>;
+	startTime: number;
 	timings: Array<{ id: ID; duration: number }>;
 }
 
 export function parseCommitMessage(data: number[]): ParsedMsg {
 	const rootId = data[0] || -1;
+	const startTime = data[1] || -1;
+
+	console.log(JSON.stringify(data, null, 2));
 
 	// String table
-	let i = 1;
+	let i = 2;
 	const len = data[i++];
-	const strings = parseTable(data.slice(1, len + 2));
+	console.log(
+		data.slice(i, len + 2),
+		data.slice(i, len + 2).map(ch => String.fromCharCode(ch)),
+		i,
+	);
+	const strings = parseTable(data.slice(i, len + 3));
 	const mounts: any[] = [];
 	const unmounts: any[] = [];
 	const timings: any[] = [];
@@ -66,6 +75,7 @@ export function parseCommitMessage(data: number[]): ParsedMsg {
 		unmounts,
 		timings,
 		reorders,
+		startTime,
 	};
 }
 
@@ -119,6 +129,7 @@ export function fromSnapshot(events: string[]): number[] {
 	if (/^rootId:/.test(events[0])) {
 		const id = +events[0].slice(events[0].indexOf(":") + 1);
 		out.push(id);
+		out.push(123);
 		operations.push(MsgTypes.ADD_ROOT, id);
 	} else {
 		throw new Error("rootId must be first event");
@@ -210,8 +221,13 @@ export function printCommit(data: number[]) {
 	/* eslint-disable no-console */
 	console.group("commit", data);
 	try {
-		console.log("root id: ", data[0]);
-		let i = 1;
+		console.log(
+			`root id: %c${data[0]}%c, startTime: %c${data[1]}`,
+			"color: yellow",
+			"color: inherit",
+			"color: peachpuff",
+		);
+		let i = 2;
 
 		// String table
 		const len = data[i++];

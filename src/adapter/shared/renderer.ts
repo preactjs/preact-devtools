@@ -20,6 +20,7 @@ import { createCommit, shouldFilter } from "../shared/traverse";
 import { PreactBindings, SharedVNode } from "../shared/bindings";
 import { inspectVNode } from "./inspectVNode";
 import { logVNode } from "../10/log";
+import { printCommit } from "../debug";
 
 export interface RendererConfig {
 	Fragment: FunctionalComponent;
@@ -186,6 +187,7 @@ export function createRenderer<T extends SharedVNode>(
 					rootId,
 					strings: new Map(),
 					unmountIds: currentUnmounts,
+					startTime: -1,
 					stats: profiler.recordStats ? createStats() : null,
 				};
 
@@ -254,6 +256,7 @@ export function createRenderer<T extends SharedVNode>(
 				profiler.pendingHighlightUpdates.clear();
 			}
 
+			printCommit(ev.data);
 			port.send(ev.type as any, ev.data);
 		},
 		onUnmount,

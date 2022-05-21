@@ -15,14 +15,15 @@ import { ParsedStats, parseStats } from "../shared/stats";
 export function ops2Tree(oldTree: Tree, existingRoots: ID[], ops: number[]) {
 	const pending: Tree = new Map(oldTree);
 	const rootId = ops[0];
+	const startTime = ops[1] / 1000;
 	const roots: ID[] = [...existingRoots];
 	const removals: ID[] = [];
 	const rendered = new Set<ID>();
 	const reasons: RenderReasonMap = new Map();
 	let stats: ParsedStats | null = null;
 
-	let i = ops[1] + 1;
-	const strings = parseTable(ops.slice(1, i + 1));
+	let i = ops[2] + 2;
+	const strings = parseTable(ops.slice(2, i + 1));
 
 	for (i += 1; i < ops.length; i++) {
 		switch (ops[i]) {
@@ -165,5 +166,14 @@ export function ops2Tree(oldTree: Tree, existingRoots: ID[], ops: number[]) {
 		}
 	}
 
-	return { rootId, roots, tree: pending, removals, rendered, reasons, stats };
+	return {
+		rootId,
+		roots,
+		tree: pending,
+		removals,
+		rendered,
+		reasons,
+		stats,
+		startTime,
+	};
 }

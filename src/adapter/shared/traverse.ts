@@ -554,9 +554,13 @@ export function createCommit<T extends SharedVNode>(
 	timingsByVNode: VNodeTimings<T>,
 	renderReasonPre: Map<T, RenderReasonData> | null,
 ): Commit {
-	const commit = {
+	const startTime = timingsByVNode.start.get(vnode) || 0;
+	const endTime = timingsByVNode.end.get(vnode) || 0;
+	console.log({ startTime, endTime });
+	const commit: Commit & { renderReasons: Map<any, any> } = {
 		operations: [],
 		rootId: -1,
+		startTime: startTime * 1000,
 		strings: new Map(),
 		unmountIds: [],
 		renderReasons: new Map(),

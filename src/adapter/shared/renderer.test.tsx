@@ -61,7 +61,7 @@ describe("Renderer 10", () => {
 		if (destroy) destroy();
 	});
 
-	it("should detect root nodes", () => {
+	it.only("should detect root nodes", () => {
 		render(<div />, scratch);
 		expect(toSnapshot(spy.args[0][1])).to.deep.equal([
 			"rootId: 1",

@@ -73,6 +73,7 @@ export enum MsgTypes {
 //
 export interface Commit {
 	rootId: number;
+	startTime: number;
 	strings: StringTable;
 	unmountIds: number[];
 	operations: number[];
@@ -87,7 +88,7 @@ export function flush(commit: Commit) {
 	const { rootId, unmountIds, operations, strings, stats } = commit;
 	if (unmountIds.length === 0 && operations.length === 0) return;
 
-	const msg = [rootId, ...flushTable(strings)];
+	const msg = [rootId, commit.startTime, ...flushTable(strings)];
 	if (unmountIds.length > 0) {
 		msg.push(MsgTypes.REMOVE_VNODE, unmountIds.length, ...unmountIds);
 	}
@@ -114,7 +115,10 @@ export function applyOperationsV2(store: Store, data: number[]) {
 		tree,
 		reasons,
 		stats,
+		startTime,
 	} = ops2Tree(store.nodes.$, store.roots.$, data);
+
+	console.log(tree);
 
 	// Update store data
 	store.roots.$ = roots;
@@ -130,7 +134,13 @@ export function applyOperationsV2(store: Store, data: number[]) {
 	// If we are profiling, we'll make a frozen copy of the mutable
 	// elements tree because the profiler can step through time
 	if (store.profiler.isRecording.$) {
-		recordProfilerCommit(store.nodes.$, store.profiler, rendered, commitRootId);
+		recordProfilerCommit(
+			store.nodes.$,
+			store.profiler,
+			rendered,
+			commitRootId,
+			startTime,
+		);
 		store.profiler.renderReasons.update(m => {
 			m.set(commitRootId, reasons);
 		});

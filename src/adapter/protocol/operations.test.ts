@@ -19,6 +19,7 @@ describe("ops2Tree", () => {
 			const ops = fromSnapshot(["rootId: 1"]);
 			expect(ops2Tree(new Map(), [], ops)).to.deep.equal({
 				rootId: 1,
+				startTime: 123,
 				roots: [1],
 				rendered: new Set(),
 				removals: [],

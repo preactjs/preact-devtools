@@ -17,6 +17,7 @@ export interface CommitData {
 	/** Nodes that are part of the current commit */
 	rendered: Set<ID>;
 	maxSelfDuration: number;
+	startTime: number;
 	duration: number;
 	nodes: Map<ID, DevNode>;
 	selfDurations: Map<ID, number>;
@@ -208,6 +209,7 @@ export function recordProfilerCommit(
 	profiler: ProfilerState,
 	rendered: Set<ID>,
 	commitRootId: number,
+	startTime: number,
 ) {
 	const nodes = new Map<ID, DevNode>();
 
@@ -277,6 +279,7 @@ export function recordProfilerCommit(
 			rendered,
 			nodes,
 			maxSelfDuration,
+			startTime,
 			duration: totalCommitDuration,
 			selfDurations,
 		});

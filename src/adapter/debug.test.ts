@@ -9,6 +9,7 @@ describe("debug", () => {
 			const root = 1;
 			expect(fromSnapshot(["rootId: " + root])).to.deep.equal([
 				root,
+				123,
 				0,
 				MsgTypes.ADD_ROOT,
 				root,
@@ -21,6 +22,7 @@ describe("debug", () => {
 				fromSnapshot(["rootId: " + root, "Add 2 <div> to parent " + root]),
 			).to.deep.equal([
 				root,
+				123,
 				...toStringTable("div"),
 				MsgTypes.ADD_ROOT,
 				root,
@@ -42,6 +44,7 @@ describe("debug", () => {
 				fromSnapshot(["rootId: " + root, "Update timings 2 duration 12"]),
 			).to.deep.equal([
 				root,
+				123,
 				0,
 				MsgTypes.ADD_ROOT,
 				root,
@@ -55,6 +58,7 @@ describe("debug", () => {
 			const root = 1;
 			expect(fromSnapshot(["rootId: " + root, "Remove 2"])).to.deep.equal([
 				root,
+				123,
 				0,
 				MsgTypes.REMOVE_VNODE,
 				1,
@@ -70,6 +74,7 @@ describe("debug", () => {
 				fromSnapshot(["rootId: " + root, "Remove 2", "Remove 3"]),
 			).to.deep.equal([
 				root,
+				123,
 				0,
 				MsgTypes.REMOVE_VNODE,
 				2,
@@ -86,6 +91,7 @@ describe("debug", () => {
 				fromSnapshot(["rootId: " + root, "Reorder 2 [3, 4, 5]"]),
 			).to.deep.equal([
 				root,
+				123,
 				0,
 				MsgTypes.ADD_ROOT,
 				root,
