@@ -14,7 +14,7 @@ export function patchTree(commit: CommitData) {
 	const { nodes, commitRootId } = commit;
 
 	const idToTransform = new Map<ID, NodeTransform>();
-	placeNode(commit, idToTransform, commit.rootId, 0);
+	placeNode(commit, idToTransform, commit.rootId, 0, 1);
 
 	let direct: DevNode | undefined = nodes.get(commitRootId);
 	if (direct !== undefined) {
@@ -34,6 +34,7 @@ function placeNode(
 	idToTransform: Map<ID, NodeTransform>,
 	id: ID,
 	depth: number,
+	scale: number,
 ) {
 	const node = commit.nodes.get(id)!;
 	if (!node) return;
@@ -44,7 +45,7 @@ function placeNode(
 		start = parentPos.x + parentPos.width;
 	}
 
-	const selfDuration = commit.selfDurations.get(id) || 0;
+	const selfDuration = (commit.selfDurations.get(id) || 0) * scale;
 
 	const nodePos: NodeTransform = {
 		id,
@@ -63,13 +64,56 @@ function placeNode(
 		enlargeParents(commit, idToTransform, id, 0.01);
 	}
 
+	// Find the total render time of children that rendered in case
+	// we're dealing with static subtrees. If ther are static subtrees
+	// we'll use the remaining space to place them.
+	let staticTreeTime = 0;
+	const nodeRendered = commit.rendered.has(id);
+	if (nodeRendered) {
+		let totalChildrenTime = 0;
+		let staticChildrenCount = 0;
+		for (let i = 0; i < node.children.length; i++) {
+			const childId = node.children[i];
+			if (!commit.rendered.has(childId)) {
+				staticChildrenCount++;
+				continue;
+			}
+
+			const child = commit.nodes.get(childId);
+			if (!child) continue;
+
+			totalChildrenTime += child.endTime - child.startTime;
+		}
+
+		if (staticChildrenCount > 0) {
+			const availableStaticSpace = Math.max(
+				0,
+				selfDuration - totalChildrenTime,
+			);
+
+			staticTreeTime = Math.max(
+				0.01,
+				availableStaticSpace / staticChildrenCount,
+			);
+		}
+	}
+
 	for (let i = 0; i < node.children.length; i++) {
 		const childId = node.children[i];
 
-		// TODO: Handle static trees differently
-		const childSelfDuration = commit.selfDurations.get(childId) || 0;
+		// Potentially scale static subtrees
+		let childSelfDuration = commit.selfDurations.get(childId) || 0;
+		let childScale = scale;
+		if (nodeRendered && !commit.rendered.has(childId)) {
+			const child = commit.nodes.get(childId);
+			if (!child) continue;
 
-		placeNode(commit, idToTransform, childId, depth + 1);
+			const duration = Math.max(0.01, child.endTime - child.startTime);
+			childScale = staticTreeTime / duration;
+		}
+		childSelfDuration *= childScale;
+
+		placeNode(commit, idToTransform, childId, depth + 1, childScale);
 
 		// Expand parents upwards by self duration
 		enlargeParents(commit, idToTransform, id, childSelfDuration);
