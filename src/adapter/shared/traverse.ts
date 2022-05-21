@@ -342,12 +342,12 @@ function update<T extends SharedVNode>(
 
 	const skip = shouldFilter(vnode, filters, config, bindings);
 	if (skip) {
-		// const id = getVNodeId(ids, vnode);
-		// if (filters.type.has("hoc")) {
-		// 	const name = bindings.getDisplayName(vnode, config);
-		// 	const res = detectHocs(commit, name, id, hocs);
-		// 	hocs = res.hocs;
-		// }
+		const id = getVNodeId(ids, vnode);
+		if (filters.type.has("hoc")) {
+			const name = bindings.getDisplayName(vnode, config);
+			const res = detectHocs(commit, name, id, hocs);
+			hocs = res.hocs;
+		}
 
 		let childCount = 0;
 		const children = bindings.getActualChildren(vnode);
