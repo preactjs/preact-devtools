@@ -70,7 +70,6 @@ function placeNode(
 	let staticTreeTime = 0;
 	const nodeRendered = commit.rendered.has(id);
 	if (nodeRendered) {
-		let totalChildrenTime = 0;
 		let staticChildrenCount = 0;
 		for (let i = 0; i < node.children.length; i++) {
 			const childId = node.children[i];
@@ -78,18 +77,10 @@ function placeNode(
 				staticChildrenCount++;
 				continue;
 			}
-
-			const child = commit.nodes.get(childId);
-			if (!child) continue;
-
-			totalChildrenTime += child.endTime - child.startTime;
 		}
 
 		if (staticChildrenCount > 0) {
-			const availableStaticSpace = Math.max(
-				0,
-				selfDuration - totalChildrenTime,
-			);
+			const availableStaticSpace = Math.max(0, selfDuration);
 
 			staticTreeTime = Math.max(
 				0.01,
