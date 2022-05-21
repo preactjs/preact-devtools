@@ -41,6 +41,7 @@ export function Message(props: MessageProps) {
 	return (
 		<div
 			class={`${s.root} ${props.type === "info" ? s.info : s.warning}`}
+			data-type={props.type}
 			data-testid={props.testId}
 		>
 			<span class={s.icon}>{props.type === "info" ? infoIcon : warnIcon}</span>
