@@ -141,7 +141,9 @@ export function CommitTimeline(props: CommitTimelineProps) {
 					<span class={s.hidden}>
 						{leading.slice(0, itemsCountLen - selectedCount.length)}
 					</span>
-					{selected + 1} / {items.length}
+					<span data-testid="commit-page-info">
+						{selected + 1} / {items.length}
+					</span>
 				</div>
 				<button
 					disabled={items.length <= 1}
