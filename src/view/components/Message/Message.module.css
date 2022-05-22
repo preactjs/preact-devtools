@@ -6,16 +6,29 @@
 	border-width: 0.0625rem;
 	border-style: solid;
 	font-size: 0.8rem;
+	background: var(--bg);
+	border-color: var(--border);
 }
 
-.root.info {
-	background: var(--message-info-bg);
-	border-color: var(--message-info-border);
+.root[data-type="info"] {
+	--bg: var(--message-info-bg);
+	--border: var(--message-info-border);
+	--btn: var(--message-info-link);
+	--icon: var(--message-info-strong);
+}
+.root[data-type="warning"] {
+	--bg: var(--message-warning-bg);
+	--border: var(--message-warning-border);
+	--btn: var(--message-warning-link);
+	--icon: var(--message-warning-strong);
 }
 
-.root.warning {
-	background: var(--message-warning-bg);
-	border-color: var(--message-warning-border);
+.root .icon {
+	color: var(--icon);
+}
+
+.root .btn {
+	color: var(--btn);
 }
 
 .root svg {
@@ -26,20 +39,6 @@
 .icon {
 	display: inline-flex;
 	margin-right: 0.4rem;
-}
-
-.info .icon {
-	color: var(--message-info-strong);
-}
-.info .btn {
-	color: var(--message-info-link);
-}
-
-.warning .icon {
-	color: var(--message-warning-strong);
-}
-.warning .btn {
-	color: var(--message-warning-link);
 }
 
 .btn {
