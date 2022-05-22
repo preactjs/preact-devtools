@@ -5,15 +5,14 @@ import { ThemeSwitcher } from "../../ThemeSwitcher";
 import { TimelineBar } from "./TimelineBar/TimelineBar";
 import { FlameGraph } from "../flamegraph/FlameGraph";
 import { SidebarHeader } from "./SidebarHeader";
-import { RenderedAt } from "./RenderedAt/RenderedAt";
 import { ProfilerInfo } from "./ProfilerInfo/ProfilerInfo";
-import { CommitInfo } from "./CommitInfo/CommitInfo";
 import { RenderReasons } from "./RenderReasons";
 import { DebugProfilerInfo } from "./CommitInfo/DebugInfo";
 import { DebugNodeNav } from "./RenderedAt/DebugNodeNav";
 import { useStore, useObserver } from "../../../store/react-bindings";
 import { SidebarLayout } from "../../SidebarLayout";
 import { Message, MessageBtn } from "../../Message/Message";
+import { EventLog } from "./EventLog/EventLog";
 
 export function Profiler() {
 	const store = useStore();
@@ -50,8 +49,7 @@ export function Profiler() {
 					</div>
 				)}
 				<RenderReasons />
-				<RenderedAt />
-				<CommitInfo />
+				<EventLog />
 				{showDebug && <DebugProfilerInfo />}
 				{showDebug && <DebugNodeNav />}
 			</div>

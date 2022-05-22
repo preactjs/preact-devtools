@@ -5,7 +5,7 @@ import { RenderReason } from "../../../../adapter/shared/renderReasons";
 import s from "./RenderReason.module.css";
 import { Message, MessageBtn } from "../../Message/Message";
 
-function getReasonName(reason: RenderReason) {
+export function getReasonName(reason: RenderReason) {
 	switch (reason) {
 		case RenderReason.HOOKS_CHANGED:
 			return "Hooks changed";

@@ -1,0 +1,118 @@
+.eventTimeline {
+	--bar: 0.125rem;
+	display: flex;
+	flex-direction: column;
+	list-style: none;
+	padding: 0;
+	margin: 0;
+	position: relative;
+	z-index: 0;
+}
+
+.eventTimeline::after {
+	content: "";
+	width: var(--bar);
+	position: absolute;
+	top: 0;
+	left: calc(0.75rem - (var(--bar) / 2));
+	bottom: 0;
+	background: var(--name-dynamic);
+	border-left: 4px solid #333;
+	border-right: 4px solid #333;
+	z-index: 1;
+}
+
+.eventListItem {
+	/* */
+	display: block;
+}
+
+.eventItem {
+	cursor: pointer;
+	--dot: 1rem;
+	display: block;
+	position: relative;
+	width: 100%;
+	text-align: left;
+	padding: var(--top) 1rem var(--top) 0;
+	color: var(--color-text);
+	background: transparent;
+}
+
+.eventItem[data-kind="primary"] {
+	--top: 0.5rem;
+}
+.eventItem[data-kind="primary"][data-selected="true"]::after {
+	background: var(--name-dynamic);
+	box-shadow: 1px solid red;
+}
+
+.eventItem:hover {
+	background: #333;
+}
+
+.eventItem[data-kind="primary"]::before {
+	content: "";
+	position: absolute;
+	top: var(--top);
+	left: calc(var(--dot) / 2);
+	width: var(--dot);
+	height: var(--dot);
+	border-radius: 50%;
+	z-index: 2;
+}
+
+.eventItem[data-kind="primary"]::after {
+	content: "";
+	position: absolute;
+	top: calc(var(--top) + var(--bar));
+	left: calc((var(--dot) / 2) + var(--bar));
+	width: calc(var(--dot) - (var(--bar) * 2));
+	height: calc(var(--dot) - (var(--bar) * 2));
+	border-radius: 50%;
+	z-index: 2;
+}
+
+.eventItem[data-kind="primary"]::before {
+	background: var(--name-dynamic);
+}
+.eventItem[data-kind="primary"]::after {
+	background: var(--color-bg);
+}
+
+.eventItem[data-kind="secondary"] {
+	padding: 0.25rem 0;
+}
+
+.content {
+	display: block;
+	padding-left: 2rem;
+	font-size: 0.75rem;
+}
+
+.title {
+	font-weight: bold;
+	display: block;
+	color: var(--color-text-stronger);
+}
+
+.componentName {
+	position: relative;
+	color: var(--name-dynamic);
+}
+.componentName::before {
+	content: "<";
+	color: var(--color-text);
+	font-size: 0.8em;
+}
+.componentName::after {
+	content: " />";
+	color: var(--color-text);
+	font-size: 0.8em;
+}
+
+.timing {
+	font-weight: normal;
+	padding-left: 0.25rem;
+	color: var(--color-profiler-gradient-0);
+}
