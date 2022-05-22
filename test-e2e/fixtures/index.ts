@@ -83,7 +83,11 @@ async function waitForDevtoolsInit() {
 
 	if (!active.preact || !active.fixtures) {
 		const params = new URLSearchParams();
-		params.set("preact", active.preact || preactVersions[0]);
+		params.set(
+			"preact",
+			active.preact ||
+				preactVersions.find(v => !v.includes("-") || preactVersions[0]),
+		);
 		params.set("fixtures", active.fixtures || fixtures[0]);
 		window.location.search = params.toString();
 		return;
