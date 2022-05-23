@@ -1,5 +1,39 @@
 # Changelog
 
+## 4.2.0
+
+### Features
+
+- **Profiler:** Add new layout algorithm for FlameGraph (#366, thanks @marvinhagemeister)
+
+### Bug Fixes
+
+- **Profiler:** Accurately track rendered nodes in a commit (#368, thanks @marvinhagemeister)
+- **Profiler:** Fix deep FlameGraph leaf nodes sometimes not visible (#370, thanks @marvinhagemeister)
+- **Profiler:** Simplify ranked layout (#371, thanks @marvinhagemeister)
+- **Profiler:** Fix gaps in FlameGraph caused by incorrect timings (#373, thanks @marvinhagemeister)
+- **Profiler:** Resize static subtrees to available space in FlameGraph (#377, thanks @marvinhagemeister)
+- **Profiler:** Simplify static space calculation (#378, thanks @marvinhagemeister)
+- Dynamically resize virtual list buffer (#369, thanks @marvinhagemeister)
+- Fix duplicate HOC labels on update (#379, thanks @marvinhagemeister)
+- Fix serialization of complex debug values from `useDebugValue` (#380, thanks @marvinhagemeister)
+- Fix unable to scroll to item if out of view (#381, thanks @marvinhagemeister)
+- Fix HOCs disappearing on update (#382, thanks @marvinhagemeister)
+- Fix memo render reasons (#350, thanks @marconi1992, @marvinhagemeister)
+
+### Maintenance
+
+- **Profiler:** Simplify FlameGraph node content (#365, thanks @marvinhagemeister)
+- **Tests:** Pick stable Preact version by default (#384, thanks @marvinhagemeister)
+- Remove dead code (#363, thanks @marvinhagemeister)
+- Drop barely used `binding.getAncestor()` (#362, thanks @marvinhagemeister)
+- Remove unused styleguide demo (#367, thanks @marvinhagemeister)
+- Update test dependencies (#372, thanks @marvinhagemeister)
+- Use node 18 on CI (#374, thanks @marvinhagemeister)
+- Remove unused `data-*` attributes (#375, thanks @marvinhagemeister)
+- Fix release script not resetting lower versions (#376, thanks @marvinhagemeister)
+- Simplify `Message` styles (#383, thanks @marvinhagemeister)
+
 ## 4.1.0
 
 ### Features
