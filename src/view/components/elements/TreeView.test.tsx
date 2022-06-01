@@ -17,6 +17,7 @@ describe("TreeItem", () => {
 			id: 1,
 			hocs: null,
 			name: "foo",
+			owner: -1,
 			parent: -1,
 			startTime: 0,
 			type: DevNodeType.ClassComponent,

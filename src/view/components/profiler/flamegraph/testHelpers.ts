@@ -79,6 +79,7 @@ export function flames(
 				depth: i,
 				key: "",
 				parent: -1,
+				owner: -1,
 				type:
 					name[0].toUpperCase() === name[0]
 						? DevNodeType.FunctionComponent

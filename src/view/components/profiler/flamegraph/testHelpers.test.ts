@@ -21,6 +21,7 @@ describe("FlameGraph DSL", () => {
 				children: [2],
 				hocs: null,
 				parent: -1,
+				owner: -1,
 				depth: 0,
 			},
 			{
@@ -33,6 +34,7 @@ describe("FlameGraph DSL", () => {
 				children: [3],
 				hocs: null,
 				parent: 1,
+				owner: -1,
 				depth: 1,
 			},
 			{
@@ -45,6 +47,7 @@ describe("FlameGraph DSL", () => {
 				depth: 2,
 				children: [],
 				hocs: null,
+				owner: -1,
 				parent: 2,
 			},
 		];
@@ -70,6 +73,7 @@ describe("FlameGraph DSL", () => {
 				children: [2],
 				hocs: null,
 				parent: -1,
+				owner: -1,
 				depth: 0,
 			},
 			{
@@ -82,6 +86,7 @@ describe("FlameGraph DSL", () => {
 				children: [3],
 				hocs: null,
 				parent: 1,
+				owner: -1,
 				depth: 1,
 			},
 			{
@@ -92,6 +97,7 @@ describe("FlameGraph DSL", () => {
 				startTime: 0,
 				endTime: 70,
 				parent: 2,
+				owner: -1,
 				depth: 2,
 				children: [],
 				hocs: null,
@@ -159,6 +165,7 @@ describe("FlameGraph DSL", () => {
 				children: [2, 3],
 				hocs: null,
 				parent: -1,
+				owner: -1,
 				depth: 0,
 			},
 			{
@@ -171,6 +178,7 @@ describe("FlameGraph DSL", () => {
 				children: [],
 				hocs: null,
 				parent: 1,
+				owner: -1,
 				depth: 1,
 			},
 			{
@@ -184,6 +192,7 @@ describe("FlameGraph DSL", () => {
 				children: [],
 				hocs: null,
 				parent: 1,
+				owner: -1,
 			},
 		];
 
@@ -209,6 +218,7 @@ describe("FlameGraph DSL", () => {
 				hocs: null,
 				depth: 0,
 				parent: -1,
+				owner: -1,
 			},
 			{
 				id: 2,
@@ -220,6 +230,7 @@ describe("FlameGraph DSL", () => {
 				children: [3],
 				hocs: null,
 				parent: 1,
+				owner: -1,
 				depth: 1,
 			},
 			{
@@ -233,6 +244,7 @@ describe("FlameGraph DSL", () => {
 				children: [],
 				hocs: null,
 				parent: 2,
+				owner: -1,
 			},
 			{
 				id: 4,
@@ -245,6 +257,7 @@ describe("FlameGraph DSL", () => {
 				children: [5],
 				hocs: null,
 				parent: 1,
+				owner: -1,
 			},
 			{
 				id: 5,
@@ -257,6 +270,7 @@ describe("FlameGraph DSL", () => {
 				children: [],
 				hocs: null,
 				parent: 4,
+				owner: -1,
 			},
 		];
 
