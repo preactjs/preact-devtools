@@ -229,7 +229,8 @@ export function printCommit(data: number[]) {
 				case MsgTypes.ADD_VNODE: {
 					const id = data[i + 1];
 					const name = strings[data[i + 5] - 1];
-					const key = data[i + 6] > 0 ? ` key="${strings[i + 6 - 1]}" ` : "";
+					const key =
+						data[i + 6] > 0 ? ` key="${strings[data[i + 6] - 1]}" ` : "";
 					const parentId = data[i + 3];
 					const startTime = data[i + 7];
 					const endTime = data[i + 8];
