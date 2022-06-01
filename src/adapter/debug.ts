@@ -208,7 +208,10 @@ export function fromSnapshot(events: string[]): number[] {
 
 export function printCommit(data: number[]) {
 	/* eslint-disable no-console */
-	console.group("commit", data);
+	console.group("commit");
+	console.groupCollapsed("raw");
+	console.log(data);
+	console.groupEnd();
 	try {
 		console.log("root id: ", data[0]);
 		let i = 1;
