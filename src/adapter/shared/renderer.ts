@@ -207,6 +207,7 @@ export function createRenderer<T extends SharedVNode>(
 				const commit = createCommit(
 					ids,
 					roots,
+					new Map(),
 					root,
 					filters,
 					domToVNode,
@@ -223,10 +224,11 @@ export function createRenderer<T extends SharedVNode>(
 
 			queue.forEach(ev => port.send(ev.type, ev.data));
 		},
-		onCommit(vnode, timingsByVNode, renderReasonPre) {
+		onCommit(vnode, owners, timingsByVNode, renderReasonPre) {
 			const commit = createCommit(
 				ids,
 				roots,
+				owners,
 				vnode,
 				filters,
 				domToVNode,

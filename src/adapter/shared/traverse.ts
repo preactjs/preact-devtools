@@ -182,7 +182,9 @@ export function shouldFilter<T extends SharedVNode>(
 function mount<T extends SharedVNode>(
 	ids: IdMappingState<T>,
 	commit: Commit,
+	owners: Map<T, T>,
 	vnode: T,
+	ownerId: ID,
 	ancestorId: ID,
 	filters: FilterState,
 	domCache: WeakMap<HTMLElement | Text, T>,
@@ -219,12 +221,20 @@ function mount<T extends SharedVNode>(
 			commit.operations.push(MsgTypes.ADD_ROOT, id);
 		}
 
+		if (!root) {
+			const maybeOwner = owners.get(vnode);
+			if (maybeOwner !== undefined && !bindings.isRoot(maybeOwner, config)) {
+				const maybeOwnerId = getVNodeId(ids, maybeOwner);
+				ownerId = maybeOwnerId !== -1 ? maybeOwnerId : ownerId;
+			}
+		}
+
 		commit.operations.push(
 			MsgTypes.ADD_VNODE,
 			id,
 			getDevtoolsType(vnode, bindings), // Type
 			ancestorId,
-			9999, // owner
+			ownerId,
 			getStringId(commit.strings, name),
 			vnode.key ? getStringId(commit.strings, vnode.key) : 0,
 			// Multiply, because operations array only supports integers
@@ -232,6 +242,10 @@ function mount<T extends SharedVNode>(
 			(timingsByVNode.start.get(vnode) || 0) * 1000,
 			(timingsByVNode.end.get(vnode) || 0) * 1000,
 		);
+
+		if (ownerId === 9999 && !root) {
+			ownerId = id;
+		}
 
 		if (hocs.length > 0) {
 			addHocs(commit, id, hocs);
@@ -268,7 +282,9 @@ function mount<T extends SharedVNode>(
 			mount(
 				ids,
 				commit,
+				owners,
 				child,
+				ownerId,
 				ancestorId,
 				filters,
 				domCache,
@@ -323,7 +339,9 @@ function resetChildren<T extends SharedVNode>(
 function update<T extends SharedVNode>(
 	ids: IdMappingState<T>,
 	commit: Commit,
+	owners: Map<T, T>,
 	vnode: T,
+	ownerId: ID,
 	ancestorId: number,
 	filters: FilterState,
 	domCache: WeakMap<HTMLElement | Text, T>,
@@ -362,7 +380,9 @@ function update<T extends SharedVNode>(
 				update(
 					ids,
 					commit,
+					owners,
 					child,
+					ownerId,
 					ancestorId,
 					filters,
 					domCache,
@@ -387,7 +407,9 @@ function update<T extends SharedVNode>(
 		mount(
 			ids,
 			commit,
+			owners,
 			vnode,
+			ownerId,
 			ancestorId,
 			filters,
 			domCache,
@@ -473,7 +495,9 @@ function update<T extends SharedVNode>(
 			update(
 				ids,
 				commit,
+				owners,
 				child,
+				ownerId,
 				id,
 				filters,
 				domCache,
@@ -494,7 +518,9 @@ function update<T extends SharedVNode>(
 			mount(
 				ids,
 				commit,
+				owners,
 				child,
+				ownerId,
 				id,
 				filters,
 				domCache,
@@ -545,6 +571,7 @@ function findClosestNonFilteredParent<T extends SharedVNode>(
 export function createCommit<T extends SharedVNode>(
 	ids: IdMappingState<T>,
 	roots: Set<T>,
+	owners: Map<T, T>,
 	vnode: T,
 	filters: FilterState,
 	domCache: WeakMap<HTMLElement | Text, T>,
@@ -580,11 +607,16 @@ export function createCommit<T extends SharedVNode>(
 		parentId = findClosestNonFilteredParent(ids, helpers, vnode);
 	}
 
+	// Roots have no known ownerId
+	const ownerId = 9999;
+
 	if (isNew) {
 		mount(
 			ids,
 			commit,
+			owners,
 			vnode,
+			ownerId,
 			parentId,
 			filters,
 			domCache,
@@ -599,7 +631,9 @@ export function createCommit<T extends SharedVNode>(
 		update(
 			ids,
 			commit,
+			owners,
 			vnode,
+			ownerId,
 			parentId,
 			filters,
 			domCache,

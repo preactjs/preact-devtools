@@ -101,6 +101,7 @@ export function setupOptionsV11(
 	const timings = createVNodeTimings<Internal>();
 	let renderReasons = new Map<Internal, RenderReasonData>();
 	let reasonTmpData = new Map<Internal, RenderReasonTmpData>();
+	const owners = new Map();
 
 	const o = options;
 
@@ -208,7 +209,7 @@ export function setupOptionsV11(
 		// These cases are already handled by `unmount`
 		if (internal == null) return;
 
-		renderer.onCommit(internal, timings, renderReasons);
+		renderer.onCommit(internal, owners, timings, renderReasons);
 
 		if (profiler.captureRenderReasons) {
 			renderReasons = new Map();
