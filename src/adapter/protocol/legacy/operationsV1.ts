@@ -51,6 +51,7 @@ export function applyOperationsV1(store: Store, data: number[]) {
 						id,
 						hocs: null,
 						name,
+						owner: -1,
 						parent: parentId,
 						type,
 						key,
