@@ -67,6 +67,8 @@ export function setupOptionsV10(
 	// @ts-ignore
 	let prevHookName = options.useDebugName;
 
+	const skipEffects = o._skipEffects || o.__s;
+
 	// Make sure that we are always the first `option._hook` to be called.
 	// This is necessary to ensure that our callstack remains consistent.
 	// Othwerwise we'll end up with an unknown number of frames in-between
@@ -127,7 +129,11 @@ export function setupOptionsV10(
 	};
 
 	o._render = o.__r = (vnode: VNode, parent: VNode | null) => {
-		if (typeof vnode.type === "function" && vnode.type !== config.Fragment) {
+		if (
+			!skipEffects &&
+			typeof vnode.type === "function" &&
+			vnode.type !== config.Fragment
+		) {
 			ownerStack.push(vnode);
 		}
 		if (prevRender != null) prevRender(vnode, parent);
