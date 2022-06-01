@@ -243,13 +243,14 @@ function mount<T extends SharedVNode>(
 			(timingsByVNode.end.get(vnode) || 0) * 1000,
 		);
 
-		if (ownerId === 9999 && !root) {
+		if (ownerId === -1 && !root) {
 			ownerId = id;
 		}
 
 		if (hocs.length > 0) {
 			addHocs(commit, id, hocs);
 			hocs = [];
+			ownerId = id;
 		}
 
 		// Capture render reason (mount here)
@@ -591,6 +592,8 @@ export function createCommit<T extends SharedVNode>(
 	};
 
 	let parentId = -1;
+	// Roots have no known ownerId
+	let ownerId = -1;
 
 	const isNew = !hasVNodeId(ids, vnode);
 
@@ -605,10 +608,12 @@ export function createCommit<T extends SharedVNode>(
 		roots.add(vnode);
 	} else {
 		parentId = findClosestNonFilteredParent(ids, helpers, vnode);
+		if (!isNew) {
+			ownerId = shouldFilter(vnode, filters, config, helpers)
+				? parentId
+				: getVNodeId(ids, vnode);
+		}
 	}
-
-	// Roots have no known ownerId
-	const ownerId = 9999;
 
 	if (isNew) {
 		mount(
