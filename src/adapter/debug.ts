@@ -235,14 +235,17 @@ export function printCommit(data: number[]) {
 					const key =
 						data[i + 6] > 0 ? ` key="${strings[data[i + 6] - 1]}" ` : "";
 					const parentId = data[i + 3];
+					const ownerId = data[i + 4];
 					const startTime = data[i + 7];
 					const endTime = data[i + 8];
 					console.log(
-						`Add %c${id} %c<${name}${key}>%c to parent %c${parentId}%c, time: %c${startTime}%c - %c${endTime}`,
+						`Add %c${id} %c<${name}${key}>%c to parent %c${parentId}%c with owner %c${ownerId}%c, time: %c${startTime}%c - %c${endTime}`,
 						"color: yellow",
 						"color: violet",
 						"color: inherit",
 						"color: green",
+						"color: inherit",
+						"color: yellow",
 						"color: inherit",
 						"color: peachpuff",
 						"color: inherit",
