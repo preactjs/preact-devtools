@@ -46,6 +46,7 @@ export function ops2Tree(oldTree: Tree, existingRoots: ID[], ops: number[]) {
 					id,
 					hocs: null,
 					name: strings[ops[i + 5] - 1],
+					owner: ops[i + 4],
 					parent: parentId,
 					type: ops[i + 2],
 					key: ops[i + 6] > 0 ? strings[ops[i + 6] - 1] : "",
