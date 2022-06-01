@@ -1,7 +1,7 @@
 .item {
 	background: none;
 	border: none;
-	color: var(--color-text);
+	color: var(--color-element-text);
 	width: 100%;
 	text-align: start;
 	display: flex;
@@ -9,6 +9,11 @@
 	font-size: var(--font-small);
 	padding: 0.25rem 0.5rem;
 	cursor: pointer;
+}
+
+.item:hover {
+	background: var(--color-dim-bg);
+	border-radius: 0.1875rem;
 }
 
 .item[data-active] {

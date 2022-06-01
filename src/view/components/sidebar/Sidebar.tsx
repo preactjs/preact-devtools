@@ -4,6 +4,7 @@ import { PropsPanel } from "./inspect/PropsPanel";
 import { serializeProps } from "./inspect/serializeProps";
 import { DebugTreeStats } from "./DebugTreeStats";
 import { DebugNodeNavTree } from "./DebugNodeNavTree";
+import { OwnerInfo } from "./../elements/OwnerInfo";
 import { KeyPanel } from "./KeyPanel";
 import { HocPanel } from "./HocPanel";
 
@@ -79,6 +80,7 @@ export function Sidebar() {
 					}
 				/>
 			)}
+			{inspect && <OwnerInfo />}
 			{showDebug && <DebugNodeNavTree />}
 			{showDebug && <DebugTreeStats />}
 		</Fragment>
