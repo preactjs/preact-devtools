@@ -70,6 +70,7 @@ export function createRenderer<T extends SharedVNode>(
 	const roots = new Set<T>();
 
 	let currentUnmounts: number[] = [];
+	let prevOwners = new Map<T, T>();
 
 	const domToVNode = new WeakMap<HTMLElement | Text, T>();
 
@@ -207,7 +208,7 @@ export function createRenderer<T extends SharedVNode>(
 				const commit = createCommit(
 					ids,
 					roots,
-					new Map(),
+					prevOwners,
 					root,
 					filters,
 					domToVNode,
@@ -238,6 +239,8 @@ export function createRenderer<T extends SharedVNode>(
 				timingsByVNode,
 				renderReasonPre,
 			);
+
+			prevOwners = owners;
 
 			timingsByVNode.start.clear();
 			timingsByVNode.end.clear();
