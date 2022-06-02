@@ -114,7 +114,11 @@ export function setupOptionsV10(
 	}, 100);
 
 	options.vnode = (vnode: VNode) => {
-		if (typeof vnode.type === "function" && vnode.type !== config.Fragment) {
+		if (
+			ownerStack.length > 0 &&
+			typeof vnode.type === "function" &&
+			vnode.type !== config.Fragment
+		) {
 			owners.set(vnode, ownerStack[ownerStack.length - 1]);
 		}
 		if (prevVNodeHook) prevVNodeHook(vnode);
