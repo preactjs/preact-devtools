@@ -70,6 +70,7 @@ export function createRenderer<T extends SharedVNode>(
 	const roots = new Set<T>();
 
 	let currentUnmounts: number[] = [];
+	let prevOwners = new Map<T, T>();
 
 	const domToVNode = new WeakMap<HTMLElement | Text, T>();
 
@@ -207,6 +208,7 @@ export function createRenderer<T extends SharedVNode>(
 				const commit = createCommit(
 					ids,
 					roots,
+					prevOwners,
 					root,
 					filters,
 					domToVNode,
@@ -223,10 +225,11 @@ export function createRenderer<T extends SharedVNode>(
 
 			queue.forEach(ev => port.send(ev.type, ev.data));
 		},
-		onCommit(vnode, timingsByVNode, renderReasonPre) {
+		onCommit(vnode, owners, timingsByVNode, renderReasonPre) {
 			const commit = createCommit(
 				ids,
 				roots,
+				owners,
 				vnode,
 				filters,
 				domToVNode,
@@ -236,6 +239,8 @@ export function createRenderer<T extends SharedVNode>(
 				timingsByVNode,
 				renderReasonPre,
 			);
+
+			prevOwners = owners;
 
 			timingsByVNode.start.clear();
 			timingsByVNode.end.clear();

@@ -50,6 +50,8 @@ export function setupOptionsV10(
 	}
 
 	let timings = createVNodeTimings<VNode>();
+	const owners = new Map<VNode, VNode>();
+	let ownerStack: VNode[] = [];
 
 	const o = options as any;
 
@@ -58,11 +60,14 @@ export function setupOptionsV10(
 	const prevCommitRoot = o._commit || o.__c;
 	const prevBeforeUnmount = options.unmount;
 	const prevBeforeDiff = o._diff || o.__b;
+	const prevRender = o._render || o.__r;
 	const prevAfterDiff = options.diffed;
 	let prevHook = o._hook || o.__h;
 	let prevUseDebugValue = options.useDebugValue;
 	// @ts-ignore
 	let prevHookName = options.useDebugName;
+
+	const skipEffects = o._skipEffects || o.__s;
 
 	// Make sure that we are always the first `option._hook` to be called.
 	// This is necessary to ensure that our callstack remains consistent.
@@ -108,6 +113,17 @@ export function setupOptionsV10(
 		};
 	}, 100);
 
+	options.vnode = (vnode: VNode) => {
+		if (
+			ownerStack.length > 0 &&
+			typeof vnode.type === "function" &&
+			vnode.type !== config.Fragment
+		) {
+			owners.set(vnode, ownerStack[ownerStack.length - 1]);
+		}
+		if (prevVNodeHook) prevVNodeHook(vnode);
+	};
+
 	o._diff = o.__b = (vnode: VNode) => {
 		if (typeof vnode.type === "function") {
 			timings.start.set(vnode, performance.now());
@@ -118,8 +134,23 @@ export function setupOptionsV10(
 		if (prevBeforeDiff != null) prevBeforeDiff(vnode);
 	};
 
+	o._render = o.__r = (vnode: VNode, parent: VNode | null) => {
+		if (
+			!skipEffects &&
+			typeof vnode.type === "function" &&
+			vnode.type !== config.Fragment
+		) {
+			ownerStack.push(vnode);
+		}
+		if (prevRender != null) prevRender(vnode, parent);
+	};
+
 	options.diffed = vnode => {
 		if (typeof vnode.type === "function") {
+			if (vnode.type !== config.Fragment) {
+				ownerStack.pop();
+			}
+
 			timings.end.set(vnode, performance.now());
 			endMark(getDisplayName(vnode, config));
 		}
@@ -133,15 +164,17 @@ export function setupOptionsV10(
 		// These cases are already handled by `unmount`
 		if (vnode == null) return;
 
-		const tmp = timings;
+		const tmpTimings = timings;
+		ownerStack = [];
 		timings = createVNodeTimings();
-		renderer.onCommit(vnode, tmp, null);
+		renderer.onCommit(vnode, owners, tmpTimings, null);
 	};
 
 	options.unmount = vnode => {
 		if (prevBeforeUnmount) prevBeforeUnmount(vnode);
 		timings.start.delete(vnode);
 		timings.end.delete(vnode);
+		owners.delete(vnode);
 		renderer.onUnmount(vnode as any);
 	};
 

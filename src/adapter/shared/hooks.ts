@@ -295,7 +295,7 @@ export function inspectHooks<T extends SharedVNode>(
 		};
 
 		// Force preact to reset internal hooks index
-		const renderHook = (options as any)._render || (options as any).__r;
+		const renderHook = (options as any).__r || (options as any)._render;
 		if (renderHook) {
 			const dummyVNode = h("div", null);
 			// Note: A "div" normally won't have the _component property set,
@@ -309,7 +309,7 @@ export function inspectHooks<T extends SharedVNode>(
 				__hooks: hooks,
 				__H: hooks,
 			};
-			renderHook(dummyVNode);
+			renderHook(dummyVNode, null);
 		}
 
 		if (isClass) {

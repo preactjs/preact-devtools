@@ -34,6 +34,7 @@ export interface DevNode {
 	type: DevNodeType;
 	name: string;
 	key: string | null;
+	owner: ID;
 	parent: ID;
 	children: ID[];
 	/** Higher Order Component wrappers */

@@ -20,6 +20,7 @@ export interface Renderer<T extends SharedVNode = SharedVNode> {
 	clear?(): void;
 	onCommit(
 		vnode: T,
+		owners: Map<T, T>,
 		timings: VNodeTimings<T>,
 		renderReasons: Map<T, RenderReasonData> | null,
 	): void;

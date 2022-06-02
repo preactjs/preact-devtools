@@ -7,6 +7,7 @@ import {
 	newPage,
 	resizePage,
 	clickSelector,
+	waitForTestId,
 } from "pentf/browser_utils";
 import { Page } from "puppeteer";
 import { getPreactVersions } from "./fixtures/utils";
@@ -403,6 +404,20 @@ export async function clickAndWaitForHooks(devtools: Page, component: string) {
 	await waitForPass(async () => {
 		await clickTreeItem(devtools, component);
 		expect(await devtools.$('[data-testid="props-row"]')).not.to.equal(null);
+	});
+}
+
+export async function getOwners(devtools: Page) {
+	await waitForTestId(devtools, "owners");
+	return await devtools.evaluate(() => {
+		const parent = document.querySelector('[data-testid="owners"]')!;
+		if (parent.textContent === "") {
+			return [];
+		}
+
+		return Array.from(parent.querySelectorAll("button")).map(
+			el => el.textContent,
+		);
 	});
 }
 
