@@ -1,5 +1,11 @@
 # Changelog
 
+## 4.3.0
+
+### Features
+
+- **Elements:** Add "Rendered by" panel to the sidebar (#385, thanks @marvinhagemeister)
+
 ## 4.2.0
 
 ### Features
