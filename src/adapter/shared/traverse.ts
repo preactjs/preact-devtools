@@ -421,7 +421,7 @@ function update<T extends SharedVNode>(
 			timingsByVNode,
 			renderReasonPre,
 		);
-		return true;
+		return;
 	}
 
 	const id = getVNodeId(ids, vnode);
@@ -429,44 +429,46 @@ function update<T extends SharedVNode>(
 	updateVNodeId(ids, id, vnode);
 
 	const didRender = timingsByVNode.end.has(vnode);
-	if (didRender) {
-		const name = bindings.getDisplayName(vnode, config);
-		if (filters.type.has("hoc")) {
-			const res = detectHocs(commit, name, id, hocs);
-			hocs = res.hocs;
-		}
+	if (!didRender) {
+		return;
+	}
 
-		commit.operations.push(
-			MsgTypes.UPDATE_VNODE_TIMINGS,
-			id,
-			(timingsByVNode.start.get(vnode) || 0) * 1000,
-			(timingsByVNode.end.get(vnode) || 0) * 1000,
-		);
+	const name = bindings.getDisplayName(vnode, config);
+	if (filters.type.has("hoc")) {
+		const res = detectHocs(commit, name, id, hocs);
+		hocs = res.hocs;
+	}
 
-		if (profiler.isProfiling && profiler.captureRenderReasons) {
-			const reason =
-				renderReasonPre !== null
-					? renderReasonPre.get(vnode) || null
-					: bindings.getRenderReasonPost(
-							ids,
-							bindings,
-							timingsByVNode,
-							oldVNode,
-							vnode,
-					  );
-			if (reason !== null) {
-				const count = reason.items ? reason.items.length : 0;
-				commit.operations.push(MsgTypes.RENDER_REASON, id, reason.type, count);
-				if (reason.items && count > 0) {
-					commit.operations.push(
-						...reason.items.map(str => getStringId(commit.strings, str)),
-					);
-				}
+	commit.operations.push(
+		MsgTypes.UPDATE_VNODE_TIMINGS,
+		id,
+		(timingsByVNode.start.get(vnode) || 0) * 1000,
+		(timingsByVNode.end.get(vnode) || 0) * 1000,
+	);
+
+	if (profiler.isProfiling && profiler.captureRenderReasons) {
+		const reason =
+			renderReasonPre !== null
+				? renderReasonPre.get(vnode) || null
+				: bindings.getRenderReasonPost(
+						ids,
+						bindings,
+						timingsByVNode,
+						oldVNode,
+						vnode,
+				  );
+		if (reason !== null) {
+			const count = reason.items ? reason.items.length : 0;
+			commit.operations.push(MsgTypes.RENDER_REASON, id, reason.type, count);
+			if (reason.items && count > 0) {
+				commit.operations.push(
+					...reason.items.map(str => getStringId(commit.strings, str)),
+				);
 			}
 		}
-
-		updateHighlight(profiler, vnode, bindings);
 	}
+
+	updateHighlight(profiler, vnode, bindings);
 
 	const oldChildren = oldVNode
 		? bindings
@@ -599,9 +601,8 @@ export function createCommit<T extends SharedVNode>(
 
 	if (helpers.isRoot(vnode, config)) {
 		if (commit.stats !== null) {
-			commit.stats.roots.total++;
-			const children = helpers.getActualChildren(vnode);
-			commit.stats.roots.children.push(children.length);
+			const childrenLen = helpers.getActualChildren(vnode).length;
+			commit.stats.roots[childrenLen > 4 ? 4 : childrenLen]++;
 		}
 
 		parentId = -1;
