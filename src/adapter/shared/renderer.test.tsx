@@ -73,6 +73,7 @@ describe("Renderer 10", () => {
 		expect(toSnapshot(spy.args[1][1])).to.deep.equal([
 			"rootId: 1",
 			"Update timings 1",
+			"Update timings 2",
 		]);
 	});
 
@@ -106,6 +107,7 @@ describe("Renderer 10", () => {
 			"rootId: 1",
 			"Add 3 <span> to parent 2",
 			"Update timings 1",
+			"Update timings 2",
 		]);
 	});
 
@@ -148,6 +150,7 @@ describe("Renderer 10", () => {
 		expect(toSnapshot(spy.args[1][1])).to.deep.equal([
 			"rootId: 1",
 			"Update timings 1",
+			"Update timings 2",
 		]);
 	});
 
@@ -170,6 +173,9 @@ describe("Renderer 10", () => {
 		expect(toSnapshot(spy.args[1][1])).to.deep.equal([
 			"rootId: 1",
 			"Update timings 1",
+			"Update timings 2",
+			"Update timings 4",
+			"Update timings 3",
 			"Reorder 2 [4, 3]",
 		]);
 	});

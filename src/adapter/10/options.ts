@@ -126,9 +126,12 @@ export function setupOptionsV10(
 
 	o._diff = o.__b = (vnode: VNode) => {
 		if (typeof vnode.type === "function") {
-			timings.start.set(vnode, performance.now());
 			const name = getDisplayName(vnode, config);
 			recordMark(`${name}_diff`);
+		}
+
+		if (vnode.type !== null) {
+			timings.start.set(vnode, performance.now());
 		}
 
 		if (prevBeforeDiff != null) prevBeforeDiff(vnode);
@@ -151,8 +154,11 @@ export function setupOptionsV10(
 				ownerStack.pop();
 			}
 
-			timings.end.set(vnode, performance.now());
 			endMark(getDisplayName(vnode, config));
+		}
+
+		if (vnode.type !== null) {
+			timings.end.set(vnode, performance.now());
 		}
 
 		if (prevAfterDiff) prevAfterDiff(vnode);
@@ -172,8 +178,10 @@ export function setupOptionsV10(
 
 	options.unmount = vnode => {
 		if (prevBeforeUnmount) prevBeforeUnmount(vnode);
-		timings.start.delete(vnode);
-		timings.end.delete(vnode);
+		if (vnode.type !== null) {
+			timings.start.delete(vnode);
+			timings.end.delete(vnode);
+		}
 		owners.delete(vnode);
 		renderer.onUnmount(vnode as any);
 	};
