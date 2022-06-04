@@ -3,7 +3,7 @@ import { Store } from "../../view/store/types";
 import { recordProfilerCommit } from "../../view/components/profiler/data/commits";
 import { ops2Tree } from "./operations";
 import { applyOperationsV1 } from "./legacy/operationsV1";
-import { Stats, stats2ops } from "../shared/stats";
+import { OperationInfo, Stats, stats2ops } from "../shared/stats";
 
 export enum MsgTypes {
 	ADD_ROOT = 1,
@@ -93,10 +93,22 @@ export function flush(commit: Commit) {
 	}
 	msg.push(...operations);
 	if (stats !== null) {
-		msg.push(...stats2ops(rootId, stats));
+		msg.push(...stats2ops(stats));
 	}
 
 	return { type: "operation_v2", data: msg };
+}
+
+function sumArrays(a: number[], b: number[]) {
+	for (let i = 0; i < b.length; i++) {
+		a[i] += b[i];
+	}
+}
+
+function sumOps(a: OperationInfo, b: OperationInfo) {
+	a.components += b.components;
+	a.elements += b.elements;
+	a.text += b.text;
 }
 
 /**
@@ -141,33 +153,36 @@ export function applyOperationsV2(store: Store, data: number[]) {
 			store.stats.data.$ = stats;
 		} else {
 			store.stats.data.update(v => {
-				for (const key in stats) {
-					const next = (stats as any)[key];
+				if (v === null) return;
 
-					if (key === "singleChildType") {
-						const old = (v as any)[key];
-						old.roots += next.roots;
-						old.classComponents += next.classComponents;
-						old.functionComponents += next.functionComponents;
-						old.fragments += next.fragments;
-						old.forwardRef += next.forwardRef;
-						old.memo += next.memo;
-						old.suspense += next.suspense;
-						old.elements += next.elements;
-						old.text += next.text;
-					} else {
-						if (typeof next === "object") {
-							const old = (v as any)[key];
-							next.children.forEach((nextValue: any, nextKey: any) => {
-								const oldChildren = old.children.get(nextKey) || 0;
-								old.children.set(nextKey, oldChildren + nextValue);
-							});
-							old.total += next.total;
-						} else {
-							(v as any)[key] += (stats as any)[key];
-						}
-					}
-				}
+				sumArrays(v.roots, stats.roots);
+				sumArrays(v.classComponents, stats.classComponents);
+				sumArrays(v.functionComponents, stats.functionComponents);
+				sumArrays(v.fragments, stats.fragments);
+				sumArrays(v.forwardRef, stats.forwardRef);
+				sumArrays(v.memo, stats.memo);
+				sumArrays(v.suspense, stats.suspense);
+				sumArrays(v.elements, stats.elements);
+				v.text += stats.text;
+				sumArrays(v.keyed, stats.keyed);
+				sumArrays(v.unkeyed, stats.unkeyed);
+				sumArrays(v.mixed, stats.mixed);
+
+				sumOps(v.mounts, stats.mounts);
+				sumOps(v.updates, stats.updates);
+				sumOps(v.unmounts, stats.unmounts);
+
+				const single = v.singleChildType;
+				const singleNew = stats.singleChildType;
+
+				single.roots += singleNew.roots;
+				single.classComponents += singleNew.classComponents;
+				single.functionComponents += singleNew.functionComponents;
+				single.fragments += singleNew.fragments;
+				single.forwardRef += singleNew.forwardRef;
+				single.memo += singleNew.memo;
+				single.suspense += singleNew.suspense;
+				single.elements += singleNew.elements;
 
 				return v;
 			});

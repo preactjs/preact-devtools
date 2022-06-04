@@ -2,6 +2,7 @@ import { MsgTypes } from "./protocol/events";
 import { parseTable, flushTable } from "./protocol/string-table";
 import { ID, DevNodeType } from "../view/store/types";
 import { renderReasonToStr } from "./shared/renderReasons";
+import { parseStats } from "./shared/stats";
 
 export interface ParsedMsg {
 	rootId: number;
@@ -324,6 +325,12 @@ export function printCommit(data: number[]) {
 						"font-size: 10px; color: #ccc; background-color: #444; padding: .1rem .3rem; border-radius: 2px;",
 					);
 					i += 2 + count;
+					break;
+				}
+				case MsgTypes.COMMIT_STATS: {
+					const stats = parseStats(i + 1, data);
+					console.log("stats", stats.stats);
+					i = stats.i;
 					break;
 				}
 				default: {

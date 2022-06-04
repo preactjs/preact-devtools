@@ -13,7 +13,7 @@ import {
 import { ProfilerState } from "../adapter/profiler";
 import { getDevtoolsType, RendererConfig } from "./renderer";
 import { RenderReason, RenderReasonData } from "./renderReasons";
-import { createStats, DiffType, updateDiffStats } from "./stats";
+import { createStats, DiffType, updateDiffStats, updateOpStats } from "./stats";
 import { NodeType } from "../../constants";
 import { getDiffType, recordComponentStats } from "./stats";
 import { measureUpdate } from "../adapter/highlightUpdates";
@@ -196,7 +196,7 @@ function mount<T extends SharedVNode>(
 	renderReasonPre: Map<T, RenderReasonData> | null,
 ) {
 	if (commit.stats !== null) {
-		commit.stats.mounts++;
+		updateOpStats(commit.stats, "mounts", vnode, bindings);
 	}
 
 	const root = bindings.isRoot(vnode, config);
@@ -354,7 +354,7 @@ function update<T extends SharedVNode>(
 	renderReasonPre: Map<T, RenderReasonData> | null,
 ) {
 	if (commit.stats !== null) {
-		commit.stats.updates++;
+		updateOpStats(commit.stats, "updates", vnode, bindings);
 	}
 
 	let diff = DiffType.UNKNOWN;

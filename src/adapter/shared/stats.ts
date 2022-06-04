@@ -1,4 +1,4 @@
-import { DevNodeType, ID } from "../../view/store/types";
+import { DevNodeType } from "../../view/store/types";
 import { MsgTypes } from "../protocol/events";
 import { PreactBindings, SharedVNode } from "./bindings";
 import { getDevtoolsType, RendererConfig } from "./renderer";
@@ -10,27 +10,30 @@ export enum DiffType {
 	MIXED = 3,
 }
 
-export interface ComponentStats {
-	total: number;
-	children: number[];
+export type StatsChildren = [number, number, number, number, number];
+
+export interface OperationInfo {
+	components: number;
+	elements: number;
+	text: number;
 }
 
 export interface Stats {
-	roots: ComponentStats;
-	classComponents: ComponentStats;
-	functionComponents: ComponentStats;
-	fragments: ComponentStats;
-	forwardRef: ComponentStats;
-	memo: ComponentStats;
-	suspense: ComponentStats;
-	elements: ComponentStats;
+	roots: StatsChildren;
+	classComponents: StatsChildren;
+	functionComponents: StatsChildren;
+	fragments: StatsChildren;
+	forwardRef: StatsChildren;
+	memo: StatsChildren;
+	suspense: StatsChildren;
+	elements: StatsChildren;
 	text: number;
-	keyed: ComponentStats;
-	unkeyed: ComponentStats;
-	mixed: ComponentStats;
-	mounts: number;
-	updates: number;
-	unmounts: number;
+	keyed: StatsChildren;
+	unkeyed: StatsChildren;
+	mixed: StatsChildren;
+	mounts: OperationInfo;
+	updates: OperationInfo;
+	unmounts: OperationInfo;
 	singleChildType: {
 		roots: number;
 		classComponents: number;
@@ -44,74 +47,58 @@ export interface Stats {
 	};
 }
 
+function getChildCountIdx(count: number) {
+	return count > 4 ? 4 : count;
+}
+
 export function updateDiffStats(
 	stats: Stats,
 	diff: DiffType,
 	childCount: number,
 ) {
+	const idx = getChildCountIdx(childCount);
 	if (diff === DiffType.KEYED) {
-		stats.keyed.total++;
-		stats.keyed.children.push(childCount);
+		stats.keyed[idx]++;
 	} else if (diff === DiffType.UNKEYED) {
-		stats.unkeyed.total++;
-		stats.unkeyed.children.push(childCount);
+		stats.unkeyed[idx]++;
 	} else if (diff === DiffType.MIXED) {
-		stats.mixed.total++;
-		stats.mixed.children.push(childCount);
+		stats.mixed[idx]++;
+	}
+}
+
+export function updateOpStats<T extends SharedVNode>(
+	stats: Stats,
+	kind: "updates" | "mounts" | "unmounts",
+	vnode: T,
+	bindings: PreactBindings<T>,
+) {
+	if (bindings.isComponent(vnode)) {
+		stats[kind].components++;
+	} else if (bindings.isElement(vnode)) {
+		stats[kind].elements++;
+	} else {
+		stats[kind].text++;
 	}
 }
 
 // TODO: store update depth
 export function createStats(): Stats {
 	return {
-		roots: {
-			total: 0,
-			children: [],
-		},
-		classComponents: {
-			total: 0,
-			children: [],
-		},
-		functionComponents: {
-			total: 0,
-			children: [],
-		},
-		fragments: {
-			total: 0,
-			children: [],
-		},
-		forwardRef: {
-			total: 0,
-			children: [],
-		},
-		memo: {
-			total: 0,
-			children: [],
-		},
-		suspense: {
-			total: 0,
-			children: [],
-		},
-		elements: {
-			total: 0,
-			children: [],
-		},
+		roots: [0, 0, 0, 0, 0],
+		classComponents: [0, 0, 0, 0, 0],
+		functionComponents: [0, 0, 0, 0, 0],
+		fragments: [0, 0, 0, 0, 0],
+		forwardRef: [0, 0, 0, 0, 0],
+		memo: [0, 0, 0, 0, 0],
+		suspense: [0, 0, 0, 0, 0],
+		elements: [0, 0, 0, 0, 0],
 		text: 0,
-		keyed: {
-			total: 0,
-			children: [],
-		},
-		unkeyed: {
-			total: 0,
-			children: [],
-		},
-		mixed: {
-			total: 0,
-			children: [],
-		},
-		mounts: 0,
-		unmounts: 0,
-		updates: 0,
+		keyed: [0, 0, 0, 0, 0],
+		unkeyed: [0, 0, 0, 0, 0],
+		mixed: [0, 0, 0, 0, 0],
+		mounts: { components: 0, elements: 0, text: 0 },
+		unmounts: { components: 0, elements: 0, text: 0 },
+		updates: { components: 0, elements: 0, text: 0 },
 		singleChildType: {
 			roots: 0,
 			classComponents: 0,
@@ -126,58 +113,32 @@ export function createStats(): Stats {
 	};
 }
 
-export function stats2ops(rootId: ID, stats: Stats): number[] {
+export function stats2ops(stats: Stats): number[] {
 	return [
 		MsgTypes.COMMIT_STATS,
-		rootId,
-
-		stats.roots.total,
-		stats.roots.children.length,
-		...stats.roots.children,
-
-		stats.classComponents.total,
-		stats.classComponents.children.length,
-		...stats.classComponents.children,
-
-		stats.functionComponents.total,
-		stats.functionComponents.children.length,
-		...stats.functionComponents.children,
-
-		stats.fragments.total,
-		stats.fragments.children.length,
-		...stats.fragments.children,
-
-		stats.forwardRef.total,
-		stats.forwardRef.children.length,
-		...stats.forwardRef.children,
-
-		stats.memo.total,
-		stats.memo.children.length,
-		...stats.memo.children,
-
-		stats.suspense.total,
-		stats.suspense.children.length,
-		...stats.suspense.children,
-
-		stats.elements.total,
-		stats.elements.children.length,
-		...stats.elements.children,
-
+		...stats.roots,
+		...stats.classComponents,
+		...stats.functionComponents,
+		...stats.fragments,
+		...stats.forwardRef,
+		...stats.memo,
+		...stats.suspense,
+		...stats.elements,
 		stats.text,
 
-		stats.keyed.total,
-		stats.keyed.children.length,
-		...stats.keyed.children,
-		stats.unkeyed.total,
-		stats.unkeyed.children.length,
-		...stats.unkeyed.children,
-		stats.mixed.total,
-		stats.mixed.children.length,
-		...stats.mixed.children,
+		...stats.keyed,
+		...stats.unkeyed,
+		...stats.mixed,
 
-		stats.mounts,
-		stats.updates,
-		stats.unmounts,
+		stats.mounts.components,
+		stats.mounts.elements,
+		stats.mounts.text,
+		stats.updates.components,
+		stats.updates.elements,
+		stats.updates.text,
+		stats.unmounts.components,
+		stats.unmounts.elements,
+		stats.unmounts.text,
 
 		// Single child types
 		stats.singleChildType.roots,
@@ -192,27 +153,22 @@ export function stats2ops(rootId: ID, stats: Stats): number[] {
 	];
 }
 
-export interface ParsedComponentStats {
-	total: number;
-	children: Map<number, number>;
-}
-
 export interface ParsedStats {
-	roots: ParsedComponentStats;
-	classComponents: ParsedComponentStats;
-	functionComponents: ParsedComponentStats;
-	fragments: ParsedComponentStats;
-	forwardRef: ParsedComponentStats;
-	memo: ParsedComponentStats;
-	suspense: ParsedComponentStats;
-	elements: ParsedComponentStats;
+	roots: StatsChildren;
+	classComponents: StatsChildren;
+	functionComponents: StatsChildren;
+	fragments: StatsChildren;
+	forwardRef: StatsChildren;
+	memo: StatsChildren;
+	suspense: StatsChildren;
+	elements: StatsChildren;
 	text: number;
-	keyed: ParsedComponentStats;
-	unkeyed: ParsedComponentStats;
-	mixed: ParsedComponentStats;
-	mounts: number;
-	updates: number;
-	unmounts: number;
+	keyed: StatsChildren;
+	unkeyed: StatsChildren;
+	mixed: StatsChildren;
+	mounts: OperationInfo;
+	updates: OperationInfo;
+	unmounts: OperationInfo;
 	singleChildType: {
 		roots: number;
 		classComponents: number;
@@ -249,23 +205,18 @@ export function recordComponentStats<T extends SharedVNode>(
 	children: Array<T | null | undefined>,
 ) {
 	const childrenLen = children.length;
-	const type = vnode.type;
-	if (typeof type === "function") {
-		if (type.prototype && type.prototype.render) {
-			stats.classComponents.total++;
-			stats.classComponents.children.push(childrenLen);
-		} else {
-			if (type === config.Fragment) {
-				stats.fragments.total++;
-				stats.fragments.children.push(childrenLen);
-			}
+	const idx = getChildCountIdx(childrenLen);
 
-			stats.functionComponents.total++;
-			stats.functionComponents.children.push(childrenLen);
+	if (bindings.isComponent(vnode)) {
+		if (vnode.type === config.Fragment) {
+			stats.fragments[idx]++;
+		} else if (vnode.type.prototype && vnode.type.prototype.render) {
+			stats.classComponents[idx]++;
+		} else {
+			stats.functionComponents[idx]++;
 		}
-	} else if (type !== null) {
-		stats.elements.total++;
-		stats.elements.children.push(childrenLen);
+	} else if (bindings.isElement(vnode)) {
+		stats.elements[idx]++;
 	} else {
 		stats.text++;
 	}
@@ -273,16 +224,13 @@ export function recordComponentStats<T extends SharedVNode>(
 	const devType = getDevtoolsType(vnode, bindings);
 	switch (devType) {
 		case DevNodeType.ForwardRef:
-			stats.forwardRef.total++;
-			stats.forwardRef.children.push(childrenLen);
+			stats.forwardRef[idx]++;
 			break;
 		case DevNodeType.Memo:
-			stats.memo.total++;
-			stats.memo.children.push(childrenLen);
+			stats.memo[idx]++;
 			break;
 		case DevNodeType.Suspense:
-			stats.suspense.total++;
-			stats.suspense.children.push(childrenLen);
+			stats.suspense[idx]++;
 			break;
 	}
 
@@ -320,67 +268,57 @@ export function recordComponentStats<T extends SharedVNode>(
 	}
 }
 
-export function parseComponentStats(i: number, ops: number[]) {
-	const total = ops[i++];
-	const len = ops[i++];
-	const children = new Map();
-
-	let j = len;
-	while (j--) {
-		const value = children.get(ops[i + j]) || 0;
-		children.set(ops[i + j], value + 1);
-	}
-
-	i += len;
+export function parseChildrenStats(
+	i: number,
+	ops: number[],
+): { i: number; data: StatsChildren } {
+	const data: StatsChildren = [
+		ops[i++],
+		ops[i++],
+		ops[i++],
+		ops[i++],
+		ops[i++],
+	];
 
 	return {
 		i,
-		total,
-		children,
+		data,
 	};
 }
 
-export function parseStats(ops: number[]): ParsedStats {
-	let i = 1;
-	// const rootId = ops[i++];
-	const roots = parseComponentStats(i, ops);
-	i = roots.i;
+export function parseTypeStats(i: number, ops: number[]) {
+	const data = { components: ops[i++], elements: ops[i++], text: ops[i++] };
+	return {
+		i,
+		data,
+	};
+}
 
-	const klass = parseComponentStats(i, ops);
-	i = klass.i;
-
-	const fnComps = parseComponentStats(i, ops);
-	i = fnComps.i;
-
-	const fragments = parseComponentStats(i, ops);
-	i = fragments.i;
-
-	const forwardRef = parseComponentStats(i, ops);
-	i = forwardRef.i;
-
-	const memo = parseComponentStats(i, ops);
-	i = memo.i;
-
-	const suspense = parseComponentStats(i, ops);
-	i = suspense.i;
-
-	const elements = parseComponentStats(i, ops);
+export function parseStats(
+	i: number,
+	ops: number[],
+): { i: number; stats: ParsedStats } {
+	const roots = parseChildrenStats(i, ops);
+	const klass = parseChildrenStats(roots.i, ops);
+	const fnComps = parseChildrenStats(klass.i, ops);
+	const fragments = parseChildrenStats(fnComps.i, ops);
+	const forwardRef = parseChildrenStats(fragments.i, ops);
+	const memo = parseChildrenStats(forwardRef.i, ops);
+	const suspense = parseChildrenStats(memo.i, ops);
+	const elements = parseChildrenStats(suspense.i, ops);
 	i = elements.i;
 
 	const text = ops[i++];
 
-	const keyed = parseComponentStats(i, ops);
-	i = keyed.i;
-
-	const unkeyed = parseComponentStats(i, ops);
-	i = unkeyed.i;
-
-	const mixed = parseComponentStats(i, ops);
+	const keyed = parseChildrenStats(i, ops);
+	const unkeyed = parseChildrenStats(keyed.i, ops);
+	const mixed = parseChildrenStats(unkeyed.i, ops);
 	i = mixed.i;
 
-	const mounts = ops[i++];
-	const updates = ops[i++];
-	const unmounts = ops[i++];
+	const mounts = parseTypeStats(i, ops);
+	const updates = parseTypeStats(mounts.i, ops);
+	const unmounts = parseTypeStats(updates.i, ops);
+	i = unmounts.i;
 
 	const singleRoots = ops[i++];
 	const singleClassComponents = ops[i++];
@@ -392,24 +330,24 @@ export function parseStats(ops: number[]): ParsedStats {
 	const singleElements = ops[i++];
 	const singleText = ops[i++];
 
-	return {
-		roots,
-		classComponents: klass,
-		functionComponents: fnComps,
-		fragments,
-		forwardRef,
-		memo,
-		suspense,
-		elements,
+	const stats = {
+		roots: roots.data,
+		classComponents: klass.data,
+		functionComponents: fnComps.data,
+		fragments: fragments.data,
+		forwardRef: forwardRef.data,
+		memo: memo.data,
+		suspense: suspense.data,
+		elements: elements.data,
 		text,
 
-		keyed,
-		unkeyed,
-		mixed,
+		keyed: keyed.data,
+		unkeyed: unkeyed.data,
+		mixed: mixed.data,
 
-		mounts,
-		updates,
-		unmounts,
+		mounts: mounts.data,
+		updates: updates.data,
+		unmounts: unmounts.data,
 		singleChildType: {
 			roots: singleRoots,
 			classComponents: singleClassComponents,
@@ -422,4 +360,6 @@ export function parseStats(ops: number[]): ParsedStats {
 			text: singleText,
 		},
 	};
+
+	return { i, stats };
 }

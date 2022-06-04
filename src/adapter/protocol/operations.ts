@@ -141,10 +141,9 @@ export function ops2Tree(oldTree: Tree, existingRoots: ID[], ops: number[]) {
 				break;
 			}
 			case MsgTypes.COMMIT_STATS: {
-				const count = ops[i + 1];
-				const statsOps = ops.slice(i + 1, i + 1 + count);
-				stats = parseStats(statsOps);
-				i = i + 1 + count;
+				const statsData = parseStats(i + 1, ops);
+				i = statsData.i;
+				stats = statsData.stats;
 				break;
 			}
 			case MsgTypes.HOC_NODES: {

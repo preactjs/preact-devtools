@@ -7,7 +7,7 @@ import { FilterState } from "../adapter/filter";
 import { Renderer } from "../renderer";
 import { startDrawing } from "../adapter/highlightUpdates";
 import { setIn, setInCopy } from "../shared/serialize";
-import { createStats } from "../shared/stats";
+import { createStats, OperationInfo } from "../shared/stats";
 import { ProfilerState } from "../adapter/profiler";
 import {
 	getVNodeById,
@@ -74,7 +74,23 @@ export function createRenderer<T extends SharedVNode>(
 
 	const domToVNode = new WeakMap<HTMLElement | Text, T>();
 
+	let unmountStats: OperationInfo = {
+		components: 0,
+		elements: 0,
+		text: 0,
+	};
+
 	function onUnmount(vnode: T) {
+		if (profiler.recordStats) {
+			if (bindings.isComponent(vnode)) {
+				unmountStats.components++;
+			} else if (bindings.isElement(vnode)) {
+				unmountStats.elements++;
+			} else {
+				unmountStats.text++;
+			}
+		}
+
 		if (!shouldFilter(vnode, filters, config, bindings)) {
 			if (hasVNodeId(ids, vnode)) {
 				currentUnmounts.push(getVNodeId(ids, vnode));
@@ -180,6 +196,13 @@ export function createRenderer<T extends SharedVNode>(
 
 			roots.forEach(root => {
 				const rootId = getVNodeId(ids, root);
+
+				unmountStats = {
+					components: 0,
+					elements: 0,
+					text: 0,
+				};
+
 				traverse(root, vnode => this.onUnmount(vnode), bindings);
 
 				const commit: Commit = {
@@ -191,7 +214,7 @@ export function createRenderer<T extends SharedVNode>(
 				};
 
 				if (commit.stats !== null) {
-					commit.stats.unmounts += commit.unmountIds.length;
+					commit.stats.unmounts = unmountStats;
 				}
 
 				const unmounts = flush(commit);
@@ -246,7 +269,13 @@ export function createRenderer<T extends SharedVNode>(
 			timingsByVNode.end.clear();
 
 			if (commit.stats !== null) {
-				commit.stats.unmounts += currentUnmounts.length;
+				commit.stats.unmounts = unmountStats;
+
+				unmountStats = {
+					components: 0,
+					elements: 0,
+					text: 0,
+				};
 			}
 
 			commit.unmountIds.push(...currentUnmounts);
