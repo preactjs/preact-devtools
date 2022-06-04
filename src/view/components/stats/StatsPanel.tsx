@@ -7,18 +7,11 @@ import { Actions } from "../Actions";
 import { IconBtn } from "../IconBtn";
 import { RecordIcon, Refresh, NotInterested } from "../icons";
 import { useCallback } from "preact/hooks";
-import { ParsedStats } from "../../../adapter/shared/stats";
-
-function parseChildrenMap(data: Map<number, number>): Children {
-	const children: Children = [0, 0, 0, 0, 0];
-
-	data.forEach((v, k) => {
-		if (k >= 4) k = 4;
-		children[k] += v;
-	});
-
-	return children;
-}
+import {
+	OperationInfo,
+	ParsedStats,
+	StatsChildren,
+} from "../../../adapter/shared/stats";
 
 export function StatsRecordBtn() {
 	const store = useStore();
@@ -123,8 +116,6 @@ export function StatsPanel() {
 	);
 }
 
-export type Children = [number, number, number, number, number];
-
 export function ChildHeadings() {
 	return (
 		<tr>
@@ -139,10 +130,18 @@ export function ChildHeadings() {
 	);
 }
 
+function getTotal(arr: number[]): number {
+	return arr.reduce((acc, n) => acc + n, 0);
+}
+
+function getOpTotal(info: OperationInfo): number {
+	return info.components + info.elements + info.text;
+}
+
 export function ChildRow(props: {
 	label: string;
 	total: number;
-	count?: Children;
+	count?: StatsChildren;
 	testId?: string;
 }) {
 	const {
@@ -176,6 +175,26 @@ export function ChildRow(props: {
 	);
 }
 
+function OperationRow({ name, info }: { name: string; info: OperationInfo }) {
+	return (
+		<tr>
+			<td>{name}</td>
+			<td class={s.alignRight} data-testid={name + "-total"}>
+				{getOpTotal(info)}
+			</td>
+			<td class={s.alignRight} data-testid={name + "-components"}>
+				{info.components}
+			</td>
+			<td class={s.alignRight} data-testid={name + "-elements"}>
+				{info.elements}
+			</td>
+			<td class={s.alignRight} data-testid={name + "-text"}>
+				{info.text}
+			</td>
+		</tr>
+	);
+}
+
 export function StatsData({ stats }: { stats: ParsedStats }) {
 	return (
 		<Fragment>
@@ -202,21 +221,15 @@ export function StatsData({ stats }: { stats: ParsedStats }) {
 							<tr>
 								<th>Type</th>
 								<th>Total</th>
+								<th>Components</th>
+								<th>Elements</th>
+								<th>Text</th>
 							</tr>
 						</thead>
 						<tbody>
-							<tr>
-								<td>mount</td>
-								<td class={s.alignRight}>{stats.mounts}</td>
-							</tr>
-							<tr>
-								<td>update</td>
-								<td class={s.alignRight}>{stats.updates}</td>
-							</tr>
-							<tr>
-								<td>unmount</td>
-								<td class={s.alignRight}>{stats.unmounts}</td>
-							</tr>
+							<OperationRow name="mount" info={stats.mounts} />
+							<OperationRow name="update" info={stats.updates} />
+							<OperationRow name="unmount" info={stats.unmounts} />
 						</tbody>
 					</table>
 				</div>
@@ -231,18 +244,18 @@ export function StatsData({ stats }: { stats: ParsedStats }) {
 						<tbody>
 							<ChildRow
 								label="keyed"
-								total={stats.keyed.total}
-								count={parseChildrenMap(stats.keyed.children)}
+								total={getTotal(stats.keyed)}
+								count={stats.keyed}
 							/>
 							<ChildRow
 								label="unkeyed"
-								total={stats.unkeyed.total}
-								count={parseChildrenMap(stats.unkeyed.children)}
+								total={getTotal(stats.unkeyed)}
+								count={stats.unkeyed}
 							/>
 							<ChildRow
 								label="mixed"
-								total={stats.mixed.total}
-								count={parseChildrenMap(stats.mixed.children)}
+								total={getTotal(stats.mixed)}
+								count={stats.mixed}
 							/>
 						</tbody>
 					</table>
@@ -259,50 +272,50 @@ export function StatsData({ stats }: { stats: ParsedStats }) {
 							<ChildRow
 								label="Root"
 								testId="root"
-								total={stats.roots.total}
-								count={parseChildrenMap(stats.roots.children)}
+								total={getTotal(stats.roots)}
+								count={stats.roots}
 							/>
 							<ChildRow
 								label="Class Component"
 								testId="class-component"
-								total={stats.classComponents.total}
-								count={parseChildrenMap(stats.classComponents.children)}
+								total={getTotal(stats.classComponents)}
+								count={stats.classComponents}
 							/>
 							<ChildRow
 								label="Function Component*"
 								testId="function-component"
-								total={stats.functionComponents.total}
-								count={parseChildrenMap(stats.functionComponents.children)}
+								total={getTotal(stats.functionComponents)}
+								count={stats.functionComponents}
 							/>
 							<ChildRow
 								label="Fragment"
 								testId="fragment"
-								total={stats.fragments.total}
-								count={parseChildrenMap(stats.fragments.children)}
+								total={getTotal(stats.fragments)}
+								count={stats.fragments}
 							/>
 							<ChildRow
 								label="forwardRef"
 								testId="forwardref"
-								total={stats.forwardRef.total}
-								count={parseChildrenMap(stats.forwardRef.children)}
+								total={getTotal(stats.forwardRef)}
+								count={stats.forwardRef}
 							/>
 							<ChildRow
 								label="Memo"
 								testId="memo"
-								total={stats.memo.total}
-								count={parseChildrenMap(stats.memo.children)}
+								total={getTotal(stats.memo)}
+								count={stats.memo}
 							/>
 							<ChildRow
 								label="Suspense"
 								testId="suspense"
-								total={stats.suspense.total}
-								count={parseChildrenMap(stats.suspense.children)}
+								total={getTotal(stats.suspense)}
+								count={stats.suspense}
 							/>
 							<ChildRow
 								label="Element"
 								testId="element"
-								total={stats.elements.total}
-								count={parseChildrenMap(stats.elements.children)}
+								total={getTotal(stats.elements)}
+								count={stats.elements}
 							/>
 
 							<ChildRow label="Text**" testId="text" total={stats.text} />
