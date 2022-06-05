@@ -86,7 +86,8 @@ async function waitForDevtoolsInit() {
 		params.set(
 			"preact",
 			active.preact ||
-				preactVersions.find(v => !v.includes("-") || preactVersions[0]),
+				preactVersions.find(v => !v.includes("-")) ||
+				preactVersions[0],
 		);
 		params.set("fixtures", active.fixtures || fixtures[0]);
 		window.location.search = params.toString();
