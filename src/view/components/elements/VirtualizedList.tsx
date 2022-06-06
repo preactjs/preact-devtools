@@ -2,7 +2,6 @@ import { RefObject, VNode } from "preact";
 import {
 	useCallback,
 	useEffect,
-	useLayoutEffect,
 	useMemo,
 	useRef,
 	useState,
@@ -83,12 +82,6 @@ export function useVirtualizedList<T>({
 		[rowHeight],
 	);
 
-	useLayoutEffect(() => {
-		if (container.current) {
-			setHeight(container.current.clientHeight);
-		}
-	}, []);
-
 	useEffect(() => {
 		const scrollFn = (e: Event) => {
 			const top = (e.target as Element).scrollTop;
@@ -109,11 +102,15 @@ export function useVirtualizedList<T>({
 		};
 	}, [container.current]);
 
-	useResize(() => {
-		if (container.current) {
-			setHeight(container.current.clientHeight);
-		}
-	}, []);
+	useResize(
+		() => {
+			if (container.current) {
+				setHeight(container.current.clientHeight);
+			}
+		},
+		[],
+		true,
+	);
 
 	const vnodes = useMemo(() => {
 		const vnodes: VNode[] = [];
