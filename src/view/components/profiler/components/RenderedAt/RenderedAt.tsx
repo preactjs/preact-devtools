@@ -10,16 +10,13 @@ export function RenderedAt() {
 		const id = store.profiler.selectedNodeId.$;
 
 		return store.profiler.commits.$.reduce<
-			Array<{ index: number; startTime: number; selfDuration: number }>
+			Array<{ index: number; selfDuration: number }>
 		>((acc, commit, i) => {
 			if (!commit.rendered.has(id)) return acc;
-
-			const node = commit.nodes.get(id)!;
 
 			const selfDuration = commit.selfDurations.get(id) || 0;
 			acc.push({
 				index: i,
-				startTime: node.startTime,
 				selfDuration,
 			});
 			return acc;
@@ -45,8 +42,7 @@ export function RenderedAt() {
 								onClick={() => (store.profiler.activeCommitIdx.$ = node.index)}
 							>
 								<span>
-									{formatTime(node.startTime / 1000)} for{" "}
-									{formatTime(node.selfDuration)}
+									Commit #{node.index} for {formatTime(node.selfDuration)}
 								</span>
 							</button>
 						);
