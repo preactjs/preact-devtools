@@ -40,7 +40,7 @@ function placeNode(
 	if (!node) return;
 
 	let start = 0;
-	if (node.parent !== -1) {
+	if (node.parent !== -1 && idToTransform.has(node.parent)) {
 		const parentPos = idToTransform.get(node.parent)!;
 		start = parentPos.x + parentPos.width;
 	}
@@ -120,6 +120,10 @@ function enlargeParents(
 	let parentId = id;
 	while (parentId !== -1) {
 		const parent = commit.nodes.get(parentId)!;
+		if (!idToTransform.has(parentId)) {
+			break;
+		}
+
 		idToTransform.get(parentId)!.width += value;
 		parentId = parent.parent;
 	}

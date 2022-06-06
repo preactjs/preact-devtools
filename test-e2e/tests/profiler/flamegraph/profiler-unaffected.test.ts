@@ -20,12 +20,12 @@ export async function run(config: any) {
 
 	let nodes = await getText$$(
 		devtools,
-		'[data-type="flamegraph"] > *:not([data-weight="-1"])',
+		'[data-type="flamegraph"] [data-id]:not([data-weight="-1"])',
 	);
 	expect(nodes.map(n => n.split(" ")[0])).to.deep.equal(["Counter", "Display"]);
 	nodes = await getText$$(
 		devtools,
-		'[data-type="flamegraph"] > [data-commit-parent]',
+		'[data-type="flamegraph"] [data-commit-parent]',
 	);
 	expect(nodes.map(n => n.split(" ")[0])).to.deep.equal(["Fragment", "App"]);
 }

@@ -33,12 +33,16 @@ export function FlameGraph() {
 			setCanvasWidth(Math.floor(ref.current.clientWidth) - 4);
 		}
 	}, [isRecording, commit]);
-	useResize(() => {
-		if (ref.current) {
-			// Pad for potential rounding issues
-			setCanvasWidth(Math.floor(ref.current.clientWidth) - 4);
-		}
-	}, [commit]);
+	useResize(
+		() => {
+			if (ref.current) {
+				// Pad for potential rounding issues
+				setCanvasWidth(Math.floor(ref.current.clientWidth) - 4);
+			}
+		},
+		[commit],
+		true,
+	);
 
 	const onSelect = useCallback(
 		(id: number) => {
@@ -70,6 +74,7 @@ export function FlameGraph() {
 					{displayType === FlamegraphType.RANKED ? (
 						<RankedLayout
 							canvasWidth={canvasWidth}
+							containerRef={ref}
 							commit={commit!}
 							onSelect={onSelect}
 							selected={selected}
@@ -79,6 +84,7 @@ export function FlameGraph() {
 					) : (
 						<FlamegraphLayout
 							canvasWidth={canvasWidth}
+							containerRef={ref}
 							commit={commit!}
 							onSelect={onSelect}
 							selected={selected}

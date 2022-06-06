@@ -7,6 +7,10 @@
 	scrollbar-gutter: stable;
 }
 
+.pane {
+	position: relative;
+}
+
 .node {
 	position: absolute;
 	cursor: pointer;
