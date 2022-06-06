@@ -22,7 +22,7 @@ export async function run(config: any) {
 	await clickRecordButton(devtools);
 
 	const nodes = await devtools.$$(
-		'[data-type="ranked"] > *:not([data-weight])',
+		'[data-type="ranked"] [data-id]:not([data-weight])',
 	);
 	expect(nodes.length).to.equal(0);
 

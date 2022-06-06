@@ -37,7 +37,10 @@ export function throttle<T extends any[]>(
 		if (!running) {
 			callback(...args);
 			running = true;
-			setTimeout(() => (running = false), wait);
+			setTimeout(() => {
+				running = false;
+				callback(...args);
+			}, wait);
 		}
 	};
 }
