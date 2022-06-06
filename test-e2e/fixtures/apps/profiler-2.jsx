@@ -5,14 +5,13 @@ function Display(props) {
 	return <div data-testid="result">Counter: {props.value}</div>;
 }
 
-let i = 0;
-function Counter() {
+function Counter({ num }) {
 	const [v, set] = useState(0);
 
 	return (
 		<div style="padding: 2rem;">
 			<Display value={v} />
-			<button id={"counter-1" + i++} onClick={() => set(v + 1)}>
+			<button data-testid={"counter-" + num} onClick={() => set(v + 1)}>
 				Increment
 			</button>
 		</div>
@@ -23,7 +22,7 @@ function Foo() {
 	return (
 		<Fragment>
 			<div>foo</div>
-			<Counter />
+			<Counter num={2} />
 		</Fragment>
 	);
 }
@@ -31,7 +30,7 @@ function Foo() {
 function App() {
 	return (
 		<Fragment>
-			<Counter />
+			<Counter num={1} />
 			<Foo />
 		</Fragment>
 	);

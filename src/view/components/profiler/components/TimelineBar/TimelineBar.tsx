@@ -7,7 +7,7 @@ import { RecordIcon, NotInterested, Refresh } from "../../../icons";
 import s from "../../../elements/TreeBar.module.css";
 import { useCallback } from "preact/hooks";
 import { FlameGraphMode } from "../../flamegraph/FlameGraphMode";
-import { resetProfiler } from "../../data/commits";
+import { FlamegraphType, resetProfiler } from "../../data/commits";
 
 export function TimelineBar() {
 	const store = useStore();
@@ -27,12 +27,36 @@ export function TimelineBar() {
 
 	const onCommitChange = useCallback(
 		(n: number) => {
-			const { activeCommitIdx, selectedNodeId, activeCommit } = store.profiler;
+			const {
+				activeCommitIdx,
+				selectedNodeId,
+				activeCommit,
+				flamegraphType,
+			} = store.profiler;
 
 			activeCommitIdx.$ = n;
+			const commit = activeCommit.$;
+			if (!commit) return;
 
-			if (activeCommit.$ && !activeCommit.$.nodes.has(selectedNodeId.$)) {
-				selectedNodeId.$ = activeCommit.$.rootId;
+			if (flamegraphType.$ === FlamegraphType.FLAMEGRAPH) {
+				if (!commit.nodes.has(selectedNodeId.$)) {
+					selectedNodeId.$ = commit.rootId;
+				}
+			} else if (!commit.rendered.has(selectedNodeId.$)) {
+				// RANKED: Pick longest rendered node if currently selected node
+				// is not part of the next commit.
+				let id = commit.rootId;
+				let max = commit.selfDurations.get(id) || 0;
+
+				commit.rendered.forEach(rId => {
+					const selfDuration = commit.selfDurations.get(rId) || 0;
+					if (selfDuration > max) {
+						max = selfDuration;
+						id = rId;
+					}
+				});
+
+				selectedNodeId.$ = id;
 			}
 		},
 		[store],
