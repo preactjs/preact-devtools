@@ -1,5 +1,18 @@
 # Changelog
 
+## 4.3.1
+
+### Bug Fixes
+
+- Improve layout measurement for virtualized lists (#392, thanks @marvinhagemeister)
+- Profiler UX improvements (#391, thanks @marvinhagemeister)
+- Profiler(Ranked): Fix missing selection on commit change (#390, thanks @marvinhagemeister)
+- Improve stats capturing (#388, thanks @marvinhagemeister)
+
+### Maintenance
+
+- Test: Fix error in pick latest stable preact version (#389, thanks @marvinhagemeister)
+
 ## 4.3.0
 
 ### Features
