@@ -17,7 +17,7 @@ export function placeFlamegraph(
 	rootId: ID,
 	selectedId: ID,
 	canvasWidth: number,
-): NodeTransform[] {
+): NodeTransform[][] {
 	const maximizedIds = new Set<ID>([selectedId]);
 	const commitParentIds = new Set<ID>();
 
@@ -52,7 +52,9 @@ export function placeFlamegraph(
 		scale = canvasWidth / selectedPos.width;
 	}
 
-	return Array.from(idToTransform.values()).map(pos => {
+	const byRow: NodeTransform[][] = [];
+
+	idToTransform.forEach(pos => {
 		let start;
 		let width;
 		let hidden = false;
@@ -75,12 +77,18 @@ export function placeFlamegraph(
 
 		const visible = hidden ? false : start >= 0 && start <= canvasWidth;
 
-		return {
+		if (pos.row >= byRow.length) {
+			byRow.push([]);
+		}
+
+		byRow[pos.row].push({
 			...pos,
 			x: start,
 			width,
 			maximized: maximizedIds.has(pos.id),
 			visible,
-		};
+		});
 	});
+
+	return byRow;
 }

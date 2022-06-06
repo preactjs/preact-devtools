@@ -29,10 +29,13 @@ export function FlameNode(props: Props) {
 
 	const { visible, width, x } = node;
 
+	if (width < 0.5) {
+		return null;
+	}
+
 	if (visible) {
-		const y = node.row * ROW_HEIGHT;
 		widthCss.current = `width: ${width}px;`;
-		transform.current = `transform: translate3d(${x}px, ${y}px, 0);`;
+		transform.current = `transform: translate3d(${x}px, 0, 0);`;
 	}
 
 	return (

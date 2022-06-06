@@ -10,7 +10,7 @@ import { clickNestedText, getAttribute } from "pentf/browser_utils";
 import { waitForPass } from "pentf/assert_utils";
 
 async function getFlameNodes(page: Page) {
-	return await page.$$eval('[data-type="ranked"] > *', els => {
+	return await page.$$eval('[data-type="ranked"] [data-id]', els => {
 		return els.map(el => {
 			const text = el.textContent!;
 			return {

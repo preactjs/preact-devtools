@@ -21,11 +21,11 @@ export async function run(config: any) {
 
 	await clickRecordButton(devtools);
 
-	// Initially only the top node should be focused.
+	// Commit root should be selected initially
 	expect(await getFlameNodes(devtools)).to.deep.equal([
 		{ maximized: true, name: "Fragment", visible: true },
-		{ maximized: false, name: "Foo", visible: true },
-		{ maximized: false, name: "Counter", visible: true },
+		{ maximized: true, name: "Foo", visible: true },
+		{ maximized: true, name: "Counter", visible: true },
 		{ maximized: false, name: "Display", visible: true },
 		{ maximized: false, name: "Value", visible: true },
 	]);

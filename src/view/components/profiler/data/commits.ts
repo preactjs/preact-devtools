@@ -71,6 +71,30 @@ export interface ProfilerState {
 	rankedNodes: Observable<NodeTransform[]>;
 }
 
+function getMaxSelfDurationNode(commit: CommitData) {
+	let id = commit.commitRootId;
+	let max = commit.selfDurations.get(id) || 0;
+
+	commit.rendered.forEach(rId => {
+		const t = commit.selfDurations.get(rId) || 0;
+		if (t > max) {
+			max = t;
+			id = rId;
+		}
+	});
+
+	return id;
+}
+
+export function getCommitInitalSelectNodeId(
+	commit: CommitData,
+	type: FlamegraphType,
+) {
+	return type === FlamegraphType.FLAMEGRAPH
+		? commit.commitRootId
+		: getMaxSelfDurationNode(commit);
+}
+
 /**
  * Create a new profiler instance. It intentiall doesn't have
  * any methods, to not go down the OOP rabbit hole.
@@ -104,11 +128,10 @@ export function createProfiler(): ProfilerState {
 
 	// Flamegraph
 	const flamegraphType = valoo(FlamegraphType.FLAMEGRAPH);
-	flamegraphType.on(type => {
-		selectedNodeId.$ =
-			type === FlamegraphType.FLAMEGRAPH && activeCommit.$
-				? activeCommit.$.rootId
-				: -1;
+	flamegraphType.on(() => {
+		selectedNodeId.$ = activeCommit.$
+			? getCommitInitalSelectNodeId(activeCommit.$, flamegraphType.$)
+			: -1;
 	});
 
 	// Recording
@@ -124,10 +147,10 @@ export function createProfiler(): ProfilerState {
 			// Reset selection when recording stopped
 			// and new profiling data was collected.
 			if (commits.$.length > 0) {
-				selectedNodeId.$ =
-					flamegraphType.$ === FlamegraphType.FLAMEGRAPH
-						? commits.$[0].rootId
-						: commits.$[0].commitRootId;
+				selectedNodeId.$ = getCommitInitalSelectNodeId(
+					commits.$[0],
+					flamegraphType.$,
+				);
 			}
 		}
 	});
