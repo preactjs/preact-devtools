@@ -126,8 +126,7 @@ export function setupOptionsV10(
 
 	o._diff = o.__b = (vnode: VNode) => {
 		if (typeof vnode.type === "function") {
-			const name = getDisplayName(vnode, config);
-			recordMark(`${name}_diff`);
+			recordMark(getDisplayName(vnode, config));
 		}
 
 		if (vnode.type !== null) {

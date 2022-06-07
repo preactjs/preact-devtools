@@ -10,7 +10,7 @@ const supportsPerformance =
 
 export function recordMark(s: string) {
 	if (supportsPerformance) {
-		performance.mark(markName(s));
+		performance.mark(markName(`${s}_diff`));
 	}
 }
 
