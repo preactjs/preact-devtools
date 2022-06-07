@@ -16,9 +16,12 @@ export interface CommitData {
 	commitRootId: ID;
 	/** Nodes that are part of the current commit */
 	rendered: Set<ID>;
-	maxSelfDuration: number;
-	duration: number;
 	nodes: Map<ID, DevNode>;
+
+	startTime: number;
+	duration: number;
+	maxSelfDuration: number;
+	totalSelfDuration: number;
 	selfDurations: Map<ID, number>;
 }
 
@@ -231,12 +234,14 @@ export function recordProfilerCommit(
 	profiler: ProfilerState,
 	rendered: Set<ID>,
 	commitRootId: number,
+	startTime: number,
+	duration: number,
 ) {
 	const nodes = new Map<ID, DevNode>();
 
 	// The time of the node that took the longest to render
 	let maxSelfDuration = 0;
-	let totalCommitDuration = 0;
+	let totalSelfDuration = 0;
 	const selfDurations = new Map<ID, number>();
 
 	const rootId = getRoot(tree, commitRootId);
@@ -274,7 +279,7 @@ export function recordProfilerCommit(
 			if (selfDuration > maxSelfDuration) {
 				maxSelfDuration = selfDuration;
 			}
-			totalCommitDuration += selfDuration;
+			totalSelfDuration += selfDuration;
 			selfDurations.set(node.id, selfDuration);
 		} else if (prevCommit) {
 			// Otherwise just copy over the duration from the previous commit
@@ -299,8 +304,10 @@ export function recordProfilerCommit(
 			commitRootId: commitRootId,
 			rendered,
 			nodes,
+			startTime,
+			duration,
 			maxSelfDuration,
-			duration: totalCommitDuration,
+			totalSelfDuration,
 			selfDurations,
 		});
 	});

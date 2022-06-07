@@ -73,6 +73,8 @@ export enum MsgTypes {
 //
 export interface Commit {
 	rootId: number;
+	startTime: number;
+	duration: number;
 	strings: StringTable;
 	unmountIds: number[];
 	operations: number[];
@@ -84,10 +86,23 @@ export interface Commit {
  * the detools can understand
  */
 export function flush(commit: Commit) {
-	const { rootId, unmountIds, operations, strings, stats } = commit;
+	const {
+		rootId,
+		startTime,
+		duration,
+		unmountIds,
+		operations,
+		strings,
+		stats,
+	} = commit;
 	if (unmountIds.length === 0 && operations.length === 0) return;
 
-	const msg = [rootId, ...flushTable(strings)];
+	const msg = [
+		rootId,
+		startTime * 1000,
+		duration * 1000,
+		...flushTable(strings),
+	];
 	if (unmountIds.length > 0) {
 		msg.push(MsgTypes.REMOVE_VNODE, unmountIds.length, ...unmountIds);
 	}
@@ -120,6 +135,8 @@ function sumOps(a: OperationInfo, b: OperationInfo) {
  */
 export function applyOperationsV2(store: Store, data: number[]) {
 	const {
+		startTime,
+		duration,
 		rootId: commitRootId,
 		rendered,
 		roots,
@@ -142,7 +159,14 @@ export function applyOperationsV2(store: Store, data: number[]) {
 	// If we are profiling, we'll make a frozen copy of the mutable
 	// elements tree because the profiler can step through time
 	if (store.profiler.isRecording.$) {
-		recordProfilerCommit(store.nodes.$, store.profiler, rendered, commitRootId);
+		recordProfilerCommit(
+			store.nodes.$,
+			store.profiler,
+			rendered,
+			commitRootId,
+			startTime,
+			duration,
+		);
 		store.profiler.renderReasons.update(m => {
 			m.set(commitRootId, reasons);
 		});

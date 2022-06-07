@@ -6,6 +6,8 @@ import { parseStats } from "./shared/stats";
 
 export interface ParsedMsg {
 	rootId: number;
+	startTime: number;
+	duration: number;
 	mounts: Array<{ id: ID; key: string; name: string; parentId: ID }>;
 	unmounts: ID[];
 	reorders: Array<{ id: ID; children: ID[] }>;
@@ -14,11 +16,13 @@ export interface ParsedMsg {
 
 export function parseCommitMessage(data: number[]): ParsedMsg {
 	const rootId = data[0] || -1;
+	const startTime = data[1] || 0;
+	const duration = data[2] || 0;
 
 	// String table
-	let i = 1;
+	let i = 3;
 	const len = data[i++];
-	const strings = parseTable(data.slice(1, len + 2));
+	const strings = parseTable(data.slice(i - 1, len + i - 1));
 	const mounts: any[] = [];
 	const unmounts: any[] = [];
 	const timings: any[] = [];
@@ -63,6 +67,8 @@ export function parseCommitMessage(data: number[]): ParsedMsg {
 
 	return {
 		rootId,
+		startTime,
+		duration,
 		mounts,
 		unmounts,
 		timings,
@@ -214,8 +220,13 @@ export function printCommit(data: number[]) {
 	console.log(data);
 	console.groupEnd();
 	try {
-		console.log("root id: ", data[0]);
-		let i = 1;
+		console.log(
+			`root id: ${data[0]}, %c${data[1]}%c -> %c${data[2]}`,
+			"color: peachpuff",
+			"color: inherit",
+			"color: peachpuff",
+		);
+		let i = 3;
 
 		// String table
 		const len = data[i++];

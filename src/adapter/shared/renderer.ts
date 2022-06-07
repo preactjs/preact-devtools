@@ -213,6 +213,8 @@ export function createRenderer<T extends SharedVNode>(
 				traverse(root, vnode => this.onUnmount(vnode), bindings);
 
 				const commit: Commit = {
+					startTime: 0,
+					duration: 0,
 					operations: [],
 					rootId,
 					strings: new Map(),
@@ -271,9 +273,6 @@ export function createRenderer<T extends SharedVNode>(
 			);
 
 			prevOwners = owners;
-
-			timingsByVNode.start.clear();
-			timingsByVNode.end.clear();
 
 			if (commit.stats !== null) {
 				commit.stats.unmounts = unmountStats;
