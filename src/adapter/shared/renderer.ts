@@ -20,6 +20,7 @@ import { createCommit, shouldFilter } from "../shared/traverse";
 import { PreactBindings, SharedVNode } from "../shared/bindings";
 import { inspectVNode } from "./inspectVNode";
 import { logVNode } from "../10/log";
+import { SharedState } from "../hook";
 
 export interface RendererConfig {
 	Fragment: FunctionalComponent;
@@ -66,6 +67,7 @@ export function createRenderer<T extends SharedVNode>(
 	filters: FilterState,
 	ids: IdMappingState<T>,
 	bindings: PreactBindings<T>,
+	sharedState: SharedState,
 ): Renderer<T> {
 	const roots = new Set<T>();
 
@@ -106,7 +108,12 @@ export function createRenderer<T extends SharedVNode>(
 	}
 
 	const inspect = (id: ID) => {
-		return inspectVNode(ids, config, bindings, options, id, supports.hooks);
+		try {
+			sharedState.isInspecting = true;
+			return inspectVNode(ids, config, bindings, options, id, supports.hooks);
+		} finally {
+			sharedState.isInspecting = true;
+		}
 	};
 
 	return {

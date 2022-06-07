@@ -17,6 +17,7 @@ import {
 import { createVNodeTimings } from "../shared/timings";
 import { Renderer } from "../renderer";
 import { RendererConfig } from "../shared/renderer";
+import { SharedState } from "../hook";
 
 export type OptionsV10 = Options;
 
@@ -43,13 +44,14 @@ export function setupOptionsV10(
 	options: Options,
 	renderer: Renderer,
 	config: RendererConfig,
+	sharedState: SharedState,
 ) {
 	// Track component state. Only supported in Preact > 10.4.0
 	if (config.Component) {
 		trackPrevState(config.Component);
 	}
 
-	let timings = createVNodeTimings<VNode>();
+	const timings = createVNodeTimings<VNode>();
 	const owners = new Map<VNode, VNode>();
 	let ownerStack: VNode[] = [];
 
@@ -67,8 +69,6 @@ export function setupOptionsV10(
 	// @ts-ignore
 	let prevHookName = options.useDebugName;
 
-	const skipEffects = o._skipEffects || o.__s;
-
 	// Make sure that we are always the first `option._hook` to be called.
 	// This is necessary to ensure that our callstack remains consistent.
 	// Othwerwise we'll end up with an unknown number of frames in-between
@@ -81,34 +81,38 @@ export function setupOptionsV10(
 		prevHookName = options._addHookName || options.__a;
 
 		o._hook = o.__h = (c: Component, index: number, type: number) => {
-			const vnode = (c as any)._vnode || (c as any).__v;
-			const s = getStatefulHooks(vnode);
-			if (s && Array.isArray(s) && s.length > 0 && getComponent(s[0])) {
-				s[0]._oldValue = getStatefulHookValue(s);
-				s[0]._index = index;
-			}
+			if (sharedState.isInspecting) {
+				const vnode = (c as any)._vnode || (c as any).__v;
+				const s = getStatefulHooks(vnode);
+				if (s && Array.isArray(s) && s.length > 0 && getComponent(s[0])) {
+					s[0]._oldValue = getStatefulHookValue(s);
+					s[0]._index = index;
+				}
 
-			if (type) {
-				addHookStack(type);
-			}
-
-			// Don't continue the chain while the devtools is inspecting hooks.
-			// Otherwise the next hook will very likely throw as we're only
-			// faking a render and not doing a proper one. #278
-			if (!(options as any)._skipEffects && !(options as any).__s) {
+				if (type) {
+					addHookStack(type);
+				}
+			} else {
+				// Don't continue the chain while the devtools is inspecting hooks.
+				// Otherwise the next hook will very likely throw as we're only
+				// faking a render and not doing a proper one. #278
 				if (prevHook) prevHook(c, index, type);
 			}
 		};
 
 		options.useDebugValue = (value: any) => {
-			addHookStack(HookType.useDebugValue);
-			addDebugValue(value);
+			if (sharedState.isInspecting) {
+				addHookStack(HookType.useDebugValue);
+				addDebugValue(value);
+			}
 			if (prevUseDebugValue) prevUseDebugValue(value);
 		};
 
 		// @ts-ignore
 		options._addHookName = options.__a = (name: string | number) => {
-			addHookName(name);
+			if (sharedState.isInspecting) {
+				addHookName(name);
+			}
 			if (prevHookName) prevHookName(name);
 		};
 	}, 100);
@@ -138,7 +142,7 @@ export function setupOptionsV10(
 
 	o._render = o.__r = (vnode: VNode, parent: VNode | null) => {
 		if (
-			!skipEffects &&
+			!sharedState.isInspecting &&
 			typeof vnode.type === "function" &&
 			vnode.type !== config.Fragment
 		) {
@@ -169,10 +173,10 @@ export function setupOptionsV10(
 		// These cases are already handled by `unmount`
 		if (vnode == null) return;
 
-		const tmpTimings = timings;
+		renderer.onCommit(vnode, owners, timings, null);
 		ownerStack = [];
-		timings = createVNodeTimings();
-		renderer.onCommit(vnode, owners, tmpTimings, null);
+		timings.start.clear();
+		timings.end.clear();
 	};
 
 	options.unmount = vnode => {

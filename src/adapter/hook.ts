@@ -16,6 +16,10 @@ import { bindingsV11 } from "./11/bindings";
 
 export type EmitterFn = (event: string, data: any) => void;
 
+export interface SharedState {
+	isInspecting?: boolean;
+}
+
 export interface ProfilerOptions {
 	captureRenderReasons?: boolean;
 }
@@ -207,6 +211,10 @@ export function createHook(port: PortPageHook): DevtoolsHook {
 			// multiple connected renderers
 			const namespace = Math.floor(Math.random() * 2 ** 32);
 
+			const sharedState: SharedState = {
+				isInspecting: false,
+			};
+
 			// currently we only support preact >= 10, later we can add another branch for major === 8
 			if (preactVersionMatch.major == 10) {
 				const supports = {
@@ -231,8 +239,9 @@ export function createHook(port: PortPageHook): DevtoolsHook {
 					filters,
 					idMapper,
 					bindingsV10,
+					sharedState,
 				);
-				setupOptionsV10(options, renderer, config as any);
+				setupOptionsV10(options, renderer, config as any, sharedState);
 				return attachRenderer(renderer, supports);
 			} else if (preactVersionMatch.major === 11) {
 				const idMapper = createIdMappingState(
@@ -249,6 +258,7 @@ export function createHook(port: PortPageHook): DevtoolsHook {
 					filters,
 					idMapper,
 					bindingsV11,
+					sharedState,
 				);
 				setupOptionsV11(options as any, renderer, config, profiler);
 				return attachRenderer(renderer, {

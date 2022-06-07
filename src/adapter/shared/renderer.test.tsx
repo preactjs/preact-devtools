@@ -12,6 +12,7 @@ import { Renderer } from "../renderer";
 import { newProfiler } from "../adapter/profiler";
 import { getFilteredChildren } from "./traverse";
 import { createIdMappingState } from "./idMapper";
+import { SharedState } from "../hook";
 
 export function setupScratch() {
 	const div = document.createElement("div");
@@ -22,6 +23,7 @@ export function setupScratch() {
 
 export function setupMockHook(options: Options) {
 	const spy = sinon.spy();
+	const sharedState: SharedState = { isInspecting: false };
 	const renderer = createRenderer(
 		{ send: spy, listen: () => null },
 		{ Fragment: Fragment as any },
@@ -31,10 +33,16 @@ export function setupMockHook(options: Options) {
 		{ type: new Set(), regex: [] },
 		createIdMappingState(1, bindingsV10.getInstance),
 		bindingsV10,
+		sharedState,
 	);
-	const destroy = setupOptionsV10(options, renderer, {
-		Fragment: Fragment as any,
-	});
+	const destroy = setupOptionsV10(
+		options,
+		renderer,
+		{
+			Fragment: Fragment as any,
+		},
+		sharedState,
+	);
 	return {
 		renderer,
 		destroy,
