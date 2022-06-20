@@ -91,6 +91,38 @@ export function getStatefulHookValue(hookState: HookState): unknown {
 	return null;
 }
 
+export function getPendingHookValue(state: HookState) {
+	// Preact >= 10.8.1
+	if (state.__pendingValue !== undefined) {
+		return state.__pendingValue;
+	}
+	// Preact > 10.8.1
+	else if (state.__V !== undefined) {
+		return state.__V;
+	}
+	// Preact 10.8.1
+	else if (state.o !== undefined) {
+		return state.o;
+	}
+
+	return undefined;
+}
+
+export function setPendingHookValue(state: HookState, value: unknown) {
+	// Preact >= 10.8.1
+	if ("__pendingValue" in state) {
+		state.__pendingValue = value;
+	}
+	// Preact > 10.8.1
+	else if ("__V" in state) {
+		state.__V = value;
+	}
+	// Preact === 10.8.1
+	else if ("o" in state) {
+		state.o = value;
+	}
+}
+
 export function getHookState(
 	vnode: VNode,
 	index: number,
@@ -109,7 +141,18 @@ export function getHookState(
 				? provider.props.value
 				: context._defaultValue || context.__;
 		}
-		const value = list[index]._value || list[index].__;
+
+		let value;
+		const state = list[index];
+
+		// Prefer current value before pending
+		if ("_value" in state) {
+			value = state._value;
+		} else if ("__" in state) {
+			value = state.__;
+		} else {
+			value = getPendingHookValue(list[index]);
+		}
 
 		if (type === HookType.useRef) {
 			return value.current;
@@ -282,6 +325,8 @@ export const bindingsV10: PreactBindings<VNode> = {
 	getComponent,
 	getComponentHooks,
 	getHookState,
+	getPendingHookValue,
+	setPendingHookValue,
 	getVNodeParent,
 	isComponent,
 	isElement,

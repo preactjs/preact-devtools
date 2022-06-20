@@ -243,7 +243,7 @@ export function getHookState(
 				? provider.props.value
 				: context._defaultValue || context.__;
 		}
-		const value = list[index]._value || list[index].__;
+		const value = getPendingHookValue(list[index]);
 
 		if (type === HookType.useRef) {
 			return value[0].current;
@@ -255,6 +255,18 @@ export function getHookState(
 	}
 
 	return [];
+}
+
+export function getPendingHookValue(state: HookState) {
+	return state._value !== undefined ? state._value : state.__;
+}
+
+export function setPendingHookValue(state: HookState, value: unknown) {
+	if ("_value" in state) {
+		state._value = value;
+	} else {
+		state.__ = value;
+	}
 }
 
 export function createSuspenseState(vnode: Internal, suspended: boolean) {
@@ -297,6 +309,8 @@ export const bindingsV11: PreactBindings<Internal> = {
 	getComponent,
 	getComponentHooks,
 	getHookState,
+	getPendingHookValue,
+	setPendingHookValue,
 	getVNodeParent,
 	isComponent,
 	isElement,
