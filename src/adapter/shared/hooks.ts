@@ -7,7 +7,7 @@ import {
 } from "../../view/components/sidebar/inspect/parseProps";
 import { RendererConfig } from "./renderer";
 import { isEditable, serialize } from "./serialize";
-import { PreactBindings, SharedVNode } from "./bindings";
+import { HookState, PreactBindings, SharedVNode } from "./bindings";
 import { OptionsV11 } from "../11/options";
 import { OptionsV10 } from "../10/options";
 
@@ -280,11 +280,20 @@ export function inspectHooks<T extends SharedVNode>(
 		}
 	}
 
+	let pendingValues: unknown[] | null = null;
+	let statefulHooks: HookState[] | null = null;
 	try {
 		// Call render on a dummy component, so that any possible
 		// state changes or effect are not written to our original
 		// component.
 		const hooks = helpers.getComponentHooks(vnode);
+		if (hooks === null) return [];
+
+		statefulHooks = helpers.getStatefulHooks(vnode);
+		if (statefulHooks !== null) {
+			pendingValues = statefulHooks.map(s => helpers.getPendingHookValue(s));
+		}
+
 		const dummy = {
 			props: c.props,
 			context: c.context,
@@ -326,6 +335,15 @@ export function inspectHooks<T extends SharedVNode>(
 		// We don't care about any errors here. We only need
 		// the hook call sites
 	} finally {
+		// Restore hook state
+		if (pendingValues !== null && statefulHooks !== null) {
+			pendingValues.forEach((original, i) => {
+				if (original !== undefined) {
+					helpers.setPendingHookValue(statefulHooks![i], original);
+				}
+			});
+		}
+
 		// Restore original console
 		for (const method in prevConsole) {
 			try {

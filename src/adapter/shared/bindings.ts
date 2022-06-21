@@ -40,6 +40,8 @@ export interface PreactBindings<T extends SharedVNode = SharedVNode> {
 	getStatefulHooks(vnode: T): HookState[] | null;
 	isUseReducerOrState(state: HookState): boolean;
 	getStatefulHookValue(state: HookState): unknown;
+	setPendingHookValue(state: HookState, value: unknown): void;
+	getPendingHookValue(state: HookState): unknown;
 
 	// Profiler related
 	getRenderReasonPost(
