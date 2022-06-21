@@ -10,12 +10,16 @@ export function useAutoIndent(container: RefObject<HTMLElement>, deps: any[]) {
 	const [available, setAvailable] = useState(0);
 	const cacheRef = useRef(new Map<string, number>());
 
-	useResize(() => {
-		indent.current = INITIAL;
-		if (container.current) {
-			setAvailable(container.current.clientWidth);
-		}
-	}, []);
+	useResize(
+		() => {
+			indent.current = INITIAL;
+			if (container.current) {
+				setAvailable(container.current.clientWidth);
+			}
+		},
+		[],
+		true,
+	);
 
 	useLayoutEffect(() => {
 		if (container.current) {
