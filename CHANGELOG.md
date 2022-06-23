@@ -1,5 +1,10 @@
 # Changelog
 
+## 4.3.2
+
+- Calculate auto-indent for tree view on intialization in case resize is not fired (#393, thanks @marvinhagemeister)
+- Fix hooks inspection not working with 10.8.1 (#394, thanks @marvinhagemeister)
+
 ## 4.3.1
 
 ### Bug Fixes
