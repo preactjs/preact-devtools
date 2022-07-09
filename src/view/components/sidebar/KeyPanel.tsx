@@ -1,6 +1,5 @@
 import { h } from "preact";
 import { SidebarPanel } from "./SidebarPanel";
-import s from "./KeyPanel.module.css";
 
 export interface Props {
 	onCopy: () => void;
@@ -10,7 +9,7 @@ export interface Props {
 export function KeyPanel(props: Props) {
 	return (
 		<SidebarPanel title="Key" testId="key-panel" onCopy={props.onCopy}>
-			<span class={s.key} data-testid="vnode-key">
+			<span class="keypanel-value" data-testid="vnode-key">
 				{props.value}
 			</span>
 		</SidebarPanel>
