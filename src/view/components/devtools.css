@@ -359,6 +359,42 @@
 }
 
 /**
+ * RadioBar
+ */
+.radio-bar label:first-of-type .radio-bar-text {
+	border-top-left-radius: 0.3rem;
+	border-bottom-left-radius: 0.3rem;
+}
+.radio-bar label:last-of-type .radio-bar-text {
+	border-top-right-radius: 0.3rem;
+	border-bottom-right-radius: 0.3rem;
+}
+
+.radio-bar-input {
+	opacity: 0;
+	position: absolute;
+}
+.radio-bar-input:focus + .radio-bar-text,
+.radio-bar-input:checked + .radio-bar-text {
+	background: var(--color-radio);
+	color: var(--color-bg);
+}
+
+.radio-bar-text {
+	padding: 0.2rem 0.6rem;
+	color: var(--color-radio);
+	border: 0.0625rem solid var(--color-radio);
+}
+
+.radio-bar-text:hover {
+	cursor: pointer;
+}
+
+.radio-bar label + label .radio-bar-text {
+	border-left: none;
+}
+
+/**
  * Profiler tab
  */
 .flamegraph-wrapper {
