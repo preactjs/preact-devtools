@@ -142,7 +142,7 @@ export default entries.map(data => ({
 				})),
 			}),
 		postcss({
-			modules: true,
+			autoModules: true,
 			extract: true,
 		}),
 	].filter(Boolean),

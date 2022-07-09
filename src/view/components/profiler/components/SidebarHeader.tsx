@@ -9,8 +9,8 @@ import {
 import { ComponentName } from "../../ComponentName";
 import { useCallback } from "preact/hooks";
 import { IconBtn } from "../../IconBtn";
-import { BugIcon, InspectNativeIcon, CodeIcon } from "../../icons";
 import { DevNodeType } from "../../../store/types";
+import { Icon } from "../../icons";
 
 export function SidebarHeader() {
 	const store = useStore();
@@ -43,17 +43,17 @@ export function SidebarHeader() {
 							title="Show matching DOM element"
 							onClick={inspectHostNode}
 						>
-							<InspectNativeIcon />
+							<Icon icon="inspect" />
 						</IconBtn>
 						<IconBtn title="Log internal vnode" onClick={log}>
-							<BugIcon />
+							<Icon icon="bug" />
 						</IconBtn>
 						<IconBtn
 							title="View Component Source"
 							onClick={viewSource}
 							disabled={!canViewSource}
 						>
-							<CodeIcon />
+							<Icon icon="code-icon" />
 						</IconBtn>
 					</Fragment>
 				)}

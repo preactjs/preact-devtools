@@ -1,6 +1,5 @@
 import { h, Fragment } from "preact";
 import { SidebarPanel } from "../../../sidebar/SidebarPanel";
-import s from "./CommitInfo.module.css";
 import { useStore, useObserver } from "../../../../store/react-bindings";
 import { getRoot } from "../../flamegraph/FlamegraphStore";
 
@@ -26,23 +25,23 @@ export function DebugProfilerInfo() {
 
 	return (
 		<SidebarPanel title="Debug Stats" testId="profiler-debug-stats">
-			<dl class={s.list}>
-				<dt class={s.title}>id:</dt>
-				<dd class={s.value}>{selected.id}</dd>
+			<dl class="commit-info-list">
+				<dt class="commit-info-title">id:</dt>
+				<dd class="commit-info-value">{selected.id}</dd>
 				<br />
-				<dt class={s.title}>parentId:</dt>
-				<dd class={s.value}>{selected.parent}</dd>
+				<dt class="commit-info-title">parentId:</dt>
+				<dd class="commit-info-value">{selected.parent}</dd>
 				<br />
-				<dt class={s.title}>rootId:</dt>
-				<dd class={s.value}>{getRoot(commit.nodes, selected.id)}</dd>
+				<dt class="commit-info-title">rootId:</dt>
+				<dd class="commit-info-value">{getRoot(commit.nodes, selected.id)}</dd>
 				<br />
-				<dt class={s.title}>tree:</dt>
-				<dd class={s.value}>
+				<dt class="commit-info-title">tree:</dt>
+				<dd class="commit-info-value">
 					<TimeRange from={pos.x} to={pos.x + pos.width} />
 				</dd>
 				<br />
-				<dt class={s.title}>real:</dt>
-				<dd class={s.value}>
+				<dt class="commit-info-title">real:</dt>
+				<dd class="commit-info-value">
 					<TimeRange from={selected.startTime} to={selected.endTime} />
 				</dd>
 			</dl>

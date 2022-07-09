@@ -9,6 +9,7 @@ import { Store, Panel } from "../store/types";
 import { Elements } from "./elements/Elements";
 import { Profiler } from "./profiler/components/Profiler";
 import { SmallTab, SmallTabGroup } from "./profiler/components/Tabs/Tabs";
+import "./devtools.css";
 import s from "./Devtools.module.css";
 import { ThemeSwitcher } from "./ThemeSwitcher";
 import { Settings } from "./settings/Settings";

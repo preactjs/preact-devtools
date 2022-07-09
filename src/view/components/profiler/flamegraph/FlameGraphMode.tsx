@@ -1,9 +1,9 @@
 import { h, Fragment } from "preact";
 import { IconTab } from "../components/Tabs/Tabs";
-import { SortIcon, FireIcon } from "../../icons";
 import { useStore, useObserver } from "../../../store/react-bindings";
 import { useCallback } from "preact/hooks";
 import { FlamegraphType } from "../data/commits";
+import { Icon } from "../../icons";
 
 export function FlameGraphMode() {
 	const store = useStore();
@@ -18,7 +18,7 @@ export function FlameGraphMode() {
 		<Fragment>
 			<IconTab
 				name="flamegraph_mode"
-				icon={<FireIcon />}
+				icon={<Icon icon="fire-icon" />}
 				value={FlamegraphType.FLAMEGRAPH}
 				checked={type === FlamegraphType.FLAMEGRAPH}
 				onClick={onClick}
@@ -28,7 +28,7 @@ export function FlameGraphMode() {
 			</IconTab>
 			<IconTab
 				name="flamegraph_mode"
-				icon={<SortIcon />}
+				icon={<Icon icon="sort-icon" />}
 				value={FlamegraphType.RANKED}
 				checked={type === FlamegraphType.RANKED}
 				onClick={onClick}
