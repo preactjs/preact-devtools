@@ -1,3 +1,52 @@
+.sidebar-layout {
+	height: 100%;
+	display: grid;
+	grid-template-columns: 1fr;
+	grid-template-rows: 2.25rem 1fr 2.25rem 1fr;
+	grid-template-areas:
+		"treeActions"
+		"tree"
+		"sidebarActions"
+		"sidebar";
+
+	/* Different browsers may have different defaults */
+	font-family: sans-serif;
+	overflow: auto;
+}
+
+@media (min-width: 37.5rem) {
+	.sidebar-layout {
+		grid-template-columns: minmax(0, 75%) minmax(35%, 15rem);
+		grid-template-rows: 2.25rem 1fr;
+		grid-template-areas:
+			"treeActions sidebarActions"
+			"tree sidebar";
+	}
+}
+
+.sidebar-layout-single {
+	height: 100%;
+	display: grid;
+	grid-template-columns: 1fr;
+	grid-template-rows: 2.25rem 1fr;
+	grid-template-areas: "actions" "content";
+
+	/* Different browsers may have different defaults */
+	font-family: sans-serif;
+	overflow: hidden;
+}
+
+.sidebar-layout-root {
+	height: 100%;
+	display: flex;
+	overflow: hidden;
+}
+
+.sidebar-layout-inner {
+	overflow: auto;
+	width: 100%;
+}
+
 /**
  * Checkbox
  */
