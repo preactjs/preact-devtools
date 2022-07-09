@@ -43,3 +43,29 @@ iframe {
 	display: grid;
 	grid-template-columns: auto auto;
 }
+
+/**
+ * NewProp input
+ */
+.newprop-root {
+	margin-top: 0.5rem;
+	padding-left: 1rem;
+	display: flex;
+	flex-direction: row;
+}
+
+.newprop-name {
+	width: 5rem;
+	background: var(--color-props-input-bg);
+}
+
+.newprop-namewrapper::after {
+	margin: 0 0.2rem;
+	display: inline-block;
+}
+
+.newprop-value {
+	background: var(--color-props-input-bg);
+	max-width: 5rem;
+	padding-left: 0.2rem;
+}
