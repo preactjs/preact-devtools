@@ -1,9 +1,9 @@
 import { h } from "preact";
 import s from "./DataInput.module.css";
 import { useCallback, useRef, useMemo, useState } from "preact/hooks";
-import { Undo } from "../icons";
 import { parseValue } from "./parseValue";
 import { debug } from "../../../debug";
+import { Icon } from "../icons";
 
 export interface InputProps {
 	name: string;
@@ -134,7 +134,7 @@ export function DataInput({
 					onClick={onReset}
 					data-testid={showReset ? "undo-btn" : "undo-btn-hidden"}
 				>
-					<Undo size="s" />
+					<Icon icon="undo" />
 				</button>
 			</div>
 		</div>

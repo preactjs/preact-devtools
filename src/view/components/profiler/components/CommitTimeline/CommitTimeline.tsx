@@ -1,9 +1,9 @@
 import { h, RefObject } from "preact";
 import { useState, useCallback, useRef, useEffect } from "preact/hooks";
-import { ArrowBack, ArrowForward } from "../../../icons";
 import s from "./CommitTimeline.module.css";
 import { getGradient } from "../../data/gradient";
 import { useResize } from "../../../utils";
+import { Icon } from "../../../icons";
 
 function calcSize(
 	container: RefObject<HTMLDivElement>,
@@ -151,7 +151,7 @@ export function CommitTimeline(props: CommitTimelineProps) {
 					class={s.navBtn}
 					data-testid="prev-commit"
 				>
-					<ArrowBack />
+					<Icon icon="arrow-back" />
 				</button>
 				<div
 					class={s.itemContainer}
@@ -181,7 +181,7 @@ export function CommitTimeline(props: CommitTimelineProps) {
 					class={s.navBtn}
 					data-testid="next-commit"
 				>
-					<ArrowForward />
+					<Icon icon="arrow-forward" />
 				</button>
 			</div>
 		</div>

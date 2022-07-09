@@ -2,11 +2,11 @@ import { h, Fragment } from "preact";
 import s from "./Sidebar.module.css";
 import { Actions } from "../Actions";
 import { IconBtn } from "../IconBtn";
-import { BugIcon, InspectNativeIcon, CodeIcon, SuspendIcon } from "../icons";
 import { useStore, useEmitter, useObserver } from "../../store/react-bindings";
 import { useCallback } from "preact/hooks";
 import { ComponentName } from "../ComponentName";
 import { DevNodeType } from "../../store/types";
+import { Icon } from "../icons";
 
 export function SidebarActions() {
 	const store = useStore();
@@ -64,24 +64,24 @@ export function SidebarActions() {
 								active={suspense.suspended}
 								onClick={onSuspend}
 							>
-								<SuspendIcon />
+								<Icon icon="suspend-icon" />
 							</IconBtn>
 						)}
 						<IconBtn
 							title="Show matching DOM element"
 							onClick={inspectHostNode}
 						>
-							<InspectNativeIcon />
+							<Icon icon="inspect" />
 						</IconBtn>
 						<IconBtn title="Log internal vnode" onClick={log}>
-							<BugIcon />
+							<Icon icon="bug" />
 						</IconBtn>
 						<IconBtn
 							title="View Component Source"
 							onClick={viewSource}
 							disabled={!canViewSource}
 						>
-							<CodeIcon />
+							<Icon icon="code-icon" />
 						</IconBtn>
 					</Fragment>
 				)}

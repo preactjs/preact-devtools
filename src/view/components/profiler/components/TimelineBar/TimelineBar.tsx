@@ -3,11 +3,11 @@ import { Actions, ActionSeparator } from "../../../Actions";
 import { CommitTimeline } from "../CommitTimeline/CommitTimeline";
 import { IconBtn } from "../../../IconBtn";
 import { useStore, useObserver } from "../../../../store/react-bindings";
-import { RecordIcon, NotInterested, Refresh } from "../../../icons";
 import s from "../../../elements/TreeBar.module.css";
 import { useCallback } from "preact/hooks";
 import { FlameGraphMode } from "../../flamegraph/FlameGraphMode";
 import { getCommitInitalSelectNodeId, resetProfiler } from "../../data/commits";
+import { Icon } from "../../../icons";
 
 export function TimelineBar() {
 	const store = useStore();
@@ -67,7 +67,7 @@ export function TimelineBar() {
 					testId="reload-and-profile-btn"
 					onClick={onReloadAndProfile}
 				>
-					<Refresh size="s" />
+					<Icon icon="refresh" />
 				</IconBtn>
 			</div>
 			<div class={s.btnWrapper}>
@@ -76,7 +76,7 @@ export function TimelineBar() {
 					disabled={!isSupported || commits.length === 0 || isRecording}
 					onClick={onReset}
 				>
-					<NotInterested size="s" />
+					<Icon icon="not-interested" />
 				</IconBtn>
 			</div>
 			<ActionSeparator />
@@ -131,7 +131,7 @@ export function RecordBtn() {
 			disabled={!isSupported}
 			testId="record-btn"
 		>
-			<RecordIcon size="s" />
+			<Icon icon="record-icon" />
 		</IconBtn>
 	);
 }

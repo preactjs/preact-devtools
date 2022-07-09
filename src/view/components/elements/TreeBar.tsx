@@ -2,18 +2,7 @@ import { h } from "preact";
 import { useState } from "preact/hooks";
 import { Actions, ActionSeparator } from "../Actions";
 import { IconBtn } from "../IconBtn";
-import {
-	Picker,
-	KeyboardDown,
-	KeyboardUp,
-	Close,
-	Search,
-	Remove,
-	AddCircle,
-	CheckboxChecked,
-	CheckboxUnChecked,
-	FilterList,
-} from "../icons";
+import { Icon, Picker } from "../icons";
 import { useStore, useObserver } from "../../store/react-bindings";
 import s from "./TreeBar.module.css";
 import { useSearch } from "../../store/search";
@@ -56,7 +45,7 @@ export function TreeBar() {
 			</div>
 			<ActionSeparator />
 			<div class={s.searchContainer}>
-				<Search size="xs" />
+				<Icon icon="search" />
 				<input
 					class={s.search}
 					type="text"
@@ -78,7 +67,7 @@ export function TreeBar() {
 					title="Select next result"
 					disabled={!searchActive}
 				>
-					<KeyboardDown />
+					<Icon icon="keyboard-down" />
 				</IconBtn>
 			</div>
 			<div class={s.btnWrapper}>
@@ -87,7 +76,7 @@ export function TreeBar() {
 					title="Select previous result"
 					disabled={!searchActive}
 				>
-					<KeyboardUp />
+					<Icon icon="keyboard-up" />
 				</IconBtn>
 			</div>
 			<div class={s.btnWrapper}>
@@ -96,7 +85,7 @@ export function TreeBar() {
 					title="Clear search input"
 					disabled={!searchActive}
 				>
-					<Close />
+					<Icon icon="close" />
 				</IconBtn>
 			</div>
 			<ActionSeparator />
@@ -111,7 +100,7 @@ export function TreeBar() {
 						testId="filter-menu-button"
 						onClick={() => setFilterVisible(!filterVisible)}
 					>
-						<FilterList />
+						<Icon icon="filter-list" />
 					</IconBtn>
 					{filterVisible && <FilterPopup />}
 				</OutsideClick>
@@ -137,7 +126,7 @@ function FilterCheck({
 					checked={checked}
 					onInput={e => onInput((e.target as any).checked)}
 				/>
-				{checked ? <CheckboxChecked /> : <CheckboxUnChecked />}
+				<Icon icon={checked ? "checkbox-checked" : "checkbox-unchecked"} />
 			</span>
 			<span class={`${s.filterValue} ${s.filterValueText}`}>{label}</span>
 		</label>
@@ -205,7 +194,9 @@ export function FilterPopup() {
 										setFilters(copy);
 									}}
 								/>
-								{x.enabled ? <CheckboxChecked /> : <CheckboxUnChecked />}
+								<Icon
+									icon={x.enabled ? "checkbox-checked" : "checkbox-unchecked"}
+								/>
 							</label>
 							<span class={s.filterValue}>
 								<input
@@ -233,7 +224,7 @@ export function FilterPopup() {
 										}
 									}}
 								>
-									<Remove />
+									<Icon icon="remove" />
 								</IconBtn>
 							</span>
 						</div>
@@ -251,7 +242,7 @@ export function FilterPopup() {
 					>
 						<span class={s.filterAdd}>
 							<span class={s.filterCheck}>
-								<AddCircle />
+								<Icon icon="add-circle" />
 							</span>
 							Add filter
 						</span>

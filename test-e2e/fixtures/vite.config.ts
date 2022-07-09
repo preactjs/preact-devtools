@@ -4,6 +4,7 @@ import { rewritePreactVersion } from "./rewrite-preact-version";
 import { loadPreactVersion } from "./load-preact-version";
 import { listPreactVersions } from "./list-preact-versions";
 import path from "path";
+import { injectSvgSpritePlugin } from "./inject-sprite";
 
 // https://vitejs.dev/config/
 export default defineConfig({
@@ -40,5 +41,6 @@ export default defineConfig({
 		listFixtures(),
 		loadPreactVersion(),
 		rewritePreactVersion(),
+		injectSvgSpritePlugin(),
 	],
 });

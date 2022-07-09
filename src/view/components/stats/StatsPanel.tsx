@@ -5,13 +5,13 @@ import s2 from "../profiler/components/ProfilerInfo/ProfilerInfo.module.css";
 import { SingleLayout } from "../SidebarLayout";
 import { Actions } from "../Actions";
 import { IconBtn } from "../IconBtn";
-import { RecordIcon, Refresh, NotInterested } from "../icons";
 import { useCallback } from "preact/hooks";
 import {
 	OperationInfo,
 	ParsedStats,
 	StatsChildren,
 } from "../../../adapter/shared/stats";
+import { Icon } from "../icons";
 
 export function StatsRecordBtn() {
 	const store = useStore();
@@ -38,7 +38,7 @@ export function StatsRecordBtn() {
 			onClick={onClick}
 			testId="record-btn"
 		>
-			<RecordIcon size="s" />
+			<Icon icon="record-icon" />
 		</IconBtn>
 	);
 }
@@ -71,7 +71,7 @@ export function StatsPanel() {
 							testId="reload-and-record-stats-btn"
 							onClick={onReloadAndRecordStats}
 						>
-							<Refresh size="s" />
+							<Icon icon="refresh" />
 						</IconBtn>
 					</div>
 					<div class={s.btnWrapper}>
@@ -80,7 +80,7 @@ export function StatsPanel() {
 							disabled={stats === null || isRecording}
 							onClick={onReset}
 						>
-							<NotInterested size="s" />
+							<Icon icon="not-interested" />
 						</IconBtn>
 					</div>
 				</Actions>

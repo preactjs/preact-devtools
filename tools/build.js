@@ -39,6 +39,16 @@ fs.renameSync(
 	path.join(dist, "preact-devtools-page.css"),
 );
 
+// Inject svg sprite
+const spriteFile = path.join(__dirname, "..", "src", "view", "sprite.svg");
+const htmlFile = path.join(dist, "panel", "panel.html");
+const svg = fs.readFileSync(spriteFile, "utf-8");
+const html = fs
+	.readFileSync(htmlFile, "utf-8")
+	.replace(/<body>/, "<body>\n\t\t" + svg.split("\n").join("\n\t\t") + "\n");
+
+fs.writeFileSync(htmlFile, html, "utf-8");
+
 // Package extension
 const output = fs.createWriteStream(__dirname + `/../dist/${browser}.zip`);
 const archive = archiver("zip", { zlib: { level: 9 } });

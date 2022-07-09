@@ -1,6 +1,6 @@
 import { h, ComponentChildren } from "preact";
 import { IconBtn } from "../IconBtn";
-import { FileCopy } from "../icons";
+import { Icon } from "../icons";
 
 export interface Props {
 	title: string;
@@ -16,7 +16,7 @@ export function SidebarPanel(props: Props) {
 				<h3 class="sidebar-panel-title">{props.title}</h3>
 				{props.onCopy && props.children != null && (
 					<IconBtn onClick={props.onCopy} title={`Copy ${props.title}`}>
-						<FileCopy />
+						<Icon icon="file-copy" />
 					</IconBtn>
 				)}
 			</header>
