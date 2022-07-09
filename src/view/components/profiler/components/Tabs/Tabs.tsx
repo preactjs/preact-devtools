@@ -1,5 +1,4 @@
 import { h, ComponentChild } from "preact";
-import s from "./Tabs.module.css";
 import { useCallback } from "preact/hooks";
 
 export interface TabProps {
@@ -16,16 +15,16 @@ export function SmallTab(props: TabProps) {
 	}, [props]);
 
 	return (
-		<label class={s.root}>
+		<label class="tab">
 			<input
-				class={s.input}
+				class="tab-input"
 				type="radio"
 				name={props.name}
 				value={props.value}
 				checked={props.checked}
 				onClick={onClick}
 			/>
-			<span class={s.label}>{props.children}</span>
+			<span class="tab-title">{props.children}</span>
 		</label>
 	);
 }
@@ -34,7 +33,7 @@ export function SmallTabGroup(props: {
 	children: ComponentChild;
 	class?: string;
 }) {
-	return <div class={`${s.group} ${props.class || ""}`}>{props.children}</div>;
+	return <div class={`tab-group ${props.class || ""}`}>{props.children}</div>;
 }
 
 export interface IconTabProps extends TabProps {
@@ -48,9 +47,9 @@ export function IconTab(props: IconTabProps) {
 	}, [props]);
 
 	return (
-		<label class={s.iconRoot}>
+		<label class="tab-icon-wrapper">
 			<input
-				class={s.input}
+				class="tab-input"
 				type="radio"
 				name={props.name}
 				value={props.value}
@@ -58,9 +57,9 @@ export function IconTab(props: IconTabProps) {
 				onClick={onClick}
 				disabled={props.disabled}
 			/>
-			<span class={s.iconInner}>
+			<span class="tab-icon-inner">
 				{props.icon}
-				<span class={s.iconLabel}>{props.children}</span>
+				<span class="tab-icon-label">{props.children}</span>
 			</span>
 		</label>
 	);
