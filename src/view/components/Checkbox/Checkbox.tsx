@@ -1,6 +1,5 @@
 import { h } from "preact";
 import { CheckboxChecked, CheckboxUnChecked } from "../icons";
-import s from "./Checkbox.module.css";
 
 export interface CheckboxProps {
 	testId?: string;
@@ -11,8 +10,8 @@ export interface CheckboxProps {
 
 export function Checkbox(props: CheckboxProps) {
 	return (
-		<label class={s.root}>
-			<span class={s.checkbox}>
+		<label class="checkbox-root">
+			<span class="checkbox-wrapper">
 				<input
 					type="checkbox"
 					checked={props.checked}
@@ -21,7 +20,7 @@ export function Checkbox(props: CheckboxProps) {
 				/>
 				{props.checked ? <CheckboxChecked /> : <CheckboxUnChecked />}
 			</span>
-			<span class={s.content}>{props.children}</span>
+			<span class="checkbox-content">{props.children}</span>
 		</label>
 	);
 }
