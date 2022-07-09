@@ -101,11 +101,10 @@ export function createHook(port: PortPageHook): DevtoolsHook {
 		createAdapter(port, profiler, renderers);
 
 		status = "pending";
-		send("init", null);
-
 		listen("init", () => {
 			status = "connected";
 		});
+		send("init", null);
 	};
 
 	const attachRenderer = (
