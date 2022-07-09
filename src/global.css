@@ -123,6 +123,37 @@ iframe {
 }
 
 /**
+ * Sidebar Panel
+ */
+.sidebar-panel {
+	padding: 0.6rem;
+}
+
+.sidebar-panel-placeholder {
+	font-style: italic;
+	color: var(--color-text-empty);
+	font-size: 0.65rem;
+	padding-left: 0.8rem;
+}
+
+.sidebar-panel-header {
+	display: flex;
+	justify-content: space-between;
+}
+
+.sidebar-panel-title {
+	font-size: 0.8rem;
+	line-height: 1.4;
+	margin: 0 0 0.1rem 0;
+	font-weight: normal;
+	color: var(--color-sidebar-title);
+}
+
+.sidebar-panel-content {
+	padding: 0.25rem 0;
+}
+
+/**
  * Message
  */
 .message {
