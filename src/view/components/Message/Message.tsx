@@ -1,5 +1,4 @@
 import { h } from "preact";
-import s from "./Message.module.css";
 
 const infoIcon = (
 	<svg
@@ -39,12 +38,10 @@ export interface MessageProps {
 
 export function Message(props: MessageProps) {
 	return (
-		<div
-			class={`${s.root} ${props.type === "info" ? s.info : s.warning}`}
-			data-type={props.type}
-			data-testid={props.testId}
-		>
-			<span class={s.icon}>{props.type === "info" ? infoIcon : warnIcon}</span>
+		<div class="message" data-type={props.type} data-testid={props.testId}>
+			<span class="message-icon">
+				{props.type === "info" ? infoIcon : warnIcon}
+			</span>
 			{props.children}
 		</div>
 	);
@@ -58,7 +55,11 @@ export interface MessageBtnProps {
 
 export function MessageBtn(props: MessageBtnProps) {
 	return (
-		<button class={s.btn} onClick={props.onClick} data-testid={props.testId}>
+		<button
+			class="message-btn"
+			onClick={props.onClick}
+			data-testid={props.testId}
+		>
 			{props.children}
 		</button>
 	);

@@ -123,6 +123,56 @@ iframe {
 }
 
 /**
+ * Message
+ */
+.message {
+	border-radius: 3px;
+	display: inline-flex;
+	align-items: center;
+	padding: 0.2rem 0.4rem;
+	border-width: 0.0625rem;
+	border-style: solid;
+	font-size: 0.8rem;
+	background: var(--bg);
+	border-color: var(--border);
+}
+
+.message[data-type="info"] {
+	--bg: var(--message-info-bg);
+	--border: var(--message-info-border);
+	--btn: var(--message-info-link);
+	--icon: var(--message-info-strong);
+}
+.message[data-type="warning"] {
+	--bg: var(--message-warning-bg);
+	--border: var(--message-warning-border);
+	--btn: var(--message-warning-link);
+	--icon: var(--message-warning-strong);
+}
+
+.message-icon {
+	color: var(--icon);
+	display: inline-flex;
+	margin-right: 0.4rem;
+}
+
+.message-btn {
+	color: var(--btn);
+	border: none;
+	background: none;
+	padding: 0;
+	text-decoration: underline;
+	display: inline-block;
+	margin-left: 0.25rem;
+	cursor: pointer;
+}
+
+.message svg {
+	width: 1rem;
+	height: 1rem;
+}
+
+/**
  * Settings tab
  */
 .settings-tab {
