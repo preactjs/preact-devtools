@@ -2,11 +2,16 @@ import { inject, injectStyles } from "./utils";
 import {
 	ContentScriptName,
 	PageHookName,
-	Status,
 	ClientToDevtools,
 	DevtoolsToClient,
 } from "../../constants";
 import { debug } from "../../debug";
+
+const enum Status {
+	Disconnected = "disconnected",
+	Connected = "connected",
+	Pending = "pending",
+}
 
 /** Connection to background page */
 let connection: chrome.runtime.Port | null = null;
