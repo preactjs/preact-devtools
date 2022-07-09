@@ -309,6 +309,133 @@
 }
 
 /**
+ * CommitTimeline
+ */
+.commit-timeline {
+	display: flex;
+	height: 100%;
+	flex-shrink: 0;
+	flex-grow: 1;
+	justify-content: flex-end;
+	position: relative;
+}
+
+.commit-timeline-inner {
+	display: flex;
+	align-items: center;
+	height: 100%;
+}
+
+.commit-timeline-legend {
+	display: flex;
+	flex-direction: row;
+	font-size: 0.8rem;
+	margin-left: 0.25rem;
+}
+
+.commit-timeline-item-container {
+	position: relative;
+	height: 100%;
+	overflow: hidden;
+}
+
+.commit-timeline-items {
+	position: absolute;
+	top: 0;
+	bottom: 0;
+	display: flex;
+	margin: 0 0rem;
+	min-height: 1rem;
+	height: 100%;
+	padding-top: 0.25rem;
+	padding-bottom: 0.25rem;
+	transition: all 0.15s;
+}
+
+.commit-timeline-item {
+	position: relative;
+	width: 100%;
+	cursor: pointer;
+	min-width: 0.75rem;
+	max-width: 1.75rem;
+}
+
+.commit-timeline-item::-moz-focus-inner {
+	border: 0;
+}
+
+.commit-timeline-item + .commit-timeline-item {
+	margin-left: 0.1rem;
+}
+
+.commit-timeline-item[data-selected]::after {
+	content: "";
+	height: 0.1875rem;
+	width: 100%;
+	position: absolute;
+	top: calc(100% + 0.0625rem);
+	left: 0;
+	background: var(--color-selected-bg);
+}
+
+.commit-timeline-item-inner {
+	position: absolute;
+	bottom: 0;
+	left: 0;
+	right: 0;
+}
+
+.commit-time-line-nav-btn {
+	display: flex;
+	background: none;
+	border: none;
+	padding: 0 0.5rem;
+	cursor: pointer;
+	color: var(--color-text);
+	transition: color 0.3s;
+}
+
+.commit-time-line-nav-btn[disabled] {
+	color: var(--color-disabled);
+	cursor: inherit;
+}
+
+.commit-timeline-item[data-weight="0"] .commit-timeline-item-inner {
+	background: var(--color-profiler-gradient-0);
+}
+.commit-timeline-item[data-weight="1"] .commit-timeline-item-inner {
+	background: var(--color-profiler-gradient-1);
+}
+.commit-timeline-item[data-weight="2"] .commit-timeline-item-inner {
+	background: var(--color-profiler-gradient-2);
+}
+.commit-timeline-item[data-weight="3"] .commit-timeline-item-inner {
+	background: var(--color-profiler-gradient-3);
+}
+.commit-timeline-item[data-weight="4"] .commit-timeline-item-inner {
+	background: var(--color-profiler-gradient-4);
+}
+.commit-timeline-item[data-weight="5"] .commit-timeline-item-inner {
+	background: var(--color-profiler-gradient-5);
+}
+.commit-timeline-item[data-weight="6"] .commit-timeline-item-inner {
+	background: var(--color-profiler-gradient-6);
+}
+.commit-timeline-item[data-weight="7"] .commit-timeline-item-inner {
+	background: var(--color-profiler-gradient-7);
+}
+.commit-timeline-item[data-weight="8"] .commit-timeline-item-inner {
+	background: var(--color-profiler-gradient-8);
+}
+.commit-timeline-item[data-weight="9"] .commit-timeline-item-inner {
+	background: var(--color-profiler-gradient-9);
+}
+
+.commit-timeline-hidden {
+	visibility: hidden;
+}
+
+/**
  * Message
  */
 .message {

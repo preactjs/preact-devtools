@@ -1,6 +1,5 @@
 import { h, RefObject } from "preact";
 import { useState, useCallback, useRef, useEffect } from "preact/hooks";
-import s from "./CommitTimeline.module.css";
 import { getGradient } from "../../data/gradient";
 import { useResize } from "../../../utils";
 import { Icon } from "../../../icons";
@@ -135,10 +134,10 @@ export function CommitTimeline(props: CommitTimelineProps) {
 	const leading = selectedCount.padStart(itemsCountLen, "0");
 
 	return (
-		<div class={s.root} ref={container}>
-			<div class={s.inner} ref={inner}>
-				<div class={s.legend}>
-					<span class={s.hidden}>
+		<div class="commit-timeline" ref={container}>
+			<div class="commit-timeline-inner" ref={inner}>
+				<div class="commit-timeline-legend">
+					<span class="commit-timeline-hidden">
 						{leading.slice(0, itemsCountLen - selectedCount.length)}
 					</span>
 					<span data-testid="commit-page-info">
@@ -148,18 +147,18 @@ export function CommitTimeline(props: CommitTimelineProps) {
 				<button
 					disabled={items.length <= 1}
 					onClick={onPrev}
-					class={s.navBtn}
+					class="commit-time-line-nav-btn"
 					data-testid="prev-commit"
 				>
 					<Icon icon="arrow-back" />
 				</button>
 				<div
-					class={s.itemContainer}
+					class="commit-timeline-item-container"
 					ref={paneContainerRef}
 					style={`width: ${viewportWidth}px`}
 				>
 					<div
-						class={s.items}
+						class="commit-timeline-items"
 						ref={pane}
 						style={`width: ${paneWidth}px; transform: translate3d(${offset}px, 0, 0);`}
 					>
@@ -178,7 +177,7 @@ export function CommitTimeline(props: CommitTimelineProps) {
 				<button
 					disabled={items.length <= 1}
 					onClick={onNext}
-					class={s.navBtn}
+					class="commit-time-line-nav-btn"
 					data-testid="next-commit"
 				>
 					<Icon icon="arrow-forward" />
@@ -202,12 +201,12 @@ export function CommitItem(props: CommitItem) {
 	return (
 		<div
 			data-testid="commit-item"
-			class={s.item}
+			class="commit-timeline-item"
 			data-selected={props.selected}
 			data-weight={color}
 			onClick={props.onClick}
 		>
-			<div class={s.itemInner} style={`top: ${top}%`} />
+			<div class="commit-timeline-item-inner" style={`top: ${top}%`} />
 		</div>
 	);
 }
