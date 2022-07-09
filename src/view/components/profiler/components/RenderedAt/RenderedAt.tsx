@@ -1,7 +1,6 @@
 import { Fragment, h } from "preact";
 import { useStore, useObserver } from "../../../../store/react-bindings";
 import { SidebarPanel, Empty } from "../../../sidebar/SidebarPanel";
-import s from "./RenderedAt.module.css";
 import { formatTime } from "../../util";
 
 export function RenderedAt() {
@@ -36,7 +35,7 @@ export function RenderedAt() {
 			<SidebarPanel title="Commit Root:">
 				<nav data-testid="commitRoot">
 					<button
-						class={s.item}
+						class="rendered-at-item"
 						data-active={selected === commit.commitRootId}
 						onClick={() =>
 							(store.profiler.selectedNodeId.$ = commit.commitRootId)
@@ -57,7 +56,7 @@ export function RenderedAt() {
 								return (
 									<button
 										key={node.index}
-										class={s.item}
+										class="rendered-at-item"
 										data-active={commitIdx === node.index}
 										onClick={() =>
 											(store.profiler.activeCommitIdx.$ = node.index)

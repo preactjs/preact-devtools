@@ -56,6 +56,34 @@
 }
 
 /**
+ * RenderedAt panel
+ */
+.rendered-at-item {
+	background: none;
+	border: none;
+	color: var(--color-element-text);
+	width: 100%;
+	text-align: start;
+	display: flex;
+	align-items: center;
+	font-size: var(--font-small);
+	padding: 0.25rem 0.5rem;
+	cursor: pointer;
+	border-radius: 0.1875rem;
+}
+.rendered-at-item:hover {
+	background: var(--color-dim-bg);
+}
+.rendered-at-item[data-active] {
+	color: var(--color-selected-text);
+	background: var(--color-selected-bg);
+}
+
+.rendered-at-item span {
+	display: block;
+}
+
+/**
  * HOC panel
  */
 .hoc-panel {

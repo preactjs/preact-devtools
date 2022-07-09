@@ -1,7 +1,6 @@
 import { h } from "preact";
 import { useStore, useObserver } from "../../../../store/react-bindings";
 import { SidebarPanel, Empty } from "../../../sidebar/SidebarPanel";
-import s from "./RenderedAt.module.css";
 import { DevNode } from "../../../../store/types";
 
 export function DebugNodeNav() {
@@ -43,7 +42,7 @@ export function DebugNodeNav() {
 						return (
 							<button
 								key={node.id}
-								class={s.item}
+								class="rendered-at-item"
 								data-active={selected === node.id}
 								onClick={() => (store.profiler.selectedNodeId.$ = node.id)}
 							>
