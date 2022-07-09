@@ -1,6 +1,5 @@
 import { h } from "preact";
 import s from "../../Devtools.module.css";
-import s2 from "./Profiler.module.css";
 import { ThemeSwitcher } from "../../ThemeSwitcher";
 import { TimelineBar } from "./TimelineBar/TimelineBar";
 import { FlameGraph } from "../flamegraph/FlameGraph";
@@ -26,7 +25,7 @@ export function Profiler() {
 			<div class={s.componentActions}>
 				<TimelineBar />
 			</div>
-			<div class={`${s.components} ${s2.flamegraphWrapper}`}>
+			<div class={`${s.components} flamegraph-wrapper`}>
 				<ProfilerInfo />
 				<FlameGraph />
 			</div>
@@ -35,7 +34,7 @@ export function Profiler() {
 			</div>
 			<div class={s.sidebar}>
 				{statsRecording && (
-					<div class={s2.sidebarItemWrapper}>
+					<div class="profiler-sidebar-panel">
 						<Message type="info">
 							Stats recording is enabled. Timings may be less accurate.
 							<MessageBtn

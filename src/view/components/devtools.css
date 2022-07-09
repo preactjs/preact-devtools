@@ -348,6 +348,17 @@
 }
 
 /**
+ * Profiler tab
+ */
+.flamegraph-wrapper {
+	padding: 0.4rem;
+}
+
+.profiler-sidebar-panel {
+	padding: 0.6rem;
+}
+
+/**
  * Settings tab
  */
 .settings-tab {
