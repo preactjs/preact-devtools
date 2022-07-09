@@ -121,3 +121,39 @@ iframe {
 	max-width: 5rem;
 	padding-left: 0.2rem;
 }
+
+/**
+ * Settings tab
+ */
+.settings-tab {
+	padding: 1rem;
+}
+
+.settings-tab-label {
+	display: block;
+	margin-bottom: 0.75rem;
+	font-size: 0.9rem;
+}
+
+.settings-tab h2 {
+	margin-top: 3rem;
+	font-size: 2rem;
+	font-weight: lighter;
+}
+
+.settings-tab-message {
+	margin-left: 1.25rem;
+	margin-top: 0.5rem;
+	margin-bottom: 2rem;
+}
+
+.settings-tab-checkbox {
+	margin-bottom: 0.5rem;
+}
+
+.settings-tab-description {
+	margin-left: 1.25rem;
+	margin-top: 0.25rem !important;
+	margin-bottom: 2rem;
+	font-size: 0.9rem;
+}

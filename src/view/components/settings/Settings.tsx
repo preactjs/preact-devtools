@@ -3,7 +3,6 @@ import { useStore, useObserver } from "../../store/react-bindings";
 import { useCallback } from "preact/hooks";
 import { Theme } from "../../store/types";
 import { RadioBar } from "../RadioBar";
-import s from "./Settings.module.css";
 import { Checkbox } from "../Checkbox/Checkbox";
 import { Message } from "../Message/Message";
 import { PageLayout } from "../SidebarLayout";
@@ -21,7 +20,7 @@ export function Settings() {
 
 	return (
 		<PageLayout>
-			<div class={s.root}>
+			<div class="settings-tab">
 				<form>
 					<Checkbox
 						checked={highlightUpdates}
@@ -38,7 +37,7 @@ export function Settings() {
 						Highlight updates
 					</Checkbox>
 					<div>
-						<p class={s.description}>
+						<p class="settings-tab-description">
 							Visualize updates by highlighting each component that updated in
 							the page.
 						</p>
@@ -52,7 +51,7 @@ export function Settings() {
 					>
 						Capture render reasons
 					</Checkbox>
-					<div class={`${s.message} ${s.settingSpace}`}>
+					<div class="settings-tab-message">
 						<Message type="info">
 							All props, state, and hooks of the current node will be compared
 							to the previous node to determine what changed between renders.
@@ -60,7 +59,7 @@ export function Settings() {
 						</Message>
 					</div>
 
-					<label class={s.label}>Theme:</label>
+					<label class="settings-tab-label">Theme:</label>
 					<RadioBar
 						name="theme"
 						value={theme}
@@ -74,7 +73,7 @@ export function Settings() {
 
 					<h2>Experimental</h2>
 
-					<div class={s.settingsSpaceSmall}>
+					<div class="settings-tab-checkbox">
 						<Checkbox
 							checked={debugMode}
 							onChange={() => (store.debugMode.$ = !store.debugMode.$)}
