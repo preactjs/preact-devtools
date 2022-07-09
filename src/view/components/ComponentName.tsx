@@ -1,14 +1,13 @@
 import { h, Fragment } from "preact";
-import s from "./ComponentName.module.css";
 
 export function ComponentName(props: { children: any }) {
 	return (
-		<span class={s.title} data-testid="inspect-component-name">
+		<span class="component-name-title" data-testid="inspect-component-name">
 			{props.children ? (
 				<Fragment>
-					<span class={s.nameCh}>&lt;</span>
+					<span class="component-name-ch">&lt;</span>
 					{props.children}
-					<span class={s.nameCh}>&gt;</span>
+					<span class="component-name-ch">&gt;</span>
 				</Fragment>
 			) : (
 				"-"

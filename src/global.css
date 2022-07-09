@@ -143,6 +143,23 @@ iframe {
 }
 
 /**
+ * ComponentName
+ */
+.component-name-title {
+	text-overflow: ellipsis;
+	white-space: nowrap;
+	overflow: hidden;
+	color: var(--color-element-text);
+	font-family: var(--font-monospace);
+	font-size: var(--font-xnormal);
+}
+
+.component-name-ch {
+	color: var(--color-text);
+	font-size: var(--font-small);
+}
+
+/**
  * CommitInfo
  */
 .commit-info-list {
