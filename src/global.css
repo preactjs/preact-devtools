@@ -143,6 +143,25 @@ iframe {
 }
 
 /**
+ * CommitInfo
+ */
+.commit-info-list {
+	margin: 0 0 0 0.75rem;
+}
+
+.commit-info-title {
+	display: inline-block;
+	font-size: 0.8rem;
+	margin-bottom: 0.15rem;
+}
+
+.commit-info-value {
+	color: var(--color-text);
+	display: inline-block;
+	margin: 0 0 0 0.5rem;
+}
+
+/**
  * Sidebar Panel
  */
 .sidebar-panel {
