@@ -123,6 +123,26 @@ iframe {
 }
 
 /**
+ * Render Reason
+ */
+.render-reason {
+	margin: 0 0 0 0.75rem;
+}
+
+.render-reason-name {
+	display: inline-block;
+}
+
+.render-reason-value {
+	display: inline-block;
+	margin-left: 0.75rem;
+}
+
+.render-reason-message {
+	margin-top: 1rem;
+}
+
+/**
  * Sidebar Panel
  */
 .sidebar-panel {

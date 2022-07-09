@@ -2,7 +2,6 @@ import { h } from "preact";
 import { SidebarPanel, Empty } from "../../sidebar/SidebarPanel";
 import { useStore, useObserver } from "../../../store/react-bindings";
 import { RenderReason } from "../../../../adapter/shared/renderReasons";
-import s from "./RenderReason.module.css";
 import { Message, MessageBtn } from "../../Message/Message";
 
 function getReasonName(reason: RenderReason) {
@@ -49,12 +48,12 @@ export function RenderReasons() {
 		<SidebarPanel title="Render reasons">
 			<div data-testid="render-reasons">
 				{reason !== null ? (
-					<dl class={s.reason}>
-						<dt class={s.reasonName}>
+					<dl class="render-reason">
+						<dt class="render-reason-name">
 							{getReasonName(reason.type)}
 							{hasReasons ? ":" : ""}
 						</dt>
-						<dd class={s.reasonValue}>
+						<dd class="render-reason-value">
 							{hasReasons && reason!.items!.join(", ")}
 						</dd>
 					</dl>
@@ -62,7 +61,7 @@ export function RenderReasons() {
 					<Empty>{rendered ? "-" : "Did not render"}</Empty>
 				)}
 			</div>
-			<div class={s.message}>
+			<div class="render-reason-message">
 				{isSupported ? (
 					<Message type={captureReason ? "info" : "warning"}>
 						{captureReason
