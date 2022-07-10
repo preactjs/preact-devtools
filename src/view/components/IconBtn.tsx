@@ -1,5 +1,4 @@
 import { h } from "preact";
-import s from "./IconBtn.module.css";
 import { ComponentChildren } from "preact";
 
 export interface IconBtnProps {
@@ -17,7 +16,8 @@ export function IconBtn(props: IconBtnProps) {
 	return (
 		<button
 			type="button"
-			class={`${s.root} + ${props.styling === "secondary" ? s.secondary : ""}`}
+			class="icon-btn"
+			data-kind={props.styling || null}
 			data-active={props.active}
 			title={props.title}
 			disabled={props.disabled}
@@ -28,12 +28,12 @@ export function IconBtn(props: IconBtnProps) {
 			}}
 		>
 			<span
-				class={s.inner}
+				class="icon-btn-inner"
 				tabIndex={-1}
 				style={props.color ? "color: " + props.color : undefined}
 			>
 				{props.children}
-				<span class={s.bg} />
+				<span class="icon-btn-bg" />
 			</span>
 		</button>
 	);

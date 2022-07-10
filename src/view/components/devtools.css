@@ -93,6 +93,78 @@
 }
 
 /**
+ * IconBtn
+ */
+.icon-btn {
+	position: relative;
+	border: none;
+	background: none;
+	display: inline-flex;
+	flex: 0 0 auto;
+	padding: 0;
+	align-items: center;
+	outline: none;
+}
+
+.icon-btn:not([disabled]) {
+	color: var(--color-text);
+	cursor: pointer;
+}
+
+.icon-btn[disabled] {
+	color: var(--color-disabled);
+}
+
+.icon-btn svg {
+	position: relative;
+	z-index: 1;
+}
+
+.icon-btn-inner {
+	display: flex;
+	justify-content: center;
+	align-items: center;
+	outline: none;
+}
+
+.icon-btn:active .icon-btn-inner,
+.icon-btn:focus .icon-btn-inner {
+	position: relative;
+	z-index: 2;
+}
+
+.icon-btn:not([disabled])[data-active] .icon-btn-inner,
+.icon-btn:focus .icon-btn-inner,
+.icon-btn:not([disabled]):active .icon-btn-inner {
+	color: var(--color-selected-text);
+}
+
+.icon-btn[data-kind="secondary"]:active .icon-btn-inner {
+	color: var(--color-text) !important;
+	transform: translate3d(0, 0.0625rem, 0);
+}
+
+.icon-btn-bg {
+	display: none;
+}
+
+.icon-btn:focus .bg {
+	z-index: -1;
+}
+
+.icon-btn:not([disabled])[data-active] .icon-btn-bg {
+	display: block;
+	content: "";
+	position: absolute;
+	left: -0.25rem;
+	top: -0.25rem;
+	right: -0.25rem;
+	bottom: -0.25rem;
+	background: var(--color-selected-bg);
+	border-radius: 0.2rem;
+}
+
+/**
  * Actions
  */
 .actions {
