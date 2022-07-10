@@ -1,4 +1,3 @@
-import { render, h } from "preact";
 import { CanvasHighlight } from "../../view/components/CanvasHighlight/CanvasHighlight";
 
 const DISPLAY_DURATION = 250;
@@ -72,18 +71,14 @@ export function drawRect(ctx: CanvasRenderingContext2D, data: UpdateRect) {
 
 let timer: NodeJS.Timeout;
 
-let container: HTMLDivElement | null = null;
-let canvas: HTMLCanvasElement | null = null;
+const component = new CanvasHighlight();
+
 export function destroyCanvas() {
-	if (container) {
-		render(null, container);
-		container.remove();
-		container = null;
-		canvas = null;
-	}
+	component.destroy();
 }
 
 function draw(updates: UpdateRects) {
+	const canvas = component.canvas;
 	if (!canvas || !canvas.getContext) return;
 	if (timer) clearTimeout(timer);
 
@@ -111,13 +106,6 @@ function draw(updates: UpdateRects) {
 }
 
 export function startDrawing(updateRects: UpdateRects) {
-	if (!canvas) {
-		container = document.createElement("div");
-		container.id = "preact-devtools-highlight-updates";
-		document.body.appendChild(container);
-
-		render(h(CanvasHighlight, null), container);
-		canvas = container.querySelector("canvas")!;
-	}
+	component.render();
 	draw(updateRects);
 }

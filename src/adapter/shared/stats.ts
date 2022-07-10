@@ -1,6 +1,6 @@
 import { DevNodeType } from "../../view/store/types";
 import { MsgTypes } from "../protocol/events";
-import { PreactBindings, SharedVNode } from "./bindings";
+import type { PreactBindings, SharedVNode } from "./bindings";
 import { getDevtoolsType, RendererConfig } from "./renderer";
 
 export enum DiffType {

@@ -1,10 +1,14 @@
 import { BaseEvent, PortPageHook } from "../adapter/port";
 import { Commit, flush } from "../protocol/events";
-import { FunctionalComponent, ComponentConstructor, Options } from "preact";
+import type {
+	FunctionalComponent,
+	ComponentConstructor,
+	Options,
+} from "preact";
 import { ID, DevNodeType } from "../../view/store/types";
 import { traverse } from "./utils";
-import { FilterState } from "../adapter/filter";
-import { Renderer } from "../renderer";
+import type { FilterState } from "../adapter/filter";
+import type { Renderer } from "../renderer";
 import { startDrawing } from "../adapter/highlightUpdates";
 import { setIn, setInCopy } from "../shared/serialize";
 import { createStats, OperationInfo } from "../shared/stats";

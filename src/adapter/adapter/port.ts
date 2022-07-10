@@ -1,4 +1,4 @@
-import { DevtoolEvents } from "../hook";
+import type { DevtoolEvents } from "../hook";
 import { DevtoolsToClient, PageHookName } from "../../constants";
 
 export interface BaseEvent<K extends string, T> {

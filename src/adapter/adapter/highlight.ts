@@ -1,5 +1,4 @@
 import { Renderer } from "../renderer";
-import { render, h } from "preact";
 import { getNearestElement, measureNode, mergeMeasure } from "../dom";
 import { ID } from "../../view/store/types";
 import { Highlighter, style } from "../../view/components/Highlighter";
@@ -18,23 +17,17 @@ export function createHightlighter(
 	 * hovering a node in the tree.
 	 */
 	let highlightRef: HTMLDivElement | null = null;
-
-	function destroyHighlight() {
-		if (highlightRef) {
-			document.body.removeChild(highlightRef!);
-		}
-		highlightRef = null;
-	}
+	const highlighter = new Highlighter();
 
 	function highlight(id: ID) {
 		const renderer = getRendererByVnodeId(id);
 		if (!renderer) {
-			return destroyHighlight();
+			return highlighter.destroy();
 		}
 
 		const vnode = renderer.getVNodeById(id);
 		if (!vnode) {
-			return destroyHighlight();
+			return highlighter.destroy();
 		}
 		const dom = renderer.findDomForVNode(id);
 
@@ -94,24 +87,21 @@ export function createHightlighter(
 				let height = size.height;
 				let width = size.width;
 				if (size.boxSizing === "border-box") {
-					height += size.marginTop + size.marginBottom;
-					width += size.marginLeft + size.marginRight;
+					height += size.margin[0] + size.margin[2];
+					width += size.margin[1] + size.margin[3];
 				}
 
-				render(
-					h(Highlighter, {
-						label,
-						...size,
-						top: size.top - size.marginTop,
-						left: size.left - size.marginLeft,
-						height,
-						width,
-					}),
-					highlightRef,
-				);
+				highlighter.render({
+					label,
+					...size,
+					top: size.top - size.margin[0],
+					left: size.left - size.margin[3],
+					height,
+					width,
+				});
 			}
 		}
 	}
 
-	return { highlight, destroy: destroyHighlight };
+	return { highlight, destroy: () => highlighter.destroy() };
 }
