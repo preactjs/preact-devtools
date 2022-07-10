@@ -14,7 +14,7 @@ export type Dimensions = [number, number, number, number];
 export type Bounds = [boolean, boolean, boolean, boolean];
 
 export interface Measurements {
-	boxSizing: string;
+	boxSizing: "content-box" | "border-box";
 	top: number;
 	left: number;
 	width: number;
@@ -49,7 +49,7 @@ export function measureNode(dom: Element): Measurements {
 		top,
 		left,
 		bounds: getBoundsState(r),
-		boxSizing: s.boxSizing,
+		boxSizing: s.boxSizing as any,
 
 		// Round to at most 2 decimals. This is not 100% accurate,
 		// but good enough for our use case

@@ -34,10 +34,10 @@ fs.writeFileSync(target, targetFile);
 fs.unlinkSync(source);
 
 // Rename injected css file so users understand where it's coming from.
-fs.renameSync(
-	path.join(dist, "installHook.css"),
-	path.join(dist, "preact-devtools-page.css"),
-);
+// fs.renameSync(
+// 	path.join(dist, "installHook.css"),
+// 	path.join(dist, "preact-devtools-page.css"),
+// );
 
 // Inject svg sprite
 const spriteFile = path.join(__dirname, "..", "src", "view", "sprite.svg");

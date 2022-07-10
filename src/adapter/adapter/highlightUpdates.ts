@@ -3,20 +3,6 @@ import { CanvasHighlight } from "../../view/components/CanvasHighlight/CanvasHig
 const DISPLAY_DURATION = 250;
 const MAX_DISPLAY_DURATION = 3000;
 
-const OUTLINE_COLOR = "#f0f0f0";
-const COLORS = [
-	"#37afa9",
-	"#63b19e",
-	"#80b393",
-	"#97b488",
-	"#abb67d",
-	"#beb771",
-	"#cfb965",
-	"#dfba57",
-	"#efbb49",
-	"#febc38",
-];
-
 export interface UpdateRect {
 	x: number;
 	y: number;
@@ -50,62 +36,18 @@ export function measureUpdate(updates: UpdateRects, dom: HTMLElement) {
 	});
 }
 
-export function drawRect(ctx: CanvasRenderingContext2D, data: UpdateRect) {
-	const colorIndex = Math.min(COLORS.length - 1, data.count - 1);
-
-	// Outline
-	ctx.lineWidth = 1;
-	ctx.strokeStyle = OUTLINE_COLOR;
-	ctx.strokeRect(data.x - 1, data.y - 1, data.width + 2, data.height + 2);
-
-	// Inset
-	ctx.lineWidth = 1;
-	ctx.strokeStyle = OUTLINE_COLOR;
-	ctx.strokeRect(data.x + 1, data.y + 1, data.width - 2, data.height - 2);
-
-	// Border
-	ctx.strokeStyle = COLORS[colorIndex];
-	ctx.lineWidth = 1;
-	ctx.strokeRect(data.x, data.y, data.width, data.height);
+const tag = "preact-devtools-updates";
+if (!customElements.get(tag)) {
+	customElements.define(tag, CanvasHighlight);
 }
 
-let timer: NodeJS.Timeout;
-
-const component = new CanvasHighlight();
-
-export function destroyCanvas() {
-	component.destroy();
-}
-
-function draw(updates: UpdateRects) {
-	const canvas = component.canvas;
-	if (!canvas || !canvas.getContext) return;
-	if (timer) clearTimeout(timer);
-
-	const ctx = canvas.getContext("2d");
-	if (!ctx) return;
-
-	ctx.clearRect(0, 0, canvas.width, canvas.height);
-
-	const now = performance.now();
-	let nextRedraw = Number.MAX_SAFE_INTEGER;
-	updates.forEach((data, key) => {
-		if (data.expirationTime < now) {
-			updates.delete(key);
-		} else {
-			drawRect(ctx, data);
-			nextRedraw = Math.min(nextRedraw, data.expirationTime);
-		}
-	});
-
-	if (nextRedraw !== Number.MAX_SAFE_INTEGER) {
-		timer = setTimeout(() => draw(updates), nextRedraw - now);
-	} else {
-		destroyCanvas();
-	}
-}
+const canvas = document.createElement(tag) as CanvasHighlight;
 
 export function startDrawing(updateRects: UpdateRects) {
-	component.render();
-	draw(updateRects);
+	if (!canvas.isConnected) {
+		document.body.appendChild(canvas);
+	}
+
+	canvas.refresh();
+	canvas.draw(updateRects);
 }
