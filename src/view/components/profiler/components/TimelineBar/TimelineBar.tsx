@@ -3,7 +3,6 @@ import { Actions, ActionSeparator } from "../../../Actions";
 import { CommitTimeline } from "../CommitTimeline/CommitTimeline";
 import { IconBtn } from "../../../IconBtn";
 import { useStore, useObserver } from "../../../../store/react-bindings";
-import s from "../../../elements/TreeBar.module.css";
 import { useCallback } from "preact/hooks";
 import { FlameGraphMode } from "../../flamegraph/FlameGraphMode";
 import { getCommitInitalSelectNodeId, resetProfiler } from "../../data/commits";
@@ -57,10 +56,10 @@ export function TimelineBar() {
 
 	return (
 		<Actions>
-			<div class={s.btnWrapper}>
+			<div class="tree-bar-btn-wrapper">
 				<RecordBtn />
 			</div>
-			<div class={s.btnWrapper}>
+			<div class="tree-bar-btn-wrapper">
 				<IconBtn
 					title="Reload and profile"
 					disabled={!isSupported || isRecording}
@@ -70,7 +69,7 @@ export function TimelineBar() {
 					<Icon icon="refresh" />
 				</IconBtn>
 			</div>
-			<div class={s.btnWrapper}>
+			<div class="tree-bar-btn-wrapper">
 				<IconBtn
 					title="Clear profiling data"
 					disabled={!isSupported || commits.length === 0 || isRecording}
