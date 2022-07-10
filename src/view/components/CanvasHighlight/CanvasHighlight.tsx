@@ -48,9 +48,7 @@ export class CanvasHighlight extends HTMLElement {
 		window.addEventListener("resize", this.onResize);
 
 		this.canvas = this.shadowRoot!.firstChild as HTMLCanvasElement;
-
-		this.canvas.width = window.innerWidth;
-		this.canvas.height = window.innerHeight;
+		this.refresh();
 	}
 
 	disconnectedCallback() {
@@ -94,7 +92,6 @@ export class CanvasHighlight extends HTMLElement {
 		const ctx = canvas.getContext("2d");
 		if (!ctx) return;
 
-		console.log("draw");
 		ctx.clearRect(0, 0, canvas.width, canvas.height);
 
 		const now = performance.now();
@@ -111,8 +108,7 @@ export class CanvasHighlight extends HTMLElement {
 		if (nextRedraw !== Number.MAX_SAFE_INTEGER) {
 			this.timer = setTimeout(() => this.draw(updates), nextRedraw - now);
 		} else {
-			console.log("remove");
-			// this.remove();
+			this.remove();
 		}
 	}
 }
