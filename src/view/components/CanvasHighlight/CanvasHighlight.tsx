@@ -1,5 +1,4 @@
 import { throttle } from "../../../shells/shared/utils";
-import s from "./CanvasHighlight.module.css";
 
 export class CanvasHighlight {
 	dom: HTMLDivElement | null = null;
@@ -12,10 +11,11 @@ export class CanvasHighlight {
 		document.getElementById(this.id)?.remove();
 		const dom = document.createElement("div");
 		dom.id = this.id;
+		dom.className = "preact-devtools";
 		document.body.appendChild(dom);
 
 		const canvas = document.createElement("canvas");
-		canvas.className = s.root;
+		canvas.className = "canvas-highlight";
 		canvas.width = window.innerWidth;
 		canvas.height = window.innerHeight;
 		dom.appendChild(canvas);
