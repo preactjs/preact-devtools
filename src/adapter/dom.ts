@@ -8,30 +8,21 @@ export function px2Int(input: string | null) {
 	return input ? +input.replace(/px/, "") : 0;
 }
 
+/** Top, Right, Bottom, Left */
+export type Dimensions = [number, number, number, number];
+/** Top, Right, Bottom, Left */
+export type Bounds = [boolean, boolean, boolean, boolean];
+
 export interface Measurements {
 	boxSizing: string;
 	top: number;
 	left: number;
 	width: number;
 	height: number;
-	marginTop: number;
-	marginRight: number;
-	marginBottom: number;
-	marginLeft: number;
-	borderTop: number;
-	borderRight: number;
-	borderBottom: number;
-	borderLeft: number;
-	paddingTop: number;
-	paddingRight: number;
-	paddingBottom: number;
-	paddingLeft: number;
-	bounds: {
-		top?: boolean;
-		left?: boolean;
-		bottom?: boolean;
-		right?: boolean;
-	};
+	margin: Dimensions;
+	border: Dimensions;
+	padding: Dimensions;
+	bounds: Bounds;
 }
 
 function getBoundsState(rect: {
@@ -39,13 +30,12 @@ function getBoundsState(rect: {
 	height: number;
 	left: number;
 	width: number;
-}) {
-	return {
-		top: rect.top + window.pageYOffset < window.scrollY,
-		bottom: rect.top + rect.height > window.innerHeight + scrollY,
-		left: rect.left + window.pageXOffset < window.scrollX,
-		right: rect.left + rect.width > window.scrollX + window.innerWidth,
-	};
+}): Bounds {
+	const top = rect.top + window.pageYOffset < window.scrollY;
+	const bottom = rect.top + rect.height > window.innerHeight + scrollY;
+	const left = rect.left + window.pageXOffset < window.scrollX;
+	const right = rect.left + rect.width > window.scrollX + window.innerWidth;
+	return [top, right, bottom, left];
 }
 
 export function measureNode(dom: Element): Measurements {
@@ -66,18 +56,24 @@ export function measureNode(dom: Element): Measurements {
 		width: Math.round(r.width * 100) / 100,
 		height: Math.round(r.height * 100) / 100,
 
-		marginTop: px2Int(s.marginTop),
-		marginRight: px2Int(s.marginRight),
-		marginBottom: px2Int(s.marginBottom),
-		marginLeft: px2Int(s.marginLeft),
-		borderTop: px2Int(s.borderTopWidth),
-		borderRight: px2Int(s.borderRightWidth),
-		borderBottom: px2Int(s.borderBottomWidth),
-		borderLeft: px2Int(s.borderLeftWidth),
-		paddingTop: px2Int(s.paddingTop),
-		paddingRight: px2Int(s.paddingRight),
-		paddingBottom: px2Int(s.paddingBottom),
-		paddingLeft: px2Int(s.paddingLeft),
+		margin: [
+			px2Int(s.marginTop),
+			px2Int(s.marginRight),
+			px2Int(s.marginBottom),
+			px2Int(s.marginLeft),
+		],
+		border: [
+			px2Int(s.borderTopWidth),
+			px2Int(s.borderRightWidth),
+			px2Int(s.borderBottomWidth),
+			px2Int(s.borderLeftWidth),
+		],
+		padding: [
+			px2Int(s.paddingTop),
+			px2Int(s.paddingRight),
+			px2Int(s.paddingBottom),
+			px2Int(s.paddingLeft),
+		],
 	};
 }
 
@@ -101,17 +97,8 @@ export function mergeMeasure(a: Measurements, b: Measurements): Measurements {
 
 		// Reset all margins for combined nodes. There is no
 		// meaningful way to display them.
-		marginTop: 0,
-		marginRight: 0,
-		marginBottom: 0,
-		marginLeft: 0,
-		borderTop: 0,
-		borderRight: 0,
-		borderBottom: 0,
-		borderLeft: 0,
-		paddingTop: 0,
-		paddingRight: 0,
-		paddingBottom: 0,
-		paddingLeft: 0,
+		margin: [0, 0, 0, 0],
+		border: [0, 0, 0, 0],
+		padding: [0, 0, 0, 0],
 	};
 }
