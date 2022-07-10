@@ -9,7 +9,6 @@ import { useObserver, useStore } from "../../../../store/react-bindings";
 import { HocLabels } from "../../../elements/TreeView";
 import { NodeTransform } from "../shared";
 import { useVirtualizedList } from "../../../elements/VirtualizedList";
-import s from "../FlameGraph.module.css";
 
 export interface FlamegraphLayoutProps {
 	commit: CommitData;
@@ -84,7 +83,7 @@ export function FlamegraphLayout({
 	}, [selected, scrollToItem]);
 
 	return (
-		<div class={s.pane} style={`height: ${containerHeight}px;`}>
+		<div class="flamegraph-pane" style={`height: ${containerHeight}px;`}>
 			{rowItems}
 		</div>
 	);
