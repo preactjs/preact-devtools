@@ -59,6 +59,30 @@
 }
 
 /**
+ * Sidebar
+ */
+
+.sidebar-actions {
+	justify-content: space-between;
+	padding: 0 0.6rem !important;
+}
+
+@media (max-width: 37.5rem) {
+	.sidebar-actions {
+		border-top: 0.0625rem solid var(--color-border);
+	}
+}
+
+.sidebar-icon-actions {
+	display: flex;
+	align-items: center;
+}
+
+.sidebar-icon-actions > * + * {
+	margin-left: 0.5rem;
+}
+
+/**
  * Checkbox
  */
 .checkbox-root {

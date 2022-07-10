@@ -1,6 +1,5 @@
 import { h, Fragment } from "preact";
 import { Actions } from "../../Actions";
-import s from "../../sidebar/Sidebar.module.css";
 import {
 	useStore,
 	useObserver,
@@ -34,9 +33,9 @@ export function SidebarHeader() {
 		selected.type !== DevNodeType.Element;
 
 	return (
-		<Actions class={s.actions}>
+		<Actions class="sidebar-actions">
 			<ComponentName>{selected && selected.name}</ComponentName>
-			<div class={s.iconActions}>
+			<div class="sidebar-icon-actions">
 				{selected && (
 					<Fragment>
 						<IconBtn
