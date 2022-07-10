@@ -1,6 +1,5 @@
 import { h, Fragment } from "preact";
 import { useObserver, useStore } from "../../store/react-bindings";
-import s from "./StatsPanel.module.css";
 import { SingleLayout } from "../SidebarLayout";
 import { Actions } from "../Actions";
 import { IconBtn } from "../IconBtn";
@@ -58,12 +57,12 @@ export function StatsPanel() {
 
 	return (
 		<SingleLayout>
-			<div class={s.actions}>
+			<div class="stats-actions">
 				<Actions>
-					<div class={s.btnWrapper}>
+					<div class="stats-btn-wrapper">
 						<StatsRecordBtn />
 					</div>
-					<div class={s.btnWrapper}>
+					<div class="stats-btn-wrapper">
 						<IconBtn
 							title="Reload and record statistic"
 							disabled={isRecording}
@@ -73,7 +72,7 @@ export function StatsPanel() {
 							<Icon icon="refresh" />
 						</IconBtn>
 					</div>
-					<div class={s.btnWrapper}>
+					<div class="stats-btn-wrapper">
 						<IconBtn
 							title="Clear statistic data"
 							disabled={stats === null || isRecording}
@@ -84,7 +83,7 @@ export function StatsPanel() {
 					</div>
 				</Actions>
 			</div>
-			<div class={s.content}>
+			<div class="stats-content">
 				{stats !== null ? (
 					<StatsData stats={stats} />
 				) : isRecording ? (
@@ -154,22 +153,22 @@ export function ChildRow(props: {
 	return (
 		<tr>
 			<td>{label}</td>
-			<td class={s.alignRight} data-testid={testId + "-total"}>
+			<td class="text-right" data-testid={testId + "-total"}>
 				{total}
 			</td>
-			<td class={s.alignRight} data-testid={testId + "-0"}>
+			<td class="text-right" data-testid={testId + "-0"}>
 				{count ? count[0] : "-"}
 			</td>
-			<td class={s.alignRight} data-testid={testId + "-1"}>
+			<td class="text-right" data-testid={testId + "-1"}>
 				{count ? count[1] : "-"}
 			</td>
-			<td class={s.alignRight} data-testid={testId + "-2"}>
+			<td class="text-right" data-testid={testId + "-2"}>
 				{count ? count[2] : "-"}
 			</td>
-			<td class={s.alignRight} data-testid={testId + "-3"}>
+			<td class="text-right" data-testid={testId + "-3"}>
 				{count ? count[3] : "-"}
 			</td>
-			<td class={s.alignRight} data-testid={testId + "-n"}>
+			<td class="text-right" data-testid={testId + "-n"}>
 				{count ? count[4] : "-"}
 			</td>
 		</tr>
@@ -180,16 +179,16 @@ function OperationRow({ name, info }: { name: string; info: OperationInfo }) {
 	return (
 		<tr>
 			<td>{name}</td>
-			<td class={s.alignRight} data-testid={name + "-total"}>
+			<td class="text-right" data-testid={name + "-total"}>
 				{getOpTotal(info)}
 			</td>
-			<td class={s.alignRight} data-testid={name + "-components"}>
+			<td class="text-right" data-testid={name + "-components"}>
 				{info.components}
 			</td>
-			<td class={s.alignRight} data-testid={name + "-elements"}>
+			<td class="text-right" data-testid={name + "-elements"}>
 				{info.elements}
 			</td>
-			<td class={s.alignRight} data-testid={name + "-text"}>
+			<td class="text-right" data-testid={name + "-text"}>
 				{info.text}
 			</td>
 		</tr>
@@ -199,7 +198,7 @@ function OperationRow({ name, info }: { name: string; info: OperationInfo }) {
 export function StatsData({ stats }: { stats: ParsedStats }) {
 	return (
 		<Fragment>
-			<div class={s.intro}>
+			<div class="stats-intro">
 				<p>
 					Help us make Preact even faster by sharing these statistics over at{" "}
 					<a
@@ -213,11 +212,11 @@ export function StatsData({ stats }: { stats: ParsedStats }) {
 					.
 				</p>
 			</div>
-			<div class={s.cards}>
-				<div class={s.card}>
-					<h2 class={s.heading}>Operations</h2>
+			<div class="stats-cards">
+				<div class="stats-card">
+					<h2 class="stats-card-heading">Operations</h2>
 
-					<table class={s.table} data-testid="operation-type">
+					<table class="table" data-testid="operation-type">
 						<thead>
 							<tr>
 								<th>Type</th>
@@ -235,10 +234,10 @@ export function StatsData({ stats }: { stats: ParsedStats }) {
 					</table>
 				</div>
 
-				<div class={s.card}>
-					<h2 class={s.heading}>Reconciler</h2>
+				<div class="stats-card">
+					<h2 class="stats-card-heading">Reconciler</h2>
 
-					<table class={s.table} data-testid="diff-type">
+					<table class="table" data-testid="diff-type">
 						<thead>
 							<ChildHeadings />
 						</thead>
@@ -262,10 +261,10 @@ export function StatsData({ stats }: { stats: ParsedStats }) {
 					</table>
 				</div>
 
-				<div class={s.card}>
-					<h2 class={s.heading}>Render Frequency</h2>
+				<div class="stats-card">
+					<h2 class="stats-card-heading">Render Frequency</h2>
 
-					<table class={s.table} data-testid="vnode-stats">
+					<table class="table" data-testid="vnode-stats">
 						<thead>
 							<ChildHeadings />
 						</thead>
@@ -327,10 +326,10 @@ export function StatsData({ stats }: { stats: ParsedStats }) {
 					<small>** Text nodes can&apos;t have children.</small>
 				</div>
 
-				<div class={s.card}>
-					<h2 class={s.heading}>Single Child Type</h2>
+				<div class="stats-card">
+					<h2 class="stats-card-heading">Single Child Type</h2>
 
-					<table class={s.table} data-testid="sing-child-type">
+					<table class="table" data-testid="sing-child-type">
 						<thead>
 							<tr>
 								<th>Type</th>
