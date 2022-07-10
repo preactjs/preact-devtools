@@ -1,5 +1,4 @@
 import { h } from "preact";
-import s from "./TreeView.module.css";
 import { useObserver, useStore } from "../../store/react-bindings";
 import { useEffect, useState, useRef, useCallback } from "preact/hooks";
 import { getLastChild } from "../tree/windowing";
@@ -96,19 +95,19 @@ export function TreeView() {
 		<div
 			ref={ref}
 			tabIndex={0}
-			class={s.tree}
+			class="tree-view"
 			onKeyDown={onKeyDown}
 			data-tree={true}
 			onMouseLeave={onMouseLeave}
 		>
 			{isOnlyConnected && (
-				<div class={s.empty} data-testid="msg-only-connected">
-					<div class={s.emptyInner}>
-						<BackgroundLogo class={s.bgLogo} />
+				<div class="tree-view-empty" data-testid="msg-only-connected">
+					<div class="tree-view-empty-inner">
+						<BackgroundLogo class="tree-view-empty-logo" />
 						<p>
 							<b>Connected</b>, listening for Preact operations...
 						</p>
-						<p class={s.emptyDescription}>
+						<p class="tree-view-empty-descr">
 							<small>
 								If this message doesn&apos;t go away Preact started rendering
 								before devtools was initialized. You can fix this by adding the{" "}
@@ -120,13 +119,13 @@ export function TreeView() {
 				</div>
 			)}
 			{hasNoResults && (
-				<div class={s.empty} data-testid="msg-no-results">
-					<div class={s.emptyInner}>
-						<BackgroundLogo class={s.bgLogo} />
+				<div class="tree-view-empty" data-testid="msg-no-results">
+					<div class="tree-view-empty-inner">
+						<BackgroundLogo class="tree-view-empty-logo" />
 						<p>
 							<b>Nothing to show</b>
 						</p>
-						<p class={s.emptyDescription}>
+						<p class="tree-view-empty-descr">
 							<small>
 								No nodes visible with active filters. To fix this update filters
 								or make sure to render at least one component in your app.
@@ -136,7 +135,7 @@ export function TreeView() {
 				</div>
 			)}
 			<div
-				class={s.pane}
+				class="tree-view-pane"
 				ref={paneRef}
 				data-testid="elements-tree"
 				style={`height: ${containerHeight}px`}
@@ -161,10 +160,7 @@ export function MarkResult(props: { text: string; id: ID }) {
 		return (
 			<span data-testid="node-name">
 				{start}
-				<mark
-					class={`${s.mark} ${isActive ? s.markSelected : ""}`}
-					data-marked={isActive}
-				>
+				<mark class="mark" data-marked={isActive}>
 					{m[0]}
 				</mark>
 				{end}
@@ -193,7 +189,7 @@ export function TreeItem(props: { key: any; id: ID; top: number }) {
 	return (
 		<div
 			ref={ref}
-			class={s.item}
+			class="tree-view-item"
 			data-testid="tree-item"
 			data-name={node.name}
 			onClick={() => {
@@ -207,28 +203,28 @@ export function TreeItem(props: { key: any; id: ID; top: number }) {
 			style={`top: ${props.top}px;`}
 		>
 			<div
-				class={s.itemHeader}
+				class="tree-view-item-header"
 				style={`transform: translate3d(calc(var(--indent-depth) * ${
 					node.depth + (filterRoot ? -1 : 0)
 				}), 0, 0);`}
 			>
 				{node.children.length > 0 && (
 					<button
-						class={s.toggle}
+						class="tree-view-collapse"
 						data-collapsed={collapsed.has(id)}
 						onClick={onToggle}
 					>
 						<Arrow />
 					</button>
 				)}
-				{node.children.length === 0 && <div class={s.noToggle} />}
-				<span class={s.name}>
+				{node.children.length === 0 && <div class="tree-view-no-collapse" />}
+				<span class="tree-view-name">
 					<MarkResult text={node.name} id={id} />
 					{node.key ? (
-						<span class={s.keyLabel}>
+						<span class="tree-view-key-label">
 							{" "}
 							key=&quot;
-							<span class={s.key}>
+							<span class="tree-view-key">
 								{node.key.length > 15 ? `${node.key.slice(0, 15)}…` : node.key}
 							</span>
 							&quot;
@@ -239,7 +235,7 @@ export function TreeItem(props: { key: any; id: ID; top: number }) {
 					{filterHoc && node.hocs && node.hocs.length > 0 && (
 						<HocLabels hocs={node.hocs} nodeId={id} />
 					)}
-					{isRoot ? <span class={s.rootLabel}>(Root)</span> : ""}
+					{isRoot ? <span class="tree-view-root-label">(Root)</span> : ""}
 				</span>
 			</div>
 		</div>
@@ -256,7 +252,7 @@ export function HocLabels({
 	canMark?: boolean;
 }) {
 	return (
-		<span class={s.hocs} data-testid="hoc-labels">
+		<span class="hocs" data-testid="hoc-labels">
 			{hocs.map((hoc, i) => {
 				return (
 					<Hoc key={i} small>
@@ -322,7 +318,7 @@ export function HighlightPane(props: { treeDom: HTMLDivElement | null }) {
 
 	return (
 		<div
-			class={s.dimmer}
+			class="tree-view-dimmer"
 			style={`top: ${pos.top}px; height: ${pos.height}px;`}
 		/>
 	);
