@@ -4,7 +4,6 @@ import { Actions, ActionSeparator } from "../Actions";
 import { IconBtn } from "../IconBtn";
 import { Icon, Picker } from "../icons";
 import { useStore, useObserver } from "../../store/react-bindings";
-import s from "./TreeBar.module.css";
 import { useSearch } from "../../store/search";
 import { OutsideClick } from "../OutsideClick";
 
@@ -30,7 +29,7 @@ export function TreeBar() {
 
 	return (
 		<Actions>
-			<div class={s.btnWrapper}>
+			<div class="filter-btn-wrapper">
 				<IconBtn
 					active={isPicking}
 					title="Pick a Component from the page"
@@ -44,10 +43,10 @@ export function TreeBar() {
 				</IconBtn>
 			</div>
 			<ActionSeparator />
-			<div class={s.searchContainer}>
+			<div class="search-container">
 				<Icon icon="search" />
 				<input
-					class={s.search}
+					class="search"
 					type="text"
 					data-testid="element-search"
 					placeholder="Search (text or /regex/)"
@@ -56,12 +55,12 @@ export function TreeBar() {
 					onInput={e => store.search.onChange((e.target as any).value)}
 				/>
 				{searchActive && (
-					<div class={s.searchCounter} data-testid="search-counter">
+					<div class="search-counter" data-testid="search-counter">
 						{count > 0 ? selected + 1 : 0} | {count}
 					</div>
 				)}
 			</div>
-			<div class={s.btnWrapper}>
+			<div class="filter-btn-wrapper">
 				<IconBtn
 					onClick={store.search.selectNext}
 					title="Select next result"
@@ -70,7 +69,7 @@ export function TreeBar() {
 					<Icon icon="keyboard-down" />
 				</IconBtn>
 			</div>
-			<div class={s.btnWrapper}>
+			<div class="filter-btn-wrapper">
 				<IconBtn
 					onClick={store.search.selectPrev}
 					title="Select previous result"
@@ -79,7 +78,7 @@ export function TreeBar() {
 					<Icon icon="keyboard-up" />
 				</IconBtn>
 			</div>
-			<div class={s.btnWrapper}>
+			<div class="filter-btn-wrapper">
 				<IconBtn
 					onClick={store.search.reset}
 					title="Clear search input"
@@ -89,10 +88,10 @@ export function TreeBar() {
 				</IconBtn>
 			</div>
 			<ActionSeparator />
-			<div class={s.btnWrapper}>
+			<div class="filter-btn-wrapper">
 				<OutsideClick
 					onClick={() => setFilterVisible(false)}
-					class={s.filterBtnWrapper}
+					class="filter-btn-wrapper"
 				>
 					<IconBtn
 						title="Filter Components"
@@ -119,8 +118,8 @@ function FilterCheck({
 	label: string;
 }) {
 	return (
-		<label class={s.filterRow}>
-			<span class={s.filterCheck}>
+		<label class="filter-row">
+			<span class="filter-check">
 				<input
 					type="checkbox"
 					checked={checked}
@@ -128,7 +127,7 @@ function FilterCheck({
 				/>
 				<Icon icon={checked ? "checkbox-checked" : "checkbox-unchecked"} />
 			</span>
-			<span class={`${s.filterValue} ${s.filterValueText}`}>{label}</span>
+			<span class="filter-value">{label}</span>
 		</label>
 	);
 }
@@ -144,7 +143,7 @@ export function FilterPopup() {
 	const [filters, setFilters] = useState(store.filter.filters.$);
 
 	return (
-		<div class={s.filter} data-testid="filter-popup">
+		<div class="filter" data-testid="filter-popup">
 			<form
 				onSubmit={e => {
 					e.preventDefault();
@@ -183,8 +182,8 @@ export function FilterPopup() {
 				{/* Custom user filters */}
 				{filters.map((x, i) => {
 					return (
-						<div key={i} class={s.filterRow}>
-							<label class={s.filterCheck}>
+						<div key={i} class="filter-row">
+							<label class="filter-check">
 								<input
 									type="checkbox"
 									checked={x.enabled}
@@ -198,9 +197,9 @@ export function FilterPopup() {
 									icon={x.enabled ? "checkbox-checked" : "checkbox-unchecked"}
 								/>
 							</label>
-							<span class={s.filterValue}>
+							<span class="filter-value">
 								<input
-									className={s.filterName}
+									className="filter-name"
 									type="text"
 									placeholder="MyComponent"
 									value={x.value}
@@ -211,7 +210,7 @@ export function FilterPopup() {
 									}}
 								/>
 							</span>
-							<span class={s.removeWrapper}>
+							<span class="filter-remove-wrapper">
 								<IconBtn
 									title="Remove filter"
 									styling="secondary"
@@ -230,8 +229,8 @@ export function FilterPopup() {
 						</div>
 					);
 				})}
-				<div class={s.vSep} />
-				<div class={s.filterActions}>
+				<div class="v-sep" />
+				<div class="filter-actions">
 					<IconBtn
 						styling="secondary"
 						title="Add new filter"
@@ -240,8 +239,8 @@ export function FilterPopup() {
 							setFilters([...filters, { enabled: false, value: "" }])
 						}
 					>
-						<span class={s.filterAdd}>
-							<span class={s.filterCheck}>
+						<span class="filter-add">
+							<span class="filter-check">
 								<Icon icon="add-circle" />
 							</span>
 							Add filter
@@ -249,7 +248,7 @@ export function FilterPopup() {
 					</IconBtn>
 					<button
 						type="submit"
-						class={s.filterSubmitBtn}
+						class="filter-submit-btn"
 						data-testid="filter-update"
 					>
 						Update

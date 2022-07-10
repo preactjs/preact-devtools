@@ -211,6 +211,177 @@
 }
 
 /**
+ * TreeBar
+ */
+.tree-bar-btn-icon {
+	border: none;
+	background: none;
+	cursor: pointer;
+	display: inline-flex;
+	align-items: center;
+	outline: none;
+	color: var(--color-text);
+}
+
+.tree-bar-btn-icon[data-active] {
+	color: var(--color-button-active);
+	color: var(--color-button-active);
+}
+
+.tree-bar-btn-wrapper {
+	display: flex;
+	justify-content: center;
+	align-items: center;
+	height: 100%;
+	padding-left: 0.25rem;
+	padding-right: 0.25rem;
+}
+
+.search-container {
+	align-items: center;
+	flex: 1 1 auto;
+	display: flex;
+	height: 100%;
+	margin-left: 0.5rem;
+	margin-right: 0.5rem;
+	min-width: 0;
+}
+
+.search {
+	flex: 1 1 auto;
+	border: none;
+	height: 100%;
+	background: none;
+	color: var(--color-text);
+	margin-left: 0.25rem !important;
+	position: relative;
+	padding: 0.25rem 0;
+	border-bottom: 0.0625rem solid transparent;
+	border-top: 0.025rem solid transparent;
+}
+
+.search:focus {
+	outline: none;
+	border-bottom: 0.0625rem solid var(--color-selected-bg);
+}
+
+.search-counter {
+	display: inline-flex;
+	font-size: var(--font-small);
+	color: var(--color-text-empty);
+}
+
+.filter-btn-wrapper {
+	position: relative;
+	display: flex;
+	height: 100%;
+	align-items: center;
+}
+
+.filter {
+	position: absolute;
+	top: 90%;
+	right: -0.5rem;
+	border-top: none;
+	border: 0.0625rem solid var(--color-border);
+	background: var(--color-bg);
+	width: 12rem;
+	z-index: 10;
+	padding: 0.5rem 0.5rem 0.5rem 0.75rem;
+}
+
+.filter form {
+	margin: 0;
+}
+
+.filter label {
+	cursor: pointer;
+}
+
+.filter-row {
+	display: flex;
+	height: 1.375rem;
+	align-items: center;
+}
+
+.filter-check {
+	width: 1.25rem;
+	display: flex;
+	flex: 0 0 auto;
+	justify-content: flex-start;
+	align-items: center;
+}
+
+.filter-check svg {
+	width: 1.25rem;
+}
+
+.filter-check input {
+	opacity: 0;
+	position: absolute;
+	left: 0;
+}
+
+.filter-check input:checked + svg {
+	color: var(--color-selected-bg);
+}
+
+.filter-value {
+	text-align: left;
+	padding-left: 0.25rem;
+	font-size: 0.875rem;
+}
+
+.filter-add {
+	display: flex;
+	align-items: center;
+	font-size: 0.875rem;
+}
+
+.filter-name {
+	display: flex;
+	align-items: center;
+	width: 100%;
+	background: var(--color-props-input-bg);
+	border: none;
+	color: var(--color-text-input);
+	padding: 0.15rem 0.3rem;
+	font-size: 0.75rem;
+}
+
+.filter-actions {
+	display: flex;
+	justify-content: space-between;
+	align-items: center;
+}
+
+.filter-submit-button {
+	display: block;
+	background: var(--color-selected-bg);
+	color: var(--color-selected-text);
+	border: none;
+	border-radius: 0.1875rem;
+	font-size: 0.875rem;
+	padding: 0.25rem 0.5rem;
+}
+
+.filter-submit-button svg {
+	margin-right: 0.25rem;
+}
+
+.filter-remove-wrapper {
+	width: 1.5rem;
+	display: flex;
+	flex: 0 0 auto;
+	justify-content: flex-end;
+}
+
+.v-sep {
+	height: 0.0625rem;
+	margin: 0.4rem 0;
+}
+
+/**
  * TreeView
  */
 .tree-view {
