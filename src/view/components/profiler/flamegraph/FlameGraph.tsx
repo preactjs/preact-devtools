@@ -1,5 +1,4 @@
 import { Fragment, h } from "preact";
-import s from "./FlameGraph.module.css";
 import { useStore, useObserver } from "../../../store/react-bindings";
 import { useRef, useCallback, useState, useEffect } from "preact/hooks";
 import { FlamegraphType } from "../data/commits";
@@ -64,7 +63,7 @@ export function FlameGraph() {
 
 	return (
 		<div
-			class={s.root}
+			class="flamegraph"
 			ref={ref}
 			data-type={displayType.toLowerCase()}
 			style={showDebug ? "overflow-x: auto" : ""}

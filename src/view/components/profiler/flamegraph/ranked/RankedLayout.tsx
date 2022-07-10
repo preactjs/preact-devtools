@@ -9,7 +9,6 @@ import { useObserver, useStore } from "../../../../store/react-bindings";
 import { HocLabels } from "../../../elements/TreeView";
 import { useVirtualizedList } from "../../../elements/VirtualizedList";
 import { NodeTransform } from "../shared";
-import s from "../FlameGraph.module.css";
 
 export interface RankedLayoutProps {
 	commit: CommitData;
@@ -82,7 +81,7 @@ export function RankedLayout({
 	});
 
 	return (
-		<div class={s.pane} style={`height: ${containerHeight}px;`}>
+		<div class="flamegraph-pane" style={`height: ${containerHeight}px;`}>
 			{rowItems}
 		</div>
 	);

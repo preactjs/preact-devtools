@@ -1,6 +1,5 @@
 import { h } from "preact";
 import { useRef, useCallback } from "preact/hooks";
-import s from "./FlameGraph.module.css";
 import { NodeTransform } from "./shared";
 import { ID } from "../../../store/types";
 
@@ -40,7 +39,7 @@ export function FlameNode(props: Props) {
 
 	return (
 		<div
-			class={s.node}
+			class="flamegraph-node"
 			onClick={onRawClick}
 			onMouseEnter={onRawMouseEnter}
 			onMouseLeave={onMouseLeave}
@@ -55,7 +54,7 @@ export function FlameNode(props: Props) {
 			data-name={name}
 			style={`height: ${ROW_HEIGHT}px; ${transform.current} ${widthCss.current}`}
 		>
-			<span class={s.text} style={widthCss.current}>
+			<span class="flamegraph-text" style={widthCss.current}>
 				{props.children}
 			</span>
 		</div>

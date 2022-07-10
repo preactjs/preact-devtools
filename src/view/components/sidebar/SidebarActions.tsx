@@ -1,5 +1,4 @@
 import { h, Fragment } from "preact";
-import s from "./Sidebar.module.css";
 import { Actions } from "../Actions";
 import { IconBtn } from "../IconBtn";
 import { useStore, useEmitter, useObserver } from "../../store/react-bindings";
@@ -51,10 +50,10 @@ export function SidebarActions() {
 	}, [node, suspense]);
 
 	return (
-		<Actions class={s.actions}>
+		<Actions class="sidebar-actions">
 			<ComponentName>{node && node.name}</ComponentName>
 
-			<div class={s.iconActions}>
+			<div class="sidebar-icon-actions">
 				{node && (
 					<Fragment>
 						{suspense.canSuspend && (
