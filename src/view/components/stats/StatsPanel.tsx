@@ -1,7 +1,6 @@
 import { h, Fragment } from "preact";
 import { useObserver, useStore } from "../../store/react-bindings";
 import s from "./StatsPanel.module.css";
-import s2 from "../profiler/components/ProfilerInfo/ProfilerInfo.module.css";
 import { SingleLayout } from "../SidebarLayout";
 import { Actions } from "../Actions";
 import { IconBtn } from "../IconBtn";
@@ -89,22 +88,24 @@ export function StatsPanel() {
 				{stats !== null ? (
 					<StatsData stats={stats} />
 				) : isRecording ? (
-					<div class={s2.root} data-testid="stats-info-recording">
-						<p class={s2.title}>Statistic recording in progress...</p>
-						<p class={s2.descr}>
+					<div class="profiler-info" data-testid="stats-info-recording">
+						<p class="profiler-info-title">
+							Statistic recording in progress...
+						</p>
+						<p class="profiler-info-descr">
 							Click the record button{" "}
-							<span class={s2.inlineBtn}>
+							<span class="profiler-info-btn">
 								<StatsRecordBtn />
 							</span>{" "}
 							to stop recording.
 						</p>
 					</div>
 				) : (
-					<div class={s2.root} data-testid="stats-info">
-						<p class={s2.title}>No statistic data collected</p>
-						<p class={s2.descr}>
+					<div class="profiler-info" data-testid="stats-info">
+						<p class="profiler-info-title">No statistic data collected</p>
+						<p class="profiler-info-descr">
 							Click the record button{" "}
-							<span class={s2.inlineBtn}>
+							<span class="profiler-info-btn">
 								<StatsRecordBtn />
 							</span>{" "}
 							to start recording.
