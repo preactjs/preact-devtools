@@ -1,4 +1,4 @@
-import { attachCss, css } from "../../../adapter/adapter/custom-element";
+import { PreactElement } from "../../../adapter/adapter/custom-element";
 import {
 	UpdateRect,
 	UpdateRects,
@@ -19,7 +19,9 @@ const COLORS = [
 	"#febc38",
 ];
 
-const sheet = css`
+const css = (s: TemplateStringsArray) => s[0];
+
+const style = css`
 	:host {
 		position: fixed;
 		left: 0;
@@ -34,20 +36,15 @@ const sheet = css`
 	}
 `;
 
-export class CanvasHighlight extends HTMLElement {
+export class CanvasHighlight extends PreactElement {
 	timer: any;
 	canvas: HTMLCanvasElement | null = null;
 
-	constructor() {
-		super();
-		attachCss(this, sheet);
-	}
-
 	connectedCallback() {
-		this.shadowRoot!.innerHTML = "<canvas></canvas>";
+		this.shadowRoot!.innerHTML = `<style>${style}</style><canvas></canvas>`;
 		window.addEventListener("resize", this.onResize);
 
-		this.canvas = this.shadowRoot!.firstChild as HTMLCanvasElement;
+		this.canvas = this.shadowRoot!.firstChild!.nextSibling as HTMLCanvasElement;
 		this.refresh();
 	}
 

@@ -1,4 +1,4 @@
-import { attachCss, css } from "../../adapter/adapter/custom-element";
+import { css, PreactElement } from "../../adapter/adapter/custom-element";
 import { Dimensions, Measurements } from "../../adapter/dom";
 
 export function css2Border(dim: Dimensions) {
@@ -10,7 +10,7 @@ export function css2Border(dim: Dimensions) {
 	`;
 }
 
-const sheet = css`
+const style = css`
 	:host {
 		font-family: "SFMono-Regular", Consolas, "Liberation Mono", Menlo, Courier,
 			monospace;
@@ -98,14 +98,9 @@ const sheet = css`
 	}
 `;
 
-export class Highlighter extends HTMLElement {
-	constructor() {
-		super();
-		attachCss(this, sheet);
-	}
-
+export class Highlighter extends PreactElement {
 	connectedCallback() {
-		this.shadowRoot!.innerHTML = `<div class="margin"><div class="border"><div class="content"></div></div></div><span class="footer"><span class="label"><slot /></span> | <span class="value"></span> × <span class="value"></span></span>`;
+		this.shadowRoot!.innerHTML = `<style>${style}</style><div class="margin"><div class="border"><div class="content"></div></div></div><span class="footer"><span class="label"><slot /></span> | <span class="value"></span> × <span class="value"></span></span>`;
 	}
 
 	set props(props: Measurements) {

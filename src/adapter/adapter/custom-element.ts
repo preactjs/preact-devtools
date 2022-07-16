@@ -1,11 +1,8 @@
-export function css(arr: TemplateStringsArray) {
-	const sheet = new CSSStyleSheet();
-	// Typings are too old
-	(sheet as any).replaceSync(arr[0]);
-	return sheet;
-}
+export const css = (s: TemplateStringsArray) => s[0];
 
-export function attachCss(el: HTMLElement, sheet: CSSStyleSheet) {
-	const shadow = el.attachShadow({ mode: "open" });
-	(shadow as any).adoptedStyleSheets = [sheet];
+export class PreactElement extends HTMLElement {
+	constructor() {
+		super();
+		this.attachShadow({ mode: "open" });
+	}
 }
