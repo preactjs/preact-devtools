@@ -210,6 +210,31 @@
 	flex-basis: 0.125rem;
 }
 
+.action-btn-area {
+	padding: 0.25rem;
+	border-bottom: 0.0625rem solid var(--color-border);
+	display: flex;
+	gap: 0.25rem;
+}
+
+.action-btn {
+	font-size: var(--font-small);
+	background: var(--color-button-bg);
+	color: var(--color-text);
+	border-radius: 0.1875rem;
+	padding: 0.25rem;
+	cursor: pointer;
+	text-decoration: none;
+	display: flex;
+	align-items: center;
+	gap: 0.25rem;
+	transition: all 0.3s ease-out;
+	transform: translate3d(0, 0, 0);
+}
+.action-btn:active {
+	transform: translate3d(0, 5%, 0);
+}
+
 /**
  * TreeView
  */

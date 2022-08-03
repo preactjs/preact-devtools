@@ -99,6 +99,7 @@ input {
 	--color-hoc-text: #111;
 	--color-hoc-selected-text: #fff;
 	--color-hoc-selected-bg: #4101b3;
+	--color-button-bg: #444;
 
 	/* Table */
 	--table-hover: rgba(174, 128, 255, 0.4);
@@ -167,6 +168,7 @@ input {
 	--color-hover: #3a3a3a;
 	--color-border: #575757;
 	--color-dim-border: #474747;
+	--color-button-bg: #444;
 	--color-text-empty: #999;
 	--color-button-active: #d2adff;
 	--color-sidebar-title: #c5c5c5;

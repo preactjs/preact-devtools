@@ -7,6 +7,7 @@ import { DebugNodeNavTree } from "./DebugNodeNavTree";
 import { OwnerInfo } from "./../elements/OwnerInfo";
 import { KeyPanel } from "./KeyPanel";
 import { HocPanel } from "./HocPanel";
+import { LinkProviderPanel } from "./LinkProviderPanel";
 
 export function Sidebar() {
 	const store = useStore();
@@ -24,6 +25,7 @@ export function Sidebar() {
 
 	return (
 		<Fragment>
+			{inspect && <LinkProviderPanel />}
 			{inspect && inspect.key !== null && (
 				<KeyPanel
 					value={inspect.key}

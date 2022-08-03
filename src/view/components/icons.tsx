@@ -47,7 +47,9 @@ export type Icon =
 	| "sort-icon"
 	| "fire-icon"
 	| "code-icon"
-	| "suspend-icon";
+	| "suspend-icon"
+	| "external"
+	| "edit";
 
 export function Icon({ icon }: { icon: Icon }) {
 	return (

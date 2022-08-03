@@ -58,6 +58,7 @@ export interface DevtoolEvents {
 	refresh: null;
 	disconnect: null;
 	suspend: { id: ID; active: boolean };
+	"link-provider": { supportsEditor: boolean; stories: string[] };
 }
 export type EmitFn = <K extends keyof DevtoolEvents>(
 	name: K,
