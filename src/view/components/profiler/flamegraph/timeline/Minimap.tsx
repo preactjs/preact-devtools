@@ -1,57 +1,44 @@
 import { h } from "preact";
-import { useCallback, useEffect, useRef, useState } from "preact/hooks";
+import { useEffect, useRef, useState } from "preact/hooks";
 import { useObserver, useStore } from "../../../../store/react-bindings";
 import { useResize } from "../../../utils";
+import { newMinimapState, worldToLocalPercent } from "./minimap-state";
 
 export type DragTarget = "none" | "marker-left" | "marker-right" | "pane";
 
 export function Minimap() {
+	const [state] = useState(() => newMinimapState());
+	const left = useObserver(() => state.left.$);
+	const right = useObserver(() => state.right.$);
 	const ref = useRef<HTMLCanvasElement>();
-	const [size, setSize] = useState({ min: 0, max: 100 });
-	const [left, setLeft] = useState(0);
-	const [right, setRight] = useState(100);
-
-	const leftRef = useRef(left);
-	const rightRef = useRef(right);
-	leftRef.current = left;
-	rightRef.current = right;
-
-	// User interactions
-	const [drag, setDrag] = useState<DragTarget>("none");
 
 	useResize(
 		() => {
 			if (!ref.current) return;
 			const rect = ref.current.getBoundingClientRect();
-			setSize({ min: rect.left, max: rect.right - rect.left });
+			state.viewport.$ = {
+				left: rect.left,
+				right: rect.right,
+			};
 		},
-		[],
+		[state],
 		true,
 	);
 
 	useEffect(() => {
-		const MARKER_WIDTH = 12 + 4; // width + gap;
 		const fn = (e: PointerEvent) => {
-			switch (drag) {
+			const GAP = 2;
+			switch (state.target.$) {
 				case "marker-left":
-					setLeft(
-						Math.max(
-							0,
-							Math.min(
-								size.max,
-								rightRef.current - MARKER_WIDTH,
-								e.clientX - size.min,
-							),
-						),
+					state.left.$ = Math.min(
+						worldToLocalPercent(state, e.clientX),
+						state.right.$ - GAP,
 					);
 					break;
 				case "marker-right":
-					setRight(
-						Math.max(
-							0,
-							leftRef.current + MARKER_WIDTH,
-							Math.min(size.max, e.clientX),
-						),
+					state.right.$ = Math.max(
+						worldToLocalPercent(state, e.clientX),
+						state.left.$ + GAP,
 					);
 					break;
 			}
@@ -61,28 +48,25 @@ export function Minimap() {
 		return () => {
 			window.removeEventListener("pointermove", fn);
 		};
-	}, [drag, size]);
+	}, [state]);
 
 	useEffect(() => {
 		const fn = () => {
-			setDrag(drag => {
-				if (drag !== "none") {
-					return "none";
-				}
-				return null;
-			});
+			if (state.target.$ !== "none") {
+				state.target.$ = "none";
+			}
 		};
 		window.addEventListener("pointerup", fn);
 		return () => {
 			window.removeEventListener("pointerup", fn);
 		};
-	});
+	}, [state]);
 
 	// Draw on canvas
 	const store = useStore();
 	const commits = useObserver(() => store.profiler.commits.$);
 
-	console.log(commits);
+	// console.log(commits, state);
 
 	useEffect(() => {
 		const canvas = ref.current;
@@ -98,21 +82,21 @@ export function Minimap() {
 			onPointerDown={e => {
 				if (e.target instanceof HTMLElement) {
 					if (e.target.classList.contains("minimap-marker-handle-left")) {
-						setDrag("marker-left");
+						state.target.$ = "marker-left";
 					} else if (
 						e.target.classList.contains("minimap-marker-handle-right")
 					) {
-						setDrag("marker-right");
+						state.target.$ = "marker-right";
 					}
 				}
 			}}
 		>
-			<div class="minimap-marker minimap-marker-left" style={`left: ${left}px`}>
+			<div class="minimap-marker minimap-marker-left" style={`left: ${left}%`}>
 				<button class="minimap-marker-handle minimap-marker-handle-left" />
 			</div>
 			<div
 				class="minimap-marker minimap-marker-right"
-				style={`left: ${right}px`}
+				style={`left: ${right}%`}
 			>
 				<button class="minimap-marker-handle minimap-marker-handle-right" />
 			</div>

@@ -1130,7 +1130,6 @@
 }
 .minimap-marker-right {
 	left: 100%;
-	margin-left: -0.375rem;
 }
 .minimap-marker-right::after {
 	content: "";
