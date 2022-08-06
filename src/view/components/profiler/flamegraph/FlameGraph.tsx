@@ -9,6 +9,7 @@ import { EMPTY } from "./placeNodes";
 import { debounce } from "../../../../shells/shared/utils";
 import { EmitFn } from "../../../../adapter/hook";
 import { ID } from "../../../store/types";
+import { TimelineLayout } from "./timeline/TimelineLayout";
 
 const highlightNode = debounce(
 	(notify: EmitFn, id: ID | null) => notify("highlight", id),
@@ -80,8 +81,18 @@ export function FlameGraph() {
 							onMouseEnter={onMouseEnter}
 							onMouseLeave={onMouseLeave}
 						/>
-					) : (
+					) : displayType === FlamegraphType.FLAMEGRAPH ? (
 						<FlamegraphLayout
+							canvasWidth={canvasWidth}
+							containerRef={ref}
+							commit={commit!}
+							onSelect={onSelect}
+							selected={selected}
+							onMouseEnter={onMouseEnter}
+							onMouseLeave={onMouseLeave}
+						/>
+					) : (
+						<TimelineLayout
 							canvasWidth={canvasWidth}
 							containerRef={ref}
 							commit={commit!}

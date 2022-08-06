@@ -43,6 +43,16 @@ export function FlameGraphMode() {
 			>
 				Ranked
 			</IconTab>
+			<IconTab
+				name="flamegraph_mode"
+				icon={<Icon icon="timeline" />}
+				value={FlamegraphType.TIMELINE}
+				checked={type === FlamegraphType.TIMELINE}
+				onClick={onClick}
+				disabled={disabled}
+			>
+				Timeline
+			</IconTab>
 		</Fragment>
 	);
 }

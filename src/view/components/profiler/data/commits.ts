@@ -28,6 +28,7 @@ export interface CommitData {
  */
 export enum FlamegraphType {
 	FLAMEGRAPH = "FLAMEGRAPH",
+	TIMELINE = "TIMELINE",
 	RANKED = "RANKED",
 }
 

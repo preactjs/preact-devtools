@@ -22,7 +22,6 @@ export function listFixtures(): Plugin {
 					.readdirSync(dir)
 					.map(x => path.basename(x, path.extname(x)))
 					.sort((a, b) => a.localeCompare(b));
-
 				return `export const fixtures = [
           ${items.map(x => '"' + x + '"').join(",\n")}  
         ]`;
