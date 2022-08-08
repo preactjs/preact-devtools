@@ -2,7 +2,7 @@ import { Fragment, h, RefObject } from "preact";
 import { CommitData } from "../../data/commits";
 import { ID, DevNode } from "../../../../store/types";
 import { FlameNode } from "../FlameNode";
-import { useEffect, useMemo } from "preact/hooks";
+import { useEffect, useMemo, useRef } from "preact/hooks";
 import { placeFlamegraph } from "../modes/flamegraph-utils";
 import { formatTime } from "../../util";
 import { useObserver, useStore } from "../../../../store/react-bindings";
@@ -10,6 +10,7 @@ import { HocLabels } from "../../../elements/TreeView";
 import { NodeTransform } from "../shared";
 import { useVirtualizedList } from "../../../elements/VirtualizedList";
 import { Minimap } from "./Minimap";
+import { renderTimeLegend, setupCanvas } from "./minimap-state";
 
 export interface FlamegraphLayoutProps {
 	commit: CommitData;
@@ -46,11 +47,22 @@ export function TimelineLayout({
 		[commit, data, selected, canvasWidth],
 	);
 
+	const ref = useRef<HTMLCanvasElement>(null);
+	useEffect(() => {
+		const canvas = ref.current;
+		if (!canvas) return;
+
+		const ctx = setupCanvas(canvas);
+
+		renderTimeLegend(ctx, 10, "hehe");
+		renderTimeLegend(ctx, 100, "hehe");
+	}, []);
+
 	return (
 		<div class="timeline">
 			<Minimap />
 			<div class="timeline-pane">
-				<canvas class="timeline-canvas" style="background: #444" />
+				<canvas class="timeline-canvas" style="background: #444" ref={ref} />
 			</div>
 		</div>
 	);

@@ -2,15 +2,27 @@ import { h } from "preact";
 import { useEffect, useRef, useState } from "preact/hooks";
 import { useObserver, useStore } from "../../../../store/react-bindings";
 import { useResize } from "../../../utils";
-import { newMinimapState, worldToLocalPercent } from "./minimap-state";
+import {
+	newMinimapState,
+	renderTimeLegend,
+	setupCanvas,
+	worldToLocalPercent,
+} from "./minimap-state";
 
 export type DragTarget = "none" | "marker-left" | "marker-right" | "pane";
 
 export function Minimap() {
+	const store = useStore();
 	const [state] = useState(() => newMinimapState());
 	const left = useObserver(() => state.left.$);
 	const right = useObserver(() => state.right.$);
 	const ref = useRef<HTMLCanvasElement>();
+
+	const [start, end] = useObserver(() => {
+		return [store.profiler.sessionStart.$, store.profiler.sessionEnd.$];
+	});
+
+	console.log([start, end, end - start]);
 
 	useResize(
 		() => {
@@ -63,7 +75,6 @@ export function Minimap() {
 	}, [state]);
 
 	// Draw on canvas
-	const store = useStore();
 	const commits = useObserver(() => store.profiler.commits.$);
 
 	// console.log(commits, state);
@@ -72,8 +83,11 @@ export function Minimap() {
 		const canvas = ref.current;
 		if (!canvas) return;
 
-		const ctx = canvas.getContext("2d");
-		if (!ctx) return;
+		const ctx = setupCanvas(canvas);
+
+		renderTimeLegend(ctx, 20, "100xx");
+		renderTimeLegend(ctx, 80, "200xx");
+		renderTimeLegend(ctx, 120, "500xx");
 	}, [commits]);
 
 	return (
