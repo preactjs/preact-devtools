@@ -104,6 +104,10 @@ export function createProfiler(): ProfilerState {
 	const commits = signal<CommitData[]>([]);
 	const isSupported = signal(false);
 
+	// Session
+	// const sessionStart = valoo(-1);
+	// const sessionEnd = valoo(-1);
+
 	// Render Reasons
 	const supportsRenderReasons = signal(false);
 	const renderReasons = signal<Map<ID, RenderReasonMap>>(new Map());
