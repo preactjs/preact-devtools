@@ -1,5 +1,5 @@
 import { h } from "preact";
-import { useObserver, useStore } from "../../store/react-bindings";
+import { useStore } from "../../store/react-bindings";
 import { useEffect, useState, useRef, useCallback } from "preact/hooks";
 import { getLastChild } from "../tree/windowing";
 import { useKeyListNav } from "../tree/keyboard";
@@ -24,8 +24,8 @@ const highlightNode = debounce(
 
 export function TreeView() {
 	const store = useStore();
-	const nodeList = useObserver(() => store.nodeList.$);
-	const roots = useObserver(() => store.roots.$);
+	const nodeList = store.nodeList.$;
+	const roots = store.roots.$;
 	const { collapseNode, collapsed } = useCollapser();
 	const { selected, selectNext, selectPrev } = useSelection();
 
@@ -175,10 +175,10 @@ export function TreeItem(props: { key: any; id: ID; top: number }) {
 	const store = useStore();
 	const as = useSelection();
 	const { collapsed, toggle } = useCollapser();
-	const node = useObserver(() => store.nodes.$.get(id) || null);
-	const filterRoot = useObserver(() => store.filter.filterRoot.$);
-	const filterHoc = useObserver(() => store.filter.filterHoc.$);
-	const roots = useObserver(() => store.roots.$);
+	const node = store.nodes.$.get(id) || null;
+	const filterRoot = store.filter.filterRoot.$;
+	const filterHoc = store.filter.filterHoc.$;
+	const roots = store.roots.$;
 	const onToggle = () => toggle(id);
 	const ref = useRef<HTMLDivElement>(null);
 
@@ -279,13 +279,13 @@ export function Arrow() {
 
 export function HighlightPane(props: { treeDom: HTMLDivElement | null }) {
 	const store = useStore();
-	const nodes = useObserver(() => store.nodes.$);
+	const nodes = store.nodes.$;
 	const { selected } = useSelection();
 	const { collapsed } = useCollapser();
 
 	// Subscribe to nodeList so that we rerender whenever nodes
 	// are collapsed
-	const list = useObserver(() => store.nodeList.$);
+	const list = store.nodeList.$;
 
 	const [pos, setPos] = useState({ top: 0, height: 0 });
 	useEffect(() => {

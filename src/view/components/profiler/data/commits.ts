@@ -1,5 +1,5 @@
 import { ID, DevNode } from "../../../store/types";
-import { Observable, valoo, watch } from "../../../valoo";
+import { computed, Observable, valoo } from "../../../preact-signals";
 import { getRoot } from "../flamegraph/FlamegraphStore";
 import {
 	RenderReasonMap,
@@ -28,6 +28,7 @@ export interface CommitData {
  */
 export enum FlamegraphType {
 	FLAMEGRAPH = "FLAMEGRAPH",
+	TIMELINE = "TIMELINE",
 	RANKED = "RANKED",
 }
 
@@ -101,62 +102,51 @@ export function getCommitInitalSelectNodeId(
  */
 export function createProfiler(): ProfilerState {
 	const commits = valoo<CommitData[]>([]);
+	commits.name = "commits";
 	const isSupported = valoo(false);
+	isSupported.name = "isSupported";
 
 	// Render Reasons
 	const supportsRenderReasons = valoo(false);
+	supportsRenderReasons.name = "supportsRenderReasons";
 	const renderReasons = valoo<Map<ID, RenderReasonMap>>(new Map());
+	renderReasons.name = "renderReasons";
 	const captureRenderReasons = valoo(false);
+	captureRenderReasons.name = "captureRenderReasons";
 	const setRenderReasonCapture = (v: boolean) => {
 		captureRenderReasons.$ = v;
 	};
 
 	// Highlight updates
 	const showUpdates = valoo(false);
+	showUpdates.name = "showUpdates";
 
 	// Selection
 	const activeCommitIdx = valoo(0);
+	activeCommitIdx.name = "activeCommitIdx";
 	const selectedNodeId = valoo(0);
-	const activeCommit = watch(() => {
+	selectedNodeId.name = "selectedNodeId";
+	const activeCommit = computed(() => {
+		if (isRecording.$) return null;
 		return (commits.$.length > 0 && commits.$[activeCommitIdx.$]) || null;
 	});
-	const selectedNode = watch(() => {
+	activeCommit.name = "activeCommit";
+	const selectedNode = computed(() => {
 		return activeCommit.$ != null
 			? activeCommit.$.nodes.get(selectedNodeId.$) || null
 			: null;
 	});
+	selectedNode.name = "selectedNode";
 
 	// Flamegraph
 	const flamegraphType = valoo(FlamegraphType.FLAMEGRAPH);
-	flamegraphType.on(() => {
-		selectedNodeId.$ = activeCommit.$
-			? getCommitInitalSelectNodeId(activeCommit.$, flamegraphType.$)
-			: -1;
-	});
 
 	// Recording
 	const isRecording = valoo(false);
-	isRecording.on(v => {
-		// Clear current selection and profiling data when
-		// a new recording starts.
-		if (v) {
-			commits.$ = [];
-			activeCommitIdx.$ = 0;
-			selectedNodeId.$ = 0;
-		} else {
-			// Reset selection when recording stopped
-			// and new profiling data was collected.
-			if (commits.$.length > 0) {
-				selectedNodeId.$ = getCommitInitalSelectNodeId(
-					commits.$[0],
-					flamegraphType.$,
-				);
-			}
-		}
-	});
+	isRecording.name = "isRecording";
 
 	// Render reasons
-	const activeReason = watch(() => {
+	const activeReason = computed(() => {
 		if (activeCommit.$ !== null) {
 			const commitId = activeCommit.$.commitRootId;
 			const reason = renderReasons.$.get(commitId);
@@ -167,9 +157,10 @@ export function createProfiler(): ProfilerState {
 
 		return null;
 	});
+	activeReason.name = "activeReason";
 
 	// FlamegraphNode
-	const flamegraphNodes = watch<Map<ID, NodeTransform>>(() => {
+	const flamegraphNodes = computed<Map<ID, NodeTransform>>(() => {
 		const commit = activeCommit.$;
 		if (!commit || flamegraphType.$ !== FlamegraphType.FLAMEGRAPH) {
 			return new Map();
@@ -183,8 +174,9 @@ export function createProfiler(): ProfilerState {
 
 		return patchTree(commit);
 	});
+	flamegraphNodes.name = "flamegraphNodes";
 
-	const rankedNodes = watch<NodeTransform[]>(() => {
+	const rankedNodes = computed<NodeTransform[]>(() => {
 		const commit = activeCommit.$;
 		if (!commit || flamegraphType.$ !== FlamegraphType.RANKED) {
 			return [];
@@ -192,6 +184,7 @@ export function createProfiler(): ProfilerState {
 
 		return toTransform(commit);
 	});
+	rankedNodes.name = "rankedNodes";
 
 	return {
 		supportsRenderReasons,
@@ -215,10 +208,26 @@ export function createProfiler(): ProfilerState {
 	};
 }
 
+export function startProfiling(state: ProfilerState) {
+	state.isRecording.$ = true;
+	state.commits.$ = [];
+	state.activeCommitIdx.$ = 0;
+	state.selectedNodeId.$ = 0;
+}
+
 export function stopProfiling(state: ProfilerState) {
 	state.isRecording.$ = false;
 	state.activeCommitIdx.$ = 0;
-	state.selectedNodeId.$ = -1;
+	// Reset selection when recording stopped
+	// and new profiling data was collected.
+	if (state.commits.$.length > 0) {
+		state.selectedNodeId.$ = getCommitInitalSelectNodeId(
+			state.commits.$[0],
+			state.flamegraphType.$,
+		);
+	} else {
+		state.selectedNodeId.$ = -1;
+	}
 }
 
 export function resetProfiler(state: ProfilerState) {
@@ -293,8 +302,9 @@ export function recordProfilerCommit(
 	// console.log(JSON.stringify(Array.from(nodes.values())));
 	// console.groupEnd();
 
-	profiler.commits.update(arr => {
-		arr.push({
+	profiler.commits.value = [
+		...profiler.commits.value,
+		{
 			rootId: getRoot(tree, commitRootId),
 			commitRootId: commitRootId,
 			rendered,
@@ -302,6 +312,6 @@ export function recordProfilerCommit(
 			maxSelfDuration,
 			duration: totalCommitDuration,
 			selfDurations,
-		});
-	});
+		},
+	];
 }

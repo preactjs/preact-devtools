@@ -34,6 +34,7 @@ export interface InspectData {
 	hooks: PropData[] | null;
 	props: Record<string, any> | null;
 	state: Record<string, any> | null;
+	signals: null;
 	canSuspend: boolean;
 	/** Only Suspense components have this */
 	suspended: boolean;

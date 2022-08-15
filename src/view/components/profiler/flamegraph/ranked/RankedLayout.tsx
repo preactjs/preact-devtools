@@ -5,7 +5,7 @@ import { CommitData } from "../../data/commits";
 import { ID, DevNode } from "../../../../store/types";
 import { FlameNode } from "../FlameNode";
 import { formatTime } from "../../util";
-import { useObserver, useStore } from "../../../../store/react-bindings";
+import { useStore } from "../../../../store/react-bindings";
 import { HocLabels } from "../../../elements/TreeView";
 import { useVirtualizedList } from "../../../elements/VirtualizedList";
 import { NodeTransform } from "../shared";
@@ -36,8 +36,8 @@ export function RankedLayout({
 }: RankedLayoutProps) {
 	// Convert node tree to position data
 	const store = useStore();
-	const data = useObserver(() => store.profiler.rankedNodes.$);
-	const filterHoc = useObserver(() => store.filter.filterHoc.$);
+	const data = store.profiler.rankedNodes.$;
+	const filterHoc = store.filter.filterHoc.$;
 
 	const placed = useMemo(
 		() => placeRanked(commit.selfDurations, data, selected, canvasWidth),

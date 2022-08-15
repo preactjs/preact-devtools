@@ -1,4 +1,4 @@
-import { valoo, watch } from "../valoo";
+import { valoo, computed, watch } from "../preact-signals";
 import { createSearchStore } from "./search";
 import { createFilterStore } from "./filter";
 import { flattenChildren } from "../components/tree/windowing";
@@ -18,19 +18,24 @@ export function createStore(): Store {
 	};
 
 	const debugMode = valoo(!!process.env.DEBUG);
+	debugMode.name = "debugMode";
 
 	const nodes = valoo<Map<ID, DevNode>>(new Map());
+	nodes.name = "nodes";
 	const roots = valoo<ID[]>([]);
+	roots.name = "roots";
 
 	// Toggle
 	const isPicking = valoo<boolean>(false);
+	isPicking.name = "isPicking";
 	const filterState = createFilterStore(notify);
 
 	// List
 	const collapsed = valoo(new Set<ID>());
+	collapsed.name = "collapsed";
 	const collapser = createCollapser<ID>(collapsed);
 
-	const nodeList = watch(() => {
+	const nodeList = computed(() => {
 		return roots.$.map(root => {
 			const items = flattenChildren<ID, DevNode>(nodes.$, root, id =>
 				collapser.collapsed.$.has(id),
@@ -43,6 +48,7 @@ export function createStore(): Store {
 			return items;
 		}).reduce((acc, val) => acc.concat(val), []);
 	});
+	nodeList.name = "nodeList";
 
 	// Sidebar
 	const sidebar = {
@@ -62,9 +68,23 @@ export function createStore(): Store {
 			uncollapsed: valoo<string[]>([]),
 			items: valoo<PropData[]>([]),
 		},
+		signals: {
+			uncollapsed: valoo<string[]>([]),
+			items: valoo<PropData[]>([]),
+		},
 	};
 
+	sidebar.props.uncollapsed.name = "sidebar.props.uncollapsed";
+	sidebar.props.items.name = "sidebar.props.items";
+	sidebar.state.uncollapsed.name = "sidebar.state.uncollapsed";
+	sidebar.state.items.name = "sidebar.state.items";
+	sidebar.context.uncollapsed.name = "sidebar.context.uncollapsed";
+	sidebar.context.items.name = "sidebar.context.items";
+	sidebar.hooks.uncollapsed.name = "sidebar.hooks.uncollapsed";
+	sidebar.hooks.items.name = "sidebar.hooks.items";
+
 	const inspectData = valoo<InspectData | null>(null);
+	inspectData.name = "inspectData";
 
 	watch(() => {
 		const data = inspectData.$ ? inspectData.$.props : null;
@@ -83,6 +103,7 @@ export function createStore(): Store {
 	});
 
 	const supportsHooks = valoo(false);
+	supportsHooks.name = "supportsHooks";
 	watch(() => {
 		if (supportsHooks) {
 			const items =
@@ -96,17 +117,23 @@ export function createStore(): Store {
 
 	const selection = createSelectionStore(nodeList);
 	const stats = valoo(null);
+	stats.name = "stats";
+
+	const activePanel = valoo(Panel.ELEMENTS);
+	activePanel.name = "activePanel";
+	const isRecording = valoo(false);
+	isRecording.name = "isRecording";
 
 	return {
 		supports: {
 			hooks: supportsHooks,
 		},
 		stats: {
-			isRecording: valoo(false),
+			isRecording,
 			data: stats,
 		},
 		debugMode,
-		activePanel: valoo(Panel.ELEMENTS),
+		activePanel,
 		profiler: createProfiler(),
 		notify,
 		nodeList,

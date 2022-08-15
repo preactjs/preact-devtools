@@ -1,5 +1,6 @@
 import {
 	clickNestedText,
+	clickSelector,
 	clickTestId,
 	getText,
 	waitForTestId,
@@ -22,7 +23,11 @@ export async function run(config: any) {
 	await clickTab(devtools, "PROFILER");
 
 	await clickRecordButton(devtools);
-	await click(page, "button");
+	await clickSelector(page, "button", {
+		async retryUntil() {
+			return await page.$eval("p", el => el.textContent === "I am foo");
+		},
+	});
 	await clickRecordButton(devtools);
 
 	await waitForSelector(
@@ -48,7 +53,11 @@ export async function run(config: any) {
 
 	await clickTab(devtools, "PROFILER");
 	await clickRecordButton(devtools);
-	await click(page, "button");
+	await clickSelector(page, "button", {
+		async retryUntil() {
+			return await page.$eval("p", el => el.textContent === "forward");
+		},
+	});
 	await clickRecordButton(devtools);
 
 	await waitForSelector(

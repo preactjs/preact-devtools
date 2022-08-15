@@ -1,5 +1,5 @@
 import { Fragment, h } from "preact";
-import { useStore, useObserver } from "../../../store/react-bindings";
+import { useStore } from "../../../store/react-bindings";
 import { useRef, useCallback, useState, useEffect } from "preact/hooks";
 import { FlamegraphType } from "../data/commits";
 import { useResize } from "../../utils";
@@ -19,11 +19,11 @@ export function FlameGraph() {
 	const store = useStore();
 	const [canvasWidth, setCanvasWidth] = useState(-1);
 
-	const displayType = useObserver(() => store.profiler.flamegraphType.$);
-	const selected = useObserver(() => store.profiler.selectedNode.$ || EMPTY);
-	const commit = useObserver(() => store.profiler.activeCommit.$);
-	const isRecording = useObserver(() => store.profiler.isRecording.$);
-	const showDebug = useObserver(() => store.debugMode.$);
+	const displayType = store.profiler.flamegraphType.$;
+	const selected = store.profiler.selectedNode.$ || EMPTY;
+	const commit = store.profiler.activeCommit.$;
+	const isRecording = store.profiler.isRecording.$;
+	const showDebug = store.debugMode.$;
 
 	const ref = useRef<HTMLDivElement>(null);
 	useEffect(() => {

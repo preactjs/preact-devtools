@@ -11,6 +11,9 @@ export default defineConfig({
 	optimizeDeps: {
 		exclude: ["preact"],
 	},
+	resolve: {
+		extensions: [".ts", ".tsx", ".js", ".jsx", ".d.ts"],
+	},
 	plugins: [
 		{
 			name: "preact:config",

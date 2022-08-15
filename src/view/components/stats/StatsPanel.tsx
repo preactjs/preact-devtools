@@ -1,5 +1,5 @@
 import { h, Fragment } from "preact";
-import { useObserver, useStore } from "../../store/react-bindings";
+import { useStore } from "../../store/react-bindings";
 import s from "./StatsPanel.module.css";
 import { SingleLayout } from "../SidebarLayout";
 import { Actions } from "../Actions";
@@ -14,7 +14,7 @@ import { Icon } from "../icons";
 
 export function StatsRecordBtn() {
 	const store = useStore();
-	const isRecording = useObserver(() => store.stats.isRecording.$);
+	const isRecording = store.stats.isRecording.$;
 
 	const onClick = useCallback(() => {
 		const { isRecording } = store.stats;
@@ -44,8 +44,8 @@ export function StatsRecordBtn() {
 
 export function StatsPanel() {
 	const store = useStore();
-	const stats = useObserver(() => store.stats.data.$);
-	const isRecording = useObserver(() => store.stats.isRecording.$);
+	const stats = store.stats.data.$;
+	const isRecording = store.stats.isRecording.$;
 	const onReloadAndRecordStats = useCallback(() => {
 		store.stats.isRecording.$ = true;
 		store.emit("reload-and-record-stats", null);

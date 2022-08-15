@@ -8,6 +8,7 @@ import { PageHookName, DevtoolsToClient } from "../../constants";
 
 export function setupFrontendStore(ctx: Window) {
 	const store = createStore();
+	window.store = store;
 
 	function handleClientEvents(e: MessageEvent) {
 		if (

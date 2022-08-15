@@ -71,6 +71,7 @@ export function inspectVNode<T extends SharedVNode>(
 		name: bindings.getDisplayName(vnode, config),
 		props,
 		state,
+		signals: null,
 		// TODO: We're not using this information anywhere yet
 		type: getDevtoolsType(vnode, bindings),
 		suspended,

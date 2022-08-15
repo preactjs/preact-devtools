@@ -1,4 +1,4 @@
-import { Observable } from "../valoo";
+import { Observable } from "../preact-signals";
 import { InspectData } from "../../adapter/adapter/adapter";
 import { createSearchStore } from "./search";
 import { createFilterStore } from "./filter";
@@ -53,6 +53,7 @@ export enum Panel {
 	ELEMENTS = "ELEMENTS",
 	PROFILER = "PROFILER",
 	SETTINGS = "SETTINGS",
+	SIGNALS = "SIGNALS",
 	STATISTICS = "STATISTICS",
 }
 
@@ -94,6 +95,10 @@ export interface Store {
 			items: Observable<PropData[]>;
 		};
 		hooks: {
+			uncollapsed: Observable<string[]>;
+			items: Observable<PropData[]>;
+		};
+		signals: {
 			uncollapsed: Observable<string[]>;
 			items: Observable<PropData[]>;
 		};

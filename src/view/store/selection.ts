@@ -1,5 +1,5 @@
-import { AppCtx, useObserver } from "./react-bindings";
-import { valoo, Observable } from "../valoo";
+import { AppCtx } from "./react-bindings";
+import { valoo, Observable } from "../preact-signals";
 import { clamp } from "../components/tree/windowing";
 import { useContext } from "preact/hooks";
 import { ID } from "./types";
@@ -9,7 +9,9 @@ import { ID } from "./types";
  */
 export function createSelectionStore(list: Observable<ID[]>) {
 	const selected = valoo<ID>(list.$.length > 0 ? list.$[0] : -1);
+	selected.name = "selected";
 	const selectedIdx = valoo(0);
+	selectedIdx.name = "selectedIdx";
 
 	const selectByIndex = (idx: number) => {
 		const n = clamp(idx, list.$.length - 1);
@@ -37,8 +39,8 @@ export function createSelectionStore(list: Observable<ID[]>) {
 
 export function useSelection() {
 	const sel = useContext(AppCtx).selection;
-	const selected = useObserver(() => sel.selected.$);
-	const selectedIdx = useObserver(() => sel.selectedIdx.$);
+	const selected = sel.selected.$;
+	const selectedIdx = sel.selectedIdx.$;
 	return {
 		selected,
 		selectedIdx,

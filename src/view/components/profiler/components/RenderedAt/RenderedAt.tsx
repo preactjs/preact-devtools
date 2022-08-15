@@ -1,13 +1,14 @@
 import { Fragment, h } from "preact";
-import { useStore, useObserver } from "../../../../store/react-bindings";
+import { useComputed } from "../../../../preact-signals";
+import { useStore } from "../../../../store/react-bindings";
 import { SidebarPanel, Empty } from "../../../sidebar/SidebarPanel";
 import { formatTime } from "../../util";
 
 export function RenderedAt() {
 	const store = useStore();
-	const commit = useObserver(() => store.profiler.activeCommit.$);
-	const selected = useObserver(() => store.profiler.selectedNodeId.$);
-	const data = useObserver(() => {
+	const commit = store.profiler.activeCommit.$;
+	const selected = store.profiler.selectedNodeId.$;
+	const data = useComputed(() => {
 		const id = store.profiler.selectedNodeId.$;
 
 		return store.profiler.commits.$.reduce<
@@ -22,9 +23,9 @@ export function RenderedAt() {
 			});
 			return acc;
 		}, []);
-	});
+	}).value;
 
-	const commitIdx = useObserver(() => store.profiler.activeCommitIdx.$);
+	const commitIdx = store.profiler.activeCommitIdx.$;
 
 	if (commit === null) return null;
 

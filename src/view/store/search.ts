@@ -1,5 +1,5 @@
-import { Observable, valoo } from "../valoo";
-import { useStore, useObserver } from "./react-bindings";
+import { Observable, valoo } from "../preact-signals";
+import { useStore } from "./react-bindings";
 import { escapeStringRegexp } from "./utils";
 import { ID, DevNode } from "./types";
 
@@ -93,13 +93,13 @@ export function createSearchStore(
 
 export function useSearch() {
 	const { search: s } = useStore();
-	const match = useObserver(() => s.match.$);
-	const value = useObserver(() => s.value.$);
-	const marked = useObserver(() => s.selected.$);
-	const regex = useObserver(() => s.regex.$);
-	const count = useObserver(() => s.count.$);
-	const selected = useObserver(() => s.selected.$);
-	const selectedId = useObserver(() => s.match.$[s.selected.$]);
+	const match = s.match.$;
+	const value = s.value.$;
+	const marked = s.selected.$;
+	const regex = s.regex.$;
+	const count = s.count.$;
+	const selected = s.selected.$;
+	const selectedId = s.match.$[s.selected.$];
 	return {
 		count,
 		selected,

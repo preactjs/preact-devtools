@@ -129,6 +129,6 @@ export function applyOperationsV1(store: Store, data: number[]) {
 		}
 	}
 
-	store.roots.update();
+	store.roots.$ = [...store.roots.$];
 	store.nodes.$ = nodes;
 }

@@ -1,10 +1,5 @@
 import { h, Fragment } from "preact";
-import {
-	AppCtx,
-	EmitCtx,
-	WindowCtx,
-	useObserver,
-} from "../store/react-bindings";
+import { AppCtx, EmitCtx, WindowCtx } from "../store/react-bindings";
 import { Store, Panel } from "../store/types";
 import { Elements } from "./elements/Elements";
 import { Profiler } from "./profiler/components/Profiler";
@@ -14,13 +9,15 @@ import s from "./Devtools.module.css";
 import { ThemeSwitcher } from "./ThemeSwitcher";
 import { Settings } from "./settings/Settings";
 import { StatsPanel } from "./stats/StatsPanel";
+import { SignalsPage } from "./signals/SignalsPage";
 
 export function DevTools(props: { store: Store; window: Window }) {
-	const panel = useObserver(() => props.store.activePanel.$);
+	const panel = props.store.activePanel.$;
 
 	const showElements = panel === Panel.ELEMENTS;
 	const showProfiler = panel === Panel.PROFILER;
 	const showSettings = panel === Panel.SETTINGS;
+	const showSignals = panel === Panel.SIGNALS;
 	const showStats = panel === Panel.STATISTICS;
 
 	return (
@@ -39,6 +36,14 @@ export function DevTools(props: { store: Store; window: Window }) {
 										value={Panel.ELEMENTS}
 									>
 										Elements
+									</SmallTab>
+									<SmallTab
+										onClick={() => (props.store.activePanel.$ = Panel.SIGNALS)}
+										checked={showSignals}
+										name="root-panel"
+										value={Panel.SIGNALS}
+									>
+										Signals
 									</SmallTab>
 									<SmallTab
 										onClick={() => (props.store.activePanel.$ = Panel.PROFILER)}
@@ -79,6 +84,7 @@ export function DevTools(props: { store: Store; window: Window }) {
 							{showElements && <Elements />}
 							{showProfiler && <Profiler />}
 							{showStats && <StatsPanel />}
+							{showSignals && <SignalsPage />}
 							{showSettings && <Settings />}
 						</div>
 					</Fragment>

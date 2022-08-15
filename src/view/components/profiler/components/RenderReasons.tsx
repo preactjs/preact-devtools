@@ -3,6 +3,7 @@ import { SidebarPanel, Empty } from "../../sidebar/SidebarPanel";
 import { useStore, useObserver } from "../../../store/react-bindings";
 import { RenderReason } from "../../../../adapter/shared/renderReasons";
 import { Message, MessageBtn } from "../../Message/Message";
+import { startProfiling } from "../data/commits";
 
 function getReasonName(reason: RenderReason) {
 	switch (reason) {
@@ -25,15 +26,13 @@ function getReasonName(reason: RenderReason) {
 
 export function RenderReasons() {
 	const store = useStore();
-	const isRecording = useObserver(() => store.profiler.isRecording.$);
-	const commits = useObserver(() => store.profiler.commits.$);
-	const reason = useObserver(() => store.profiler.activeReason.$);
-	const commit = useObserver(() => store.profiler.activeCommit.$);
-	const selected = useObserver(() => store.profiler.selectedNode.$);
-	const isSupported = useObserver(() => store.profiler.supportsRenderReasons.$);
-	const captureReason = useObserver(
-		() => store.profiler.captureRenderReasons.$,
-	);
+	const isRecording = store.profiler.isRecording.$;
+	const commits = store.profiler.commits.$;
+	const reason = store.profiler.activeReason.$;
+	const commit = store.profiler.activeCommit.$;
+	const selected = store.profiler.selectedNode.$;
+	const isSupported = store.profiler.supportsRenderReasons.$;
+	const captureReason = store.profiler.captureRenderReasons.$;
 
 	if (commits.length === 0 || isRecording) {
 		return null;
@@ -71,7 +70,7 @@ export function RenderReasons() {
 							onClick={() => {
 								const value = !captureReason;
 								store.profiler.setRenderReasonCapture(value);
-								store.profiler.isRecording.$ = true;
+								startProfiling(store.profiler);
 								store.emit("start-profiling", {
 									captureRenderReasons: value,
 								});

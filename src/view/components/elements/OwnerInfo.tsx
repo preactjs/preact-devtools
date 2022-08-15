@@ -1,13 +1,14 @@
 import { h } from "preact";
-import { useObserver, useStore } from "../../store/react-bindings";
+import { useStore } from "../../store/react-bindings";
+import { useComputed } from "../../preact-signals";
 import { DevNode } from "../../store/types";
 import { SidebarPanel } from "../sidebar/SidebarPanel";
 
 export function OwnerInfo() {
 	const store = useStore();
 
-	const selectedId = useObserver(() => store.selection.selected.$);
-	const data = useObserver(() => {
+	const selectedId = store.selection.selected.$;
+	const data = useComputed(() => {
 		const owners: DevNode[] = [];
 		const selectedId = store.selection.selected.$;
 
@@ -33,8 +34,8 @@ export function OwnerInfo() {
 	return (
 		<SidebarPanel title="Rendered by">
 			<nav data-testid="owners">
-				{data.length === 0 && <p>-</p>}
-				{data.map(node => {
+				{data.$.length === 0 && <p>-</p>}
+				{data.$.map(node => {
 					return (
 						<button
 							key={node.id}

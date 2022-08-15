@@ -1,5 +1,5 @@
 import { h, Fragment } from "preact";
-import { useObserver, useStore } from "../../store/react-bindings";
+import { useStore } from "../../store/react-bindings";
 import { PropsPanel } from "./inspect/PropsPanel";
 import { serializeProps } from "./inspect/serializeProps";
 import { DebugTreeStats } from "./DebugTreeStats";
@@ -7,19 +7,21 @@ import { DebugNodeNavTree } from "./DebugNodeNavTree";
 import { OwnerInfo } from "./../elements/OwnerInfo";
 import { KeyPanel } from "./KeyPanel";
 import { HocPanel } from "./HocPanel";
+import { useComputed } from "../../preact-signals";
+import { SignalPanel } from "./inspect/SignalPanel";
 
 export function Sidebar() {
 	const store = useStore();
-	const showDebug = useObserver(() => store.debugMode.$);
-	const inspect = useObserver(() => store.inspectData.$);
-	const hocs = useObserver(() => {
+	const showDebug = store.debugMode.$;
+	const inspect = store.inspectData.$;
+	const hocs = useComputed(() => {
 		if (store.inspectData.$) {
 			const node = store.nodes.$.get(store.inspectData.$.id);
 			return node ? node.hocs : null;
 		}
 		return null;
-	});
-	const { props: propData, state, context, hooks } = store.sidebar;
+	}).value;
+	const { props: propData, state, context, hooks, signals } = store.sidebar;
 	const { emit } = store;
 
 	return (
@@ -41,6 +43,9 @@ export function Sidebar() {
 				onCopy={() => inspect && emit("copy", serializeProps(inspect.props))}
 				canAddNew
 			/>
+			{inspect && inspect.signals !== null && (
+				<SignalPanel items={signals.items} uncollapsed={signals.uncollapsed} />
+			)}
 			{inspect && inspect.hooks !== null && (
 				<PropsPanel
 					label="Hooks"

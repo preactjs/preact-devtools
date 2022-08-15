@@ -1,10 +1,6 @@
 import { h, Fragment } from "preact";
 import { Actions } from "../../Actions";
-import {
-	useStore,
-	useObserver,
-	useEmitter,
-} from "../../../store/react-bindings";
+import { useStore, useEmitter } from "../../../store/react-bindings";
 import { ComponentName } from "../../ComponentName";
 import { useCallback } from "preact/hooks";
 import { IconBtn } from "../../IconBtn";
@@ -13,7 +9,7 @@ import { Icon } from "../../icons";
 
 export function SidebarHeader() {
 	const store = useStore();
-	const selected = useObserver(() => store.profiler.selectedNode.$);
+	const selected = store.profiler.selectedNode.$;
 	const emit = useEmitter();
 	const log = useCallback(() => {
 		if (selected) emit("log", { id: selected.id, children: selected.children });

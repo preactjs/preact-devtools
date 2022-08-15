@@ -1,5 +1,5 @@
 import { h } from "preact";
-import { useStore, useObserver } from "../../store/react-bindings";
+import { useStore } from "../../store/react-bindings";
 import { useCallback } from "preact/hooks";
 import { Theme } from "../../store/types";
 import { RadioBar } from "../RadioBar";
@@ -9,12 +9,11 @@ import { PageLayout } from "../SidebarLayout";
 
 export function Settings() {
 	const store = useStore();
-	const theme = useObserver(() => store.theme.$);
-	const renderReasons = useObserver(
-		() => store.profiler.captureRenderReasons.$,
-	);
-	const highlightUpdates = useObserver(() => store.profiler.highlightUpdates.$);
-	const debugMode = useObserver(() => store.debugMode.$);
+	const theme = store.theme.$;
+	const renderReasons = store.profiler.captureRenderReasons.$;
+
+	const highlightUpdates = store.profiler.highlightUpdates.$;
+	const debugMode = store.debugMode.$;
 
 	const setTheme = useCallback((v: Theme) => (store.theme.$ = v), []);
 

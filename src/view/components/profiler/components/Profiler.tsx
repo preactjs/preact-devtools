@@ -10,14 +10,14 @@ import { CommitInfo } from "./CommitInfo/CommitInfo";
 import { RenderReasons } from "./RenderReasons";
 import { DebugProfilerInfo } from "./CommitInfo/DebugInfo";
 import { DebugNodeNav } from "./RenderedAt/DebugNodeNav";
-import { useStore, useObserver } from "../../../store/react-bindings";
+import { useStore } from "../../../store/react-bindings";
 import { SidebarLayout } from "../../SidebarLayout";
 import { Message, MessageBtn } from "../../Message/Message";
 
 export function Profiler() {
 	const store = useStore();
-	const showDebug = useObserver(() => store.debugMode.$);
-	const statsRecording = useObserver(() => store.stats.isRecording.$);
+	const showDebug = store.debugMode.$;
+	const statsRecording = store.stats.isRecording.$;
 
 	return (
 		<SidebarLayout>
