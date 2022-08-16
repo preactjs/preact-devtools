@@ -1,6 +1,7 @@
 import { newTestPage, waitForSelector } from "../test-utils";
 import { expect } from "chai";
 import { Page } from "puppeteer";
+import { clickSelector } from "pentf/browser_utils";
 
 async function getTreeItems(page: Page) {
 	return await page.evaluate(() => {
@@ -33,7 +34,11 @@ export async function run(config: any) {
 	]);
 
 	// Trigger update
-	await page.click("button");
+	await clickSelector(page, "button", {
+		async retryUntil() {
+			return await page.$eval("p", el => el.textContent === "I am foo");
+		},
+	});
 
 	items = await getTreeItems(devtools);
 	expect(items).to.deep.equal([
