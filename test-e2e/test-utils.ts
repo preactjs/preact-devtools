@@ -73,7 +73,7 @@ export async function newTestPage(
 
 			preactVersion = parsed;
 		} else {
-			preactVersion = versions[0];
+			preactVersion = versions.find(v => !v.includes("-"));
 		}
 	}
 
