@@ -2,7 +2,7 @@ import { h, Fragment, render, Component } from "preact";
 import { memo, forwardRef } from "preact/compat";
 
 function Foo() {
-	return <div>I am foo</div>;
+	return <p>I am foo</p>;
 }
 const MemoFoo = memo(Foo);
 
@@ -12,9 +12,9 @@ function Wrapped(props) {
 
 const Forward = forwardRef(function Bar(props, ref) {
 	return (
-		<div {...props} ref={ref}>
+		<p {...props} ref={ref}>
 			forward
-		</div>
+		</p>
 	);
 });
 
