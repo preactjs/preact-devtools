@@ -1,4 +1,4 @@
-import { PreactBindings, SharedVNode } from "./bindings";
+import type { PreactBindings, SharedVNode } from "./bindings";
 
 export function traverse<T extends SharedVNode>(
 	vnode: T,

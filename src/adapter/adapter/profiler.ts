@@ -1,4 +1,4 @@
-import { UpdateRects } from "./highlightUpdates";
+import type { UpdateRects } from "./highlightUpdates";
 
 export interface ProfilerState {
 	isProfiling: boolean;
