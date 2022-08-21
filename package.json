@@ -5,6 +5,16 @@
 	"main": "dist/preact-devtools.js",
 	"module": "dist/preact-devtools.module.js",
 	"types": "types/devtools.d.ts",
+	"exports": {
+		".": {
+			"types": "./dist/inline/setup.d.ts",
+			"import": "./dist/inline/setup.js"
+		},
+		"./client": {
+			"types": "./dist/inline/installHook.d.ts",
+			"import": "./dist/inline/installHook.js"
+		}
+	},
 	"scripts": {
 		"build": "rimraf dist/ && rollup -c && cross-env node tools/build-inline.js && cpy dist/inline/setup.css dist/preact-devtools.css && rimraf dist/inline",
 		"build:chrome:fast": "rimraf dist/chrome/ dist/chrome.zip && cross-env BROWSER=chrome rollup -c && cross-env BROWSER=chrome node tools/build.js",
@@ -91,7 +101,7 @@
 	},
 	"files": [
 		"types/",
-		"dist/preact*",
+		"dist/inline/",
 		"README.md",
 		"LICENSE"
 	],

@@ -7,6 +7,7 @@ import commonjs from "@rollup/plugin-commonjs";
 import replace from "@rollup/plugin-replace";
 import alias from "@rollup/plugin-alias";
 import path from "path";
+import fs from "fs";
 
 const BROWSERS = ["chrome", "edge", "firefox", "inline"].filter(x => {
 	if (process.env.BROWSER) {
@@ -24,14 +25,29 @@ const entries = BROWSERS.map(browser => {
 		browser === "test" ? `test-e2e/fixtures/extension` : `dist/${browser}`;
 
 	if (browser === "inline" || browser === "test") {
+		const pkg = fs.readFileSync(path.join(__dirname, "package.json"), "utf-8");
+		const pkgJson = JSON.parse(pkg);
+		const external =
+			browser === "inline"
+				? Array.from(
+						new Set([
+							"preact/hooks", // Not sure why we need this
+							...Object.keys(pkgJson.dependencies),
+							...Object.keys(pkgJson.peerDependencies),
+						]),
+				  )
+				: [];
+
 		return [
 			{
 				dist: `${dist}/setup.js`,
 				entry: "src/shells/inline/index.ts",
+				external,
 			},
 			{
 				dist: `${dist}/installHook.js`,
 				entry: "src/shells/shared/installHook.ts",
+				external,
 			},
 		];
 	}
@@ -85,7 +101,7 @@ export default entries.map(data => ({
 	output: {
 		file: data.dist,
 		name: camelCase(path.basename(data.dist, path.extname(data.dist))),
-		format: "iife",
+		format: BROWSERS.length === 1 && BROWSERS[0] === "inline" ? "es" : "iife",
 	},
 	external: data.external || [],
 	plugins: [
@@ -132,7 +148,10 @@ export default entries.map(data => ({
 		resolve(),
 		commonjs(),
 		replace({
-			"process.env.DEBUG": process.env.DEBUG === "true",
+			preventAssignment: true,
+			values: {
+				"process.env.DEBUG": process.env.DEBUG === "true",
+			},
 		}),
 		data.copy &&
 			copy({

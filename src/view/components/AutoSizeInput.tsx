@@ -14,7 +14,7 @@ const sizerStyle = {
 	visibility: "hidden",
 	height: 0,
 	whiteSpace: "pre",
-};
+} as const;
 
 export interface Props {
 	value?: string;
