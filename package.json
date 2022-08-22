@@ -48,7 +48,7 @@
 		"@babel/plugin-syntax-typescript": "^7.18.6",
 		"@babel/plugin-transform-react-jsx": "^7.18.10",
 		"@parcel/css": "^1.12.2",
-		"@preact/preset-vite": "^2.0.0",
+		"@preact/preset-vite": "^2.3.0",
 		"@testing-library/preact": "^2.0.0",
 		"@types/archiver": "^5.3.1",
 		"@types/babel__core": "^7.1.19",
