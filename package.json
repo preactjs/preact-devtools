@@ -18,6 +18,7 @@
 	"scripts": {
 		"type-check": "tsc --noEmit",
 		"prebuild": "yarn type-check",
+		"prepublishOnly": "yarn run build:inline",
 		"build": "node tools/build.mjs --browser chrome,edge,firefox,inline",
 		"build:chrome": "node tools/build.mjs --browser chrome",
 		"build:edge": "node tools/build.mjs --browser edge",
@@ -91,7 +92,7 @@
 	},
 	"files": [
 		"types/",
-		"dist/preact*",
+		"dist/inline/",
 		"README.md",
 		"LICENSE"
 	],
