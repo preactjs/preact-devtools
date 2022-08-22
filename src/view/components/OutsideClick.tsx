@@ -9,7 +9,7 @@ export interface Props {
 }
 
 export function OutsideClick(props: Props) {
-	const ref = useRef<HTMLDivElement>();
+	const ref = useRef<HTMLDivElement>(null);
 
 	useEffect(() => {
 		if (!ref.current) return;

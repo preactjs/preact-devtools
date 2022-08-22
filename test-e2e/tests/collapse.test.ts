@@ -66,6 +66,8 @@ export async function run(config: any) {
 	await waitForSelector(devtools, '[data-testid="record-btn"]');
 	await clickTab(devtools, "ELEMENTS");
 
+	await waitFor(async () => (await devtools.$$(row)).length > 0);
+
 	// Our input should still be visible
 	expect((await devtools.$$(row)).length > 0).to.equal(true);
 	expect((await devtools.$$(selector)).length).to.equal(0);

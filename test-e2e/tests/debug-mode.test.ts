@@ -3,7 +3,9 @@ import { expect } from "chai";
 import {
 	assertNotTestId,
 	clickNestedText,
+	clickSelector,
 	getAttribute,
+	getText,
 	waitForTestId,
 } from "pentf/browser_utils";
 import { waitForPass } from "pentf/assert_utils";
@@ -26,8 +28,18 @@ export async function run(config: any) {
 	// Start profiling
 	await clickTab(devtools, "PROFILER");
 	await clickRecordButton(devtools);
-	await click(page, "button");
-	await click(page, "button");
+	await clickSelector(page, "button", {
+		async retryUntil() {
+			const target = '[data-testid="result"]';
+			return (await getText(page, target)) === "Counter: 1";
+		},
+	});
+	await clickSelector(page, "button", {
+		async retryUntil() {
+			const target = '[data-testid="result"]';
+			return (await getText(page, target)) === "Counter: 2";
+		},
+	});
 	await clickRecordButton(devtools);
 	await clickNestedText(devtools, "Counter");
 

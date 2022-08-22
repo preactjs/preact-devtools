@@ -4,7 +4,7 @@ import { useResize } from "../utils";
 import s from "./CanvasHighlight.module.css";
 
 export function CanvasHighlight() {
-	const ref = useRef<HTMLCanvasElement>();
+	const ref = useRef<HTMLCanvasElement>(null);
 
 	useResize(() => {
 		if (ref.current) {

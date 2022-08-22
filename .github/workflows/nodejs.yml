@@ -16,7 +16,7 @@ jobs:
           yarn
           yarn lint
           yarn test
-          yarn build:chrome:fast
+          yarn build:chrome
           PREACT_VERSION=10 yarn test-e2e --repeat-flaky 3
         env:
           CI: true

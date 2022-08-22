@@ -10,7 +10,7 @@ import { waitFor } from "pentf/assert_utils";
 
 	try {
 		await fetch("http://localhost:8100", {});
-	} catch (err) {
+	} catch (err: any) {
 		if (/ECONNREFUSED/.test(err.message)) {
 			// eslint-disable-next-line no-console
 			console.log(`No server running at http://localhost:8100/ Starting...`);
@@ -24,10 +24,9 @@ import { waitFor } from "pentf/assert_utils";
 			child.stderr!.on("data", data => output.push(data.toString()));
 
 			try {
-				await waitFor(
-					() => output.some(line => /dev server running at/.test(line)),
-					{ timeout: 2000 },
-				);
+				await waitFor(() => output.some(line => /ready in/.test(line)), {
+					timeout: 2000,
+				});
 			} catch (err) {
 				// eslint-disable-next-line no-console
 				console.log(output);

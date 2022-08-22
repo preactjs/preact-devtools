@@ -84,10 +84,10 @@ export function CommitTimeline(props: CommitTimelineProps) {
 	const [paneWidth, setPaneWidth] = useState(0);
 	const [offset, setOffset] = useState(0);
 
-	const container = useRef<HTMLDivElement>();
-	const inner = useRef<HTMLDivElement>();
-	const pane = useRef<HTMLDivElement>();
-	const paneContainerRef = useRef<HTMLDivElement>();
+	const container = useRef<HTMLDivElement>(null);
+	const inner = useRef<HTMLDivElement>(null);
+	const pane = useRef<HTMLDivElement>(null);
+	const paneContainerRef = useRef<HTMLDivElement>(null);
 
 	useEffect(() => {
 		if (pane.current) {

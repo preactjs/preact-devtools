@@ -1,9 +1,12 @@
-const fetch = require("node-fetch").default;
-const util = require("util");
-const fs = require("fs");
-const path = require("path");
-const kl = require("kolorist");
-const { pipeline } = require("stream");
+import fetch from "node-fetch";
+import * as util from "util";
+import fs from "fs";
+import path from "path";
+import * as kl from "kolorist";
+import { pipeline } from "stream";
+import { fileURLToPath } from "url";
+
+const __dirname = path.dirname(fileURLToPath(import.meta.url));
 const streamPipeline = util.promisify(pipeline);
 
 /* eslint-disable no-console */

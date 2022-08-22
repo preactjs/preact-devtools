@@ -52,7 +52,7 @@ export type Icon =
 export function Icon({ icon }: { icon: Icon }) {
 	return (
 		<svg class="svg-icon">
-			<use xlinkHref={`#${icon}`} />
+			<use xlinkHref={`#preact-devtools-${icon}`} />
 		</svg>
 	);
 }
