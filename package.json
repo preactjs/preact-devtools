@@ -72,7 +72,7 @@
 		"lint-staged": "^10.4.0",
 		"mochette": "^1.0.1",
 		"mri": "^1.2.0",
-		"node-fetch": "^3.2.10",
+		"node-fetch": "^2.6.1",
 		"pentf": "^3.3.10",
 		"preact": "^10.10.6",
 		"prettier": "^2.1.2",

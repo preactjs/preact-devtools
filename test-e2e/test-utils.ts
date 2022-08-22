@@ -31,7 +31,7 @@ export async function waitForSelector(
 			found = await page.evaluate(selector => {
 				return !!document.querySelector(selector);
 			}, selector);
-		} catch (err) {
+		} catch (err: any) {
 			errored = true;
 			if (!ignoreError(err)) {
 				throw err;
@@ -179,7 +179,7 @@ export async function typeText(page: Page, selector: string, text: string) {
 			}
 			await input.click({ clickCount: 3 });
 			break;
-		} catch (err) {
+		} catch (err: any) {
 			if (/Node is detached from document/.test(err.message)) {
 				continue;
 			}
