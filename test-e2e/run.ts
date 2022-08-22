@@ -10,7 +10,7 @@ import { waitFor } from "pentf/assert_utils";
 
 	try {
 		await fetch("http://localhost:8100", {});
-	} catch (err) {
+	} catch (err: any) {
 		if (/ECONNREFUSED/.test(err.message)) {
 			// eslint-disable-next-line no-console
 			console.log(`No server running at http://localhost:8100/ Starting...`);
