@@ -91,8 +91,8 @@ async function initDevtools() {
 	}
 
 	// Render our application
-	const root = window.document.getElementById("root")!;
-	render(h(DevTools, { store, window }), root);
+	const container = window.document.getElementById("preact-devtools-root")!;
+	render(h(DevTools, { store, window }), container);
 }
 
 // Send messages from devtools to the content script

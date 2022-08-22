@@ -1,12 +1,13 @@
 import * as esbuild from "esbuild";
 import path from "path";
+import fs from "fs/promises";
 import {
 	aliasPlugin,
 	archivePlugin,
 	babelPlugin,
 	copyPlugin,
 	cssModules,
-	inlinePlugin,
+	inlineHookPlugin,
 	renamePlugin,
 	spritePlugin,
 	gitSourcePlugin,
@@ -86,20 +87,42 @@ async function build(browser) {
 
 	await fsExtra.remove(dist);
 
+	const isInline = browser === "inline";
+	/** @type {string[] | undefined} */
+	let external;
+	if (isInline) {
+		const raw = await fs.readFile(path.join(__dirname, "..", "package.json"));
+		const json = JSON.parse(raw);
+
+		external = Array.from(
+			new Set([
+				...Object.keys(json.peerDependencies),
+				...Object.keys(json.dependencies),
+			]),
+		);
+	}
+
 	await esbuild.build({
 		bundle: true,
 		sourcemap: false,
 		outdir: dist,
 		watch: args.watch,
+		format: isInline ? "esm" : "iife",
 		define: {
 			"process.env.DEBUG": DEBUG,
 		},
-		entryPoints: {
-			"panel/panel": "src/shells/shared/panel/panel.ts",
-			"background/background": "src/shells/shared/background/background.ts",
-			"content-script": "src/shells/shared/content-script.ts",
-			installHook: "src/shells/shared/installHook.ts",
-		},
+		external,
+		entryPoints: isInline
+			? {
+					"panel/panel": "src/shells/shared/panel/panel.ts",
+					client: "src/shells/shared/installHook.ts",
+			  }
+			: {
+					"panel/panel": "src/shells/shared/panel/panel.ts",
+					"background/background": "src/shells/shared/background/background.ts",
+					"content-script": "src/shells/shared/content-script.ts",
+					installHook: "src/shells/shared/installHook.ts",
+			  },
 		plugins: [
 			DEBUG
 				? aliasPlugin({
@@ -109,24 +132,41 @@ async function build(browser) {
 				: undefined,
 			cssModules(),
 			babelPlugin(),
-			copyPlugin({
-				[`src/shells/${browser}/manifest.json`]: dist,
-				"src/shells/shared/panel/empty-panel.html": path.join(dist, "panel"),
-				"src/shells/shared/panel/panel.html": path.join(dist, "panel"),
-				"src/shells/shared/icons": dist,
-				"src/shells/shared/popup/enabled.html": path.join(dist, "popup"),
-				"src/shells/shared/popup/disabled.html": path.join(dist, "popup"),
-			}),
-			renamePlugin({
-				[`${dist}/installHook.css`]: `${dist}/preact-devtools-page.css`,
-			}),
-			inlinePlugin(dist),
+			copyPlugin(
+				isInline
+					? {
+							"src/shells/shared/panel/panel.html": path.join(dist, "panel"),
+							"src/view/sprite.svg": path.join(dist, "panel"),
+					  }
+					: {
+							[`src/shells/${browser}/manifest.json`]: dist,
+							"src/shells/shared/panel/empty-panel.html": path.join(
+								dist,
+								"panel",
+							),
+							"src/shells/shared/panel/panel.html": path.join(dist, "panel"),
+							"src/shells/shared/icons": dist,
+							"src/shells/shared/popup/enabled.html": path.join(dist, "popup"),
+							"src/shells/shared/popup/disabled.html": path.join(dist, "popup"),
+					  },
+			),
+			!isInline &&
+				renamePlugin({
+					[`${dist}/installHook.css`]: `${dist}/preact-devtools-page.css`,
+				}),
+			!isInline && inlineHookPlugin(dist),
+
 			spritePlugin(
 				path.join(__dirname, "..", "src", "view", "sprite.svg"),
-				dist,
+				isInline
+					? [path.join(dist, "panel", "panel.html")]
+					: [
+							path.join(dist, "panel", "panel.html"),
+							path.join(dist, "panel", "empty-panel.html"),
+					  ],
 			),
-			archivePlugin("dist", browser),
-			gitSourcePlugin(),
+			!isInline && archivePlugin("dist", browser),
+			!isInline && gitSourcePlugin(),
 		].filter(Boolean),
 	});
 

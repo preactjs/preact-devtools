@@ -6,7 +6,8 @@
 		"target": "ES2020",
 		"strict": true,
 		"jsx": "preserve",
-		"jsxFactory": "h"
+		"jsxFactory": "h",
+		"skipLibCheck": true
 	},
 	"include": ["./src/global.d.ts", "./src"]
 }

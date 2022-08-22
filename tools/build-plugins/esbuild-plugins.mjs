@@ -86,20 +86,15 @@ export function renamePlugin(mapping) {
 
 /**
  * @param {string} svgPath
- * @param {string} dir
+ * @param {string[]} files
  * @returns {import("esbuild").Plugin}
  */
-export function spritePlugin(svgPath, dir) {
+export function spritePlugin(svgPath, files) {
 	return {
 		name: "sprite-plugin",
 		setup(build) {
 			build.onEnd(async args => {
 				if (args.errors.length) return;
-
-				const files = [
-					path.join(dir, "panel", "empty-panel.html"),
-					path.join(dir, "panel", "panel.html"),
-				];
 
 				const svg = await fs.readFile(svgPath, "utf-8");
 
@@ -122,9 +117,9 @@ export function spritePlugin(svgPath, dir) {
  * @param {string} dir
  * @returns {import("esbuild").Plugin}
  */
-export function inlinePlugin(dir) {
+export function inlineHookPlugin(dir) {
 	return {
-		name: "inline-plugin",
+		name: "inline-hook-plugin",
 		setup(build) {
 			build.onEnd(async args => {
 				if (args.errors.length) return;

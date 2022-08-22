@@ -49,7 +49,7 @@ export function DataInput({
 		}
 	}, [value]);
 
-	const ref = useRef<HTMLInputElement>();
+	const ref = useRef<HTMLInputElement>(null);
 
 	useMemo(() => {
 		if (ref.current) {

@@ -1,0 +1,13 @@
+{
+	"extends": "./tsconfig.json",
+	"compilerOptions": {
+		"emitDeclarationOnly": true,
+		"declaration": true,
+		"declarationDir": "dist/inline/types/"
+	},
+	"files": [
+		"src/shells/shared/panel/panel.ts",
+		"src/shells/shared/installHook.ts"
+	],
+	"include": ["./src/global.d.ts", "./src"]
+}
