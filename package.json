@@ -28,7 +28,7 @@
 		"archive": "git archive --format zip --output dist/source-code.zip main",
 		"lint": "eslint 'src/**/*.{ts,tsx}' 'test-e2e/**/*.ts'",
 		"test": "mochette -c tsconfig.cjs.json 'src/**/*.test.{ts,tsx}'",
-		"test-e2e": "node tools/fetch-preact-versions.js && cross-env TS_NODE_PROJECT=tsconfig.cjs.json ts-node test-e2e/run.ts --default-timeout 5000",
+		"test-e2e": "node tools/fetch-preact-versions.mjs && cross-env TS_NODE_PROJECT=tsconfig.cjs.json ts-node test-e2e/run.ts --default-timeout 5000",
 		"test-e2e:10": "PREACT_VERSION=10 npm run test-e2e",
 		"test-e2e:all": "npm run test-e2e && npm run test-e2e:10",
 		"dev": "npm run dev:serve",
