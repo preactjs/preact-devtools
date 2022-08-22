@@ -166,7 +166,7 @@ async function build(browser) {
 					  ],
 			),
 			!isInline && archivePlugin("dist", browser),
-			!isInline && gitSourcePlugin(),
+			!isInline && !process.env.CI && gitSourcePlugin(),
 		].filter(Boolean),
 	});
 
