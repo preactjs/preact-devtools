@@ -180,7 +180,7 @@ export function TreeItem(props: { key: any; id: ID; top: number }) {
 	const filterHoc = useObserver(() => store.filter.filterHoc.$);
 	const roots = useObserver(() => store.roots.$);
 	const onToggle = () => toggle(id);
-	const ref = useRef<HTMLDivElement>();
+	const ref = useRef<HTMLDivElement>(null);
 
 	if (!node) return null;
 

@@ -1,11 +1,12 @@
 import { DevtoolsHook } from "./hook";
-import { Options, Fragment } from "preact";
+import { Options, Fragment, Component } from "preact";
 
 export async function init(options: Options, getHook: () => DevtoolsHook) {
 	const hook = getHook();
 	if (hook.attachPreact) {
-		return hook.attachPreact("10.0.5", options, {
-			Fragment,
+		return hook.attachPreact("10.10.6", options, {
+			Fragment: Fragment as any,
+			Component: Component as any,
 		});
 	} else {
 		// eslint-disable-next-line no-console

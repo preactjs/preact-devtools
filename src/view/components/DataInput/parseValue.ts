@@ -27,7 +27,7 @@ export function parseValue(v: string) {
 	} else if (/^\{.*\}$/.test(v) || /^\[.*\]$/.test(v)) {
 		try {
 			return JSON.parse(v);
-		} catch (err) {
+		} catch (err: any) {
 			throw new TypeError(err.message);
 		}
 	}

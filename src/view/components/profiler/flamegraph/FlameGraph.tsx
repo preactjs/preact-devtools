@@ -25,7 +25,7 @@ export function FlameGraph() {
 	const isRecording = useObserver(() => store.profiler.isRecording.$);
 	const showDebug = useObserver(() => store.debugMode.$);
 
-	const ref = useRef<HTMLDivElement>();
+	const ref = useRef<HTMLDivElement>(null);
 	useEffect(() => {
 		if (ref.current) {
 			// Pad for potential rounding issues
