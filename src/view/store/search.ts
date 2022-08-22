@@ -1,6 +1,6 @@
 import { Observable, valoo } from "../valoo";
 import { useStore, useObserver } from "./react-bindings";
-import escapeRegex from "escape-string-regexp";
+import { escapeStringRegexp } from "./utils";
 import { ID, DevNode } from "./types";
 
 export function createRegex(s: string): RegExp {
@@ -15,7 +15,7 @@ export function createRegex(s: string): RegExp {
 			return new RegExp("");
 		}
 	}
-	return new RegExp(`(${escapeRegex(s)})`, "i");
+	return new RegExp(`(${escapeStringRegexp(s)})`, "i");
 }
 
 export function createSearchStore(
