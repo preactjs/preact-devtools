@@ -35,5 +35,5 @@ export function useObserver<T>(fn: () => T): T {
 		return () => dispose();
 	}, []);
 
-	return ref.current.$;
+	return ref.current.value;
 }

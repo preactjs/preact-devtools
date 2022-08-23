@@ -8,20 +8,20 @@ import { ID } from "./types";
  * Manages selection state of the TreeView.
  */
 export function createSelectionStore(list: Signal<ID[]>) {
-	const selected = signal<ID>(list.$.length > 0 ? list.$[0] : -1);
+	const selected = signal<ID>(list.value.length > 0 ? list.value[0] : -1);
 	const selectedIdx = signal(0);
 
 	const selectByIndex = (idx: number) => {
-		const n = clamp(idx, list.$.length - 1);
-		selected.$ = list.$[n];
-		selectedIdx.$ = n;
+		const n = clamp(idx, list.value.length - 1);
+		selected.value = list.value[n];
+		selectedIdx.value = n;
 	};
 
-	const selectNext = () => selectByIndex(selectedIdx.$ + 1);
-	const selectPrev = () => selectByIndex(selectedIdx.$ - 1);
+	const selectNext = () => selectByIndex(selectedIdx.value + 1);
+	const selectPrev = () => selectByIndex(selectedIdx.value - 1);
 
 	const selectById = (id: ID) => {
-		const idx = list.$.findIndex(x => x === id);
+		const idx = list.value.findIndex(x => x === id);
 		selectByIndex(idx);
 	};
 
@@ -37,8 +37,8 @@ export function createSelectionStore(list: Signal<ID[]>) {
 
 export function useSelection() {
 	const sel = useContext(AppCtx).selection;
-	const selected = useObserver(() => sel.selected.$);
-	const selectedIdx = useObserver(() => sel.selectedIdx.$);
+	const selected = useObserver(() => sel.selected.value);
+	const selectedIdx = useObserver(() => sel.selectedIdx.value);
 	return {
 		selected,
 		selectedIdx,

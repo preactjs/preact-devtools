@@ -4,7 +4,7 @@ import { useObserver, useStore } from "../store/react-bindings";
 
 export function ThemeSwitcher() {
 	const store = useStore();
-	let theme = useObserver(() => store.theme.$);
+	let theme = useObserver(() => store.theme.value);
 	if (theme === "auto") {
 		theme = matchMedia("(prefers-color-scheme: dark)").matches
 			? "dark"

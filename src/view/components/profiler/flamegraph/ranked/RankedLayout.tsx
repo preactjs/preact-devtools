@@ -36,8 +36,8 @@ export function RankedLayout({
 }: RankedLayoutProps) {
 	// Convert node tree to position data
 	const store = useStore();
-	const data = useObserver(() => store.profiler.rankedNodes.$);
-	const filterHoc = useObserver(() => store.filter.filterHoc.$);
+	const data = useObserver(() => store.profiler.rankedNodes.value);
+	const filterHoc = useObserver(() => store.filter.filterHoc.value);
 
 	const placed = useMemo(
 		() => placeRanked(commit.selfDurations, data, selected, canvasWidth),

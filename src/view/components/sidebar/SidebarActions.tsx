@@ -11,7 +11,7 @@ export function SidebarActions() {
 	const store = useStore();
 	const emit = useEmitter();
 	const node = useObserver(
-		() => store.nodes.$.get(store.selection.selected.$) || null,
+		() => store.nodes.value.get(store.selection.selected.value) || null,
 	);
 	const log = useCallback(() => {
 		if (node) emit("log", { id: node.id, children: node.children });
@@ -36,9 +36,9 @@ export function SidebarActions() {
 			suspended: false,
 		};
 
-		if (store.inspectData.$) {
-			state.canSuspend = store.inspectData.$.canSuspend;
-			state.suspended = store.inspectData.$.suspended;
+		if (store.inspectData.value) {
+			state.canSuspend = store.inspectData.value.canSuspend;
+			state.suspended = store.inspectData.value.suspended;
 		}
 
 		return state;

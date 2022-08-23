@@ -25,14 +25,16 @@ function getReasonName(reason: RenderReason) {
 
 export function RenderReasons() {
 	const store = useStore();
-	const isRecording = useObserver(() => store.profiler.isRecording.$);
-	const commits = useObserver(() => store.profiler.commits.$);
-	const reason = useObserver(() => store.profiler.activeReason.$);
-	const commit = useObserver(() => store.profiler.activeCommit.$);
-	const selected = useObserver(() => store.profiler.selectedNode.$);
-	const isSupported = useObserver(() => store.profiler.supportsRenderReasons.$);
+	const isRecording = useObserver(() => store.profiler.isRecording.value);
+	const commits = useObserver(() => store.profiler.commits.value);
+	const reason = useObserver(() => store.profiler.activeReason.value);
+	const commit = useObserver(() => store.profiler.activeCommit.value);
+	const selected = useObserver(() => store.profiler.selectedNode.value);
+	const isSupported = useObserver(
+		() => store.profiler.supportsRenderReasons.value,
+	);
 	const captureReason = useObserver(
-		() => store.profiler.captureRenderReasons.$,
+		() => store.profiler.captureRenderReasons.value,
 	);
 
 	if (commits.length === 0 || isRecording) {
@@ -71,7 +73,7 @@ export function RenderReasons() {
 							onClick={() => {
 								const value = !captureReason;
 								store.profiler.setRenderReasonCapture(value);
-								store.profiler.isRecording.$ = true;
+								store.profiler.isRecording.value = true;
 								store.emit("start-profiling", {
 									captureRenderReasons: value,
 								});

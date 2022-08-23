@@ -5,12 +5,12 @@ import { formatTime } from "../../util";
 
 export function RenderedAt() {
 	const store = useStore();
-	const commit = useObserver(() => store.profiler.activeCommit.$);
-	const selected = useObserver(() => store.profiler.selectedNodeId.$);
+	const commit = useObserver(() => store.profiler.activeCommit.value);
+	const selected = useObserver(() => store.profiler.selectedNodeId.value);
 	const data = useObserver(() => {
-		const id = store.profiler.selectedNodeId.$;
+		const id = store.profiler.selectedNodeId.value;
 
-		return store.profiler.commits.$.reduce<
+		return store.profiler.commits.value.reduce<
 			Array<{ index: number; selfDuration: number }>
 		>((acc, commit, i) => {
 			if (!commit.rendered.has(id)) return acc;
@@ -24,7 +24,7 @@ export function RenderedAt() {
 		}, []);
 	});
 
-	const commitIdx = useObserver(() => store.profiler.activeCommitIdx.$);
+	const commitIdx = useObserver(() => store.profiler.activeCommitIdx.value);
 
 	if (commit === null) return null;
 
@@ -38,7 +38,7 @@ export function RenderedAt() {
 						class="rendered-at-item"
 						data-active={selected === commit.commitRootId}
 						onClick={() =>
-							(store.profiler.selectedNodeId.$ = commit.commitRootId)
+							(store.profiler.selectedNodeId.value = commit.commitRootId)
 						}
 					>
 						<span>{commitRoot.name}</span>
@@ -59,7 +59,7 @@ export function RenderedAt() {
 										class="rendered-at-item"
 										data-active={commitIdx === node.index}
 										onClick={() =>
-											(store.profiler.activeCommitIdx.$ = node.index)
+											(store.profiler.activeCommitIdx.value = node.index)
 										}
 									>
 										<span>

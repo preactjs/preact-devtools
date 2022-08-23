@@ -6,10 +6,10 @@ describe("valoo", () => {
 	describe("primitive", () => {
 		it("should read and write values", () => {
 			const a = signal(2);
-			expect(a.$).to.eq(2);
+			expect(a.value).to.eq(2);
 
-			a.$ = 3;
-			expect(a.$).to.eq(3);
+			a.value = 3;
+			expect(a.value).to.eq(3);
 		});
 
 		it("should update mutable values", () => {
@@ -17,7 +17,7 @@ describe("valoo", () => {
 			a.update(v => {
 				v.push(2);
 			});
-			expect(a.$).to.deep.eq([1, 2]);
+			expect(a.value).to.deep.eq([1, 2]);
 		});
 
 		it("should update mutable values without arguments to update", () => {
@@ -25,12 +25,12 @@ describe("valoo", () => {
 			const spy = sinon.spy();
 			a.on(spy);
 
-			a.$.push(2);
+			a.value.push(2);
 			a.update();
 
 			expect(spy.callCount).to.eq(1);
 			expect(spy.args[0][0].length).to.eq(2);
-			expect(a.$).to.deep.eq([1, 2]);
+			expect(a.value).to.deep.eq([1, 2]);
 		});
 
 		it("should call listener", () => {
@@ -38,7 +38,7 @@ describe("valoo", () => {
 			const spy = sinon.spy();
 			a.on(spy);
 
-			a.$ = 2;
+			a.value = 2;
 			expect(spy.callCount).to.eq(1);
 			expect(spy.args[0]).to.deep.eq([2]);
 		});
@@ -48,9 +48,9 @@ describe("valoo", () => {
 			const spy = sinon.spy();
 			const disp = a.on(spy);
 
-			a.$ = 2;
+			a.value = 2;
 			disp();
-			a.$ = 3;
+			a.value = 3;
 
 			expect(spy.callCount).to.eq(1);
 		});
@@ -62,18 +62,18 @@ describe("valoo", () => {
 			const b = signal(2);
 			const spy = sinon.spy();
 
-			const c = watch(() => a.$ + b.$);
+			const c = watch(() => a.value + b.value);
 			c.on(spy);
 
-			expect(c.$).to.eq(3);
+			expect(c.value).to.eq(3);
 
-			a.$ = 2;
+			a.value = 2;
 			expect(spy.callCount).to.eq(1);
-			expect(c.$).to.eq(4);
+			expect(c.value).to.eq(4);
 
-			b.$ = 3;
+			b.value = 3;
 			expect(spy.callCount).to.eq(2);
-			expect(c.$).to.eq(5);
+			expect(c.value).to.eq(5);
 		});
 
 		it("should unsubscribe from dependencies", () => {
@@ -81,13 +81,13 @@ describe("valoo", () => {
 			const b = signal(2);
 			const spy = sinon.spy();
 
-			const c = watch(() => (a.$ > 2 ? a.$ : b.$));
+			const c = watch(() => (a.value > 2 ? a.value : b.value));
 			c.on(spy);
 
-			a.$ = 3;
+			a.value = 3;
 			expect(spy.callCount).to.eq(1);
 
-			b.$ = 3;
+			b.value = 3;
 			expect(spy.callCount).to.eq(1);
 		});
 
@@ -98,7 +98,7 @@ describe("valoo", () => {
 
 			const c = watch(() => {
 				a.update(v => {
-					v.push(b.$);
+					v.push(b.value);
 				});
 			});
 			c.on(spy);
@@ -115,7 +115,7 @@ describe("valoo", () => {
 			const spy = sinon.spy();
 
 			a.on(() => {
-				b.$ = a.$.length + 1;
+				b.value = a.value.length + 1;
 			});
 
 			watch(() => {

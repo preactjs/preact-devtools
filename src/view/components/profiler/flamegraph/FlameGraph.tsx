@@ -19,11 +19,13 @@ export function FlameGraph() {
 	const store = useStore();
 	const [canvasWidth, setCanvasWidth] = useState(-1);
 
-	const displayType = useObserver(() => store.profiler.flamegraphType.$);
-	const selected = useObserver(() => store.profiler.selectedNode.$ || EMPTY);
-	const commit = useObserver(() => store.profiler.activeCommit.$);
-	const isRecording = useObserver(() => store.profiler.isRecording.$);
-	const showDebug = useObserver(() => store.debugMode.$);
+	const displayType = useObserver(() => store.profiler.flamegraphType.value);
+	const selected = useObserver(
+		() => store.profiler.selectedNode.value || EMPTY,
+	);
+	const commit = useObserver(() => store.profiler.activeCommit.value);
+	const isRecording = useObserver(() => store.profiler.isRecording.value);
+	const showDebug = useObserver(() => store.debugMode.value);
 
 	const ref = useRef<HTMLDivElement>(null);
 	useEffect(() => {
@@ -45,7 +47,7 @@ export function FlameGraph() {
 
 	const onSelect = useCallback(
 		(id: number) => {
-			store.profiler.selectedNodeId.$ = id;
+			store.profiler.selectedNodeId.value = id;
 			store.selection.selectById(id);
 		},
 		[store],

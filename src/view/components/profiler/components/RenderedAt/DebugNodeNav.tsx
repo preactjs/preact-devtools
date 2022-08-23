@@ -5,10 +5,10 @@ import { DevNode } from "../../../../store/types";
 
 export function DebugNodeNav() {
 	const store = useStore();
-	const selected = useObserver(() => store.profiler.selectedNodeId.$);
-	const commit = useObserver(() => store.profiler.activeCommit.$);
+	const selected = useObserver(() => store.profiler.selectedNodeId.value);
+	const commit = useObserver(() => store.profiler.activeCommit.value);
 	const nodes = useObserver(() => {
-		const commit = store.profiler.activeCommit.$;
+		const commit = store.profiler.activeCommit.value;
 		if (!commit) return [];
 
 		const out: DevNode[] = [];
@@ -26,7 +26,7 @@ export function DebugNodeNav() {
 
 		return out;
 	});
-	const isRecording = useObserver(() => store.profiler.isRecording.$);
+	const isRecording = useObserver(() => store.profiler.isRecording.value);
 
 	if (isRecording) {
 		return null;
@@ -44,7 +44,7 @@ export function DebugNodeNav() {
 								key={node.id}
 								class="rendered-at-item"
 								data-active={selected === node.id}
-								onClick={() => (store.profiler.selectedNodeId.$ = node.id)}
+								onClick={() => (store.profiler.selectedNodeId.value = node.id)}
 							>
 								<span style="display: flex; justify-content: space-between; width: 100%">
 									<span>

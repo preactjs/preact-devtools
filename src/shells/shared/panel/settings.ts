@@ -25,11 +25,11 @@ export async function loadSettings(window: Window, store: Store) {
 
 		if (settings) {
 			if (["light", "dark", "auto"].includes(settings.theme)) {
-				store.theme.$ = settings.theme;
+				store.theme.value = settings.theme;
 			}
-			store.profiler.captureRenderReasons.$ = !!settings.captureRenderReasons;
-			store.profiler.highlightUpdates.$ = !!settings.highlightUpdates;
-			store.debugMode.$ = !!settings.debugMode;
+			store.profiler.captureRenderReasons.value = !!settings.captureRenderReasons;
+			store.profiler.highlightUpdates.value = !!settings.highlightUpdates;
+			store.debugMode.value = !!settings.debugMode;
 			if (settings.componentFilters) {
 				store.filter.restore(settings.componentFilters);
 			}

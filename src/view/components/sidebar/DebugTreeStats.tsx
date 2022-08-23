@@ -4,7 +4,7 @@ import { SidebarPanel } from "./SidebarPanel";
 
 export function DebugTreeStats() {
 	const store = useStore();
-	const nodeList = useObserver(() => store.nodeList.$);
+	const nodeList = useObserver(() => store.nodeList.value);
 
 	return (
 		<SidebarPanel title="Debug Tree Stats" testId="tree-debug-stats">

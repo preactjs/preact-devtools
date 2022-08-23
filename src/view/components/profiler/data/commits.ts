@@ -108,7 +108,7 @@ export function createProfiler(): ProfilerState {
 	const renderReasons = signal<Map<ID, RenderReasonMap>>(new Map());
 	const captureRenderReasons = signal(false);
 	const setRenderReasonCapture = (v: boolean) => {
-		captureRenderReasons.$ = v;
+		captureRenderReasons.value = v;
 	};
 
 	// Highlight updates
@@ -118,19 +118,21 @@ export function createProfiler(): ProfilerState {
 	const activeCommitIdx = signal(0);
 	const selectedNodeId = signal(0);
 	const activeCommit = watch(() => {
-		return (commits.$.length > 0 && commits.$[activeCommitIdx.$]) || null;
+		return (
+			(commits.value.length > 0 && commits.value[activeCommitIdx.value]) || null
+		);
 	});
 	const selectedNode = watch(() => {
-		return activeCommit.$ != null
-			? activeCommit.$.nodes.get(selectedNodeId.$) || null
+		return activeCommit.value != null
+			? activeCommit.value.nodes.get(selectedNodeId.value) || null
 			: null;
 	});
 
 	// Flamegraph
 	const flamegraphType = signal(FlamegraphType.FLAMEGRAPH);
 	flamegraphType.on(() => {
-		selectedNodeId.$ = activeCommit.$
-			? getCommitInitalSelectNodeId(activeCommit.$, flamegraphType.$)
+		selectedNodeId.value = activeCommit.value
+			? getCommitInitalSelectNodeId(activeCommit.value, flamegraphType.value)
 			: -1;
 	});
 
@@ -140,16 +142,16 @@ export function createProfiler(): ProfilerState {
 		// Clear current selection and profiling data when
 		// a new recording starts.
 		if (v) {
-			commits.$ = [];
-			activeCommitIdx.$ = 0;
-			selectedNodeId.$ = 0;
+			commits.value = [];
+			activeCommitIdx.value = 0;
+			selectedNodeId.value = 0;
 		} else {
 			// Reset selection when recording stopped
 			// and new profiling data was collected.
-			if (commits.$.length > 0) {
-				selectedNodeId.$ = getCommitInitalSelectNodeId(
-					commits.$[0],
-					flamegraphType.$,
+			if (commits.value.length > 0) {
+				selectedNodeId.value = getCommitInitalSelectNodeId(
+					commits.value[0],
+					flamegraphType.value,
 				);
 			}
 		}
@@ -157,11 +159,11 @@ export function createProfiler(): ProfilerState {
 
 	// Render reasons
 	const activeReason = watch(() => {
-		if (activeCommit.$ !== null) {
-			const commitId = activeCommit.$.commitRootId;
-			const reason = renderReasons.$.get(commitId);
+		if (activeCommit.value !== null) {
+			const commitId = activeCommit.value.commitRootId;
+			const reason = renderReasons.value.get(commitId);
 			if (reason) {
-				return reason.get(selectedNodeId.$) || null;
+				return reason.get(selectedNodeId.value) || null;
 			}
 		}
 
@@ -170,13 +172,13 @@ export function createProfiler(): ProfilerState {
 
 	// FlamegraphNode
 	const flamegraphNodes = watch<Map<ID, NodeTransform>>(() => {
-		const commit = activeCommit.$;
-		if (!commit || flamegraphType.$ !== FlamegraphType.FLAMEGRAPH) {
+		const commit = activeCommit.value;
+		if (!commit || flamegraphType.value !== FlamegraphType.FLAMEGRAPH) {
 			return new Map();
 		}
 
-		for (let i = activeCommitIdx.$ - 1; i >= 0; i--) {
-			if (i >= commits.$.length) {
+		for (let i = activeCommitIdx.value - 1; i >= 0; i--) {
+			if (i >= commits.value.length) {
 				return new Map();
 			}
 		}
@@ -185,8 +187,8 @@ export function createProfiler(): ProfilerState {
 	});
 
 	const rankedNodes = watch<NodeTransform[]>(() => {
-		const commit = activeCommit.$;
-		if (!commit || flamegraphType.$ !== FlamegraphType.RANKED) {
+		const commit = activeCommit.value;
+		if (!commit || flamegraphType.value !== FlamegraphType.RANKED) {
 			return [];
 		}
 
@@ -216,14 +218,14 @@ export function createProfiler(): ProfilerState {
 }
 
 export function stopProfiling(state: ProfilerState) {
-	state.isRecording.$ = false;
-	state.activeCommitIdx.$ = 0;
-	state.selectedNodeId.$ = -1;
+	state.isRecording.value = false;
+	state.activeCommitIdx.value = 0;
+	state.selectedNodeId.value = -1;
 }
 
 export function resetProfiler(state: ProfilerState) {
 	stopProfiling(state);
-	state.commits.$ = [];
+	state.commits.value = [];
 }
 
 export function recordProfilerCommit(
@@ -242,7 +244,7 @@ export function recordProfilerCommit(
 	const rootId = getRoot(tree, commitRootId);
 
 	// Find previous commit to copy over timing data later
-	const commits = profiler.commits.$;
+	const commits = profiler.commits.value;
 	let prevCommit: CommitData | undefined;
 	for (let i = commits.length - 1; i >= 0; i--) {
 		if (commits[i].rootId === rootId) {

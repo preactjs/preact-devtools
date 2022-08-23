@@ -19,10 +19,10 @@ export interface Props {
 
 export function PropsPanel(props: Props) {
 	const { label, onCopy, onChange, canAddNew } = props;
-	const uncollapsed = useObserver(() => props.uncollapsed.$);
-	const items = useObserver(() => props.items.$);
+	const uncollapsed = useObserver(() => props.uncollapsed.value);
+	const items = useObserver(() => props.items.value);
 	const store = useStore();
-	const isSupported = useObserver(() => store.supports.hooks.$);
+	const isSupported = useObserver(() => store.supports.hooks.value);
 
 	return (
 		<SidebarPanel title={label} onCopy={onCopy} testId={label}>
@@ -33,7 +33,7 @@ export function PropsPanel(props: Props) {
 						items={items}
 						onChange={onChange}
 						onCollapse={id => {
-							const idx = props.uncollapsed.$.indexOf(id);
+							const idx = props.uncollapsed.value.indexOf(id);
 							props.uncollapsed.update(v => {
 								idx > -1 ? v.splice(idx, 1) : v.push(id);
 							});

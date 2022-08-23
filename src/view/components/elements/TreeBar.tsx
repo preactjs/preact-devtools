@@ -10,7 +10,7 @@ import { OutsideClick } from "../OutsideClick";
 
 export function TreeBar() {
 	const store = useStore();
-	const isPicking = useObserver(() => store.isPicking.$);
+	const isPicking = useObserver(() => store.isPicking.value);
 	const { value, count, selected, goPrev, goNext } = useSearch();
 
 	const [filterVisible, setFilterVisible] = useState(false);
@@ -36,7 +36,7 @@ export function TreeBar() {
 					title="Pick a Component from the page"
 					testId="inspect-btn"
 					onClick={() => {
-						store.isPicking.$ = !isPicking;
+						store.isPicking.value = !isPicking;
 						store.notify(!isPicking ? "start-picker" : "stop-picker", null);
 					}}
 				>
@@ -135,13 +135,13 @@ function FilterCheck({
 
 export function FilterPopup() {
 	const store = useStore();
-	const [filterDom, setFilterDom] = useState(store.filter.filterDom.$);
+	const [filterDom, setFilterDom] = useState(store.filter.filterDom.value);
 	const [filterFragment, setFilterFragment] = useState(
-		store.filter.filterFragment.$,
+		store.filter.filterFragment.value,
 	);
-	const [filterHoc, setFilterHoc] = useState(store.filter.filterHoc.$);
-	const [filterRoot, setFilterRoot] = useState(store.filter.filterRoot.$);
-	const [filters, setFilters] = useState(store.filter.filters.$);
+	const [filterHoc, setFilterHoc] = useState(store.filter.filterHoc.value);
+	const [filterRoot, setFilterRoot] = useState(store.filter.filterRoot.value);
+	const [filters, setFilters] = useState(store.filter.filters.value);
 
 	return (
 		<div class={s.filter} data-testid="filter-popup">
@@ -149,12 +149,12 @@ export function FilterPopup() {
 				onSubmit={e => {
 					e.preventDefault();
 
-					store.filter.filterDom.$ = filterDom;
-					store.filter.filterFragment.$ = filterFragment;
-					store.filter.filterRoot.$ = filterRoot;
-					store.filter.filterHoc.$ = filterHoc;
+					store.filter.filterDom.value = filterDom;
+					store.filter.filterFragment.value = filterFragment;
+					store.filter.filterRoot.value = filterRoot;
+					store.filter.filterHoc.value = filterHoc;
 
-					store.filter.filters.$ = filters;
+					store.filter.filters.value = filters;
 
 					store.filter.submit();
 				}}

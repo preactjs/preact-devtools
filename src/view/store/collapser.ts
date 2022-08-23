@@ -18,7 +18,7 @@ export function createCollapser<T>(collapsed: Signal<Set<T>>): Collapser<T> {
 		});
 	};
 
-	const toggle = (id: T) => collapseNode(id, !collapsed.$.has(id));
+	const toggle = (id: T) => collapseNode(id, !collapsed.value.has(id));
 
 	return {
 		collapsed,
@@ -29,6 +29,6 @@ export function createCollapser<T>(collapsed: Signal<Set<T>>): Collapser<T> {
 
 export function useCollapser() {
 	const c = useContext(AppCtx).collapser;
-	const collapsed = useObserver(() => c.collapsed.$);
+	const collapsed = useObserver(() => c.collapsed.value);
 	return { collapsed, collapseNode: c.collapseNode, toggle: c.toggle };
 }

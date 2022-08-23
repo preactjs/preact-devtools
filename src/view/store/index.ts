@@ -31,17 +31,19 @@ export function createStore(): Store {
 	const collapser = createCollapser<ID>(collapsed);
 
 	const nodeList = watch(() => {
-		return roots.$.map(root => {
-			const items = flattenChildren<ID, DevNode>(nodes.$, root, id =>
-				collapser.collapsed.$.has(id),
-			);
+		return roots.value
+			.map(root => {
+				const items = flattenChildren<ID, DevNode>(nodes.value, root, id =>
+					collapser.collapsed.value.has(id),
+				);
 
-			if (filterState.filterRoot.$) {
-				return items.slice(1);
-			}
+				if (filterState.filterRoot.value) {
+					return items.slice(1);
+				}
 
-			return items;
-		}).reduce((acc, val) => acc.concat(val), []);
+				return items;
+			})
+			.reduce((acc, val) => acc.concat(val), []);
 	});
 
 	// Sidebar
@@ -67,18 +69,24 @@ export function createStore(): Store {
 	const inspectData = signal<InspectData | null>(null);
 
 	watch(() => {
-		const data = inspectData.$ ? inspectData.$.props : null;
-		sidebar.props.items.$ = parseObjectState(data, sidebar.props.uncollapsed.$);
-	});
-	watch(() => {
-		const data = inspectData.$ ? inspectData.$.state : null;
-		sidebar.state.items.$ = parseObjectState(data, sidebar.state.uncollapsed.$);
-	});
-	watch(() => {
-		const data = inspectData.$ ? inspectData.$.context : null;
-		sidebar.context.items.$ = parseObjectState(
+		const data = inspectData.value ? inspectData.value.props : null;
+		sidebar.props.items.value = parseObjectState(
 			data,
-			sidebar.context.uncollapsed.$,
+			sidebar.props.uncollapsed.value,
+		);
+	});
+	watch(() => {
+		const data = inspectData.value ? inspectData.value.state : null;
+		sidebar.state.items.value = parseObjectState(
+			data,
+			sidebar.state.uncollapsed.value,
+		);
+	});
+	watch(() => {
+		const data = inspectData.value ? inspectData.value.context : null;
+		sidebar.context.items.value = parseObjectState(
+			data,
+			sidebar.context.uncollapsed.value,
 		);
 	});
 
@@ -86,10 +94,12 @@ export function createStore(): Store {
 	watch(() => {
 		if (supportsHooks) {
 			const items =
-				inspectData.$ && inspectData.$.hooks ? inspectData.$.hooks : [];
-			sidebar.hooks.items.$ = filterCollapsed(
+				inspectData.value && inspectData.value.hooks
+					? inspectData.value.hooks
+					: [];
+			sidebar.hooks.items.value = filterCollapsed(
 				items,
-				sidebar.hooks.uncollapsed.$,
+				sidebar.hooks.uncollapsed.value,
 			).slice(1);
 		}
 	});
@@ -121,11 +131,11 @@ export function createStore(): Store {
 		theme: signal<Theme>("auto"),
 		sidebar,
 		clear() {
-			roots.$ = [];
-			nodes.$ = new Map();
-			selection.selected.$ = -1;
-			collapser.collapsed.$ = new Set();
-			stats.$ = null;
+			roots.value = [];
+			nodes.value = new Map();
+			selection.selected.value = -1;
+			collapser.collapsed.value = new Set();
+			stats.value = null;
 		},
 		subscribe(fn) {
 			const idx = listeners.push(fn);

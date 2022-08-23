@@ -16,7 +16,7 @@ import { Settings } from "./settings/Settings";
 import { StatsPanel } from "./stats/StatsPanel";
 
 export function DevTools(props: { store: Store; window: Window }) {
-	const panel = useObserver(() => props.store.activePanel.$);
+	const panel = useObserver(() => props.store.activePanel.value);
 
 	const showElements = panel === Panel.ELEMENTS;
 	const showProfiler = panel === Panel.PROFILER;
@@ -33,7 +33,9 @@ export function DevTools(props: { store: Store; window: Window }) {
 							<SmallTabGroup class={s.switcher}>
 								<div class={s.switcherInner}>
 									<SmallTab
-										onClick={() => (props.store.activePanel.$ = Panel.ELEMENTS)}
+										onClick={() =>
+											(props.store.activePanel.value = Panel.ELEMENTS)
+										}
 										checked={showElements}
 										name="root-panel"
 										value={Panel.ELEMENTS}
@@ -41,7 +43,9 @@ export function DevTools(props: { store: Store; window: Window }) {
 										Elements
 									</SmallTab>
 									<SmallTab
-										onClick={() => (props.store.activePanel.$ = Panel.PROFILER)}
+										onClick={() =>
+											(props.store.activePanel.value = Panel.PROFILER)
+										}
 										checked={showProfiler}
 										name="root-panel"
 										value={Panel.PROFILER}
@@ -50,7 +54,7 @@ export function DevTools(props: { store: Store; window: Window }) {
 									</SmallTab>
 									<SmallTab
 										onClick={() =>
-											(props.store.activePanel.$ = Panel.STATISTICS)
+											(props.store.activePanel.value = Panel.STATISTICS)
 										}
 										checked={showStats}
 										name="root-panel"
@@ -59,7 +63,9 @@ export function DevTools(props: { store: Store; window: Window }) {
 										Statistics
 									</SmallTab>
 									<SmallTab
-										onClick={() => (props.store.activePanel.$ = Panel.SETTINGS)}
+										onClick={() =>
+											(props.store.activePanel.value = Panel.SETTINGS)
+										}
 										checked={showSettings}
 										name="root-panel"
 										value={Panel.SETTINGS}

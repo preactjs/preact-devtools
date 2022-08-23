@@ -11,16 +11,18 @@ import { Icon } from "../../../icons";
 
 export function TimelineBar() {
 	const store = useStore();
-	const commits = useObserver(() => store.profiler.commits.$);
-	const isRecording = useObserver(() => store.profiler.isRecording.$);
-	const isSupported = useObserver(() => store.profiler.isSupported.$);
-	const selectedCommit = useObserver(() => store.profiler.activeCommitIdx.$);
+	const commits = useObserver(() => store.profiler.commits.value);
+	const isRecording = useObserver(() => store.profiler.isRecording.value);
+	const isSupported = useObserver(() => store.profiler.isSupported.value);
+	const selectedCommit = useObserver(
+		() => store.profiler.activeCommitIdx.value,
+	);
 	const stats = useObserver(() => {
 		return {
-			max: Math.max(16, ...store.profiler.commits.$.map(x => x.duration)),
+			max: Math.max(16, ...store.profiler.commits.value.map(x => x.duration)),
 			min: Math.max(
 				0,
-				Math.min(...store.profiler.commits.$.map(x => x.duration)),
+				Math.min(...store.profiler.commits.value.map(x => x.duration)),
 			),
 		};
 	});
@@ -34,19 +36,22 @@ export function TimelineBar() {
 				flamegraphType,
 			} = store.profiler;
 
-			activeCommitIdx.$ = n;
-			const commit = activeCommit.$;
+			activeCommitIdx.value = n;
+			const commit = activeCommit.value;
 			if (!commit) return;
 
-			selectedNodeId.$ = getCommitInitalSelectNodeId(commit, flamegraphType.$);
+			selectedNodeId.value = getCommitInitalSelectNodeId(
+				commit,
+				flamegraphType.value,
+			);
 		},
 		[store],
 	);
 
 	const onReloadAndProfile = useCallback(() => {
-		store.profiler.isRecording.$ = true;
+		store.profiler.isRecording.value = true;
 		store.emit("reload-and-profile", {
-			captureRenderReasons: store.profiler.captureRenderReasons.$,
+			captureRenderReasons: store.profiler.captureRenderReasons.value,
 		});
 	}, []);
 
@@ -100,17 +105,17 @@ export function TimelineBar() {
 
 export function RecordBtn() {
 	const store = useStore();
-	const isRecording = useObserver(() => store.profiler.isRecording.$);
-	const isSupported = useObserver(() => store.profiler.isSupported.$);
+	const isRecording = useObserver(() => store.profiler.isRecording.value);
+	const isSupported = useObserver(() => store.profiler.isSupported.value);
 
 	const onClick = useCallback(() => {
 		const { isRecording, captureRenderReasons } = store.profiler;
-		const v = !isRecording.$;
-		isRecording.$ = v;
+		const v = !isRecording.value;
+		isRecording.value = v;
 
 		if (v) {
 			store.emit("start-profiling", {
-				captureRenderReasons: captureRenderReasons.$,
+				captureRenderReasons: captureRenderReasons.value,
 			});
 		} else {
 			store.emit("stop-profiling", null);

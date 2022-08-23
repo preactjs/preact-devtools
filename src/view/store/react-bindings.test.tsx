@@ -9,14 +9,14 @@ describe("useObserver", () => {
 	it("should render on update", () => {
 		const v = signal(0);
 		const Foo = () => {
-			const x = useObserver(() => v.$);
+			const x = useObserver(() => v.value);
 			return <div>{x}</div>;
 		};
 		const { container } = renderTest(<Foo />);
 		expect(container.textContent).to.equal("0");
 
 		act(() => {
-			v.$ = 42;
+			v.value = 42;
 		});
 
 		expect(container.textContent).to.equal("42");
@@ -25,7 +25,7 @@ describe("useObserver", () => {
 	it("should render on complex value update", () => {
 		const v = signal([1]);
 		const Foo = () => {
-			const x = useObserver(() => v.$);
+			const x = useObserver(() => v.value);
 			return <div>{x.join(",")}</div>;
 		};
 		const { container } = renderTest(<Foo />);

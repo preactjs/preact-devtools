@@ -6,7 +6,7 @@ export interface SubscribeOptions {
 }
 
 export type Signal<T = any> = {
-	$: T;
+	value: T;
 	on(fn: (value: T) => void, options?: SubscribeOptions): Disposer;
 	update(fn?: (value: T) => T | void): T;
 	_disposers: Disposer[];
@@ -43,11 +43,11 @@ export function signal<T>(v: T): Signal<T> {
 	// Long story short: This is why we're using getters and setters now.
 	const cb: Array<((v: T) => void) | null> = [];
 	const obs: Signal = {
-		get $(): T {
+		get value(): T {
 			tracking.add(obs);
 			return v;
 		},
-		set $(c: T) {
+		set value(c: T) {
 			v = c;
 
 			// Be careful not to track any observables in callbacks
@@ -68,7 +68,7 @@ export function signal<T>(v: T): Signal<T> {
 		},
 		update(fn?: (v: T) => T | void) {
 			const res = fn ? fn(v) : undefined;
-			obs.$ = res !== undefined ? res : v;
+			obs.value = res !== undefined ? res : v;
 		},
 		_disposers: [],
 	};
@@ -96,7 +96,7 @@ export function watch<R>(fn: () => R): Signal<R> {
 		out._disposers = [];
 
 		// Call the actual function
-		out.$ = fn();
+		out.value = fn();
 
 		// Resubscribe to listeners
 		tracking.forEach(x => {

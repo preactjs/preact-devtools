@@ -9,7 +9,7 @@ import { DevNodeType } from "../../store/types";
 describe("TreeItem", () => {
 	it("should limit key length to 15", () => {
 		const store = createStore();
-		store.nodes.$.set(1, {
+		store.nodes.value.set(1, {
 			children: [],
 			depth: 1,
 			endTime: 0,
@@ -29,7 +29,7 @@ describe("TreeItem", () => {
 		);
 		expect(container.textContent).to.equal('foo key="abcdefghijklmno…",');
 
-		store.nodes.$.get(1)!.key = "foobar";
+		store.nodes.value.get(1)!.key = "foobar";
 		rerender(
 			<AppCtx.Provider value={store}>
 				<TreeItem id={1} key="" top={0} />,
