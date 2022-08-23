@@ -1,5 +1,5 @@
 import { ID, DevNode } from "../../../store/types";
-import { Observable, valoo, watch } from "../../../valoo";
+import { Signal, signal, watch } from "../../../valoo";
 import { getRoot } from "../flamegraph/FlamegraphStore";
 import {
 	RenderReasonMap,
@@ -35,40 +35,40 @@ export interface ProfilerState {
 	/**
 	 * Flag to indicate if profiling is supported by the attached renderer.
 	 */
-	isSupported: Observable<boolean>;
+	isSupported: Signal<boolean>;
 
 	// Render reasons
-	supportsRenderReasons: Observable<boolean>;
-	captureRenderReasons: Observable<boolean>;
+	supportsRenderReasons: Signal<boolean>;
+	captureRenderReasons: Signal<boolean>;
 	setRenderReasonCapture: (v: boolean) => void;
 
 	// Highlight updates
-	highlightUpdates: Observable<boolean>;
+	highlightUpdates: Signal<boolean>;
 
 	/**
 	 * Flag that indicates if we are currently
 	 * recording commits to be displayed in the
 	 * profiler.
 	 */
-	isRecording: Observable<boolean>;
-	commits: Observable<CommitData[]>;
+	isRecording: Signal<boolean>;
+	commits: Signal<CommitData[]>;
 
 	// Selection
-	activeCommitIdx: Observable<number>;
-	activeCommit: Observable<CommitData | null>;
-	selectedNodeId: Observable<ID>;
-	selectedNode: Observable<DevNode | null>;
+	activeCommitIdx: Signal<number>;
+	activeCommit: Signal<CommitData | null>;
+	selectedNodeId: Signal<ID>;
+	selectedNode: Signal<DevNode | null>;
 
 	// Render reasons
-	renderReasons: Observable<Map<ID, RenderReasonMap>>;
-	activeReason: Observable<RenderReasonData | null>;
+	renderReasons: Signal<Map<ID, RenderReasonMap>>;
+	activeReason: Signal<RenderReasonData | null>;
 
 	// View state
-	flamegraphType: Observable<FlamegraphType>;
+	flamegraphType: Signal<FlamegraphType>;
 
 	// Flamegraph mode
-	flamegraphNodes: Observable<Map<ID, NodeTransform>>;
-	rankedNodes: Observable<NodeTransform[]>;
+	flamegraphNodes: Signal<Map<ID, NodeTransform>>;
+	rankedNodes: Signal<NodeTransform[]>;
 }
 
 function getMaxSelfDurationNode(commit: CommitData) {
@@ -100,23 +100,23 @@ export function getCommitInitalSelectNodeId(
  * any methods, to not go down the OOP rabbit hole.
  */
 export function createProfiler(): ProfilerState {
-	const commits = valoo<CommitData[]>([]);
-	const isSupported = valoo(false);
+	const commits = signal<CommitData[]>([]);
+	const isSupported = signal(false);
 
 	// Render Reasons
-	const supportsRenderReasons = valoo(false);
-	const renderReasons = valoo<Map<ID, RenderReasonMap>>(new Map());
-	const captureRenderReasons = valoo(false);
+	const supportsRenderReasons = signal(false);
+	const renderReasons = signal<Map<ID, RenderReasonMap>>(new Map());
+	const captureRenderReasons = signal(false);
 	const setRenderReasonCapture = (v: boolean) => {
 		captureRenderReasons.$ = v;
 	};
 
 	// Highlight updates
-	const showUpdates = valoo(false);
+	const showUpdates = signal(false);
 
 	// Selection
-	const activeCommitIdx = valoo(0);
-	const selectedNodeId = valoo(0);
+	const activeCommitIdx = signal(0);
+	const selectedNodeId = signal(0);
 	const activeCommit = watch(() => {
 		return (commits.$.length > 0 && commits.$[activeCommitIdx.$]) || null;
 	});
@@ -127,7 +127,7 @@ export function createProfiler(): ProfilerState {
 	});
 
 	// Flamegraph
-	const flamegraphType = valoo(FlamegraphType.FLAMEGRAPH);
+	const flamegraphType = signal(FlamegraphType.FLAMEGRAPH);
 	flamegraphType.on(() => {
 		selectedNodeId.$ = activeCommit.$
 			? getCommitInitalSelectNodeId(activeCommit.$, flamegraphType.$)
@@ -135,7 +135,7 @@ export function createProfiler(): ProfilerState {
 	});
 
 	// Recording
-	const isRecording = valoo(false);
+	const isRecording = signal(false);
 	isRecording.on(v => {
 		// Clear current selection and profiling data when
 		// a new recording starts.

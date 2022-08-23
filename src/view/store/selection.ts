@@ -1,5 +1,5 @@
 import { AppCtx, useObserver } from "./react-bindings";
-import { valoo, Observable } from "../valoo";
+import { signal, Signal } from "../valoo";
 import { clamp } from "../components/tree/windowing";
 import { useContext } from "preact/hooks";
 import { ID } from "./types";
@@ -7,9 +7,9 @@ import { ID } from "./types";
 /**
  * Manages selection state of the TreeView.
  */
-export function createSelectionStore(list: Observable<ID[]>) {
-	const selected = valoo<ID>(list.$.length > 0 ? list.$[0] : -1);
-	const selectedIdx = valoo(0);
+export function createSelectionStore(list: Signal<ID[]>) {
+	const selected = signal<ID>(list.$.length > 0 ? list.$[0] : -1);
+	const selectedIdx = signal(0);
 
 	const selectByIndex = (idx: number) => {
 		const n = clamp(idx, list.$.length - 1);

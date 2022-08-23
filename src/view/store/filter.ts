@@ -1,4 +1,4 @@
-import { valoo } from "../valoo";
+import { signal } from "../valoo";
 import { escapeStringRegexp } from "./utils";
 import { RawFilterState, TypeFilterValue } from "../../adapter/adapter/filter";
 
@@ -18,11 +18,11 @@ export function createFilterStore(
 		regex: [] as RawFilter[],
 	};
 
-	const filters = valoo<RawFilter[]>(defaults.regex);
-	const filterFragment = valoo(defaults.fragment);
-	const filterDom = valoo(defaults.dom);
-	const filterHoc = valoo(defaults.hoc);
-	const filterRoot = valoo(defaults.root);
+	const filters = signal<RawFilter[]>(defaults.regex);
+	const filterFragment = signal(defaults.fragment);
+	const filterDom = signal(defaults.dom);
+	const filterHoc = signal(defaults.hoc);
+	const filterRoot = signal(defaults.root);
 
 	const submit = () => {
 		const s: RawFilterState = {

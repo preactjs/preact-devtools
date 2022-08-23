@@ -5,7 +5,7 @@ export interface SubscribeOptions {
 	init?: boolean;
 }
 
-export type Observable<T = any> = {
+export type Signal<T = any> = {
 	$: T;
 	on(fn: (value: T) => void, options?: SubscribeOptions): Disposer;
 	update(fn?: (value: T) => T | void): T;
@@ -15,14 +15,14 @@ export type Observable<T = any> = {
 /**
  * We'll use this variable to track used dependencies
  */
-let tracking = new Set<Observable>();
+let tracking = new Set<Signal>();
 
-const dummy = new Set<Observable>();
+const dummy = new Set<Signal>();
 
 /**
  * Base observable primitive.
  */
-export function valoo<T>(v: T): Observable<T> {
+export function signal<T>(v: T): Signal<T> {
 	// In an earlier version we used a function to read and write values:
 	//
 	//   read: foo()
@@ -42,7 +42,7 @@ export function valoo<T>(v: T): Observable<T> {
 	//
 	// Long story short: This is why we're using getters and setters now.
 	const cb: Array<((v: T) => void) | null> = [];
-	const obs: Observable = {
+	const obs: Signal = {
 		get $(): T {
 			tracking.add(obs);
 			return v;
@@ -80,12 +80,12 @@ export function valoo<T>(v: T): Observable<T> {
  * Track used observables automatically and re-execute the callback
  * whenever one of the dependencies changes.
  */
-export function watch<R>(fn: () => R): Observable<R> {
-	const out = valoo(null as any);
+export function watch<R>(fn: () => R): Signal<R> {
+	const out = signal(null as any);
 
 	// Perf: Don't allocate this in update, because it's much better
 	// to reuse the Set and just mutate + clear it for an update cycle.
-	const tracker = new Set<Observable>();
+	const tracker = new Set<Signal>();
 
 	const update = () => {
 		const oldTracker = tracking;

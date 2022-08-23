@@ -2,7 +2,7 @@ import { createContext } from "preact";
 import { useEffect, useContext, useState, useMemo, useRef } from "preact/hooks";
 import { Store } from "./types";
 import { EmitFn } from "../../adapter/hook";
-import { watch, Observable } from "../valoo";
+import { watch, Signal } from "../valoo";
 
 // Make sure we're accessing the right window object. The global window
 // reference is not the same and won't trigger any "resize" (and likely
@@ -19,7 +19,7 @@ export function useObserver<T>(fn: () => T): T {
 	const [_, set] = useState(0);
 	const count = useRef(0);
 	const tmp = useRef<any>(null as any);
-	const ref = useRef<Observable<T>>(tmp.current || (tmp.current = watch(fn)));
+	const ref = useRef<Signal<T>>(tmp.current || (tmp.current = watch(fn)));
 
 	const dispose = useMemo(() => {
 		const disp = ref.current.on(() => {

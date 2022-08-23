@@ -1,4 +1,4 @@
-import { Observable, valoo } from "../valoo";
+import { Signal, signal } from "../valoo";
 import { useStore, useObserver } from "./react-bindings";
 import { escapeStringRegexp } from "./utils";
 import { ID, DevNode } from "./types";
@@ -19,15 +19,15 @@ export function createRegex(s: string): RegExp {
 }
 
 export function createSearchStore(
-	items: Observable<Map<ID, DevNode>>,
-	list: Observable<ID[]>,
+	items: Signal<Map<ID, DevNode>>,
+	list: Signal<ID[]>,
 ) {
-	const value = valoo("");
-	const selected = valoo(0);
-	const selectedIdx = valoo(-1);
-	const regex = valoo<RegExp | null>(null);
-	const match = valoo<number[]>([]);
-	const count = valoo(0);
+	const value = signal("");
+	const selected = signal(0);
+	const selectedIdx = signal(-1);
+	const regex = signal<RegExp | null>(null);
+	const match = signal<number[]>([]);
+	const count = signal(0);
 
 	const onChange = (s: string) => {
 		value.$ = s;

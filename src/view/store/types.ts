@@ -1,4 +1,4 @@
-import { Observable } from "../valoo";
+import { Signal } from "../valoo";
 import { InspectData } from "../../adapter/adapter/adapter";
 import { createSearchStore } from "./search";
 import { createFilterStore } from "./filter";
@@ -60,42 +60,42 @@ export type Tree = Map<ID, DevNode>;
 
 export interface Store {
 	supports: {
-		hooks: Observable<boolean>;
+		hooks: Signal<boolean>;
 	};
 	stats: {
-		isRecording: Observable<boolean>;
-		data: Observable<ParsedStats | null>;
+		isRecording: Signal<boolean>;
+		data: Signal<ParsedStats | null>;
 	};
-	debugMode: Observable<boolean>;
-	activePanel: Observable<Panel>;
+	debugMode: Signal<boolean>;
+	activePanel: Signal<Panel>;
 	notify: EmitFn;
 	profiler: ProfilerState;
-	isPicking: Observable<boolean>;
-	inspectData: Observable<InspectData | null>;
-	roots: Observable<ID[]>;
-	nodes: Observable<Tree>;
-	nodeList: Observable<ID[]>;
-	theme: Observable<Theme>;
+	isPicking: Signal<boolean>;
+	inspectData: Signal<InspectData | null>;
+	roots: Signal<ID[]>;
+	nodes: Signal<Tree>;
+	nodeList: Signal<ID[]>;
+	theme: Signal<Theme>;
 	search: ReturnType<typeof createSearchStore>;
 	filter: ReturnType<typeof createFilterStore>;
 	selection: ReturnType<typeof createSelectionStore>;
 	collapser: Collapser<ID>;
 	sidebar: {
 		props: {
-			uncollapsed: Observable<string[]>;
-			items: Observable<PropData[]>;
+			uncollapsed: Signal<string[]>;
+			items: Signal<PropData[]>;
 		};
 		state: {
-			uncollapsed: Observable<string[]>;
-			items: Observable<PropData[]>;
+			uncollapsed: Signal<string[]>;
+			items: Signal<PropData[]>;
 		};
 		context: {
-			uncollapsed: Observable<string[]>;
-			items: Observable<PropData[]>;
+			uncollapsed: Signal<string[]>;
+			items: Signal<PropData[]>;
 		};
 		hooks: {
-			uncollapsed: Observable<string[]>;
-			items: Observable<PropData[]>;
+			uncollapsed: Signal<string[]>;
+			items: Signal<PropData[]>;
 		};
 	};
 	clear(): void;

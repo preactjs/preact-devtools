@@ -1,4 +1,4 @@
-import { valoo, watch } from "../valoo";
+import { signal, watch } from "../valoo";
 import { createSearchStore } from "./search";
 import { createFilterStore } from "./filter";
 import { flattenChildren } from "../components/tree/windowing";
@@ -17,17 +17,17 @@ export function createStore(): Store {
 		listeners.forEach(fn => fn && fn(name, data));
 	};
 
-	const debugMode = valoo(!!process.env.DEBUG);
+	const debugMode = signal(!!process.env.DEBUG);
 
-	const nodes = valoo<Map<ID, DevNode>>(new Map());
-	const roots = valoo<ID[]>([]);
+	const nodes = signal<Map<ID, DevNode>>(new Map());
+	const roots = signal<ID[]>([]);
 
 	// Toggle
-	const isPicking = valoo<boolean>(false);
+	const isPicking = signal<boolean>(false);
 	const filterState = createFilterStore(notify);
 
 	// List
-	const collapsed = valoo(new Set<ID>());
+	const collapsed = signal(new Set<ID>());
 	const collapser = createCollapser<ID>(collapsed);
 
 	const nodeList = watch(() => {
@@ -47,24 +47,24 @@ export function createStore(): Store {
 	// Sidebar
 	const sidebar = {
 		props: {
-			uncollapsed: valoo<string[]>([]),
-			items: valoo<PropData[]>([]),
+			uncollapsed: signal<string[]>([]),
+			items: signal<PropData[]>([]),
 		},
 		state: {
-			uncollapsed: valoo<string[]>([]),
-			items: valoo<PropData[]>([]),
+			uncollapsed: signal<string[]>([]),
+			items: signal<PropData[]>([]),
 		},
 		context: {
-			uncollapsed: valoo<string[]>([]),
-			items: valoo<PropData[]>([]),
+			uncollapsed: signal<string[]>([]),
+			items: signal<PropData[]>([]),
 		},
 		hooks: {
-			uncollapsed: valoo<string[]>([]),
-			items: valoo<PropData[]>([]),
+			uncollapsed: signal<string[]>([]),
+			items: signal<PropData[]>([]),
 		},
 	};
 
-	const inspectData = valoo<InspectData | null>(null);
+	const inspectData = signal<InspectData | null>(null);
 
 	watch(() => {
 		const data = inspectData.$ ? inspectData.$.props : null;
@@ -82,7 +82,7 @@ export function createStore(): Store {
 		);
 	});
 
-	const supportsHooks = valoo(false);
+	const supportsHooks = signal(false);
 	watch(() => {
 		if (supportsHooks) {
 			const items =
@@ -95,18 +95,18 @@ export function createStore(): Store {
 	});
 
 	const selection = createSelectionStore(nodeList);
-	const stats = valoo(null);
+	const stats = signal(null);
 
 	return {
 		supports: {
 			hooks: supportsHooks,
 		},
 		stats: {
-			isRecording: valoo(false),
+			isRecording: signal(false),
 			data: stats,
 		},
 		debugMode,
-		activePanel: valoo(Panel.ELEMENTS),
+		activePanel: signal(Panel.ELEMENTS),
 		profiler: createProfiler(),
 		notify,
 		nodeList,
@@ -118,7 +118,7 @@ export function createStore(): Store {
 		search: createSearchStore(nodes, nodeList),
 		filter: filterState,
 		selection,
-		theme: valoo<Theme>("auto"),
+		theme: signal<Theme>("auto"),
 		sidebar,
 		clear() {
 			roots.$ = [];
