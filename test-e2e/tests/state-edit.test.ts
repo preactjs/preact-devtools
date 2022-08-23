@@ -1,23 +1,17 @@
-import { newTestPage, typeText, waitForSelector } from "../test-utils";
-import { expect } from "chai";
-import { clickNestedText, getText, getAttribute } from "pentf/browser_utils";
+import { test, expect } from "@playwright/test";
+import { gotoTest } from "../pw-utils";
 
-export const description = "Mirror component state to the devtools";
+test("Mirror component state to the devtools", async ({ page }) => {
+	const { devtools } = await gotoTest(page, "counter");
 
-export async function run(config: any) {
-	const { page, devtools } = await newTestPage(config, "counter");
-
-	await clickNestedText(devtools, "Display");
-
-	const input = '[data-testid="props-row"] input';
-	await waitForSelector(devtools, input, { timeout: 3000 });
-
-	await typeText(devtools, input, "42");
+	await devtools.locator('[data-name="Display"]').click();
+	await devtools.locator('[data-testid="props-row"] input').fill("42");
 	await page.keyboard.press("Enter");
 
-	const value = await getAttribute(devtools, input, "value");
-	const text = await getText(page, '[data-testid="result"]');
+	const value = await devtools
+		.locator('[data-testid="props-row"] input')
+		.inputValue();
+	expect(value).toEqual("42");
 
-	expect(value).to.equal("42");
-	expect(text).to.equal("Counter: 42");
-}
+	await page.locator('[data-testid=result]:has-text("Counter: 42")').waitFor();
+});

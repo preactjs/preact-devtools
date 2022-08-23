@@ -1,29 +1,18 @@
-import {
-	newTestPage,
-	installMouseHelper,
-	clickTreeItem,
-	waitForSelector,
-} from "../test-utils";
-import { expect } from "chai";
-import { wait } from "pentf/utils";
+import { test, expect } from "@playwright/test";
+import { gotoTest, locateTreeItem, wait } from "../pw-utils";
 
-export const description =
-	"Don't scroll a virtualized element if already visible";
+test("Don't scroll a virtualized element if already visible", async ({
+	page,
+}) => {
+	const { devtools } = await gotoTest(page, "deep-tree-2");
 
-export async function run(config: any) {
-	const { devtools } = await newTestPage(config, "deep-tree-2");
-	await installMouseHelper(devtools);
+	await devtools.click(locateTreeItem("Bar"));
 
-	const selector = '[data-name="App"]';
-	await waitForSelector(devtools, selector);
-
-	await clickTreeItem(devtools, "Bar");
-
-	await wait(2000);
+	await wait(1000);
 
 	const scroll = await devtools.evaluate(() => {
 		return Number(document.querySelector('[data-tree="true"]')?.scrollTop);
 	});
 
-	expect(scroll).to.equal(0);
-}
+	expect(scroll).toEqual(0);
+});

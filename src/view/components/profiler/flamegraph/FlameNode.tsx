@@ -44,6 +44,7 @@ export function FlameNode(props: Props) {
 			onMouseEnter={onRawMouseEnter}
 			onMouseLeave={onMouseLeave}
 			data-id={node.id}
+			data-testid="flame-node"
 			data-parent-id={props.parentId}
 			data-visible={visible}
 			data-weight={node.weight}

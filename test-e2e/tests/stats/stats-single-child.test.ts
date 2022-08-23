@@ -1,35 +1,35 @@
-import { newTestPage, clickTab, clickRecordButton } from "../../test-utils";
-import { getText, waitForTestId, clickTestId } from "pentf/browser_utils";
-import { expect } from "chai";
+import { expect, test } from "@playwright/test";
+import { locateTab, gotoTest, clickRecordButton } from "../../pw-utils";
 
-export const description = "Display single child stats";
+test("Display single child stats", async ({ page }) => {
+	const { devtools } = await gotoTest(page, "simple-stats");
 
-export async function run(config: any) {
-	const { page, devtools } = await newTestPage(config, "simple-stats");
-
-	await clickTab(devtools, "STATISTICS");
-	await waitForTestId(devtools, "stats-info");
+	await devtools.locator(locateTab("STATISTICS")).click();
+	await devtools.waitForSelector('[data-testId="stats-info"]');
 
 	await clickRecordButton(devtools);
-	await waitForTestId(devtools, "stats-info-recording");
+	await devtools.waitForSelector('[data-testid="stats-info-recording"]');
 
-	await clickTestId(page, "update");
+	await page.click('[data-testid="update"]');
 	await clickRecordButton(devtools);
 
-	const classComponents = await getText(
-		devtools,
-		'[data-testid="single-class-component"]',
-	);
-	expect(classComponents).to.equal("0");
+	const classComponents = await devtools
+		.locator('[data-testid="single-class-component"]')
+		.textContent();
+	expect(classComponents).toEqual("0");
 
-	const functionComponents = await getText(
-		devtools,
-		'[data-testid="single-function-component"]',
-	);
-	expect(functionComponents).to.equal("0");
+	const fnComponents = await devtools
+		.locator('[data-testid="single-function-component"]')
+		.textContent();
+	expect(fnComponents).toEqual("0");
 
-	const elements = await getText(devtools, '[data-testid="single-element"]');
-	expect(elements).to.equal("2");
-	const texts = await getText(devtools, '[data-testid="single-text"]');
-	expect(texts).to.equal("3");
-}
+	const elements = await devtools
+		.locator('[data-testid="single-element"]')
+		.textContent();
+	expect(elements).toEqual("2");
+
+	const texts = await devtools
+		.locator('[data-testid="single-text"]')
+		.textContent();
+	expect(texts).toEqual("3");
+});

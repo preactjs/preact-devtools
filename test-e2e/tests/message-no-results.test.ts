@@ -1,9 +1,8 @@
-import { newTestPage } from "../test-utils";
-import { waitForTestId } from "pentf/browser_utils";
+import { test } from "@playwright/test";
+import { gotoTest } from "../pw-utils";
 
-export const description = "Display filter no match message";
+test("Display filter no match message", async ({ page }) => {
+	const { devtools } = await gotoTest(page, "message-no-results");
 
-export async function run(config: any) {
-	const { devtools } = await newTestPage(config, "message-no-results");
-	await waitForTestId(devtools, "msg-no-results");
-}
+	await devtools.locator("data-testid=msg-no-results").waitFor();
+});

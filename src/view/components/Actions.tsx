@@ -6,7 +6,11 @@ export interface Props {
 }
 
 export function Actions(props: Props) {
-	return <div class={`actions ${props.class || ""}`}>{props.children}</div>;
+	return (
+		<div class={`actions ${props.class || ""}`} data-testid="actions">
+			{props.children}
+		</div>
+	);
 }
 
 export function ActionSeparator() {

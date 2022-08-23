@@ -1,65 +1,41 @@
-import { newTestPage, click, clickTab, clickRecordButton } from "../test-utils";
-import { expect } from "chai";
+import { test, expect } from "@playwright/test";
 import {
-	assertNotTestId,
-	clickNestedText,
-	clickSelector,
-	getAttribute,
-	getText,
-	waitForTestId,
-} from "pentf/browser_utils";
-import { waitForPass } from "pentf/assert_utils";
+	clickRecordButton,
+	gotoTest,
+	locateFlame,
+	locateTab,
+} from "../pw-utils";
 
-export const description = "Debug mode toggles debug views";
-
-export async function run(config: any) {
-	const { page, devtools } = await newTestPage(config, "counter");
+test("Debug mode toggles debug views", async ({ page }) => {
+	const { devtools } = await gotoTest(page, "counter");
 
 	// Enable Capturing
-	await clickTab(devtools, "SETTINGS");
-	expect(
-		await getAttribute(
-			devtools,
-			'[data-testid="toggle-debug-mode"]',
-			"checked",
-		),
-	).to.equal(false);
+	await devtools.locator(locateTab("SETTINGS")).click();
+	const checked = await devtools
+		.locator('[data-testid="toggle-debug-mode"]')
+		.isChecked();
+	expect(checked).toEqual(false);
 
 	// Start profiling
-	await clickTab(devtools, "PROFILER");
+	await devtools.locator(locateTab("PROFILER")).click();
 	await clickRecordButton(devtools);
-	await clickSelector(page, "button", {
-		async retryUntil() {
-			const target = '[data-testid="result"]';
-			return (await getText(page, target)) === "Counter: 1";
-		},
-	});
-	await clickSelector(page, "button", {
-		async retryUntil() {
-			const target = '[data-testid="result"]';
-			return (await getText(page, target)) === "Counter: 2";
-		},
-	});
+	await page.click("button");
+	await page.click("button");
 	await clickRecordButton(devtools);
-	await clickNestedText(devtools, "Counter");
+	await devtools.locator(locateFlame("Counter")).click();
 
-	await assertNotTestId(devtools, "profiler-debug-stats");
-	await assertNotTestId(devtools, "profiler-debug-nav");
+	await expect(
+		devtools.locator('[data-testid="profiler-debug-stats"]'),
+	).toHaveCount(0);
+	await expect(
+		devtools.locator('[data-testid="profiler-debug-nav"]'),
+	).toHaveCount(0);
 
-	await clickTab(devtools, "SETTINGS");
-	await click(devtools, '[data-testid="toggle-debug-mode"]');
+	await devtools.locator(locateTab("SETTINGS")).click();
+	await devtools.click('[data-testid="toggle-debug-mode"]');
 
-	await waitForPass(async () => {
-		expect(
-			await getAttribute(
-				devtools,
-				'[data-testid="toggle-debug-mode"]',
-				"checked",
-			),
-		).to.equal(true);
-	});
-	await clickTab(devtools, "PROFILER");
+	await devtools.locator(locateTab("PROFILER")).click();
 
-	await waitForTestId(devtools, "profiler-debug-stats");
-	await waitForTestId(devtools, "profiler-debug-nav");
-}
+	await devtools.waitForSelector('[data-testid="profiler-debug-stats"]');
+	await devtools.waitForSelector('[data-testid="profiler-debug-nav"]');
+});

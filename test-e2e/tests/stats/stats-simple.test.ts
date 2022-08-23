@@ -1,42 +1,40 @@
-import { newTestPage, clickTab } from "../../test-utils";
-import { getText, waitForTestId, clickTestId } from "pentf/browser_utils";
-import { expect } from "chai";
+import { expect, test } from "@playwright/test";
+import { locateTab, gotoTest, clickRecordButton } from "../../pw-utils";
 
-export const description = "Display simple stats";
+test("Display simple stats", async ({ page }) => {
+	const { devtools } = await gotoTest(page, "simple-stats");
 
-export async function run(config: any) {
-	const { page, devtools } = await newTestPage(config, "simple-stats");
+	await devtools.locator(locateTab("STATISTICS")).click();
+	await devtools.waitForSelector('[data-testId="stats-info"]');
 
-	await clickTab(devtools, "STATISTICS");
-	await waitForTestId(devtools, "stats-info");
+	await clickRecordButton(devtools);
+	await devtools.waitForSelector('[data-testid="stats-info-recording"]');
 
-	await clickTestId(devtools, "record-btn");
-	await waitForTestId(devtools, "stats-info-recording");
+	await page.click('[data-testid="update"]');
+	await clickRecordButton(devtools);
 
-	await clickTestId(page, "update");
-	await clickTestId(devtools, "record-btn");
+	const classComponents = await devtools
+		.locator('[data-testid="class-component-total"]')
+		.textContent();
+	expect(classComponents).toEqual("1");
 
-	const classComponents = await getText(
-		devtools,
-		'[data-testid="class-component-total"]',
-	);
-	expect(classComponents).to.equal("1");
+	const fnComponents = await devtools
+		.locator('[data-testid="function-component-total"]')
+		.textContent();
+	expect(fnComponents).toEqual("1");
 
-	const functionComponents = await getText(
-		devtools,
-		'[data-testid="function-component-total"]',
-	);
-	expect(functionComponents).to.equal("1");
+	const fragmentsCount = await devtools
+		.locator('[data-testid="fragment-total"]')
+		.textContent();
+	expect(fragmentsCount).toEqual("0");
 
-	const fragmentsCount = await getText(
-		devtools,
-		'[data-testid="fragment-total"]',
-	);
-	expect(fragmentsCount).to.equal("0");
+	const elementsCount = await devtools
+		.locator('[data-testid="element-total"]')
+		.textContent();
+	expect(elementsCount).toEqual("5");
 
-	const elementsCount = await getText(devtools, '[data-testid="element-total');
-	expect(elementsCount).to.equal("5");
-
-	const textCount = await getText(devtools, '[data-testid="text-total');
-	expect(textCount).to.equal("6");
-}
+	const textCount = await devtools
+		.locator('[data-testid="text-total"]')
+		.textContent();
+	expect(textCount).toEqual("6");
+});

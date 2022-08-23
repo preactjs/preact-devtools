@@ -1,23 +1,17 @@
-import { newTestPage, click, clickAndWaitForHooks } from "../../test-utils";
-import { expect } from "chai";
-import { getText } from "pentf/browser_utils";
+import { test, expect } from "@playwright/test";
+import { getHooks, gotoTest, locateTreeItem } from "../../pw-utils";
 
-export const description = "Show custom debug value";
+test("Show custom debug value", async ({ page }) => {
+	const { devtools } = await gotoTest(page, "hooks");
 
-export async function run(config: any) {
-	const { page, devtools } = await newTestPage(config, "hooks");
+	await devtools.locator(locateTreeItem("DebugValue")).click();
+	await devtools.locator('[data-testid="Hooks"]').waitFor();
 
-	// State update
-	await clickAndWaitForHooks(devtools, "DebugValue");
+	let hooks = await getHooks(devtools);
+	expect(hooks).toEqual([["useMyHook", '"Offline"']]);
 
-	const name = await getText(devtools, '[data-testid="prop-name"]');
-	let value = await getText(devtools, '[data-testid="prop-value"]');
+	await page.locator('[data-testid="debug-hook-toggle"]').click();
 
-	expect(name).to.equal("useMyHook");
-	expect(value).to.equal('"Offline"');
-
-	await click(page, '[data-testid="debug-hook-toggle"]');
-
-	value = await getText(devtools, '[data-testid="prop-value"]');
-	expect(value).to.equal('"Online"');
-}
+	hooks = await getHooks(devtools);
+	expect(hooks).toEqual([["useMyHook", '"Online"']]);
+});

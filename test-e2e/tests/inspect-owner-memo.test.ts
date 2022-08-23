@@ -1,25 +1,23 @@
-import { clickTreeItem, getOwners, newTestPage } from "../test-utils";
-import { expect } from "chai";
+import { test, expect } from "@playwright/test";
+import { getOwners, gotoTest } from "../pw-utils";
 
-export const description = "Inspect owner information with filtered nodes";
+test("Inspect owner information with filtered nodes", async ({ page }) => {
+	const { devtools } = await gotoTest(page, "static-subtree");
 
-export async function run(config: any) {
-	const { devtools } = await newTestPage(config, "static-subtree");
-
-	await clickTreeItem(devtools, "App");
+	await devtools.click('[data-name="App"]');
 
 	let owners = await getOwners(devtools);
-	expect(owners).to.deep.equal([]);
+	expect(owners).toEqual([]);
 
-	await clickTreeItem(devtools, "Static");
+	await devtools.click('[data-name="Static"]');
 	owners = await getOwners(devtools);
-	expect(owners).to.deep.equal(["App"]);
+	expect(owners).toEqual(["App"]);
 
-	await clickTreeItem(devtools, "Foo");
+	await devtools.click('[data-name="Foo"]');
 	owners = await getOwners(devtools);
-	expect(owners).to.deep.equal(["Static", "App"]);
+	expect(owners).toEqual(["Static", "App"]);
 
-	await clickTreeItem(devtools, "Display");
+	await devtools.click('[data-name="Display"]');
 	owners = await getOwners(devtools);
-	expect(owners).to.deep.equal(["App"]);
-}
+	expect(owners).toEqual(["App"]);
+});

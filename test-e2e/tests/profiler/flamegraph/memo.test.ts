@@ -1,48 +1,39 @@
-import {
-	newTestPage,
-	click,
-	getSize,
-	clickTab,
-	clickRecordButton,
-} from "../../../test-utils";
-import { expect } from "chai";
+import { test, expect } from "@playwright/test";
+import { clickRecordButton, locateTab, gotoTest } from "../../../pw-utils";
+import assert from "assert";
 import { getFlameNodes } from "./utils";
 
-export const description = "Correctly position memoized sub-trees";
+test("Correctly position memoized sub-trees", async ({ page }) => {
+	const { devtools } = await gotoTest(page, "memo");
 
-// TODO: Test case is flakey
-export const skip = () => true;
-
-export async function run(config: any) {
-	const { page, devtools } = await newTestPage(config, "memo");
-
-	await clickTab(devtools, "PROFILER");
-
+	await devtools.locator(locateTab("PROFILER")).click();
 	await clickRecordButton(devtools);
-	await click(page, "button");
+	await page.click("button");
 	await clickRecordButton(devtools);
 
 	const nodes = await getFlameNodes(devtools);
-	expect(nodes).to.deep.equal([
-		{ maximized: true, name: "Fragment", visible: true },
-		{ maximized: false, name: "Counter", visible: true },
-		{ maximized: false, name: "Memo(Display)", visible: true },
-		{ maximized: false, name: "Display", visible: true },
-		{ maximized: false, name: "Value", visible: true },
-		{ maximized: false, name: "Value", visible: true },
+	expect(nodes).toEqual([
+		{ maximized: true, name: "Fragment", visible: true, hocs: [] },
+		{ maximized: true, name: "Counter", visible: true, hocs: [] },
+		{ maximized: false, name: "Display", visible: true, hocs: ["Memo"] },
+		{ maximized: false, name: "Value", visible: true, hocs: [] },
+		{ maximized: false, name: "Value", visible: true, hocs: [] },
 	]);
 
-	const memoSize = await getSize(
-		devtools,
-		'[data-type="flamegraph"] *:nth-child(3)',
-	);
-	const staticSize = await getSize(
-		devtools,
-		'[data-type="flamegraph"] *:nth-child(4)',
-	);
+	const memoSize = await devtools
+		.locator('[data-type="flamegraph"] [data-testid="flame-node"]')
+		.nth(2)
+		.boundingBox();
+	const staticSize = await devtools
+		.locator('[data-type="flamegraph"] [data-testid="flame-node"]')
+		.nth(3)
+		.boundingBox();
 
-	expect(memoSize.x <= staticSize.x).to.equal(true);
+	assert(memoSize);
+	assert(staticSize);
+
+	expect(memoSize.x <= staticSize.x).toEqual(true);
 	expect(
 		memoSize.x + memoSize.width >= staticSize.x + staticSize.width,
-	).to.equal(true);
-}
+	).toEqual(true);
+});

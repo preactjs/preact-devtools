@@ -1,43 +1,47 @@
-import { clickAndWaitForHooks, newTestPage } from "../../test-utils";
-import { waitForTestId, getText, clickNestedText } from "pentf/browser_utils";
-import { expect } from "chai";
+import { test, expect } from "@playwright/test";
+import { clickHookItem, gotoTest, waitForPass } from "../../pw-utils";
 
-export const description =
-	"Show a deeply nested hook tree and limit value parsing depth";
+test("Show a deeply nested hook tree and limit value parsing depth", async ({
+	page,
+}) => {
+	const { devtools } = await gotoTest(page, "hooks-depth-limit");
 
-export async function run(config: any) {
-	const { devtools } = await newTestPage(config, "hooks-depth-limit");
-
-	await waitForTestId(devtools, "tree-item");
+	await devtools.waitForSelector('[data-testid="tree-item"]');
 
 	// State update
-	await clickAndWaitForHooks(devtools, "Hook");
+	await waitForPass(async () => {
+		await devtools.click('[data-name="Hook"]');
+		await devtools.waitForSelector('[data-testid="props-row"]');
+		const count = await devtools.locator('[data-testid="props-row"]').count();
+		expect(count).toBeGreaterThan(0);
+	});
 
-	await clickNestedText(devtools, "useBrobba");
-	await clickNestedText(devtools, "useBlaBla");
-	await clickNestedText(devtools, "useBleb");
-	await clickNestedText(devtools, "useBabby");
-	await clickNestedText(devtools, "useBubby");
-	await clickNestedText(devtools, "useBread");
-	await clickNestedText(devtools, "useBlub");
-	await clickNestedText(devtools, "useBoof");
-	await clickNestedText(devtools, "useBob");
-	await clickNestedText(devtools, "useBar");
-	await clickNestedText(devtools, "useFoo");
+	await clickHookItem(devtools, "useBrobba");
+	await clickHookItem(devtools, "useBlaBla");
+	await clickHookItem(devtools, "useBleb");
+	await clickHookItem(devtools, "useBabby");
+	await clickHookItem(devtools, "useBubby");
+	await clickHookItem(devtools, "useBread");
+	await clickHookItem(devtools, "useBlub");
+	await clickHookItem(devtools, "useBoof");
+	await clickHookItem(devtools, "useBob");
+	await clickHookItem(devtools, "useBar");
+	await clickHookItem(devtools, "useFoo");
 
-	// Native hooks
-	await clickNestedText(devtools, "useState");
-	await clickNestedText(devtools, /^key1/);
-	await clickNestedText(devtools, /^key2/);
-	await clickNestedText(devtools, /^key3/);
-	await clickNestedText(devtools, /^key4/);
-	await clickNestedText(devtools, /^key5/);
-	await clickNestedText(devtools, /^key6/);
-	await clickNestedText(devtools, /^key7/);
+	await clickHookItem(devtools, "useState");
+	await clickHookItem(devtools, "key1");
+	await clickHookItem(devtools, "key2");
+	await clickHookItem(devtools, "key3");
+	await clickHookItem(devtools, "key4");
+	await clickHookItem(devtools, "key5");
+	await clickHookItem(devtools, "key6");
+	await clickHookItem(devtools, "key7");
 
-	const text = await getText(
-		devtools,
-		'form [data-testid="props-row"]:last-child [data-testid="prop-value"]',
-	);
-	expect(text).to.equal('"…"');
-}
+	// await page.pause;
+	const text = await devtools
+		.locator(
+			'form [data-testid="props-row"]:last-child [data-testid="prop-value"]',
+		)
+		.textContent();
+	expect(text).toEqual('"…"');
+});

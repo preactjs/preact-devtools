@@ -1,23 +1,20 @@
-import { clickTreeItem, getOwners, newTestPage } from "../test-utils";
-import { expect } from "chai";
-import { clickSelector, waitForSelector } from "pentf/browser_utils";
+import { test, expect } from "@playwright/test";
+import { getOwners, gotoTest } from "../pw-utils";
 
-export const description = "Inspect owner with fake HOC";
+test("Inspect owner with fake HOC", async ({ page }) => {
+	const { devtools } = await gotoTest(page, "update-hoc");
 
-export async function run(config: any) {
-	const { devtools, page } = await newTestPage(config, "update-hoc");
+	await page.waitForSelector("button");
 
-	await waitForSelector(page, "button");
-
-	await clickTreeItem(devtools, "List");
+	await devtools.click('[data-name="List"]');
 	let owners = await getOwners(devtools);
-	expect(owners).to.deep.equal(["Counter", "App"]);
+	expect(owners).toEqual(["Counter", "App"]);
 
 	// Trigger update
-	await clickSelector(page, "button");
-	await waitForSelector(devtools, '[data-testid="elements-tree"]');
+	await page.click("button");
+	await devtools.waitForSelector('[data-testid="elements-tree"]');
 
-	await clickTreeItem(devtools, "ListItem");
+	await devtools.click('[data-name="ListItem"]');
 	owners = await getOwners(devtools);
-	expect(owners).to.deep.equal(["List", "Counter", "App"]);
-}
+	expect(owners).toEqual(["List", "Counter", "App"]);
+});

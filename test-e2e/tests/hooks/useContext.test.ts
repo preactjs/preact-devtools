@@ -1,48 +1,36 @@
+import { test, expect } from "@playwright/test";
 import {
-	clickAndWaitForHooks,
-	newTestPage,
-	waitForSelector,
-} from "../../test-utils";
-import { expect } from "chai";
-import {
-	assertNotSelector,
-	clickNestedText,
-	getText,
-} from "pentf/browser_utils";
-import { waitForPass } from "pentf/assert_utils";
+	getHooks,
+	gotoTest,
+	locateTreeItem,
+	waitForPass,
+} from "../../pw-utils";
 
-export const description = "Inspect useContext hook";
+test("Inspect useContext hook", async ({ page }) => {
+	const { devtools } = await gotoTest(page, "hooks");
 
-export async function run(config: any) {
-	const { devtools } = await newTestPage(config, "hooks");
+	await devtools.locator(locateTreeItem("ContextComponent")).click();
+	await devtools.locator('[data-testid="Hooks"]').waitFor();
 
-	const hooksPanel = '[data-testid="props-row"]';
-
-	await clickAndWaitForHooks(devtools, "ContextComponent");
-
-	let name = await getText(devtools, '[data-testid="prop-name"]');
-	let value = await getText(devtools, '[data-testid="prop-value"]');
-
-	expect(name).to.equal("useContext");
-	expect(value).to.equal('"foobar"');
+	const hooks = await getHooks(devtools);
+	expect(hooks).toEqual([["useContext", '"foobar"']]);
 
 	// Should not be collapsable
-	await assertNotSelector(devtools, '[data-testid="props-row"] > button');
+	await expect(
+		devtools.locator('[data-testid="props-row"] > button'),
+	).toHaveCount(0);
 
 	// Should not be editable
-	await assertNotSelector(devtools, '[data-testid="prop-value"] input');
+	await expect(
+		devtools.locator('[data-testid="props-value"] > input'),
+	).toHaveCount(0);
 
 	// Check if default value is read when no Provider is present
-	await clickNestedText(devtools, "ContextNoProvider");
-	await waitForSelector(devtools, hooksPanel, { timeout: 2000 });
+	await devtools.locator(locateTreeItem("ContextNoProvider")).click();
+	await devtools.locator('[data-testid="Hooks"]').waitFor();
 
 	await waitForPass(async () => {
-		name = await getText(devtools, '[data-testid="prop-name"]');
-		expect(name).to.equal("useContext");
+		const hooks = await getHooks(devtools);
+		expect(hooks).toEqual([["useContext", "0"]]);
 	});
-
-	await waitForPass(async () => {
-		value = await getText(devtools, '[data-testid="prop-value"]');
-		expect(value).to.equal("0");
-	});
-}
+});

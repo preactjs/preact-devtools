@@ -1,45 +1,42 @@
+import { expect, test } from "@playwright/test";
 import {
-	newTestPage,
-	click,
-	clickTab,
+	locateTab,
+	gotoTest,
+	wait,
 	clickRecordButton,
-} from "../../test-utils";
-import { expect } from "chai";
-import { clickNestedText, getAttribute, getText } from "pentf/browser_utils";
-import { wait } from "pentf/utils";
+	locateFlame,
+} from "../../pw-utils";
 
-export const description = "Disables render reason capturing";
+test("Disables render reason capturing", async ({ page }) => {
+	const { devtools } = await gotoTest(page, "render-reasons");
 
-export async function run(config: any) {
-	const { page, devtools } = await newTestPage(config, "render-reasons");
-
-	// Enable Capturing
-	await clickTab(devtools, "SETTINGS");
-	await click(devtools, '[data-testid="toggle-render-reason"]');
-	expect(
-		await getAttribute(
-			devtools,
-			'[data-testid="toggle-render-reason"]',
-			"checked",
-		),
-	).to.equal(true);
+	await devtools.locator(locateTab("SETTINGS")).click();
+	await devtools.click('[data-testid="toggle-render-reason"]');
+	const checked = await devtools
+		.locator('[data-testid="toggle-render-reason"]')
+		.isChecked();
+	expect(checked).toEqual(true);
 
 	// Start profiling
-	await clickTab(devtools, "PROFILER");
+	await devtools.locator(locateTab("PROFILER")).click();
 	await clickRecordButton(devtools);
 
-	await click(page, '[data-testid="counter-1"]');
-	await click(page, '[data-testid="counter-2"]');
+	await page.click('[data-testid="counter-1"]');
+	await page.click('[data-testid="counter-2"]');
 	await wait(1000);
 
 	await clickRecordButton(devtools);
 
-	await clickNestedText(devtools, "ComponentState");
-	let reasons = await getText(devtools, '[data-testid="render-reasons"');
-	expect(reasons).to.equal("State changed:value");
+	await devtools.locator(locateFlame("ComponentState")).click();
+	let reasons = await devtools
+		.locator('[data-testid="render-reasons"]')
+		.textContent();
+	expect(reasons).toEqual("State changed:value");
 
 	// Reset flamegraph
-	await clickNestedText(devtools, "Fragment");
-	reasons = await getText(devtools, '[data-testid="render-reasons"]');
-	expect(reasons).to.equal("Did not render");
-}
+	await devtools.locator(locateFlame("Fragment")).click();
+	reasons = await devtools
+		.locator('[data-testid="render-reasons"]')
+		.textContent();
+	expect(reasons).toEqual("Did not render");
+});

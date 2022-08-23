@@ -1,24 +1,24 @@
-import { newTestPage, waitForSelector } from "../test-utils";
-import { expect } from "chai";
-import { clickNestedText } from "pentf/browser_utils";
+import { test, expect } from "@playwright/test";
+import { gotoTest, waitForPass } from "../pw-utils";
 
-export const description = "Format inspected data";
+test("Format inspected data", async ({ page }) => {
+	const { devtools } = await gotoTest(page, "truncate");
 
-export async function run(config: any) {
-	const { devtools } = await newTestPage(config, "truncate");
+	await devtools.locator('[data-name="App"]').click();
 
-	await clickNestedText(devtools, "App");
+	await waitForPass(async () => {
+		let texts = await devtools
+			.locator('[data-testid="props-row"]')
+			.allInnerTexts();
 
-	const row = '[data-testid="props-row"]';
-	await waitForSelector(devtools, row);
-
-	const texts = await devtools.$$eval(row, els => els.map(x => x.textContent));
-	expect(texts).to.deep.equal([
-		"blobBlob {}",
-		'obj{type: "foo", props: null}',
-		"obj2{foobarA: 1, foobarB: 1, foobarC: 1, foobarD: 1, foobarE: 1, foobarF: 1, foobarG: 1, foobarH: 1}",
-		"arr[1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19, 20, 21, 22, 23, 24, 25, 26, 27, 28, 29, 30, 31, 32, 33, 34, 35, 36, 37, 38, 39]",
-		"vnode<div />",
-		"vnode2<Child />",
-	]);
-}
+		texts = texts.map(x => x.replace(/\n/g, ""));
+		expect(texts).toEqual([
+			"blobBlob {}",
+			'obj{type: "foo", props: null}',
+			"obj2{foobarA: 1, foobarB: 1, foobarC: 1, foobarD: 1, foobarE: 1, foobarF: 1, foobarG: 1, foobarH: 1}",
+			"arr[1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19, 20, 21, 22, 23, 24, 25, 26, 27, 28, 29, 30, 31, 32, 33, 34, 35, 36, 37, 38, 39]",
+			"vnode<div />",
+			"vnode2<Child />",
+		]);
+	});
+});

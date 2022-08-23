@@ -1,41 +1,39 @@
-import { clickTreeItem, getOwners, newTestPage } from "../test-utils";
-import { expect } from "chai";
+import { test, expect } from "@playwright/test";
+import { getOwners, gotoTest, locateTreeItem } from "../pw-utils";
 
-export const description = "Inspect owner information";
+test("Inspect owner information", async ({ page }) => {
+	const { devtools } = await gotoTest(page, "update-all");
 
-export async function run(config: any) {
-	const { devtools } = await newTestPage(config, "update-all");
-
-	await clickTreeItem(devtools, "App");
+	await devtools.click(locateTreeItem("App"));
 
 	let owners = await getOwners(devtools);
-	expect(owners).to.deep.equal([]);
+	expect(owners).toEqual([]);
 
-	await clickTreeItem(devtools, "Props");
+	await devtools.click(locateTreeItem("Props"));
 	owners = await getOwners(devtools);
-	expect(owners).to.deep.equal(["App"]);
+	expect(owners).toEqual(["App"]);
 
-	await clickTreeItem(devtools, "State");
+	await devtools.click(locateTreeItem("State"));
 	owners = await getOwners(devtools);
-	expect(owners).to.deep.equal(["App"]);
+	expect(owners).toEqual(["App"]);
 
-	await clickTreeItem(devtools, "Context");
+	await devtools.click(locateTreeItem("Context"));
 	owners = await getOwners(devtools);
-	expect(owners).to.deep.equal(["App"]);
+	expect(owners).toEqual(["App"]);
 
-	await clickTreeItem(devtools, "Provider");
+	await devtools.click(locateTreeItem("Provider"));
 	owners = await getOwners(devtools);
-	expect(owners).to.deep.equal(["Context", "App"]);
+	expect(owners).toEqual(["Context", "App"]);
 
-	await clickTreeItem(devtools, "Consumer");
+	await devtools.click(locateTreeItem("Consumer"));
 	owners = await getOwners(devtools);
-	expect(owners).to.deep.equal(["Context", "App"]);
+	expect(owners).toEqual(["Context", "App"]);
 
-	await clickTreeItem(devtools, "LegacyContext");
+	await devtools.click(locateTreeItem("LegacyContext"));
 	owners = await getOwners(devtools);
-	expect(owners).to.deep.equal(["App"]);
+	expect(owners).toEqual(["App"]);
 
-	await clickTreeItem(devtools, "LegacyConsumer");
+	await devtools.click(locateTreeItem("LegacyConsumer"));
 	owners = await getOwners(devtools);
-	expect(owners).to.deep.equal(["LegacyContext", "App"]);
-}
+	expect(owners).toEqual(["LegacyContext", "App"]);
+});

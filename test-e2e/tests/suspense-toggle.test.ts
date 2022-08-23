@@ -1,76 +1,54 @@
+import { test, expect, Page } from "@playwright/test";
 import {
-	newTestPage,
 	getTreeViewItemNames,
-	clickTreeItem,
-} from "../test-utils";
-import { expect } from "chai";
-import {
-	assertNotTestId,
-	clickSelector,
-	clickTestId,
-	getAttribute,
-	getText,
-} from "pentf/browser_utils";
-import { assertEventually } from "pentf/assert_utils";
+	gotoTest,
+	locateTreeItem,
+	waitFor,
+} from "../pw-utils";
 
-async function runTest(config: any, version: string) {
-	const { devtools } = await newTestPage(config, "suspense", {
-		preact: version,
-	});
+function testCase(preactVersion: string) {
+	return async ({ page }: { page: Page }) => {
+		const { devtools } = await gotoTest(page, "suspense", {
+			preact: preactVersion,
+		});
 
-	await clickTreeItem(devtools, "Delayed");
+		await devtools.click(locateTreeItem("Delayed"));
+		await devtools.click('[data-testid="suspend-action"]');
 
-	await clickTestId(devtools, "suspend-action");
-
-	await assertEventually(
-		async () => {
+		await waitFor(async () => {
 			const items = await getTreeViewItemNames(devtools);
-			expect(items).to.deep.equal(
+			expect(items).toEqual(
 				[
 					"Shortly",
 					"Block",
 					"Suspense",
 					// <10.4.5, newer versions use a Fragment
-					version === "10.4.1" && "Component",
+					preactVersion === "10.4.1" && "Component",
 					"Block",
 				].filter(Boolean),
 			);
 			return true;
-		},
-		{ crashOnError: false, timeout: 2000 },
-	);
+		});
 
-	const selected = await getAttribute(
-		devtools,
-		'[data-testid="tree-item"][data-selected="true"]',
-		"data-name",
-	);
+		const selected = await devtools
+			.locator('[data-testid="tree-item"][data-selected="true"]')
+			.getAttribute("data-name");
 
-	expect(selected).to.equal("Suspense");
+		expect(selected).toEqual("Suspense");
 
-	await clickSelector(
-		devtools,
-		'[data-testid="tree-item"][data-name="Shortly"]',
-		{ timeout: 2000 },
-	);
+		await devtools.click(locateTreeItem("Shortly"));
 
-	await assertEventually(
-		async () => {
-			const inspected = await getText(
-				devtools,
-				'[data-testid="inspect-component-name"]',
-			);
-			expect(inspected).to.equal("<Shortly>");
-			return true;
-		},
-		{ crashOnError: false, timeout: 2000 },
-	);
+		await devtools
+			.locator('[data-testid="inspect-component-name"]:has-text("<Shortly>")')
+			.textContent();
 
-	await assertNotTestId(devtools, "suspend-action", { timeout: 2000 });
+		await expect(
+			devtools.locator('[data-testid="suspend-action"]'),
+		).toHaveCount(0);
+	};
 }
 
-export const description = "Display Suspense in tree view";
-export async function run(config: any) {
-	await runTest(config, "10.5.9");
-	await runTest(config, "10.4.1");
-}
+test.describe("Display Suspense in tree view", () => {
+	test("Preact 10.5.9", testCase("10.5.9"));
+	test("Preact 10.4.1", testCase("10.4.1"));
+});

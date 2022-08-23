@@ -1,32 +1,25 @@
+import { test } from "@playwright/test";
 import {
-	newTestPage,
-	click,
-	clickTab,
 	clickRecordButton,
-	waitForSelector,
-} from "../test-utils";
-import { expect } from "chai";
-import { clickNestedText, getText } from "pentf/browser_utils";
+	gotoTest,
+	locateFlame,
+	locateTab,
+	locateTreeItem,
+} from "../pw-utils";
 
-export const description = "Sync selection from profiler";
+test("Sync selection from profiler", async ({ page }) => {
+	const { devtools } = await gotoTest(page, "counter");
 
-export async function run(config: any) {
-	const { page, devtools } = await newTestPage(config, "counter");
-
-	await clickNestedText(devtools, "Counter");
-
-	await clickTab(devtools, "PROFILER");
+	await devtools.click(locateTreeItem("Counter"));
+	await devtools.click(locateTab("PROFILER"));
 
 	await clickRecordButton(devtools);
-	await click(page, "button");
+	await page.click("button");
 	await clickRecordButton(devtools);
 
-	await waitForSelector(devtools, '[data-type="flamegraph"]');
+	await devtools.waitForSelector('[data-type="flamegraph"]');
+	await devtools.click(locateFlame("Display"));
 
-	await clickNestedText(devtools, /^Displ/);
-
-	await clickTab(devtools, "ELEMENTS");
-
-	const text = await getText(devtools, "[data-selected]");
-	expect(text).to.equal("Display");
-}
+	await devtools.click(locateTab("ELEMENTS"));
+	await devtools.locator('[data-selected]:has-text("Display")').waitFor();
+});

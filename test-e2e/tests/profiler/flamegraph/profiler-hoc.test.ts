@@ -1,58 +1,40 @@
+import { test, expect } from "@playwright/test";
 import {
-	clickNestedText,
-	clickTestId,
-	getText,
-	waitForTestId,
-} from "pentf/browser_utils";
-import { expect } from "chai";
-import {
-	newTestPage,
-	click,
-	clickTab,
 	clickRecordButton,
-	waitForSelector,
-} from "../../../test-utils";
-import { wait } from "pentf/utils";
+	locateTab,
+	gotoTest,
+	locateFlame,
+	wait,
+} from "../../../pw-utils";
+import { getFlameNodes } from "./utils";
 
-export const description = "Should work with filtered HOC roots";
+test("Should work with filtered HOC roots", async ({ page }) => {
+	const { devtools } = await gotoTest(page, "hoc-update");
 
-export async function run(config: any) {
-	const { page, devtools } = await newTestPage(config, "hoc-update");
-
-	await clickTab(devtools, "PROFILER");
-
+	await devtools.locator(locateTab("PROFILER")).click();
 	await clickRecordButton(devtools);
-	await click(page, "button");
+	await page.click("button");
 	await clickRecordButton(devtools);
 
-	await waitForSelector(
-		devtools,
-		'[data-type="flamegraph"] [data-name="Wrapped"]',
-		{ timeout: 3000 },
-	);
+	await devtools.locator(locateFlame("Wrapped")).waitFor();
 
-	const labels = await getText(
-		devtools,
-		'[data-type="flamegraph"] [data-name="Wrapped"] [data-testid="hoc-labels"]',
-	);
-
-	expect(labels).to.equal("withBoof");
+	const nodes = await getFlameNodes(devtools);
+	expect(nodes.find(x => x.name === "Wrapped")?.hocs).toEqual(["withBoof"]);
 
 	// Disabling HOC-filter should remove hoc labels
-	await clickTab(devtools, "ELEMENTS");
-	await clickTestId(devtools, "filter-menu-button");
-	await waitForTestId(devtools, "filter-popup");
-	await clickNestedText(devtools, "HOC-Components");
-	await clickTestId(devtools, "filter-update");
+	await devtools.locator(locateTab("ELEMENTS")).click();
+	await devtools.click('[data-testid="filter-menu-button"]');
+	await devtools.waitForSelector('[data-testid="filter-popup"]');
+	await devtools
+		.locator('[data-testid="filter-popup"]:has-text("HOC-Components")')
+		.click();
+	await devtools.click('[data-testid="filter-update"]');
 	await wait(1000);
 
-	await clickTab(devtools, "PROFILER");
+	await devtools.locator(locateTab("PROFILER")).click();
 	await clickRecordButton(devtools);
-	await click(page, "button");
+	await page.click("button");
 	await clickRecordButton(devtools);
 
-	await waitForSelector(
-		devtools,
-		'[data-type="flamegraph"] [data-name="withBoof(Wrapped)"]',
-	);
-}
+	await devtools.locator(locateFlame("withBoof(Wrapped)")).waitFor();
+});

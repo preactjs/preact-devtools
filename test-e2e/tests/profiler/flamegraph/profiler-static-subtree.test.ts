@@ -1,45 +1,29 @@
-import { clickTestId } from "pentf/browser_utils";
-import { expect } from "chai";
+import { test, expect } from "@playwright/test";
 import {
-	newTestPage,
-	click,
-	clickTab,
 	clickRecordButton,
-	waitForSelector,
-} from "../../../test-utils";
-import { wait } from "pentf/utils";
+	locateTab,
+	gotoTest,
+	locateFlame,
+	wait,
+} from "../../../pw-utils";
 
-export const description = "Should work with filtered HOC roots";
+test("Static subtree should be smaller in size", async ({ page }) => {
+	const { devtools } = await gotoTest(page, "static-subtree");
 
-export async function run(config: any) {
-	const { page, devtools } = await newTestPage(config, "static-subtree");
-
-	await clickTab(devtools, "PROFILER");
-
+	await devtools.locator(locateTab("PROFILER")).click();
 	await clickRecordButton(devtools);
-	await click(page, "button");
-	await wait(50);
-	await click(page, "button");
+	await page.click("button");
+	await page.click("button");
 	await clickRecordButton(devtools);
 
-	await waitForSelector(
-		devtools,
-		'[data-type="flamegraph"] [data-name="App"]',
-		{ timeout: 3000 },
-	);
+	await devtools.locator(locateFlame("App")).waitFor();
+	await devtools.locator('[data-testid="next-commit"]').click();
+	await devtools
+		.locator('[data-testid="commit-page-info"]:has-text("2 / 2")')
+		.waitFor();
 
-	await clickTestId(devtools, "next-commit", {
-		async retryUntil() {
-			return await devtools.evaluate(() => {
-				return (
-					document.querySelector('[data-testid="commit-page-info"]')!
-						.textContent === "2 / 2"
-				);
-			});
-		},
-	});
-
-	await wait(300);
+	// Wait for layouting
+	await wait(500);
 
 	const res = await devtools.evaluate(() => {
 		const display = document.querySelector('[data-name="Display"]')!
@@ -51,5 +35,6 @@ export async function run(config: any) {
 		return statics.every(w => w < display);
 	});
 
-	expect(res).to.equal(true, "Static nodes were bigger than Display");
-}
+	// Static nodes were bigger than Display
+	expect(res).toEqual(true);
+});

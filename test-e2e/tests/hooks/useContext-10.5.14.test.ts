@@ -1,32 +1,20 @@
-import { clickAndWaitForHooks, newTestPage } from "../../test-utils";
-import { expect } from "chai";
-import { clickSelector, waitForSelector, getText } from "pentf/browser_utils";
+import { test, expect } from "@playwright/test";
+import { getHooks, gotoTest, locateTreeItem } from "../../pw-utils";
 
-export const description = "Inspect useContext hook";
+test("Inspect useContext hook Preact 10.5.14 (goober)", async ({ page }) => {
+	const { devtools } = await gotoTest(page, "goober");
 
-export async function run(config: any) {
-	const { devtools } = await newTestPage(config, "goober", {
-		preact: "10.5.14",
-	});
+	await devtools.locator(locateTreeItem("a")).click();
+	await devtools.locator('[data-testid="Hooks"]').waitFor();
 
-	await clickAndWaitForHooks(devtools, "a");
+	await devtools
+		.locator('[data-testid="Hooks"] [data-depth="1"] button')
+		.click();
+	await devtools.locator('[data-testid="Hooks"] [data-depth="2"]').click();
 
-	await clickSelector(
-		devtools,
-		'[data-testid="Hooks"] [data-depth="1"] button',
-	);
-
-	await waitForSelector(devtools, '[data-testid="Hooks"] [data-depth="2"]');
-
-	const name = await getText(
-		devtools,
-		'[data-testid="Hooks"] [data-depth="2"] [data-testid="prop-name"]',
-	);
-	const value = await getText(
-		devtools,
-		'[data-testid="Hooks"] [data-depth="2"] [data-testid="prop-value"]',
-	);
-
-	expect(name).to.equal("useContext");
-	expect(value).to.equal("undefined");
-}
+	const hooks = await getHooks(devtools);
+	expect(hooks).toEqual([
+		["useTheme", ""],
+		["useContext", "undefined"],
+	]);
+});

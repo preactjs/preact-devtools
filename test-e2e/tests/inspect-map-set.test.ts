@@ -1,79 +1,50 @@
-import { newTestPage } from "../test-utils";
-import { expect } from "chai";
-import {
-	clickNestedText,
-	clickSelector,
-	getText,
-	typeSelector,
-	waitForTestId,
-} from "pentf/browser_utils";
-import { waitForPass } from "pentf/assert_utils";
+import { expect, test } from "@playwright/test";
+import { getProps, gotoTest, locateTreeItem } from "../pw-utils";
 
-export const description = "Inspect Map and Set objects";
+test("Inspect Map and Set objects", async ({ page }) => {
+	const { devtools } = await gotoTest(page, "inspect-map-set");
 
-export async function run(config: any) {
-	const { page, devtools } = await newTestPage(config, "inspect-map-set");
+	await devtools.click(locateTreeItem("App"));
+	await devtools.waitForSelector('[data-testid="Props"]');
 
-	await clickNestedText(devtools, /App$/);
-	await waitForTestId(devtools, "Props");
+	const count = await devtools.locator('[data-testid="props-row"]').count();
+	expect(count).toEqual(2);
 
-	await waitForPass(async () => {
-		const count = await devtools.$$eval(
-			'[data-testid="props-row"]',
-			els => els.length,
-		);
-		expect(count).to.equal(2);
-	});
-
-	await waitForPass(async () => {
-		const values = await devtools.$$eval('[data-testid="prop-value"]', els =>
-			Array.from(els).map(el => el.textContent),
-		);
-		expect(values).to.deep.equal([
-			"Set(1) [{foo: 123}])",
-			"Map(1) [[{foo: 123}, 123]])",
-		]);
+	const props = await getProps(devtools);
+	expect(props).toEqual({
+		set: "Set(1) [{foo: 123}])",
+		map: "Map(1) [[{foo: 123}, 123]])",
 	});
 
 	// Edit set
-	await clickSelector(devtools, '[data-testid="prop-name"][data-type="set"]');
-	await clickSelector(devtools, '[data-testid="props-row"][data-depth="2"]');
-	await typeSelector(
-		devtools,
+	await devtools.click('[data-testid="prop-name"][data-type="set"]');
+	await devtools.click('[data-testid="props-row"][data-depth="2"]');
+	await devtools.fill(
 		'[data-testid="props-row"][data-depth="3"] input',
 		"12345",
 	);
-	await devtools.keyboard.press("Enter");
-	await waitForPass(async () => {
-		const text = await getText(page, "#json-set");
-		expect(text).to.equal(JSON.stringify([{ foo: 12312345 }], null, 2));
-	});
+	await page.keyboard.press("Enter");
+	let text = await page.locator("#json-set").textContent();
+	expect(text).toEqual(JSON.stringify([{ foo: 12345 }], null, 2));
 
 	// Close set
-	await clickSelector(devtools, '[data-testid="prop-name"][data-type="set"]');
+	await devtools.click('[data-testid="prop-name"][data-type="set"]');
 
 	// Edit map value
-	await clickSelector(devtools, '[data-type="map"]');
-	await clickSelector(devtools, '[data-testid="props-row"][data-depth="2"]');
-	await typeSelector(
-		devtools,
+	await devtools.click('[data-type="map"]');
+	await devtools.click('[data-testid="props-row"][data-depth="2"]');
+	await devtools.fill(
 		'[data-testid="props-row"][data-depth="3"] input',
 		"12345",
 	);
-	await devtools.keyboard.press("Enter");
-	await waitForPass(async () => {
-		const text = await getText(page, "#json-map");
-		expect(text).to.equal(JSON.stringify([[{ foo: 123 }, 12312345]], null, 2));
-	});
+	await page.keyboard.press("Enter");
+	text = await page.locator("#json-map").textContent();
+	expect(text).toEqual(JSON.stringify([[{ foo: 123 }, 12345]], null, 2));
 
 	// Edit map key
-	await clickSelector(devtools, '[data-depth="3"] [data-testid="prop-name"]');
-	await typeSelector(devtools, '[name="root.map.0.0.foo"]', "111");
-	await devtools.keyboard.press("Enter");
-	await waitForPass(async () => {
-		const text = await getText(page, "#json-map");
-		expect(text).to.equal(
-			JSON.stringify([[{ foo: 123111 }, 12312345]], null, 2),
-		);
-	});
-}
+	await devtools.click('[data-depth="3"] [data-testid="prop-name"]');
+	await devtools.fill('[name="root.map.0.0.foo"]', "111");
+	await page.keyboard.press("Enter");
+	text = await page.locator("#json-map").textContent();
+	expect(text).toEqual(JSON.stringify([[{ foo: 111 }, 12345]], null, 2));
+});

@@ -1,14 +1,12 @@
-import { newTestPage } from "../test-utils";
-import { waitFor } from "pentf/assert_utils";
-import { waitForSelector } from "pentf/browser_utils";
+import { test } from "@playwright/test";
+import { gotoTest, waitFor } from "../pw-utils";
 
-export const description =
-	"Pressing Enter should scroll marked results into view during search #162";
+test("Pressing Enter should scroll marked results into view during search #162", async ({
+	page,
+}) => {
+	const { devtools } = await gotoTest(page, "deep-tree");
 
-export async function run(config: any) {
-	const { page, devtools } = await newTestPage(config, "deep-tree");
-
-	await waitForSelector(devtools, '[data-name="App"]');
+	await devtools.waitForSelector('[data-name="App"]');
 	await devtools.type('[data-testid="element-search"]', "Child");
 
 	// Press Enter a bunch of times
@@ -19,6 +17,6 @@ export async function run(config: any) {
 	await waitFor(async () => {
 		const marked = await devtools.$("[data-marked]");
 		if (!marked) return false;
-		return await marked!.isIntersectingViewport();
+		return await marked!.isVisible();
 	});
-}
+});

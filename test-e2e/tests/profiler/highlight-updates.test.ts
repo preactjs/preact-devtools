@@ -1,31 +1,21 @@
-import {
-	newTestPage,
-	click,
-	clickTab,
-	typeText,
-	waitForSelector,
-} from "../../test-utils";
-import { wait } from "pentf/utils";
-import { assertNotSelector } from "pentf/browser_utils";
+import { expect, test } from "@playwright/test";
+import { locateTab, gotoTest, wait } from "../../pw-utils";
 
-export const description = "Check if highlight updates is rendered";
+test("Check if highlight updates is rendered", async ({ page }) => {
+	const { devtools } = await gotoTest(page, "todo");
 
-export async function run(config: any) {
-	const { page, devtools } = await newTestPage(config, "todo");
-	await waitForSelector(page, "button");
-
-	await clickTab(devtools, "SETTINGS");
-	await click(devtools, '[data-testId="toggle-highlight-updates"]');
+	await devtools.locator(locateTab("SETTINGS")).click();
+	await devtools.click('[data-testId="toggle-highlight-updates"]');
 
 	// Run twice to check if canvas is re-created
 	for (let i = 0; i < 2; i++) {
-		await typeText(page, "input", "foo");
+		await page.locator("input").type("foo");
 		await page.keyboard.press("Enter");
 
 		const id = "#preact-devtools-highlight-updates";
-		await waitForSelector(page, id);
+		await page.waitForSelector(id, { state: "attached" });
 
 		await wait(1000);
-		await assertNotSelector(page, id);
+		await expect(page.locator(id)).toHaveCount(0);
 	}
-}
+});

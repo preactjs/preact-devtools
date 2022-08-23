@@ -1,20 +1,18 @@
-const { newPage } = require("pentf/browser_utils");
+const { chromium } = require("playwright-chromium");
+
 const path = require("path");
 
 async function main() {
-	const page = await newPage(
-		{
-			headless: false,
-			devtools: true,
-			moduleType: "commonjs",
-			extensions: [path.join(__dirname, "..", "dist", "chrome")],
-		},
-		["--user-data-dir=./profiles/chrome"],
-	);
-
-	// Reset emulation
-	await page._client.send("Emulation.clearDeviceMetricsOverride");
-
+	const extension = path.join(__dirname, "..", "dist", "chrome");
+	const browser = await chromium.launchPersistentContext("./profiles/chrome", {
+		args: [
+			`--disable-extensions-except=${extension}`,
+			`--load-extension=${extension}`,
+		],
+		headless: false,
+		devtools: true,
+	});
+	const page = await browser.newPage();
 	await page.goto("https://preactjs.com");
 }
 

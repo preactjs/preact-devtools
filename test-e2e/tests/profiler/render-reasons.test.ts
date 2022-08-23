@@ -1,82 +1,70 @@
+import { expect, test } from "@playwright/test";
 import {
-	newTestPage,
-	click,
-	clickTab,
+	locateTab,
+	gotoTest,
+	wait,
 	clickRecordButton,
-	waitForSelector,
-} from "../../test-utils";
-import { expect } from "chai";
-import { Page } from "puppeteer";
-import { wait } from "pentf/utils";
-import { getText } from "pentf/browser_utils";
+	locateFlame,
+} from "../../pw-utils";
 
-export const description = "Captures render reasons";
+test("Captures render reasons", async ({ page }) => {
+	const { devtools } = await gotoTest(page, "render-reasons");
 
-async function clickFlameNode(page: Page, name: string) {
-	const selector = `[data-name="${name}"]`;
-	await waitForSelector(page, selector, { timeout: 3000 });
-	await click(page, selector);
-	await waitForSelector(page, `${selector}[data-selected="true"]`, {
-		timeout: 3000,
-	});
-
-	// Wait for animations (0.3s)
-	await wait(300);
-}
-
-export async function run(config: any) {
-	const { page, devtools } = await newTestPage(config, "render-reasons");
-
-	// Enable Capturing
-	await clickTab(devtools, "SETTINGS");
-	await click(devtools, '[data-testid="toggle-render-reason"]');
+	await devtools.locator(locateTab("SETTINGS")).click();
+	await devtools.click('[data-testid="toggle-render-reason"]');
 
 	// Start profiling
-	await clickTab(devtools, "PROFILER");
-
+	await devtools.locator(locateTab("PROFILER")).click();
 	await clickRecordButton(devtools);
+	await page.click('[data-testid="counter-1"]');
+	await page.click('[data-testid="class-state-multi"]');
+	await page.click('[data-testid="counter-2"]');
+	await page.click('[data-testid="force-update"]');
 
-	await click(page, '[data-testid="counter-1"]');
-	await click(page, '[data-testid="class-state-multi"]');
-	await click(page, '[data-testid="counter-2"]');
-	await click(page, '[data-testid="force-update"]');
-
-	// Wait for profiler to flush
-	await wait(500);
+	await wait(1000);
 	await clickRecordButton(devtools);
-	await clickFlameNode(devtools, "Fragment");
 
 	// Class state
-	await clickFlameNode(devtools, "ComponentState");
-	let reasons = await getText(devtools, '[data-testid="render-reasons"');
-	expect(reasons).to.equal("State changed:value");
+	await devtools.locator(locateFlame("ComponentState")).click();
+	let reasons = await devtools
+		.locator('[data-testid="render-reasons"]')
+		.textContent();
+	expect(reasons).toEqual("State changed:value");
+	await devtools.locator(locateFlame("Fragment")).click();
 
-	await clickFlameNode(devtools, "Fragment");
-	await clickFlameNode(devtools, "Display");
-	reasons = await getText(devtools, '[data-testid="render-reasons"]');
-	expect(reasons).to.equal("Props changed:value");
+	await devtools.locator(locateFlame("Display")).first().click();
+	reasons = await devtools
+		.locator('[data-testid="render-reasons"]')
+		.textContent();
+	expect(reasons).toEqual("Props changed:value");
 
 	// Class state multiple
-	await click(devtools, '[data-testid="next-commit"]');
-	await clickFlameNode(devtools, "Fragment");
+	await devtools.click('[data-testid="next-commit"]');
+	await devtools.locator(locateFlame("Fragment")).click();
 
-	await clickFlameNode(devtools, "ComponentMultiState");
-	reasons = await getText(devtools, '[data-testid="render-reasons"');
-	expect(reasons).to.equal("State changed:counter, other");
+	await devtools.locator(locateFlame("ComponentMultiState")).click();
+	reasons = await devtools
+		.locator('[data-testid="render-reasons"]')
+		.textContent();
+	expect(reasons).toEqual("State changed:counter, other");
 
 	// Hooks
-	await click(devtools, '[data-testid="next-commit"]');
-	await clickFlameNode(devtools, "Fragment");
+	await devtools.click('[data-testid="next-commit"]');
+	await devtools.locator(locateFlame("Fragment")).click();
 
-	await clickFlameNode(devtools, "HookState");
-	reasons = await getText(devtools, '[data-testid="render-reasons"');
-	expect(reasons).to.equal("Hooks changed");
+	await devtools.locator(locateFlame("HookState")).click();
+	reasons = await devtools
+		.locator('[data-testid="render-reasons"]')
+		.textContent();
+	expect(reasons).toEqual("Hooks changed");
 
 	// Force update
-	await click(devtools, '[data-testid="next-commit"]');
-	await clickFlameNode(devtools, "Fragment");
+	await devtools.click('[data-testid="next-commit"]');
+	await devtools.locator(locateFlame("Fragment")).click();
 
-	await clickFlameNode(devtools, "ForceUpdate");
-	reasons = await getText(devtools, '[data-testid="render-reasons"');
-	expect(reasons).to.equal("Force update");
-}
+	await devtools.locator(locateFlame("ForceUpdate")).click();
+	reasons = await devtools
+		.locator('[data-testid="render-reasons"]')
+		.textContent();
+	expect(reasons).toEqual("Force update");
+});
