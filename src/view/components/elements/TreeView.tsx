@@ -1,5 +1,5 @@
 import { h } from "preact";
-import { useObserver, useStore } from "../../store/react-bindings";
+import { useStore } from "../../store/react-bindings";
 import { useEffect, useState, useRef, useCallback } from "preact/hooks";
 import { getLastChild } from "../tree/windowing";
 import { useKeyListNav } from "../tree/keyboard";
@@ -24,8 +24,8 @@ const highlightNode = debounce(
 
 export function TreeView() {
 	const store = useStore();
-	const nodeList = useObserver(() => store.nodeList.value);
-	const roots = useObserver(() => store.roots.value);
+	const nodeList = store.nodeList.value;
+	const roots = store.roots.value;
 	const { collapseNode, collapsed } = useCollapser();
 	const { selected, selectNext, selectPrev } = useSelection();
 
@@ -175,10 +175,10 @@ export function TreeItem(props: { key: any; id: ID; top: number }) {
 	const store = useStore();
 	const as = useSelection();
 	const { collapsed, toggle } = useCollapser();
-	const node = useObserver(() => store.nodes.value.get(id) || null);
-	const filterRoot = useObserver(() => store.filter.filterRoot.value);
-	const filterHoc = useObserver(() => store.filter.filterHoc.value);
-	const roots = useObserver(() => store.roots.value);
+	const node = store.nodes.value.get(id) || null;
+	const filterRoot = store.filter.filterRoot.value;
+	const filterHoc = store.filter.filterHoc.value;
+	const roots = store.roots.value;
 	const onToggle = () => toggle(id);
 	const ref = useRef<HTMLDivElement>(null);
 
@@ -279,13 +279,13 @@ export function Arrow() {
 
 export function HighlightPane(props: { treeDom: HTMLDivElement | null }) {
 	const store = useStore();
-	const nodes = useObserver(() => store.nodes.value);
+	const nodes = store.nodes.value;
 	const { selected } = useSelection();
 	const { collapsed } = useCollapser();
 
 	// Subscribe to nodeList so that we rerender whenever nodes
 	// are collapsed
-	const list = useObserver(() => store.nodeList.value);
+	const list = store.nodeList.value;
 
 	const [pos, setPos] = useState({ top: 0, height: 0 });
 	useEffect(() => {

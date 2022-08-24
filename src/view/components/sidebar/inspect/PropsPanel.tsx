@@ -2,9 +2,9 @@ import { h, Fragment } from "preact";
 import { ElementProps, ChangeFn } from "./ElementProps";
 import { SidebarPanel, Empty } from "../SidebarPanel";
 import { NewProp } from "./NewProp";
-import { Signal } from "../../../valoo";
+import { Signal } from "@preact/signals";
 import { PropData } from "./parseProps";
-import { useObserver, useStore } from "../../../store/react-bindings";
+import { useStore } from "../../../store/react-bindings";
 import { Message } from "../../Message/Message";
 
 export interface Props {
@@ -19,10 +19,10 @@ export interface Props {
 
 export function PropsPanel(props: Props) {
 	const { label, onCopy, onChange, canAddNew } = props;
-	const uncollapsed = useObserver(() => props.uncollapsed.value);
-	const items = useObserver(() => props.items.value);
+	const uncollapsed = props.uncollapsed.value;
+	const items = props.items.value;
 	const store = useStore();
-	const isSupported = useObserver(() => store.supports.hooks.value);
+	const isSupported = store.supports.hooks.value;
 
 	return (
 		<SidebarPanel title={label} onCopy={onCopy} testId={label}>
@@ -34,9 +34,9 @@ export function PropsPanel(props: Props) {
 						onChange={onChange}
 						onCollapse={id => {
 							const idx = props.uncollapsed.value.indexOf(id);
-							props.uncollapsed.update(v => {
-								idx > -1 ? v.splice(idx, 1) : v.push(id);
-							});
+							const v = props.uncollapsed.value;
+							idx > -1 ? v.splice(idx, 1) : v.push(id);
+							props.uncollapsed.value = v.slice();
 						}}
 					/>
 					{canAddNew && (

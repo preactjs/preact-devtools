@@ -3,6 +3,7 @@ import { applyOperationsV2 } from "./protocol/events";
 import { expect } from "chai";
 import { fromSnapshot } from "./debug";
 import * as sinon from "sinon";
+import { effect } from "@preact/signals";
 
 describe("Store", () => {
 	it("should apply mounts", () => {
@@ -54,7 +55,8 @@ describe("Store", () => {
 		applyOperationsV2(store, event);
 
 		const spy = sinon.spy();
-		store.nodeList.on(spy);
+		effect(() => spy(store.nodeList.value));
+		spy.resetHistory();
 
 		// prettier-ignore
 		const event2 = fromSnapshot([

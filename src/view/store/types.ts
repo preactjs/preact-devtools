@@ -1,4 +1,4 @@
-import { Signal } from "../valoo";
+import { Signal } from "@preact/signals";
 import { InspectData } from "../../adapter/adapter/adapter";
 import { createSearchStore } from "./search";
 import { createFilterStore } from "./filter";

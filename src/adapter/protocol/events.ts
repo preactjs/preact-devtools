@@ -1,5 +1,6 @@
 import { flushTable, StringTable } from "./string-table";
 import { Store } from "../../view/store/types";
+import { batch } from "@preact/signals-core";
 import { recordProfilerCommit } from "../../view/components/profiler/data/commits";
 import { ops2Tree } from "./operations";
 import { applyOperationsV1 } from "./legacy/operationsV1";
@@ -148,49 +149,45 @@ export function applyOperationsV2(store: Store, data: number[]) {
 			rendered,
 			commitRootId,
 		);
-		store.profiler.renderReasons.update(m => {
-			m.set(commitRootId, reasons);
-		});
+		const map = store.profiler.renderReasons.value.set(commitRootId, reasons);
+		store.profiler.renderReasons.value = new Map(map);
 	}
 
 	if (stats !== null) {
 		if (store.stats.data.value === null) {
 			store.stats.data.value = stats;
 		} else {
-			store.stats.data.update(v => {
-				if (v === null) return;
+			const v = store.stats.data.value;
+			sumArrays(v.roots, stats.roots);
+			sumArrays(v.classComponents, stats.classComponents);
+			sumArrays(v.functionComponents, stats.functionComponents);
+			sumArrays(v.fragments, stats.fragments);
+			sumArrays(v.forwardRef, stats.forwardRef);
+			sumArrays(v.memo, stats.memo);
+			sumArrays(v.suspense, stats.suspense);
+			sumArrays(v.elements, stats.elements);
+			v.text += stats.text;
+			sumArrays(v.keyed, stats.keyed);
+			sumArrays(v.unkeyed, stats.unkeyed);
+			sumArrays(v.mixed, stats.mixed);
 
-				sumArrays(v.roots, stats.roots);
-				sumArrays(v.classComponents, stats.classComponents);
-				sumArrays(v.functionComponents, stats.functionComponents);
-				sumArrays(v.fragments, stats.fragments);
-				sumArrays(v.forwardRef, stats.forwardRef);
-				sumArrays(v.memo, stats.memo);
-				sumArrays(v.suspense, stats.suspense);
-				sumArrays(v.elements, stats.elements);
-				v.text += stats.text;
-				sumArrays(v.keyed, stats.keyed);
-				sumArrays(v.unkeyed, stats.unkeyed);
-				sumArrays(v.mixed, stats.mixed);
+			sumOps(v.mounts, stats.mounts);
+			sumOps(v.updates, stats.updates);
+			sumOps(v.unmounts, stats.unmounts);
 
-				sumOps(v.mounts, stats.mounts);
-				sumOps(v.updates, stats.updates);
-				sumOps(v.unmounts, stats.unmounts);
+			const single = v.singleChildType;
+			const singleNew = stats.singleChildType;
 
-				const single = v.singleChildType;
-				const singleNew = stats.singleChildType;
+			single.roots += singleNew.roots;
+			single.classComponents += singleNew.classComponents;
+			single.functionComponents += singleNew.functionComponents;
+			single.fragments += singleNew.fragments;
+			single.forwardRef += singleNew.forwardRef;
+			single.memo += singleNew.memo;
+			single.suspense += singleNew.suspense;
+			single.elements += singleNew.elements;
 
-				single.roots += singleNew.roots;
-				single.classComponents += singleNew.classComponents;
-				single.functionComponents += singleNew.functionComponents;
-				single.fragments += singleNew.fragments;
-				single.forwardRef += singleNew.forwardRef;
-				single.memo += singleNew.memo;
-				single.suspense += singleNew.suspense;
-				single.elements += singleNew.elements;
-
-				return v;
-			});
+			store.stats.data.value = { ...v };
 		}
 	}
 }
@@ -217,7 +214,9 @@ export function applyEvent(store: Store, type: string, data: any) {
 			applyOperationsV1(store, data);
 			break;
 		case "operation_v2":
-			applyOperationsV2(store, data);
+			batch(() => {
+				applyOperationsV2(store, data);
+			});
 			break;
 		case "inspect-result": {
 			const { props, state, context } = store.sidebar;

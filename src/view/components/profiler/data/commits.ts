@@ -1,5 +1,5 @@
 import { ID, DevNode } from "../../../store/types";
-import { Signal, signal, watch } from "../../../valoo";
+import { Signal, signal, computed } from "@preact/signals";
 import { getRoot } from "../flamegraph/FlamegraphStore";
 import {
 	RenderReasonMap,
@@ -117,12 +117,12 @@ export function createProfiler(): ProfilerState {
 	// Selection
 	const activeCommitIdx = signal(0);
 	const selectedNodeId = signal(0);
-	const activeCommit = watch(() => {
+	const activeCommit = computed(() => {
 		return (
 			(commits.value.length > 0 && commits.value[activeCommitIdx.value]) || null
 		);
 	});
-	const selectedNode = watch(() => {
+	const selectedNode = computed(() => {
 		return activeCommit.value != null
 			? activeCommit.value.nodes.get(selectedNodeId.value) || null
 			: null;
@@ -130,35 +130,12 @@ export function createProfiler(): ProfilerState {
 
 	// Flamegraph
 	const flamegraphType = signal(FlamegraphType.FLAMEGRAPH);
-	flamegraphType.on(() => {
-		selectedNodeId.value = activeCommit.value
-			? getCommitInitalSelectNodeId(activeCommit.value, flamegraphType.value)
-			: -1;
-	});
 
 	// Recording
 	const isRecording = signal(false);
-	isRecording.on(v => {
-		// Clear current selection and profiling data when
-		// a new recording starts.
-		if (v) {
-			commits.value = [];
-			activeCommitIdx.value = 0;
-			selectedNodeId.value = 0;
-		} else {
-			// Reset selection when recording stopped
-			// and new profiling data was collected.
-			if (commits.value.length > 0) {
-				selectedNodeId.value = getCommitInitalSelectNodeId(
-					commits.value[0],
-					flamegraphType.value,
-				);
-			}
-		}
-	});
 
 	// Render reasons
-	const activeReason = watch(() => {
+	const activeReason = computed(() => {
 		if (activeCommit.value !== null) {
 			const commitId = activeCommit.value.commitRootId;
 			const reason = renderReasons.value.get(commitId);
@@ -171,7 +148,7 @@ export function createProfiler(): ProfilerState {
 	});
 
 	// FlamegraphNode
-	const flamegraphNodes = watch<Map<ID, NodeTransform>>(() => {
+	const flamegraphNodes = computed<Map<ID, NodeTransform>>(() => {
 		const commit = activeCommit.value;
 		if (!commit || flamegraphType.value !== FlamegraphType.FLAMEGRAPH) {
 			return new Map();
@@ -186,7 +163,7 @@ export function createProfiler(): ProfilerState {
 		return patchTree(commit);
 	});
 
-	const rankedNodes = watch<NodeTransform[]>(() => {
+	const rankedNodes = computed<NodeTransform[]>(() => {
 		const commit = activeCommit.value;
 		if (!commit || flamegraphType.value !== FlamegraphType.RANKED) {
 			return [];
@@ -217,10 +194,26 @@ export function createProfiler(): ProfilerState {
 	};
 }
 
+export function startProfiling(state: ProfilerState) {
+	state.isRecording.value = true;
+	state.commits.value = [];
+	state.activeCommitIdx.value = 0;
+	state.selectedNodeId.value = 0;
+}
+
 export function stopProfiling(state: ProfilerState) {
 	state.isRecording.value = false;
 	state.activeCommitIdx.value = 0;
-	state.selectedNodeId.value = -1;
+	// Reset selection when recording stopped
+	// and new profiling data was collected.
+	if (state.commits.value.length > 0) {
+		state.selectedNodeId.value = getCommitInitalSelectNodeId(
+			state.commits.value[0],
+			state.flamegraphType.value,
+		);
+	} else {
+		state.selectedNodeId.value = -1;
+	}
 }
 
 export function resetProfiler(state: ProfilerState) {
@@ -295,15 +288,15 @@ export function recordProfilerCommit(
 	// console.log(JSON.stringify(Array.from(nodes.values())));
 	// console.groupEnd();
 
-	profiler.commits.update(arr => {
-		arr.push({
-			rootId: getRoot(tree, commitRootId),
-			commitRootId: commitRootId,
-			rendered,
-			nodes,
-			maxSelfDuration,
-			duration: totalCommitDuration,
-			selfDurations,
-		});
+	const commitStore = profiler.commits.value;
+	commitStore.push({
+		rootId: getRoot(tree, commitRootId),
+		commitRootId: commitRootId,
+		rendered,
+		nodes,
+		maxSelfDuration,
+		duration: totalCommitDuration,
+		selfDurations,
 	});
+	profiler.commits.value = commitStore.slice();
 }

@@ -1,13 +1,14 @@
+import { useComputed } from "@preact/signals";
 import { h } from "preact";
-import { useObserver, useStore } from "../../store/react-bindings";
+import { useStore } from "../../store/react-bindings";
 import { DevNode } from "../../store/types";
 import { SidebarPanel } from "../sidebar/SidebarPanel";
 
 export function OwnerInfo() {
 	const store = useStore();
 
-	const selectedId = useObserver(() => store.selection.selected.value);
-	const data = useObserver(() => {
+	const selectedId = store.selection.selected.value;
+	const data = useComputed(() => {
 		const owners: DevNode[] = [];
 		const selectedId = store.selection.selected.value;
 
@@ -24,7 +25,7 @@ export function OwnerInfo() {
 		}
 
 		return owners;
-	});
+	}).value;
 
 	if (selectedId === -1) {
 		return null;

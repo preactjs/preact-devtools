@@ -1,4 +1,4 @@
-import { signal, watch } from "../valoo";
+import { signal, effect, computed } from "@preact/signals";
 import { createSearchStore } from "./search";
 import { createFilterStore } from "./filter";
 import { flattenChildren } from "../components/tree/windowing";
@@ -30,7 +30,7 @@ export function createStore(): Store {
 	const collapsed = signal(new Set<ID>());
 	const collapser = createCollapser<ID>(collapsed);
 
-	const nodeList = watch(() => {
+	const nodeList = computed(() => {
 		return roots.value
 			.map(root => {
 				const items = flattenChildren<ID, DevNode>(nodes.value, root, id =>
@@ -68,21 +68,21 @@ export function createStore(): Store {
 
 	const inspectData = signal<InspectData | null>(null);
 
-	watch(() => {
+	effect(() => {
 		const data = inspectData.value ? inspectData.value.props : null;
 		sidebar.props.items.value = parseObjectState(
 			data,
 			sidebar.props.uncollapsed.value,
 		);
 	});
-	watch(() => {
+	effect(() => {
 		const data = inspectData.value ? inspectData.value.state : null;
 		sidebar.state.items.value = parseObjectState(
 			data,
 			sidebar.state.uncollapsed.value,
 		);
 	});
-	watch(() => {
+	effect(() => {
 		const data = inspectData.value ? inspectData.value.context : null;
 		sidebar.context.items.value = parseObjectState(
 			data,
@@ -91,7 +91,7 @@ export function createStore(): Store {
 	});
 
 	const supportsHooks = signal(false);
-	watch(() => {
+	effect(() => {
 		if (supportsHooks) {
 			const items =
 				inspectData.value && inspectData.value.hooks

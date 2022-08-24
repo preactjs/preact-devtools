@@ -1,13 +1,14 @@
 import { h } from "preact";
-import { useStore, useObserver } from "../../../../store/react-bindings";
+import { useStore } from "../../../../store/react-bindings";
 import { SidebarPanel, Empty } from "../../../sidebar/SidebarPanel";
 import { DevNode } from "../../../../store/types";
+import { useComputed } from "@preact/signals";
 
 export function DebugNodeNav() {
 	const store = useStore();
-	const selected = useObserver(() => store.profiler.selectedNodeId.value);
-	const commit = useObserver(() => store.profiler.activeCommit.value);
-	const nodes = useObserver(() => {
+	const selected = store.profiler.selectedNodeId.value;
+	const commit = store.profiler.activeCommit.value;
+	const nodes = useComputed(() => {
 		const commit = store.profiler.activeCommit.value;
 		if (!commit) return [];
 
@@ -25,8 +26,8 @@ export function DebugNodeNav() {
 		}
 
 		return out;
-	});
-	const isRecording = useObserver(() => store.profiler.isRecording.value);
+	}).value;
+	const isRecording = store.profiler.isRecording.value;
 
 	if (isRecording) {
 		return null;

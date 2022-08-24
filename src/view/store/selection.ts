@@ -1,5 +1,5 @@
-import { AppCtx, useObserver } from "./react-bindings";
-import { signal, Signal } from "../valoo";
+import { AppCtx } from "./react-bindings";
+import { signal, Signal } from "@preact/signals";
 import { clamp } from "../components/tree/windowing";
 import { useContext } from "preact/hooks";
 import { ID } from "./types";
@@ -37,8 +37,8 @@ export function createSelectionStore(list: Signal<ID[]>) {
 
 export function useSelection() {
 	const sel = useContext(AppCtx).selection;
-	const selected = useObserver(() => sel.selected.value);
-	const selectedIdx = useObserver(() => sel.selectedIdx.value);
+	const selected = sel.selected.value;
+	const selectedIdx = sel.selectedIdx.value;
 	return {
 		selected,
 		selectedIdx,

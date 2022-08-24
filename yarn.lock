@@ -750,6 +750,18 @@
     kolorist "^1.2.10"
     resolve "^1.20.0"
 
+"@preact/signals-core@^0.0.4":
+  version "0.0.4"
+  resolved "https://registry.yarnpkg.com/@preact/signals-core/-/signals-core-0.0.4.tgz#5e5e640fc78549ddd49fe014f0112e97e284fddf"
+  integrity sha512-mUn/uKFfgj1Crcz3fOAM5e273ZFdx+pJFXsO1qJG5DML4rnLFXxjbqB0vYZ9cJNbnnRm3qjqc47ih3Ryzg8r6Q==
+
+"@preact/signals@^0.0.3":
+  version "0.0.3"
+  resolved "https://registry.yarnpkg.com/@preact/signals/-/signals-0.0.3.tgz#d45daf26180bf2940d07f0cc0cdce0333c08e554"
+  integrity sha512-Z7n4tVZ4nhukK1jaC7dUDITBciFo/Ne/p+2UVSLAMc6t5hI3yGpaenjmeItgC1/doov7H+5b6vV0K1QxlmRKfg==
+  dependencies:
+    "@preact/signals-core" "^0.0.4"
+
 "@prefresh/babel-plugin@0.4.3":
   version "0.4.3"
   resolved "https://registry.yarnpkg.com/@prefresh/babel-plugin/-/babel-plugin-0.4.3.tgz#175ecf6f7a038d06a83d1806503283c98c7d9865"

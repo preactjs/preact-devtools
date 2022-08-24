@@ -3,14 +3,14 @@ import { useState } from "preact/hooks";
 import { Actions, ActionSeparator } from "../Actions";
 import { IconBtn } from "../IconBtn";
 import { Icon, Picker } from "../icons";
-import { useStore, useObserver } from "../../store/react-bindings";
+import { useStore } from "../../store/react-bindings";
 import s from "./TreeBar.module.css";
 import { useSearch } from "../../store/search";
 import { OutsideClick } from "../OutsideClick";
 
 export function TreeBar() {
 	const store = useStore();
-	const isPicking = useObserver(() => store.isPicking.value);
+	const isPicking = store.isPicking.value;
 	const { value, count, selected, goPrev, goNext } = useSearch();
 
 	const [filterVisible, setFilterVisible] = useState(false);

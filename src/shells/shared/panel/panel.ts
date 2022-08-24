@@ -12,6 +12,7 @@ import {
 	storeHighlightUpdates,
 	storeFilters,
 } from "./settings";
+import { effect } from "@preact/signals";
 
 // Updated when the selection in the native elements panel changed.
 let hostSelectionChanged = false;
@@ -81,10 +82,12 @@ async function initDevtools() {
 
 	// Settings
 	await loadSettings(window, store);
-	store.theme.on(v => storeTheme(v));
-	store.profiler.captureRenderReasons.on(v => storeCaptureRenderReasons(v));
-	store.profiler.highlightUpdates.on(v => storeHighlightUpdates(v));
-	store.debugMode.on(v => storeDebugMode(v));
+	effect(() => storeTheme(store.theme.value));
+	effect(() =>
+		storeCaptureRenderReasons(store.profiler.captureRenderReasons.value),
+	);
+	effect(() => storeHighlightUpdates(store.profiler.highlightUpdates.value));
+	effect(() => storeDebugMode(store.debugMode.value));
 
 	if (process.env.DEBUG) {
 		(window as any).store = store;

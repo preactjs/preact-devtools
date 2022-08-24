@@ -30,6 +30,7 @@ describe("TreeItem", () => {
 		expect(container.textContent).to.equal('foo key="abcdefghijklmno…",');
 
 		store.nodes.value.get(1)!.key = "foobar";
+		store.nodes.value = new Map(store.nodes.value);
 		rerender(
 			<AppCtx.Provider value={store}>
 				<TreeItem id={1} key="" top={0} />,
