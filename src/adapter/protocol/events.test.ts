@@ -9,7 +9,7 @@ describe("applyEvent", () => {
 		const store = createStore();
 		const data = fromSnapshot(["rootId: 1"]);
 		applyEvent(store, "operation_v2", data);
-		expect(store.roots.$.length).to.equal(1);
+		expect(store.roots.value.length).to.equal(1);
 	});
 
 	it("should update roots correctly", () => {
@@ -20,7 +20,7 @@ describe("applyEvent", () => {
 			"Add 2 <div> to parent 1",
 		]);
 		applyEvent(store, "operation_v2", data);
-		expect(store.roots.$.length).to.equal(1);
+		expect(store.roots.value.length).to.equal(1);
 	});
 
 	it("should mount nodes", () => {
@@ -31,10 +31,10 @@ describe("applyEvent", () => {
 			"Add 2 <Parent> to parent 1",
 		]);
 		applyEvent(store, "operation_v2", data);
-		expect(store.nodes.$.size).to.equal(2);
-		expect(store.nodes.$.get(1)!.name).to.equal("Fragment");
-		expect(store.nodes.$.get(1)!.children).to.deep.equal([2]);
-		expect(store.nodes.$.get(2)!.name).to.equal("Parent");
+		expect(store.nodes.value.size).to.equal(2);
+		expect(store.nodes.value.get(1)!.name).to.equal("Fragment");
+		expect(store.nodes.value.get(1)!.children).to.deep.equal([2]);
+		expect(store.nodes.value.get(2)!.name).to.equal("Parent");
 	});
 
 	it("should do nothing on legacy update timings", () => {
@@ -45,7 +45,7 @@ describe("applyEvent", () => {
 			"Add 2 <Parent> to parent 1",
 		]);
 		applyEvent(store, "operation_v2", data);
-		expect(store.nodes.$.size).to.equal(2);
+		expect(store.nodes.value.size).to.equal(2);
 
 		const data2 = fromSnapshot([
 			"rootId: 1",
@@ -64,7 +64,7 @@ describe("applyEvent", () => {
 			"Add 2 <Parent> to parent 1",
 		]);
 		applyEvent(store, "operation_v2", data);
-		expect(store.nodes.$.size).to.equal(2);
+		expect(store.nodes.value.size).to.equal(2);
 
 		const data2 = fromSnapshot([
 			"rootId: 1",
@@ -74,10 +74,10 @@ describe("applyEvent", () => {
 
 		applyEvent(store, "operation_v2", data2);
 
-		expect(store.nodes.$.get(1)!.startTime).to.equal(2);
-		expect(store.nodes.$.get(1)!.endTime).to.equal(5);
-		expect(store.nodes.$.get(2)!.startTime).to.equal(3);
-		expect(store.nodes.$.get(2)!.endTime).to.equal(4);
+		expect(store.nodes.value.get(1)!.startTime).to.equal(2);
+		expect(store.nodes.value.get(1)!.endTime).to.equal(5);
+		expect(store.nodes.value.get(2)!.startTime).to.equal(3);
+		expect(store.nodes.value.get(2)!.endTime).to.equal(4);
 	});
 
 	it("should remove nodes", () => {
@@ -89,7 +89,7 @@ describe("applyEvent", () => {
 			"Add 3 <Foo> to parent 2",
 		]);
 		applyEvent(store, "operation_v2", data);
-		expect(store.nodes.$.size).to.equal(3);
+		expect(store.nodes.value.size).to.equal(3);
 
 		const data2 = fromSnapshot([
 			"rootId: 2",
@@ -97,8 +97,8 @@ describe("applyEvent", () => {
 			"Remove 3",
 		]);
 		applyEvent(store, "operation_v2", data2);
-		expect(store.nodes.$.size).to.equal(2);
-		expect(store.nodes.$.get(2)!.children).to.deep.equal([]);
+		expect(store.nodes.value.size).to.equal(2);
+		expect(store.nodes.value.get(2)!.children).to.deep.equal([]);
 	});
 
 	it("should remove nodes in any order", () => {
@@ -110,12 +110,12 @@ describe("applyEvent", () => {
 			"Add 3 <Foo> to parent 2",
 		]);
 		applyEvent(store, "operation_v2", data);
-		expect(store.nodes.$.size).to.equal(3);
+		expect(store.nodes.value.size).to.equal(3);
 
 		const data2 = fromSnapshot(["rootId: 1", "Remove 2", "Remove 3"]);
 		applyEvent(store, "operation_v2", data2);
-		expect(store.nodes.$.size).to.equal(1);
-		expect(store.nodes.$.get(1)!.children).to.deep.equal([]);
+		expect(store.nodes.value.size).to.equal(1);
+		expect(store.nodes.value.get(1)!.children).to.deep.equal([]);
 	});
 
 	it("should not throw on removing non-existing node", () => {
@@ -139,7 +139,7 @@ describe("applyEvent", () => {
 
 		const data2 = fromSnapshot(["rootId: 1", "Reorder 1 [3, 2]"]);
 		applyEvent(store, "operation_v2", data2);
-		expect(store.nodes.$.get(1)!.children).to.deep.equal([3, 2]);
+		expect(store.nodes.value.get(1)!.children).to.deep.equal([3, 2]);
 	});
 
 	it("should reorder children #2", () => {
@@ -156,7 +156,7 @@ describe("applyEvent", () => {
 
 		const data2 = fromSnapshot(["rootId: 1", "Reorder 1 [4, 3, 2, 5]"]);
 		applyEvent(store, "operation_v2", data2);
-		expect(store.nodes.$.get(1)!.children).to.deep.equal([4, 3, 2, 5]);
+		expect(store.nodes.value.get(1)!.children).to.deep.equal([4, 3, 2, 5]);
 	});
 
 	it("should apply after filter", () => {
@@ -212,8 +212,8 @@ describe("applyEvent", () => {
 		]);
 		applyEvent(store, "operation_v2", data3);
 
-		expect(store.nodes.$.has(1)).to.be.true;
-		expect(store.nodes.$.get(1)!.children).to.deep.equal([17]);
+		expect(store.nodes.value.has(1)).to.be.true;
+		expect(store.nodes.value.get(1)!.children).to.deep.equal([17]);
 	});
 
 	it("should update inspect data when inspected node is updated", () => {
@@ -221,7 +221,7 @@ describe("applyEvent", () => {
 		const store = createStore();
 		store.subscribe(spy);
 
-		store.inspectData.$ = {
+		store.inspectData.value = {
 			id: 2,
 			key: null,
 			context: null,
@@ -248,7 +248,7 @@ describe("applyEvent", () => {
 	it("should reset uncollapsed state", () => {
 		const store = createStore();
 
-		store.inspectData.$ = {
+		store.inspectData.value = {
 			id: 2,
 			key: null,
 			context: null,
@@ -261,9 +261,9 @@ describe("applyEvent", () => {
 			suspended: false,
 		};
 
-		store.sidebar.props.uncollapsed.$ = ["a", "b", "c"];
-		store.sidebar.state.uncollapsed.$ = ["a", "b", "c"];
-		store.sidebar.context.uncollapsed.$ = ["a", "b", "c"];
+		store.sidebar.props.uncollapsed.value = ["a", "b", "c"];
+		store.sidebar.state.uncollapsed.value = ["a", "b", "c"];
+		store.sidebar.context.uncollapsed.value = ["a", "b", "c"];
 
 		applyEvent(store, "inspect-result", {
 			id: 42,
@@ -276,8 +276,8 @@ describe("applyEvent", () => {
 			state: null,
 		});
 
-		expect(store.sidebar.props.uncollapsed.$).to.deep.equal([]);
-		expect(store.sidebar.state.uncollapsed.$).to.deep.equal([]);
-		expect(store.sidebar.context.uncollapsed.$).to.deep.equal([]);
+		expect(store.sidebar.props.uncollapsed.value).to.deep.equal([]);
+		expect(store.sidebar.state.uncollapsed.value).to.deep.equal([]);
+		expect(store.sidebar.context.uncollapsed.value).to.deep.equal([]);
 	});
 });

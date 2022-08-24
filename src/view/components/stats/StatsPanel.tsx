@@ -14,12 +14,12 @@ import { Icon } from "../icons";
 
 export function StatsRecordBtn() {
 	const store = useStore();
-	const isRecording = useObserver(() => store.stats.isRecording.$);
+	const isRecording = useObserver(() => store.stats.isRecording.value);
 
 	const onClick = useCallback(() => {
 		const { isRecording } = store.stats;
-		const v = !isRecording.$;
-		isRecording.$ = v;
+		const v = !isRecording.value;
+		isRecording.value = v;
 
 		if (v) {
 			store.emit("start-stats-recording", null);
@@ -44,15 +44,15 @@ export function StatsRecordBtn() {
 
 export function StatsPanel() {
 	const store = useStore();
-	const stats = useObserver(() => store.stats.data.$);
-	const isRecording = useObserver(() => store.stats.isRecording.$);
+	const stats = useObserver(() => store.stats.data.value);
+	const isRecording = useObserver(() => store.stats.isRecording.value);
 	const onReloadAndRecordStats = useCallback(() => {
-		store.stats.isRecording.$ = true;
+		store.stats.isRecording.value = true;
 		store.emit("reload-and-record-stats", null);
 	}, []);
 	const onReset = useCallback(() => {
-		store.stats.data.$ = null;
-		store.stats.isRecording.$ = false;
+		store.stats.data.value = null;
+		store.stats.isRecording.value = false;
 		store.emit("stop-profiling", null);
 	}, [store]);
 

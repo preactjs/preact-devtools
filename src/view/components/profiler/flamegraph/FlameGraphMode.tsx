@@ -7,11 +7,11 @@ import { Icon } from "../../icons";
 
 export function FlameGraphMode() {
 	const store = useStore();
-	const type = useObserver(() => store.profiler.flamegraphType.$);
-	const disabled = useObserver(() => !store.profiler.isSupported.$);
+	const type = useObserver(() => store.profiler.flamegraphType.value);
+	const disabled = useObserver(() => !store.profiler.isSupported.value);
 
 	const onClick = useCallback((value: string) => {
-		store.profiler.flamegraphType.$ = value as any;
+		store.profiler.flamegraphType.value = value as any;
 	}, []);
 
 	return (

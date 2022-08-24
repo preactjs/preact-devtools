@@ -16,8 +16,8 @@ import { Message, MessageBtn } from "../../Message/Message";
 
 export function Profiler() {
 	const store = useStore();
-	const showDebug = useObserver(() => store.debugMode.$);
-	const statsRecording = useObserver(() => store.stats.isRecording.$);
+	const showDebug = useObserver(() => store.debugMode.value);
+	const statsRecording = useObserver(() => store.stats.isRecording.value);
 
 	return (
 		<SidebarLayout>
@@ -39,7 +39,7 @@ export function Profiler() {
 							Stats recording is enabled. Timings may be less accurate.
 							<MessageBtn
 								onClick={() => {
-									store.stats.isRecording.$ = false;
+									store.stats.isRecording.value = false;
 								}}
 								testId="disable-stats-recording"
 							>

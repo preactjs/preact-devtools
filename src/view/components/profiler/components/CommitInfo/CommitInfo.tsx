@@ -5,8 +5,8 @@ import { useStore, useObserver } from "../../../../store/react-bindings";
 
 export function CommitInfo() {
 	const store = useStore();
-	const commit = useObserver(() => store.profiler.activeCommit.$);
-	const isRecording = useObserver(() => store.profiler.isRecording.$);
+	const commit = useObserver(() => store.profiler.activeCommit.value);
+	const isRecording = useObserver(() => store.profiler.isRecording.value);
 
 	if (commit === null || isRecording) {
 		return null;

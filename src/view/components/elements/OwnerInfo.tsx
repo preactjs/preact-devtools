@@ -6,12 +6,12 @@ import { SidebarPanel } from "../sidebar/SidebarPanel";
 export function OwnerInfo() {
 	const store = useStore();
 
-	const selectedId = useObserver(() => store.selection.selected.$);
+	const selectedId = useObserver(() => store.selection.selected.value);
 	const data = useObserver(() => {
 		const owners: DevNode[] = [];
-		const selectedId = store.selection.selected.$;
+		const selectedId = store.selection.selected.value;
 
-		const nodes = store.nodes.$;
+		const nodes = store.nodes.value;
 
 		let id = selectedId;
 		let current: DevNode | undefined;

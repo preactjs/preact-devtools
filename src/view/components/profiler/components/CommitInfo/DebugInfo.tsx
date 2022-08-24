@@ -11,12 +11,12 @@ const TimeRange = ({ from, to }: { from: number; to: number }) => (
 
 export function DebugProfilerInfo() {
 	const store = useStore();
-	const commit = useObserver(() => store.profiler.activeCommit.$);
-	const selected = useObserver(() => store.profiler.selectedNode.$);
-	const isRecording = useObserver(() => store.profiler.isRecording.$);
+	const commit = useObserver(() => store.profiler.activeCommit.value);
+	const selected = useObserver(() => store.profiler.selectedNode.value);
+	const isRecording = useObserver(() => store.profiler.isRecording.value);
 	const pos = useObserver(() => {
-		const s = store.profiler.selectedNodeId.$;
-		return store.profiler.flamegraphNodes.$.get(s);
+		const s = store.profiler.selectedNodeId.value;
+		return store.profiler.flamegraphNodes.value.get(s);
 	})!;
 
 	if (commit === null || isRecording || !selected || !pos) {

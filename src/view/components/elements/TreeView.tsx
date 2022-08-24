@@ -24,8 +24,8 @@ const highlightNode = debounce(
 
 export function TreeView() {
 	const store = useStore();
-	const nodeList = useObserver(() => store.nodeList.$);
-	const roots = useObserver(() => store.roots.$);
+	const nodeList = useObserver(() => store.nodeList.value);
+	const roots = useObserver(() => store.roots.value);
 	const { collapseNode, collapsed } = useCollapser();
 	const { selected, selectNext, selectPrev } = useSelection();
 
@@ -33,19 +33,19 @@ export function TreeView() {
 		selected,
 		onCollapse: collapseNode,
 		canCollapse: id => {
-			const node = store.nodes.$.get(id);
+			const node = store.nodes.value.get(id);
 			return node ? node.children.length > 0 : false;
 		},
 		checkCollapsed: id => collapsed.has(id),
 		onNext: () => {
 			selectNext();
-			const s = store.selection.selected.$;
+			const s = store.selection.selected.value;
 			highlightNode(store.notify, s);
 			store.notify("inspect", s);
 		},
 		onPrev: () => {
 			selectPrev();
-			const s = store.selection.selected.$;
+			const s = store.selection.selected.value;
 			highlightNode(store.notify, s);
 			store.notify("inspect", s);
 		},
@@ -175,10 +175,10 @@ export function TreeItem(props: { key: any; id: ID; top: number }) {
 	const store = useStore();
 	const as = useSelection();
 	const { collapsed, toggle } = useCollapser();
-	const node = useObserver(() => store.nodes.$.get(id) || null);
-	const filterRoot = useObserver(() => store.filter.filterRoot.$);
-	const filterHoc = useObserver(() => store.filter.filterHoc.$);
-	const roots = useObserver(() => store.roots.$);
+	const node = useObserver(() => store.nodes.value.get(id) || null);
+	const filterRoot = useObserver(() => store.filter.filterRoot.value);
+	const filterHoc = useObserver(() => store.filter.filterHoc.value);
+	const roots = useObserver(() => store.roots.value);
 	const onToggle = () => toggle(id);
 	const ref = useRef<HTMLDivElement>(null);
 
@@ -279,13 +279,13 @@ export function Arrow() {
 
 export function HighlightPane(props: { treeDom: HTMLDivElement | null }) {
 	const store = useStore();
-	const nodes = useObserver(() => store.nodes.$);
+	const nodes = useObserver(() => store.nodes.value);
 	const { selected } = useSelection();
 	const { collapsed } = useCollapser();
 
 	// Subscribe to nodeList so that we rerender whenever nodes
 	// are collapsed
-	const list = useObserver(() => store.nodeList.$);
+	const list = useObserver(() => store.nodeList.value);
 
 	const [pos, setPos] = useState({ top: 0, height: 0 });
 	useEffect(() => {

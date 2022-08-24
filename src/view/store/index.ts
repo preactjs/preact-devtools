@@ -1,4 +1,4 @@
-import { valoo, watch } from "../valoo";
+import { signal, watch } from "../valoo";
 import { createSearchStore } from "./search";
 import { createFilterStore } from "./filter";
 import { flattenChildren } from "../components/tree/windowing";
@@ -17,96 +17,106 @@ export function createStore(): Store {
 		listeners.forEach(fn => fn && fn(name, data));
 	};
 
-	const debugMode = valoo(!!process.env.DEBUG);
+	const debugMode = signal(!!process.env.DEBUG);
 
-	const nodes = valoo<Map<ID, DevNode>>(new Map());
-	const roots = valoo<ID[]>([]);
+	const nodes = signal<Map<ID, DevNode>>(new Map());
+	const roots = signal<ID[]>([]);
 
 	// Toggle
-	const isPicking = valoo<boolean>(false);
+	const isPicking = signal<boolean>(false);
 	const filterState = createFilterStore(notify);
 
 	// List
-	const collapsed = valoo(new Set<ID>());
+	const collapsed = signal(new Set<ID>());
 	const collapser = createCollapser<ID>(collapsed);
 
 	const nodeList = watch(() => {
-		return roots.$.map(root => {
-			const items = flattenChildren<ID, DevNode>(nodes.$, root, id =>
-				collapser.collapsed.$.has(id),
-			);
+		return roots.value
+			.map(root => {
+				const items = flattenChildren<ID, DevNode>(nodes.value, root, id =>
+					collapser.collapsed.value.has(id),
+				);
 
-			if (filterState.filterRoot.$) {
-				return items.slice(1);
-			}
+				if (filterState.filterRoot.value) {
+					return items.slice(1);
+				}
 
-			return items;
-		}).reduce((acc, val) => acc.concat(val), []);
+				return items;
+			})
+			.reduce((acc, val) => acc.concat(val), []);
 	});
 
 	// Sidebar
 	const sidebar = {
 		props: {
-			uncollapsed: valoo<string[]>([]),
-			items: valoo<PropData[]>([]),
+			uncollapsed: signal<string[]>([]),
+			items: signal<PropData[]>([]),
 		},
 		state: {
-			uncollapsed: valoo<string[]>([]),
-			items: valoo<PropData[]>([]),
+			uncollapsed: signal<string[]>([]),
+			items: signal<PropData[]>([]),
 		},
 		context: {
-			uncollapsed: valoo<string[]>([]),
-			items: valoo<PropData[]>([]),
+			uncollapsed: signal<string[]>([]),
+			items: signal<PropData[]>([]),
 		},
 		hooks: {
-			uncollapsed: valoo<string[]>([]),
-			items: valoo<PropData[]>([]),
+			uncollapsed: signal<string[]>([]),
+			items: signal<PropData[]>([]),
 		},
 	};
 
-	const inspectData = valoo<InspectData | null>(null);
+	const inspectData = signal<InspectData | null>(null);
 
 	watch(() => {
-		const data = inspectData.$ ? inspectData.$.props : null;
-		sidebar.props.items.$ = parseObjectState(data, sidebar.props.uncollapsed.$);
-	});
-	watch(() => {
-		const data = inspectData.$ ? inspectData.$.state : null;
-		sidebar.state.items.$ = parseObjectState(data, sidebar.state.uncollapsed.$);
-	});
-	watch(() => {
-		const data = inspectData.$ ? inspectData.$.context : null;
-		sidebar.context.items.$ = parseObjectState(
+		const data = inspectData.value ? inspectData.value.props : null;
+		sidebar.props.items.value = parseObjectState(
 			data,
-			sidebar.context.uncollapsed.$,
+			sidebar.props.uncollapsed.value,
+		);
+	});
+	watch(() => {
+		const data = inspectData.value ? inspectData.value.state : null;
+		sidebar.state.items.value = parseObjectState(
+			data,
+			sidebar.state.uncollapsed.value,
+		);
+	});
+	watch(() => {
+		const data = inspectData.value ? inspectData.value.context : null;
+		sidebar.context.items.value = parseObjectState(
+			data,
+			sidebar.context.uncollapsed.value,
 		);
 	});
 
-	const supportsHooks = valoo(false);
+	const supportsHooks = signal(false);
 	watch(() => {
 		if (supportsHooks) {
 			const items =
-				inspectData.$ && inspectData.$.hooks ? inspectData.$.hooks : [];
-			sidebar.hooks.items.$ = filterCollapsed(
+				inspectData.value && inspectData.value.hooks
+					? inspectData.value.hooks
+					: [];
+			sidebar.hooks.items.value = filterCollapsed(
 				items,
-				sidebar.hooks.uncollapsed.$,
+				sidebar.hooks.uncollapsed.value,
 			).slice(1);
 		}
 	});
 
 	const selection = createSelectionStore(nodeList);
-	const stats = valoo(null);
+	const stats = signal(null);
 
 	return {
 		supports: {
 			hooks: supportsHooks,
 		},
 		stats: {
-			isRecording: valoo(false),
+			isRecording: signal(false),
 			data: stats,
 		},
 		debugMode,
-		activePanel: valoo(Panel.ELEMENTS),
+		activePanel: signal(Panel.ELEMENTS),
 		profiler: createProfiler(),
 		notify,
 		nodeList,
@@ -118,14 +128,14 @@ export function createStore(): Store {
 		search: createSearchStore(nodes, nodeList),
 		filter: filterState,
 		selection,
-		theme: valoo<Theme>("auto"),
+		theme: signal<Theme>("auto"),
 		sidebar,
 		clear() {
-			roots.$ = [];
-			nodes.$ = new Map();
-			selection.selected.$ = -1;
-			collapser.collapsed.$ = new Set();
-			stats.$ = null;
+			roots.value = [];
+			nodes.value = new Map();
+			selection.selected.value = -1;
+			collapser.collapsed.value = new Set();
+			stats.value = null;
 		},
 		subscribe(fn) {
 			const idx = listeners.push(fn);

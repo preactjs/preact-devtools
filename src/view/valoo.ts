@@ -5,8 +5,8 @@ export interface SubscribeOptions {
 	init?: boolean;
 }
 
-export type Observable<T = any> = {
-	$: T;
+export type Signal<T = any> = {
+	value: T;
 	on(fn: (value: T) => void, options?: SubscribeOptions): Disposer;
 	update(fn?: (value: T) => T | void): T;
 	_disposers: Disposer[];
@@ -15,14 +15,14 @@ export type Observable<T = any> = {
 /**
  * We'll use this variable to track used dependencies
  */
-let tracking = new Set<Observable>();
+let tracking = new Set<Signal>();
 
-const dummy = new Set<Observable>();
+const dummy = new Set<Signal>();
 
 /**
  * Base observable primitive.
  */
-export function valoo<T>(v: T): Observable<T> {
+export function signal<T>(v: T): Signal<T> {
 	// In an earlier version we used a function to read and write values:
 	//
 	//   read: foo()
@@ -42,12 +42,12 @@ export function valoo<T>(v: T): Observable<T> {
 	//
 	// Long story short: This is why we're using getters and setters now.
 	const cb: Array<((v: T) => void) | null> = [];
-	const obs: Observable = {
-		get $(): T {
+	const obs: Signal = {
+		get value(): T {
 			tracking.add(obs);
 			return v;
 		},
-		set $(c: T) {
+		set value(c: T) {
 			v = c;
 
 			// Be careful not to track any observables in callbacks
@@ -68,7 +68,7 @@ export function valoo<T>(v: T): Observable<T> {
 		},
 		update(fn?: (v: T) => T | void) {
 			const res = fn ? fn(v) : undefined;
-			obs.$ = res !== undefined ? res : v;
+			obs.value = res !== undefined ? res : v;
 		},
 		_disposers: [],
 	};
@@ -80,12 +80,12 @@ export function valoo<T>(v: T): Observable<T> {
  * Track used observables automatically and re-execute the callback
  * whenever one of the dependencies changes.
  */
-export function watch<R>(fn: () => R): Observable<R> {
-	const out = valoo(null as any);
+export function watch<R>(fn: () => R): Signal<R> {
+	const out = signal(null as any);
 
 	// Perf: Don't allocate this in update, because it's much better
 	// to reuse the Set and just mutate + clear it for an update cycle.
-	const tracker = new Set<Observable>();
+	const tracker = new Set<Signal>();
 
 	const update = () => {
 		const oldTracker = tracking;
@@ -96,7 +96,7 @@ export function watch<R>(fn: () => R): Observable<R> {
 		out._disposers = [];
 
 		// Call the actual function
-		out.$ = fn();
+		out.value = fn();
 
 		// Resubscribe to listeners
 		tracking.forEach(x => {

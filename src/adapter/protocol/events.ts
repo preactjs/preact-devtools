@@ -126,14 +126,14 @@ export function applyOperationsV2(store: Store, data: number[]) {
 		tree,
 		reasons,
 		stats,
-	} = ops2Tree(store.nodes.$, store.roots.$, data);
+	} = ops2Tree(store.nodes.value, store.roots.value, data);
 
 	// Update store data
-	store.roots.$ = roots;
-	store.nodes.$ = tree;
+	store.roots.value = roots;
+	store.nodes.value = tree;
 
-	if (store.inspectData.$) {
-		const id = store.inspectData.$.id;
+	if (store.inspectData.value) {
+		const id = store.inspectData.value.id;
 		if (tree.has(id)) {
 			store.notify("inspect", id);
 		}
@@ -141,16 +141,21 @@ export function applyOperationsV2(store: Store, data: number[]) {
 
 	// If we are profiling, we'll make a frozen copy of the mutable
 	// elements tree because the profiler can step through time
-	if (store.profiler.isRecording.$) {
-		recordProfilerCommit(store.nodes.$, store.profiler, rendered, commitRootId);
+	if (store.profiler.isRecording.value) {
+		recordProfilerCommit(
+			store.nodes.value,
+			store.profiler,
+			rendered,
+			commitRootId,
+		);
 		store.profiler.renderReasons.update(m => {
 			m.set(commitRootId, reasons);
 		});
 	}
 
 	if (stats !== null) {
-		if (store.stats.data.$ === null) {
-			store.stats.data.$ = stats;
+		if (store.stats.data.value === null) {
+			store.stats.data.value = stats;
 		} else {
 			store.stats.data.update(v => {
 				if (v === null) return;
@@ -193,18 +198,18 @@ export function applyOperationsV2(store: Store, data: number[]) {
 export function applyEvent(store: Store, type: string, data: any) {
 	switch (type) {
 		case "attach":
-			if (!store.profiler.isSupported.$) {
-				store.profiler.isSupported.$ = !!data.supportsProfiling;
+			if (!store.profiler.isSupported.value) {
+				store.profiler.isSupported.value = !!data.supportsProfiling;
 			}
-			if (!store.profiler.supportsRenderReasons.$) {
-				store.profiler.supportsRenderReasons.$ = !!data.supportsRenderReasons;
-			}
-
-			if (!store.supports.hooks.$) {
-				store.supports.hooks.$ = !!data.supportsHooks;
+			if (!store.profiler.supportsRenderReasons.value) {
+				store.profiler.supportsRenderReasons.value = !!data.supportsRenderReasons;
 			}
 
-			if (store.profiler.highlightUpdates.$) {
+			if (!store.supports.hooks.value) {
+				store.supports.hooks.value = !!data.supportsHooks;
+			}
+
+			if (store.profiler.highlightUpdates.value) {
 				store.emit("start-highlight-updates", null);
 			}
 			break;
@@ -216,15 +221,15 @@ export function applyEvent(store: Store, type: string, data: any) {
 			break;
 		case "inspect-result": {
 			const { props, state, context } = store.sidebar;
-			store.inspectData.$ = data;
+			store.inspectData.value = data;
 
-			if (store.selection.selected.$ !== data.id) {
+			if (store.selection.selected.value !== data.id) {
 				store.selection.selectById(data.id);
 
 				// Reset collapsible state
-				props.uncollapsed.$ = [];
-				state.uncollapsed.$ = [];
-				context.uncollapsed.$ = [];
+				props.uncollapsed.value = [];
+				state.uncollapsed.value = [];
+				context.uncollapsed.value = [];
 			}
 			break;
 		}
@@ -232,7 +237,7 @@ export function applyEvent(store: Store, type: string, data: any) {
 			store.selection.selectById(data);
 			break;
 		case "stop-picker":
-			store.isPicking.$ = false;
+			store.isPicking.value = false;
 			break;
 	}
 }

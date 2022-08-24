@@ -1,4 +1,4 @@
-import { Observable, valoo } from "../valoo";
+import { Signal, signal } from "../valoo";
 import { useStore, useObserver } from "./react-bindings";
 import { escapeStringRegexp } from "./utils";
 import { ID, DevNode } from "./types";
@@ -19,34 +19,34 @@ export function createRegex(s: string): RegExp {
 }
 
 export function createSearchStore(
-	items: Observable<Map<ID, DevNode>>,
-	list: Observable<ID[]>,
+	items: Signal<Map<ID, DevNode>>,
+	list: Signal<ID[]>,
 ) {
-	const value = valoo("");
-	const selected = valoo(0);
-	const selectedIdx = valoo(-1);
-	const regex = valoo<RegExp | null>(null);
-	const match = valoo<number[]>([]);
-	const count = valoo(0);
+	const searchValue = signal("");
+	const selected = signal(0);
+	const selectedIdx = signal(-1);
+	const regex = signal<RegExp | null>(null);
+	const match = signal<number[]>([]);
+	const count = signal(0);
 
 	const onChange = (s: string) => {
-		value.$ = s;
+		searchValue.value = s;
 
-		match.$ = [];
+		match.value = [];
 
 		if (s === "") {
-			regex.$ = null;
-			count.$ = 0;
-			selected.$ = 0;
+			regex.value = null;
+			count.value = 0;
+			selected.value = 0;
 			return;
 		}
 
 		const reg = createRegex(s);
-		regex.$ = reg;
+		regex.value = reg;
 
 		const ids: number[] = [];
-		list.$.forEach(id => {
-			const node = items.$.get(id);
+		list.value.forEach(id => {
+			const node = items.value.get(id);
 			if (
 				node &&
 				(reg.test(node.name) || (node.hocs && node.hocs.some(h => reg.test(h))))
@@ -56,33 +56,33 @@ export function createSearchStore(
 		});
 
 		if (ids.length > 0) {
-			selected.$ = 0;
+			selected.value = 0;
 		}
-		count.$ = ids.length;
-		match.$ = ids;
+		count.value = ids.length;
+		match.value = ids;
 	};
 
 	const reset = () => {
-		selectedIdx.$ = -1;
+		selectedIdx.value = -1;
 		onChange("");
 	};
 
 	function go(n: number) {
-		if (n < 0) n = match.$.length - 1;
-		else if (n > match.$.length - 1) n = 0;
-		selected.$ = n;
-		selectedIdx.$ = list.$.findIndex(id => match.$[n] === id);
+		if (n < 0) n = match.value.length - 1;
+		else if (n > match.value.length - 1) n = 0;
+		selected.value = n;
+		selectedIdx.value = list.value.findIndex(id => match.value[n] === id);
 	}
 
-	const selectNext = () => go(selected.$ + 1);
-	const selectPrev = () => go(selected.$ - 1);
+	const selectNext = () => go(selected.value + 1);
+	const selectPrev = () => go(selected.value - 1);
 
 	return {
 		selected,
 		selectedIdx,
 		regex,
 		count,
-		value,
+		searchValue,
 		match,
 		reset,
 		onChange,
@@ -93,13 +93,13 @@ export function createSearchStore(
 
 export function useSearch() {
 	const { search: s } = useStore();
-	const match = useObserver(() => s.match.$);
-	const value = useObserver(() => s.value.$);
-	const marked = useObserver(() => s.selected.$);
-	const regex = useObserver(() => s.regex.$);
-	const count = useObserver(() => s.count.$);
-	const selected = useObserver(() => s.selected.$);
-	const selectedId = useObserver(() => s.match.$[s.selected.$]);
+	const match = useObserver(() => s.match.value);
+	const value = useObserver(() => s.searchValue.value);
+	const marked = useObserver(() => s.selected.value);
+	const regex = useObserver(() => s.regex.value);
+	const count = useObserver(() => s.count.value);
+	const selected = useObserver(() => s.selected.value);
+	const selectedId = useObserver(() => s.match.value[s.selected.value]);
 	return {
 		count,
 		selected,

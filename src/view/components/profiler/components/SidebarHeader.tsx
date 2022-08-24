@@ -13,7 +13,7 @@ import { Icon } from "../../icons";
 
 export function SidebarHeader() {
 	const store = useStore();
-	const selected = useObserver(() => store.profiler.selectedNode.$);
+	const selected = useObserver(() => store.profiler.selectedNode.value);
 	const emit = useEmitter();
 	const log = useCallback(() => {
 		if (selected) emit("log", { id: selected.id, children: selected.children });

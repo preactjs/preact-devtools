@@ -9,14 +9,16 @@ import { PageLayout } from "../SidebarLayout";
 
 export function Settings() {
 	const store = useStore();
-	const theme = useObserver(() => store.theme.$);
+	const theme = useObserver(() => store.theme.value);
 	const renderReasons = useObserver(
-		() => store.profiler.captureRenderReasons.$,
+		() => store.profiler.captureRenderReasons.value,
 	);
-	const highlightUpdates = useObserver(() => store.profiler.highlightUpdates.$);
-	const debugMode = useObserver(() => store.debugMode.$);
+	const highlightUpdates = useObserver(
+		() => store.profiler.highlightUpdates.value,
+	);
+	const debugMode = useObserver(() => store.debugMode.value);
 
-	const setTheme = useCallback((v: Theme) => (store.theme.$ = v), []);
+	const setTheme = useCallback((v: Theme) => (store.theme.value = v), []);
 
 	return (
 		<PageLayout>
@@ -25,8 +27,8 @@ export function Settings() {
 					<Checkbox
 						checked={highlightUpdates}
 						onChange={() => {
-							const value = !store.profiler.highlightUpdates.$;
-							store.profiler.highlightUpdates.$ = value;
+							const value = !store.profiler.highlightUpdates.value;
+							store.profiler.highlightUpdates.value = value;
 							store.notify(
 								value ? "start-highlight-updates" : "stop-highlight-updates",
 								null,
@@ -76,7 +78,7 @@ export function Settings() {
 					<div class="settings-tab-checkbox">
 						<Checkbox
 							checked={debugMode}
-							onChange={() => (store.debugMode.$ = !store.debugMode.$)}
+							onChange={() => (store.debugMode.value = !store.debugMode.value)}
 							testId="toggle-debug-mode"
 						>
 							Toggle debug mode

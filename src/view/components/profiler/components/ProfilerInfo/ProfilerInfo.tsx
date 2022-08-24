@@ -4,9 +4,9 @@ import { RecordBtn } from "../TimelineBar/TimelineBar";
 
 export function ProfilerInfo() {
 	const store = useStore();
-	const isRecording = useObserver(() => store.profiler.isRecording.$);
-	const isSupported = useObserver(() => store.profiler.isSupported.$);
-	const commits = useObserver(() => store.profiler.commits.$);
+	const isRecording = useObserver(() => store.profiler.isRecording.value);
+	const isSupported = useObserver(() => store.profiler.isSupported.value);
+	const commits = useObserver(() => store.profiler.commits.value);
 
 	if (!isSupported) {
 		return (

@@ -18,9 +18,9 @@ describe("Store", () => {
 		]);
 		applyOperationsV2(store, event);
 
-		expect(store.nodes.$.get(1)!.children).to.deep.equal([2]);
-		expect(store.nodes.$.get(2)!.children).to.deep.equal([3, 5]);
-		expect(store.nodes.$.get(3)!.children).to.deep.equal([4]);
+		expect(store.nodes.value.get(1)!.children).to.deep.equal([2]);
+		expect(store.nodes.value.get(2)!.children).to.deep.equal([3, 5]);
+		expect(store.nodes.value.get(3)!.children).to.deep.equal([4]);
 	});
 
 	it("should update durations", () => {
@@ -39,8 +39,8 @@ describe("Store", () => {
     ]);
 		applyOperationsV2(store, event2);
 
-		expect(store.nodes.$.get(1)!.startTime).to.equal(12);
-		expect(store.nodes.$.get(1)!.endTime).to.equal(15);
+		expect(store.nodes.value.get(1)!.startTime).to.equal(12);
+		expect(store.nodes.value.get(1)!.endTime).to.equal(15);
 	});
 
 	it("should unmount vnodes", () => {
@@ -65,8 +65,8 @@ describe("Store", () => {
 		applyOperationsV2(store, event2);
 
 		expect(spy.callCount).to.eq(2); // TODO: Should be called once
-		expect(store.nodes.$.get(1)!.children).to.deep.equal([]);
-		expect(store.nodes.$.get(2)).to.equal(undefined);
-		expect(store.nodes.$.get(3)).to.equal(undefined);
+		expect(store.nodes.value.get(1)!.children).to.deep.equal([]);
+		expect(store.nodes.value.get(2)).to.equal(undefined);
+		expect(store.nodes.value.get(3)).to.equal(undefined);
 	});
 });

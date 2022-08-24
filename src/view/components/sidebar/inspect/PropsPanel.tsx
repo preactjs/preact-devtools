@@ -2,7 +2,7 @@ import { h, Fragment } from "preact";
 import { ElementProps, ChangeFn } from "./ElementProps";
 import { SidebarPanel, Empty } from "../SidebarPanel";
 import { NewProp } from "./NewProp";
-import { Observable } from "../../../valoo";
+import { Signal } from "../../../valoo";
 import { PropData } from "./parseProps";
 import { useObserver, useStore } from "../../../store/react-bindings";
 import { Message } from "../../Message/Message";
@@ -10,8 +10,8 @@ import { Message } from "../../Message/Message";
 export interface Props {
 	label: string;
 	isOptional?: boolean;
-	uncollapsed: Observable<string[]>;
-	items: Observable<PropData[]>;
+	uncollapsed: Signal<string[]>;
+	items: Signal<PropData[]>;
 	canAddNew?: boolean;
 	onChange: ChangeFn;
 	onCopy?: () => void;
@@ -19,10 +19,10 @@ export interface Props {
 
 export function PropsPanel(props: Props) {
 	const { label, onCopy, onChange, canAddNew } = props;
-	const uncollapsed = useObserver(() => props.uncollapsed.$);
-	const items = useObserver(() => props.items.$);
+	const uncollapsed = useObserver(() => props.uncollapsed.value);
+	const items = useObserver(() => props.items.value);
 	const store = useStore();
-	const isSupported = useObserver(() => store.supports.hooks.$);
+	const isSupported = useObserver(() => store.supports.hooks.value);
 
 	return (
 		<SidebarPanel title={label} onCopy={onCopy} testId={label}>
@@ -33,7 +33,7 @@ export function PropsPanel(props: Props) {
 						items={items}
 						onChange={onChange}
 						onCollapse={id => {
-							const idx = props.uncollapsed.$.indexOf(id);
+							const idx = props.uncollapsed.value.indexOf(id);
 							props.uncollapsed.update(v => {
 								idx > -1 ? v.splice(idx, 1) : v.push(id);
 							});

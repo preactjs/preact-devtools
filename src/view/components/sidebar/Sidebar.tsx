@@ -10,11 +10,11 @@ import { HocPanel } from "./HocPanel";
 
 export function Sidebar() {
 	const store = useStore();
-	const showDebug = useObserver(() => store.debugMode.$);
-	const inspect = useObserver(() => store.inspectData.$);
+	const showDebug = useObserver(() => store.debugMode.value);
+	const inspect = useObserver(() => store.inspectData.value);
 	const hocs = useObserver(() => {
-		if (store.inspectData.$) {
-			const node = store.nodes.$.get(store.inspectData.$.id);
+		if (store.inspectData.value) {
+			const node = store.nodes.value.get(store.inspectData.value.id);
 			return node ? node.hocs : null;
 		}
 		return null;

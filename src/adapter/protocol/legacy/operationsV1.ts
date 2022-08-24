@@ -4,18 +4,19 @@ import { Store } from "../../../view/store/types";
 import { deepClone } from "../../shared/utils";
 
 export function applyOperationsV1(store: Store, data: number[]) {
-	const nodes = new Map(store.nodes.$);
+	const nodes = new Map(store.nodes.value);
 
 	let i = data[1] + 1;
 	const strings = parseTable(data.slice(1, i + 1));
 
-	const inspected = store.inspectData.$ != null ? store.inspectData.$.id : -2;
+	const inspected =
+		store.inspectData.value != null ? store.inspectData.value.id : -2;
 
 	for (; i < data.length; i++) {
 		switch (data[i]) {
 			case MsgTypes.ADD_ROOT: {
 				const id = data[i + 1];
-				store.roots.$.push(id);
+				store.roots.value.push(id);
 				i += 1;
 				break;
 			}
@@ -130,5 +131,5 @@ export function applyOperationsV1(store: Store, data: number[]) {
 	}
 
 	store.roots.update();
-	store.nodes.$ = nodes;
+	store.nodes.value = nodes;
 }

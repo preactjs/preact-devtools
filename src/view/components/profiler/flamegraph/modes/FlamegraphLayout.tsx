@@ -30,8 +30,8 @@ export function FlamegraphLayout({
 	containerRef,
 }: FlamegraphLayoutProps) {
 	const store = useStore();
-	const data = useObserver(() => store.profiler.flamegraphNodes.$);
-	const filterHoc = useObserver(() => store.filter.filterHoc.$);
+	const data = useObserver(() => store.profiler.flamegraphNodes.value);
+	const filterHoc = useObserver(() => store.filter.filterHoc.value);
 
 	const placed = useMemo(
 		() =>
