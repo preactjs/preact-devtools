@@ -56,6 +56,7 @@ describe("Store", () => {
 
 		const spy = sinon.spy();
 		effect(() => spy(store.nodeList.value));
+		spy.resetHistory();
 
 		// prettier-ignore
 		const event2 = fromSnapshot([
