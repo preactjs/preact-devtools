@@ -78,8 +78,10 @@ export function Highlighter(props: Props) {
 					bounds.top && !bounds.bottom ? s.fixedTop : ""
 				}  ${bounds.bottom ? s.fixedBottom : ""}`}
 			>
-				<span class={s.label}>{props.label}</span> |{" "}
-				<span class={s.value}>{width}px</span> ×{" "}
+				<span class={s.label} data-testid="highlighter-label">
+					{props.label}
+				</span>{" "}
+				| <span class={s.value}>{width}px</span> ×{" "}
 				<span class={s.value}>{height}px</span>
 			</span>
 		</div>

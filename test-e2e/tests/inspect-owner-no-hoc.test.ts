@@ -1,37 +1,29 @@
-import { clickTreeItem, getOwners, newTestPage } from "../test-utils";
-import { expect } from "chai";
-import {
-	clickNestedText,
-	clickSelector,
-	clickTestId,
-	waitForSelector,
-	waitForTestId,
-} from "pentf/browser_utils";
+import { test, expect } from "@playwright/test";
+import { getOwners, gotoTest } from "../pw-utils";
 
-export const description = "Inspect owner with disabled HOC filter";
+test("Inspect owner with disabled HOC filter", async ({ page }) => {
+	const { devtools } = await gotoTest(page, "update-hoc");
 
-export async function run(config: any) {
-	const { devtools, page } = await newTestPage(config, "update-hoc");
+	await devtools.click('[data-testid="filter-menu-button"]');
+	await devtools.waitForSelector('[data-testid="filter-popup"]');
+	await devtools.click(
+		'[data-testid="filter-popup"] label:has-text("HOC-Components")',
+	);
+	await devtools.click('[data-testid="filter-update"]');
 
-	await clickTestId(devtools, "filter-menu-button");
-	await waitForTestId(devtools, "filter-popup");
-	await clickNestedText(devtools, "HOC-Components");
-	await clickTestId(devtools, "filter-update");
-
-	await waitForSelector(
-		devtools,
+	await devtools.waitForSelector(
 		'[data-testid="tree-item"][data-name="Memo(Foo)"]',
 	);
 
-	await clickTreeItem(devtools, "List");
+	await devtools.click('[data-name="List"]');
 	let owners = await getOwners(devtools);
-	expect(owners).to.deep.equal(["Counter", "App"]);
+	expect(owners).toEqual(["Counter", "App"]);
 
 	// Trigger update
-	await clickSelector(page, "button");
-	await waitForSelector(devtools, '[data-testid="elements-tree"]');
+	await page.click("button");
+	await devtools.waitForSelector('[data-testid="elements-tree"]');
 
-	await clickTreeItem(devtools, "ListItem");
+	await devtools.click('[data-name="ListItem"]');
 	owners = await getOwners(devtools);
-	expect(owners).to.deep.equal(["List", "Counter", "App"]);
-}
+	expect(owners).toEqual(["List", "Counter", "App"]);
+});

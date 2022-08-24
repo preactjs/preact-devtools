@@ -1,45 +1,35 @@
-import { newTestPage, getCount, clickAndWaitForHooks } from "../../test-utils";
-import { expect } from "chai";
-import { clickNestedText, getAttribute } from "pentf/browser_utils";
-import { waitForPass } from "pentf/assert_utils";
-import { wait } from "pentf/utils";
+import { test, expect } from "@playwright/test";
+import { gotoTest, locateHook, locateTreeItem } from "../../pw-utils";
 
-export const description = "Inspect custom hooks";
+test("Inspect custom hooks", async ({ page }) => {
+	const { devtools } = await gotoTest(page, "hooks");
 
-export async function run(config: any) {
-	const { devtools } = await newTestPage(config, "hooks");
+	await devtools.locator(locateTreeItem("CustomHooks")).click();
+	await devtools.locator('[data-testid="Hooks"]').waitFor();
 
-	const hooksPanel = '[data-testid="props-row"]';
+	await devtools
+		.locator(
+			'[data-testid="Hooks"] [data-testid="props-row"] button[data-collapsed="true"]',
+		)
+		.waitFor();
 
-	// CutomHook
-	await clickAndWaitForHooks(devtools, "CustomHooks");
+	await expect(
+		devtools.locator('[data-testid="Hooks"] [data-testid="props-row"]'),
+	).toHaveCount(1);
 
-	const isCollapsed = await getAttribute(
-		devtools,
-		`${hooksPanel} button`,
-		"data-collapsed",
-	);
-	expect(isCollapsed).to.equal("true");
-	await waitForPass(async () => {
-		expect(await getCount(devtools, hooksPanel)).to.equal(1);
-	});
+	await devtools.locator(locateHook("useFoo")).click();
+	await expect(
+		devtools.locator('[data-testid="Hooks"] [data-testid="props-row"]'),
+	).toHaveCount(2);
 
-	await waitForPass(async () => {
-		await clickNestedText(devtools, "useFoo");
-		await wait(200);
-		expect(await getCount(devtools, hooksPanel)).to.equal(2);
-	});
-
-	await waitForPass(async () => {
-		await clickNestedText(devtools, "useBar");
-		await wait(200);
-		expect(await getCount(devtools, hooksPanel)).to.equal(4);
-	});
+	await devtools.locator(locateHook("useBar")).click();
+	await expect(
+		devtools.locator('[data-testid="Hooks"] [data-testid="props-row"]'),
+	).toHaveCount(4);
 
 	// Collapse all hooks
-	await waitForPass(async () => {
-		await clickNestedText(devtools, "useFoo");
-		await wait(200);
-		expect(await getCount(devtools, hooksPanel)).to.equal(1);
-	});
-}
+	await devtools.locator(locateHook("useFoo")).click();
+	await expect(
+		devtools.locator('[data-testid="Hooks"] [data-testid="props-row"]'),
+	).toHaveCount(1);
+});

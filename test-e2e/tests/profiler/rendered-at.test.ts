@@ -1,60 +1,53 @@
+import { expect, test } from "@playwright/test";
 import {
-	newTestPage,
-	click,
-	getCount,
-	getAttribute$$,
-	clickTab,
+	locateTab,
+	gotoTest,
 	clickRecordButton,
-	waitForSelector,
-} from "../../test-utils";
-import { expect } from "chai";
-import { clickNestedText } from "pentf/browser_utils";
+	locateFlame,
+} from "../../pw-utils";
 
-export const description = "Show in which commit a node rendered";
+test("Show in which commit a node rendered", async ({ page }) => {
+	const { devtools } = await gotoTest(page, "root-multi");
 
-export async function run(config: any) {
-	const { page, devtools } = await newTestPage(config, "root-multi");
+	await devtools.locator(locateTab("PROFILER")).click();
+	await clickRecordButton(devtools);
 
-	await clickTab(devtools, "PROFILER");
+	await page.click("#app button");
+	await page.click("#app2 button");
+	await page.click("#app button");
+	await page.click("#app2 button");
 
 	await clickRecordButton(devtools);
 
-	await click(page, "#app button");
-	await click(page, "#app2 button");
-	await click(page, "#app button");
-	await click(page, "#app2 button");
+	await devtools.locator(locateFlame("Counter")).click();
+	await devtools.waitForSelector('[data-testid="rendered-at"]');
 
-	await clickRecordButton(devtools);
+	const items = await devtools
+		.locator('[data-testid="rendered-at"] button')
+		.count();
+	expect(items).toEqual(2);
 
-	await clickNestedText(devtools, "Counter");
-	await waitForSelector(devtools, '[data-testid="rendered-at"]');
+	let commits = await devtools
+		.locator('[data-testid="commit-item"]')
+		.evaluateAll(els =>
+			Array.from(els).map(el => el.getAttribute("data-selected")),
+		);
+	expect(commits).toEqual(["true", null, null, null]);
 
-	const items = await getCount(devtools, '[data-testid="rendered-at"] button');
-	expect(items).to.equal(2);
+	const btns = await devtools
+		.locator('[data-testid="rendered-at"] button')
+		.evaluateAll(els =>
+			Array.from(els).map(el => el.getAttribute("data-active")),
+		);
 
-	let commits = await getAttribute$$(
-		devtools,
-		'[data-testid="commit-item"]',
-		"data-selected",
-	);
-	expect(commits).to.deep.equal(["true", null, null, null]);
+	expect(btns).toEqual(["true", null]);
 
-	const btns = await getAttribute$$(
-		devtools,
-		'[data-testid="rendered-at"] button',
-		"data-active",
-	);
-	expect(btns).to.deep.equal(["true", null]);
+	await devtools.click('[data-testid="rendered-at"] button:not([data-active])');
 
-	await click(
-		devtools,
-		'[data-testid="rendered-at"] button:not([data-active])',
-	);
-
-	commits = await getAttribute$$(
-		devtools,
-		'[data-testid="commit-item"]',
-		"data-selected",
-	);
-	expect(commits).to.deep.equal([null, null, "true", null]);
-}
+	commits = await devtools
+		.locator('[data-testid="commit-item"]')
+		.evaluateAll(els =>
+			Array.from(els).map(el => el.getAttribute("data-selected")),
+		);
+	expect(commits).toEqual([null, null, "true", null]);
+});

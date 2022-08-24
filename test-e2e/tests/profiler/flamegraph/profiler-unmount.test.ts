@@ -1,33 +1,25 @@
+import { test } from "@playwright/test";
 import {
-	newTestPage,
-	click,
-	clickTab,
 	clickRecordButton,
-	waitForSelector,
-} from "../../../test-utils";
-import { clickNestedText } from "pentf/browser_utils";
-import { wait } from "pentf/utils";
+	locateTab,
+	gotoTest,
+	locateFlame,
+	wait,
+	locateProfilerTab,
+} from "../../../pw-utils";
 
-export const description = "Should highlight flamegraph node if present in DOM";
+test("Should highlight flamegraph node if present in DOM", async ({ page }) => {
+	const { devtools } = await gotoTest(page, "profiler-highlight");
 
-export async function run(config: any) {
-	const { page, devtools } = await newTestPage(config, "profiler-highlight");
-
-	await clickTab(devtools, "PROFILER");
-
+	await devtools.locator(locateTab("PROFILER")).click();
 	await clickRecordButton(devtools);
-	await click(page, "button");
+	await page.locator("button").first().click();
 	await clickRecordButton(devtools);
 
-	await clickNestedText(page, "Toggle");
-
-	await click(devtools, 'input[value="RANKED"]');
+	await page.click("button");
+	await devtools.locator(locateProfilerTab("RANKED")).click();
 	await wait(1000);
-	await click(devtools, 'input[value="FLAMEGRAPH"]');
+	await devtools.locator(locateProfilerTab("FLAMEGRAPH")).click();
 
-	await waitForSelector(
-		devtools,
-		'[data-type="flamegraph"] [data-name="Counter"]',
-		{ timeout: 3000 },
-	);
-}
+	await devtools.locator(locateFlame("Counter")).first().waitFor();
+});

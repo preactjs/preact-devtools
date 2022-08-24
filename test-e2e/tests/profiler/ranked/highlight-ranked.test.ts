@@ -1,30 +1,24 @@
+import { expect, test } from "@playwright/test";
 import {
-	newTestPage,
-	click,
-	clickTab,
 	clickRecordButton,
-} from "../../../test-utils";
-import { expect } from "chai";
-import { wait } from "pentf/utils";
+	locateTab,
+	gotoTest,
+	wait,
+	locateProfilerTab,
+} from "../../../pw-utils";
 
-export const description = "Should highlight ranked node if present in DOM";
+test("Should highlight ranked node if present in DOM", async ({ page }) => {
+	const { devtools } = await gotoTest(page, "profiler-highlight");
 
-export async function run(config: any) {
-	const { page, devtools } = await newTestPage(config, "profiler-highlight");
-
-	await clickTab(devtools, "PROFILER");
-
+	await devtools.locator(locateTab("PROFILER")).click();
 	await clickRecordButton(devtools);
-	await click(page, "button");
+	await page.locator("button").first().click();
 	await clickRecordButton(devtools);
 
-	await click(devtools, 'input[value="RANKED"]');
-
+	await devtools.locator(locateProfilerTab("RANKED")).click();
 	await devtools.hover('[data-type="ranked"] [data-name="Counter"]');
-
-	// Wait for possible flickering to occur
 	await wait(1000);
 
 	const log = (await page.evaluate(() => (window as any).log)) as any[];
-	expect(log.filter(x => x.type === "highlight").length).to.equal(1);
-}
+	expect(log.filter(x => x.type === "highlight").length).toEqual(1);
+});

@@ -1,34 +1,19 @@
-import { newTestPage, click, waitFor } from "../test-utils";
-import { expect } from "chai";
-import { wait } from "pentf/utils";
-import { clickSelector, waitForSelectorGone } from "pentf/browser_utils";
+import { test, expect } from "@playwright/test";
+import { gotoTest } from "../pw-utils";
 
-export const description = "Test hocs on update";
+test("Test HOCs on forwardRef update", async ({ page }) => {
+	const { devtools } = await gotoTest(page, "forwardRef-update");
 
-export async function run(config: any) {
-	const { page, devtools } = await newTestPage(config, "forwardRef-update");
+	await devtools.locator('[data-name="Foo"]').click();
+	let labels = devtools.locator('[data-name="Foo"] [data-testid="hoc-labels"]');
+	await expect(labels).toHaveCount(0);
 
-	await clickSelector(devtools, '[data-name="Foo"]');
-	await waitForSelectorGone(
-		devtools,
-		'[data-name="Foo"] [data-testid="hoc-labels"]',
-	);
+	await page.locator("button").click();
 
-	await click(page, "button");
-	await waitFor(async () => {
-		const res = await page.$eval('[data-testid="result"]', el => {
-			return el.textContent;
-		});
+	await page.locator('[data-testid="result"]:has-text("Counter: 1")');
 
-		expect(res).to.equal("Counter: 1");
-		return true;
-	});
+	await devtools.locator('[data-name="Foo"]').click();
 
-	await wait(200);
-
-	await clickSelector(devtools, '[data-name="Foo"]');
-	await waitForSelectorGone(
-		devtools,
-		'[data-name="Foo"] [data-testid="hoc-labels"]',
-	);
-}
+	labels = devtools.locator('[data-name="Foo"] [data-testid="hoc-labels"]');
+	await expect(labels).toHaveCount(0);
+});

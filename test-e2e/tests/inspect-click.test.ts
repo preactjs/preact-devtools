@@ -1,20 +1,14 @@
-import { newTestPage, click } from "../test-utils";
-import { expect } from "chai";
-import { getText } from "pentf/browser_utils";
+import { test, expect } from "@playwright/test";
+import { gotoTest } from "../pw-utils";
 
-export const description = "Don't trigger events on click during inspection";
+test("Don't trigger events on click during inspection", async ({ page }) => {
+	const { devtools } = await gotoTest(page, "counter");
 
-export async function run(config: any) {
-	const { page, devtools } = await newTestPage(config, "counter");
+	let txt = await page.locator('[data-testid="result"]').textContent();
 
-	const target = '[data-testid="result"]';
-	expect(await getText(page, target)).to.equal("Counter: 0");
+	await devtools.locator('[data-testid="inspect-btn"]').click();
+	await page.locator("button").click();
 
-	const inspect = '[data-testid="inspect-btn"]';
-	await click(devtools, inspect);
-
-	await page.click("button");
-
-	const text = await getText(page, target);
-	expect(text).to.equal("Counter: 0");
-}
+	txt = await page.locator('[data-testid="result"]').textContent();
+	expect(txt).toEqual("Counter: 0");
+});

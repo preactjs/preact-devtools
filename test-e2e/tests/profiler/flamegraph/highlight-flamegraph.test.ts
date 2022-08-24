@@ -1,31 +1,24 @@
+import { test, expect } from "@playwright/test";
 import {
-	newTestPage,
-	click,
-	clickTab,
 	clickRecordButton,
-} from "../../../test-utils";
-import { expect } from "chai";
-import { wait } from "pentf/utils";
-import { waitForSelector } from "pentf/browser_utils";
+	locateTab,
+	gotoTest,
+	locateFlame,
+	wait,
+} from "../../../pw-utils";
 
-export const description = "Should highlight flamegraph node if present in DOM";
+test("Should highlight flamegraph node if present in DOM", async ({ page }) => {
+	const { devtools } = await gotoTest(page, "profiler-highlight");
 
-export async function run(config: any) {
-	const { page, devtools } = await newTestPage(config, "profiler-highlight");
-
-	await clickTab(devtools, "PROFILER");
-
+	await devtools.locator(locateTab("PROFILER")).click();
 	await clickRecordButton(devtools);
-	await click(page, "button");
+	await page.click("button");
 	await clickRecordButton(devtools);
 
-	const selector = '[data-type="flamegraph"] [data-name="Counter"]';
-	await waitForSelector(devtools, selector);
-	await devtools.hover(selector);
-
+	await devtools.locator(locateFlame("Counter")).first().hover();
 	// Wait for possible flickering to occur
 	await wait(1000);
 
 	const log = (await page.evaluate(() => (window as any).log)) as any[];
-	expect(log.filter(x => x.type === "highlight").length).to.equal(1);
-}
+	expect(log.filter(x => x.type === "highlight").length).toEqual(1);
+});

@@ -1,23 +1,14 @@
-import { newTestPage } from "../test-utils";
-import { expect } from "chai";
-import { getText } from "pentf/browser_utils";
-import { waitForPass } from "pentf/assert_utils";
+import { test, expect } from "@playwright/test";
+import { gotoTest, waitForPass } from "../pw-utils";
 
-export const description = "Inspect should select node in elements panel";
-
-export async function run(config: any) {
-	const { page, devtools } = await newTestPage(config, "root-multi");
+test("Inspect should select node in elements panel", async ({ page }) => {
+	const { devtools } = await gotoTest(page, "root-multi");
 
 	await waitForPass(async () => {
-		const buttons = await page.$$("button");
-		expect(buttons.length).to.equal(2);
+		const btns = await page.locator("button").count();
+		expect(btns).toEqual(2);
 	});
 
-	const item = '[data-testid="tree-item"]';
-	const items = await devtools.$$(item);
-
-	const texts = await Promise.all(
-		items.map((_, i) => getText(devtools, `${item}:nth-child(${i + 1})`)),
-	);
-	expect(texts).to.deep.equal(["Counter", "Display", "Counter", "Display"]);
-}
+	const txts = await devtools.locator("data-testid=tree-item").allInnerTexts();
+	expect(txts).toEqual(["Counter", "Display", "Counter", "Display"]);
+});

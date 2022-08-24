@@ -1,13 +1,11 @@
-import { newTestPage, clickTab } from "../../test-utils";
-import { assertNotSelector, waitForTestId } from "pentf/browser_utils";
+import { expect, test } from "@playwright/test";
+import { locateTab, gotoTest } from "../../pw-utils";
 
-export const description = "Display no stats initially";
+test("Display no stats initially", async ({ page }) => {
+	const { devtools } = await gotoTest(page, "counter");
 
-export async function run(config: any) {
-	const { devtools } = await newTestPage(config, "counter");
+	await devtools.locator(locateTab("STATISTICS")).click();
+	await devtools.waitForSelector('[data-testId="stats-info"]');
 
-	await clickTab(devtools, "STATISTICS");
-	await waitForTestId(devtools, "stats-info");
-
-	await assertNotSelector(devtools, '[data-testid="vnode-stats"]');
-}
+	await expect(devtools.locator('[data-testid="vnode-stats"]')).toHaveCount(0);
+});

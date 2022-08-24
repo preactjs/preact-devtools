@@ -1,39 +1,27 @@
-import {
-	newTestPage,
-	click,
-	clickAndWaitForHooks,
-	waitForSelector,
-} from "../../test-utils";
-import { expect } from "chai";
-import { assertNotSelector, getAttribute, getText } from "pentf/browser_utils";
+import { test, expect } from "@playwright/test";
+import { getHooks, gotoTest, locateTreeItem } from "../../pw-utils";
 
-export const description = "Inspect useState hook";
+test("Inspect useState hook", async ({ page }) => {
+	const { devtools } = await gotoTest(page, "hooks");
 
-export async function run(config: any) {
-	const { page, devtools } = await newTestPage(config, "hooks");
+	await devtools.locator(locateTreeItem("Counter")).click();
+	await devtools.locator('[data-testid="Hooks"]').waitFor();
 
-	// State update
-	await clickAndWaitForHooks(devtools, "Counter");
-
-	const name = await getText(devtools, '[data-testid="prop-name"]');
-	const value = await getAttribute(
-		devtools,
-		'[data-testid="prop-value"] input',
-		"value",
-	);
-
-	expect(name).to.equal("useState");
-	expect(value).to.equal("0");
+	const hooks = await getHooks(devtools);
+	expect(hooks).toEqual([["useState", "0"]]);
 
 	// Should not be collapsable
-	await assertNotSelector(devtools, '[data-testid="props-row"] > button');
+	await expect(
+		devtools.locator('[data-testid="props-row"] > button'),
+	).toHaveCount(0);
 
 	// Should be editable
-	await waitForSelector(devtools, '[data-testid="prop-value"] input');
-	await click(devtools, '[data-testid="prop-value"] input');
+	await devtools
+		.locator('[data-testid="Hooks"] [data-testid="prop-value"] input')
+		.click();
 	await page.keyboard.press("ArrowUp");
 	await page.keyboard.press("Enter");
 
-	const text = await getText(page, '[data-testid="result"]');
-	expect(text).to.equal("Counter: 1");
-}
+	const text = await page.locator('[data-testid="result"]').textContent();
+	expect(text).toEqual("Counter: 1");
+});

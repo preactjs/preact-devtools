@@ -1,32 +1,24 @@
-import { clickAndWaitForHooks, newTestPage } from "../../test-utils";
-import { waitForTestId } from "pentf/browser_utils";
-import { expect } from "chai";
+import { test, expect } from "@playwright/test";
+import {
+	clickHookItem,
+	clickTreeItem,
+	getHooks,
+	gotoTest,
+} from "../../pw-utils";
 
-export const description =
-	"Show upgrade warning when Preact version is too old";
+test("Show multiple hook names at the same time", async ({ page }) => {
+	const { devtools } = await gotoTest(page, "hooks-multiple");
 
-export async function run(config: any) {
-	const { devtools } = await newTestPage(config, "hooks-multiple");
+	await clickTreeItem(devtools, "App");
+	await devtools.locator('[data-testid="Hooks"]').waitFor();
 
-	// State update
-	await clickAndWaitForHooks(devtools, "App");
-
-	await waitForTestId(devtools, "Hooks");
-
-	const hooks = await devtools.evaluate(() => {
-		const items = Array.from(
-			document.querySelectorAll(
-				'[data-testid="Hooks"] [data-testid="prop-name"]',
-			),
-		);
-		return items.map(item => item.textContent);
-	});
-
-	expect(hooks).to.deep.equal([
-		"useState",
-		"useState",
-		"useState",
-		"useCallback",
-		"useMemo",
+	await clickHookItem(devtools, "useMemo");
+	const hooks = await getHooks(devtools);
+	expect(hooks).toEqual([
+		["useState", "1"],
+		["useState", "2"],
+		["useState", "3"],
+		["useCallback", "ƒ ()"],
+		["useMemo", "6"],
 	]);
-}
+});

@@ -1,40 +1,28 @@
-import {
-	newTestPage,
-	typeText,
-	getText$$,
-	waitForSelector,
-} from "../test-utils";
-import { expect } from "chai";
-import { clickNestedText, getAttribute } from "pentf/browser_utils";
-import { wait } from "pentf/utils";
+import { expect, test } from "@playwright/test";
+import { getProps, gotoTest, locateTreeItem, wait } from "../pw-utils";
 
-export const description = "Add new props";
+test("Add new props", async ({ page }) => {
+	const { devtools } = await gotoTest(page, "counter");
 
-export async function run(config: any) {
-	const { page, devtools } = await newTestPage(config, "counter");
+	await devtools.click(locateTreeItem("Display"));
 
-	await clickNestedText(devtools, "Display");
-
-	await waitForSelector(devtools, '[data-testid="props-row"]');
+	await devtools.waitForSelector('[data-testid="props-row"]');
 
 	const propName = 'input[name="new-prop-name"]';
 	const propValue = 'input[name="new-prop-value"]';
-	await typeText(devtools, propName, "foo");
-	await typeText(devtools, propValue, "42");
+	await devtools.fill(propName, "foo");
+	await devtools.fill(propValue, "42");
 	await page.keyboard.press("Enter");
 
 	await wait(500);
 
-	const text = await getText$$(devtools, '[data-testid="props-row"]');
-	const valueFoo = await getAttribute(
-		devtools,
-		'input[name="root.foo"]',
-		"value",
-	);
-	expect(text).to.deep.equal(["value", "foo"]);
-	expect(valueFoo).to.equal("42");
+	const props = await getProps(devtools);
+	expect(props).toEqual({
+		value: "0",
+		foo: "42",
+	});
 
 	// New prop input should be cleared
-	expect(await getAttribute(devtools, propName, "value")).to.equal("");
-	expect(await getAttribute(devtools, propValue, "value")).to.equal("");
-}
+	expect(await devtools.locator(propName).getAttribute("value")).toEqual(null);
+	expect(await devtools.locator(propValue).getAttribute("value")).toEqual(null);
+});

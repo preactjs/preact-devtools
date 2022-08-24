@@ -1,27 +1,20 @@
-import { newTestPage, getSize } from "../test-utils";
-import { expect } from "chai";
-import { wait } from "pentf/utils";
-import { waitForSelector } from "pentf/browser_utils";
-import type { Page } from "puppeteer";
+import { expect, test } from "@playwright/test";
+import { gotoTest, locateTreeItem, wait } from "../pw-utils";
 
-function getHighlightSize(page: Page): unknown {
-	return getSize(page, "#preact-devtools-highlighter > div");
-}
+test("Highlight Suspense nodes without crashing", async ({ page }) => {
+	const { devtools } = await gotoTest(page, "suspense");
 
-export const description = "Highlight Suspense nodes without crashing";
-export async function run(config: any) {
-	const { page, devtools } = await newTestPage(config, "suspense");
-
-	await waitForSelector(
-		devtools,
-		'[data-testid="tree-item"][data-name="Suspense"]',
-	);
-
-	await devtools.hover('[data-testid="tree-item"][data-name="Suspense"]');
+	await devtools.waitForSelector(locateTreeItem("Suspense"));
+	await devtools.hover(locateTreeItem("Suspense"));
 	// Wait for possible flickering to occur
 	await wait(1000);
 
-	const sizeOnPage = await getSize(page, '[data-testid="delayed"]');
-	const sizeOfHighlight = await getHighlightSize(page);
-	expect(sizeOfHighlight).to.eql(sizeOnPage);
-}
+	const sizeOnPage = await page.$eval('[data-testid="delayed"]', el =>
+		el.getBoundingClientRect(),
+	);
+	const sizeOfHighlight = await page.$eval(
+		"#preact-devtools-highlighter > div",
+		el => el.getBoundingClientRect(),
+	);
+	expect(sizeOfHighlight).toEqual(sizeOnPage);
+});

@@ -1,35 +1,27 @@
-import { clickAndWaitForHooks, newTestPage } from "../../test-utils";
-import { expect } from "chai";
-import { assertNotSelector, getText } from "pentf/browser_utils";
-import { waitForPass } from "pentf/assert_utils";
+import { test, expect } from "@playwright/test";
+import { getHooks, gotoTest, locateTreeItem } from "../../pw-utils";
 
-export const description = "Inspect useErrorBoundary hook";
+test("Inspect useErrorBoundary hook", async ({ page }) => {
+	const { devtools } = await gotoTest(page, "hooks");
 
-export async function run(config: any) {
-	const { devtools } = await newTestPage(config, "hooks");
+	await devtools.locator(locateTreeItem("ErrorBoundary1")).click();
+	await devtools.locator('[data-testid="Hooks"]').waitFor();
 
-	await clickAndWaitForHooks(devtools, "ErrorBoundary1");
-
-	let name = await getText(devtools, '[data-testid="prop-name"]');
-	let value = await getText(devtools, '[data-testid="prop-value"]');
-
-	expect(name).to.equal("useErrorBoundary");
-	expect(value).to.equal("");
+	let hooks = await getHooks(devtools);
+	expect(hooks).toEqual([["useErrorBoundary", ""]]);
 
 	// Should not be collapsable
-	await assertNotSelector(devtools, '[data-testid="props-row"] > button');
+	await expect(
+		devtools.locator('[data-testid="props-row"] > button'),
+	).toHaveCount(0);
 
 	// Should not be editable
-	await assertNotSelector(devtools, '[data-testid="prop-value"] input');
+	await expect(
+		devtools.locator('[data-testid="props-value"] > input'),
+	).toHaveCount(0);
 
 	// Error boundary with callback
-	await clickAndWaitForHooks(devtools, "ErrorBoundary2");
-
-	name = await getText(devtools, '[data-testid="prop-name"]');
-	expect(name).to.equal("useErrorBoundary");
-
-	await waitForPass(async () => {
-		value = await getText(devtools, '[data-testid="prop-value"]');
-		expect(value).to.equal("ƒ ()");
-	});
-}
+	await devtools.locator(locateTreeItem("ErrorBoundary2")).click();
+	hooks = await getHooks(devtools);
+	expect(hooks).toEqual([["useErrorBoundary", "ƒ ()"]]);
+});

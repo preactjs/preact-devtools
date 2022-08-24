@@ -1,32 +1,30 @@
-import {
-	newTestPage,
-	clickTab,
-	waitForSelector,
-	clickRecordButton,
-} from "../../test-utils";
-import { getText, waitForTestId, clickSelector } from "pentf/browser_utils";
-import { expect } from "chai";
+import { expect, test } from "@playwright/test";
+import { locateTab, gotoTest, clickRecordButton } from "../../pw-utils";
 
-export const description = "Skip memoized components for stats";
+test("Skip memoized components for stats", async ({ page }) => {
+	const { devtools } = await gotoTest(page, "memo-stats");
 
-export async function run(config: any) {
-	const { page, devtools } = await newTestPage(config, "memo-stats");
-
-	await clickTab(devtools, "STATISTICS");
-	await waitForTestId(devtools, "stats-info");
+	await devtools.locator(locateTab("STATISTICS")).click();
+	await devtools.waitForSelector('[data-testId="stats-info"]');
 
 	await clickRecordButton(devtools);
 
-	await clickSelector(page, "button");
-	await waitForSelector(page, '[data-value="1"]');
+	await page.click("button");
+	await page.waitForSelector('[data-value="1"]');
 	await clickRecordButton(devtools);
 
-	const mountTotal = await getText(devtools, '[data-testid="mount-total"]');
-	expect(mountTotal).to.equal("0");
+	const mountTotal = await devtools
+		.locator('[data-testid="mount-total"]')
+		.textContent();
+	expect(mountTotal).toEqual("0");
 
-	const updateTotal = await getText(devtools, '[data-testid="update-total"]');
-	expect(updateTotal).to.equal("8");
+	const updateTotal = await devtools
+		.locator('[data-testid="update-total"]')
+		.textContent();
+	expect(updateTotal).toEqual("8");
 
-	const unmountTotal = await getText(devtools, '[data-testid="unmount-total"]');
-	expect(unmountTotal).to.equal("0");
-}
+	const unmountTotal = await devtools
+		.locator('[data-testid="unmount-total"]')
+		.textContent();
+	expect(unmountTotal).toEqual("0");
+});

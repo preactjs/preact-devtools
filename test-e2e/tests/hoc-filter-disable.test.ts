@@ -1,34 +1,25 @@
-import { newTestPage, waitForSelector } from "../test-utils";
-import { expect } from "chai";
-import {
-	assertNotTestId,
-	clickNestedText,
-	clickTestId,
-	waitForTestId,
-} from "pentf/browser_utils";
+import { expect, test } from "@playwright/test";
+import { gotoTest, locateTreeItem } from "../pw-utils";
 
-export const description = "HOC-Component filter should be disabled";
+test("HOC-Component filter should be disabled", async ({ page }) => {
+	const { devtools } = await gotoTest(page, "hoc");
 
-export async function run(config: any) {
-	const { devtools } = await newTestPage(config, "hoc");
-
-	await clickTestId(devtools, "filter-menu-button");
-	await waitForTestId(devtools, "filter-popup");
-	await clickNestedText(devtools, "HOC-Components");
-	await clickTestId(devtools, "filter-update");
-
-	await waitForSelector(
-		devtools,
-		'[data-testid="tree-item"][data-name="Memo(Foo)"]',
+	await devtools.click('[data-testid="filter-menu-button"]');
+	await devtools.waitForSelector('[data-testid="filter-popup"]');
+	await devtools.click(
+		'[data-testid="filter-popup"] label:has-text("HOC-Components")',
 	);
+	await devtools.click('[data-testid="filter-update"]');
 
-	const items = await devtools.evaluate(() => {
-		return Array.from(
-			document.querySelectorAll('[data-testid="tree-item"]'),
-		).map(el => el.getAttribute("data-name"));
-	});
+	await devtools.waitForSelector(locateTreeItem("Memo(Foo)"));
 
-	expect(items).to.deep.equal([
+	const items = await devtools
+		.locator('[data-testid="tree-item"]')
+		.evaluateAll(els =>
+			Array.from(els).map(el => el.getAttribute("data-name")),
+		);
+
+	expect(items).toEqual([
 		"Memo(Foo)",
 		"Foo",
 		"ForwardRef(Bar)",
@@ -40,5 +31,5 @@ export async function run(config: any) {
 		"Last",
 	]);
 
-	await assertNotTestId(devtools, "hoc-panel");
-}
+	await expect(devtools.locator('[data-testid="hoc-panel"]')).toHaveCount(0);
+});

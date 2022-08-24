@@ -1,22 +1,22 @@
-import {
-	clickAndWaitForHooks,
-	newTestPage,
-	waitForProp,
-} from "../../test-utils";
-import { assertNotSelector } from "pentf/browser_utils";
+import { test, expect } from "@playwright/test";
+import { getHooks, gotoTest, locateTreeItem } from "../../pw-utils";
 
-export const description = "Inspect useRef hook";
+test("Inspect useRef hook", async ({ page }) => {
+	const { devtools } = await gotoTest(page, "hooks");
 
-export async function run(config: any) {
-	const { devtools } = await newTestPage(config, "hooks");
+	await devtools.locator(locateTreeItem("RefComponent")).click();
+	await devtools.locator('[data-testid="Hooks"]').waitFor();
 
-	// State update
-	await clickAndWaitForHooks(devtools, "RefComponent");
-	await waitForProp(devtools, "useRef", "0");
+	const hooks = await getHooks(devtools);
+	expect(hooks).toEqual([["useRef", "0"]]);
 
 	// Should not be collapsable
-	await assertNotSelector(devtools, '[data-testid="props-row"] > button');
+	await expect(
+		devtools.locator('[data-testid="props-row"] > button'),
+	).toHaveCount(0);
 
 	// Should not be editable
-	await assertNotSelector(devtools, '[data-testid="prop-value"] input');
-}
+	await expect(
+		devtools.locator('[data-testid="props-value"] > input'),
+	).toHaveCount(0);
+});

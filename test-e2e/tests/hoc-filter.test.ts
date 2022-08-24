@@ -1,44 +1,30 @@
-import { newTestPage, waitForSelector } from "../test-utils";
-import { expect } from "chai";
-import { clickNestedText, waitForTestId } from "pentf/browser_utils";
-import { waitForPass } from "pentf/assert_utils";
+import { test, expect } from "@playwright/test";
+import { gotoTest, waitForPass } from "../pw-utils";
 
-export const description = "HOC-Component filter should flatten tree";
+test("HOC-Component filter should flatten tree", async ({ page }) => {
+	const { devtools } = await gotoTest(page, "hoc");
 
-export async function run(config: any) {
-	const { devtools } = await newTestPage(config, "hoc");
+	await devtools.waitForSelector('[data-testid="tree-item"][data-name="Foo"]');
 
-	await waitForSelector(devtools, '[data-testid="tree-item"][data-name="Foo"]');
+	const items = await devtools
+		.locator('[data-testid="tree-item"]')
+		.evaluateAll(els => els.map(el => el.getAttribute("data-name")));
 
-	const items = await devtools.evaluate(() => {
-		return Array.from(
-			document.querySelectorAll('[data-testid="tree-item"]'),
-		).map(el => el.getAttribute("data-name"));
+	expect(items).toEqual(["Foo", "Bar", "Anonymous", "Foo", "Last"]);
+
+	await devtools.click('[data-name="Anonymous"]');
+
+	const hocs = await devtools
+		.locator('[data-testid="hoc-panel"] .hoc-item')
+		.allInnerTexts();
+	expect(hocs).toEqual(["ForwardRef"]);
+
+	await devtools.click('[data-name="Last"]');
+
+	await waitForPass(async () => {
+		const hocs = await devtools
+			.locator('[data-testid="hoc-panel"] .hoc-item')
+			.allInnerTexts();
+		expect(hocs).toEqual(["withBoof", "Memo"]);
 	});
-
-	expect(items).to.deep.equal(["Foo", "Bar", "Anonymous", "Foo", "Last"]);
-
-	await clickNestedText(devtools, "Anonymous");
-	await waitForTestId(devtools, "hoc-panel");
-
-	async function getSidebarHocs() {
-		return await devtools.evaluate(() => {
-			return Array.from(
-				document.querySelectorAll('[data-testid="hoc-panel"] .hoc-item'),
-			).map(el => el.textContent);
-		});
-	}
-
-	const hocs = await getSidebarHocs();
-	expect(hocs).to.deep.equal(["ForwardRef"]);
-
-	await clickNestedText(devtools, "Last");
-
-	await waitForPass(
-		async () => {
-			const hocs2 = await getSidebarHocs();
-			expect(hocs2).to.deep.equal(["withBoof", "Memo"]);
-		},
-		{ timeout: 2000 },
-	);
-}
+});

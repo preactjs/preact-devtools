@@ -1,27 +1,20 @@
-import { newTestPage, getSize } from "../test-utils";
-import { expect } from "chai";
-import { wait } from "pentf/utils";
-import { getText } from "pentf/browser_utils";
+import { test, expect } from "@playwright/test";
+import { gotoTest } from "../pw-utils";
 
-export const description = "Highlighting nested elements affects overlay size";
+test("Highlighting nested elements affects overlay size", async ({ page }) => {
+	const { devtools } = await gotoTest(page, "counter");
 
-export async function run(config: any) {
-	const { page, devtools } = await newTestPage(config, "counter");
+	await page.locator('[data-testid="result"]:has-text("Counter: 0")').waitFor();
 
-	const target = '[data-testid="result"]';
-	expect(await getText(page, target)).to.equal("Counter: 0");
-
-	const inspect = '[data-testid="inspect-btn"]';
-	await devtools.click(inspect);
+	await devtools.click('[data-testid="inspect-btn"]');
 
 	const highlight = '[data-testid="highlight"]';
-	await page.hover(target);
-	await wait(500);
-	const sizeTarget = await getSize(page, highlight);
+	await page.hover('[data-testid="result"]');
+
+	const sizeTarget = await page.locator(highlight).boundingBox();
 
 	await page.hover("button");
-	await wait(500);
-	const sizeBtn = await getSize(page, highlight);
+	const sizeBtn = await page.locator(highlight).boundingBox();
 
-	expect(sizeTarget).not.to.deep.equal(sizeBtn);
-}
+	expect(sizeTarget).not.toEqual(sizeBtn);
+});

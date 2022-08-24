@@ -1,31 +1,23 @@
-import { expect } from "chai";
-import { newTestPage } from "../test-utils";
-import { wait } from "pentf/utils";
-import { clickSelector, getText } from "pentf/browser_utils";
+import { test, expect } from "@playwright/test";
+import { getProps, gotoTest, locateTreeItem } from "../pw-utils";
 
-export const description = "Test keyboard navigation in elements tree";
+test("Test keyboard navigation in elements tree", async ({ page }) => {
+	const { devtools } = await gotoTest(page, "counter");
 
-export async function run(config: any) {
-	const { page, devtools } = await newTestPage(config, "counter");
-
-	const elem1 = '[data-testid="tree-item"][data-name="Counter"]';
-	const prop = '[data-testid="Props"] [data-testid="props-row"]';
-
-	await clickSelector(devtools, elem1);
-	await wait(500);
-	expect((await devtools.$$(prop)).length).to.equal(0);
+	await devtools.locator(locateTreeItem("Counter")).click();
+	expect(Object.keys(await getProps(devtools))).toEqual([]);
 
 	await page.keyboard.press("ArrowDown");
-	await wait(500);
-	let selected = await getText(devtools, '[data-selected="true"]');
+	let selected = await devtools.locator('[data-selected="true"]').textContent();
 
-	expect(selected).to.equal("Display");
-	expect((await devtools.$$(prop)).length).to.equal(1);
+	const prop = '[data-testid="Props"] [data-testid="props-row"]';
+
+	expect(selected).toEqual("Display");
+	expect((await devtools.$$(prop)).length).toEqual(1);
 
 	await page.keyboard.press("ArrowUp");
-	await wait(500);
-	selected = await getText(devtools, '[data-selected="true"]');
+	selected = await devtools.locator('[data-selected="true"]').textContent();
 
-	expect(selected).to.equal("Counter");
-	expect((await devtools.$$(prop)).length).to.equal(0);
-}
+	expect(selected).toEqual("Counter");
+	expect((await devtools.$$(prop)).length).toEqual(0);
+});

@@ -1,27 +1,20 @@
-import { newTestPage, click, waitForSelector } from "../test-utils";
-import { expect } from "chai";
-import { getText } from "pentf/browser_utils";
+import { test, expect } from "@playwright/test";
+import { gotoTest } from "../pw-utils";
 
-export const description = "Inspect should only parse vnodes as vnodes #114";
+test("Inspect should only parse vnodes as vnodes #114", async ({ page }) => {
+	const { devtools } = await gotoTest(page, "non-vnode");
 
-export async function run(config: any) {
-	const { devtools } = await newTestPage(config, "non-vnode");
+	await devtools.click('[data-testid="tree-item"]');
+	await devtools.waitForSelector('[name="new-prop-name"]');
 
-	await click(devtools, '[data-testid="tree-item"]');
-	await waitForSelector(devtools, '[name="new-prop-name"]');
+	const values = await devtools
+		.locator('[data-testid="Props"] [data-testid="props-row"] [data-type]')
+		.evaluateAll(els => els.map(el => el.getAttribute("data-type")));
 
-	const values = await devtools.evaluate(() => {
-		const el = Array.from(
-			document.querySelectorAll('[data-testid="props-row"] [data-type]'),
-		);
-		return el.map(x => x.getAttribute("data-type"));
-	});
+	expect(values).toEqual(["blob", "object", "vnode", "vnode"]);
 
-	expect(values).to.deep.equal(["blob", "object", "vnode", "vnode"]);
-
-	const blob = await getText(
-		devtools,
-		'[data-testid="props-row"]:first-child [data-testid="prop-value"]',
-	);
-	expect(blob).to.equal("Blob {}");
-}
+	const blob = await devtools
+		.locator('[data-testid="props-row"]:first-child [data-testid="prop-value"]')
+		.textContent();
+	expect(blob).toEqual("Blob {}");
+});
