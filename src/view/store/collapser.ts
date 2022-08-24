@@ -1,5 +1,5 @@
-import { AppCtx, useObserver } from "./react-bindings";
-import { Signal } from "../valoo";
+import { AppCtx } from "./react-bindings";
+import { Signal } from "@preact/signals";
 import { useContext } from "preact/hooks";
 
 export interface Collapser<T> {
@@ -29,6 +29,6 @@ export function createCollapser<T>(collapsed: Signal<Set<T>>): Collapser<T> {
 
 export function useCollapser() {
 	const c = useContext(AppCtx).collapser;
-	const collapsed = useObserver(() => c.collapsed.value);
+	const collapsed = c.collapsed.value;
 	return { collapsed, collapseNode: c.collapseNode, toggle: c.toggle };
 }

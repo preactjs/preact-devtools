@@ -1,10 +1,10 @@
 import { h } from "preact";
 import { useEffect, useRef } from "preact/hooks";
-import { useObserver, useStore } from "../store/react-bindings";
+import { useStore } from "../store/react-bindings";
 
 export function ThemeSwitcher() {
 	const store = useStore();
-	let theme = useObserver(() => store.theme.value);
+	let theme = store.theme.value;
 	if (theme === "auto") {
 		theme = matchMedia("(prefers-color-scheme: dark)").matches
 			? "dark"

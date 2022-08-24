@@ -1,4 +1,4 @@
-import { signal } from "../valoo";
+import { signal } from "@preact/signals";
 import { escapeStringRegexp } from "./utils";
 import { RawFilterState, TypeFilterValue } from "../../adapter/adapter/filter";
 

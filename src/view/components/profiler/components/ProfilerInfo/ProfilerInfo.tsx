@@ -1,12 +1,12 @@
 import { h } from "preact";
-import { useStore, useObserver } from "../../../../store/react-bindings";
+import { useStore } from "../../../../store/react-bindings";
 import { RecordBtn } from "../TimelineBar/TimelineBar";
 
 export function ProfilerInfo() {
 	const store = useStore();
-	const isRecording = useObserver(() => store.profiler.isRecording.value);
-	const isSupported = useObserver(() => store.profiler.isSupported.value);
-	const commits = useObserver(() => store.profiler.commits.value);
+	const isRecording = store.profiler.isRecording.value;
+	const isSupported = store.profiler.isSupported.value;
+	const commits = store.profiler.commits.value;
 
 	if (!isSupported) {
 		return (

@@ -2,22 +2,21 @@ import { h } from "preact";
 import { Actions, ActionSeparator } from "../../../Actions";
 import { CommitTimeline } from "../CommitTimeline/CommitTimeline";
 import { IconBtn } from "../../../IconBtn";
-import { useStore, useObserver } from "../../../../store/react-bindings";
+import { useStore } from "../../../../store/react-bindings";
 import s from "../../../elements/TreeBar.module.css";
 import { useCallback } from "preact/hooks";
 import { FlameGraphMode } from "../../flamegraph/FlameGraphMode";
 import { getCommitInitalSelectNodeId, resetProfiler } from "../../data/commits";
 import { Icon } from "../../../icons";
+import { useComputed } from "@preact/signals";
 
 export function TimelineBar() {
 	const store = useStore();
-	const commits = useObserver(() => store.profiler.commits.value);
-	const isRecording = useObserver(() => store.profiler.isRecording.value);
-	const isSupported = useObserver(() => store.profiler.isSupported.value);
-	const selectedCommit = useObserver(
-		() => store.profiler.activeCommitIdx.value,
-	);
-	const stats = useObserver(() => {
+	const commits = store.profiler.commits.value;
+	const isRecording = store.profiler.isRecording.value;
+	const isSupported = store.profiler.isSupported.value;
+	const selectedCommit = store.profiler.activeCommitIdx.value;
+	const stats = useComputed(() => {
 		return {
 			max: Math.max(16, ...store.profiler.commits.value.map(x => x.duration)),
 			min: Math.max(
@@ -25,7 +24,7 @@ export function TimelineBar() {
 				Math.min(...store.profiler.commits.value.map(x => x.duration)),
 			),
 		};
-	});
+	}).value;
 
 	const onCommitChange = useCallback(
 		(n: number) => {
@@ -105,8 +104,8 @@ export function TimelineBar() {
 
 export function RecordBtn() {
 	const store = useStore();
-	const isRecording = useObserver(() => store.profiler.isRecording.value);
-	const isSupported = useObserver(() => store.profiler.isSupported.value);
+	const isRecording = store.profiler.isRecording.value;
+	const isSupported = store.profiler.isSupported.value;
 
 	const onClick = useCallback(() => {
 		const { isRecording, captureRenderReasons } = store.profiler;

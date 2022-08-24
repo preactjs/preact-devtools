@@ -130,6 +130,6 @@ export function applyOperationsV1(store: Store, data: number[]) {
 		}
 	}
 
-	store.roots.update();
+	store.roots.value = [...store.roots.value];
 	store.nodes.value = nodes;
 }

@@ -1,14 +1,14 @@
 import { h, Fragment } from "preact";
 import { IconTab } from "../components/Tabs/Tabs";
-import { useStore, useObserver } from "../../../store/react-bindings";
+import { useStore } from "../../../store/react-bindings";
 import { useCallback } from "preact/hooks";
 import { FlamegraphType } from "../data/commits";
 import { Icon } from "../../icons";
 
 export function FlameGraphMode() {
 	const store = useStore();
-	const type = useObserver(() => store.profiler.flamegraphType.value);
-	const disabled = useObserver(() => !store.profiler.isSupported.value);
+	const type = store.profiler.flamegraphType.value;
+	const disabled = !store.profiler.isSupported.value;
 
 	const onClick = useCallback((value: string) => {
 		store.profiler.flamegraphType.value = value as any;

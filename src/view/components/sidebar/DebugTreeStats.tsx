@@ -1,10 +1,10 @@
 import { h } from "preact";
-import { useObserver, useStore } from "../../store/react-bindings";
+import { useStore } from "../../store/react-bindings";
 import { SidebarPanel } from "./SidebarPanel";
 
 export function DebugTreeStats() {
 	const store = useStore();
-	const nodeList = useObserver(() => store.nodeList.value);
+	const nodeList = store.nodeList.value;
 
 	return (
 		<SidebarPanel title="Debug Tree Stats" testId="tree-debug-stats">

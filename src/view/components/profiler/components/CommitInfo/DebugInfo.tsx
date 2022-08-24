@@ -1,6 +1,6 @@
 import { h, Fragment } from "preact";
 import { SidebarPanel } from "../../../sidebar/SidebarPanel";
-import { useStore, useObserver } from "../../../../store/react-bindings";
+import { useStore } from "../../../../store/react-bindings";
 import { getRoot } from "../../flamegraph/FlamegraphStore";
 
 const TimeRange = ({ from, to }: { from: number; to: number }) => (
@@ -11,13 +11,10 @@ const TimeRange = ({ from, to }: { from: number; to: number }) => (
 
 export function DebugProfilerInfo() {
 	const store = useStore();
-	const commit = useObserver(() => store.profiler.activeCommit.value);
-	const selected = useObserver(() => store.profiler.selectedNode.value);
-	const isRecording = useObserver(() => store.profiler.isRecording.value);
-	const pos = useObserver(() => {
-		const s = store.profiler.selectedNodeId.value;
-		return store.profiler.flamegraphNodes.value.get(s);
-	})!;
+	const commit = store.profiler.activeCommit.value;
+	const selected = store.profiler.selectedNode.value;
+	const isRecording = store.profiler.isRecording.value;
+	const pos = store.profiler.flamegraphNodes.value.get(selected?.id || -1);
 
 	if (commit === null || isRecording || !selected || !pos) {
 		return null;

@@ -1,5 +1,5 @@
 import { ID, DevNode } from "../../../store/types";
-import { Signal, signal, watch } from "../../../valoo";
+import { Signal, signal, computed } from "@preact/signals";
 import { getRoot } from "../flamegraph/FlamegraphStore";
 import {
 	RenderReasonMap,
@@ -117,12 +117,12 @@ export function createProfiler(): ProfilerState {
 	// Selection
 	const activeCommitIdx = signal(0);
 	const selectedNodeId = signal(0);
-	const activeCommit = watch(() => {
+	const activeCommit = computed(() => {
 		return (
 			(commits.value.length > 0 && commits.value[activeCommitIdx.value]) || null
 		);
 	});
-	const selectedNode = watch(() => {
+	const selectedNode = computed(() => {
 		return activeCommit.value != null
 			? activeCommit.value.nodes.get(selectedNodeId.value) || null
 			: null;
@@ -158,7 +158,7 @@ export function createProfiler(): ProfilerState {
 	});
 
 	// Render reasons
-	const activeReason = watch(() => {
+	const activeReason = computed(() => {
 		if (activeCommit.value !== null) {
 			const commitId = activeCommit.value.commitRootId;
 			const reason = renderReasons.value.get(commitId);
@@ -171,7 +171,7 @@ export function createProfiler(): ProfilerState {
 	});
 
 	// FlamegraphNode
-	const flamegraphNodes = watch<Map<ID, NodeTransform>>(() => {
+	const flamegraphNodes = computed<Map<ID, NodeTransform>>(() => {
 		const commit = activeCommit.value;
 		if (!commit || flamegraphType.value !== FlamegraphType.FLAMEGRAPH) {
 			return new Map();
@@ -186,7 +186,7 @@ export function createProfiler(): ProfilerState {
 		return patchTree(commit);
 	});
 
-	const rankedNodes = watch<NodeTransform[]>(() => {
+	const rankedNodes = computed<NodeTransform[]>(() => {
 		const commit = activeCommit.value;
 		if (!commit || flamegraphType.value !== FlamegraphType.RANKED) {
 			return [];

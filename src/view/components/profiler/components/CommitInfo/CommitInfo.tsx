@@ -1,12 +1,12 @@
 import { h } from "preact";
 import { SidebarPanel } from "../../../sidebar/SidebarPanel";
 import { formatTime } from "../../util";
-import { useStore, useObserver } from "../../../../store/react-bindings";
+import { useStore } from "../../../../store/react-bindings";
 
 export function CommitInfo() {
 	const store = useStore();
-	const commit = useObserver(() => store.profiler.activeCommit.value);
-	const isRecording = useObserver(() => store.profiler.isRecording.value);
+	const commit = store.profiler.activeCommit.value;
+	const isRecording = store.profiler.isRecording.value;
 
 	if (commit === null || isRecording) {
 		return null;

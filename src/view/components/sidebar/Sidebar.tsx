@@ -1,5 +1,5 @@
 import { h, Fragment } from "preact";
-import { useObserver, useStore } from "../../store/react-bindings";
+import { useStore } from "../../store/react-bindings";
 import { PropsPanel } from "./inspect/PropsPanel";
 import { serializeProps } from "./inspect/serializeProps";
 import { DebugTreeStats } from "./DebugTreeStats";
@@ -7,18 +7,19 @@ import { DebugNodeNavTree } from "./DebugNodeNavTree";
 import { OwnerInfo } from "./../elements/OwnerInfo";
 import { KeyPanel } from "./KeyPanel";
 import { HocPanel } from "./HocPanel";
+import { useComputed } from "@preact/signals";
 
 export function Sidebar() {
 	const store = useStore();
-	const showDebug = useObserver(() => store.debugMode.value);
-	const inspect = useObserver(() => store.inspectData.value);
-	const hocs = useObserver(() => {
+	const showDebug = store.debugMode.value;
+	const inspect = store.inspectData.value;
+	const hocs = useComputed(() => {
 		if (store.inspectData.value) {
 			const node = store.nodes.value.get(store.inspectData.value.id);
 			return node ? node.hocs : null;
 		}
 		return null;
-	});
+	}).value;
 	const { props: propData, state, context, hooks } = store.sidebar;
 	const { emit } = store;
 

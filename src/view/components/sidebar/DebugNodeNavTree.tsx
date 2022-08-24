@@ -1,13 +1,11 @@
 import { h } from "preact";
-import { useStore, useObserver } from "../../store/react-bindings";
+import { useStore } from "../../store/react-bindings";
 import { SidebarPanel, Empty } from "./SidebarPanel";
 
 export function DebugNodeNavTree() {
 	const store = useStore();
-	const selected = useObserver(() => store.selection.selected.value);
-	const nodes = useObserver(() =>
-		store.nodeList.value.map(id => store.nodes.value.get(id)!),
-	);
+	const selected = store.selection.selected.value;
+	const nodes = store.nodeList.value.map(id => store.nodes.value.get(id)!);
 
 	return (
 		<SidebarPanel title="Debug Node Navigation:" testId="profiler-debug-nav">

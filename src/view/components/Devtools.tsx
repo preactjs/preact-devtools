@@ -1,10 +1,5 @@
 import { h, Fragment } from "preact";
-import {
-	AppCtx,
-	EmitCtx,
-	WindowCtx,
-	useObserver,
-} from "../store/react-bindings";
+import { AppCtx, EmitCtx, WindowCtx } from "../store/react-bindings";
 import { Store, Panel } from "../store/types";
 import { Elements } from "./elements/Elements";
 import { Profiler } from "./profiler/components/Profiler";
@@ -16,7 +11,7 @@ import { Settings } from "./settings/Settings";
 import { StatsPanel } from "./stats/StatsPanel";
 
 export function DevTools(props: { store: Store; window: Window }) {
-	const panel = useObserver(() => props.store.activePanel.value);
+	const panel = props.store.activePanel.value;
 
 	const showElements = panel === Panel.ELEMENTS;
 	const showProfiler = panel === Panel.PROFILER;

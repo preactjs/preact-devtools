@@ -1,18 +1,17 @@
 import { h, Fragment } from "preact";
 import { Actions } from "../Actions";
 import { IconBtn } from "../IconBtn";
-import { useStore, useEmitter, useObserver } from "../../store/react-bindings";
+import { useStore, useEmitter } from "../../store/react-bindings";
 import { useCallback } from "preact/hooks";
 import { ComponentName } from "../ComponentName";
 import { DevNodeType } from "../../store/types";
 import { Icon } from "../icons";
+import { useComputed } from "@preact/signals";
 
 export function SidebarActions() {
 	const store = useStore();
 	const emit = useEmitter();
-	const node = useObserver(
-		() => store.nodes.value.get(store.selection.selected.value) || null,
-	);
+	const node = store.nodes.value.get(store.selection.selected.value) || null;
 	const log = useCallback(() => {
 		if (node) emit("log", { id: node.id, children: node.children });
 	}, [node]);
@@ -30,7 +29,7 @@ export function SidebarActions() {
 		node.type !== DevNodeType.Group &&
 		node.type !== DevNodeType.Element;
 
-	const suspense = useObserver(() => {
+	const suspense = useComputed(() => {
 		const state = {
 			canSuspend: false,
 			suspended: false,
@@ -42,7 +41,7 @@ export function SidebarActions() {
 		}
 
 		return state;
-	});
+	}).value;
 	const onSuspend = useCallback(() => {
 		if (node) {
 			emit("suspend", { id: node.id, active: !suspense.suspended });
