@@ -29,3 +29,4 @@ jobs:
         with:
           name: playwright-report
           path: playwright-report
+          retention-days: 5
