@@ -81,3 +81,5 @@ profiles/chrome/*
 
 # macOS
 .DS_Store
+
+test-results/
