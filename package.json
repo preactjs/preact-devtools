@@ -50,7 +50,7 @@
 		"@parcel/css": "^1.12.2",
 		"@playwright/test": "^1.25.1",
 		"@preact/preset-vite": "^2.3.0",
-		"@preact/signals": "^0.0.2",
+		"@preact/signals": "^0.0.3",
 		"@testing-library/preact": "^2.0.0",
 		"@types/archiver": "^5.3.1",
 		"@types/babel__core": "^7.1.19",
