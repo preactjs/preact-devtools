@@ -1,6 +1,6 @@
 import { signal } from "@preact/signals";
 import { escapeStringRegexp } from "./utils";
-import { RawFilterState, TypeFilterValue } from "../../adapter/adapter/filter";
+import { RawFilterState } from "../../adapter/adapter/filter";
 
 export interface RawFilter {
 	value: string;
@@ -71,42 +71,6 @@ export function createFilterStore(
 		filterDom,
 		filterHoc,
 		filterRoot,
-		setEnabled(filter: RawFilter | TypeFilterValue, v: boolean) {
-			if (typeof filter === "string") {
-				if (filter === "dom") {
-					filterDom.value = v;
-				} else if (filter === "fragment") {
-					filterFragment.value = v;
-				} else if (filter === "hoc") {
-					filterHoc.value = v;
-				} else if (filter === "root") {
-					filterRoot.value = v;
-				}
-			} else {
-				filter.enabled = v;
-			}
-			filters.update();
-		},
-		setValue(filter: RawFilter, value: string) {
-			filter.value = value;
-			filters.update();
-		},
-		add() {
-			filters.update(v => {
-				v.push({
-					value: "",
-					enabled: false,
-				});
-			});
-		},
-		remove(filter: RawFilter) {
-			const idx = filters.value.indexOf(filter);
-			if (idx > -1) {
-				filters.update(v => {
-					v.splice(idx, 1);
-				});
-			}
-		},
 		submit,
 		restore,
 	};

@@ -3,6 +3,7 @@ import { SidebarPanel, Empty } from "../../sidebar/SidebarPanel";
 import { useStore } from "../../../store/react-bindings";
 import { RenderReason } from "../../../../adapter/shared/renderReasons";
 import { Message, MessageBtn } from "../../Message/Message";
+import { startProfiling } from "../data/commits";
 
 function getReasonName(reason: RenderReason) {
 	switch (reason) {
@@ -69,7 +70,7 @@ export function RenderReasons() {
 							onClick={() => {
 								const value = !captureReason;
 								store.profiler.setRenderReasonCapture(value);
-								store.profiler.isRecording.value = true;
+								startProfiling(store.profiler);
 								store.emit("start-profiling", {
 									captureRenderReasons: value,
 								});

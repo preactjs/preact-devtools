@@ -6,7 +6,12 @@ import { useStore } from "../../../../store/react-bindings";
 import s from "../../../elements/TreeBar.module.css";
 import { useCallback } from "preact/hooks";
 import { FlameGraphMode } from "../../flamegraph/FlameGraphMode";
-import { getCommitInitalSelectNodeId, resetProfiler } from "../../data/commits";
+import {
+	getCommitInitalSelectNodeId,
+	resetProfiler,
+	startProfiling,
+	stopProfiling,
+} from "../../data/commits";
 import { Icon } from "../../../icons";
 import { useComputed } from "@preact/signals";
 
@@ -48,7 +53,7 @@ export function TimelineBar() {
 	);
 
 	const onReloadAndProfile = useCallback(() => {
-		store.profiler.isRecording.value = true;
+		startProfiling(store.profiler);
 		store.emit("reload-and-profile", {
 			captureRenderReasons: store.profiler.captureRenderReasons.value,
 		});
@@ -109,14 +114,14 @@ export function RecordBtn() {
 
 	const onClick = useCallback(() => {
 		const { isRecording, captureRenderReasons } = store.profiler;
-		const v = !isRecording.value;
-		isRecording.value = v;
 
-		if (v) {
+		if (!isRecording.value) {
+			startProfiling(store.profiler);
 			store.emit("start-profiling", {
 				captureRenderReasons: captureRenderReasons.value,
 			});
 		} else {
+			stopProfiling(store.profiler);
 			store.emit("stop-profiling", null);
 		}
 	}, [store]);

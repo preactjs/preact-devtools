@@ -2,7 +2,7 @@ import { h, Fragment } from "preact";
 import { IconTab } from "../components/Tabs/Tabs";
 import { useStore } from "../../../store/react-bindings";
 import { useCallback } from "preact/hooks";
-import { FlamegraphType } from "../data/commits";
+import { FlamegraphType, getCommitInitalSelectNodeId } from "../data/commits";
 import { Icon } from "../../icons";
 
 export function FlameGraphMode() {
@@ -11,7 +11,14 @@ export function FlameGraphMode() {
 	const disabled = !store.profiler.isSupported.value;
 
 	const onClick = useCallback((value: string) => {
-		store.profiler.flamegraphType.value = value as any;
+		const profiler = store.profiler;
+		profiler.flamegraphType.value = value as any;
+		profiler.selectedNodeId.value = profiler.activeCommit.value
+			? getCommitInitalSelectNodeId(
+					profiler.activeCommit.value,
+					profiler.flamegraphType.value,
+			  )
+			: -1;
 	}, []);
 
 	return (

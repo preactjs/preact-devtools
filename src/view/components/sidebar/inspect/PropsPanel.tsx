@@ -34,9 +34,9 @@ export function PropsPanel(props: Props) {
 						onChange={onChange}
 						onCollapse={id => {
 							const idx = props.uncollapsed.value.indexOf(id);
-							props.uncollapsed.update(v => {
-								idx > -1 ? v.splice(idx, 1) : v.push(id);
-							});
+							const v = props.uncollapsed.value;
+							idx > -1 ? v.splice(idx, 1) : v.push(id);
+							props.uncollapsed.value = v.slice();
 						}}
 					/>
 					{canAddNew && (

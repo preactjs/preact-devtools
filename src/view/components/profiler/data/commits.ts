@@ -130,32 +130,9 @@ export function createProfiler(): ProfilerState {
 
 	// Flamegraph
 	const flamegraphType = signal(FlamegraphType.FLAMEGRAPH);
-	flamegraphType.on(() => {
-		selectedNodeId.value = activeCommit.value
-			? getCommitInitalSelectNodeId(activeCommit.value, flamegraphType.value)
-			: -1;
-	});
 
 	// Recording
 	const isRecording = signal(false);
-	isRecording.on(v => {
-		// Clear current selection and profiling data when
-		// a new recording starts.
-		if (v) {
-			commits.value = [];
-			activeCommitIdx.value = 0;
-			selectedNodeId.value = 0;
-		} else {
-			// Reset selection when recording stopped
-			// and new profiling data was collected.
-			if (commits.value.length > 0) {
-				selectedNodeId.value = getCommitInitalSelectNodeId(
-					commits.value[0],
-					flamegraphType.value,
-				);
-			}
-		}
-	});
 
 	// Render reasons
 	const activeReason = computed(() => {
@@ -217,10 +194,26 @@ export function createProfiler(): ProfilerState {
 	};
 }
 
+export function startProfiling(state: ProfilerState) {
+	state.isRecording.value = true;
+	state.commits.value = [];
+	state.activeCommitIdx.value = 0;
+	state.selectedNodeId.value = 0;
+}
+
 export function stopProfiling(state: ProfilerState) {
 	state.isRecording.value = false;
 	state.activeCommitIdx.value = 0;
-	state.selectedNodeId.value = -1;
+	// Reset selection when recording stopped
+	// and new profiling data was collected.
+	if (state.commits.value.length > 0) {
+		state.selectedNodeId.value = getCommitInitalSelectNodeId(
+			state.commits.value[0],
+			state.flamegraphType.value,
+		);
+	} else {
+		state.selectedNodeId.value = -1;
+	}
 }
 
 export function resetProfiler(state: ProfilerState) {
@@ -295,15 +288,15 @@ export function recordProfilerCommit(
 	// console.log(JSON.stringify(Array.from(nodes.values())));
 	// console.groupEnd();
 
-	profiler.commits.update(arr => {
-		arr.push({
-			rootId: getRoot(tree, commitRootId),
-			commitRootId: commitRootId,
-			rendered,
-			nodes,
-			maxSelfDuration,
-			duration: totalCommitDuration,
-			selfDurations,
-		});
+	const commitStore = profiler.commits.value;
+	commitStore.push({
+		rootId: getRoot(tree, commitRootId),
+		commitRootId: commitRootId,
+		rendered,
+		nodes,
+		maxSelfDuration,
+		duration: totalCommitDuration,
+		selfDurations,
 	});
+	profiler.commits.value = commitStore.slice();
 }

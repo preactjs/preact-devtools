@@ -13,9 +13,9 @@ export interface Collapser<T> {
  */
 export function createCollapser<T>(collapsed: Signal<Set<T>>): Collapser<T> {
 	const collapseNode = (id: T, shouldCollapse: boolean) => {
-		collapsed.update(s => {
-			shouldCollapse ? s.add(id) : s.delete(id);
-		});
+		const v = collapsed.value;
+		shouldCollapse ? v.add(id) : v.delete(id);
+		collapsed.value = new Set(v);
 	};
 
 	const toggle = (id: T) => collapseNode(id, !collapsed.value.has(id));
