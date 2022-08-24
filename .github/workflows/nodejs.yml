@@ -5,15 +5,17 @@ on: [push]
 jobs:
   build:
     runs-on: ubuntu-latest
-    container:
-      image: mcr.microsoft.com/playwright:v1.24.0-focal
 
     steps:
       - uses: actions/checkout@v3
       - uses: actions/setup-node@v3
         with:
           node-version: 18
-      - name: Run install and tests
+      - name: Install Deps
+        run: yarn
+      - name: Install Playwright
+        run: yarn playwright install --with-deps
+      - name: Run tests
         run: |
           yarn
           yarn lint
