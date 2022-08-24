@@ -12,7 +12,10 @@ test("Highlight iframe nodes", async ({ page }) => {
 			),
 		);
 
-	await devtools.locator('[data-testid="elements-tree"] [data-name]').waitFor();
+	await devtools
+		.locator('[data-testid="elements-tree"] [data-name]')
+		.first()
+		.waitFor();
 
 	// TODO: Find a better solution
 	await wait(1000);

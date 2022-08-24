@@ -10,7 +10,7 @@ test("Clicking at the right of element names #144", async ({ page }) => {
 	});
 
 	const selector = '[data-name="App"]';
-	await page.waitForSelector(selector);
+	await devtools.waitForSelector(selector);
 	const { x, y } = await devtools.evaluate((s: string) => {
 		const rect = document.querySelector(s)!.getBoundingClientRect();
 		return { x: rect.right, y: rect.top };
