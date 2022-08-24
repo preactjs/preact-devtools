@@ -1,5 +1,5 @@
 import { expect, test } from "@playwright/test";
-import { gotoTest } from "../pw-utils";
+import { gotoTest, wait } from "../pw-utils";
 
 test("Highlight iframe nodes", async ({ page }) => {
 	const { devtools } = await gotoTest(page, "iframe");
@@ -11,6 +11,11 @@ test("Highlight iframe nodes", async ({ page }) => {
 				x => x.contentDocument?.readyState == "complete",
 			),
 		);
+
+	await devtools.locator('[data-testid="elements-tree"] [data-name]').waitFor();
+
+	// TODO: Find a better solution
+	await wait(1000);
 	const elements = await devtools
 		.locator('[data-testid="elements-tree"] [data-name]')
 		.allTextContents();

@@ -6,6 +6,8 @@ test("Fragment filter should filter Fragment nodes", async ({ page }) => {
 		preact: "10.4.1",
 	});
 
+	await devtools.locator('[data-testid="elements-tree"] [data-name]').waitFor();
+
 	const names = await devtools
 		.locator('[data-testid="elements-tree"] [data-name]')
 		.allTextContents();
