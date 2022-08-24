@@ -13,10 +13,9 @@ jobs:
       - uses: actions/setup-node@v3
         with:
           node-version: 18
-      - name: Install Deps
-        run: yarn
-      - name: Run tests
+      - name: Run install and tests
         run: |
+          yarn
           yarn lint
           yarn test
           yarn build:chrome
