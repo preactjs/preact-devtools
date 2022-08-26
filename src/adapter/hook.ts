@@ -58,6 +58,10 @@ export interface DevtoolEvents {
 	refresh: null;
 	disconnect: null;
 	suspend: { id: ID; active: boolean };
+	"root-order-page": null;
+	"root-order": number[];
+	operation: number[];
+	operation_v2: number[];
 }
 export type EmitFn = <K extends keyof DevtoolEvents>(
 	name: K,
@@ -206,6 +210,8 @@ export function createHook(port: PortPageHook): DevtoolsHook {
 			// multiple connected renderers
 			const namespace = Math.floor(Math.random() * 2 ** 32);
 
+			const roots = new Map<any, Node>();
+
 			// currently we only support preact >= 10, later we can add another branch for major === 8
 			if (preactVersionMatch.major == 10) {
 				const supports = {
@@ -230,8 +236,9 @@ export function createHook(port: PortPageHook): DevtoolsHook {
 					filters,
 					idMapper,
 					bindingsV10,
+					roots,
 				);
-				setupOptionsV10(options, renderer, config as any);
+				setupOptionsV10(options, renderer, roots, config as any);
 				return attachRenderer(renderer, supports);
 			} else if (preactVersionMatch.major === 11) {
 				const idMapper = createIdMappingState(
@@ -248,8 +255,9 @@ export function createHook(port: PortPageHook): DevtoolsHook {
 					filters,
 					idMapper,
 					bindingsV11,
+					roots,
 				);
-				setupOptionsV11(options as any, renderer, config, profiler);
+				setupOptionsV11(options as any, renderer, roots, config, profiler);
 				return attachRenderer(renderer, {
 					hooks: true,
 					renderReasons: true,

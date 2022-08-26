@@ -5,6 +5,7 @@ import { recordProfilerCommit } from "../../view/components/profiler/data/commit
 import { ops2Tree } from "./operations";
 import { applyOperationsV1 } from "./legacy/operationsV1";
 import { OperationInfo, Stats, stats2ops } from "../shared/stats";
+import { DevtoolEvents } from "../hook";
 
 export enum MsgTypes {
 	ADD_ROOT = 1,
@@ -192,7 +193,7 @@ export function applyOperationsV2(store: Store, data: number[]) {
 	}
 }
 
-export function applyEvent(store: Store, type: string, data: any) {
+export function applyEvent(store: Store, type: keyof DevtoolEvents, data: any) {
 	switch (type) {
 		case "attach":
 			if (!store.profiler.isSupported.value) {
@@ -238,5 +239,19 @@ export function applyEvent(store: Store, type: string, data: any) {
 		case "stop-picker":
 			store.isPicking.value = false;
 			break;
+		case "root-order": {
+			const oldRoots = store.roots.value;
+			const newOrder = new Set(data);
+
+			for (let i = 0; i < oldRoots.length; i++) {
+				const id = oldRoots[i];
+				if (!newOrder.has(id)) {
+					data.push(id);
+				}
+			}
+
+			store.roots.value = data;
+			break;
+		}
 	}
 }
