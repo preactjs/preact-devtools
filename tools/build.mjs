@@ -2,7 +2,6 @@ import * as esbuild from "esbuild";
 import path from "path";
 import fs from "fs/promises";
 import {
-	aliasPlugin,
 	archivePlugin,
 	babelPlugin,
 	copyPlugin,
@@ -124,12 +123,6 @@ async function build(browser) {
 					installHook: "src/shells/shared/installHook.ts",
 			  },
 		plugins: [
-			DEBUG
-				? aliasPlugin({
-						"preact/hooks": "./node_modules/preact/hooks/src/index.js",
-						preact: "./node_modules/preact/src/index.js",
-				  })
-				: undefined,
 			cssModules(),
 			babelPlugin(),
 			copyPlugin(
