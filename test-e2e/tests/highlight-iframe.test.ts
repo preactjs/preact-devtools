@@ -1,7 +1,7 @@
 import { expect, test } from "@playwright/test";
 import { gotoTest, wait } from "../pw-utils";
 
-test.only("Highlight iframe nodes", async ({ page }) => {
+test("Highlight iframe nodes", async ({ page }) => {
 	const { devtools } = await gotoTest(page, "iframe");
 
 	await devtools
