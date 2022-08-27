@@ -34,31 +34,20 @@ export interface Measurements {
 	};
 }
 
-function getBoundsState(rect: {
-	top: number;
-	height: number;
-	left: number;
-	width: number;
-}) {
-	return {
-		top: rect.top + window.pageYOffset < window.scrollY,
-		bottom: rect.top + rect.height > window.innerHeight + scrollY,
-		left: rect.left + window.pageXOffset < window.scrollX,
-		right: rect.left + rect.width > window.scrollX + window.innerWidth,
-	};
-}
-
 export function measureNode(dom: Element): Measurements {
 	const s = window.getComputedStyle(dom);
 	const r = dom.getBoundingClientRect();
 
-	const top = r.top + window.pageYOffset;
-	const left = r.left + window.pageXOffset;
-
 	return {
-		top,
-		left,
-		bounds: getBoundsState(r),
+		top: r.top + window.scrollY,
+		left: r.left + window.scrollX,
+		// Attention: getBoundingClientRect() is relative to the viewport.
+		bounds: {
+			top: r.top + r.height <= 0,
+			bottom: r.top >= window.innerHeight,
+			left: r.left + r.width <= 0,
+			right: r.left >= window.innerWidth,
+		},
 		boxSizing: s.boxSizing,
 
 		// Round to at most 2 decimals. This is not 100% accurate,
@@ -90,12 +79,13 @@ export function mergeMeasure(a: Measurements, b: Measurements): Measurements {
 		boxSizing: a.boxSizing,
 		top,
 		left,
-		bounds: getBoundsState({
-			height,
-			left,
-			top,
-			width,
-		}),
+		// Attention: We're dealing with absolute coordinates here
+		bounds: {
+			top: top + height <= window.scrollY,
+			bottom: top >= window.scrollY + window.innerHeight,
+			left: left + width <= window.scrollX,
+			right: left >= window.scrollX + window.innerWidth,
+		},
 		width,
 		height,
 
