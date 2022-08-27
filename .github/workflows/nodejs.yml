@@ -14,13 +14,13 @@ jobs:
       - name: Install Deps
         run: yarn
       - name: Install Playwright
-        run: yarn playwright install --with-deps
+        run: yarn playwright install-deps chromium
       - name: Run tests
         run: |
           yarn lint
           yarn test
           yarn build:chrome
-          PREACT_VERSION=10 yarn test:e2e --retries 3
+          PREACT_VERSION=10 yarn test:e2e --retries 5
         env:
           CI: true
       - name: Upload test results
