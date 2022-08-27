@@ -586,14 +586,18 @@
  * Sidebar Panel
  */
 .sidebar-panel {
-	padding: 0.6rem;
+	padding: 0.6rem 0.6rem 0.6rem 0;
+}
+
+.sidebar-panel + .sidebar-panel {
+	border-top: 0.0625rem solid var(--color-border);
 }
 
 .sidebar-panel-placeholder {
 	font-style: italic;
 	color: var(--color-text-empty);
 	font-size: 0.65rem;
-	padding-left: 0.8rem;
+	padding-left: 1.2rem;
 }
 
 .sidebar-panel-header {
@@ -602,15 +606,25 @@
 }
 
 .sidebar-panel-title {
+	padding-left: 0.6rem;
 	font-size: 0.8rem;
 	line-height: 1.4;
 	margin: 0 0 0.1rem 0;
 	font-weight: normal;
 	color: var(--color-sidebar-title);
+	text-transform: lowercase;
 }
 
 .sidebar-panel-content {
-	padding: 0.25rem 0;
+	padding: 0.25rem 0 0 0.25rem;
+}
+
+.sidebar-panel-empty {
+	padding-left: 1.4rem;
+}
+
+.sidebar-nav-panel-content {
+	padding-left: 0.4rem;
 }
 
 /**

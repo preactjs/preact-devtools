@@ -62,28 +62,32 @@ export function RenderReasons() {
 			</div>
 			<div class="render-reason-message">
 				{isSupported ? (
-					<Message type={captureReason ? "info" : "warning"}>
-						{captureReason
-							? "Timings may be less accurate. "
-							: "Capturing disabled. "}
-						<MessageBtn
-							onClick={() => {
-								const value = !captureReason;
-								store.profiler.setRenderReasonCapture(value);
-								startProfiling(store.profiler);
-								store.emit("start-profiling", {
-									captureRenderReasons: value,
-								});
-							}}
-							testId="toggle-render-reason"
-						>
-							{captureReason ? "Disable" : "Enable"}
-						</MessageBtn>
-					</Message>
+					<div class="sidebar-nav-panel-content">
+						<Message type={captureReason ? "info" : "warning"}>
+							{captureReason
+								? "Timings may be less accurate. "
+								: "Capturing disabled. "}
+							<MessageBtn
+								onClick={() => {
+									const value = !captureReason;
+									store.profiler.setRenderReasonCapture(value);
+									startProfiling(store.profiler);
+									store.emit("start-profiling", {
+										captureRenderReasons: value,
+									});
+								}}
+								testId="toggle-render-reason"
+							>
+								{captureReason ? "Disable" : "Enable"}
+							</MessageBtn>
+						</Message>
+					</div>
 				) : (
-					<Message type="warning">
-						Upgrade to Preact &gt;=10.4.1 to fully enable this feature.
-					</Message>
+					<div class="sidebar-nav-panel-content">
+						<Message type="warning">
+							Upgrade to Preact &gt;=10.4.1 to fully enable this feature.
+						</Message>
+					</div>
 				)}
 			</div>
 		</SidebarPanel>
