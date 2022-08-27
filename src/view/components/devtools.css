@@ -275,7 +275,7 @@
 }
 
 .tree-view-pane {
-	--indent-depth: 1.5rem;
+	--indent-depth: 0.875rem;
 	position: relative;
 }
 
