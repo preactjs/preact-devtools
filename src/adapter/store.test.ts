@@ -71,4 +71,22 @@ describe("Store", () => {
 		expect(store.nodes.value.get(2)).to.equal(undefined);
 		expect(store.nodes.value.get(3)).to.equal(undefined);
 	});
+
+	it("should reset inspectData on clear()", () => {
+		const store = createStore();
+		store.inspectData.value = {
+			canSuspend: false,
+			context: null,
+			hooks: null,
+			id: 123,
+			key: null,
+			name: "Foo",
+			props: null,
+			state: null,
+			suspended: false,
+			type: 1,
+		};
+		store.clear();
+		expect(store.inspectData.value).to.equal(null);
+	});
 });

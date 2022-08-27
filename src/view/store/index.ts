@@ -136,6 +136,7 @@ export function createStore(): Store {
 			selection.selected.value = -1;
 			collapser.collapsed.value = new Set();
 			stats.value = null;
+			inspectData.value = null;
 		},
 		subscribe(fn) {
 			const idx = listeners.push(fn);
