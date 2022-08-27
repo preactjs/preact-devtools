@@ -4,6 +4,7 @@ import { InspectData, UpdateType } from "./adapter/adapter";
 import { SharedVNode } from "./shared/bindings";
 import { VNodeTimings } from "./shared/timings";
 import { RenderReasonData } from "./shared/renderReasons";
+import { RootData } from "./shared/utils";
 
 export type ObjPath = Array<string | number>;
 
@@ -31,6 +32,9 @@ export interface Renderer<T extends SharedVNode = SharedVNode> {
 
 	// Component actions
 	suspend?(id: ID, active: boolean): void; // V4
+
+	// Get a list of root node mappings
+	getRootMappings(): RootData[];
 }
 
 export function getRendererByVNodeId(

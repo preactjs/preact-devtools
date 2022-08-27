@@ -7,6 +7,8 @@ import {
 	getStatefulHooks,
 	getStatefulHookValue,
 	getComponent,
+	isRoot,
+	getActualChildren,
 } from "./bindings";
 import {
 	addDebugValue,
@@ -42,6 +44,7 @@ function trackPrevState(Ctor: ComponentConstructor) {
 export function setupOptionsV10(
 	options: Options,
 	renderer: Renderer,
+	roots: Map<VNode, Node>,
 	config: RendererConfig,
 ) {
 	// Track component state. Only supported in Preact > 10.4.0
@@ -58,6 +61,7 @@ export function setupOptionsV10(
 	// Store (possible) previous hooks so that we don't overwrite them
 	const prevVNodeHook = options.vnode;
 	const prevCommitRoot = o._commit || o.__c;
+	const prevRoot = o._root || o.__;
 	const prevBeforeUnmount = options.unmount;
 	const prevBeforeDiff = o._diff || o.__b;
 	const prevRender = o._render || o.__r;
@@ -164,16 +168,42 @@ export function setupOptionsV10(
 		if (prevAfterDiff) prevAfterDiff(vnode);
 	};
 
+	const userRootToContainer = new Map<VNode, Node>();
 	o._commit = o.__c = (vnode: VNode | null, queue: any[]) => {
 		if (prevCommitRoot) prevCommitRoot(vnode, queue);
 
 		// These cases are already handled by `unmount`
 		if (vnode == null) return;
+		if (isRoot(vnode, config)) {
+			const children = getActualChildren(vnode);
+			if (children.length > 0) {
+				const dom = userRootToContainer.get(children[0] as any);
+				if (dom) {
+					roots.set(vnode, dom);
+				}
+			}
+		}
 
 		const tmpTimings = timings;
 		ownerStack = [];
 		timings = createVNodeTimings();
 		renderer.onCommit(vnode, owners, tmpTimings, null);
+	};
+
+	o._root = o.__ = (vnode: VNode, parent: Node | null) => {
+		if (parent === null) {
+			userRootToContainer.delete(vnode);
+		} else {
+			// Some islands based frameworks use a virtual container node
+			// instead of an actual DOM node.
+			const treeParent =
+				"Node" in globalThis && parent instanceof Node
+					? parent
+					: (parent as any).parentNode;
+			userRootToContainer.set(vnode, treeParent);
+		}
+
+		if (prevRoot) prevRoot(vnode, parent);
 	};
 
 	options.unmount = vnode => {

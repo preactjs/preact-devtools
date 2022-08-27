@@ -573,7 +573,7 @@ function findClosestNonFilteredParent<T extends SharedVNode>(
 
 export function createCommit<T extends SharedVNode>(
 	ids: IdMappingState<T>,
-	roots: Set<T>,
+	roots: Map<T, Node>,
 	owners: Map<T, T>,
 	vnode: T,
 	filters: FilterState,
@@ -600,13 +600,22 @@ export function createCommit<T extends SharedVNode>(
 	const isNew = !hasVNodeId(ids, vnode);
 
 	if (helpers.isRoot(vnode, config)) {
+		const children = helpers.getActualChildren(vnode);
 		if (commit.stats !== null) {
-			const childrenLen = helpers.getActualChildren(vnode).length;
+			const childrenLen = children.length;
 			commit.stats.roots[childrenLen > 4 ? 4 : childrenLen]++;
 		}
 
 		parentId = -1;
-		roots.add(vnode);
+
+		if (children.length > 0 && helpers.isVNode(children[0])) {
+			const child = children[0];
+			if (roots.has(child)) {
+				const dom = roots.get(child)!;
+				roots.delete(child);
+				roots.set(vnode, dom);
+			}
+		}
 	} else {
 		parentId = findClosestNonFilteredParent(ids, helpers, vnode);
 		if (!isNew) {

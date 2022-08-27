@@ -21,6 +21,14 @@ import { DevtoolsToClient, PageHookName } from "../../src/constants";
 			"*",
 		);
 	},
+	listenToPage: (type, callback) => {
+		window.addEventListener("message", e => {
+			if (e.source === window && e.data.source === PageHookName) {
+				const data = e.data;
+				if (data.type === type) callback(data.data);
+			}
+		});
+	},
 });
 
 (async () => {

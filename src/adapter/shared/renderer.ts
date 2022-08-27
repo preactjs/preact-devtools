@@ -2,7 +2,7 @@ import { BaseEvent, PortPageHook } from "../adapter/port";
 import { Commit, flush } from "../protocol/events";
 import { FunctionalComponent, ComponentConstructor, Options } from "preact";
 import { ID, DevNodeType } from "../../view/store/types";
-import { traverse } from "./utils";
+import { newRootData, traverse } from "./utils";
 import { FilterState } from "../adapter/filter";
 import { Renderer } from "../renderer";
 import { startDrawing } from "../adapter/highlightUpdates";
@@ -66,11 +66,13 @@ export function createRenderer<T extends SharedVNode>(
 	filters: FilterState,
 	ids: IdMappingState<T>,
 	bindings: PreactBindings<T>,
+	roots: Map<T, Node>,
 ): Renderer<T> {
-	const roots = new Set<T>();
-
 	let currentUnmounts: number[] = [];
 	let prevOwners = new Map<T, T>();
+
+	/** Use this to check if we added a root */
+	let rootSize = roots.size;
 
 	const domToVNode = new WeakMap<HTMLElement | Text, T>();
 
@@ -111,8 +113,13 @@ export function createRenderer<T extends SharedVNode>(
 
 	return {
 		clear() {
-			roots.forEach(vnode => {
+			roots.forEach((dom, vnode) => {
 				onUnmount(vnode);
+			});
+		},
+		getRootMappings() {
+			return Array.from(roots.entries()).map(entry => {
+				return newRootData(getVNodeId(ids, entry[0]), entry[1]);
 			});
 		},
 
@@ -194,7 +201,7 @@ export function createRenderer<T extends SharedVNode>(
 			/** Queue events and flush in one go */
 			const queue: BaseEvent<any, any>[] = [];
 
-			roots.forEach(root => {
+			roots.forEach((dom, root) => {
 				const rootId = getVNodeId(ids, root);
 
 				unmountStats = {
@@ -227,7 +234,7 @@ export function createRenderer<T extends SharedVNode>(
 			filters.regex = nextFilters.regex;
 			filters.type = nextFilters.type;
 
-			roots.forEach(root => {
+			roots.forEach((dom, root) => {
 				const commit = createCommit(
 					ids,
 					roots,
@@ -247,6 +254,7 @@ export function createRenderer<T extends SharedVNode>(
 			});
 
 			queue.forEach(ev => port.send(ev.type, ev.data));
+			port.send("root-order-page", null);
 		},
 		onCommit(vnode, owners, timingsByVNode, renderReasonPre) {
 			const commit = createCommit(
@@ -289,6 +297,10 @@ export function createRenderer<T extends SharedVNode>(
 			}
 
 			port.send(ev.type as any, ev.data);
+			if (rootSize !== roots.size) {
+				rootSize = roots.size;
+				port.send("root-order-page", null);
+			}
 		},
 		onUnmount,
 		update(id, type, path, value) {

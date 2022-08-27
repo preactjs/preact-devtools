@@ -90,6 +90,7 @@ function trackPrevState(Ctor: any) {
 export function setupOptionsV11(
 	options: OptionsV11,
 	renderer: Renderer,
+	roots: Map<any, Node>,
 	config: RendererConfig,
 	profiler: ProfilerState,
 ) {

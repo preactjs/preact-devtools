@@ -9,6 +9,7 @@ import { PortPageHook } from "./port";
 import { PropData } from "../../view/components/sidebar/inspect/parseProps";
 import { PROFILE_RELOAD, STATS_RELOAD } from "../../constants";
 import { ProfilerState } from "./profiler";
+import { RootData, sortRoots } from "../shared/utils";
 
 export type Path = Array<string | number>;
 
@@ -44,7 +45,7 @@ export function createAdapter(
 	profiler: ProfilerState,
 	renderers: Map<number, Renderer>,
 ) {
-	const { listen, send } = port;
+	const { listen, send, listenToPage } = port;
 
 	const forAll = (fn: (renderer: Renderer) => void) => {
 		for (const r of renderers.values()) {
@@ -130,6 +131,17 @@ export function createAdapter(
 		// Notify all frontends that something changed
 		inspect(id);
 	};
+
+	listenToPage("root-order-page", () => {
+		let roots: RootData[] = [];
+		renderers.forEach(r => {
+			const m = r.getRootMappings();
+			roots = roots.concat(m);
+		});
+
+		const sorted = sortRoots(document.body, roots);
+		send("root-order", sorted);
+	});
 
 	listen("update-prop", data => update({ ...data, type: "props" }));
 	listen("update-state", data => update({ ...data, type: "state" }));

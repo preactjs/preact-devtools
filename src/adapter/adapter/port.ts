@@ -18,6 +18,18 @@ export function listenToDevtools<
 	});
 }
 
+export function listenToPageHook<
+	K extends keyof DevtoolEvents,
+	T extends DevtoolEvents[K]
+>(ctx: Window, type: K, callback: (message: T) => void) {
+	ctx.addEventListener("message", e => {
+		if (e.source === window && e.data.source === PageHookName) {
+			const data = e.data;
+			if (data.type === type) callback(data.data);
+		}
+	});
+}
+
 export function sendToDevtools<K extends keyof DevtoolEvents>(
 	ctx: Window,
 	type: K,
@@ -46,11 +58,16 @@ export interface PortPageHook {
 		type: K,
 		callback: (data: T) => void,
 	) => void;
+	listenToPage: <K extends keyof DevtoolEvents, T extends DevtoolEvents[K]>(
+		type: K,
+		callback: (data: T) => void,
+	) => void;
 }
 
 export function createPortForHook(ctx: Window): PortPageHook {
 	return {
 		send: (type, message) => sendToDevtools(ctx, type, message),
 		listen: (type, callback) => listenToDevtools(ctx, type, callback),
+		listenToPage: (type, callback) => listenToPageHook(ctx, type, callback),
 	};
 }
