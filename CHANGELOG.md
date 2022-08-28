@@ -1,5 +1,17 @@
 # Changelog
 
+## 4.4.0
+
+### Features
+
+- Print Preact version that rendered the selected component in sidebar (#423, thanks @marvinhagemeister)
+- Design: Tweak spacing and alignment (#421, #422, #424, #426, thanks @marvinhagemeister)
+
+### Bug Fixes
+
+- Fix incorrect highlight bounds checks (#420, thanks @marvinhagemeister)
+- Add missing changelog entry in `CHANGELOG.md` for `v4.3.3` (#425, thanks @marvinhagemeister)
+
 ## 4.3.3
 
 ### Bug Fixes
