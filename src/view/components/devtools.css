@@ -1001,7 +1001,7 @@
 	background: var(--color-profiler-old);
 }
 
-.flamegraph-node[data-overflow] .text {
+.flamegraph-node[data-overflow] .flamegraph-text {
 	display: none;
 }
 
