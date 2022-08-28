@@ -1,5 +1,21 @@
 # Changelog
 
+## 4.3.3
+
+### Bug Fixes
+
+- Fix sidebar data not cleared on disconnect (#419, thanks @marvinhagemeister)
+- Fix roots displayed by render order instead of ordering them based on the DOM structure. This commonly occurs when working with Astro or Deno's Fresh framework (#417, thanks @marvinhagemeister)
+- Fix DevTools panel height not filling viewport if smaller than available space (#416, thanks @marvinhagemeister)
+- Fix rare case of DevTools not initializing (#398, thanks @marvinhagemeister)
+
+### Maintenance
+
+- Switch e2e test setup to `playwright` (#403, #408, #410, #411, #412, #413, #415, #418 thanks @marvinhagemeister)
+- Switch build tooling to `esbuild` to reduce build times (#405, thanks @marvinhagemeister)
+- Simplify styling (#397, #399, #401, #402, thanks @marvinhagemeister)
+- Switch to signals for state management (#407, #414 thanks @marvinhagemeister)
+
 ## 4.3.2
 
 - Calculate auto-indent for tree view on intialization in case resize is not fired (#393, thanks @marvinhagemeister)
