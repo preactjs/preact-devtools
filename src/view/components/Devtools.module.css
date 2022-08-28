@@ -165,11 +165,11 @@ input {
 	--color-dim-active-bg: #545454;
 	--color-inactive-child-bg: #e9e1f8;
 	--color-hover: #3a3a3a;
-	--color-border: #575757;
+	--color-border: #424242;
 	--color-dim-border: #474747;
 	--color-text-empty: #999;
 	--color-button-active: #d2adff;
-	--color-sidebar-title: #c5c5c5;
+	--color-sidebar-title: #e0e0e0;
 	--color-modal-backdrop: rgba(50, 50, 50, 0.8);
 	--color-modal-border: #4d4d4d;
 	--color-marker: yellow;

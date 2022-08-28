@@ -34,7 +34,7 @@ export function OwnerInfo() {
 	return (
 		<SidebarPanel title="Rendered by">
 			<nav data-testid="owners">
-				{data.length === 0 && <p>-</p>}
+				{data.length === 0 && <p class="sidebar-panel-empty">-</p>}
 				{data.map(node => {
 					return (
 						<button

@@ -2,7 +2,7 @@ import { RefObject } from "preact";
 import { useLayoutEffect, useRef, useState } from "preact/hooks";
 import { useResize } from "../utils";
 
-const INITIAL = 24;
+const INITIAL = 14;
 const RIGHT_MARGIN = 16;
 
 export function useAutoIndent(container: RefObject<HTMLElement>, deps: any[]) {

@@ -33,45 +33,46 @@ export function RenderedAt() {
 
 	return (
 		<Fragment>
-			<SidebarPanel title="Commit Root:">
-				<nav data-testid="commitRoot">
-					<button
-						class="rendered-at-item"
-						data-active={selected === commit.commitRootId}
-						onClick={() =>
-							(store.profiler.selectedNodeId.value = commit.commitRootId)
-						}
-					>
-						<span>{commitRoot.name}</span>
-					</button>
-				</nav>
-			</SidebarPanel>
-
 			{data.length > 0 && (
-				<SidebarPanel title="Rendered at:">
-					{data.length <= 0 ? (
-						<Empty>Did not render during this profiling session</Empty>
-					) : (
-						<nav data-testid="rendered-at">
-							{data.map(node => {
-								return (
-									<button
-										key={node.index}
-										class="rendered-at-item"
-										data-active={commitIdx === node.index}
-										onClick={() =>
-											(store.profiler.activeCommitIdx.value = node.index)
-										}
-									>
-										<span>
-											Commit #{node.index} for {formatTime(node.selfDuration)}
-										</span>
-									</button>
-								);
-							})}
+				<Fragment>
+					<SidebarPanel title="Commit Root:">
+						<nav data-testid="commitRoot" class="sidebar-nav-panel-content">
+							<button
+								class="rendered-at-item"
+								data-active={selected === commit.commitRootId}
+								onClick={() =>
+									(store.profiler.selectedNodeId.value = commit.commitRootId)
+								}
+							>
+								<span>{commitRoot.name}</span>
+							</button>
 						</nav>
-					)}
-				</SidebarPanel>
+					</SidebarPanel>
+					<SidebarPanel title="Rendered at:">
+						{data.length <= 0 ? (
+							<Empty>Did not render during this profiling session</Empty>
+						) : (
+							<nav data-testid="rendered-at" class="sidebar-nav-panel-content">
+								{data.map(node => {
+									return (
+										<button
+											key={node.index}
+											class="rendered-at-item"
+											data-active={commitIdx === node.index}
+											onClick={() =>
+												(store.profiler.activeCommitIdx.value = node.index)
+											}
+										>
+											<span>
+												Commit #{node.index} for {formatTime(node.selfDuration)}
+											</span>
+										</button>
+									);
+								})}
+							</nav>
+						)}
+					</SidebarPanel>
+				</Fragment>
 			)}
 		</Fragment>
 	);
