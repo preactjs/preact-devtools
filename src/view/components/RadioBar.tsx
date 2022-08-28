@@ -9,7 +9,7 @@ export interface RadioBarProps {
 
 export function RadioBar(props: RadioBarProps) {
 	return (
-		<div class="radio-bar">
+		<span class="radio-bar">
 			{props.items.map(x => {
 				return (
 					<label key={x.value}>
@@ -25,6 +25,6 @@ export function RadioBar(props: RadioBarProps) {
 					</label>
 				);
 			})}
-		</div>
+		</span>
 	);
 }

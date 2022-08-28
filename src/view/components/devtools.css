@@ -87,6 +87,7 @@
 .checkbox-root {
 	display: flex;
 	font-size: 1rem;
+	padding-bottom: 0.25rem;
 }
 
 .checkbox-wrapper {
@@ -95,10 +96,6 @@
 	flex: 0 0 auto;
 	justify-content: flex-start;
 	align-items: center;
-}
-
-.checkbox-wrapper svg {
-	width: 1.25rem;
 }
 
 .checkbox-wrapper input {
@@ -1089,18 +1086,13 @@
  * Settings tab
  */
 .settings-tab {
-	padding: 1rem;
-}
-
-.settings-tab-label {
-	display: block;
-	margin-bottom: 0.75rem;
-	font-size: 0.9rem;
+	padding: 1rem 0.8rem;
 }
 
 .settings-tab h2 {
-	margin-top: 3rem;
-	font-size: 2rem;
+	margin-top: 1.4rem;
+	margin-bottom: 1rem;
+	font-size: 1rem;
 	font-weight: lighter;
 }
 
@@ -1110,7 +1102,7 @@
 
 .settings-tab-message {
 	margin-left: 1.25rem;
-	margin-top: 0.5rem;
+	margin-top: 0.25rem;
 	margin-bottom: 2rem;
 }
 
@@ -1120,7 +1112,17 @@
 
 .settings-tab-description {
 	margin-left: 1.25rem;
-	margin-top: 0.25rem !important;
-	margin-bottom: 2rem;
-	font-size: 0.9rem;
+	margin-top: 0.25rem;
+	font-size: var(--font-xnormal);
+}
+
+.settings-checkbox-setting {
+	margin-bottom: 1rem;
+}
+
+.settings-tab-label {
+	display: inline-block;
+	margin-bottom: 0.75rem;
+	font-size: var(--font-xnormal);
+	margin-right: 0.6rem;
 }
