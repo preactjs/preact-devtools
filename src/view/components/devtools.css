@@ -423,6 +423,10 @@
 /**
  * RenderedAt panel
  */
+.rendered-by-wrapper {
+	margin-left: 0.3rem;
+}
+
 .rendered-at-item {
 	background: none;
 	border: none;
@@ -432,7 +436,7 @@
 	display: flex;
 	align-items: center;
 	font-size: var(--font-small);
-	padding: 0.25rem 0.5rem;
+	padding: 0.25rem 1rem;
 	cursor: pointer;
 	border-radius: 0.1875rem;
 }
@@ -445,6 +449,14 @@
 }
 
 .rendered-at-item span {
+	display: block;
+}
+
+.sidebar-preact-version {
+	color: var(--color-text);
+	font-size: var(--font-small);
+	margin-top: 0.5rem;
+	margin-left: 1rem;
 	display: block;
 }
 
@@ -617,10 +629,6 @@
 
 .sidebar-panel-content {
 	padding: 0.25rem 0 0 0.25rem;
-}
-
-.sidebar-panel-empty {
-	padding-left: 1.4rem;
 }
 
 .sidebar-nav-panel-content {
@@ -1094,6 +1102,10 @@
 	margin-top: 3rem;
 	font-size: 2rem;
 	font-weight: lighter;
+}
+
+.settings-tab p {
+	margin-top: 0;
 }
 
 .settings-tab-message {

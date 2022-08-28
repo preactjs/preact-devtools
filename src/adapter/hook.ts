@@ -237,6 +237,7 @@ export function createHook(port: PortPageHook): DevtoolsHook {
 					idMapper,
 					bindingsV10,
 					roots,
+					version,
 				);
 				setupOptionsV10(options, renderer, roots, config as any);
 				return attachRenderer(renderer, supports);
@@ -256,6 +257,7 @@ export function createHook(port: PortPageHook): DevtoolsHook {
 					idMapper,
 					bindingsV11,
 					roots,
+					version,
 				);
 				setupOptionsV11(options as any, renderer, roots, config, profiler);
 				return attachRenderer(renderer, {

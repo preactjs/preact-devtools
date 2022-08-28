@@ -67,6 +67,7 @@ export function createRenderer<T extends SharedVNode>(
 	ids: IdMappingState<T>,
 	bindings: PreactBindings<T>,
 	roots: Map<T, Node>,
+	version: string,
 ): Renderer<T> {
 	let currentUnmounts: number[] = [];
 	let prevOwners = new Map<T, T>();
@@ -108,7 +109,15 @@ export function createRenderer<T extends SharedVNode>(
 	}
 
 	const inspect = (id: ID) => {
-		return inspectVNode(ids, config, bindings, options, id, supports.hooks);
+		return inspectVNode(
+			ids,
+			config,
+			bindings,
+			options,
+			id,
+			supports.hooks,
+			version,
+		);
 	};
 
 	return {

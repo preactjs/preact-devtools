@@ -38,6 +38,8 @@ export interface InspectData {
 	canSuspend: boolean;
 	/** Only Suspense components have this */
 	suspended: boolean;
+	/** Preact version that rendered this VNode */
+	version: string;
 }
 
 export function createAdapter(

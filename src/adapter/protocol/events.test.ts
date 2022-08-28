@@ -232,6 +232,7 @@ describe("applyEvent", () => {
 			type: "asd",
 			canSuspend: false,
 			suspended: false,
+			version: "",
 		};
 
 		const data = fromSnapshot([
@@ -259,6 +260,7 @@ describe("applyEvent", () => {
 			type: "asd",
 			canSuspend: false,
 			suspended: false,
+			version: "",
 		};
 
 		store.sidebar.props.uncollapsed.value = ["a", "b", "c"];

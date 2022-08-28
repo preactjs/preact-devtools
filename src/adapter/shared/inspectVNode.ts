@@ -20,6 +20,7 @@ export function inspectVNode<T extends SharedVNode>(
 	options: Options,
 	id: ID,
 	supportsHooks: boolean,
+	version: string,
 ): InspectData | null {
 	const vnode = getVNodeById(ids, id);
 	if (!vnode) return null;
@@ -74,5 +75,6 @@ export function inspectVNode<T extends SharedVNode>(
 		// TODO: We're not using this information anywhere yet
 		type: getDevtoolsType(vnode, bindings),
 		suspended,
+		version,
 	};
 }
