@@ -33,23 +33,27 @@ export function OwnerInfo() {
 
 	return (
 		<SidebarPanel title="Rendered by">
-			<nav data-testid="owners">
-				{data.length === 0 && <p class="sidebar-panel-empty">-</p>}
-				{data.map(node => {
-					return (
-						<button
-							key={node.id}
-							class="rendered-at-item"
-							data-active={selectedId === node.id}
-							onClick={() => {
-								store.selection.selectById(node.id);
-							}}
-						>
-							{node.name}
-						</button>
-					);
-				})}
-			</nav>
+			<div class="rendered-by-wrapper">
+				<nav data-testid="owners">
+					{data.map(node => {
+						return (
+							<button
+								key={node.id}
+								class="rendered-at-item"
+								data-active={selectedId === node.id}
+								onClick={() => {
+									store.selection.selectById(node.id);
+								}}
+							>
+								{node.name}
+							</button>
+						);
+					})}
+				</nav>
+				<p class="sidebar-preact-version">
+					Preact@{store.inspectData.value?.version || ""}
+				</p>
+			</div>
 		</SidebarPanel>
 	);
 }

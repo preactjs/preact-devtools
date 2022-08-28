@@ -85,6 +85,7 @@ describe("Store", () => {
 			state: null,
 			suspended: false,
 			type: 1,
+			version: "",
 		};
 		store.clear();
 		expect(store.inspectData.value).to.equal(null);

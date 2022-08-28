@@ -33,6 +33,7 @@ export function setupMockHook(options: Options) {
 		createIdMappingState(1, bindingsV10.getInstance),
 		bindingsV10,
 		roots,
+		"",
 	);
 	const destroy = setupOptionsV10(options, renderer, roots, {
 		Fragment: Fragment as any,
