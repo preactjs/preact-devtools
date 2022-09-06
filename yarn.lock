@@ -750,17 +750,17 @@
     kolorist "^1.2.10"
     resolve "^1.20.0"
 
-"@preact/signals-core@^0.0.4":
-  version "0.0.4"
-  resolved "https://registry.yarnpkg.com/@preact/signals-core/-/signals-core-0.0.4.tgz#5e5e640fc78549ddd49fe014f0112e97e284fddf"
-  integrity sha512-mUn/uKFfgj1Crcz3fOAM5e273ZFdx+pJFXsO1qJG5DML4rnLFXxjbqB0vYZ9cJNbnnRm3qjqc47ih3Ryzg8r6Q==
+"@preact/signals-core@^1.0.0":
+  version "1.0.0"
+  resolved "https://registry.yarnpkg.com/@preact/signals-core/-/signals-core-1.0.0.tgz#ccdfb40e9ec97668c74aecbe91192c7422636836"
+  integrity sha512-Gx5zCzjJLnI7ZeS4Z5TKu48vBGe/fqNONxXNmoIToOw0lOz3dN32/Lmfcg408Mf52kwyqWmMRjPJo1paPYhLOg==
 
-"@preact/signals@^0.0.3":
-  version "0.0.3"
-  resolved "https://registry.yarnpkg.com/@preact/signals/-/signals-0.0.3.tgz#d45daf26180bf2940d07f0cc0cdce0333c08e554"
-  integrity sha512-Z7n4tVZ4nhukK1jaC7dUDITBciFo/Ne/p+2UVSLAMc6t5hI3yGpaenjmeItgC1/doov7H+5b6vV0K1QxlmRKfg==
+"@preact/signals@^1.0.1":
+  version "1.0.1"
+  resolved "https://registry.yarnpkg.com/@preact/signals/-/signals-1.0.1.tgz#9f427abf5eea09f0163e05e4f3b58b00dff3111d"
+  integrity sha512-G1SCckKl1V0AGJ6Ulf8nqLPxyiReoXLqFWAYKMkH4YyUlLQJP+qq8/qcjw0Iqx92f8fyTRnuMLYKSdiqemPeRQ==
   dependencies:
-    "@preact/signals-core" "^0.0.4"
+    "@preact/signals-core" "^1.0.0"
 
 "@prefresh/babel-plugin@0.4.3":
   version "0.4.3"

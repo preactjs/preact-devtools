@@ -141,6 +141,9 @@ export function FilterPopup() {
 	);
 	const [filterHoc, setFilterHoc] = useState(store.filter.filterHoc.value);
 	const [filterRoot, setFilterRoot] = useState(store.filter.filterRoot.value);
+	const [filterTextSignal, setFilterTextSignal] = useState(
+		store.filter.filterTextSignal.value,
+	);
 	const [filters, setFilters] = useState(store.filter.filters.value);
 
 	return (
@@ -153,6 +156,7 @@ export function FilterPopup() {
 					store.filter.filterFragment.value = filterFragment;
 					store.filter.filterRoot.value = filterRoot;
 					store.filter.filterHoc.value = filterHoc;
+					store.filter.filterTextSignal.value = filterTextSignal;
 
 					store.filter.filters.value = filters;
 
@@ -179,6 +183,11 @@ export function FilterPopup() {
 					label="DOM nodes"
 					onInput={checked => setFilterDom(checked)}
 					checked={filterDom}
+				/>
+				<FilterCheck
+					label="Text Signal nodes"
+					onInput={checked => setFilterTextSignal(checked)}
+					checked={filterTextSignal}
 				/>
 				{/* Custom user filters */}
 				{filters.map((x, i) => {

@@ -11,6 +11,7 @@ export type PropDataType =
 	| "function"
 	| "bigint"
 	| "vnode"
+	| "signal"
 	| "blob"
 	| "symbol"
 	| "html";
@@ -33,6 +34,7 @@ export function parseProps(
 	depth = 0,
 	name = path,
 	out = new Map<string, PropData>(),
+	forceReadonly = false,
 ): Map<string, PropData> {
 	if (depth >= limit) {
 		out.set(path, {
@@ -63,7 +65,7 @@ export function parseProps(
 		data.forEach((item, i) => {
 			const childPath = `${path}.${i}`;
 			children.push(childPath);
-			parseProps(item, childPath, limit, depth + 1, "" + i, out);
+			parseProps(item, childPath, limit, depth + 1, "" + i, out, forceReadonly);
 		});
 	} else if (typeof data === "object") {
 		if (data === null) {
@@ -134,7 +136,15 @@ export function parseProps(
 				(data.entries as any[]).forEach((item, i) => {
 					const childPath = `${path}.${i}`;
 					children.push(childPath);
-					parseProps(item, childPath, limit, depth + 1, "" + i, out);
+					parseProps(
+						item,
+						childPath,
+						limit,
+						depth + 1,
+						"" + i,
+						out,
+						forceReadonly,
+					);
 				});
 				out.set(path, node);
 			} else if (
@@ -158,7 +168,15 @@ export function parseProps(
 				(data.entries as any[]).forEach((item, i) => {
 					const childPath = `${path}.${i}`;
 					children.push(childPath);
-					parseProps(item, childPath, limit, depth + 1, "" + i, out);
+					parseProps(
+						item,
+						childPath,
+						limit,
+						depth + 1,
+						"" + i,
+						out,
+						forceReadonly,
+					);
 				});
 				out.set(path, node);
 			} else if (
@@ -209,6 +227,36 @@ export function parseProps(
 					children: [],
 					meta: null,
 				});
+			} else if (
+				// Same for Signals
+				maybeCollection &&
+				typeof data.name === "string" &&
+				data.type === "signal"
+			) {
+				const children: string[] = [];
+				const isEditable = data.name === "Signal";
+				const node: PropData = {
+					depth,
+					name,
+					id: path,
+					type: "signal",
+					editable: isEditable,
+					value: data,
+					children,
+					meta: null,
+				};
+				const childPath = `${path}.value`;
+				children.push(childPath);
+				out.set(path, node);
+				parseProps(
+					data.value,
+					childPath,
+					limit,
+					depth + 1,
+					"value",
+					out,
+					!isEditable,
+				);
 			} else {
 				const node: PropData = {
 					depth,
@@ -225,7 +273,15 @@ export function parseProps(
 				Object.keys(data).forEach(key => {
 					const nextPath = `${path}.${key}`;
 					node.children.push(nextPath);
-					parseProps(data[key], nextPath, limit, depth + 1, key, out);
+					parseProps(
+						data[key],
+						nextPath,
+						limit,
+						depth + 1,
+						key,
+						out,
+						forceReadonly,
+					);
 				});
 
 				out.set(path, node);
@@ -238,7 +294,8 @@ export function parseProps(
 			name,
 			id: path,
 			type: type as any,
-			editable: type !== "undefined" && data !== "[[Circular]]",
+			editable:
+				type !== "undefined" && data !== "[[Circular]]" && !forceReadonly,
 			value: data,
 			children: [],
 			meta: null,

@@ -22,6 +22,15 @@ export const rewriteImportPlugin: Plugin<{ version: string }> = (
 						source.replace("preact", `preact@${options.version}`),
 					);
 					path.replaceWith(clone);
+				} else if (source === "@preact/signals") {
+					const clone = t.cloneNode(path.node, true);
+					clone.source = t.stringLiteral(
+						source.replace(
+							"@preact/signals",
+							`@preact/signals@${options.version}`,
+						),
+					);
+					path.replaceWith(clone);
 				}
 			},
 		},

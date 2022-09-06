@@ -50,6 +50,8 @@ export function genPreview(v: any): string {
 			return `Set(${v.entries.length}) ${truncate(genPreview(v.entries))})`;
 		} else if (v.type === "map") {
 			return `Map(${v.entries.length}) ${truncate(genPreview(v.entries))})`;
+		} else if (v.type === "signal") {
+			return `ƒ ${v.name} (${truncate(genPreview(v.value))})`;
 		}
 
 		if (Array.isArray(v)) {
