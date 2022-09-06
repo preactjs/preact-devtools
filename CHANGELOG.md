@@ -1,5 +1,11 @@
 # Changelog
 
+## 4.5.0
+
+### Features
+
+- Add support for Signals (#428, thanks @marvinhagemeister)
+
 ## 4.4.0
 
 ### Features
