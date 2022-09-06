@@ -26,7 +26,7 @@ test("Should work with filtered HOC roots", async ({ page }) => {
 	await devtools.click('[data-testid="filter-menu-button"]');
 	await devtools.waitForSelector('[data-testid="filter-popup"]');
 	await devtools
-		.locator('[data-testid="filter-popup"]:has-text("HOC-Components")')
+		.locator('[data-testid="filter-popup"] label:has-text("HOC-Components")')
 		.click();
 	await devtools.click('[data-testid="filter-update"]');
 	await wait(1000);
