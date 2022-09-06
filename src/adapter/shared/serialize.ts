@@ -211,13 +211,14 @@ export function maybeSetSignal(
 	path: ObjPath,
 	value: any,
 ) {
-	const last = path.slice().pop();
-	const parent = path.reduce((acc, attr) => (acc ? acc[attr] : null), obj);
-	if (parent && last) {
-		if (isSignal(parent)) {
-			parent.value = value;
+	let current: any = obj;
+	for (let i = 0; i < path.length; i++) {
+		if (isSignal(current)) {
+			current.value = value;
 			return true;
 		}
+
+		current = current[path[i]];
 	}
 
 	return false;
