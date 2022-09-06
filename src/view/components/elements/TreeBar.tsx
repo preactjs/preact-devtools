@@ -187,7 +187,7 @@ export function FilterPopup() {
 				<FilterCheck
 					label="Text Signal nodes"
 					onInput={checked => setFilterTextSignal(checked)}
-					checked={filterDom}
+					checked={filterTextSignal}
 				/>
 				{/* Custom user filters */}
 				{filters.map((x, i) => {
