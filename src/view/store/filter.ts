@@ -15,6 +15,7 @@ export function createFilterStore(
 		dom: true,
 		hoc: true,
 		root: true,
+		textSignal: true,
 		regex: [] as RawFilter[],
 	};
 
@@ -23,6 +24,7 @@ export function createFilterStore(
 	const filterDom = signal(defaults.dom);
 	const filterHoc = signal(defaults.hoc);
 	const filterRoot = signal(defaults.root);
+	const filterTextSignal = signal(defaults.textSignal);
 
 	const submit = () => {
 		const s: RawFilterState = {
@@ -32,6 +34,7 @@ export function createFilterStore(
 				dom: filterDom.value,
 				hoc: filterHoc.value,
 				root: filterRoot.value,
+				textSignal: filterTextSignal.value,
 			},
 		};
 
@@ -47,6 +50,8 @@ export function createFilterStore(
 			filterDom.value = !!state.type.dom;
 			filterHoc.value = !!state.type.hoc;
 			filterRoot.value = !!state.type.root;
+			filterTextSignal.value =
+				"textSignal" in state.type ? !!state.type.textSignal : true;
 			filters.value = state.regex;
 
 			// Refetch component tree if filters are not the default ones
@@ -55,6 +60,7 @@ export function createFilterStore(
 				defaults.dom !== filterDom.value ||
 				defaults.hoc !== filterHoc.value ||
 				defaults.root !== filterRoot.value ||
+				defaults.textSignal !== filterTextSignal.value ||
 				filters.value.some(f => f.enabled)
 			) {
 				submit();
@@ -71,6 +77,7 @@ export function createFilterStore(
 		filterDom,
 		filterHoc,
 		filterRoot,
+		filterTextSignal,
 		submit,
 		restore,
 	};

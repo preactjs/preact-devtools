@@ -6,6 +6,7 @@ import { cleanContext, cleanProps, serialize } from "./serialize";
 import { PreactBindings, SharedVNode } from "./bindings";
 import { InspectData } from "../adapter/adapter";
 import { ID } from "../../view/store/types";
+import { getSignalTextName } from "./utils";
 
 /**
  * Serialize all properties/attributes of a `VNode` like `props`, `context`,
@@ -33,7 +34,11 @@ export function inspectVNode<T extends SharedVNode>(
 		c.state != null &&
 		Object.keys(c.state).length > 0;
 
-	const hasHooks = c != null && bindings.getComponentHooks(vnode) != null;
+	const isSignalTextNode =
+		typeof vnode.type === "function" && vnode.type.displayName === "_st";
+
+	const hasHooks =
+		c != null && !isSignalTextNode && bindings.getComponentHooks(vnode) != null;
 	const hooks =
 		supportsHooks && hasHooks
 			? inspectHooks(config, options, vnode, bindings)
@@ -69,7 +74,7 @@ export function inspectVNode<T extends SharedVNode>(
 		key: vnode.key || null,
 		hooks: supportsHooks ? hooks : !supportsHooks && hasHooks ? [] : null,
 		id,
-		name: bindings.getDisplayName(vnode, config),
+		name: getSignalTextName(bindings.getDisplayName(vnode, config)),
 		props,
 		state,
 		// TODO: We're not using this information anywhere yet

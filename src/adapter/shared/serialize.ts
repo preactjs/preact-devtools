@@ -1,6 +1,7 @@
 import type { RendererConfig } from "./renderer";
 import type { ObjPath } from "../renderer";
 import type { PreactBindings, SharedVNode } from "./bindings";
+import type { Signal } from "@preact/signals";
 
 export interface SerializedVNode {
 	type: "vnode";
@@ -20,6 +21,19 @@ export function serializeVNode<T extends SharedVNode>(
 	}
 
 	return null;
+}
+
+export function isSignal(x: any): x is Signal {
+	return (
+		x !== null &&
+		typeof x === "object" &&
+		typeof x.peek === "function" &&
+		"value" in x
+	);
+}
+
+export function isReadOnlySignal(signal: Signal): boolean {
+	return (signal as any)._r === true;
 }
 
 export function jsonify(
@@ -45,6 +59,14 @@ export function jsonify(
 
 	const vnode = getVNode(data);
 	if (vnode != null) return vnode;
+
+	if (isSignal(data)) {
+		return {
+			type: "signal",
+			name: isReadOnlySignal(data) ? "computed Signal" : "Signal",
+			value: jsonify(data.peek(), getVNode, seen),
+		};
+	}
 
 	if (Array.isArray(data)) {
 		return data.map(x => jsonify(x, getVNode, seen));
@@ -134,6 +156,11 @@ export function setInCopy<T = any>(
 ): T {
 	if (idx >= path.length) return value;
 
+	// Signals bypass everything
+	if (path[path.length - 1] === "value" && maybeSetSignal(obj, path, value)) {
+		return obj;
+	}
+
 	const updated = clone(obj);
 	if (obj instanceof Set) {
 		const oldValue = Array.from(obj)[+path[idx]];
@@ -177,6 +204,23 @@ export function setIn(obj: Record<string, any>, path: ObjPath, value: any) {
 	if (parent && last) {
 		parent[last] = value;
 	}
+}
+
+export function maybeSetSignal(
+	obj: Record<string, any>,
+	path: ObjPath,
+	value: any,
+) {
+	const last = path.pop();
+	const parent = path.reduce((acc, attr) => (acc ? acc[attr] : null), obj);
+	if (parent && last) {
+		if (isSignal(parent)) {
+			parent.value = value;
+			return true;
+		}
+	}
+
+	return false;
 }
 
 export function hasIn(obj: Record<string, any>, path: ObjPath) {

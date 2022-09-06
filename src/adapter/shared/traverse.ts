@@ -19,6 +19,7 @@ import { getDiffType, recordComponentStats } from "./stats";
 import { measureUpdate } from "../adapter/highlightUpdates";
 import { PreactBindings, SharedVNode } from "./bindings";
 import { VNodeTimings } from "./timings";
+import { getSignalTextName } from "./utils";
 
 function getHocName(name: string) {
 	const idx = name.indexOf("(");
@@ -147,7 +148,9 @@ export function shouldFilter<T extends SharedVNode>(
 		return false;
 	} else if (bindings.isElement(vnode) && filters.type.has("dom")) {
 		return true;
-	} else if (filters.type.has("hoc")) {
+	}
+
+	if (filters.type.has("hoc")) {
 		const name = bindings.getDisplayName(vnode, config);
 
 		if (name.indexOf("(") > -1 && !name.startsWith("ForwardRef")) {
@@ -155,8 +158,13 @@ export function shouldFilter<T extends SharedVNode>(
 		}
 	}
 
+	if (filters.type.has("textSignal")) {
+		const name = getSignalTextName(bindings.getDisplayName(vnode, config));
+		if (name === "__TextSignal") return true;
+	}
+
 	if (filters.regex.length > 0) {
-		const name = bindings.getDisplayName(vnode, config);
+		const name = getSignalTextName(bindings.getDisplayName(vnode, config));
 		return filters.regex.some(r => {
 			// Regexes with a global flag are stateful in JS :((
 			r.lastIndex = 0;
@@ -202,7 +210,7 @@ function mount<T extends SharedVNode>(
 	const root = bindings.isRoot(vnode, config);
 
 	const skip = shouldFilter(vnode, filters, config, bindings);
-	let name = bindings.getDisplayName(vnode, config);
+	let name = getSignalTextName(bindings.getDisplayName(vnode, config));
 
 	if (filters.type.has("hoc")) {
 		const hocName = getHocName(name);
@@ -433,7 +441,7 @@ function update<T extends SharedVNode>(
 		return;
 	}
 
-	const name = bindings.getDisplayName(vnode, config);
+	const name = getSignalTextName(bindings.getDisplayName(vnode, config));
 	if (filters.type.has("hoc")) {
 		const res = detectHocs(commit, name, id, hocs);
 		hocs = res.hocs;
