@@ -211,7 +211,7 @@ export function maybeSetSignal(
 	path: ObjPath,
 	value: any,
 ) {
-	const last = path.pop();
+	const last = path.slice().pop();
 	const parent = path.reduce((acc, attr) => (acc ? acc[attr] : null), obj);
 	if (parent && last) {
 		if (isSignal(parent)) {
