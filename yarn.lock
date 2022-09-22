@@ -750,17 +750,17 @@
     kolorist "^1.2.10"
     resolve "^1.20.0"
 
-"@preact/signals-core@^1.0.0":
-  version "1.0.0"
-  resolved "https://registry.yarnpkg.com/@preact/signals-core/-/signals-core-1.0.0.tgz#ccdfb40e9ec97668c74aecbe91192c7422636836"
-  integrity sha512-Gx5zCzjJLnI7ZeS4Z5TKu48vBGe/fqNONxXNmoIToOw0lOz3dN32/Lmfcg408Mf52kwyqWmMRjPJo1paPYhLOg==
+"@preact/signals-core@^1.2.0":
+  version "1.2.0"
+  resolved "https://registry.yarnpkg.com/@preact/signals-core/-/signals-core-1.2.0.tgz#14721e8fea7dc687f40eced1bb62bbefdeadb30d"
+  integrity sha512-GBjq/8WJkh/aenrEMvWIOr1lRfu6nb25er0m6r+4qVqKC85mXAYIbGHnoHTooNXCKxn2KEMUrATvN54MdMHE1A==
 
-"@preact/signals@^1.0.1":
-  version "1.0.1"
-  resolved "https://registry.yarnpkg.com/@preact/signals/-/signals-1.0.1.tgz#9f427abf5eea09f0163e05e4f3b58b00dff3111d"
-  integrity sha512-G1SCckKl1V0AGJ6Ulf8nqLPxyiReoXLqFWAYKMkH4YyUlLQJP+qq8/qcjw0Iqx92f8fyTRnuMLYKSdiqemPeRQ==
+"@preact/signals@^1.1.0":
+  version "1.1.0"
+  resolved "https://registry.yarnpkg.com/@preact/signals/-/signals-1.1.0.tgz#a3c79f1231c0c3c7cd1115f045ac0720f43966ee"
+  integrity sha512-lW00Ny4q65o0BiymwbhPtIo9Fne8DUflvKVJBNwI6UeN8pZXWLdeZEr3YjMV5aXEP65Eh6yLhKQnn1jCSfzYug==
   dependencies:
-    "@preact/signals-core" "^1.0.0"
+    "@preact/signals-core" "^1.2.0"
 
 "@prefresh/babel-plugin@0.4.3":
   version "0.4.3"
@@ -5227,10 +5227,10 @@ postcss@8.4.16, postcss@^8.4.16:
     picocolors "^1.0.0"
     source-map-js "^1.0.2"
 
-preact@^10.10.6:
-  version "10.10.6"
-  resolved "https://registry.yarnpkg.com/preact/-/preact-10.10.6.tgz#1fe62aecf93974b64e6a42e09ba1f00f93207d14"
-  integrity sha512-w0mCL5vICUAZrh1DuHEdOWBjxdO62lvcO++jbzr8UhhYcTbFkpegLH9XX+7MadjTl/y0feoqwQ/zAnzkc/EGog==
+preact@^10.11.0:
+  version "10.11.0"
+  resolved "https://registry.yarnpkg.com/preact/-/preact-10.11.0.tgz#26af45a0613f4e17a197cc39d7a1ea23e09b2532"
+  integrity sha512-Fk6+vB2kb6mSJfDgODq0YDhMfl0HNtK5+Uc9QqECO4nlyPAQwCI+BKyWO//idA7ikV7o+0Fm6LQmNuQi1wXI1w==
 
 prelude-ls@^1.2.1:
   version "1.2.1"
