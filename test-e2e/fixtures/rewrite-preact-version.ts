@@ -37,7 +37,7 @@ export function rewritePreactVersion(): Plugin {
 			}
 
 			if (id === `@preact/signals@${preactVersion}`) {
-				return `@fixture-signals`;
+				return `@fixture-signals:${preactVersion}`;
 			}
 		},
 		load(id) {
@@ -45,7 +45,7 @@ export function rewritePreactVersion(): Plugin {
 				const newId = id.slice(PREFIX.length, id.indexOf("?"));
 				const filePath = path.join(__dirname, newId);
 				return fs.readFileSync(filePath, "utf-8");
-			} else if (id === "@fixture-signals") {
+			} else if (id.startsWith("@fixture-signals")) {
 				const filePath = path.join(
 					__dirname,
 					"..",
@@ -60,7 +60,7 @@ export function rewritePreactVersion(): Plugin {
 			}
 		},
 		transform(code, id) {
-			if (id === "@fixture-signals") {
+			if (id.startsWith("@fixture-signals")) {
 				const res = transformSync(code, {
 					plugins: [[rewriteImportPlugin, { version: preactVersion }]],
 				})!;
