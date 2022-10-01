@@ -64,29 +64,37 @@ export function createStore(): Store {
 			uncollapsed: signal<string[]>([]),
 			items: signal<PropData[]>([]),
 		},
+		signals: {
+			uncollapsed: signal<string[]>([]),
+			items: signal<PropData[]>([]),
+		},
 	};
 
 	const inspectData = signal<InspectData | null>(null);
 
 	effect(() => {
-		const data = inspectData.value ? inspectData.value.props : null;
+		const props = inspectData.value ? inspectData.value.props : null;
 		sidebar.props.items.value = parseObjectState(
-			data,
+			props,
 			sidebar.props.uncollapsed.value,
 		);
-	});
-	effect(() => {
-		const data = inspectData.value ? inspectData.value.state : null;
+
+		const state = inspectData.value ? inspectData.value.state : null;
 		sidebar.state.items.value = parseObjectState(
-			data,
+			state,
 			sidebar.state.uncollapsed.value,
 		);
-	});
-	effect(() => {
-		const data = inspectData.value ? inspectData.value.context : null;
+
+		const context = inspectData.value ? inspectData.value.context : null;
 		sidebar.context.items.value = parseObjectState(
-			data,
+			context,
 			sidebar.context.uncollapsed.value,
+		);
+
+		const signals = inspectData.value ? inspectData.value.signals : null;
+		sidebar.signals.items.value = parseObjectState(
+			signals,
+			sidebar.signals.uncollapsed.value,
 		);
 	});
 

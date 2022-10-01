@@ -72,3 +72,28 @@ test("Show signals in hooks", async ({ page }) => {
 		),
 	).toHaveCount(1);
 });
+
+test("Dectect signal subscriptions", async ({ page }) => {
+	const { devtools } = await gotoTest(page, "signals-subscribe");
+
+	await devtools.click(locateTreeItem("App"));
+
+	await devtools.waitForSelector('[data-testid="Signals"]');
+	await devtools.waitForSelector('[data-testid="props-row"]');
+	await expect(
+		devtools.locator('[data-testid="Signals"] [data-testid="props-row"]'),
+	).toHaveCount(2);
+
+	await devtools
+		.locator('[data-testid="Signals"] [data-testid="prop-name"]:has-text("0")')
+		.click();
+	await devtools
+		.locator('[data-testid="Signals"] [data-testid="prop-value"] input')
+		.fill("");
+	await devtools
+		.locator('[data-testid="Signals"] [data-testid="prop-value"] input')
+		.type("10");
+	await page.keyboard.press("Enter");
+
+	await page.locator("p:has-text('count: 10, double: 20')").waitFor();
+});
