@@ -35,6 +35,7 @@ export interface InspectData {
 	hooks: PropData[] | null;
 	props: Record<string, any> | null;
 	state: Record<string, any> | null;
+	signals: Record<string, any> | null;
 	canSuspend: boolean;
 	/** Only Suspense components have this */
 	suspended: boolean;
@@ -148,6 +149,13 @@ export function createAdapter(
 	listen("update-prop", data => update({ ...data, type: "props" }));
 	listen("update-state", data => update({ ...data, type: "state" }));
 	listen("update-context", data => update({ ...data, type: "context" }));
+	listen("update-signal", data => {
+		getRendererByVNodeId(renderers, data.id)?.updateSignal?.(
+			data.id,
+			+data.path.replace("root.", "").replace(".value", ""),
+			data.value,
+		);
+	});
 	listen("update-hook", data => {
 		if (!data.meta) return;
 

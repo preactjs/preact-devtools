@@ -33,7 +33,12 @@ export function isSignal(x: any): x is Signal {
 }
 
 export function isReadOnlySignal(signal: Signal): boolean {
-	return (signal as any)._r === true;
+	return (
+		// Signals <1.2.0
+		(signal as any)._r === true ||
+		// Signals >=1.2.0
+		("g" in signal && typeof (signal as any).x === "function")
+	);
 }
 
 export function jsonify(

@@ -29,6 +29,8 @@ export interface Renderer<T extends SharedVNode = SharedVNode> {
 
 	// Hooks
 	updateHook?(id: ID, index: number, value: any): void; // V3
+	// signals
+	updateSignal?(id: ID, index: number, value: any): void; // V5
 
 	// Component actions
 	suspend?(id: ID, active: boolean): void; // V4

@@ -83,6 +83,7 @@ describe("Store", () => {
 			name: "Foo",
 			props: null,
 			state: null,
+			signals: null,
 			suspended: false,
 			type: 1,
 			version: "",

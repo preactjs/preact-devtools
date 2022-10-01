@@ -89,6 +89,10 @@ export interface Store {
 			uncollapsed: Signal<string[]>;
 			items: Signal<PropData[]>;
 		};
+		signals: {
+			uncollapsed: Signal<string[]>;
+			items: Signal<PropData[]>;
+		};
 		context: {
 			uncollapsed: Signal<string[]>;
 			items: Signal<PropData[]>;

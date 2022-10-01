@@ -356,6 +356,28 @@ export function createRenderer<T extends SharedVNode>(
 			}
 		},
 
+		updateSignal(id, index, value) {
+			const vnode = getVNodeById(ids, id);
+			if (vnode !== null && bindings.isComponent(vnode)) {
+				const c = bindings.getComponent(vnode);
+
+				if (c !== null && "__$u" in c) {
+					let node = c.__$u.s;
+					let i = 0;
+					const seen = new Set();
+					while (node !== null && node !== undefined && !seen.has(node)) {
+						if (i === index) {
+							node.S.value = value;
+							return;
+						}
+						seen.add(node);
+						node = node.n;
+						i++;
+					}
+				}
+			}
+		},
+
 		suspend(id, active) {
 			let vnode = getVNodeById(ids, id);
 			while (vnode !== null) {

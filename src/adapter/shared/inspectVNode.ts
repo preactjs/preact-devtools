@@ -50,6 +50,10 @@ export function inspectVNode<T extends SharedVNode>(
 			? serialize(config, bindings, cleanProps(vnode.props))
 			: null;
 	const state = hasState ? serialize(config, bindings, c!.state) : null;
+	const signals =
+		c != null && "__$u" in c
+			? inspectSignalSubscriptions(config, bindings, c.__$u.s)
+			: null;
 
 	let suspended = false;
 	let canSuspend = false;
@@ -77,9 +81,29 @@ export function inspectVNode<T extends SharedVNode>(
 		name: getSignalTextName(bindings.getDisplayName(vnode, config)),
 		props,
 		state,
+		signals,
 		// TODO: We're not using this information anywhere yet
 		type: getDevtoolsType(vnode, bindings),
 		suspended,
 		version,
 	};
+}
+
+function inspectSignalSubscriptions<T extends SharedVNode>(
+	config: RendererConfig,
+	bindings: PreactBindings<T>,
+	node: any,
+) {
+	const out: Record<string, any> = {};
+	let i = 0;
+
+	const seen = new Set();
+	while (node !== null && node !== undefined && !seen.has(node)) {
+		seen.add(node);
+		out[i] = serialize(config, bindings, node.S);
+		node = node.n;
+		i++;
+	}
+
+	return i > 0 ? out : null;
 }

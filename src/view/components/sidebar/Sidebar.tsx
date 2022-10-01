@@ -20,7 +20,7 @@ export function Sidebar() {
 		}
 		return null;
 	}).value;
-	const { props: propData, state, context, hooks } = store.sidebar;
+	const { props: propData, state, context, hooks, signals } = store.sidebar;
 	const { emit } = store;
 
 	return (
@@ -42,6 +42,20 @@ export function Sidebar() {
 				onCopy={() => inspect && emit("copy", serializeProps(inspect.props))}
 				canAddNew
 			/>
+			{inspect && inspect.signals !== null && (
+				<PropsPanel
+					label="Signals"
+					items={signals.items}
+					uncollapsed={signals.uncollapsed}
+					onChange={(value, path) => {
+						emit("update-signal", {
+							id: inspect!.id,
+							path,
+							value,
+						});
+					}}
+				/>
+			)}
 			{inspect && inspect.hooks !== null && (
 				<PropsPanel
 					label="Hooks"
