@@ -167,6 +167,7 @@ export function parseHookData<T extends SharedVNode>(
 				const depth = hook.stack.length - i - 1;
 				let name = isNative ? type : frame.name;
 				if (
+					isNative &&
 					userHookNames.length > 0 &&
 					(hook.type === HookType.useState ||
 						hook.type === HookType.useRef ||
