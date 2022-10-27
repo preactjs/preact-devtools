@@ -65,3 +65,19 @@ test("Show custom hook name", async ({ page }) => {
 		expect(await getHooks(devtools)).toEqual([["useEffect", "ƒ ()"]]);
 	});
 });
+
+test("Skip custom hook name for user hook", async ({ page }) => {
+	const { devtools } = await gotoTest(page, "hooks-name-custom");
+
+	await clickTreeItem(devtools, "App");
+	await devtools
+		.locator('[data-testid="prop-name"]:has-text("useFoo")')
+		.click();
+	await waitForPass(async () => {
+		expect(await getHooks(devtools)).toEqual([
+			["useFoo", ""],
+			["useMemo a", '"a"'],
+			["useMemo b", '"b"'],
+		]);
+	});
+});
