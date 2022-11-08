@@ -8,10 +8,14 @@ export function DebugTreeStats() {
 
 	return (
 		<SidebarPanel title="Debug Tree Stats" testId="tree-debug-stats">
-			<dl>
-				<dt>Active VNode Count</dt>
-				<dd>{nodeList.length}</dd>
-			</dl>
+			<div style="padding-left: 0.35rem">
+				<dl>
+					<dt>Active displayed node count</dt>
+					<dd>{nodeList.length}</dd>
+					<dt>Selected node index</dt>
+					<dd>{store.selection.selectedIdx.value}</dd>
+				</dl>
+			</div>
 		</SidebarPanel>
 	);
 }
