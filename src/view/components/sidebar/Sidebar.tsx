@@ -96,8 +96,8 @@ export function Sidebar() {
 				/>
 			)}
 			{inspect && <OwnerInfo />}
-			{showDebug && <DebugNodeNavTree />}
 			{showDebug && <DebugTreeStats />}
+			{showDebug && <DebugNodeNavTree />}
 		</Fragment>
 	);
 }
