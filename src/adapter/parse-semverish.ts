@@ -4,7 +4,7 @@ const PATCH = 3;
 const PRERELEASE = 5;
 const PRERELEASE_TAG = 5;
 const PRERELEASE_VERSION = 6;
-const REGEXP_SEMVERISH = /^(\d+)\.(\d+)\.(\d+)(-(.+)\.(\d+))?$/i;
+const REGEXP_SEMVERISH = /^(\d+)\.(\d+)\.(\d+)(-([\w_-]+)(?:\.(\d+))?)?$/i;
 
 /**
  * semver-ish parsing based on https://github.com/npm/node-semver/blob/master/semver.js
@@ -27,7 +27,10 @@ export default function parseSemverish(
 		if (match[PRERELEASE]) {
 			preRelease = {
 				tag: match[PRERELEASE_TAG],
-				version: +match[PRERELEASE_VERSION],
+				version:
+					match[PRERELEASE_VERSION] !== undefined
+						? +match[PRERELEASE_VERSION]
+						: -1,
 			};
 		}
 
