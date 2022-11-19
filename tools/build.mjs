@@ -101,16 +101,18 @@ async function build(browser) {
 		);
 	}
 
+	const define = {
+		"process.env.DEBUG": DEBUG,
+		"process.env.BROWSER": JSON.stringify(browser),
+	};
+
 	await esbuild.build({
 		bundle: true,
 		sourcemap: false,
 		outdir: dist,
 		watch: args.watch,
 		format: isInline ? "esm" : "iife",
-		define: {
-			"process.env.DEBUG": DEBUG,
-			"process.env.BROWSER": JSON.stringify(browser),
-		},
+		define,
 		external,
 		entryPoints: isInline
 			? {
@@ -125,7 +127,7 @@ async function build(browser) {
 			  },
 		plugins: [
 			cssModules(),
-			babelPlugin(),
+			babelPlugin(define),
 			copyPlugin(
 				isInline
 					? {

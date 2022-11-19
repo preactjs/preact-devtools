@@ -8,6 +8,7 @@ import * as kl from "kolorist";
 import archiver from "archiver";
 import { babelPluginCssModules } from "./babel-plugin-css-module.mjs";
 import child_process from "child_process";
+import { babelPluginDeadCode } from "./babel-plugin-dead-code.mjs";
 
 /**
  * @param {Record<string, string>} mapping
@@ -275,15 +276,37 @@ export function cssModules() {
 }
 
 /**
+ * @param {Record<string, string>} define
  * @returns {import("esbuild").Plugin}
  */
-export function babelPlugin() {
+export function babelPlugin(define) {
 	const pending = new Map();
 	const cache = new Map();
 
 	return {
 		name: "babel-plugin",
 		setup(build) {
+			build.onLoad({ filter: /content-script\.ts$/ }, async args => {
+				const contents = await fs.readFile(args.path, "utf-8");
+				const result = await babel.transformAsync(contents, {
+					babelrc: false,
+					filename: args.path,
+					sourceMaps: false,
+					sourceType: "module",
+					plugins: [
+						["@babel/plugin-syntax-typescript", { isTSX: true }],
+						["babel-plugin-transform-define", define],
+						babelPluginDeadCode,
+					],
+				});
+
+				return {
+					contents: result.code,
+					resolveDir: path.dirname(args.path),
+					loader: "tsx",
+				};
+			});
+
 			build.onLoad({ filter: /\.tsx$/ }, async args => {
 				const contents = await fs.readFile(args.path, "utf-8");
 				// Using a cache is crucial as babel is 30x slower than esbuild
@@ -312,6 +335,7 @@ export function babelPlugin() {
 						plugins: [
 							["@babel/plugin-syntax-typescript", { isTSX: true }],
 							babelPluginCssModules,
+							babelPluginDeadCode,
 							[
 								"babel-plugin-transform-jsx-to-htm",
 								{
