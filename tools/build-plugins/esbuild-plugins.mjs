@@ -77,7 +77,7 @@ export function renamePlugin(mapping) {
 				if (args.errors.length) return;
 
 				for (const k in mapping) {
-					await fsExtra.move(k, mapping[k]);
+					await fsExtra.move(k, mapping[k], { overwrite: true });
 				}
 			});
 		},
