@@ -29,10 +29,34 @@ export function loadPreactVersion(): Plugin {
 			if (match) {
 				const version = match[1].replace(/_/g, ".");
 
-				const versionDir = path.join(cacheDir, version);
 				if (cache.has(id)) {
 					return cache.get(id);
+				} else if (version === "git") {
+					const versionDir = path.join(process.cwd(), "..", "preact");
+					const pkg = JSON.parse(
+						fs.readFileSync(path.join(versionDir, "package.json"), "utf-8"),
+					);
+					const modName = id
+						.replace("@git", "")
+						.replace(/^preact$/, ".")
+						.replace(/^preact\//, "./");
+					const entry = pkg.exports[modName].module;
+
+					const code = fs.readFileSync(path.join(versionDir, entry), "utf-8");
+					const map = fs.readFileSync(
+						path.join(versionDir, entry + ".map"),
+						"utf-8",
+					);
+
+					return {
+						code: code.replace(
+							/["']preact/g,
+							`"preact@${version.replace(/\./g, "_")}`,
+						),
+						map,
+					};
 				} else {
+					const versionDir = path.join(cacheDir, version);
 					// Check if someone is already resolving
 					const inProgress = pending.get(version);
 					if (inProgress) {
