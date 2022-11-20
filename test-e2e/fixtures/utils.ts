@@ -6,7 +6,7 @@ import fs from "fs";
  */
 export function getPreactVersions() {
 	const dir = path.join(__dirname, "vendor", "preact");
-	return fs
+	const versions = fs
 		.readdirSync(dir)
 		.filter(name => !name.startsWith("."))
 		.map(name => {
@@ -50,4 +50,6 @@ export function getPreactVersions() {
 			// Check if is tagged release: 11.0.0-experimental.0
 			return a.localeCompare(b) * -1;
 		});
+
+	return ["git", ...versions];
 }

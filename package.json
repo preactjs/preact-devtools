@@ -30,6 +30,8 @@
 		"test": "mochette -c tsconfig.cjs.json 'src/**/*.test.{ts,tsx}'",
 		"test:e2e": "node tools/fetch-preact-versions.mjs && playwright test",
 		"test:e2e:10": "PREACT_VERSION=10 npm run test:e2e",
+		"test:e2e:11": "PREACT_VERSION=11 npm run test:e2e",
+		"test:e2e:git": "PREACT_VERSION=git npm run test:e2e",
 		"test:e2e:all": "npm run test:e2e && npm run test:e2e:10",
 		"dev": "npm run dev:serve",
 		"dev:serve": "vite test-e2e/fixtures --port 8100",
