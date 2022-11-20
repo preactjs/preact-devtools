@@ -8,6 +8,7 @@ import {
 	getStatefulHooks,
 	getStatefulHookValue,
 	TYPE_COMPONENT,
+	isRoot,
 } from "./bindings";
 import { RendererConfig } from "../shared/renderer";
 import { Renderer } from "../renderer";
@@ -85,6 +86,10 @@ function trackPrevState(Ctor: any) {
 
 		return setState.call(this, update, callback);
 	};
+}
+
+function getParentDom(internal: Internal): Node | null {
+	return internal.props?._parentDom || internal.props?.__P || null;
 }
 
 export function setupOptionsV11(
@@ -209,6 +214,12 @@ export function setupOptionsV11(
 
 		// These cases are already handled by `unmount`
 		if (internal == null) return;
+		if (isRoot(internal, config)) {
+			const dom = getParentDom(internal);
+			if (dom) {
+				roots.set(internal, dom);
+			}
+		}
 
 		renderer.onCommit(internal, owners, timings, renderReasons);
 

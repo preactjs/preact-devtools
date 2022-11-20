@@ -9,6 +9,10 @@ test("Islands roots should be sorted by DOM order", async ({ page }) => {
 });
 
 test("Virtual island roots should be sorted by DOM order", async ({ page }) => {
+	test.skip(
+		process.env.PREACT_VERSION !== "10",
+		"Fake root DOM node is not supported in v11",
+	);
 	const { devtools } = await gotoTest(page, "islands-order-virtual");
 
 	const items = await getTreeItems(devtools);
