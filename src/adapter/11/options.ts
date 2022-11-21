@@ -188,28 +188,30 @@ export function setupOptionsV11(
 		if (prevInternalHook) prevInternalHook(internal, vnode);
 	};
 
-	o._diff = o.__b = (internal: Internal, vnode: VNodeV11) => {
+	o._diff = o.__b = (internal, vnode) => {
 		if (internal.flags & TYPE_COMPONENT) {
 			timings.start.set(internal, performance.now());
 			const name = getDisplayName(internal, config);
 			recordMark(`${name}_diff`);
 
-			const internalId = getVNodeId(internal);
-			const vnodeId = getVNodeId(vnode);
-			if (internalId !== vnodeId) {
-				const owner = vnodeIdToOwner.get(internalId);
-				if (owner) {
-					vnodeIdToOwner.set(vnodeId, owner);
+			if (vnode != null) {
+				const internalId = getVNodeId(internal);
+				const vnodeId = getVNodeId(vnode);
+				if (internalId !== vnodeId) {
+					const owner = vnodeIdToOwner.get(internalId);
+					if (owner) {
+						vnodeIdToOwner.set(vnodeId, owner);
+					}
+					vnodeIdToOwner.delete(internalId);
 				}
-				vnodeIdToOwner.delete(internalId);
 			}
 
 			if (profiler.captureRenderReasons) {
 				if (internal === null) {
-					if (vnode !== null) {
+					if (vnode != null) {
 						renderReasons.set(internal, createReason(RenderReason.MOUNT, null));
 					}
-				} else if (vnode !== null) {
+				} else if (vnode != null) {
 					reasonTmpData.set(internal, {
 						type: vnode.type,
 						props: internal.props,
