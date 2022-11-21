@@ -9,6 +9,7 @@ import {
 	getStatefulHookValue,
 	TYPE_COMPONENT,
 	isRoot,
+	getVNodeId,
 } from "./bindings";
 import { RendererConfig } from "../shared/renderer";
 import { Renderer } from "../renderer";
@@ -31,6 +32,8 @@ import { getRenderReasonPre, RenderReasonTmpData } from "./renderReason";
 export interface VNodeV11<P = Record<string, unknown>> {
 	type: ComponentType<P> | string | null;
 	props: P;
+	_vnodeId?: number;
+	__v?: number;
 }
 
 export interface OptionsV11 {
@@ -63,6 +66,7 @@ export interface OptionsV11 {
 	_catchError?(error: any, internal: Internal): void;
 	__e?(error: any, internal: Internal): void;
 
+	vnode(vnode: VNodeV11): void;
 	_internal?(internal: Internal, vnode: VNodeV11 | string): void;
 	__i?(internal: Internal, vnode: VNodeV11 | string): void;
 
@@ -107,20 +111,26 @@ export function setupOptionsV11(
 	const timings = createVNodeTimings<Internal>();
 	let renderReasons = new Map<Internal, RenderReasonData>();
 	let reasonTmpData = new Map<Internal, RenderReasonTmpData>();
-	const owners = new Map();
+	const vnodeIdToOwner = new Map<number, Internal>();
+	const owners = new Map<Internal, Internal>();
+	let ownerStack: Internal[] = [];
 
 	const o = options;
 
 	// Store (possible) previous hooks so that we don't overwrite them
-	const prevVNodeHook = options._internal;
+	const prevVNodeHook = options.vnode;
+	const prevInternalHook = options._internal || o.__i;
 	const prevCommitRoot = o._commit || o.__c;
 	const prevBeforeUnmount = options.unmount;
 	const prevBeforeDiff = o._diff || o.__b;
+	const prevRender = o._render || o.__r;
 	const prevAfterDiff = options.diffed;
 	let prevHook = o._hook || o.__h;
 	let prevUseDebugValue = options.useDebugValue;
 	// @ts-ignore
 	let prevHookName = options.useDebugName;
+
+	const skipEffects = o._skipEffects || o.__s;
 
 	// Make sure that we are always the first `option._hook` to be called.
 	// This is necessary to ensure that our callstack remains consistent.
@@ -159,11 +169,40 @@ export function setupOptionsV11(
 		};
 	}, 100);
 
+	options.vnode = vnode => {
+		if (
+			ownerStack.length > 0 &&
+			typeof vnode.type === "function" &&
+			vnode.type !== config.Fragment
+		) {
+			vnodeIdToOwner.set(getVNodeId(vnode), ownerStack[ownerStack.length - 1]);
+		}
+		if (prevVNodeHook) prevVNodeHook(vnode);
+	};
+
+	options._internal = options.__i = (internal, vnode) => {
+		const owner = vnodeIdToOwner.get(getVNodeId(internal));
+		if (owner) {
+			owners.set(internal, owner);
+		}
+		if (prevInternalHook) prevInternalHook(internal, vnode);
+	};
+
 	o._diff = o.__b = (internal: Internal, vnode: VNodeV11) => {
 		if (internal.flags & TYPE_COMPONENT) {
 			timings.start.set(internal, performance.now());
 			const name = getDisplayName(internal, config);
 			recordMark(`${name}_diff`);
+
+			const internalId = getVNodeId(internal);
+			const vnodeId = getVNodeId(vnode);
+			if (internalId !== vnodeId) {
+				const owner = vnodeIdToOwner.get(internalId);
+				if (owner) {
+					vnodeIdToOwner.set(vnodeId, owner);
+				}
+				vnodeIdToOwner.delete(internalId);
+			}
 
 			if (profiler.captureRenderReasons) {
 				if (internal === null) {
@@ -182,8 +221,23 @@ export function setupOptionsV11(
 		if (prevBeforeDiff != null) prevBeforeDiff(internal);
 	};
 
+	o._render = o.__r = (internal: Internal) => {
+		if (
+			!skipEffects &&
+			internal.flags & TYPE_COMPONENT &&
+			internal.type !== config.Fragment
+		) {
+			ownerStack.push(internal);
+		}
+		if (prevRender != null) prevRender(internal);
+	};
+
 	options.diffed = internal => {
 		if (internal.flags & TYPE_COMPONENT) {
+			if (internal.type !== config.Fragment) {
+				ownerStack.pop();
+			}
+
 			timings.end.set(internal, performance.now());
 			endMark(getDisplayName(internal, config));
 
@@ -221,6 +275,7 @@ export function setupOptionsV11(
 			}
 		}
 
+		ownerStack = [];
 		renderer.onCommit(internal, owners, timings, renderReasons);
 
 		if (profiler.captureRenderReasons) {
@@ -231,6 +286,8 @@ export function setupOptionsV11(
 
 	options.unmount = internal => {
 		if (prevBeforeUnmount) prevBeforeUnmount(internal);
+		vnodeIdToOwner.delete(getVNodeId(internal));
+		owners.delete(internal);
 		timings.start.delete(internal);
 		timings.end.delete(internal);
 		renderer.onUnmount(internal);
@@ -240,10 +297,13 @@ export function setupOptionsV11(
 	return () => {
 		options.unmount = prevBeforeUnmount;
 		o._commit = o.__c = prevCommitRoot;
-		options.diffed = prevAfterDiff;
 		o._diff = o.__b = prevBeforeDiff;
+		o._render = o.__r = prevRender;
+		options.diffed = prevAfterDiff;
 		options._internal = prevVNodeHook;
 		o._hook = o.__h = prevHook;
+		o.vnode = prevVNodeHook;
+		o._internal = o.__i = prevInternalHook;
 		options.useDebugValue = prevUseDebugValue;
 	};
 }
