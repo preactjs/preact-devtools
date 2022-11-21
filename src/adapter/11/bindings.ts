@@ -1,6 +1,7 @@
 import { RendererConfig } from "../shared/renderer";
 import { ComponentHooks, HookState, PreactBindings } from "../shared/bindings";
 import { HookType } from "../shared/hooks";
+import { VNodeV11 } from "./options";
 
 export interface Internal {
 	type: any;
@@ -295,6 +296,10 @@ const getInstance = <T>(x: T): T => x;
 
 export function isPortal(internal: Internal): boolean {
 	return "__P" in internal.props || "_parentDom" in internal.props;
+}
+
+export function getVNodeId(vnode: VNodeV11): number {
+	return vnode._vnodeId || vnode.__v || 0;
 }
 
 export const bindingsV11: PreactBindings<Internal> = {
