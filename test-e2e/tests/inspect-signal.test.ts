@@ -2,6 +2,10 @@ import { test, expect } from "@playwright/test";
 import { gotoTest, locateTreeItem } from "../pw-utils";
 
 test("Show signal in props and update value", async ({ page }) => {
+	test.skip(
+		process.env.PREACT_VERSION !== "10",
+		"Signals are not supported in v11 yet.",
+	);
 	const { devtools } = await gotoTest(page, "signals");
 
 	await devtools.locator(locateTreeItem("Display")).first().click();
@@ -74,6 +78,10 @@ test("Show signals in hooks", async ({ page }) => {
 });
 
 test("Dectect signal subscriptions", async ({ page }) => {
+	test.skip(
+		process.env.PREACT_VERSION !== "10",
+		"Signals are not supported in v11 yet.",
+	);
 	const { devtools } = await gotoTest(page, "signals-subscribe");
 
 	await devtools.click(locateTreeItem("App"));
