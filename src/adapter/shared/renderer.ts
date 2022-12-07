@@ -20,6 +20,7 @@ import { createCommit, shouldFilter } from "../shared/traverse";
 import { PreactBindings, SharedVNode } from "../shared/bindings";
 import { inspectVNode } from "./inspectVNode";
 import { logVNode } from "../10/log";
+import { printCommit } from "../debug";
 
 export interface RendererConfig {
 	Fragment: FunctionalComponent;
@@ -282,6 +283,11 @@ export function createRenderer<T extends SharedVNode>(
 
 			prevOwners = owners;
 
+			console.log(
+				(timingsByVNode.start.get(vnode) || 0) * 1000,
+				" - ",
+				(timingsByVNode.end.get(vnode) || 0) * 1000,
+			);
 			timingsByVNode.start.clear();
 			timingsByVNode.end.clear();
 
@@ -304,6 +310,8 @@ export function createRenderer<T extends SharedVNode>(
 				startDrawing(profiler.updateRects);
 				profiler.pendingHighlightUpdates.clear();
 			}
+
+			printCommit(ev.data);
 
 			port.send(ev.type as any, ev.data);
 			if (rootSize !== roots.size) {

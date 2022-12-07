@@ -75,6 +75,13 @@ export enum MsgTypes {
 //
 export interface Commit {
 	rootId: number;
+	/**
+	 * Mapping of portal children to original portal root. Needed
+	 * because the inner tree finishes rendering before the outer
+	 * one is completed.
+	 * [vnodeId, portalParentId, vnodeId2, portalParentId2,...]
+	 */
+	reparent: number[];
 	strings: StringTable;
 	unmountIds: number[];
 	operations: number[];

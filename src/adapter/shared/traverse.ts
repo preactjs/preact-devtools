@@ -229,6 +229,13 @@ function mount<T extends SharedVNode>(
 			commit.operations.push(MsgTypes.ADD_ROOT, id);
 		}
 
+		if (bindings.isPortal(vnode)) {
+			const c = bindings.getComponent(vnode);
+			const vv = fakePortalToVNodeId.get(c.l);
+			console.log("==> portal OUTER");
+			console.log(vnode, vv, id);
+		}
+
 		if (!root) {
 			const maybeOwner = owners.get(vnode);
 			if (maybeOwner !== undefined && !bindings.isRoot(maybeOwner, config)) {
@@ -579,6 +586,8 @@ function findClosestNonFilteredParent<T extends SharedVNode>(
 	return parentId;
 }
 
+const fakePortalToVNodeId = new Map<any, ID>();
+
 export function createCommit<T extends SharedVNode>(
 	ids: IdMappingState<T>,
 	roots: Map<T, Node>,
@@ -597,6 +606,7 @@ export function createCommit<T extends SharedVNode>(
 		rootId: -1,
 		strings: new Map(),
 		unmountIds: [],
+		reparent: [],
 		renderReasons: new Map(),
 		stats: profiler.recordStats ? createStats() : null,
 	};
@@ -672,7 +682,16 @@ export function createCommit<T extends SharedVNode>(
 	let rootId = getVNodeId(ids, vnode);
 	if (rootId === -1) {
 		rootId = findClosestNonFilteredParent(ids, helpers, vnode);
+	} else {
+		const parentDom = helpers.getComponent(vnode).__P;
+		const isPortalRoot = !(parentDom instanceof HTMLElement);
+		if (isPortalRoot) {
+			fakePortalToVNodeId.set(parentDom, rootId);
+			console.log("PortalRoot", rootId, parentDom, fakePortalToVNodeId);
+			console.log(vnode, getVNodeId(ids, vnode), "roots", roots);
+		}
 	}
+	console.log("rootId", rootId, vnode.type);
 	commit.rootId = rootId;
 
 	return commit;

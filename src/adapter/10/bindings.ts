@@ -195,9 +195,13 @@ export function findRoot(vnode: VNode, config: RendererConfig): VNode {
  * Get human readable name of the component/dom element
  */
 export function getDisplayName(vnode: VNode, config: RendererConfig): string {
-	const { type } = vnode;
+	const { type, props } = vnode;
 	if (type === config.Fragment) return "Fragment";
 	else if (typeof type === "function") {
+		if ((props != null && "_vnode" in props) || "__v" in props) {
+			return "Portal";
+		}
+
 		// Context is a special case :((
 		// See: https://reactjs.org/docs/context.html#contextdisplayname
 		const c = getComponent(vnode)!;
@@ -307,10 +311,12 @@ export function isElement(vnode: VNode): boolean {
 	return typeof vnode.type === "string";
 }
 
-// eslint-disable-next-line @typescript-eslint/no-unused-vars
 export function isPortal(vnode: VNode) {
-	// TODO: Find a way to detect portals
-	return false;
+	return (
+		typeof vnode.type === "function" &&
+		vnode.props != null &&
+		("_vnode" in vnode.props || "__v" in vnode.props)
+	);
 }
 
 export const bindingsV10: PreactBindings<VNode> = {
