@@ -9,6 +9,7 @@ import s from "./Devtools.module.css";
 import { ThemeSwitcher } from "./ThemeSwitcher";
 import { Settings } from "./settings/Settings";
 import { StatsPanel } from "./stats/StatsPanel";
+import { RenderTracker } from "./tracker/RenderTracker";
 
 export function DevTools(props: { store: Store; window: Window }) {
 	const panel = props.store.activePanel.value;
@@ -17,6 +18,7 @@ export function DevTools(props: { store: Store; window: Window }) {
 	const showProfiler = panel === Panel.PROFILER;
 	const showSettings = panel === Panel.SETTINGS;
 	const showStats = panel === Panel.STATISTICS;
+	const showTracker = panel === Panel.TRACKER;
 
 	return (
 		<WindowCtx.Provider value={props.window}>
@@ -46,6 +48,16 @@ export function DevTools(props: { store: Store; window: Window }) {
 										value={Panel.PROFILER}
 									>
 										Profiler
+									</SmallTab>
+									<SmallTab
+										onClick={() =>
+											(props.store.activePanel.value = Panel.TRACKER)
+										}
+										checked={showTracker}
+										name="root-panel"
+										value={Panel.TRACKER}
+									>
+										Render Tracker
 									</SmallTab>
 									<SmallTab
 										onClick={() =>
@@ -81,6 +93,7 @@ export function DevTools(props: { store: Store; window: Window }) {
 							{showProfiler && <Profiler />}
 							{showStats && <StatsPanel />}
 							{showSettings && <Settings />}
+							{showTracker && <RenderTracker />}
 						</div>
 					</Fragment>
 				</AppCtx.Provider>

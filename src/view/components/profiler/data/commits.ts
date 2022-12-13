@@ -69,6 +69,12 @@ export interface ProfilerState {
 	// Flamegraph mode
 	flamegraphNodes: Signal<Map<ID, NodeTransform>>;
 	rankedNodes: Signal<NodeTransform[]>;
+
+	// Render Tracker
+	renderTracked: Signal<{
+		selfTimings: Map<number, number>;
+		totalTimings: Map<number, number>;
+	}>;
 }
 
 function getMaxSelfDurationNode(commit: CommitData) {
@@ -172,6 +178,32 @@ export function createProfiler(): ProfilerState {
 		return toTransform(commit);
 	});
 
+	const renderTracked = computed(() => {
+		const selfTimings = new Map<number, number>();
+		const totalTimings = new Map<number, number>();
+
+		const c = commits.value;
+		for (let i = 0; i < c.length; i++) {
+			const rendered = Array.from(c[i].rendered);
+			for (let j = 0; j < rendered.length; j++) {
+				const id = rendered[j];
+				const self = c[i].selfDurations.get(id) || 0;
+
+				if (!selfTimings.has(id)) {
+					selfTimings.set(id, self);
+				}
+
+				totalTimings.set(id, (totalTimings.get(id) || 0) + self);
+			}
+		}
+
+		
+
+		console.log(c);
+
+		return { selfTimings, totalTimings };
+	});
+
 	return {
 		supportsRenderReasons,
 		captureRenderReasons,
@@ -191,6 +223,9 @@ export function createProfiler(): ProfilerState {
 		flamegraphType,
 		flamegraphNodes,
 		rankedNodes,
+
+		// Render Tracker
+		renderTracked,
 	};
 }
 

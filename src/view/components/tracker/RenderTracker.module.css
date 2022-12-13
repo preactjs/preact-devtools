@@ -1,0 +1,53 @@
+.page {
+	display: flex;
+	flex-direction: column;
+}
+
+.stretch {
+	height: 100%;
+	display: flex;
+	flex-direction: column;
+}
+
+.stretchInner {
+	height: 100%;
+}
+
+.table {
+	width: 100%;
+	border-collapse: collapse;
+}
+
+.table td {
+	padding: 0.5rem;
+}
+
+.table tbody {
+	border-top: 0.0625rem solid var(--color-border);
+}
+
+.timeWrapper {
+	width: 4rem;
+	display: inline-block;
+	text-align: right;
+	border-right: 0.0625rem solid var(--color-border);
+}
+
+.time {
+	font-size: var(--font-small);
+}
+
+.footer {
+	display: flex;
+	justify-content: space-between;
+	border-top: 0.0625rem solid var(--color-border);
+	font-size: var(--font-small);
+}
+
+.footerSection {
+	display: inline-block;
+	margin: 0;
+	padding: 0.4rem 0.5rem;
+	border-left: 0.0625rem solid var(--color-border);
+	color: var(--color-text-empty);
+}

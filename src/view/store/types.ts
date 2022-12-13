@@ -54,6 +54,7 @@ export enum Panel {
 	PROFILER = "PROFILER",
 	SETTINGS = "SETTINGS",
 	STATISTICS = "STATISTICS",
+	TRACKER = "TRACKER",
 }
 
 export type Tree = Map<ID, DevNode>;
