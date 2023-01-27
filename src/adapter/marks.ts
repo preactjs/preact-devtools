@@ -19,12 +19,14 @@ export function endMark(nodeName: string) {
 		const name = markName(nodeName);
 		const start = `${name}_diff`;
 		const end = `${name}_diffed`;
-		if (performance.getEntriesByName(start).length > 0) {
+		try {
 			performance.mark(end);
 			performance.measure(name, start, end);
+
+			performance.clearMarks(start);
+			performance.clearMarks(end);
+		} catch (e) {
+			// Do nothing
 		}
-		performance.clearMarks(start);
-		performance.clearMarks(end);
-		performance.clearMeasures(name);
 	}
 }
