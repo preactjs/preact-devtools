@@ -232,7 +232,7 @@ export function cssModules() {
 
 		// Fix CSS grid areas treated as local
 		css = css
-			.replaceAll(/grid-area:\s+[^_]+_(.*?);$/gm, (m, g) => {
+			.replaceAll(/grid-area:\s+_?[^_]+_(.*?);$/gm, (m, g) => {
 				return `grid-area: ${g};`;
 			})
 			.replaceAll(/\s["][^"']+_([^"']+)["]/g, (m, g) => {
