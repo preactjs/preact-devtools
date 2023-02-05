@@ -16,7 +16,7 @@ export type PropDataType =
 	| "symbol"
 	| "html";
 
-export interface PropData {
+export type PropData = {
 	id: string;
 	name: string;
 	type: PropDataType;
@@ -25,7 +25,7 @@ export interface PropData {
 	depth: number;
 	meta: any;
 	children: string[];
-}
+};
 
 export function parseProps(
 	data: any,
@@ -95,6 +95,22 @@ export function parseProps(
 					id: path,
 					type: "function",
 					editable: false,
+					value: data,
+					children: [],
+					meta: null,
+				});
+			} else if (
+				// Same for bigints
+				maybeCustom &&
+				typeof data.value === "string" &&
+				data.type === "bigint"
+			) {
+				out.set(path, {
+					depth,
+					name,
+					id: path,
+					type: "bigint",
+					editable: !forceReadonly,
 					value: data,
 					children: [],
 					meta: null,

@@ -20,6 +20,7 @@ import { createCommit, shouldFilter } from "../shared/traverse";
 import { PreactBindings, SharedVNode } from "../shared/bindings";
 import { inspectVNode } from "./inspectVNode";
 import { logVNode } from "../10/log";
+import { isSerializedBigint } from "../../view/components/sidebar/inspect/serializeProps";
 
 export interface RendererConfig {
 	Fragment: FunctionalComponent;
@@ -313,6 +314,9 @@ export function createRenderer<T extends SharedVNode>(
 		},
 		onUnmount,
 		update(id, type, path, value) {
+			if (isSerializedBigint(value)) {
+				value = BigInt(value.value);
+			}
 			const vnode = getVNodeById(ids, id);
 			if (vnode !== null) {
 				if (bindings.isComponent(vnode)) {
@@ -343,6 +347,9 @@ export function createRenderer<T extends SharedVNode>(
 			}
 		},
 		updateHook(id, index, value) {
+			if (isSerializedBigint(value)) {
+				value = BigInt(value.value);
+			}
 			const vnode = getVNodeById(ids, id);
 			if (vnode !== null && bindings.isComponent(vnode)) {
 				const c = bindings.getComponent(vnode);
@@ -357,6 +364,9 @@ export function createRenderer<T extends SharedVNode>(
 		},
 
 		updateSignal(id, index, value) {
+			if (isSerializedBigint(value)) {
+				value = BigInt(value.value);
+			}
 			const vnode = getVNodeById(ids, id);
 			if (vnode !== null && bindings.isComponent(vnode)) {
 				const c = bindings.getComponent(vnode);
