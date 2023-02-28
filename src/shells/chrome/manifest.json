@@ -1,14 +1,11 @@
 {
-	"manifest_version": 3,
+	"manifest_version": 2,
 	"name": "Preact Developer Tools",
 	"description": "Adds debugging tools for Preact to Chrome",
 	"version": "4.6.1",
 	"devtools_page": "panel/empty-panel.html",
-	"content_security_policy": {
-		"extension_pages": "script-src 'self'; object-src 'self'"
-	},
-	"permissions": ["storage", "scripting"],
-	"host_permissions": ["<all_urls>"],
+	"content_security_policy": "script-src 'self' 'unsafe-eval'; object-src 'self'",
+	"permissions": ["file:///*", "http://*/*", "https://*/*", "storage"],
 	"icons": {
 		"16": "icons/icon-16.png",
 		"32": "icons/icon-32.png",
@@ -16,7 +13,7 @@
 		"128": "icons/icon-128.png",
 		"192": "icons/icon-192.png"
 	},
-	"action": {
+	"browser_action": {
 		"default_icon": {
 			"16": "icons/icon-16-disabled.png",
 			"32": "icons/icon-32-disabled.png",
@@ -27,7 +24,8 @@
 		"default_popup": "popup/disabled.html"
 	},
 	"background": {
-		"service_worker": "background/background.js"
+		"scripts": ["background/background.js"],
+		"persistent": false
 	},
 	"content_scripts": [
 		{
@@ -37,11 +35,5 @@
 			"run_at": "document_start"
 		}
 	],
-	"web_accessible_resources": [
-		{
-			"resources": ["preact-devtools-page.css"],
-			"matches": ["<all_urls>"],
-			"extension_ids": ["ilcajpmogmhpliinlbcdebhbcanbghmd"]
-		}
-	]
+	"web_accessible_resources": ["preact-devtools-page.css"]
 }

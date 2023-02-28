@@ -7,20 +7,6 @@ import {
 } from "../../../constants";
 import { BaseEvent } from "../../../adapter/adapter/port";
 import { BackgroundEmitter, Emitter } from "./emitter";
-import { isFirefox } from "../utils";
-
-const IS_FIREFOX = isFirefox();
-if (!IS_FIREFOX) {
-	chrome.scripting.registerContentScripts([
-		{
-			id: "hook",
-			matches: ["<all_urls>"],
-			js: ["installHook.js"],
-			runAt: "document_start",
-			world: (chrome.scripting as any).ExecutionWorld.MAIN,
-		},
-	]);
-}
 
 /**
  * Collection of potential targets to connect to by tabId.
