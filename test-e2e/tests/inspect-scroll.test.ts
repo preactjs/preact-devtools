@@ -25,7 +25,6 @@ test("Highlighting should move with scroll", async ({ page }) => {
 
 	const _x = size.x + size.width / 2;
 	const _y = size.y + size.height / 2;
-	await page.pause();
 	await page.mouse.move(_x - 100, _y - 100);
 	await expect(page.locator(highlight)).toHaveCount(1);
 
