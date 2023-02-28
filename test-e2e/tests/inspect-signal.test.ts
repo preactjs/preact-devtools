@@ -105,3 +105,32 @@ test("Dectect signal subscriptions", async ({ page }) => {
 
 	await page.locator("p:has-text('count: 10, double: 20')").waitFor();
 });
+
+// https://github.com/preactjs/preact-devtools/issues/456
+test("Don't crash when signal hook is updated", async ({ page }) => {
+	test.skip(
+		process.env.PREACT_VERSION !== "10",
+		"Signals are not supported in v11 yet.",
+	);
+	const { devtools } = await gotoTest(page, "signals");
+
+	await devtools.click(locateTreeItem("Counter"));
+	await devtools.waitForSelector('[data-testid="props-row"]');
+
+	await devtools.click(
+		'[data-testid="Hooks"] form [data-testid="props-row"]:first-child button',
+	);
+
+	await devtools.waitForSelector(
+		'[data-testid="Hooks"] [data-testid="prop-value"]:has-text("ƒ Signal (0)")',
+	);
+
+	await page.click("button:has-text('Add')");
+	await page.click("button:has-text('Add')");
+
+	await devtools.click(locateTreeItem("Display"));
+	await expect(devtools.locator('[data-testid="Hooks"]')).toHaveCount(0);
+
+	await devtools.click(locateTreeItem("Counter"));
+	await expect(devtools.locator('[data-testid="Hooks"]')).toHaveCount(1);
+});
