@@ -41,6 +41,10 @@ export function isReadOnlySignal(signal: Signal): boolean {
 	);
 }
 
+function sortStrings(a: string, b: string) {
+	return a.localeCompare(b);
+}
+
 export function jsonify(
 	data: any,
 	getVNode: (x: any) => SerializedVNode | null,
@@ -118,10 +122,12 @@ export function jsonify(
 					}),
 				};
 			}
-			const out = { ...data };
-			Object.keys(out).forEach(key => {
-				out[key] = jsonify(out[key], getVNode, seen);
-			});
+			const out = {};
+			Object.keys(data)
+				.sort(sortStrings)
+				.forEach(key => {
+					(out as any)[key] = jsonify((data as any)[key], getVNode, seen);
+				});
 			return out;
 		}
 		default:
@@ -162,7 +168,10 @@ export function setInCopy<T = any>(
 	if (idx >= path.length) return value;
 
 	// Signals bypass everything
-	if (path[path.length - 1] === "value" && maybeSetSignal(obj, path, value)) {
+	if (
+		path[path.length - 1] === "value" &&
+		maybeSetSignal(obj as any, path, value)
+	) {
 		return obj;
 	}
 
