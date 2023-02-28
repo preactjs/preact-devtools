@@ -332,6 +332,10 @@ export function inspectHooks<T extends SharedVNode>(
 				c.constructor.call(dummy, dummy.props, dummy.context);
 			}
 		}
+
+		// Signals need this, otherwise they end up in an incosnistent state
+		const diffedHook = options.diffed;
+		if (diffedHook) diffedHook(vnode as any);
 	} catch (error) {
 		// We don't care about any errors here. We only need
 		// the hook call sites
