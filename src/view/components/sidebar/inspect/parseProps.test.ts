@@ -87,6 +87,27 @@ describe("parseProps", () => {
 		]);
 	});
 
+	it("should parse bigints", () => {
+		const big = {
+			type: "bigint",
+			value: "3",
+		};
+		const tree = parseProps(big, "foo", 2);
+
+		expect(serialize(tree)).to.deep.equal([
+			{
+				editable: true,
+				depth: 0,
+				id: "foo",
+				name: "foo",
+				type: "bigint",
+				value: big,
+				children: [],
+				meta: null,
+			},
+		]);
+	});
+
 	it("should parse functions", () => {
 		const fn = {
 			type: "function",

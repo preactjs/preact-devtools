@@ -79,6 +79,11 @@ export function jsonify(
 	switch (typeof data) {
 		case "string":
 			return data.length > 300 ? data.slice(300) : data;
+		case "bigint":
+			return {
+				type: "bigint",
+				value: data.toString(10),
+			};
 		case "function": {
 			return {
 				type: "function",
@@ -134,6 +139,7 @@ export function isEditable(x: any) {
 		case "string":
 		case "number":
 		case "boolean":
+		case "bigint":
 			return true;
 		default:
 			return false;
@@ -153,7 +159,7 @@ function clone(value: any) {
 /**
  * Deeply set a property and clone all parent objects/arrays
  */
-export function setInCopy<T = any>(
+export function setInCopy<T extends Record<string, unknown> = any>(
 	obj: T,
 	path: ObjPath,
 	value: any,

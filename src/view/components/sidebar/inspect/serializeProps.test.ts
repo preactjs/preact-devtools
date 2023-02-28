@@ -26,4 +26,8 @@ describe("serializeProps", () => {
 	it("should serialize functions", () => {
 		expect(serializeProps({ type: "function", name: "foo" })).to.equal("foo()");
 	});
+
+	it("should serialize bigints", () => {
+		expect(serializeProps({ type: "bigint", value: "3" })).to.equal("3n");
+	});
 });

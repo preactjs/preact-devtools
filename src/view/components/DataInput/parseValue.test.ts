@@ -31,6 +31,28 @@ describe("parseValue", () => {
 		expect(isNaN(parseValue("NaN") as any)).to.equal(true);
 	});
 
+	it("should parse bigints", () => {
+		expect(parseValue("5n")).to.deep.equal({
+			type: "bigint",
+			value: "5",
+		});
+		expect(parseValue("-5n")).to.deep.equal({
+			type: "bigint",
+			value: "-5",
+		});
+		// max int + 1
+		expect(parseValue("18446744073709552000n")).to.deep.equal({
+			type: "bigint",
+			value: "18446744073709552000",
+		});
+		// bigger than Number.MAX_VALUE (max double)
+		const reallyBig = (10n ** 309n).toString(10);
+		expect(parseValue(`${reallyBig}n`)).to.deep.equal({
+			type: "bigint",
+			value: reallyBig,
+		});
+	});
+
 	it("should parse strings", () => {
 		expect(parseValue('"abc"')).to.equal("abc");
 		expect(parseValue('"123"')).to.equal("123");
@@ -65,6 +87,7 @@ describe("genPreview", () => {
 		expect(genPreview("foo")).to.equal('"foo"');
 		expect(genPreview([1, 2, { a: 3 }])).to.equal("[1, 2, {a: 3}]");
 		expect(genPreview({ a: 123, b: [1, 2] })).to.equal("{a: 123, b: [1, 2]}");
+		expect(genPreview({ type: "bigint", value: "3" })).to.equal("3n");
 
 		expect(genPreview({ type: "symbol", name: "Symbol(foo)" })).to.equal(
 			"Symbol(foo)",

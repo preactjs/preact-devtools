@@ -35,6 +35,16 @@ describe("jsonify", () => {
 			name: "Symbol(foo)",
 		});
 	});
+
+	it("should serialize bigints", () => {
+		const data = { foo: 3n } as const;
+		expect(jsonify(data, () => null, new Set())).to.deep.equal({
+			foo: {
+				type: "bigint",
+				value: "3",
+			},
+		});
+	});
 });
 
 describe("cleanProps", () => {

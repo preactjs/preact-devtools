@@ -24,6 +24,11 @@ export function parseValue(v: string) {
 		throw new TypeError("Invalid input");
 	} else if (/^[-+.]?\d*(?:[.]?\d*)$/.test(v)) {
 		return Number(v);
+	} else if (/^-?\d+n$/.test(v)) {
+		return {
+			type: "bigint",
+			value: v.slice(0, -1),
+		};
 	} else if (/^\{.*\}$/.test(v) || /^\[.*\]$/.test(v)) {
 		try {
 			return JSON.parse(v);
@@ -65,6 +70,7 @@ export function genPreview(v: any): string {
 			if (v.type === "blob") return "Blob {}";
 			if (v.type === "symbol") return v.name;
 			if (v.type === "html") return v.name;
+			if (v.type === "bigint") return `${v.value}n`;
 		}
 
 		const obj = Object.entries(v).map(x => {
