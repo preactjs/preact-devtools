@@ -150,7 +150,7 @@ async function build(browser) {
 				renamePlugin({
 					[`${dist}/installHook.css`]: `${dist}/preact-devtools-page.css`,
 				}),
-			!isInline && browser === "firefox" && inlineHookPlugin(dist),
+			!isInline && inlineHookPlugin(dist),
 
 			spritePlugin(
 				path.join(__dirname, "..", "src", "view", "sprite.svg"),

@@ -2,13 +2,6 @@
 // the background page to activate or deactivate the icon
 
 import { debug } from "../../../debug";
-import { isFirefox } from "../utils";
-
-const IS_FIREFOX = isFirefox();
-function getUrl(url: string) {
-	if (IS_FIREFOX) return url;
-	return chrome.runtime.getURL(url);
-}
 
 export function setPopupStatus(tabId: number, enabled?: boolean) {
 	const status = enabled ? "enabled" : "disabled";
@@ -19,18 +12,18 @@ export function setPopupStatus(tabId: number, enabled?: boolean) {
 	);
 	const suffix = enabled ? "" : "-disabled";
 
-	(IS_FIREFOX ? chrome.browserAction : chrome.action).setIcon({
+	chrome.browserAction.setIcon({
 		tabId,
 		path: {
-			"16": getUrl(`icons/icon-16${suffix}.png`),
-			"32": getUrl(`icons/icon-32${suffix}.png`),
-			"48": getUrl(`icons/icon-48${suffix}.png`),
-			"128": getUrl(`icons/icon-128${suffix}.png`),
-			"192": getUrl(`icons/icon-192${suffix}.png`),
+			"16": `icons/icon-16${suffix}.png`,
+			"32": `icons/icon-32${suffix}.png`,
+			"48": `icons/icon-48${suffix}.png`,
+			"128": `icons/icon-128${suffix}.png`,
+			"192": `icons/icon-192${suffix}.png`,
 		},
 	});
-	(IS_FIREFOX ? chrome.browserAction : chrome.action).setPopup({
+	chrome.browserAction.setPopup({
 		tabId,
-		popup: getUrl(`popup/${status}.html`),
+		popup: `popup/${status}.html`,
 	});
 }
