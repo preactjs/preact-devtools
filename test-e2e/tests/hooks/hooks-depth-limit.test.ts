@@ -37,7 +37,6 @@ test("Show a deeply nested hook tree and limit value parsing depth", async ({
 	await clickHookItem(devtools, "key6");
 	await clickHookItem(devtools, "key7");
 
-	// await page.pause;
 	const text = await devtools
 		.locator(
 			'form [data-testid="props-row"]:last-child [data-testid="prop-value"]',

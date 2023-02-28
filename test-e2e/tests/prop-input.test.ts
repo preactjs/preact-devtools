@@ -92,7 +92,7 @@ test("Input various data types into DataInput", async ({ page }) => {
 
 	data = await enterText(page, devtools, input, '{"foo":123, "bar": [1,2]}');
 	expect(data).toEqual({
-		value: "{foo: 123, bar: [1, 2]}",
+		value: "{bar: [1, 2], foo: 123}",
 		rendered: { foo: 123, bar: [1, 2] },
 		type: "non-editable",
 	});
