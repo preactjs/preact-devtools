@@ -1,5 +1,5 @@
 import { expect, test } from "@playwright/test";
-import { getProps, gotoTest, locateTreeItem } from "../pw-utils";
+import { getHooks, getProps, gotoTest, locateTreeItem } from "../pw-utils";
 
 test("Inspect Map and Set objects", async ({ page }) => {
 	const { devtools } = await gotoTest(page, "inspect-map-set");
@@ -12,8 +12,8 @@ test("Inspect Map and Set objects", async ({ page }) => {
 
 	const props = await getProps(devtools);
 	expect(props).toEqual({
-		set: "Set(1) [{foo: 123}])",
-		map: "Map(1) [[{foo: 123}, 123]])",
+		set: "Set(1) [{foo: 123}]",
+		map: "Map(1) [[{foo: 123}, 123]]",
 	});
 
 	// Edit set
@@ -47,4 +47,36 @@ test("Inspect Map and Set objects", async ({ page }) => {
 	await page.keyboard.press("Enter");
 	text = await page.locator("#json-map").textContent();
 	expect(text).toEqual(JSON.stringify([[{ foo: 111 }, 12345]], null, 2));
+});
+
+test("Inspect Map and Set objects in hooks", async ({ page }) => {
+	const { devtools } = await gotoTest(page, "inspect-map-set-hooks");
+
+	await devtools.click(locateTreeItem("MapView"));
+	await devtools.waitForSelector('[data-testid="Hooks"]');
+
+	const count = await devtools.locator('[data-testid="props-row"]').count();
+	expect(count).toEqual(3);
+
+	const props = await getHooks(devtools);
+	expect(props).toEqual([
+		["useMemo", "Map(0) []"],
+		["useMemo", "Map(1) [[1, 2]]"],
+		["useState", "Map(1) [[1, 2]]"],
+	]);
+
+	// TODO: Fix editing for both Map and Set
+
+	await devtools.click(locateTreeItem("SetView"));
+	await devtools.waitForSelector('[data-testid="Hooks"]');
+
+	const count2 = await devtools.locator('[data-testid="props-row"]').count();
+	expect(count2).toEqual(3);
+
+	const props2 = await getHooks(devtools);
+	expect(props2).toEqual([
+		["useMemo", "Set(0) []"],
+		["useMemo", "Set(2) [1, 2]"],
+		["useState", "Set(2) [1, 2]"],
+	]);
 });

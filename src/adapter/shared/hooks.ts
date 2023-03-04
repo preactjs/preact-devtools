@@ -10,6 +10,7 @@ import { isEditable, serialize } from "./serialize";
 import { HookState, PreactBindings, SharedVNode } from "./bindings";
 import { OptionsV11 } from "../11/options";
 import { OptionsV10 } from "../10/options";
+import { flattenChildren } from "../../view/components/tree/windowing";
 
 export enum HookType {
 	useState = 1,
@@ -181,7 +182,7 @@ export function parseHookData<T extends SharedVNode>(
 					value = serialize(config, bindings, debugValues.get(id));
 				}
 
-				let hookValueTree: PropData[] = [];
+				const hookValueTree: PropData[] = [];
 
 				if (isNative) {
 					const s = bindings.getHookState(vnode, hookIdx, hook.type);
@@ -192,19 +193,19 @@ export function parseHookData<T extends SharedVNode>(
 					// properties if the value is an object. We parse it
 					// separately and append it as children to our hook node
 					if (typeof rawValue === "object" && !(rawValue instanceof Element)) {
-						const tree = parseProps(value, id, 7, 0, name);
-						children = tree.get(id)!.children;
-						hookValueTree = Array.from(tree.values());
-						if (hookValueTree.length > 1) {
-							hookValueTree = hookValueTree.slice(1);
-						}
-						nodeType = hookValueTree[0].type;
+						const valueTree = parseProps(value, id, 8, 1, name);
+						children = valueTree.get(id)!.children;
 
-						hookValueTree.forEach(node => {
-							node.id = id + node.id;
-							node.editable = false;
-							node.depth += depth;
-						});
+						const flat = flattenChildren(valueTree, id, () => false).slice(1);
+
+						for (let j = 0; j < flat.length; j++) {
+							const data = valueTree.get(flat[j])!;
+							hookValueTree.push(data);
+						}
+
+						if (hookValueTree.length > 1) {
+							nodeType = hookValueTree[0].type;
+						}
 					}
 					editable =
 						(hook.type === HookType.useState ||

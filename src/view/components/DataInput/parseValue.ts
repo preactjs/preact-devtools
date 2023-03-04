@@ -52,9 +52,9 @@ function truncate(s: string) {
 export function genPreview(v: any): string {
 	if (v !== null && typeof v === "object") {
 		if (v.type === "set") {
-			return `Set(${v.entries.length}) ${truncate(genPreview(v.entries))})`;
+			return `Set(${v.entries.length}) ${truncate(genPreview(v.entries))}`;
 		} else if (v.type === "map") {
-			return `Map(${v.entries.length}) ${truncate(genPreview(v.entries))})`;
+			return `Map(${v.entries.length}) ${truncate(genPreview(v.entries))}`;
 		} else if (v.type === "signal") {
 			return `ƒ ${v.name} (${truncate(genPreview(v.value))})`;
 		}
