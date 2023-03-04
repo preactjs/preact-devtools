@@ -1,4 +1,4 @@
-import { h } from "preact";
+import { h, Fragment } from "preact";
 import { SidebarPanel, Empty } from "../../sidebar/SidebarPanel";
 import { useStore } from "../../../store/react-bindings";
 import { RenderReason } from "../../../../adapter/shared/renderReasons";
@@ -53,7 +53,18 @@ export function RenderReasons() {
 							{hasReasons ? ":" : ""}
 						</dt>
 						<dd class="render-reason-value">
-							{hasReasons && reason!.items!.join(", ")}
+							{hasReasons &&
+								(reason.type === RenderReason.HOOKS_CHANGED ? (
+									<>
+										{reason!.items!.map(item => (
+											<span class="hook-number va-middle" key={item}>
+												{+item + 1}
+											</span>
+										))}
+									</>
+								) : (
+									reason!.items!.join(", ")
+								))}
 						</dd>
 					</dl>
 				) : (

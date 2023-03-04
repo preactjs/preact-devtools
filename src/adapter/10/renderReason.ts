@@ -31,13 +31,18 @@ export function getRenderReasonPost<T extends SharedVNode>(
 			const hooks = bindings.getStatefulHooks(next);
 
 			if (hooks !== null) {
+				const hooksChanged: string[] = [];
 				for (let i = 0; i < hooks.length; i++) {
 					if (
 						bindings.isUseReducerOrState(hooks[i]) &&
 						hooks[i]._oldValue !== bindings.getStatefulHookValue(hooks[i])
 					) {
-						return createReason(RenderReason.HOOKS_CHANGED, null);
+						hooksChanged.push(String(i));
 					}
+				}
+
+				if (hooksChanged.length > 0) {
+					return createReason(RenderReason.HOOKS_CHANGED, hooksChanged);
 				}
 			}
 

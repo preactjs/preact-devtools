@@ -56,7 +56,7 @@ test("Captures render reasons", async ({ page }) => {
 	reasons = await devtools
 		.locator('[data-testid="render-reasons"]')
 		.textContent();
-	expect(reasons).toEqual("Hooks changed");
+	expect(reasons).toEqual("Hooks changed:1");
 
 	// Force update
 	await devtools.click('[data-testid="next-commit"]');

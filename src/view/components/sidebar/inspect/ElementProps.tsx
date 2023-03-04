@@ -37,6 +37,7 @@ export function ElementProps(props: Props) {
 							value={item.value}
 							onChange={v => onChange && onChange(v, id, item)}
 							depth={item.depth}
+							index={item.index}
 						/>
 					);
 				})}
@@ -57,6 +58,7 @@ export interface SingleProps {
 	onChange?: (value: any) => void;
 	onCollapse?: (path: string) => void;
 	depth: number;
+	index?: number;
 }
 
 export function SingleItem(props: SingleProps) {
@@ -115,6 +117,9 @@ export function SingleItem(props: SingleProps) {
 					onClick={onClick}
 				>
 					<Arrow />
+					{props.index !== undefined && (
+						<span class="hook-number">{props.index + 1}</span>
+					)}
 					<span
 						class={`${s.name} ${s.nameEditable}`}
 						data-testid="prop-name"
@@ -131,10 +136,15 @@ export function SingleItem(props: SingleProps) {
 			)}
 			{!collapseable && (
 				<Fragment>
+					{props.index !== undefined && (
+						<span class={s.noCollapse}>
+							<span class="hook-number">{props.index + 1}</span>
+						</span>
+					)}
 					<span
-						class={`${s.name} ${s.noCollapse} ${s.nameStatic} ${
-							editable ? s.nameEditable : ""
-						}`}
+						class={`${s.name} ${
+							props.index === undefined ? s.noCollapse : ""
+						} ${s.nameStatic} ${editable ? s.nameEditable : ""}`}
 						data-testid="prop-name"
 						data-type={value !== "__preact_empty__" ? type : "empty"}
 					>
