@@ -26,16 +26,19 @@ export function renderReasonToStr(reason: RenderReason) {
 	}
 }
 
+// TODO: Track value patch
+export type RenderReasonItem = null | string[];
+
 export interface RenderReasonData {
 	type: RenderReason;
-	items: string[] | null;
+	items: RenderReasonItem;
 }
 
 export type RenderReasonMap = Map<ID, RenderReasonData | null>;
 
 export function createReason(
 	type: RenderReason,
-	items: null | string[],
+	items: RenderReasonItem,
 ): RenderReasonData {
 	return { type, items };
 }

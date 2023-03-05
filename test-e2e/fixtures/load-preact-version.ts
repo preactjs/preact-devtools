@@ -40,7 +40,7 @@ export function loadPreactVersion(): Plugin {
 						.replace("@git", "")
 						.replace(/^preact$/, ".")
 						.replace(/^preact\//, "./");
-					const entry = pkg.exports[modName].module;
+					const entry = pkg.exports[modName].import;
 
 					const code = fs.readFileSync(path.join(versionDir, entry), "utf-8");
 					const map = fs.readFileSync(

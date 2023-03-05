@@ -25,6 +25,7 @@ export type PropData = {
 	depth: number;
 	meta: any;
 	children: string[];
+	index?: number;
 };
 
 export function parseProps(

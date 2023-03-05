@@ -30,14 +30,19 @@ export function getRenderReasonPost<T extends SharedVNode>(
 			// Check hooks
 			const hooks = bindings.getStatefulHooks(next);
 
-			if (hooks !== null) {
+			if (hooks !== null && Array.isArray(c._oldHookValues)) {
+				const hooksChanged: string[] = [];
 				for (let i = 0; i < hooks.length; i++) {
 					if (
 						bindings.isUseReducerOrState(hooks[i]) &&
-						hooks[i]._oldValue !== bindings.getStatefulHookValue(hooks[i])
+						c._oldHookValues[i] !== bindings.getStatefulHookValue(hooks[i])
 					) {
-						return createReason(RenderReason.HOOKS_CHANGED, null);
+						hooksChanged.push(String(i));
 					}
+				}
+
+				if (hooksChanged.length > 0) {
+					return createReason(RenderReason.HOOKS_CHANGED, hooksChanged);
 				}
 			}
 

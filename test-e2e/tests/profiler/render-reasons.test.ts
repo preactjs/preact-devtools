@@ -56,7 +56,7 @@ test("Captures render reasons", async ({ page }) => {
 	reasons = await devtools
 		.locator('[data-testid="render-reasons"]')
 		.textContent();
-	expect(reasons).toEqual("Hooks changed");
+	expect(reasons).toEqual("Hooks changed:1");
 
 	// Force update
 	await devtools.click('[data-testid="next-commit"]');
@@ -67,4 +67,47 @@ test("Captures render reasons", async ({ page }) => {
 		.locator('[data-testid="render-reasons"]')
 		.textContent();
 	expect(reasons).toEqual("Force update");
+});
+
+test("Captures hook render reasons", async ({ page }) => {
+	const { devtools } = await gotoTest(page, "hooks-multiple");
+
+	await devtools.locator(locateTab("SETTINGS")).click();
+	await devtools.click('[data-testid="toggle-render-reason"]');
+
+	// Start profiling
+	await devtools.locator(locateTab("PROFILER")).click();
+	await clickRecordButton(devtools);
+	await page.click('button:has-text("S1++")');
+	await page.click('button:has-text("S2++")');
+	await page.click('button:has-text("S3++")');
+	await page.click('button:has-text("S1++")');
+
+	await wait(1000);
+	await clickRecordButton(devtools);
+
+	await devtools.locator(locateFlame("App")).click();
+
+	let reasons = await devtools
+		.locator('[data-testid="render-reasons"]')
+		.textContent();
+	expect(reasons).toEqual("Hooks changed:1");
+
+	await devtools.click('[data-testid="next-commit"]');
+	reasons = await devtools
+		.locator('[data-testid="render-reasons"]')
+		.textContent();
+	expect(reasons).toEqual("Hooks changed:2");
+
+	await devtools.click('[data-testid="next-commit"]');
+	reasons = await devtools
+		.locator('[data-testid="render-reasons"]')
+		.textContent();
+	expect(reasons).toEqual("Hooks changed:3");
+
+	await devtools.click('[data-testid="next-commit"]');
+	reasons = await devtools
+		.locator('[data-testid="render-reasons"]')
+		.textContent();
+	expect(reasons).toEqual("Hooks changed:1");
 });

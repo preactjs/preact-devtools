@@ -114,6 +114,7 @@ p {
 	--color-props-object: #1b1b1b;
 	--color-props-null: #1b1b1b;
 	--color-props-vnode: #1b1b1b;
+	--color-props-hook-label: #e4e4e4;
 
 	/* Profiling */
 	--color-bystander-text: #333;
@@ -205,6 +206,7 @@ p {
 	--color-props-object: #dedede;
 	--color-props-null: #dedede;
 	--color-props-vnode: #dedede;
+	--color-props-hook-label: #464646;
 
 	/* Profiling */
 	--color-bystander-text: #d8d8d8;
@@ -240,6 +242,10 @@ p {
 	--message-warning-border: #917b0f;
 	--message-warning-strong: #ffab00;
 	--message-warning-link: #8dbff2;
+}
+
+:global(.va-middle) {
+	vertical-align: middle;
 }
 
 .switcher {

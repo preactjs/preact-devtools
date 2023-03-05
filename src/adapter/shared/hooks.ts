@@ -227,6 +227,7 @@ export function parseHookData<T extends SharedVNode>(
 						  }
 						: frame.name,
 					value,
+					index: hookIdx,
 				};
 				tree.set(id, item);
 				out.push(item);
