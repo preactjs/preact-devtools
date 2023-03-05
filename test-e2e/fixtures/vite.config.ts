@@ -5,6 +5,7 @@ import { loadPreactVersion } from "./load-preact-version";
 import { listPreactVersions } from "./list-preact-versions";
 import path from "path";
 import { injectSvgSpritePlugin } from "./inject-sprite";
+import prefresh from "@prefresh/vite";
 
 // https://vitejs.dev/config/
 export default defineConfig({
@@ -12,6 +13,7 @@ export default defineConfig({
 		exclude: ["preact"],
 	},
 	plugins: [
+		prefresh(),
 		{
 			name: "preact:config",
 			config() {
@@ -23,7 +25,6 @@ export default defineConfig({
 						define: {
 							"process.env.DEBUG": JSON.stringify(false),
 						},
-						minify: false,
 					},
 
 					resolve: {
