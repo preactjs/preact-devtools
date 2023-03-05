@@ -54,18 +54,17 @@ export function RenderReasons() {
 						</dt>
 						<dd class="render-reason-value">
 							{hasReasons &&
-								(reason.type === RenderReason.HOOKS_CHANGED
-									? // <>
-									  // 	{reason!.items!.map(item => (
-									  // 		<span class="hook-number va-middle" key={item}>
-									  // 			{+item + 1}
-									  // 		</span>
-									  // 	))}
-									  // </>
-									  //
-									  // TODO: Improve hooks detection
-									  null
-									: reason!.items!.join(", "))}
+								(reason.type === RenderReason.HOOKS_CHANGED ? (
+									<>
+										{reason!.items!.map(item => (
+											<span class="hook-number va-middle" key={item}>
+												{+item + 1}
+											</span>
+										))}
+									</>
+								) : (
+									reason!.items!.join(", ")
+								))}
 						</dd>
 					</dl>
 				) : (

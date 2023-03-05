@@ -150,7 +150,8 @@ export function applyOperationsV2(store: Store, data: number[]) {
 			rendered,
 			commitRootId,
 		);
-		const map = store.profiler.renderReasons.value.set(commitRootId, reasons);
+		const commitIdx = store.profiler.commits.peek().length - 1;
+		const map = store.profiler.renderReasons.value.set(commitIdx, reasons);
 		store.profiler.renderReasons.value = new Map(map);
 	}
 

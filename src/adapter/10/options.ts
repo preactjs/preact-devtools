@@ -85,13 +85,6 @@ export function setupOptionsV10(
 		prevHookName = options._addHookName || options.__a;
 
 		o._hook = o.__h = (c: Component, index: number, type: number) => {
-			const vnode = (c as any)._vnode || (c as any).__v;
-			const s = getStatefulHooks(vnode);
-			if (s && Array.isArray(s) && s.length > 0 && getComponent(s[0])) {
-				s[0]._oldValue = getStatefulHookValue(s);
-				s[0]._index = index;
-			}
-
 			if (type) {
 				addHookStack(type);
 			}
@@ -132,6 +125,19 @@ export function setupOptionsV10(
 		if (typeof vnode.type === "function") {
 			const name = getDisplayName(vnode, config);
 			recordMark(`${name}_diff`);
+
+			const c = getComponent(vnode);
+			const s = getStatefulHooks(vnode);
+			if (s !== null && c !== null) {
+				if (!(c as any)._oldHookValues) {
+					(c as any)._oldHookValues = new Array(s.length).fill(undefined);
+				}
+
+				for (let i = 0; i < s.length; i++) {
+					const value = getStatefulHookValue(s[i]);
+					(c as any)._oldHookValues[i] = value;
+				}
+			}
 		}
 
 		if (vnode.type !== null) {

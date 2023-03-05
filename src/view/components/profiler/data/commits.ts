@@ -136,12 +136,9 @@ export function createProfiler(): ProfilerState {
 
 	// Render reasons
 	const activeReason = computed(() => {
-		if (activeCommit.value !== null) {
-			const commitId = activeCommit.value.commitRootId;
-			const reason = renderReasons.value.get(commitId);
-			if (reason) {
-				return reason.get(selectedNodeId.value) || null;
-			}
+		const reason = renderReasons.value.get(activeCommitIdx.value);
+		if (reason) {
+			return reason.get(selectedNodeId.value) || null;
 		}
 
 		return null;
