@@ -1094,6 +1094,13 @@
 	overflow: hidden;
 }
 
+/** TIMELINE Bar*/
+.timeline-bar {
+	justify-content: flex-end;
+	width: 100%;
+	margin-right: 0.25rem;
+}
+
 /** TIMELINE */
 .timeline {
 	height: 100%;

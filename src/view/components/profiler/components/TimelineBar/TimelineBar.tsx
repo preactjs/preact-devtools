@@ -7,6 +7,7 @@ import s from "../../../elements/TreeBar.module.css";
 import { useCallback } from "preact/hooks";
 import { FlameGraphMode } from "../../flamegraph/FlameGraphMode";
 import {
+	FlamegraphType,
 	getCommitInitalSelectNodeId,
 	resetProfiler,
 	startProfiling,
@@ -91,18 +92,20 @@ export function TimelineBar() {
 			<ActionSeparator />
 			<FlameGraphMode />
 			<ActionSeparator />
-			{isSupported && !isRecording && (
-				<CommitTimeline
-					items={commits.map(commit => {
-						const percent =
-							((commit.duration - stats.min) * 100) /
-							(stats.max - stats.min || 0.1);
-						return percent;
-					})}
-					selected={selectedCommit}
-					onChange={onCommitChange}
-				/>
-			)}
+			{isSupported &&
+				!isRecording &&
+				store.profiler.flamegraphType.value !== FlamegraphType.TIMELINE && (
+					<CommitTimeline
+						items={commits.map(commit => {
+							const percent =
+								((commit.duration - stats.min) * 100) /
+								(stats.max - stats.min || 0.1);
+							return percent;
+						})}
+						selected={selectedCommit}
+						onChange={onCommitChange}
+					/>
+				)}
 		</Actions>
 	);
 }
