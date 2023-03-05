@@ -5,7 +5,7 @@ import { FlameNode } from "../FlameNode";
 import { useEffect, useMemo, useRef } from "preact/hooks";
 import { placeFlamegraph } from "../modes/flamegraph-utils";
 import { formatTime } from "../../util";
-import { useObserver, useStore } from "../../../../store/react-bindings";
+import { useStore } from "../../../../store/react-bindings";
 import { HocLabels } from "../../../elements/TreeView";
 import { NodeTransform } from "../shared";
 import { useVirtualizedList } from "../../../elements/VirtualizedList";
@@ -32,8 +32,8 @@ export function TimelineLayout({
 	containerRef,
 }: FlamegraphLayoutProps) {
 	const store = useStore();
-	const data = useObserver(() => store.profiler.flamegraphNodes.$);
-	const filterHoc = useObserver(() => store.filter.filterHoc.$);
+	const data = store.profiler.flamegraphNodes.value;
+	const filterHoc = store.filter.filterHoc.value;
 
 	const placed = useMemo(
 		() =>

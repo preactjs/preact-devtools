@@ -1,6 +1,6 @@
 import { h } from "preact";
 import { useEffect, useRef, useState } from "preact/hooks";
-import { useObserver, useStore } from "../../../../store/react-bindings";
+import { useStore } from "../../../../store/react-bindings";
 import { useResize } from "../../../utils";
 import {
 	newMinimapState,
@@ -14,13 +14,12 @@ export type DragTarget = "none" | "marker-left" | "marker-right" | "pane";
 export function Minimap() {
 	const store = useStore();
 	const [state] = useState(() => newMinimapState());
-	const left = useObserver(() => state.left.$);
-	const right = useObserver(() => state.right.$);
-	const ref = useRef<HTMLCanvasElement>();
+	const left = state.left.value;
+	const right = state.right.value;
+	const ref = useRef<HTMLCanvasElement>(null);
 
-	const [start, end] = useObserver(() => {
-		return [store.profiler.sessionStart.$, store.profiler.sessionEnd.$];
-	});
+	const start = 0;
+	const end = 10000;
 
 	console.log([start, end, end - start]);
 
@@ -28,7 +27,7 @@ export function Minimap() {
 		() => {
 			if (!ref.current) return;
 			const rect = ref.current.getBoundingClientRect();
-			state.viewport.$ = {
+			state.viewport.value = {
 				left: rect.left,
 				right: rect.right,
 			};
@@ -40,17 +39,17 @@ export function Minimap() {
 	useEffect(() => {
 		const fn = (e: PointerEvent) => {
 			const GAP = 2;
-			switch (state.target.$) {
+			switch (state.target.value) {
 				case "marker-left":
-					state.left.$ = Math.min(
+					state.left.value = Math.min(
 						worldToLocalPercent(state, e.clientX),
-						state.right.$ - GAP,
+						state.right.value - GAP,
 					);
 					break;
 				case "marker-right":
-					state.right.$ = Math.max(
+					state.right.value = Math.max(
 						worldToLocalPercent(state, e.clientX),
-						state.left.$ + GAP,
+						state.left.value + GAP,
 					);
 					break;
 			}
@@ -64,8 +63,8 @@ export function Minimap() {
 
 	useEffect(() => {
 		const fn = () => {
-			if (state.target.$ !== "none") {
-				state.target.$ = "none";
+			if (state.target.value !== "none") {
+				state.target.value = "none";
 			}
 		};
 		window.addEventListener("pointerup", fn);
@@ -75,7 +74,7 @@ export function Minimap() {
 	}, [state]);
 
 	// Draw on canvas
-	const commits = useObserver(() => store.profiler.commits.$);
+	const commits = store.profiler.commits.value;
 
 	// console.log(commits, state);
 
@@ -96,11 +95,11 @@ export function Minimap() {
 			onPointerDown={e => {
 				if (e.target instanceof HTMLElement) {
 					if (e.target.classList.contains("minimap-marker-handle-left")) {
-						state.target.$ = "marker-left";
+						state.target.value = "marker-left";
 					} else if (
 						e.target.classList.contains("minimap-marker-handle-right")
 					) {
-						state.target.$ = "marker-right";
+						state.target.value = "marker-right";
 					}
 				}
 			}}

@@ -1,15 +1,15 @@
-import { valoo } from "../../../../valoo";
+import { signal } from "@preact/signals";
 
 export type DragTarget = "none" | "marker-left" | "marker-right" | "pane";
 
 export function newMinimapState() {
-	const left = valoo(0); // percent
-	const right = valoo(100); // percent
-	const viewport = valoo({
+	const left = signal(0); // percent
+	const right = signal(100); // percent
+	const viewport = signal({
 		left: 0,
 		right: 1,
 	});
-	const target = valoo<DragTarget>("none");
+	const target = signal<DragTarget>("none");
 
 	return { left, right, viewport, target };
 }
@@ -17,7 +17,7 @@ export function newMinimapState() {
 export type MinimapState = ReturnType<typeof newMinimapState>;
 
 export function worldToLocalPercent(state: MinimapState, x: number) {
-	const { left, right } = state.viewport.$;
+	const { left, right } = state.viewport.value;
 	const percent = Math.max(
 		0,
 		Math.min(100, (100 / (right - left)) * (x - left)),
