@@ -79,7 +79,7 @@ async function run() {
 run();
 
 async function build(browser) {
-	const dist = `dist/${browser}`;
+	const dist = `dist/${browser}${DEBUG ? "-debug" : ""}`;
 	// eslint-disable-next-line no-console
 	console.log(`${kl.dim("Browser:")} ${kl.cyan(browser)}`);
 	const start = Date.now();
