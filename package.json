@@ -36,7 +36,7 @@
 		"dev": "npm run dev:serve",
 		"dev:serve": "vite test-e2e/fixtures --port 8100",
 		"run:chrome": "node tools/build.mjs --browser chrome --debug && mkdir -p ./profiles/chrome && node tools/run-chrome.js",
-		"run:firefox": "node tools/build.mjs --browser firefox --debug && mkdir -p ./profiles/firefox && web-ext run --source-dir ./dist/firefox/ --start-url https://preactjs.com --firefox-profile=./profiles/firefox --keep-profile-changes",
+		"run:firefox": "node tools/build.mjs --browser firefox --debug && mkdir -p ./profiles/firefox && web-ext run --source-dir ./dist/firefox-debug/ --start-url https://preactjs.com --firefox-profile=./profiles/firefox --keep-profile-changes",
 		"release": "node tools/release.js"
 	},
 	"repository": {
