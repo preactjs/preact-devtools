@@ -161,7 +161,7 @@ async function build(browser) {
 							path.join(dist, "panel", "empty-panel.html"),
 					  ],
 			),
-			!isInline && archivePlugin("dist", browser),
+			!isInline && archivePlugin("dist", browser, DEBUG),
 			!isInline && !process.env.CI && gitSourcePlugin(),
 		].filter(Boolean),
 	});

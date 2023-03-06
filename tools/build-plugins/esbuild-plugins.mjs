@@ -158,9 +158,10 @@ export function inlineHookPlugin(dir) {
 /**
  * @param {string} dir
  * @param {string} browser
+ * @param {boolean} debug
  * @returns {import("esbuild").Plugin}
  */
-export function archivePlugin(dir, browser) {
+export function archivePlugin(dir, browser, debug) {
 	return {
 		name: "archive-plugin",
 		setup(build) {
@@ -169,7 +170,7 @@ export function archivePlugin(dir, browser) {
 
 				// Package extension
 				const output = fsSync.createWriteStream(
-					path.join(dir, `${browser}.zip`),
+					path.join(dir, `${browser}${debug ? "-debug" : ""}.zip`),
 				);
 				const archive = archiver("zip", { zlib: { level: 9 } });
 
