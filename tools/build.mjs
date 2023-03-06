@@ -79,7 +79,7 @@ async function run() {
 run();
 
 async function build(browser) {
-	const dist = `dist/${browser}`;
+	const dist = `dist/${browser}${DEBUG ? "-debug" : ""}`;
 	// eslint-disable-next-line no-console
 	console.log(`${kl.dim("Browser:")} ${kl.cyan(browser)}`);
 	const start = Date.now();
@@ -102,7 +102,7 @@ async function build(browser) {
 	}
 
 	const define = {
-		"process.env.DEBUG": DEBUG,
+		__DEBUG__: DEBUG,
 		"process.env.BROWSER": JSON.stringify(browser),
 	};
 
@@ -161,7 +161,7 @@ async function build(browser) {
 							path.join(dist, "panel", "empty-panel.html"),
 					  ],
 			),
-			!isInline && archivePlugin("dist", browser),
+			!isInline && archivePlugin("dist", browser, DEBUG),
 			!isInline && !process.env.CI && gitSourcePlugin(),
 		].filter(Boolean),
 	});

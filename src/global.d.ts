@@ -6,3 +6,5 @@ declare module "*.css" {
 declare module "@preact-list-versions" {
 	export const preactVersions: string[];
 }
+
+declare const __DEBUG__: boolean;
