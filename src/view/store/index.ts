@@ -17,7 +17,7 @@ export function createStore(): Store {
 		listeners.forEach(fn => fn && fn(name, data));
 	};
 
-	const debugMode = signal(!!process.env.DEBUG);
+	const debugMode = signal(!!__DEBUG__);
 
 	const nodes = signal<Map<ID, DevNode>>(new Map());
 	const roots = signal<ID[]>([]);

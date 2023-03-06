@@ -102,7 +102,7 @@ async function build(browser) {
 	}
 
 	const define = {
-		"process.env.DEBUG": DEBUG,
+		__DEBUG__: DEBUG,
 		"process.env.BROWSER": JSON.stringify(browser),
 	};
 

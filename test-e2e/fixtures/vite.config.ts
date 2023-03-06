@@ -23,7 +23,7 @@ export default defineConfig({
 						jsxFragment: "Fragment",
 						jsxInject: "",
 						define: {
-							"process.env.DEBUG": JSON.stringify(false),
+							__DEBUG__: JSON.stringify(false),
 						},
 					},
 

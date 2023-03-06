@@ -90,7 +90,7 @@ async function initDevtools() {
 	effect(() => storeHighlightUpdates(store.profiler.highlightUpdates.value));
 	effect(() => storeDebugMode(store.debugMode.value));
 
-	if (process.env.DEBUG) {
+	if (__DEBUG__) {
 		(window as any).store = store;
 	}
 
