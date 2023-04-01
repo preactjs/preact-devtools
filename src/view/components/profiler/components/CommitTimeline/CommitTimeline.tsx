@@ -73,7 +73,7 @@ function calcSize(
 
 export interface CommitTimelineProps {
 	selected: number;
-	items: number[];
+	items: { percent: number; index: number }[];
 	onChange: (i: number) => void;
 }
 
@@ -89,13 +89,15 @@ export function CommitTimeline(props: CommitTimelineProps) {
 	const pane = useRef<HTMLDivElement>(null);
 	const paneContainerRef = useRef<HTMLDivElement>(null);
 
+	const selectedItemIndex = items.findIndex(item => item.index === selected);
+
 	useEffect(() => {
 		if (pane.current) {
 			const active = pane.current.querySelector("[data-selected]");
 			// JSDOM doesn't support scrollIntoView
 			if (active && active.scrollIntoView) active.scrollIntoView();
 		}
-	}, [selected]);
+	}, [selectedItemIndex]);
 
 	useResize(
 		() => {
@@ -105,31 +107,35 @@ export function CommitTimeline(props: CommitTimelineProps) {
 				pane,
 				paneContainerRef,
 				items.length,
-				selected,
+				selectedItemIndex,
 			);
 			setPaneWidth(sizes.pane);
 			setViewportWidth(sizes.viewport);
 			setOffset(sizes.offset);
 		},
-		[pane, container, paneContainerRef, inner, items.length, selected],
+		[pane, container, paneContainerRef, inner, items.length, selectedItemIndex],
 		true,
 	);
 
 	const onPrev = useCallback(() => {
-		const next = selected - 1;
-		onChange(next < 0 ? items.length - 1 : next);
-	}, [selected]);
+		const next = selectedItemIndex - 1;
+		const nextWrapped = next < 0 ? items.length - 1 : next;
+
+		onChange(items[nextWrapped].index);
+	}, [selectedItemIndex]);
 
 	const onNext = useCallback(() => {
-		const next = selected + 1;
-		onChange(next > items.length - 1 ? 0 : next);
-	}, [selected]);
+		const next = selectedItemIndex + 1;
+		const nextWrapped = next > items.length - 1 ? 0 : next;
+		onChange(items[nextWrapped].index);
+	}, [selectedItemIndex]);
 
 	if (items.length === 0) {
-		return null;
+		// Useful just for layout purposes
+		return <div class="commit-timeline"></div>;
 	}
 
-	const selectedCount = "" + (selected + 1);
+	const selectedCount = "" + (selectedItemIndex + 1);
 	const itemsCountLen = ("" + items.length).length;
 	const leading = selectedCount.padStart(itemsCountLen, "0");
 
@@ -141,7 +147,7 @@ export function CommitTimeline(props: CommitTimelineProps) {
 						{leading.slice(0, itemsCountLen - selectedCount.length)}
 					</span>
 					<span data-testid="commit-page-info">
-						{selected + 1} / {items.length}
+						{selectedItemIndex + 1} / {items.length}
 					</span>
 				</div>
 				<button
@@ -162,13 +168,13 @@ export function CommitTimeline(props: CommitTimelineProps) {
 						ref={pane}
 						style={`width: ${paneWidth}px; transform: translate3d(${offset}px, 0, 0);`}
 					>
-						{items.map((x, i) => {
+						{items.map(x => {
 							return (
 								<CommitItem
-									key={x}
-									onClick={() => onChange(i)}
-									selected={i === selected}
-									percent={x}
+									key={x.index}
+									onClick={() => onChange(x.index)}
+									selected={x.index === selected}
+									percent={x.percent}
 								/>
 							);
 						})}
