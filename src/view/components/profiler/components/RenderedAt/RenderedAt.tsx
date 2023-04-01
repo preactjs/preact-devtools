@@ -59,9 +59,10 @@ export function RenderedAt() {
 											key={node.index}
 											class="rendered-at-item"
 											data-active={commitIdx === node.index}
-											onClick={() =>
-												(store.profiler.activeCommitIdx.value = node.index)
-											}
+											onClick={() => {
+												store.profiler.activeCommitIdx.value = node.index;
+												store.profiler.filterCommitsUnder.value = false;
+											}}
 										>
 											<span>
 												Commit #{node.index} for {formatTime(node.selfDuration)}

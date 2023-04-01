@@ -69,6 +69,10 @@ export interface ProfilerState {
 	// Flamegraph mode
 	flamegraphNodes: Signal<Map<ID, NodeTransform>>;
 	rankedNodes: Signal<NodeTransform[]>;
+
+	// Filtering
+	filterCommitsUnder: Signal<number | false>;
+	filteredCommits: Signal<(CommitData & { index: number })[]>;
 }
 
 function getMaxSelfDurationNode(commit: CommitData) {
@@ -128,6 +132,18 @@ export function createProfiler(): ProfilerState {
 			: null;
 	});
 
+	// Filtering
+	const filterCommitsUnder = signal<false | number>(false);
+	const filteredCommits = computed(() => {
+		return commits.value
+			.map((commit, index) => ({ ...commit, index }))
+			.filter(commit =>
+				filterCommitsUnder.value === false
+					? true
+					: commit.duration >= filterCommitsUnder.value,
+			);
+	});
+
 	// Flamegraph
 	const flamegraphType = signal(FlamegraphType.FLAMEGRAPH);
 
@@ -183,6 +199,10 @@ export function createProfiler(): ProfilerState {
 		activeReason,
 		selectedNodeId,
 		selectedNode,
+
+		// Filtering
+		filterCommitsUnder,
+		filteredCommits,
 
 		// Rendering
 		flamegraphType,

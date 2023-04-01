@@ -2,6 +2,7 @@ import { Renderer } from "./renderer";
 import { ID } from "../view/store/types";
 import { createAdapter, InspectData, UpdateType } from "./adapter/adapter";
 import { DEFAULT_FIlTERS, FilterState, RawFilterState } from "./adapter/filter";
+import { RawTimelineFilterState } from "./adapter/profiler";
 import { Options } from "preact";
 import { createRenderer, RendererConfig } from "./shared/renderer";
 import { setupOptionsV10 } from "./10/options";
@@ -43,6 +44,7 @@ export interface DevtoolEvents {
 	"start-highlight-updates": null;
 	"stop-highlight-updates": null;
 	"update-filter": RawFilterState;
+	"update-timeline-filter": RawTimelineFilterState;
 	"load-host-selection": null;
 	"inspect-host-node": null;
 	"view-source": ID;
