@@ -231,9 +231,9 @@ export function cssModules() {
 
 		let css = result.code.toString("utf-8");
 
-		// Fix CSS grid areas treated as local
+		// Fix CSS grid areas treated as local.
 		css = css
-			.replaceAll(/grid-area:\s+_?[^_]+_(.*?);$/gm, (m, g) => {
+			.replaceAll(/grid-area:\s+_?(?:.*_)*(.+?);/gm, (m, g) => {
 				return `grid-area: ${g};`;
 			})
 			.replaceAll(/\s["][^"']+_([^"']+)["]/g, (m, g) => {
