@@ -1,38 +1,51 @@
 import { h, render } from "preact";
-import { useState } from "preact/hooks";
+import { useEffect, useState } from "preact/hooks";
 
 function Display(props) {
 	return <div data-testid="result">Counter: {props.value}</div>;
 }
 
-function Counter({ id }) {
-	const [v, set] = useState(0);
-
-	return (
-		<div style="padding: 2rem;">
-			<h4>{id}</h4>
-			<Display value={v} />
-			<button onClick={() => set(v + 1)}>Increment</button>
-		</div>
-	);
+function Child(props) {
+	return <h3>Child {props.id}</h3>;
 }
-const app1 = <Counter id="Root" />;
-const app2 = <Counter id="Nested" />;
-const app3 = <Counter id="Nested > Nested" />;
 
 function linkRoots(parent, child) {
 	// v10 linking
 	parent.__linked_children = [child];
 	child.__linked_parent = parent;
-
-	// v11 linking
-	parent.__k[0].__linked_children = [child];
-	child.__linked_parent = parent;
 }
 
-linkRoots(app1, app2);
-linkRoots(app2, app3);
+function Counter({ id }) {
+	const [v, set] = useState(0);
+
+	const ChildRoot1 = () => <div id="child-1" dangerouslySetInnerHTML="" />;
+	const ChildRoot2 = () => <div id="child-2" dangerouslySetInnerHTML="" />;
+
+	const childRoot1Vnode = <ChildRoot1 />;
+	const childRoot2Vnode = <ChildRoot2 />;
+
+	useEffect(() => {
+		const child1 = <Child id="1" />;
+		const child2 = <Child id="2" />;
+
+		linkRoots(childRoot1Vnode, child1);
+		linkRoots(childRoot2Vnode, child2);
+
+		render(child1, document.getElementById("child-1"));
+		render(child2, document.getElementById("child-2"));
+	}, []);
+
+	return (
+		<div style="padding: 2rem;">
+			<h3>{id}</h3>
+			<Display value={v} />
+			<button onClick={() => set(v + 1)}>Increment</button>
+
+			{childRoot1Vnode}
+			{childRoot2Vnode}
+		</div>
+	);
+}
+const app1 = <Counter id="Root" />;
 
 render(app1, document.getElementById("app"));
-render(app2, document.getElementById("app2"));
-render(app3, document.getElementById("app3"));

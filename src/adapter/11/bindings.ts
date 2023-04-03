@@ -222,9 +222,6 @@ export function getVNodeParent(internal: Internal): Internal | null {
  * Check if a `vnode` is the root of a tree
  */
 export function isRoot(internal: Internal, config: RendererConfig): boolean {
-	if (getVirtualParent(internal)) {
-		return false;
-	}
 	return getVNodeParent(internal) == null && internal.type === config.Fragment;
 }
 
