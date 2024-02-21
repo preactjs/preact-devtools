@@ -17,7 +17,7 @@ test("Should highlight flamegraph node if present in DOM", async ({ page }) => {
 
 	await devtools.locator(locateFlame("Counter")).first().hover();
 	// Wait for possible flickering to occur
-	await wait(1000);
+	await wait(500);
 
 	const log = (await page.evaluate(() => (window as any).log)) as any[];
 	expect(log.filter(x => x.type === "highlight").length).toEqual(1);
