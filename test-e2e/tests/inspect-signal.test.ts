@@ -62,7 +62,7 @@ test("Show signals in hooks", async ({ page }) => {
 	await devtools.waitForSelector('[data-testid="props-row"]');
 	await devtools
 		.locator(
-			'[data-testid="props-row"] [data-testid="prop-name"]:has-text("_")',
+			'[data-testid="props-row"] [data-testid="prop-name"]:has-text("useSignal")',
 		)
 		.click();
 	await devtools
