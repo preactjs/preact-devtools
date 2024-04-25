@@ -113,44 +113,52 @@ export function createStats(): Stats {
 	};
 }
 
-export function stats2ops(stats: Stats): number[] {
-	return [
-		MsgTypes.COMMIT_STATS,
-		...stats.roots,
-		...stats.classComponents,
-		...stats.functionComponents,
-		...stats.fragments,
-		...stats.forwardRef,
-		...stats.memo,
-		...stats.suspense,
-		...stats.elements,
-		stats.text,
+export function stats2ops(stats: Stats, out: number[]): void {
+	out.push(MsgTypes.COMMIT_STATS);
 
-		...stats.keyed,
-		...stats.unkeyed,
-		...stats.mixed,
+	pushStatsChildren(out, stats.roots);
+	pushStatsChildren(out, stats.classComponents);
+	pushStatsChildren(out, stats.functionComponents);
+	pushStatsChildren(out, stats.fragments);
+	pushStatsChildren(out, stats.forwardRef);
+	pushStatsChildren(out, stats.memo);
+	pushStatsChildren(out, stats.suspense);
+	pushStatsChildren(out, stats.elements);
 
-		stats.mounts.components,
-		stats.mounts.elements,
-		stats.mounts.text,
-		stats.updates.components,
-		stats.updates.elements,
-		stats.updates.text,
-		stats.unmounts.components,
-		stats.unmounts.elements,
-		stats.unmounts.text,
+	out.push(stats.text);
 
-		// Single child types
-		stats.singleChildType.roots,
-		stats.singleChildType.classComponents,
-		stats.singleChildType.functionComponents,
-		stats.singleChildType.fragments,
-		stats.singleChildType.forwardRef,
-		stats.singleChildType.memo,
-		stats.singleChildType.suspense,
-		stats.singleChildType.elements,
-		stats.singleChildType.text,
-	];
+	pushStatsChildren(out, stats.keyed);
+	pushStatsChildren(out, stats.unkeyed);
+	pushStatsChildren(out, stats.mixed);
+
+	out.push(stats.mounts.components);
+	out.push(stats.mounts.elements);
+	out.push(stats.mounts.text);
+	out.push(stats.updates.components);
+	out.push(stats.updates.elements);
+	out.push(stats.updates.text);
+	out.push(stats.unmounts.components);
+	out.push(stats.unmounts.elements);
+	out.push(stats.unmounts.text);
+
+	// Single child types
+	out.push(stats.singleChildType.roots);
+	out.push(stats.singleChildType.classComponents);
+	out.push(stats.singleChildType.functionComponents);
+	out.push(stats.singleChildType.fragments);
+	out.push(stats.singleChildType.forwardRef);
+	out.push(stats.singleChildType.memo);
+	out.push(stats.singleChildType.suspense);
+	out.push(stats.singleChildType.elements);
+	out.push(stats.singleChildType.text);
+}
+
+function pushStatsChildren(out: number[], stats: StatsChildren): void {
+	out.push(stats[0]);
+	out.push(stats[1]);
+	out.push(stats[2]);
+	out.push(stats[3]);
+	out.push(stats[4]);
 }
 
 export interface ParsedStats {

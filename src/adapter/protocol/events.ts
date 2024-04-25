@@ -93,9 +93,12 @@ export function flush(commit: Commit) {
 	if (unmountIds.length > 0) {
 		msg.push(MsgTypes.REMOVE_VNODE, unmountIds.length, ...unmountIds);
 	}
-	msg.push(...operations);
+
+	for (let i = 0; i < operations.length; i++) {
+		msg.push(operations[i]);
+	}
 	if (stats !== null) {
-		msg.push(...stats2ops(stats));
+		stats2ops(stats, msg);
 	}
 
 	return { type: "operation_v2", data: msg };
@@ -201,7 +204,8 @@ export function applyEvent(store: Store, type: keyof DevtoolEvents, data: any) {
 				store.profiler.isSupported.value = !!data.supportsProfiling;
 			}
 			if (!store.profiler.supportsRenderReasons.value) {
-				store.profiler.supportsRenderReasons.value = !!data.supportsRenderReasons;
+				store.profiler.supportsRenderReasons.value =
+					!!data.supportsRenderReasons;
 			}
 
 			if (!store.supports.hooks.value) {
