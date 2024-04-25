@@ -198,11 +198,17 @@ export function fromSnapshot(events: string[]): number[] {
 		}
 	}
 
-	out.push(...flushTable(new Map(strings.map((x, i) => [x, i]))));
+	const strs = flushTable(new Map(strings.map((x, i) => [x, i])));
+	for (let i = 0; i < strs.length; i++) {
+		out.push(strs[i]);
+	}
 	if (unmounts.length > 0) {
 		out.push(MsgTypes.REMOVE_VNODE, unmounts.length, ...unmounts);
 	}
-	out.push(...operations);
+
+	for (let i = 0; i < operations.length; i++) {
+		out.push(operations[i]);
+	}
 
 	return out;
 }
