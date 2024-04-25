@@ -2,7 +2,7 @@ import * as babel from "@babel/core";
 import fs from "fs/promises";
 import fsSync from "fs";
 import path from "path";
-import * as parcelCss from "@parcel/css";
+import * as lightningcss from "lightningcss";
 import * as fsExtra from "fs-extra";
 import * as kl from "kolorist";
 import archiver from "archiver";
@@ -216,7 +216,7 @@ export function gitSourcePlugin() {
  */
 export function cssModules() {
 	function transform(filename, code) {
-		const result = parcelCss.transform({
+		const result = lightningcss.transform({
 			filename,
 			code,
 			cssModules: true,

@@ -1,4 +1,3 @@
-import fetch from "node-fetch";
 import * as util from "util";
 import fs from "fs";
 import path from "path";
