@@ -1,19 +1,19 @@
-import { render, h } from "preact";
-import { DevTools } from "../../../view/components/Devtools";
-import { createStore } from "../../../view/store";
-import { applyEvent } from "../../../adapter/protocol/events";
-import { debug } from "../../../debug";
-import { DevtoolsPanelName } from "../../../constants";
+import { h, render } from "preact";
+import { DevTools } from "../../../view/components/Devtools.tsx";
+import { createStore } from "../../../view/store/index.ts";
+import { applyEvent } from "../../../adapter/protocol/events.ts";
+import { debug } from "../../../debug.ts";
+import { DevtoolsPanelName } from "../../../constants.ts";
 import {
 	loadSettings,
-	storeTheme,
 	storeCaptureRenderReasons,
 	storeDebugMode,
-	storeHighlightUpdates,
 	storeFilters,
-} from "./settings";
+	storeHighlightUpdates,
+	storeTheme,
+} from "./settings.ts";
 import { effect } from "@preact/signals";
-import { isFirefox } from "../utils";
+import { isFirefox } from "../utils.ts";
 
 // Updated when the selection in the native elements panel changed.
 let hostSelectionChanged = false;
@@ -22,14 +22,19 @@ async function showPanel(): Promise<{
 	window: Window;
 	panel: chrome.devtools.panels.ExtensionPanel;
 }> {
-	return new Promise(resolve => {
-		chrome.devtools.panels.create("Preact", "", "/panel/panel.html", panel => {
-			const fn = (window: Window) => {
-				resolve({ window, panel });
-				panel.onShown.removeListener(fn);
-			};
-			panel.onShown.addListener(fn);
-		});
+	return new Promise((resolve) => {
+		chrome.devtools.panels.create(
+			"Preact",
+			"",
+			"/panel/panel.html",
+			(panel) => {
+				const fn = (window: Window) => {
+					resolve({ window, panel });
+					panel.onShown.removeListener(fn);
+				};
+				panel.onShown.addListener(fn);
+			},
+		);
 	});
 }
 
@@ -85,7 +90,7 @@ async function initDevtools() {
 	await loadSettings(window, store);
 	effect(() => storeTheme(store.theme.value));
 	effect(() =>
-		storeCaptureRenderReasons(store.profiler.captureRenderReasons.value),
+		storeCaptureRenderReasons(store.profiler.captureRenderReasons.value)
 	);
 	effect(() => storeHighlightUpdates(store.profiler.highlightUpdates.value));
 	effect(() => storeDebugMode(store.debugMode.value));
@@ -149,7 +154,7 @@ const pending = new Map<number, any[]>();
 const IS_FIREFOX = isFirefox();
 
 // Subscribe to messages from content script
-port.onMessage.addListener(async message => {
+port.onMessage.addListener(async (message) => {
 	if (!initialized) {
 		debug("initialize devtools panel");
 		await initDevtools();
@@ -203,7 +208,7 @@ chrome.devtools.network.onNavigated.addListener(() => {
 	store.clear();
 
 	if (backup.length) {
-		backup.forEach(message => {
+		backup.forEach((message) => {
 			applyEvent(store, message.type, message.data);
 		});
 		pending.delete(tabId);

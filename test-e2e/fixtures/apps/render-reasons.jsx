@@ -1,4 +1,4 @@
-import { h, Fragment, render, Component } from "preact";
+import { Component, Fragment, h, render } from "preact";
 import { useMemo, useState } from "preact/hooks";
 
 function Display(props) {

@@ -1,16 +1,16 @@
-import { h, Fragment } from "preact";
-import { useStore } from "../../store/react-bindings";
+import { Fragment, h } from "preact";
+import { useStore } from "../../store/react-bindings.ts";
 import s from "./StatsPanel.module.css";
-import { SingleLayout } from "../SidebarLayout";
-import { Actions } from "../Actions";
-import { IconBtn } from "../IconBtn";
+import { SingleLayout } from "../SidebarLayout.tsx";
+import { Actions } from "../Actions.tsx";
+import { IconBtn } from "../IconBtn.tsx";
 import { useCallback } from "preact/hooks";
 import {
 	OperationInfo,
 	ParsedStats,
 	StatsChildren,
-} from "../../../adapter/shared/stats";
-import { Icon } from "../icons";
+} from "../../../adapter/shared/stats.ts";
+import { Icon } from "../icons.tsx";
 
 export function StatsRecordBtn() {
 	const store = useStore();
@@ -31,9 +31,9 @@ export function StatsRecordBtn() {
 	return (
 		<IconBtn
 			title={!isRecording ? "Start Recording" : "Stop Recording"}
-			color={
-				isRecording ? "var(--color-record-active)" : "var(--color-selected-bg)"
-			}
+			color={isRecording
+				? "var(--color-record-active)"
+				: "var(--color-selected-bg)"}
 			onClick={onClick}
 			testId="record-btn"
 		>
@@ -85,33 +85,35 @@ export function StatsPanel() {
 				</Actions>
 			</div>
 			<div class={s.content}>
-				{stats !== null ? (
-					<StatsData stats={stats} />
-				) : isRecording ? (
-					<div class="profiler-info" data-testid="stats-info-recording">
-						<p class="profiler-info-title">
-							Statistic recording in progress...
-						</p>
-						<p class="profiler-info-descr">
-							Click the record button{" "}
-							<span class="profiler-info-btn">
-								<StatsRecordBtn />
-							</span>{" "}
-							to stop recording.
-						</p>
-					</div>
-				) : (
-					<div class="profiler-info" data-testid="stats-info">
-						<p class="profiler-info-title">No statistic data collected</p>
-						<p class="profiler-info-descr">
-							Click the record button{" "}
-							<span class="profiler-info-btn">
-								<StatsRecordBtn />
-							</span>{" "}
-							to start recording.
-						</p>
-					</div>
-				)}
+				{stats !== null
+					? <StatsData stats={stats} />
+					: isRecording
+					? (
+						<div class="profiler-info" data-testid="stats-info-recording">
+							<p class="profiler-info-title">
+								Statistic recording in progress...
+							</p>
+							<p class="profiler-info-descr">
+								Click the record button{" "}
+								<span class="profiler-info-btn">
+									<StatsRecordBtn />
+								</span>{" "}
+								to stop recording.
+							</p>
+						</div>
+					)
+					: (
+						<div class="profiler-info" data-testid="stats-info">
+							<p class="profiler-info-title">No statistic data collected</p>
+							<p class="profiler-info-descr">
+								Click the record button{" "}
+								<span class="profiler-info-btn">
+									<StatsRecordBtn />
+								</span>{" "}
+								to start recording.
+							</p>
+						</div>
+					)}
 			</div>
 		</SingleLayout>
 	);
@@ -201,7 +203,8 @@ export function StatsData({ stats }: { stats: ParsedStats }) {
 		<Fragment>
 			<div class={s.intro}>
 				<p>
-					Help us make Preact even faster by sharing these statistics over at{" "}
+					Help us make Preact even faster by sharing these statistics over at
+					{" "}
 					<a
 						href="https://github.com/preactjs/preact/issues/2618"
 						rel="noopener noreferrer"

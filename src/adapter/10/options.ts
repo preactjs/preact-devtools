@@ -1,24 +1,24 @@
-import { Options, VNode, ComponentConstructor, Component } from "preact";
-import { recordMark, endMark } from "../marks";
+import { Component, ComponentConstructor, Options, VNode } from "preact";
+import { endMark, recordMark } from "../marks.ts";
 import {
+	getActualChildren,
+	getComponent,
 	getDisplayName,
-	setNextState,
 	getNextState,
 	getStatefulHooks,
 	getStatefulHookValue,
-	getComponent,
 	isRoot,
-	getActualChildren,
-} from "./bindings";
+	setNextState,
+} from "./bindings.ts";
 import {
 	addDebugValue,
 	addHookName,
 	addHookStack,
 	HookType,
-} from "../shared/hooks";
-import { createVNodeTimings } from "../shared/timings";
-import { Renderer } from "../renderer";
-import { RendererConfig } from "../shared/renderer";
+} from "../shared/hooks.ts";
+import { createVNodeTimings } from "../shared/timings.ts";
+import { Renderer } from "../renderer.ts";
+import { RendererConfig } from "../shared/renderer.ts";
 
 export type OptionsV10 = Options;
 
@@ -30,8 +30,7 @@ function trackPrevState(Ctor: ComponentConstructor) {
 	Ctor.prototype.setState = function (update: any, callback: any) {
 		// Duplicated in setState() but doesn't matter due to the guard.
 		const nextState = getNextState(this);
-		const s =
-			(nextState !== this.state && nextState) ||
+		const s = (nextState !== this.state && nextState) ||
 			setNextState(this, Object.assign({}, this.state));
 
 		// Needed in order to check if state has changed after the tree has been committed:
@@ -68,7 +67,7 @@ export function setupOptionsV10(
 	const prevAfterDiff = options.diffed;
 	let prevHook = o._hook || o.__h;
 	let prevUseDebugValue = options.useDebugValue;
-	// @ts-ignore
+	// @ts-ignore todo
 	let prevHookName = options.useDebugName;
 
 	const skipEffects = o._skipEffects || o.__s;
@@ -81,7 +80,7 @@ export function setupOptionsV10(
 	setTimeout(() => {
 		prevHook = o._hook || o.__h;
 		prevUseDebugValue = options.useDebugValue;
-		// @ts-ignore
+		// @ts-ignore private types
 		prevHookName = options._addHookName || options.__a;
 
 		o._hook = o.__h = (c: Component, index: number, type: number) => {
@@ -103,7 +102,7 @@ export function setupOptionsV10(
 			if (prevUseDebugValue) prevUseDebugValue(value);
 		};
 
-		// @ts-ignore
+		// @ts-ignore private types
 		options._addHookName = options.__a = (name: string | number) => {
 			addHookName(name);
 			if (prevHookName) prevHookName(name);
@@ -130,6 +129,7 @@ export function setupOptionsV10(
 			const s = getStatefulHooks(vnode);
 			if (s !== null && c !== null) {
 				if (!(c as any)._oldHookValues) {
+					// eslint-disable-next-line no-new-array
 					(c as any)._oldHookValues = new Array(s.length).fill(undefined);
 				}
 
@@ -158,7 +158,7 @@ export function setupOptionsV10(
 		if (prevRender != null) prevRender(vnode, parent);
 	};
 
-	options.diffed = vnode => {
+	options.diffed = (vnode) => {
 		if (typeof vnode.type === "function") {
 			if (vnode.type !== config.Fragment) {
 				ownerStack.pop();
@@ -202,17 +202,16 @@ export function setupOptionsV10(
 		} else {
 			// Some islands based frameworks use a virtual container node
 			// instead of an actual DOM node.
-			const treeParent =
-				"Node" in globalThis && parent instanceof Node
-					? parent
-					: (parent as any).parentNode;
+			const treeParent = "Node" in globalThis && parent instanceof Node
+				? parent
+				: (parent as any).parentNode;
 			userRootToContainer.set(vnode, treeParent);
 		}
 
 		if (prevRoot) prevRoot(vnode, parent);
 	};
 
-	options.unmount = vnode => {
+	options.unmount = (vnode) => {
 		if (prevBeforeUnmount) prevBeforeUnmount(vnode);
 		if (vnode.type !== null) {
 			timings.start.delete(vnode);

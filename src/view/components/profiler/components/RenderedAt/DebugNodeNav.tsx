@@ -1,7 +1,7 @@
 import { h } from "preact";
-import { useStore } from "../../../../store/react-bindings";
-import { SidebarPanel, Empty } from "../../../sidebar/SidebarPanel";
-import { DevNode } from "../../../../store/types";
+import { useStore } from "../../../../store/react-bindings.ts";
+import { Empty, SidebarPanel } from "../../../sidebar/SidebarPanel.tsx";
+import { DevNode } from "../../../../store/types.ts";
 import { useComputed } from "@preact/signals";
 
 export function DebugNodeNav() {
@@ -35,32 +35,33 @@ export function DebugNodeNav() {
 
 	return (
 		<SidebarPanel title="Debug Node Navigation:" testId="profiler-debug-nav">
-			{nodes.length === 0 ? (
-				<Empty>No nodes found inside commmit</Empty>
-			) : (
-				<nav data-testid="debug-nav">
-					{nodes.map(node => {
-						return (
-							<button
-								key={node.id}
-								class="rendered-at-item"
-								data-active={selected === node.id}
-								onClick={() => (store.profiler.selectedNodeId.value = node.id)}
-							>
-								<span style="display: flex; justify-content: space-between; width: 100%">
-									<span>
-										{node.name}
-										{commit && node.id === commit.commitRootId ? (
-											<b> (R)</b>
-										) : null}
+			{nodes.length === 0
+				? <Empty>No nodes found inside commmit</Empty>
+				: (
+					<nav data-testid="debug-nav">
+						{nodes.map((node) => {
+							return (
+								<button
+									key={node.id}
+									class="rendered-at-item"
+									data-active={selected === node.id}
+									onClick={() => (store.profiler.selectedNodeId.value =
+										node.id)}
+								>
+									<span style="display: flex; justify-content: space-between; width: 100%">
+										<span>
+											{node.name}
+											{commit && node.id === commit.commitRootId
+												? <b>(R)</b>
+												: null}
+										</span>
+										<span>{node.id}</span>
 									</span>
-									<span>{node.id}</span>
-								</span>
-							</button>
-						);
-					})}
-				</nav>
-			)}
+								</button>
+							);
+						})}
+					</nav>
+				)}
 		</SidebarPanel>
 	);
 }

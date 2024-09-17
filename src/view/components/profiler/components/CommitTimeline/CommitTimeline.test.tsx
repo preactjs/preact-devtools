@@ -1,6 +1,6 @@
-import { h, ComponentChild } from "preact";
+import { ComponentChild, h } from "preact";
 import { expect } from "chai";
-import { CommitTimeline } from "./CommitTimeline";
+import { CommitTimeline } from "./CommitTimeline.tsx";
 import { fireEvent, render } from "@testing-library/preact";
 import * as sinon from "sinon";
 

@@ -1,5 +1,5 @@
 import { expect, test } from "@playwright/test";
-import { getProps, gotoTest, locateTreeItem, wait } from "../pw-utils";
+import { getProps, gotoTest, locateTreeItem, wait } from "../pw-utils.ts";
 
 test("Add new props", async ({ page }) => {
 	const { devtools } = await gotoTest(page, "counter");

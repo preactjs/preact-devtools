@@ -1,10 +1,10 @@
 import { Plugin } from "vite";
-import fs from "fs";
-import path from "path";
+import fs from "node:fs";
+import path from "node:path";
 import { transformSync } from "@babel/core";
 import transformJsx from "@babel/plugin-transform-react-jsx";
-import { addImport, rewriteImportPlugin } from "./babel";
-import { URL } from "url";
+import { addImport, rewriteImportPlugin } from "./babel.ts";
+import { URL } from "node:url";
 
 /**
  * Rewrite imports to preact to versioned preact imports.
@@ -20,7 +20,10 @@ export function rewritePreactVersion(): Plugin {
 		enforce: "pre",
 		configureServer(server) {
 			server.middlewares.use((req, res, next) => {
-				const url = new URL(req.originalUrl, "https://localhost");
+				const url = new URL(
+					req.originalUrl ?? req.url ?? "",
+					"https://localhost",
+				);
 				const version = url.searchParams.get("preact");
 				if (version) {
 					preactVersion = version.replace(/\./g, "_");

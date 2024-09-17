@@ -1,10 +1,10 @@
-import { test, expect, Page } from "@playwright/test";
+import { expect, Page, test } from "@playwright/test";
 import {
 	getTreeViewItemNames,
 	gotoTest,
 	locateTreeItem,
 	waitFor,
-} from "../pw-utils";
+} from "../pw-utils.ts";
 
 function testCase(preactVersion: string) {
 	return async ({ page }: { page: Page }) => {

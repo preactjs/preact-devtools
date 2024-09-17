@@ -1,8 +1,8 @@
 import { useComputed } from "@preact/signals";
 import { h } from "preact";
-import { useStore } from "../../store/react-bindings";
-import { DevNode } from "../../store/types";
-import { SidebarPanel } from "../sidebar/SidebarPanel";
+import { useStore } from "../../store/react-bindings.ts";
+import { DevNode } from "../../store/types.ts";
+import { SidebarPanel } from "../sidebar/SidebarPanel.tsx";
 
 export function OwnerInfo() {
 	const store = useStore();
@@ -35,7 +35,7 @@ export function OwnerInfo() {
 		<SidebarPanel title="Rendered by">
 			<div class="rendered-by-wrapper">
 				<nav data-testid="owners">
-					{data.map(node => {
+					{data.map((node) => {
 						return (
 							<button
 								key={node.id}

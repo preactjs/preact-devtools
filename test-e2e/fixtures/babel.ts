@@ -46,7 +46,7 @@ export const addImport: Plugin<{ imports: string[] }> = (
 		visitor: {
 			Program: {
 				exit(path) {
-					options.imports.forEach(n => {
+					options.imports.forEach((n) => {
 						path.unshiftContainer("body", template.ast`${n}`);
 					});
 				},

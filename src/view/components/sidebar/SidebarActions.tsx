@@ -1,11 +1,11 @@
-import { h, Fragment } from "preact";
-import { Actions } from "../Actions";
-import { IconBtn } from "../IconBtn";
-import { useStore, useEmitter } from "../../store/react-bindings";
+import { Fragment, h } from "preact";
+import { Actions } from "../Actions.tsx";
+import { IconBtn } from "../IconBtn.tsx";
+import { useEmitter, useStore } from "../../store/react-bindings.ts";
 import { useCallback } from "preact/hooks";
-import { ComponentName } from "../ComponentName";
-import { DevNodeType } from "../../store/types";
-import { Icon } from "../icons";
+import { ComponentName } from "../ComponentName.tsx";
+import { DevNodeType } from "../../store/types.ts";
+import { Icon } from "../icons.tsx";
 import { useComputed } from "@preact/signals";
 
 export function SidebarActions() {
@@ -24,8 +24,7 @@ export function SidebarActions() {
 		}
 	}, [node]);
 
-	const canViewSource =
-		node &&
+	const canViewSource = node &&
 		node.type !== DevNodeType.Group &&
 		node.type !== DevNodeType.Element;
 

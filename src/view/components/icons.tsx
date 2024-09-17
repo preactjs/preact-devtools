@@ -1,4 +1,4 @@
-import { h, ComponentChildren } from "preact";
+import { ComponentChildren, h } from "preact";
 
 const sizes: Record<string, string> = {
 	xs: ".8rem",

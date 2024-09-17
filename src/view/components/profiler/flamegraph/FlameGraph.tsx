@@ -1,14 +1,14 @@
 import { Fragment, h } from "preact";
-import { useStore } from "../../../store/react-bindings";
-import { useRef, useCallback, useState, useEffect } from "preact/hooks";
-import { FlamegraphType } from "../data/commits";
-import { useResize } from "../../utils";
-import { RankedLayout } from "./ranked/RankedLayout";
-import { FlamegraphLayout } from "./modes/FlamegraphLayout";
-import { EMPTY } from "./placeNodes";
-import { debounce } from "../../../../shells/shared/utils";
-import { EmitFn } from "../../../../adapter/hook";
-import { ID } from "../../../store/types";
+import { useStore } from "../../../store/react-bindings.ts";
+import { useCallback, useEffect, useRef, useState } from "preact/hooks";
+import { FlamegraphType } from "../data/commits.ts";
+import { useResize } from "../../utils.ts";
+import { RankedLayout } from "./ranked/RankedLayout.tsx";
+import { FlamegraphLayout } from "./modes/FlamegraphLayout.tsx";
+import { EMPTY } from "./placeNodes.ts";
+import { debounce } from "../../../../shells/shared/utils.ts";
+import { EmitFn } from "../../../../adapter/hook.ts";
+import { ID } from "../../../store/types.ts";
 
 const highlightNode = debounce(
 	(notify: EmitFn, id: ID | null) => notify("highlight", id),
@@ -70,27 +70,29 @@ export function FlameGraph() {
 		>
 			{canvasWidth === -1 ? null : (
 				<Fragment>
-					{displayType === FlamegraphType.RANKED ? (
-						<RankedLayout
-							canvasWidth={canvasWidth}
-							containerRef={ref}
-							commit={commit!}
-							onSelect={onSelect}
-							selected={selected}
-							onMouseEnter={onMouseEnter}
-							onMouseLeave={onMouseLeave}
-						/>
-					) : (
-						<FlamegraphLayout
-							canvasWidth={canvasWidth}
-							containerRef={ref}
-							commit={commit!}
-							onSelect={onSelect}
-							selected={selected}
-							onMouseEnter={onMouseEnter}
-							onMouseLeave={onMouseLeave}
-						/>
-					)}
+					{displayType === FlamegraphType.RANKED
+						? (
+							<RankedLayout
+								canvasWidth={canvasWidth}
+								containerRef={ref}
+								commit={commit!}
+								onSelect={onSelect}
+								selected={selected}
+								onMouseEnter={onMouseEnter}
+								onMouseLeave={onMouseLeave}
+							/>
+						)
+						: (
+							<FlamegraphLayout
+								canvasWidth={canvasWidth}
+								containerRef={ref}
+								commit={commit!}
+								onSelect={onSelect}
+								selected={selected}
+								onMouseEnter={onMouseEnter}
+								onMouseLeave={onMouseLeave}
+							/>
+						)}
 				</Fragment>
 			)}
 		</div>

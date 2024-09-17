@@ -1,4 +1,4 @@
-import { h, Fragment, render, Component } from "preact";
+import { Component, Fragment, h, render } from "preact";
 import { useState } from "preact/hooks";
 
 function SymbolComponent() {

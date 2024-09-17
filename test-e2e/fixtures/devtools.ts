@@ -1,10 +1,10 @@
-import { setupInlineDevtools } from "../../src/shells/inline/index";
+import { setupInlineDevtools } from "../../src/shells/inline/index.ts";
 
 const container = document.getElementById("app")!;
 
 const store = setupInlineDevtools(container, window);
 
-// @ts-ignore
+// @ts-ignore todo
 window.parent.store = store;
 store.subscribe((name, msg) => {
 	window.parent.postMessage(

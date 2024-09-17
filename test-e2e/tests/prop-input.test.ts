@@ -1,5 +1,5 @@
 import { expect, Frame, Page, test } from "@playwright/test";
-import { getLog, gotoTest, locateTreeItem, wait } from "../pw-utils";
+import { getLog, gotoTest, locateTreeItem, wait } from "../pw-utils.ts";
 
 test("Input various data types into DataInput", async ({ page }) => {
 	const { devtools } = await gotoTest(page, "data-input");
@@ -149,7 +149,7 @@ async function enterText(
 		? await devtools.locator(selector).getAttribute("data-type")
 		: "non-editable";
 	const value = present
-		? await devtools.$eval(selector, el => (el as any).value)
+		? await devtools.$eval(selector, (el) => (el as any).value)
 		: await devtools.locator('[data-testid="prop-value"]').textContent();
 	return { rendered, type, value };
 }

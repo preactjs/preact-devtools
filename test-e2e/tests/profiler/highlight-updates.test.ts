@@ -1,5 +1,5 @@
 import { expect, test } from "@playwright/test";
-import { locateTab, gotoTest, wait } from "../../pw-utils";
+import { gotoTest, locateTab, wait } from "../../pw-utils.ts";
 
 test("Check if highlight updates is rendered", async ({ page }) => {
 	const { devtools } = await gotoTest(page, "todo");

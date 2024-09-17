@@ -1,5 +1,5 @@
-import path from "path";
-import fs from "fs";
+import path from "node:path";
+import fs from "node:fs";
 
 /**
  * Get a sorted list of all available preact versions
@@ -8,8 +8,8 @@ export function getPreactVersions() {
 	const dir = path.join(__dirname, "vendor", "preact");
 	const versions = fs
 		.readdirSync(dir)
-		.filter(name => !name.startsWith("."))
-		.map(name => {
+		.filter((name) => !name.startsWith("."))
+		.map((name) => {
 			if (name.endsWith(".tgz")) {
 				name = name.slice(0, -".tgz".length);
 			}
@@ -21,8 +21,8 @@ export function getPreactVersions() {
 			return name;
 		})
 		.sort((a, b) => {
-			const semA = a.split(".").map(n => +n);
-			const semB = b.split(".").map(n => +n);
+			const semA = a.split(".").map((n) => +n);
+			const semB = b.split(".").map((n) => +n);
 
 			// If one is non-semver
 			if (semA.length === 1 && semB.length > 1) {

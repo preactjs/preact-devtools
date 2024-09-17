@@ -1,13 +1,13 @@
 import { Signal } from "@preact/signals";
-import { InspectData } from "../../adapter/adapter/adapter";
-import { createSearchStore } from "./search";
-import { createFilterStore } from "./filter";
-import { createSelectionStore } from "./selection";
-import { Collapser } from "./collapser";
-import { EmitFn, DevtoolEvents } from "../../adapter/hook";
-import { ProfilerState } from "../components/profiler/data/commits";
-import { PropData } from "../components/sidebar/inspect/parseProps";
-import { ParsedStats } from "../../adapter/shared/stats";
+import { InspectData } from "../../adapter/adapter/adapter.ts";
+import { createSearchStore } from "./search.ts";
+import { createFilterStore } from "./filter.ts";
+import { createSelectionStore } from "./selection.ts";
+import { Collapser } from "./collapser.ts";
+import { DevtoolEvents, EmitFn } from "../../adapter/hook.ts";
+import { ProfilerState } from "../components/profiler/data/commits.ts";
+import { PropData } from "../components/sidebar/inspect/parseProps.ts";
+import { ParsedStats } from "../../adapter/shared/stats.ts";
 
 export type ID = number;
 

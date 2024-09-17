@@ -1,9 +1,12 @@
-import { h, Fragment } from "preact";
-import { IconTab } from "../components/Tabs/Tabs";
-import { useStore } from "../../../store/react-bindings";
+import { Fragment, h } from "preact";
+import { IconTab } from "../components/Tabs/Tabs.tsx";
+import { useStore } from "../../../store/react-bindings.ts";
 import { useCallback } from "preact/hooks";
-import { FlamegraphType, getCommitInitalSelectNodeId } from "../data/commits";
-import { Icon } from "../../icons";
+import {
+	FlamegraphType,
+	getCommitInitalSelectNodeId,
+} from "../data/commits.ts";
+import { Icon } from "../../icons.tsx";
 
 export function FlameGraphMode() {
 	const store = useStore();
@@ -15,9 +18,9 @@ export function FlameGraphMode() {
 		profiler.flamegraphType.value = value as any;
 		profiler.selectedNodeId.value = profiler.activeCommit.value
 			? getCommitInitalSelectNodeId(
-					profiler.activeCommit.value,
-					profiler.flamegraphType.value,
-			  )
+				profiler.activeCommit.value,
+				profiler.flamegraphType.value,
+			)
 			: -1;
 	}, []);
 

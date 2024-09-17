@@ -12,9 +12,12 @@ function ListItem(props) {
 function List(props) {
 	return (
 		<Fragment>
-			{new Array(props.v).fill(0).map((_, i) => (
-				<ListItem key={i}>{i}</ListItem>
-			))}
+			{
+				// eslint-disable-next-line no-new-array
+				new Array(props.v).fill(0).map((_, i) => (
+					<ListItem key={i}>{i}</ListItem>
+				))
+			}
 		</Fragment>
 	);
 }

@@ -1,5 +1,10 @@
-import { test, expect } from "@playwright/test";
-import { clickTreeItem, getHooks, gotoTest, waitForPass } from "../../pw-utils";
+import { expect, test } from "@playwright/test";
+import {
+	clickTreeItem,
+	getHooks,
+	gotoTest,
+	waitForPass,
+} from "../../pw-utils.ts";
 
 test("Show custom hook name", async ({ page }) => {
 	const { devtools } = await gotoTest(page, "hooks-name");

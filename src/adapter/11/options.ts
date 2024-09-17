@@ -1,33 +1,33 @@
-import { recordMark, endMark } from "../marks";
+import { endMark, recordMark } from "../marks.ts";
 import {
-	getDisplayName,
-	setNextState,
-	getNextState,
 	getComponent,
-	Internal,
+	getDisplayName,
+	getNextState,
 	getStatefulHooks,
 	getStatefulHookValue,
-	TYPE_COMPONENT,
-	isRoot,
 	getVNodeId,
-} from "./bindings";
-import { RendererConfig } from "../shared/renderer";
-import { Renderer } from "../renderer";
+	Internal,
+	isRoot,
+	setNextState,
+	TYPE_COMPONENT,
+} from "./bindings.ts";
+import { RendererConfig } from "../shared/renderer.ts";
+import { Renderer } from "../renderer.ts";
 import {
 	addDebugValue,
 	addHookName,
 	addHookStack,
 	HookType,
-} from "../shared/hooks";
-import { createVNodeTimings } from "../shared/timings";
-import { ProfilerState } from "../adapter/profiler";
+} from "../shared/hooks.ts";
+import { createVNodeTimings } from "../shared/timings.ts";
+import { ProfilerState } from "../adapter/profiler.ts";
 import {
 	createReason,
 	RenderReason,
 	RenderReasonData,
-} from "../shared/renderReasons";
+} from "../shared/renderReasons.ts";
 import { ComponentType } from "preact";
-import { getRenderReasonPre, RenderReasonTmpData } from "./renderReason";
+import { getRenderReasonPre, RenderReasonTmpData } from "./renderReason.ts";
 
 export interface VNodeV11<P = Record<string, unknown>> {
 	type: ComponentType<P> | string | null;
@@ -81,8 +81,7 @@ function trackPrevState(Ctor: any) {
 	Ctor.prototype.setState = function (update: any, callback: any) {
 		// Duplicated in setState() but doesn't matter due to the guard.
 		const nextState = getNextState(this);
-		const s =
-			(nextState !== this.state && nextState) ||
+		const s = (nextState !== this.state && nextState) ||
 			setNextState(this, Object.assign({}, this.state));
 
 		// Needed in order to check if state has changed after the tree has been committed:
@@ -127,7 +126,7 @@ export function setupOptionsV11(
 	const prevAfterDiff = options.diffed;
 	let prevHook = o._hook || o.__h;
 	let prevUseDebugValue = options.useDebugValue;
-	// @ts-ignore
+	// @ts-ignore todo
 	let prevHookName = options.useDebugName;
 
 	const skipEffects = o._skipEffects || o.__s;
@@ -140,7 +139,7 @@ export function setupOptionsV11(
 	setTimeout(() => {
 		prevHook = o._hook || o.__h;
 		prevUseDebugValue = options.useDebugValue;
-		// @ts-ignore
+		// @ts-ignore private types
 		prevHookName = options._addHookName || options.__a;
 
 		o._hook = o.__h = (internal: Internal, index: number, type: number) => {
@@ -162,14 +161,14 @@ export function setupOptionsV11(
 			if (prevUseDebugValue) prevUseDebugValue(value);
 		};
 
-		// @ts-ignore
+		// @ts-ignore private types
 		options._addHookName = options.__a = (name: string | number) => {
 			addHookName(name);
 			if (prevHookName) prevHookName(name);
 		};
 	}, 100);
 
-	options.vnode = vnode => {
+	options.vnode = (vnode) => {
 		if (
 			ownerStack.length > 0 &&
 			typeof vnode.type === "function" &&
@@ -234,7 +233,7 @@ export function setupOptionsV11(
 		if (prevRender != null) prevRender(internal);
 	};
 
-	options.diffed = internal => {
+	options.diffed = (internal) => {
 		if (internal.flags & TYPE_COMPONENT) {
 			if (internal.type !== config.Fragment) {
 				ownerStack.pop();
@@ -286,7 +285,7 @@ export function setupOptionsV11(
 		}
 	};
 
-	options.unmount = internal => {
+	options.unmount = (internal) => {
 		if (prevBeforeUnmount) prevBeforeUnmount(internal);
 		vnodeIdToOwner.delete(getVNodeId(internal));
 		owners.delete(internal);

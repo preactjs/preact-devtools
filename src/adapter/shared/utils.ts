@@ -1,4 +1,4 @@
-import { PreactBindings, SharedVNode } from "./bindings";
+import { PreactBindings, SharedVNode } from "./bindings.ts";
 
 export function getSignalTextName(name: string) {
 	return name === "_st" ? "__TextSignal" : name;

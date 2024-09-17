@@ -1,21 +1,24 @@
 import { h } from "preact";
-import { Actions, ActionSeparator } from "../../../Actions";
-import { CommitTimeline } from "../CommitTimeline/CommitTimeline";
-import { IconBtn } from "../../../IconBtn";
-import { useStore } from "../../../../store/react-bindings";
+import { Actions, ActionSeparator } from "../../../Actions.tsx";
+import { CommitTimeline } from "../CommitTimeline/CommitTimeline.tsx";
+import { IconBtn } from "../../../IconBtn.tsx";
+import { useStore } from "../../../../store/react-bindings.ts";
 import treeBarStyles from "../../../elements/TreeBar.module.css";
 import { useCallback, useState } from "preact/hooks";
-import { FlameGraphMode } from "../../flamegraph/FlameGraphMode";
+import { FlameGraphMode } from "../../flamegraph/FlameGraphMode.tsx";
 import {
 	getCommitInitalSelectNodeId,
 	resetProfiler,
 	startProfiling,
 	stopProfiling,
-} from "../../data/commits";
-import { Icon } from "../../../icons";
+} from "../../data/commits.ts";
+import { Icon } from "../../../icons.tsx";
 import { useComputed } from "@preact/signals";
-import { OutsideClick } from "../../../OutsideClick";
-import { FilterNumber, FilterPopup } from "../../../FilterPopup/FilterPopup";
+import { OutsideClick } from "../../../OutsideClick.tsx";
+import {
+	FilterNumber,
+	FilterPopup,
+} from "../../../FilterPopup/FilterPopup.tsx";
 import filterBarStyles from "../../../FilterPopup/FilterPopup.module.css";
 import s from "./TimelineBar.module.css";
 
@@ -31,22 +34,18 @@ export function TimelineBar() {
 
 	const stats = useComputed(() => {
 		return {
-			max: Math.max(16, ...store.profiler.commits.value.map(x => x.duration)),
+			max: Math.max(16, ...store.profiler.commits.value.map((x) => x.duration)),
 			min: Math.max(
 				0,
-				Math.min(...store.profiler.commits.value.map(x => x.duration)),
+				Math.min(...store.profiler.commits.value.map((x) => x.duration)),
 			),
 		};
 	}).value;
 
 	const onCommitChange = useCallback(
 		(n: number) => {
-			const {
-				activeCommitIdx,
-				selectedNodeId,
-				activeCommit,
-				flamegraphType,
-			} = store.profiler;
+			const { activeCommitIdx, selectedNodeId, activeCommit, flamegraphType } =
+				store.profiler;
 
 			activeCommitIdx.value = n;
 			const commit = activeCommit.value;
@@ -101,9 +100,8 @@ export function TimelineBar() {
 			<ActionSeparator />
 			{isSupported && !isRecording && (
 				<CommitTimeline
-					items={filteredCommits.map(commit => {
-						const percent =
-							((commit.duration - stats.min) * 100) /
+					items={filteredCommits.map((commit) => {
+						const percent = ((commit.duration - stats.min) * 100) /
 							(stats.max - stats.min || 0.1);
 						return { percent, index: commit.index };
 					})}
@@ -157,7 +155,7 @@ export function TimelineFilterPopup() {
 				value={filterCommitsUnder}
 				label="Hide commits under"
 				units="ms"
-				onInput={value => {
+				onInput={(value) => {
 					setFilterCommitsUnder(value);
 				}}
 				defaultValue={0}
@@ -188,13 +186,11 @@ export function RecordBtn() {
 	return (
 		<IconBtn
 			title={!isRecording ? "Start Recording" : "Stop Recording"}
-			color={
-				isSupported
-					? isRecording
-						? "var(--color-record-active)"
-						: "var(--color-selected-bg)"
-					: "var(--color-disabled)"
-			}
+			color={isSupported
+				? isRecording
+					? "var(--color-record-active)"
+					: "var(--color-selected-bg)"
+				: "var(--color-disabled)"}
 			onClick={onClick}
 			disabled={!isSupported}
 			testId="record-btn"

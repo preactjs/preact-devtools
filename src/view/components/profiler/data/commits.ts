@@ -1,13 +1,13 @@
-import { ID, DevNode } from "../../../store/types";
-import { Signal, signal, computed } from "@preact/signals";
-import { getRoot } from "../flamegraph/FlamegraphStore";
+import { DevNode, ID } from "../../../store/types.ts";
+import { computed, Signal, signal } from "@preact/signals";
+import { getRoot } from "../flamegraph/FlamegraphStore.ts";
 import {
-	RenderReasonMap,
 	RenderReasonData,
-} from "../../../../adapter/shared/renderReasons";
-import { patchTree } from "../flamegraph/modes/patchTree";
-import { NodeTransform } from "../flamegraph/shared";
-import { toTransform } from "../flamegraph/ranked/ranked-utils";
+	RenderReasonMap,
+} from "../../../../adapter/shared/renderReasons.ts";
+import { patchTree } from "../flamegraph/modes/patchTree.ts";
+import { NodeTransform } from "../flamegraph/shared.ts";
+import { toTransform } from "../flamegraph/ranked/ranked-utils.ts";
 
 export interface CommitData {
 	/** Id of the tree's root node */
@@ -79,7 +79,7 @@ function getMaxSelfDurationNode(commit: CommitData) {
 	let id = commit.commitRootId;
 	let max = commit.selfDurations.get(id) || 0;
 
-	commit.rendered.forEach(rId => {
+	commit.rendered.forEach((rId) => {
 		const t = commit.selfDurations.get(rId) || 0;
 		if (t > max) {
 			max = t;
@@ -137,10 +137,10 @@ export function createProfiler(): ProfilerState {
 	const filteredCommits = computed(() => {
 		return commits.value
 			.map((commit, index) => ({ ...commit, index }))
-			.filter(commit =>
+			.filter((commit) =>
 				filterCommitsUnder.value === false
 					? true
-					: commit.duration >= filterCommitsUnder.value,
+					: commit.duration >= filterCommitsUnder.value
 			);
 	});
 

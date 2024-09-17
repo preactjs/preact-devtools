@@ -1,8 +1,8 @@
-import { AppCtx } from "./react-bindings";
-import { signal, Signal } from "@preact/signals";
-import { clamp } from "../components/tree/windowing";
+import { AppCtx } from "./react-bindings.ts";
+import { Signal, signal } from "@preact/signals";
+import { clamp } from "../components/tree/windowing.ts";
 import { useContext } from "preact/hooks";
-import { ID } from "./types";
+import { ID } from "./types.ts";
 
 /**
  * Manages selection state of the TreeView.
@@ -21,7 +21,7 @@ export function createSelectionStore(list: Signal<ID[]>) {
 	const selectPrev = () => selectByIndex(selectedIdx.value - 1);
 
 	const selectById = (id: ID) => {
-		const idx = list.value.findIndex(x => x === id);
+		const idx = list.value.findIndex((x) => x === id);
 		selectByIndex(idx);
 	};
 

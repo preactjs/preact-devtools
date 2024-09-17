@@ -1,5 +1,5 @@
-import { h, Fragment, render, createContext } from "preact";
-import { useMemo, useContext } from "preact/hooks";
+import { createContext, Fragment, h, render } from "preact";
+import { useContext, useMemo } from "preact/hooks";
 
 function Memo() {
 	const v = useMemo(() => {

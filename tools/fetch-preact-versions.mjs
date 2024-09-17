@@ -1,11 +1,10 @@
-import * as util from "util";
-import fs from "fs";
-import path from "path";
+import * as util from "node:util";
+import fs from "node:fs";
+import path from "node:path";
 import * as kl from "kolorist";
-import { pipeline } from "stream";
-import { fileURLToPath } from "url";
+import { pipeline } from "node:stream";
 
-const __dirname = path.dirname(fileURLToPath(import.meta.url));
+const __dirname = import.meta.dirname;
 const streamPipeline = util.promisify(pipeline);
 
 /* eslint-disable no-console */

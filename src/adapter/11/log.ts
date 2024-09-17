@@ -1,7 +1,7 @@
-import { ID } from "../../view/store/types";
-import { RendererConfig } from "../shared/renderer";
-import { getVNodeById, IdMappingState } from "../shared/idMapper";
-import { getComponent, getDisplayName, Internal } from "./bindings";
+import { ID } from "../../view/store/types.ts";
+import { RendererConfig } from "../shared/renderer.ts";
+import { getVNodeById, IdMappingState } from "../shared/idMapper.ts";
+import { getComponent, getDisplayName, Internal } from "./bindings.ts";
 
 export function logInternal(
 	ids: IdMappingState<Internal>,

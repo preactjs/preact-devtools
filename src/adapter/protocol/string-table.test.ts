@@ -1,4 +1,4 @@
-import { parseTable, flushTable } from "./string-table";
+import { flushTable, parseTable } from "./string-table.ts";
 import { expect } from "chai";
 
 describe("StringTable", () => {

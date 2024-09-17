@@ -1,14 +1,12 @@
 import { test } from "@playwright/test";
 import {
 	clickRecordButton,
-	locateTab,
 	gotoTest,
 	locateProfilerTab,
-} from "../../../pw-utils";
+	locateTab,
+} from "../../../pw-utils.ts";
 
-test("Selected node should be changed across commits if not present", async ({
-	page,
-}) => {
+test("Selected node should be changed across commits if not present", async ({ page }) => {
 	const { devtools } = await gotoTest(page, "profiler-2");
 
 	await devtools.locator(locateTab("PROFILER")).click();

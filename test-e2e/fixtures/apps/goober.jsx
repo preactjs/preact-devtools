@@ -1,7 +1,7 @@
 import "preact/devtools";
 import { h, render } from "preact";
 import { createContext, useContext } from "preact/compat";
-import { styled, setup } from "goober";
+import { setup, styled } from "goober";
 
 const ThemeContext = createContext();
 const useTheme = () => useContext(ThemeContext);

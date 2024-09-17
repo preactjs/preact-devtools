@@ -1,13 +1,12 @@
 import * as babel from "@babel/core";
-import fs from "fs/promises";
-import fsSync from "fs";
-import path from "path";
+import fs from "node:fs/promises";
+import fsSync from "node:fs";
+import path from "node:path";
 import * as lightningcss from "lightningcss";
-import * as fsExtra from "fs-extra";
 import * as kl from "kolorist";
 import archiver from "archiver";
 import { babelPluginCssModules } from "./babel-plugin-css-module.mjs";
-import child_process from "child_process";
+import child_process from "node:child_process";
 import { babelPluginDeadCode } from "./babel-plugin-dead-code.mjs";
 
 /**
@@ -18,7 +17,7 @@ export function aliasPlugin(mapping) {
 	return {
 		name: "alias-plugin",
 		setup(build) {
-			build.onResolve({ filter: /[^.]*/ }, args => {
+			build.onResolve({ filter: /[^.]*/ }, (args) => {
 				for (const k in mapping) {
 					if (args.path.startsWith(k)) {
 						let target = mapping[k];
@@ -45,7 +44,7 @@ export function copyPlugin(mapping) {
 				for (const k in mapping) {
 					try {
 						await fs.access(k);
-					} catch (err) {
+					} catch {
 						// eslint-disable-next-line no-console
 						console.warn(kl.yellow("Skipping: " + k));
 						continue;
@@ -59,7 +58,7 @@ export function copyPlugin(mapping) {
 					}
 
 					await fs.mkdir(targetDir, { recursive: true });
-					await fsExtra.copy(k, target, { recursive: true });
+					await fs.cp(k, target, { recursive: true });
 				}
 			});
 		},
@@ -74,11 +73,11 @@ export function renamePlugin(mapping) {
 	return {
 		name: "rename-plugin",
 		setup(build) {
-			build.onEnd(async args => {
+			build.onEnd(async (args) => {
 				if (args.errors.length) return;
 
 				for (const k in mapping) {
-					await fsExtra.move(k, mapping[k], { overwrite: true });
+					await fs.rename(k, mapping[k]);
 				}
 			});
 		},
@@ -94,13 +93,13 @@ export function spritePlugin(svgPath, files) {
 	return {
 		name: "sprite-plugin",
 		setup(build) {
-			build.onEnd(async args => {
+			build.onEnd(async (args) => {
 				if (args.errors.length) return;
 
 				const svg = await fs.readFile(svgPath, "utf-8");
 
 				await Promise.all(
-					files.map(async file => {
+					files.map(async (file) => {
 						const html = await fs.readFile(file, "utf-8");
 						const res = html.replace(
 							/<body>/,
@@ -122,7 +121,7 @@ export function inlineHookPlugin(dir) {
 	return {
 		name: "inline-hook-plugin",
 		setup(build) {
-			build.onEnd(async args => {
+			build.onEnd(async (args) => {
 				if (args.errors.length) return;
 
 				const source = path.join(dir, "installHook.js");
@@ -165,7 +164,7 @@ export function archivePlugin(dir, browser, debug) {
 	return {
 		name: "archive-plugin",
 		setup(build) {
-			build.onEnd(async args => {
+			build.onEnd(async (args) => {
 				if (args.errors.length) return;
 
 				// Package extension
@@ -174,7 +173,7 @@ export function archivePlugin(dir, browser, debug) {
 				);
 				const archive = archiver("zip", { zlib: { level: 9 } });
 
-				archive.on("warning", err => {
+				archive.on("warning", (err) => {
 					if (err.code === "ENOENT") {
 						// eslint-disable-next-line no-console
 						console.log(err);
@@ -183,7 +182,7 @@ export function archivePlugin(dir, browser, debug) {
 					}
 				});
 
-				archive.on("error", err => {
+				archive.on("error", (err) => {
 					throw err;
 				});
 
@@ -246,13 +245,13 @@ export function cssModules() {
 	return {
 		name: "css-modules-plugin",
 		setup(build) {
-			build.onResolve({ filter: /\.module-virtual\.css$/ }, async args => {
+			build.onResolve({ filter: /\.module-virtual\.css$/ }, async (args) => {
 				return {
 					path: path.join(args.resolveDir, args.path),
 				};
 			});
 
-			build.onLoad({ filter: /\.module-virtual\.css$/ }, async args => {
+			build.onLoad({ filter: /\.module-virtual\.css$/ }, async (args) => {
 				const file = args.path.replace("module-virtual", "module");
 				const contents = await fs.readFile(file);
 				const result = transform(file, contents);
@@ -263,7 +262,7 @@ export function cssModules() {
 				};
 			});
 
-			build.onLoad({ filter: /\.module\.css$/ }, async args => {
+			build.onLoad({ filter: /\.module\.css$/ }, async (args) => {
 				const contents = await fs.readFile(args.path);
 				const result = transform(args.path, contents);
 
@@ -287,7 +286,7 @@ export function babelPlugin(define) {
 	return {
 		name: "babel-plugin",
 		setup(build) {
-			build.onLoad({ filter: /content-script\.ts$/ }, async args => {
+			build.onLoad({ filter: /content-script\.ts$/ }, async (args) => {
 				const contents = await fs.readFile(args.path, "utf-8");
 				const result = await babel.transformAsync(contents, {
 					babelrc: false,
@@ -308,7 +307,7 @@ export function babelPlugin(define) {
 				};
 			});
 
-			build.onLoad({ filter: /\.tsx$/ }, async args => {
+			build.onLoad({ filter: /\.tsx$/ }, async (args) => {
 				const contents = await fs.readFile(args.path, "utf-8");
 				// Using a cache is crucial as babel is 30x slower than esbuild
 				const cached = cache.get(args.path);
@@ -357,10 +356,10 @@ export function babelPlugin(define) {
 					// file transformation
 					const waited = pending.get(args.path);
 					pending.delete(args.path);
-					waited.forEach(fn => fn());
+					waited.forEach((fn) => fn());
 				} else {
 					// Subscribe to the existing transformation completion call
-					await new Promise(r => {
+					await new Promise((r) => {
 						pending.get(args.path).push(r);
 					});
 					result = cache.get(args.path).result;

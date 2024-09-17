@@ -1,9 +1,9 @@
 import { Component } from "preact";
-import { RendererConfig } from "./renderer";
-import { HookType } from "./hooks";
-import { RenderReasonData } from "./renderReasons";
-import { IdMappingState } from "./idMapper";
-import { VNodeTimings } from "./timings";
+import { RendererConfig } from "./renderer.ts";
+import { HookType } from "./hooks.ts";
+import { RenderReasonData } from "./renderReasons.ts";
+import { IdMappingState } from "./idMapper.ts";
+import { VNodeTimings } from "./timings.ts";
 
 // These hook types are declared in "preact/hooks/src/internal" but not very
 // complete, so for now loosely declare locally.

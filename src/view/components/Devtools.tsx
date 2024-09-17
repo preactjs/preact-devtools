@@ -1,14 +1,14 @@
-import { h, Fragment } from "preact";
-import { AppCtx, EmitCtx, WindowCtx } from "../store/react-bindings";
-import { Store, Panel } from "../store/types";
-import { Elements } from "./elements/Elements";
-import { Profiler } from "./profiler/components/Profiler";
-import { SmallTab, SmallTabGroup } from "./profiler/components/Tabs/Tabs";
+import { Fragment, h } from "preact";
+import { AppCtx, EmitCtx, WindowCtx } from "../store/react-bindings.ts";
+import { Panel, Store } from "../store/types.ts";
+import { Elements } from "./elements/Elements.tsx";
+import { Profiler } from "./profiler/components/Profiler.tsx";
+import { SmallTab, SmallTabGroup } from "./profiler/components/Tabs/Tabs.tsx";
 import "./devtools.css";
 import s from "./Devtools.module.css";
-import { ThemeSwitcher } from "./ThemeSwitcher";
-import { Settings } from "./settings/Settings";
-import { StatsPanel } from "./stats/StatsPanel";
+import { ThemeSwitcher } from "./ThemeSwitcher.tsx";
+import { Settings } from "./settings/Settings.tsx";
+import { StatsPanel } from "./stats/StatsPanel.tsx";
 
 export function DevTools(props: { store: Store; window: Window }) {
 	const panel = props.store.activePanel.value;
@@ -28,9 +28,8 @@ export function DevTools(props: { store: Store; window: Window }) {
 							<SmallTabGroup class={s.switcher}>
 								<div class={s.switcherInner}>
 									<SmallTab
-										onClick={() =>
-											(props.store.activePanel.value = Panel.ELEMENTS)
-										}
+										onClick={() => (props.store.activePanel.value =
+											Panel.ELEMENTS)}
 										checked={showElements}
 										name="root-panel"
 										value={Panel.ELEMENTS}
@@ -38,9 +37,8 @@ export function DevTools(props: { store: Store; window: Window }) {
 										Elements
 									</SmallTab>
 									<SmallTab
-										onClick={() =>
-											(props.store.activePanel.value = Panel.PROFILER)
-										}
+										onClick={() => (props.store.activePanel.value =
+											Panel.PROFILER)}
 										checked={showProfiler}
 										name="root-panel"
 										value={Panel.PROFILER}
@@ -48,9 +46,8 @@ export function DevTools(props: { store: Store; window: Window }) {
 										Profiler
 									</SmallTab>
 									<SmallTab
-										onClick={() =>
-											(props.store.activePanel.value = Panel.STATISTICS)
-										}
+										onClick={() => (props.store.activePanel.value =
+											Panel.STATISTICS)}
 										checked={showStats}
 										name="root-panel"
 										value={Panel.STATISTICS}
@@ -58,9 +55,8 @@ export function DevTools(props: { store: Store; window: Window }) {
 										Statistics
 									</SmallTab>
 									<SmallTab
-										onClick={() =>
-											(props.store.activePanel.value = Panel.SETTINGS)
-										}
+										onClick={() => (props.store.activePanel.value =
+											Panel.SETTINGS)}
 										checked={showSettings}
 										name="root-panel"
 										value={Panel.SETTINGS}

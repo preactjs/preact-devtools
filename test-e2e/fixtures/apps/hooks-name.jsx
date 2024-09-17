@@ -1,14 +1,14 @@
 /* eslint-disable @typescript-eslint/no-empty-function */
 /* eslint-disable @typescript-eslint/no-unused-vars */
-import { h, Fragment, render } from "preact";
+import { Fragment, h, render } from "preact";
 import {
-	useState,
-	useEffect,
-	useReducer,
 	useCallback,
-	useRef,
+	useEffect,
 	useLayoutEffect,
 	useMemo,
+	useReducer,
+	useRef,
+	useState,
 } from "preact/hooks";
 import { addHookName } from "preact/devtools";
 
@@ -54,7 +54,7 @@ function MemoComponent() {
 
 function ReducerComponent() {
 	const [v] = addHookName(
-		useReducer(a => a, "foo"),
+		useReducer((a) => a, "foo"),
 		"customReducer",
 	);
 	return <p>Reducer: {v}</p>;

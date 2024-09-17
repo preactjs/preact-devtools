@@ -32,7 +32,8 @@ Then, download the Preact Devtools extension for your browser:
 
 - Use `npm run dev` to start a demo page
 - Use `npm run watch` to rebuild all extensions on any code changes
-- Use `npm run build:firefox` or `npm run build:chrome` to create a release build
+- Use `npm run build:firefox` or `npm run build:chrome` to create a release
+  build
 
 Chrome:
 
@@ -51,7 +52,9 @@ Firefox:
 
 ## For extension reviewers
 
-These commands will build the extension and load it into a browser with a temporary profile. The browser will automatically navigate to [preactjs.com](https://preactjs.com). There you can test the extension.
+These commands will build the extension and load it into a browser with a
+temporary profile. The browser will automatically navigate to
+[preactjs.com](https://preactjs.com). There you can test the extension.
 
 Chrome:
 

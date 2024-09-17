@@ -1,5 +1,5 @@
-import { test, expect } from "@playwright/test";
-import { getLog, gotoTest, wait } from "../pw-utils";
+import { expect, test } from "@playwright/test";
+import { getLog, gotoTest, wait } from "../pw-utils.ts";
 
 test("Inspect should select node in elements panel", async ({ page }) => {
 	const { devtools } = await gotoTest(page, "counter");
@@ -15,8 +15,8 @@ test("Inspect should select node in elements panel", async ({ page }) => {
 	await wait(500);
 
 	const log = await getLog(page);
-	expect(log.filter(x => x.type === "start-picker").length).toEqual(1);
-	expect(log.filter(x => x.type === "stop-picker").length).toEqual(1);
+	expect(log.filter((x) => x.type === "start-picker").length).toEqual(1);
+	expect(log.filter((x) => x.type === "stop-picker").length).toEqual(1);
 	// expect(log.filter(x => x.type === "start-picker").length).to.equal(1);
 	// expect(log.filter(x => x.type === "stop-picker").length).to.equal(1);
 

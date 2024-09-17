@@ -1,7 +1,7 @@
 import { Signal, signal } from "@preact/signals";
-import { useStore } from "./react-bindings";
-import { escapeStringRegexp } from "./utils";
-import { ID, DevNode } from "./types";
+import { useStore } from "./react-bindings.ts";
+import { escapeStringRegexp } from "./utils.ts";
+import { DevNode, ID } from "./types.ts";
 
 export function createRegex(s: string): RegExp {
 	if (s[0] === "/") {
@@ -11,7 +11,7 @@ export function createRegex(s: string): RegExp {
 		}
 		try {
 			return new RegExp(s, "i");
-		} catch (err) {
+		} catch {
 			return new RegExp("");
 		}
 	}
@@ -45,11 +45,12 @@ export function createSearchStore(
 		regex.value = reg;
 
 		const ids: number[] = [];
-		list.value.forEach(id => {
+		list.value.forEach((id) => {
 			const node = items.value.get(id);
 			if (
 				node &&
-				(reg.test(node.name) || (node.hocs && node.hocs.some(h => reg.test(h))))
+				(reg.test(node.name) ||
+					(node.hocs && node.hocs.some((h) => reg.test(h))))
 			) {
 				ids.push(id);
 			}
@@ -71,7 +72,7 @@ export function createSearchStore(
 		if (n < 0) n = match.value.length - 1;
 		else if (n > match.value.length - 1) n = 0;
 		selected.value = n;
-		selectedIdx.value = list.value.findIndex(id => match.value[n] === id);
+		selectedIdx.value = list.value.findIndex((id) => match.value[n] === id);
 	}
 
 	const selectNext = () => go(selected.value + 1);

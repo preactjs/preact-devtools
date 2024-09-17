@@ -1,6 +1,6 @@
 import { RefObject } from "preact";
 import { useLayoutEffect, useRef, useState } from "preact/hooks";
-import { useResize } from "../utils";
+import { useResize } from "../utils.ts";
 
 const INITIAL = 14;
 const RIGHT_MARGIN = 16;

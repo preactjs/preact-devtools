@@ -1,15 +1,15 @@
 import { expect, test } from "@playwright/test";
-import { gotoTest, wait } from "../pw-utils";
+import { gotoTest, wait } from "../pw-utils.ts";
 
 test("Highlight iframe nodes", async ({ page }) => {
 	const { devtools } = await gotoTest(page, "iframe");
 
 	await devtools
 		.locator("iframe")
-		.evaluateAll(iframes =>
+		.evaluateAll((iframes) =>
 			(iframes as HTMLIFrameElement[]).every(
-				x => x.contentDocument?.readyState == "complete",
-			),
+				(x) => x.contentDocument?.readyState == "complete",
+			)
 		);
 
 	await devtools
@@ -49,11 +49,11 @@ test("Highlight iframe nodes", async ({ page }) => {
 	await devtools.hover('[data-name="Display"]');
 
 	const frames = await page.frames();
-	const iframe1 = frames.find(frame => frame.url().endsWith("iframe.html"));
+	const iframe1 = frames.find((frame) => frame.url().endsWith("iframe.html"));
 	await iframe1!.waitForSelector(highlight);
 
 	// Foobar.Consumer
 	await devtools.hover('[data-name="Foobar.Consumer"]');
-	const iframe2 = frames.find(frame => frame.url().endsWith("iframe.html"));
+	const iframe2 = frames.find((frame) => frame.url().endsWith("iframe.html"));
 	await iframe2!.waitForSelector(highlight);
 });

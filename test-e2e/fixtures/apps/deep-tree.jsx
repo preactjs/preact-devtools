@@ -1,4 +1,4 @@
-import { h, Fragment, render } from "preact";
+import { Fragment, h, render } from "preact";
 
 const css = "border: 1px solid peachpuff; padding: 1rem;";
 
@@ -66,4 +66,4 @@ function App() {
 render(<App />, document.getElementById("app"));
 
 // eslint-disable-next-line no-console
-document.addEventListener("click", e => console.log(e), true);
+document.addEventListener("click", (e) => console.log(e), true);

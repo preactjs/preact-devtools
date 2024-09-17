@@ -1,4 +1,4 @@
-import { h, Fragment, render, Component, createContext } from "preact";
+import { Component, createContext, Fragment, h, render } from "preact";
 
 let lastState;
 class State extends Component {
@@ -39,7 +39,7 @@ function Context() {
 	return (
 		<Ctx.Provider value={{ value: 0 }}>
 			<Ctx.Consumer>
-				{v => {
+				{(v) => {
 					const out = (
 						<div data-testid="context-result">
 							context: {v.value}, {String(v !== lastContext)}

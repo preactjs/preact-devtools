@@ -1,6 +1,6 @@
 import { h } from "preact";
 import { ComponentChildren } from "preact";
-import { Icon } from "../icons";
+import { Icon } from "../icons.tsx";
 import s from "./FilterPopup.module.css";
 
 export function FilterCheck({
@@ -18,7 +18,7 @@ export function FilterCheck({
 				<input
 					type="checkbox"
 					checked={checked}
-					onInput={e => onInput((e.target as any).checked)}
+					onInput={(e) => onInput((e.target as any).checked)}
 				/>
 				<Icon icon={checked ? "checkbox-checked" : "checkbox-unchecked"} />
 			</span>
@@ -47,9 +47,10 @@ export function FilterNumber({
 				<input
 					type="checkbox"
 					checked={checked}
-					onInput={e =>
-						onInput((e.target as any).checked ? defaultValue : (false as const))
-					}
+					onInput={(e) =>
+						onInput(
+							(e.target as any).checked ? defaultValue : (false as const),
+						)}
 				/>
 				<Icon icon={checked ? "checkbox-checked" : "checkbox-unchecked"} />
 			</span>
@@ -59,10 +60,11 @@ export function FilterNumber({
 					type="number"
 					class={s.filterInputNumber}
 					value={checked ? value : defaultValue}
-					onInput={e => {
+					onInput={(e) => {
 						onInput((e.target as any).value);
 					}}
-				></input>{" "}
+				>
+				</input>{" "}
 				{units}
 			</span>
 		</label>
@@ -83,7 +85,7 @@ export function FilterPopup({
 	return (
 		<div class={`${s.filter} ${className}`} data-testid="filter-popup">
 			<form
-				onSubmit={e => {
+				onSubmit={(e) => {
 					e.preventDefault();
 					onFiltersSubmit();
 				}}

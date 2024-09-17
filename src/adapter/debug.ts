@@ -1,8 +1,8 @@
-import { MsgTypes } from "./protocol/events";
-import { parseTable, flushTable } from "./protocol/string-table";
-import { ID, DevNodeType } from "../view/store/types";
-import { renderReasonToStr } from "./shared/renderReasons";
-import { parseStats } from "./shared/stats";
+import { MsgTypes } from "./protocol/events.ts";
+import { flushTable, parseTable } from "./protocol/string-table.ts";
+import { DevNodeType, ID } from "../view/store/types.ts";
+import { renderReasonToStr } from "./shared/renderReasons.ts";
+import { parseStats } from "./shared/stats.ts";
 
 export interface ParsedMsg {
 	rootId: number;
@@ -73,17 +73,17 @@ export function parseCommitMessage(data: number[]): ParsedMsg {
 export function formatForTest(msg: ParsedMsg) {
 	const out = [];
 	out.push("rootId: " + msg.rootId);
-	msg.mounts.forEach(m => {
+	msg.mounts.forEach((m) => {
 		const key = m.key ? "#" + m.key : "";
 		out.push(`Add ${m.id} <${m.name}${key}> to parent ${m.parentId}`);
 	});
-	msg.timings.forEach(t => {
+	msg.timings.forEach((t) => {
 		out.push(`Update timings ${t.id}`);
 	});
-	msg.reorders.forEach(r => {
+	msg.reorders.forEach((r) => {
 		out.push(`Reorder ${r.id} [${r.children.join(", ")}]`);
 	});
-	msg.unmounts.forEach(u => {
+	msg.unmounts.forEach((u) => {
 		out.push(`Remove ${u}`);
 	});
 
@@ -117,7 +117,7 @@ export function fromSnapshot(events: string[]): number[] {
 	const strings: string[] = [];
 	const unmounts: number[] = [];
 
-	if (/^rootId:/.test(events[0])) {
+	if (events[0].startsWith("rootId:")) {
 		const id = +events[0].slice(events[0].indexOf(":") + 1);
 		out.push(id);
 		operations.push(MsgTypes.ADD_ROOT, id);
@@ -127,7 +127,7 @@ export function fromSnapshot(events: string[]): number[] {
 
 	for (let i = 1; i < events.length; i++) {
 		const ev = events[i];
-		if (/^Add/.test(ev)) {
+		if (ev.startsWith("Add")) {
 			const m = ev.match(/Add\s+(\d+)\s+<([#]?\w+)>\s+to\sparent\s([-]?\d+)/);
 			if (m) {
 				let idx = strings.indexOf(m[2]);
@@ -173,7 +173,7 @@ export function fromSnapshot(events: string[]): number[] {
 					throw new Error("no match: " + ev);
 				}
 			}
-		} else if (/^Remove/.test(ev)) {
+		} else if (ev.startsWith("Remove")) {
 			const m = ev.match(/Remove\s+(\d+)/);
 			if (m) {
 				const id = +m[1];
@@ -181,7 +181,7 @@ export function fromSnapshot(events: string[]): number[] {
 			} else {
 				throw new Error("no match: " + ev);
 			}
-		} else if (/^Reorder/.test(ev)) {
+		} else if (ev.startsWith("Reorder")) {
 			const m = ev.match(/Reorder\s+(\d+)\s+([[].*[\]])/);
 			if (m) {
 				const id = +m[1];
@@ -239,8 +239,9 @@ export function printCommit(data: number[]) {
 				case MsgTypes.ADD_VNODE: {
 					const id = data[i + 1];
 					const name = strings[data[i + 5] - 1];
-					const key =
-						data[i + 6] > 0 ? ` key="${strings[data[i + 6] - 1]}" ` : "";
+					const key = data[i + 6] > 0
+						? ` key="${strings[data[i + 6] - 1]}" `
+						: "";
 					const parentId = data[i + 3];
 					const ownerId = data[i + 4];
 					const startTime = data[i + 7];

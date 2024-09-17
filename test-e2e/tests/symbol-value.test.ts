@@ -1,5 +1,5 @@
 import { test } from "@playwright/test";
-import { gotoTest, locateTreeItem } from "../pw-utils";
+import { gotoTest, locateTreeItem } from "../pw-utils.ts";
 
 test("Display symbol values", async ({ page }) => {
 	const { devtools } = await gotoTest(page, "symbols");

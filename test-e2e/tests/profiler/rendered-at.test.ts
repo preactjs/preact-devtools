@@ -1,10 +1,10 @@
 import { expect, test } from "@playwright/test";
 import {
-	locateTab,
-	gotoTest,
 	clickRecordButton,
+	gotoTest,
 	locateFlame,
-} from "../../pw-utils";
+	locateTab,
+} from "../../pw-utils.ts";
 
 test("Show in which commit a node rendered", async ({ page }) => {
 	const { devtools } = await gotoTest(page, "root-multi");
@@ -29,15 +29,15 @@ test("Show in which commit a node rendered", async ({ page }) => {
 
 	let commits = await devtools
 		.locator('[data-testid="commit-item"]')
-		.evaluateAll(els =>
-			Array.from(els).map(el => el.getAttribute("data-selected")),
+		.evaluateAll((els) =>
+			Array.from(els).map((el) => el.getAttribute("data-selected"))
 		);
 	expect(commits).toEqual(["true", null, null, null]);
 
 	const btns = await devtools
 		.locator('[data-testid="rendered-at"] button')
-		.evaluateAll(els =>
-			Array.from(els).map(el => el.getAttribute("data-active")),
+		.evaluateAll((els) =>
+			Array.from(els).map((el) => el.getAttribute("data-active"))
 		);
 
 	expect(btns).toEqual(["true", null]);
@@ -46,8 +46,8 @@ test("Show in which commit a node rendered", async ({ page }) => {
 
 	commits = await devtools
 		.locator('[data-testid="commit-item"]')
-		.evaluateAll(els =>
-			Array.from(els).map(el => el.getAttribute("data-selected")),
+		.evaluateAll((els) =>
+			Array.from(els).map((el) => el.getAttribute("data-selected"))
 		);
 	expect(commits).toEqual([null, null, "true", null]);
 });

@@ -1,12 +1,12 @@
-import { test, expect } from "@playwright/test";
+import { expect, test } from "@playwright/test";
 import {
 	clickRecordButton,
-	locateTab,
 	gotoTest,
+	locateTab,
 	waitForPass,
-} from "../../../pw-utils";
-import assert from "assert";
-import { getFlameNodes } from "./utils";
+} from "../../../pw-utils.ts";
+import assert from "node:assert";
+import { getFlameNodes } from "./utils.ts";
 
 test("Correctly position memoized sibling sub-trees", async ({ page }) => {
 	const { devtools } = await gotoTest(page, "memo2");

@@ -1,4 +1,4 @@
-import { h, Fragment, render } from "preact";
+import { Fragment, h, render } from "preact";
 
 function View() {
 	return (

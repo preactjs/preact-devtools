@@ -1,7 +1,7 @@
-import { h, Fragment } from "preact";
-import { SidebarPanel } from "../../../sidebar/SidebarPanel";
-import { useStore } from "../../../../store/react-bindings";
-import { getRoot } from "../../flamegraph/FlamegraphStore";
+import { Fragment, h } from "preact";
+import { SidebarPanel } from "../../../sidebar/SidebarPanel.tsx";
+import { useStore } from "../../../../store/react-bindings.ts";
+import { getRoot } from "../../flamegraph/FlamegraphStore.ts";
 
 const TimeRange = ({ from, to }: { from: number; to: number }) => (
 	<Fragment>

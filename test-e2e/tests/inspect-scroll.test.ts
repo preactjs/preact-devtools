@@ -1,6 +1,6 @@
-import { test, expect } from "@playwright/test";
-import { gotoTest } from "../pw-utils";
-import assert from "assert";
+import { expect, test } from "@playwright/test";
+import { gotoTest } from "../pw-utils.ts";
+import assert from "node:assert";
 
 test("Highlighting should move with scroll", async ({ page }) => {
 	const { devtools } = await gotoTest(page, "highlight-scroll");
@@ -16,7 +16,10 @@ test("Highlighting should move with scroll", async ({ page }) => {
 	const highlight = '[data-testid="highlight"]';
 	await page.waitForSelector(highlight);
 
-	const before = await page.$eval(highlight, el => el.getBoundingClientRect());
+	const before = await page.$eval(
+		highlight,
+		(el) => el.getBoundingClientRect(),
+	);
 	await page.evaluate(() => {
 		document.querySelector(".test-case")!.scrollBy(0, 1000);
 	});
@@ -28,6 +31,6 @@ test("Highlighting should move with scroll", async ({ page }) => {
 	await page.mouse.move(_x - 100, _y - 100);
 	await expect(page.locator(highlight)).toHaveCount(1);
 
-	const after = await page.$eval(highlight, el => el.getBoundingClientRect());
+	const after = await page.$eval(highlight, (el) => el.getBoundingClientRect());
 	expect(before.top).not.toEqual(after.top);
 });

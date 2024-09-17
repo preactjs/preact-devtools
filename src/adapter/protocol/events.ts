@@ -1,11 +1,11 @@
-import { flushTable, StringTable } from "./string-table";
-import { Store } from "../../view/store/types";
+import { flushTable, StringTable } from "./string-table.ts";
+import { Store } from "../../view/store/types.ts";
 import { batch } from "@preact/signals-core";
-import { recordProfilerCommit } from "../../view/components/profiler/data/commits";
-import { ops2Tree } from "./operations";
-import { applyOperationsV1 } from "./legacy/operationsV1";
-import { OperationInfo, Stats, stats2ops } from "../shared/stats";
-import { DevtoolEvents } from "../hook";
+import { recordProfilerCommit } from "../../view/components/profiler/data/commits.ts";
+import { ops2Tree } from "./operations.ts";
+import { applyOperationsV1 } from "./legacy/operationsV1.ts";
+import { OperationInfo, Stats, stats2ops } from "../shared/stats.ts";
+import { DevtoolEvents } from "../hook.ts";
 
 export enum MsgTypes {
 	ADD_ROOT = 1,
@@ -204,8 +204,8 @@ export function applyEvent(store: Store, type: keyof DevtoolEvents, data: any) {
 				store.profiler.isSupported.value = !!data.supportsProfiling;
 			}
 			if (!store.profiler.supportsRenderReasons.value) {
-				store.profiler.supportsRenderReasons.value =
-					!!data.supportsRenderReasons;
+				store.profiler.supportsRenderReasons.value = !!data
+					.supportsRenderReasons;
 			}
 
 			if (!store.supports.hooks.value) {

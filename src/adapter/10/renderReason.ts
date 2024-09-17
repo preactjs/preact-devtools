@@ -1,12 +1,12 @@
-import { PreactBindings, SharedVNode } from "../shared/bindings";
-import { IdMappingState } from "../shared/idMapper";
+import { PreactBindings, SharedVNode } from "../shared/bindings.ts";
+import { IdMappingState } from "../shared/idMapper.ts";
 import {
 	createReason,
 	getChangedKeys,
 	RenderReason,
 	RenderReasonData,
-} from "../shared/renderReasons";
-import { VNodeTimings } from "../shared/timings";
+} from "../shared/renderReasons.ts";
+import { VNodeTimings } from "../shared/timings.ts";
 
 /**
  * Detect why a VNode updated.
@@ -22,8 +22,7 @@ export function getRenderReasonPost<T extends SharedVNode>(
 		return next !== null ? createReason(RenderReason.MOUNT, null) : null;
 	} else if (next === null) {
 		return null;
-	}
-	// Components
+	} // Components
 	else if (typeof old.type === "function" && old.type === next.type) {
 		const c = bindings.getComponent(next);
 		if (c !== null) {

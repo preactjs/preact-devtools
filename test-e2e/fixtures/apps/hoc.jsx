@@ -1,5 +1,5 @@
-import { h, Fragment, render, Component } from "preact";
-import { memo, forwardRef } from "preact/compat";
+import { Component, Fragment, h, render } from "preact";
+import { forwardRef, memo } from "preact/compat";
 
 function Foo() {
 	return <div>I am foo</div>;

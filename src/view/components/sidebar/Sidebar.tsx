@@ -1,12 +1,12 @@
-import { h, Fragment } from "preact";
-import { useStore } from "../../store/react-bindings";
-import { PropsPanel } from "./inspect/PropsPanel";
-import { serializeProps } from "./inspect/serializeProps";
-import { DebugTreeStats } from "./DebugTreeStats";
-import { DebugNodeNavTree } from "./DebugNodeNavTree";
-import { OwnerInfo } from "./../elements/OwnerInfo";
-import { KeyPanel } from "./KeyPanel";
-import { HocPanel } from "./HocPanel";
+import { Fragment, h } from "preact";
+import { useStore } from "../../store/react-bindings.ts";
+import { PropsPanel } from "./inspect/PropsPanel.tsx";
+import { serializeProps } from "./inspect/serializeProps.ts";
+import { DebugTreeStats } from "./DebugTreeStats.tsx";
+import { DebugNodeNavTree } from "./DebugNodeNavTree.tsx";
+import { OwnerInfo } from "../elements/OwnerInfo.tsx";
+import { KeyPanel } from "./KeyPanel.tsx";
+import { HocPanel } from "./HocPanel.tsx";
 import { useComputed } from "@preact/signals";
 
 export function Sidebar() {
@@ -37,8 +37,7 @@ export function Sidebar() {
 				items={propData.items}
 				uncollapsed={propData.uncollapsed}
 				onChange={(value, path) =>
-					emit("update-prop", { id: inspect!.id, path, value })
-				}
+					emit("update-prop", { id: inspect!.id, path, value })}
 				onCopy={() => inspect && emit("copy", serializeProps(inspect.props))}
 				canAddNew
 			/>
@@ -77,8 +76,7 @@ export function Sidebar() {
 					items={state.items}
 					uncollapsed={state.uncollapsed}
 					onChange={(value, path) =>
-						emit("update-state", { id: inspect!.id, path, value })
-					}
+						emit("update-state", { id: inspect!.id, path, value })}
 					onCopy={() => inspect && emit("copy", serializeProps(inspect.state))}
 				/>
 			)}
@@ -88,11 +86,9 @@ export function Sidebar() {
 					items={context.items}
 					uncollapsed={context.uncollapsed}
 					onChange={(value, path) =>
-						emit("update-context", { id: inspect!.id, path, value })
-					}
+						emit("update-context", { id: inspect!.id, path, value })}
 					onCopy={() =>
-						inspect && emit("copy", serializeProps(inspect.context))
-					}
+						inspect && emit("copy", serializeProps(inspect.context))}
 				/>
 			)}
 			{inspect && <OwnerInfo />}

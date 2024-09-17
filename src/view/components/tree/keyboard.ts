@@ -1,5 +1,5 @@
 import { useCallback } from "preact/hooks";
-import { ID } from "../../store/types";
+import { ID } from "../../store/types.ts";
 
 export interface ListAdapter {
 	selected: ID;

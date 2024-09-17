@@ -1,8 +1,8 @@
 import { useComputed } from "@preact/signals";
 import { Fragment, h } from "preact";
-import { useStore } from "../../../../store/react-bindings";
-import { SidebarPanel, Empty } from "../../../sidebar/SidebarPanel";
-import { formatTime } from "../../util";
+import { useStore } from "../../../../store/react-bindings.ts";
+import { Empty, SidebarPanel } from "../../../sidebar/SidebarPanel.tsx";
+import { formatTime } from "../../util.ts";
 
 export function RenderedAt() {
 	const store = useStore();
@@ -40,38 +40,41 @@ export function RenderedAt() {
 							<button
 								class="rendered-at-item"
 								data-active={selected === commit.commitRootId}
-								onClick={() =>
-									(store.profiler.selectedNodeId.value = commit.commitRootId)
-								}
+								onClick={() => (store.profiler.selectedNodeId.value =
+									commit.commitRootId)}
 							>
 								<span>{commitRoot.name}</span>
 							</button>
 						</nav>
 					</SidebarPanel>
 					<SidebarPanel title="Rendered at:">
-						{data.length <= 0 ? (
-							<Empty>Did not render during this profiling session</Empty>
-						) : (
-							<nav data-testid="rendered-at" class="sidebar-nav-panel-content">
-								{data.map(node => {
-									return (
-										<button
-											key={node.index}
-											class="rendered-at-item"
-											data-active={commitIdx === node.index}
-											onClick={() => {
-												store.profiler.activeCommitIdx.value = node.index;
-												store.profiler.filterCommitsUnder.value = false;
-											}}
-										>
-											<span>
-												Commit #{node.index} for {formatTime(node.selfDuration)}
-											</span>
-										</button>
-									);
-								})}
-							</nav>
-						)}
+						{data.length <= 0
+							? <Empty>Did not render during this profiling session</Empty>
+							: (
+								<nav
+									data-testid="rendered-at"
+									class="sidebar-nav-panel-content"
+								>
+									{data.map((node) => {
+										return (
+											<button
+												key={node.index}
+												class="rendered-at-item"
+												data-active={commitIdx === node.index}
+												onClick={() => {
+													store.profiler.activeCommitIdx.value = node.index;
+													store.profiler.filterCommitsUnder.value = false;
+												}}
+											>
+												<span>
+													Commit #{node.index} for{" "}
+													{formatTime(node.selfDuration)}
+												</span>
+											</button>
+										);
+									})}
+								</nav>
+							)}
 					</SidebarPanel>
 				</Fragment>
 			)}

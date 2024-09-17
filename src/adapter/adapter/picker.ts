@@ -1,5 +1,5 @@
-import { Renderer } from "../renderer";
-import { debounce } from "../../shells/shared/utils";
+import { Renderer } from "../renderer.ts";
+import { debounce } from "../../shells/shared/utils.ts";
 
 export function createPicker(
 	window: Window,

@@ -1,5 +1,5 @@
 import { expect } from "chai";
-import { parseProps } from "./parseProps";
+import { parseProps } from "./parseProps.ts";
 
 const serialize = (v: Map<any, any>) => Array.from(v.values());
 

@@ -1,7 +1,7 @@
-import { ID, DevNodeType, Tree, DevNode } from "../../../store/types";
-import { CommitData } from "../data/commits";
-import { NodeTransform } from "./shared";
-import { FlameNodeTransform } from "./modes/flamegraph-utils";
+import { DevNode, DevNodeType, ID, Tree } from "../../../store/types.ts";
+import { CommitData } from "../data/commits.ts";
+import { NodeTransform } from "./shared.ts";
+import { FlameNodeTransform } from "./modes/flamegraph-utils.ts";
 
 /**
  * Parse a visual flamegraph DSL into a `DevNode` tree. Each
@@ -22,8 +22,7 @@ export function flames(
 	literals: TemplateStringsArray,
 	...placeholders: string[]
 ) {
-	let res =
-		placeholders.reduce((acc, x, i) => acc + x + literals[i], "") +
+	let res = placeholders.reduce((acc, x, i) => acc + x + literals[i], "") +
 		literals[literals.length - 1];
 
 	// Delete first newline if any
@@ -35,7 +34,7 @@ export function flames(
 
 	const lines = res
 		.split(/(\r\n|\r|\n)/)
-		.map(line => {
+		.map((line) => {
 			const match = line.match(/^(\s+)/);
 			const localIndent = match ? match[0].length : 0;
 			return line.slice(localIndent < indent ? localIndent : indent);
@@ -80,10 +79,9 @@ export function flames(
 				key: "",
 				parent: -1,
 				owner: -1,
-				type:
-					name[0].toUpperCase() === name[0]
-						? DevNodeType.FunctionComponent
-						: DevNodeType.Element,
+				type: name[0].toUpperCase() === name[0]
+					? DevNodeType.FunctionComponent
+					: DevNodeType.Element,
 				startTime,
 				endTime: startTime + duration,
 				children: [],
@@ -92,7 +90,7 @@ export function flames(
 				name,
 			};
 
-			lastSiblingsNodes.forEach(child => {
+			lastSiblingsNodes.forEach((child) => {
 				if (
 					node.startTime <= child.startTime &&
 					node.endTime > child.startTime
@@ -128,19 +126,19 @@ export function flames(
 	nodes.forEach((node, i) => ids.set(node.id, i + 1));
 
 	const idMap = new Map<ID, DevNode>();
-	nodes.forEach(node => {
+	nodes.forEach((node) => {
 		node.id = ids.get(node.id)!;
-		node.children = node.children.map(childId => ids.get(childId)!);
+		node.children = node.children.map((childId) => ids.get(childId)!);
 		idMap.set(node.id, node);
 	});
 
 	const selfDurations = new Map<ID, number>();
 
 	// Add self durations (basically: duration - child durations)
-	nodes.forEach(node => {
+	nodes.forEach((node) => {
 		let selfDuration = node.endTime - node.startTime;
 
-		node.children.forEach(childId => {
+		node.children.forEach((childId) => {
 			const child = idMap.get(childId)!;
 
 			selfDuration -= child.endTime - child.startTime;
@@ -153,10 +151,10 @@ export function flames(
 	});
 
 	// Correct dangling children
-	nodes.forEach(node => {
+	nodes.forEach((node) => {
 		if (node.depth > 0 && node.parent === -1) {
 			const parents = Array.from(nodes.values()).filter(
-				x => x.depth === node.depth - 1,
+				(x) => x.depth === node.depth - 1,
 			);
 
 			let found = false;
@@ -184,7 +182,7 @@ export function flames(
 	});
 
 	// Convert units to 10ms
-	nodes.forEach(node => {
+	nodes.forEach((node) => {
 		node.startTime = node.startTime * 10;
 		node.endTime = node.endTime * 10;
 
@@ -208,11 +206,11 @@ export function flames(
 	const commit: CommitData = {
 		rootId: 1,
 		commitRootId: 1,
-		rendered: new Set(nodes.map(node => node.id)),
+		rendered: new Set(nodes.map((node) => node.id)),
 		duration: nodes.length > 0 ? nodes[0]!.endTime - nodes[0]!.startTime : 0,
 		maxSelfDuration: Math.max(
 			0,
-			...nodes.map(x => selfDurations.get(x.id) || 0),
+			...nodes.map((x) => selfDurations.get(x.id) || 0),
 		),
 		nodes: idMap,
 		selfDurations,
@@ -230,20 +228,20 @@ export function flames(
 }
 
 export function byName(tree: Tree, name: string) {
-	return Array.from(tree.values()).find(x => x.name === name);
+	return Array.from(tree.values()).find((x) => x.name === name);
 }
 
 export function visualize(nodes: NodeTransform[]) {
-	const rows = new Array(Math.max(...nodes.map(x => x.row + 1))).fill(
+	// eslint-disable-next-line no-new-array
+	const rows = new Array(Math.max(...nodes.map((x) => x.row + 1))).fill(
 		" ".repeat(100),
 	);
 
-	nodes.forEach(node => {
+	nodes.forEach((node) => {
 		const w = Math.round(node.width);
 		const x = Math.round(node.x);
 		const s = rows[node.row];
-		rows[node.row] =
-			s.substring(0, x) +
+		rows[node.row] = s.substring(0, x) +
 			(node.id + "*".repeat(w).slice(0, w)) +
 			s.substring(x + w);
 	});

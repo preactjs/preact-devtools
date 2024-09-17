@@ -1,5 +1,5 @@
-import { RawFilterState } from "../../../adapter/adapter/filter";
-import { Store } from "../../../view/store/types";
+import { RawFilterState } from "../../../adapter/adapter/filter.ts";
+import { Store } from "../../../view/store/types.ts";
 
 /**
  * Load the theme from the browser private extension storage. This
@@ -10,7 +10,7 @@ export async function loadSettings(window: Window, store: Store) {
 	const doc = window.document;
 	doc.body.classList.add((chrome.devtools.panels as any).themeName || "light");
 	try {
-		const settings: any = await new Promise(res => {
+		const settings: any = await new Promise((res) => {
 			chrome.storage.sync.get(
 				[
 					"theme",
@@ -27,7 +27,8 @@ export async function loadSettings(window: Window, store: Store) {
 			if (["light", "dark", "auto"].includes(settings.theme)) {
 				store.theme.value = settings.theme;
 			}
-			store.profiler.captureRenderReasons.value = !!settings.captureRenderReasons;
+			store.profiler.captureRenderReasons.value = !!settings
+				.captureRenderReasons;
 			store.profiler.highlightUpdates.value = !!settings.highlightUpdates;
 			store.debugMode.value = !!settings.debugMode;
 			if (settings.componentFilters) {

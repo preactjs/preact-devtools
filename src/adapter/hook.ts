@@ -1,19 +1,23 @@
-import { Renderer } from "./renderer";
-import { ID } from "../view/store/types";
-import { createAdapter, InspectData, UpdateType } from "./adapter/adapter";
-import { DEFAULT_FIlTERS, FilterState, RawFilterState } from "./adapter/filter";
-import { RawTimelineFilterState } from "./adapter/profiler";
+import { Renderer } from "./renderer.ts";
+import { ID } from "../view/store/types.ts";
+import { createAdapter, InspectData, UpdateType } from "./adapter/adapter.ts";
+import {
+	DEFAULT_FIlTERS,
+	FilterState,
+	RawFilterState,
+} from "./adapter/filter.ts";
+import { RawTimelineFilterState } from "./adapter/profiler.ts";
 import { Options } from "preact";
-import { createRenderer, RendererConfig } from "./shared/renderer";
-import { setupOptionsV10 } from "./10/options";
-import parseSemverish from "./parse-semverish";
-import { PortPageHook } from "./adapter/port";
-import { PROFILE_RELOAD, STATS_RELOAD } from "../constants";
-import { setupOptionsV11 } from "./11/options";
-import { newProfiler } from "./adapter/profiler";
-import { createIdMappingState } from "./shared/idMapper";
-import { bindingsV10 } from "./10/bindings";
-import { bindingsV11 } from "./11/bindings";
+import { createRenderer, RendererConfig } from "./shared/renderer.ts";
+import { setupOptionsV10 } from "./10/options.ts";
+import parseSemverish from "./parse-semverish.ts";
+import { PortPageHook } from "./adapter/port.ts";
+import { PROFILE_RELOAD, STATS_RELOAD } from "../constants.ts";
+import { setupOptionsV11 } from "./11/options.ts";
+import { newProfiler } from "./adapter/profiler.ts";
+import { createIdMappingState } from "./shared/idMapper.ts";
+import { bindingsV10 } from "./10/bindings.ts";
+import { bindingsV11 } from "./11/bindings.ts";
 
 export type EmitterFn = (event: string, data: any) => void;
 
@@ -154,8 +158,8 @@ export function createHook(port: PortPageHook): DevtoolsHook {
 	};
 
 	// Delete all roots when the current frame is closed
-	window.addEventListener("pagehide", () => {
-		renderers.forEach(r => {
+	globalThis.addEventListener("pagehide", () => {
+		renderers.forEach((r) => {
 			if (r.clear) r.clear();
 		});
 	});
@@ -164,14 +168,14 @@ export function createHook(port: PortPageHook): DevtoolsHook {
 	// happy with having site specific code in the extension, but
 	// codesandbox is very popular among the Preact/React community
 	// so this will get us started
-	window.addEventListener("message", e => {
+	globalThis.addEventListener("message", (e) => {
 		if (
 			renderers.size > 0 &&
 			e.data &&
 			e.data.codesandbox &&
 			e.data.type === "compile"
 		) {
-			renderers.forEach(r => {
+			renderers.forEach((r) => {
 				if (r.clear) r.clear();
 			});
 		}
@@ -276,7 +280,7 @@ export function createHook(port: PortPageHook): DevtoolsHook {
 			);
 			return -1;
 		},
-		attach: renderer => attachRenderer(renderer, { renderReasons: false }),
-		detach: id => renderers.delete(id),
+		attach: (renderer) => attachRenderer(renderer, { renderReasons: false }),
+		detach: (id) => renderers.delete(id),
 	};
 }

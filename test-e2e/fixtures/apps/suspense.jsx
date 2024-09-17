@@ -4,7 +4,7 @@ import { Suspense } from "preact/compat";
 let loading = true;
 
 function withDelay(ms) {
-	const promise = new Promise(resolve => setTimeout(resolve, ms)).then(() => {
+	const promise = new Promise((resolve) => setTimeout(resolve, ms)).then(() => {
 		loading = false;
 	});
 

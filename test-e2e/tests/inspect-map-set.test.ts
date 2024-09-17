@@ -1,5 +1,5 @@
 import { expect, test } from "@playwright/test";
-import { getHooks, getProps, gotoTest, locateTreeItem } from "../pw-utils";
+import { getHooks, getProps, gotoTest, locateTreeItem } from "../pw-utils.ts";
 
 test("Inspect Map and Set objects", async ({ page }) => {
 	const { devtools } = await gotoTest(page, "inspect-map-set");

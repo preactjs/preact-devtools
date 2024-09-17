@@ -1,19 +1,19 @@
 import { h } from "preact";
-import { useStore } from "../../store/react-bindings";
-import { useEffect, useState, useRef, useCallback } from "preact/hooks";
-import { getLastChild } from "../tree/windowing";
-import { useKeyListNav } from "../tree/keyboard";
-import { useSelection } from "../../store/selection";
-import { useCollapser } from "../../store/collapser";
-import { BackgroundLogo } from "./background-logo";
-import { useSearch } from "../../store/search";
-import { useResize } from "../utils";
-import { ID } from "../../store/types";
-import { debounce } from "../../../shells/shared/utils";
-import { EmitFn } from "../../../adapter/hook";
-import { useVirtualizedList } from "./VirtualizedList";
-import { useAutoIndent } from "./useAutoIndent";
-import { Hoc } from "../sidebar/HocPanel";
+import { useStore } from "../../store/react-bindings.ts";
+import { useCallback, useEffect, useRef, useState } from "preact/hooks";
+import { getLastChild } from "../tree/windowing.ts";
+import { useKeyListNav } from "../tree/keyboard.ts";
+import { useSelection } from "../../store/selection.ts";
+import { useCollapser } from "../../store/collapser.ts";
+import { BackgroundLogo } from "./background-logo.tsx";
+import { useSearch } from "../../store/search.ts";
+import { useResize } from "../utils.ts";
+import { ID } from "../../store/types.ts";
+import { debounce } from "../../../shells/shared/utils.ts";
+import { EmitFn } from "../../../adapter/hook.ts";
+import { useVirtualizedList } from "./VirtualizedList.tsx";
+import { useAutoIndent } from "./useAutoIndent.ts";
+import { Hoc } from "../sidebar/HocPanel.tsx";
 
 const ROW_HEIGHT = 18;
 
@@ -32,11 +32,11 @@ export function TreeView() {
 	const onKeyDown = useKeyListNav({
 		selected,
 		onCollapse: collapseNode,
-		canCollapse: id => {
+		canCollapse: (id) => {
 			const node = store.nodes.value.get(id);
 			return node ? node.children.length > 0 : false;
 		},
-		checkCollapsed: id => collapsed.has(id),
+		checkCollapsed: (id) => collapsed.has(id),
 		onNext: () => {
 			selectNext();
 			const s = store.selection.selected.value;
@@ -110,9 +110,10 @@ export function TreeView() {
 						<p class="tree-view-empty-descr">
 							<small>
 								If this message doesn&apos;t go away Preact started rendering
-								before devtools was initialized. You can fix this by adding the{" "}
-								<code>preact/debug</code> or <code>preact/devtools</code> import
-								at the <b>top</b> of your entry file.
+								before devtools was initialized. You can fix this by adding the
+								{" "}
+								<code>preact/debug</code> or <code>preact/devtools</code>{" "}
+								import at the <b>top</b> of your entry file.
 							</small>
 						</p>
 					</div>
@@ -220,18 +221,22 @@ export function TreeItem(props: { key: any; id: ID; top: number }) {
 				{node.children.length === 0 && <div class="tree-view-no-collapse" />}
 				<span class="tree-view-name">
 					<MarkResult text={node.name} id={id} />
-					{node.key ? (
-						<span class="tree-view-key-label">
-							{" "}
-							key=&quot;
-							<span class="tree-view-key">
-								{node.key.length > 15 ? `${node.key.slice(0, 15)}…` : node.key}
+					{node.key
+						? (
+							<span class="tree-view-key-label">
+								{" "}
+								key=&quot;
+								<span class="tree-view-key">
+									{node.key.length > 15
+										? `${node.key.slice(0, 15)}…`
+										: node.key}
+								</span>
+								&quot;
 							</span>
-							&quot;
-						</span>
-					) : (
-						""
-					)}
+						)
+						: (
+							""
+						)}
 					{filterHoc && node.hocs && node.hocs.length > 0 && (
 						<HocLabels hocs={node.hocs} nodeId={id} />
 					)}

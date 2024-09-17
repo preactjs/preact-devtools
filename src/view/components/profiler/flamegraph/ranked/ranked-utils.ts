@@ -1,7 +1,7 @@
-import { NodeTransform } from "../shared";
-import { CommitData } from "../../data/commits";
-import { getGradient } from "../../data/gradient";
-import { ID, DevNode } from "../../../../store/types";
+import { NodeTransform } from "../shared.ts";
+import { CommitData } from "../../data/commits.ts";
+import { getGradient } from "../../data/gradient.ts";
+import { DevNode, ID } from "../../../../store/types.ts";
 
 const MIN_WIDTH = 4;
 
@@ -36,7 +36,7 @@ export function placeRanked(
 	const scale = (canvasWidth || 1) / selectedDuration;
 	let maximized = true;
 
-	return sorted.map(pos => {
+	return sorted.map((pos) => {
 		// Ensure nodes are always visible
 		const width = maximized
 			? canvasWidth

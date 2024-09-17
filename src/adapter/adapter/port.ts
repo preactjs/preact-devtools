@@ -1,5 +1,5 @@
-import { DevtoolEvents } from "../hook";
-import { DevtoolsToClient, PageHookName } from "../../constants";
+import { DevtoolEvents } from "../hook.ts";
+import { DevtoolsToClient, PageHookName } from "../../constants.ts";
 
 export interface BaseEvent<K extends string, T> {
 	type: K;
@@ -8,9 +8,9 @@ export interface BaseEvent<K extends string, T> {
 
 export function listenToDevtools<
 	K extends keyof DevtoolEvents,
-	T extends DevtoolEvents[K]
+	T extends DevtoolEvents[K],
 >(ctx: Window, type: K, callback: (message: T) => void) {
-	ctx.addEventListener("message", e => {
+	ctx.addEventListener("message", (e) => {
 		if (e.source === window && e.data.source === DevtoolsToClient) {
 			const data = e.data;
 			if (data.type === type) callback(data.data);
@@ -20,9 +20,9 @@ export function listenToDevtools<
 
 export function listenToPageHook<
 	K extends keyof DevtoolEvents,
-	T extends DevtoolEvents[K]
+	T extends DevtoolEvents[K],
 >(ctx: Window, type: K, callback: (message: T) => void) {
-	ctx.addEventListener("message", e => {
+	ctx.addEventListener("message", (e) => {
 		if (e.source === window && e.data.source === PageHookName) {
 			const data = e.data;
 			if (data.type === type) callback(data.data);

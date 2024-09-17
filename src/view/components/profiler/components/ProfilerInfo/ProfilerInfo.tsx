@@ -1,6 +1,6 @@
 import { h } from "preact";
-import { useStore } from "../../../../store/react-bindings";
-import { RecordBtn } from "../TimelineBar/TimelineBar";
+import { useStore } from "../../../../store/react-bindings.ts";
+import { RecordBtn } from "../TimelineBar/TimelineBar.tsx";
 
 export function ProfilerInfo() {
 	const store = useStore();

@@ -1,4 +1,4 @@
-import { h, render, Fragment } from "preact";
+import { Fragment, h, render } from "preact";
 
 const css = "background: peachpuff; padding: 2rem; margin-bottom: 1rem;";
 

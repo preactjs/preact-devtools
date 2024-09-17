@@ -1,5 +1,5 @@
 import { expect } from "chai";
-import { sortRoots } from "./utils";
+import { sortRoots } from "./utils.ts";
 
 const div = (id: string) => {
 	const el = document.createElement("div");

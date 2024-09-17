@@ -1,5 +1,5 @@
-import { test, expect } from "@playwright/test";
-import { gotoTest } from "../pw-utils";
+import { expect, test } from "@playwright/test";
+import { gotoTest } from "../pw-utils.ts";
 
 test("Highlighting nested elements affects overlay size", async ({ page }) => {
 	const { devtools } = await gotoTest(page, "counter");

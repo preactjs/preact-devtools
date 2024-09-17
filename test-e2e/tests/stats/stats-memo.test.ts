@@ -1,5 +1,5 @@
 import { expect, test } from "@playwright/test";
-import { locateTab, gotoTest, clickRecordButton } from "../../pw-utils";
+import { clickRecordButton, gotoTest, locateTab } from "../../pw-utils.ts";
 
 test("Skip memoized components for stats", async ({ page }) => {
 	const { devtools } = await gotoTest(page, "memo-stats");

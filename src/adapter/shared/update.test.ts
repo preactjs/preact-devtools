@@ -1,5 +1,5 @@
 import { expect } from "chai";
-import { setInCopy } from "./serialize";
+import { setInCopy } from "./serialize.ts";
 
 describe("setInCopy", () => {
 	it("should update arrays", () => {

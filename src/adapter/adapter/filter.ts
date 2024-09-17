@@ -1,4 +1,4 @@
-import { RawFilter } from "../../view/store/filter";
+import { RawFilter } from "../../view/store/filter.ts";
 
 export interface RawFilterState {
 	regex: RawFilter[];
@@ -49,7 +49,9 @@ export function parseFilters(raw: RawFilterState): FilterState {
 	if (raw.type.textSignal) type.add("textSignal");
 
 	return {
-		regex: raw.regex.filter(x => x.enabled).map(x => new RegExp(x.value, "gi")),
+		regex: raw.regex.filter((x) => x.enabled).map((x) =>
+			new RegExp(x.value, "gi")
+		),
 		type,
 	};
 }

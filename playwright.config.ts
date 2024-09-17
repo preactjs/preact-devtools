@@ -1,7 +1,7 @@
-import type { PlaywrightTestConfig } from "@playwright/test";
-import path from "path";
+import { defineConfig } from "@playwright/test";
+import path from "node:path";
 
-const config: PlaywrightTestConfig = {
+export default defineConfig({
 	use: {
 		viewport: { width: 1280, height: 768 },
 		ignoreHTTPSErrors: true,
@@ -18,5 +18,4 @@ const config: PlaywrightTestConfig = {
 		timeout: 120 * 1000,
 		reuseExistingServer: true,
 	},
-};
-export default config;
+});

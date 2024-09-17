@@ -1,7 +1,7 @@
-import { DevNodeType } from "../../view/store/types";
-import { MsgTypes } from "../protocol/events";
-import { PreactBindings, SharedVNode } from "./bindings";
-import { getDevtoolsType, RendererConfig } from "./renderer";
+import { DevNodeType } from "../../view/store/types.ts";
+import { MsgTypes } from "../protocol/events.ts";
+import { PreactBindings, SharedVNode } from "./bindings.ts";
+import { getDevtoolsType, RendererConfig } from "./renderer.ts";
 
 export enum DiffType {
 	UNKNOWN = 0,
@@ -56,6 +56,7 @@ export function updateDiffStats(
 	diff: DiffType,
 	childCount: number,
 ) {
+	// eslint-disable-next-line no-unused-vars
 	const idx = getChildCountIdx(childCount);
 	if (diff === DiffType.KEYED) {
 		stats.keyed[idx]++;
@@ -213,6 +214,7 @@ export function recordComponentStats<T extends SharedVNode>(
 	children: Array<T | null | undefined>,
 ) {
 	const childrenLen = children.length;
+	// eslint-disable-next-line no-unused-vars
 	const idx = getChildCountIdx(childrenLen);
 
 	if (bindings.isComponent(vnode)) {

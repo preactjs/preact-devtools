@@ -10,7 +10,7 @@ export interface RadioBarProps {
 export function RadioBar(props: RadioBarProps) {
 	return (
 		<span class="radio-bar">
-			{props.items.map(x => {
+			{props.items.map((x) => {
 				return (
 					<label key={x.value}>
 						<input

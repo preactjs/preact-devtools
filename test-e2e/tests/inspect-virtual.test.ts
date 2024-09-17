@@ -1,5 +1,5 @@
-import { test, expect } from "@playwright/test";
-import { gotoTest, wait } from "../pw-utils";
+import { expect, test } from "@playwright/test";
+import { gotoTest, wait } from "../pw-utils.ts";
 
 test("Scroll a virtualized element into view #333", async ({ page }) => {
 	const { devtools } = await gotoTest(page, "deep-tree-2");

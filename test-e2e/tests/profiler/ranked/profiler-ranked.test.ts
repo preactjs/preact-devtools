@@ -1,14 +1,12 @@
 import { expect, test } from "@playwright/test";
 import {
 	clickRecordButton,
-	locateTab,
 	gotoTest,
 	locateProfilerTab,
-} from "../../../pw-utils";
+	locateTab,
+} from "../../../pw-utils.ts";
 
-test("Ranked profile view should only show nodes of the current commit", async ({
-	page,
-}) => {
+test("Ranked profile view should only show nodes of the current commit", async ({ page }) => {
 	const { devtools } = await gotoTest(page, "profiler-2");
 
 	await devtools.locator(locateTab("PROFILER")).click();

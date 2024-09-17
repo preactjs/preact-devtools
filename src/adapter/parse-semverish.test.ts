@@ -1,4 +1,4 @@
-import parseSemverish from "./parse-semverish";
+import parseSemverish from "./parse-semverish.ts";
 import { expect } from "chai";
 
 describe("parse-semverish", () => {

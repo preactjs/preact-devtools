@@ -1,18 +1,18 @@
 import { h } from "preact";
 import s from "../../Devtools.module.css";
-import { ThemeSwitcher } from "../../ThemeSwitcher";
-import { TimelineBar } from "./TimelineBar/TimelineBar";
-import { FlameGraph } from "../flamegraph/FlameGraph";
-import { SidebarHeader } from "./SidebarHeader";
-import { RenderedAt } from "./RenderedAt/RenderedAt";
-import { ProfilerInfo } from "./ProfilerInfo/ProfilerInfo";
-import { CommitInfo } from "./CommitInfo/CommitInfo";
-import { RenderReasons } from "./RenderReasons";
-import { DebugProfilerInfo } from "./CommitInfo/DebugInfo";
-import { DebugNodeNav } from "./RenderedAt/DebugNodeNav";
-import { useStore } from "../../../store/react-bindings";
-import { SidebarLayout } from "../../SidebarLayout";
-import { Message, MessageBtn } from "../../Message/Message";
+import { ThemeSwitcher } from "../../ThemeSwitcher.tsx";
+import { TimelineBar } from "./TimelineBar/TimelineBar.tsx";
+import { FlameGraph } from "../flamegraph/FlameGraph.tsx";
+import { SidebarHeader } from "./SidebarHeader.tsx";
+import { RenderedAt } from "./RenderedAt/RenderedAt.tsx";
+import { ProfilerInfo } from "./ProfilerInfo/ProfilerInfo.tsx";
+import { CommitInfo } from "./CommitInfo/CommitInfo.tsx";
+import { RenderReasons } from "./RenderReasons.tsx";
+import { DebugProfilerInfo } from "./CommitInfo/DebugInfo.tsx";
+import { DebugNodeNav } from "./RenderedAt/DebugNodeNav.tsx";
+import { useStore } from "../../../store/react-bindings.ts";
+import { SidebarLayout } from "../../SidebarLayout.tsx";
+import { Message, MessageBtn } from "../../Message/Message.tsx";
 
 export function Profiler() {
 	const store = useStore();

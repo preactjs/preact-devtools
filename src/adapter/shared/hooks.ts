@@ -4,13 +4,13 @@ import {
 	parseProps,
 	PropData,
 	PropDataType,
-} from "../../view/components/sidebar/inspect/parseProps";
-import { RendererConfig } from "./renderer";
-import { isEditable, serialize } from "./serialize";
-import { HookState, PreactBindings, SharedVNode } from "./bindings";
-import { OptionsV11 } from "../11/options";
-import { OptionsV10 } from "../10/options";
-import { flattenChildren } from "../../view/components/tree/windowing";
+} from "../../view/components/sidebar/inspect/parseProps.ts";
+import { RendererConfig } from "./renderer.ts";
+import { isEditable, serialize } from "./serialize.ts";
+import { HookState, PreactBindings, SharedVNode } from "./bindings.ts";
+import { OptionsV11 } from "../11/options.ts";
+import { OptionsV10 } from "../10/options.ts";
+import { flattenChildren } from "../../view/components/tree/windowing.ts";
 
 export enum HookType {
 	useState = 1,
@@ -64,7 +64,7 @@ export function addDebugValue(value: any) {
 	const location = last.stack
 		.reverse()
 		.slice(0, -1)
-		.map(x => (x.name === "root" ? x.name : `${x.location}.${x.name}`))
+		.map((x) => (x.name === "root" ? x.name : `${x.location}.${x.name}`))
 		.join(".");
 
 	debugValues.set(location, value);
@@ -83,12 +83,14 @@ export function addHookStack(type: HookType) {
 	}
 
 	// By default browser limit stack trace length to 10 entries
+	// @ts-ignore proprietary v8 API
 	const oldLimit = Error.stackTraceLimit;
+	// @ts-ignore proprietary v8 API
 	Error.stackTraceLimit = 1000;
 
 	const err = new Error();
 	let stack = err.stack ? parseStackTrace(err.stack) : [];
-	const ancestorIdx = stack.findIndex(x => x.name === ancestorName);
+	const ancestorIdx = stack.findIndex((x) => x.name === ancestorName);
 
 	if (ancestorIdx > -1 && stack.length > 0) {
 		// Remove `addHookStack` + `options._hook` + `getHookState` from stack
@@ -117,15 +119,16 @@ export function addHookStack(type: HookType) {
 		const next = stack[i + 1];
 		normalized.push({
 			name: frame.name,
-			location: `${next.fileName.replace(window.origin, "")}:${next.line}:${
-				next.column
-			}`,
+			location: `${
+				next.fileName.replace(globalThis.origin, "")
+			}:${next.line}:${next.column}`,
 		});
 	}
 
 	hookLog.push({ type, stack: normalized });
 
 	// Restore original stack trace limit
+	// @ts-ignore proprietary v8 API
 	Error.stackTraceLimit = oldLimit;
 }
 
@@ -207,9 +210,8 @@ export function parseHookData<T extends SharedVNode>(
 							nodeType = hookValueTree[0].type;
 						}
 					}
-					editable =
-						(hook.type === HookType.useState ||
-							hook.type === HookType.useReducer) &&
+					editable = (hook.type === HookType.useState ||
+						hook.type === HookType.useReducer) &&
 						isEditable(rawValue);
 				}
 
@@ -222,9 +224,9 @@ export function parseHookData<T extends SharedVNode>(
 					type: nodeType,
 					meta: isNative
 						? {
-								index: hookIdx,
-								type,
-						  }
+							index: hookIdx,
+							type,
+						}
 						: frame.name,
 					value,
 					index: hookIdx,
@@ -237,7 +239,7 @@ export function parseHookData<T extends SharedVNode>(
 				}
 
 				if (hookValueTree.length) {
-					hookValueTree.forEach(v => {
+					hookValueTree.forEach((v) => {
 						tree.set(v.id, v);
 						out.push(v);
 					});
@@ -264,8 +266,8 @@ export function inspectHooks<T extends SharedVNode>(
 	ancestorName = parseStackTrace(new Error().stack!)[0].name;
 
 	const c = helpers.getComponent(vnode)!;
-	const isClass =
-		(vnode.type as any).prototype && (vnode.type as any).prototype.render;
+	const isClass = (vnode.type as any).prototype &&
+		(vnode.type as any).prototype.render;
 
 	// Disable hook effects
 	(options as any)._skipEffects = (options as any).__s = true;
@@ -294,7 +296,7 @@ export function inspectHooks<T extends SharedVNode>(
 
 		statefulHooks = helpers.getStatefulHooks(vnode);
 		if (statefulHooks !== null) {
-			pendingValues = statefulHooks.map(s => helpers.getPendingHookValue(s));
+			pendingValues = statefulHooks.map((s) => helpers.getPendingHookValue(s));
 		}
 
 		const dummy = {

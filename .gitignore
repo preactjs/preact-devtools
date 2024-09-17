@@ -83,3 +83,7 @@ profiles/chrome/*
 .DS_Store
 
 test-results/
+/test-results/
+/playwright-report/
+/blob-report/
+/playwright/.cache/

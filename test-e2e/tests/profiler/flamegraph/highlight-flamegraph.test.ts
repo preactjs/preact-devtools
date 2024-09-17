@@ -1,11 +1,11 @@
-import { test, expect } from "@playwright/test";
+import { expect, test } from "@playwright/test";
 import {
 	clickRecordButton,
-	locateTab,
 	gotoTest,
 	locateFlame,
+	locateTab,
 	wait,
-} from "../../../pw-utils";
+} from "../../../pw-utils.ts";
 
 test("Should highlight flamegraph node if present in DOM", async ({ page }) => {
 	const { devtools } = await gotoTest(page, "profiler-highlight");
@@ -20,5 +20,5 @@ test("Should highlight flamegraph node if present in DOM", async ({ page }) => {
 	await wait(1000);
 
 	const log = (await page.evaluate(() => (window as any).log)) as any[];
-	expect(log.filter(x => x.type === "highlight").length).toEqual(1);
+	expect(log.filter((x) => x.type === "highlight").length).toEqual(1);
 });

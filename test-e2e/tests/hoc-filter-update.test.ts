@@ -1,5 +1,5 @@
 import { expect, test } from "@playwright/test";
-import { getTreeItems, gotoTest, locateTreeItem } from "../pw-utils";
+import { getTreeItems, gotoTest, locateTreeItem } from "../pw-utils.ts";
 
 test("HOC-Component should work with updates", async ({ page }) => {
 	const { devtools } = await gotoTest(page, "hoc-update");

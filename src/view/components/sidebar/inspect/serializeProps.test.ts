@@ -1,5 +1,5 @@
 import { expect } from "chai";
-import { serializeProps } from "./serializeProps";
+import { serializeProps } from "./serializeProps.ts";
 
 describe("serializeProps", () => {
 	it("should serialize primitives", () => {

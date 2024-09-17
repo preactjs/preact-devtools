@@ -1,10 +1,10 @@
-import { ID } from "../view/store/types";
-import { FilterState } from "./adapter/filter";
-import { InspectData, UpdateType } from "./adapter/adapter";
-import { SharedVNode } from "./shared/bindings";
-import { VNodeTimings } from "./shared/timings";
-import { RenderReasonData } from "./shared/renderReasons";
-import { RootData } from "./shared/utils";
+import { ID } from "../view/store/types.ts";
+import { FilterState } from "./adapter/filter.ts";
+import { InspectData, UpdateType } from "./adapter/adapter.ts";
+import { SharedVNode } from "./shared/bindings.ts";
+import { VNodeTimings } from "./shared/timings.ts";
+import { RenderReasonData } from "./shared/renderReasons.ts";
+import { RootData } from "./shared/utils.ts";
 
 export type ObjPath = Array<string | number>;
 

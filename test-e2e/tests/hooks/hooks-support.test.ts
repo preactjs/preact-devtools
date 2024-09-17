@@ -1,5 +1,5 @@
 import { test } from "@playwright/test";
-import { clickTreeItem, gotoTest } from "../../pw-utils";
+import { clickTreeItem, gotoTest } from "../../pw-utils.ts";
 
 test('Show "hooks not supported" warning', async ({ page }) => {
 	const { devtools } = await gotoTest(page, "hooks-support", {

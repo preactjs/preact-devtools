@@ -1,4 +1,4 @@
-import { AppCtx } from "./react-bindings";
+import { AppCtx } from "./react-bindings.ts";
 import { Signal } from "@preact/signals";
 import { useContext } from "preact/hooks";
 

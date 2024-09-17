@@ -1,5 +1,5 @@
-import { test, expect } from "@playwright/test";
-import { gotoTest, waitForPass } from "../pw-utils";
+import { expect, test } from "@playwright/test";
+import { gotoTest, waitForPass } from "../pw-utils.ts";
 
 test("Show vnode key in the sidebar", async ({ page }) => {
 	const { devtools } = await gotoTest(page, "keys");

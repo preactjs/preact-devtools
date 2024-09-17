@@ -1,12 +1,12 @@
 import { test } from "@playwright/test";
 import {
 	clickRecordButton,
-	locateTab,
 	gotoTest,
 	locateFlame,
-	wait,
 	locateProfilerTab,
-} from "../../../pw-utils";
+	locateTab,
+	wait,
+} from "../../../pw-utils.ts";
 
 test("Should highlight flamegraph node if present in DOM", async ({ page }) => {
 	const { devtools } = await gotoTest(page, "profiler-highlight");

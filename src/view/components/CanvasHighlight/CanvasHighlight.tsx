@@ -1,6 +1,6 @@
 import { h } from "preact";
 import { useRef } from "preact/hooks";
-import { useResize } from "../utils";
+import { useResize } from "../utils.ts";
 import s from "./CanvasHighlight.module.css";
 
 export function CanvasHighlight() {

@@ -1,11 +1,11 @@
 import { h } from "preact";
-import { useStore } from "../../store/react-bindings";
+import { useStore } from "../../store/react-bindings.ts";
 import { useCallback } from "preact/hooks";
-import { Theme } from "../../store/types";
-import { RadioBar } from "../RadioBar";
-import { Checkbox } from "../Checkbox/Checkbox";
-import { Message } from "../Message/Message";
-import { PageLayout } from "../SidebarLayout";
+import { Theme } from "../../store/types.ts";
+import { RadioBar } from "../RadioBar.tsx";
+import { Checkbox } from "../Checkbox/Checkbox.tsx";
+import { Message } from "../Message/Message.tsx";
+import { PageLayout } from "../SidebarLayout.tsx";
 
 export function Settings() {
 	const store = useStore();
@@ -46,8 +46,7 @@ export function Settings() {
 						<Checkbox
 							checked={renderReasons}
 							onChange={() =>
-								store.profiler.setRenderReasonCapture(!renderReasons)
-							}
+								store.profiler.setRenderReasonCapture(!renderReasons)}
 							testId="toggle-render-reason"
 						>
 							Capture render reasons

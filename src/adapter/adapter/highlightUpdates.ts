@@ -1,5 +1,5 @@
-import { render, h } from "preact";
-import { CanvasHighlight } from "../../view/components/CanvasHighlight/CanvasHighlight";
+import { h, render } from "preact";
+import { CanvasHighlight } from "../../view/components/CanvasHighlight/CanvasHighlight.tsx";
 
 const DISPLAY_DURATION = 250;
 const MAX_DISPLAY_DURATION = 3000;
@@ -36,9 +36,9 @@ export function measureUpdate(updates: UpdateRects, dom: HTMLElement) {
 	const now = performance.now();
 	const expirationTime = data
 		? Math.min(
-				now + MAX_DISPLAY_DURATION,
-				data.expirationTime + DISPLAY_DURATION,
-		  )
+			now + MAX_DISPLAY_DURATION,
+			data.expirationTime + DISPLAY_DURATION,
+		)
 		: now + DISPLAY_DURATION;
 
 	updates.set(dom, {
@@ -70,7 +70,7 @@ export function drawRect(ctx: CanvasRenderingContext2D, data: UpdateRect) {
 	ctx.strokeRect(data.x, data.y, data.width, data.height);
 }
 
-let timer: NodeJS.Timeout;
+let timer: any;
 
 let container: HTMLDivElement | null = null;
 let canvas: HTMLCanvasElement | null = null;

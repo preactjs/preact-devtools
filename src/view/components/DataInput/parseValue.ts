@@ -60,7 +60,7 @@ export function genPreview(v: any): string {
 		}
 
 		if (Array.isArray(v)) {
-			return `[${v.map(x => genPreview(x)).join(", ")}]`;
+			return `[${v.map((x) => genPreview(x)).join(", ")}]`;
 		}
 		if (Object.keys(v).length === 2) {
 			if (v.type === "vnode") return `<${truncate(v.name)} />`;
@@ -73,7 +73,7 @@ export function genPreview(v: any): string {
 			if (v.type === "bigint") return `${v.value}n`;
 		}
 
-		const obj = Object.entries(v).map(x => {
+		const obj = Object.entries(v).map((x) => {
 			return `${x[0]}: ${genPreview(x[1])}`;
 		});
 		return `{${obj.join(", ")}}`;

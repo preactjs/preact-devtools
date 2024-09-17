@@ -1,22 +1,20 @@
 import * as esbuild from "esbuild";
-import path from "path";
-import fs from "fs/promises";
+import path from "node:path";
+import fs from "node:fs/promises";
 import {
 	archivePlugin,
 	babelPlugin,
 	copyPlugin,
 	cssModules,
+	gitSourcePlugin,
 	inlineHookPlugin,
 	renamePlugin,
 	spritePlugin,
-	gitSourcePlugin,
 } from "./build-plugins/esbuild-plugins.mjs";
-import * as fsExtra from "fs-extra";
 import mri from "mri";
 import * as kl from "kolorist";
-import { fileURLToPath } from "url";
 
-const __dirname = path.dirname(fileURLToPath(import.meta.url));
+const __dirname = import.meta.dirname;
 
 const args = mri(process.argv.slice(2), {
 	string: ["browser"],
@@ -54,13 +52,15 @@ if (browsers.length === 0) {
 const DEBUG = !!args.debug;
 
 async function run() {
-	browsers.forEach(browser => {
+	browsers.forEach((browser) => {
 		if (!BROWSERS.includes(browser)) {
 			// eslint-disable-next-line no-console
 			console.error(
-				`Unknown browser: "${browser}". Expected one of: ${BROWSERS.join(
-					", ",
-				)}`,
+				`Unknown browser: "${browser}". Expected one of: ${
+					BROWSERS.join(
+						", ",
+					)
+				}`,
 			);
 			process.exit(1);
 		}
@@ -84,7 +84,7 @@ async function build(browser) {
 	console.log(`${kl.dim("Browser:")} ${kl.cyan(browser)}`);
 	const start = Date.now();
 
-	await fsExtra.remove(dist);
+	await fs.remove(dist, { recursive: true });
 
 	const isInline = browser === "inline";
 	/** @type {string[] | undefined} */
@@ -116,50 +116,48 @@ async function build(browser) {
 		external,
 		entryPoints: isInline
 			? {
-					"panel/panel": "src/shells/shared/panel/panel.ts",
-					client: "src/shells/shared/installHook.ts",
-			  }
+				"panel/panel": "src/shells/shared/panel/panel.ts",
+				client: "src/shells/shared/installHook.ts",
+			}
 			: {
-					"panel/panel": "src/shells/shared/panel/panel.ts",
-					"background/background": "src/shells/shared/background/background.ts",
-					"content-script": "src/shells/shared/content-script.ts",
-					installHook: "src/shells/shared/installHook.ts",
-			  },
+				"panel/panel": "src/shells/shared/panel/panel.ts",
+				"background/background": "src/shells/shared/background/background.ts",
+				"content-script": "src/shells/shared/content-script.ts",
+				installHook: "src/shells/shared/installHook.ts",
+			},
 		plugins: [
 			cssModules(),
 			babelPlugin(define),
 			copyPlugin(
 				isInline
 					? {
-							"src/shells/shared/panel/panel.html": path.join(dist, "panel"),
-							"src/view/sprite.svg": path.join(dist, "panel"),
-					  }
+						"src/shells/shared/panel/panel.html": path.join(dist, "panel"),
+						"src/view/sprite.svg": path.join(dist, "panel"),
+					}
 					: {
-							[`src/shells/${browser}/manifest.json`]: dist,
-							"src/shells/shared/panel/empty-panel.html": path.join(
-								dist,
-								"panel",
-							),
-							"src/shells/shared/panel/panel.html": path.join(dist, "panel"),
-							"src/shells/shared/icons": dist,
-							"src/shells/shared/popup/enabled.html": path.join(dist, "popup"),
-							"src/shells/shared/popup/disabled.html": path.join(dist, "popup"),
-					  },
+						[`src/shells/${browser}/manifest.json`]: dist,
+						"src/shells/shared/panel/empty-panel.html": path.join(
+							dist,
+							"panel",
+						),
+						"src/shells/shared/panel/panel.html": path.join(dist, "panel"),
+						"src/shells/shared/icons": dist,
+						"src/shells/shared/popup/enabled.html": path.join(dist, "popup"),
+						"src/shells/shared/popup/disabled.html": path.join(dist, "popup"),
+					},
 			),
 			!isInline &&
-				renamePlugin({
-					[`${dist}/installHook.css`]: `${dist}/preact-devtools-page.css`,
-				}),
+			renamePlugin({
+				[`${dist}/installHook.css`]: `${dist}/preact-devtools-page.css`,
+			}),
 			!isInline && inlineHookPlugin(dist),
 
 			spritePlugin(
 				path.join(__dirname, "..", "src", "view", "sprite.svg"),
-				isInline
-					? [path.join(dist, "panel", "panel.html")]
-					: [
-							path.join(dist, "panel", "panel.html"),
-							path.join(dist, "panel", "empty-panel.html"),
-					  ],
+				isInline ? [path.join(dist, "panel", "panel.html")] : [
+					path.join(dist, "panel", "panel.html"),
+					path.join(dist, "panel", "empty-panel.html"),
+				],
 			),
 			!isInline && archivePlugin("dist", browser, DEBUG),
 			!isInline && !process.env.CI && gitSourcePlugin(),

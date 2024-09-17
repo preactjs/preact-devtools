@@ -1,5 +1,4 @@
-import { h } from "preact";
-import { ComponentChildren } from "preact";
+import { ComponentChildren, h } from "preact";
 
 export interface IconBtnProps {
 	active?: boolean;
@@ -22,7 +21,7 @@ export function IconBtn(props: IconBtnProps) {
 			title={props.title}
 			disabled={props.disabled}
 			data-testid={props.testId}
-			onClick={e => {
+			onClick={(e) => {
 				e.stopPropagation();
 				if (props.onClick) props.onClick();
 			}}

@@ -1,7 +1,7 @@
 // This file is not included at runtime. It is only used by
 // the background page to activate or deactivate the icon
 
-import { debug } from "../../../debug";
+import { debug } from "../../../debug.ts";
 
 export function setPopupStatus(tabId: number, enabled?: boolean) {
 	const status = enabled ? "enabled" : "disabled";

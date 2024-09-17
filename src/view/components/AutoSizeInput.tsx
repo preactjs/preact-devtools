@@ -1,10 +1,10 @@
-import { h, Fragment } from "preact";
+import { Fragment, h } from "preact";
 import {
-	useRef,
-	useState,
+	useCallback,
 	useEffect,
 	useLayoutEffect,
-	useCallback,
+	useRef,
+	useState,
 } from "preact/hooks";
 
 const sizerStyle = {
@@ -69,8 +69,8 @@ export function AutoSizeInput(props: Props) {
 				ref={inputRef}
 				value={value}
 				style={`width: ${width}px; min-width: 0`}
-				onInput={e => setValue((e.target as any).value)}
-				onBlur={e => onChange && onChange((e.target as any).value)}
+				onInput={(e) => setValue((e.target as any).value)}
+				onBlur={(e) => onChange && onChange((e.target as any).value)}
 			/>
 			<div ref={ref} style={sizerStyle}>
 				{value}

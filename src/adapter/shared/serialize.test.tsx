@@ -1,9 +1,9 @@
 import { expect } from "chai";
-import { cleanContext, cleanProps, jsonify } from "./serialize";
-import { h, Component, createContext, render } from "preact";
+import { cleanContext, cleanProps, jsonify } from "./serialize.ts";
+import { Component, createContext, h, render } from "preact";
 import { teardown } from "preact/test-utils";
-import { setupScratch } from "./renderer.test";
-import { getActualChildren } from "../10/bindings";
+import { setupScratch } from "./renderer.test.tsx";
+import { getActualChildren } from "../10/bindings.ts";
 
 describe("jsonify", () => {
 	it("should clean circular references", () => {
@@ -78,12 +78,12 @@ describe("cleanProps", () => {
 	});
 
 	it("should filter out __source", () => {
-		const vnode = h("div", { __source: "foo", foo: 1 });
+		const vnode = h("div", { __source: "foo", foo: 1 } as any);
 		expect(cleanProps(vnode.props)).to.deep.equal({ foo: 1 });
 	});
 
 	it("should filter out __self", () => {
-		const vnode = h("div", { __self: "foo", foo: 1 });
+		const vnode = h("div", { __self: "foo", foo: 1 } as any);
 		expect(cleanProps(vnode.props)).to.deep.equal({ foo: 1 });
 	});
 });

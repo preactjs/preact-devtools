@@ -1,10 +1,10 @@
-import { test, expect } from "@playwright/test";
+import { expect, test } from "@playwright/test";
 import {
 	getHooks,
 	gotoTest,
 	locateTreeItem,
 	waitForPass,
-} from "../../pw-utils";
+} from "../../pw-utils.ts";
 
 test("Inspect useContext hook", async ({ page }) => {
 	const { devtools } = await gotoTest(page, "hooks");

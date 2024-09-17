@@ -1,8 +1,8 @@
-import { ID } from "../../store/types";
+import { ID } from "../../store/types.ts";
 
 export function flattenChildren<
 	K,
-	T extends { id: K; children: K[]; depth: number }
+	T extends { id: K; children: K[]; depth: number },
 >(tree: Map<K, T>, id: K, isCollapsed: (id: K) => boolean): K[] {
 	const out: K[] = [];
 	const visited = new Set<K>();
@@ -20,7 +20,7 @@ export function flattenChildren<
 			visited.add(node.id);
 
 			if (!isCollapsed(node.id)) {
-				for (let i = node.children.length; i--; ) {
+				for (let i = node.children.length; i--;) {
 					stack.push(node.children[i]);
 				}
 			}

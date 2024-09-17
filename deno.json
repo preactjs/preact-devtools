@@ -1,0 +1,22 @@
+{
+	"exclude": ["dist/", "test-e2e/fixtures/vendor"],
+	"compilerOptions": {
+		"jsx": "react-jsx",
+		"jsxImportSource": "preact"
+	},
+	"fmt": {
+		"useTabs": true
+	},
+	"lint": {
+		"rules": {
+			"exclude": [
+				"no-window",
+				"no-unused-vars",
+				"no-explicit-any",
+				"require-await",
+				"no-node-globals",
+				"ban-types"
+			]
+		}
+	}
+}

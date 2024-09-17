@@ -1,8 +1,8 @@
-import { getDisplayName, getComponent } from "./bindings";
-import { ID } from "../../view/store/types";
-import { getVNodeById, IdMappingState } from "../shared/idMapper";
-import { SharedVNode } from "../shared/bindings";
-import { RendererConfig } from "../shared/renderer";
+import { getComponent, getDisplayName } from "./bindings.ts";
+import { ID } from "../../view/store/types.ts";
+import { getVNodeById, IdMappingState } from "../shared/idMapper.ts";
+import { SharedVNode } from "../shared/bindings.ts";
+import { RendererConfig } from "../shared/renderer.ts";
 
 /**
  * Pretty print a `VNode` to the browser console. This can be triggered

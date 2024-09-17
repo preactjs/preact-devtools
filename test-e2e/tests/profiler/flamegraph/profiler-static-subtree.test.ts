@@ -1,11 +1,11 @@
-import { test, expect } from "@playwright/test";
+import { expect, test } from "@playwright/test";
 import {
 	clickRecordButton,
-	locateTab,
 	gotoTest,
 	locateFlame,
+	locateTab,
 	wait,
-} from "../../../pw-utils";
+} from "../../../pw-utils.ts";
 
 test("Static subtree should be smaller in size", async ({ page }) => {
 	const { devtools } = await gotoTest(page, "static-subtree");
@@ -26,13 +26,14 @@ test("Static subtree should be smaller in size", async ({ page }) => {
 	await wait(500);
 
 	const res = await devtools.evaluate(() => {
-		const display = document.querySelector('[data-name="Display"]')!
-			.clientWidth;
+		const display = document.querySelector(
+			'[data-name="Display"]',
+		)!.clientWidth;
 		const statics = Array.from(
 			document.querySelectorAll('[data-name="Static"]')!,
-		).map(el => el.clientWidth);
+		).map((el) => el.clientWidth);
 
-		return statics.every(w => w < display);
+		return statics.every((w) => w < display);
 	});
 
 	// Static nodes were bigger than Display

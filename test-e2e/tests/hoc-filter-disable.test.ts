@@ -1,5 +1,5 @@
 import { expect, test } from "@playwright/test";
-import { gotoTest, locateTreeItem } from "../pw-utils";
+import { gotoTest, locateTreeItem } from "../pw-utils.ts";
 
 test("HOC-Component filter should be disabled", async ({ page }) => {
 	const { devtools } = await gotoTest(page, "hoc");
@@ -15,8 +15,8 @@ test("HOC-Component filter should be disabled", async ({ page }) => {
 
 	const items = await devtools
 		.locator('[data-testid="tree-item"]')
-		.evaluateAll(els =>
-			Array.from(els).map(el => el.getAttribute("data-name")),
+		.evaluateAll((els) =>
+			Array.from(els).map((el) => el.getAttribute("data-name"))
 		);
 
 	expect(items).toEqual([

@@ -1,4 +1,4 @@
-import { DevNode } from "../../../store/types";
+import { DevNode } from "../../../store/types.ts";
 
 /**
  * Flatten profiler node tree into a flat list
@@ -22,7 +22,7 @@ export function flattenNodeTree<K, T extends { id: K; children: K[] }>(
 			out.push(node);
 			visited.add(node.id);
 
-			for (let i = node.children.length; i--; ) {
+			for (let i = node.children.length; i--;) {
 				stack.push(node.children[i]);
 			}
 		}

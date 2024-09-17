@@ -1,10 +1,10 @@
 import { h } from "preact";
 import { render } from "@testing-library/preact";
-import { TreeItem } from "./TreeView";
+import { TreeItem } from "./TreeView.tsx";
 import { expect } from "chai";
-import { AppCtx } from "../../store/react-bindings";
-import { createStore } from "../../store";
-import { DevNodeType } from "../../store/types";
+import { AppCtx } from "../../store/react-bindings.ts";
+import { createStore } from "../../store/index.ts";
+import { DevNodeType } from "../../store/types.ts";
 
 describe("TreeItem", () => {
 	it("should limit key length to 15", () => {

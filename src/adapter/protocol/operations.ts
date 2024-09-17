@@ -1,9 +1,9 @@
-import { ID, Tree } from "../../view/store/types";
-import { parseTable } from "./string-table";
-import { MsgTypes } from "./events";
-import { deepClone } from "../shared/utils";
-import { RenderReasonMap } from "../shared/renderReasons";
-import { ParsedStats, parseStats } from "../shared/stats";
+import { ID, Tree } from "../../view/store/types.ts";
+import { parseTable } from "./string-table.ts";
+import { MsgTypes } from "./events.ts";
+import { deepClone } from "../shared/utils.ts";
+import { RenderReasonMap } from "../shared/renderReasons.ts";
+import { ParsedStats, parseStats } from "../shared/stats.ts";
 
 /**
  * This is the heart of the devtools. Here we translate incoming events
@@ -131,7 +131,7 @@ export function ops2Tree(oldTree: Tree, existingRoots: ID[], ops: number[]) {
 				const count = ops[i + 3];
 				let items: string[] | null = null;
 				if (count > 0) {
-					items = ops.slice(i + 4, i + 4 + count).map(x => strings[x - 1]);
+					items = ops.slice(i + 4, i + 4 + count).map((x) => strings[x - 1]);
 				}
 				reasons.set(id, {
 					type,

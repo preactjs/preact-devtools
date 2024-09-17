@@ -1,12 +1,16 @@
-import { HookType } from "../shared/hooks";
+import { HookType } from "../shared/hooks.ts";
 import type { Component, VNode } from "preact";
-import type {
-	Component as IComponent,
-	VNode as IVNode,
-} from "preact/src/internal";
-import { ComponentHooks, HookState, PreactBindings } from "../shared/bindings";
-import { RendererConfig } from "../shared/renderer";
-import { getRenderReasonPost } from "./renderReason";
+import {
+	ComponentHooks,
+	HookState,
+	PreactBindings,
+} from "../shared/bindings.ts";
+import { RendererConfig } from "../shared/renderer.ts";
+import { getRenderReasonPost } from "./renderReason.ts";
+
+// TODO:
+type IComponent = any;
+type IVNode = any;
 
 // Mangle accessors
 
@@ -70,9 +74,9 @@ export function getStatefulHooks(vnode: VNode): HookState[] | null {
 	const hooks = getComponentHooks(vnode);
 	return hooks !== null
 		? hooks._list ||
-				hooks.__ ||
-				hooks.i || // Preact 10.1.0
-				null
+			hooks.__ ||
+			hooks.i || // Preact 10.1.0
+			null
 		: null;
 }
 
@@ -95,12 +99,10 @@ export function getPendingHookValue(state: HookState) {
 	// Preact >= 10.8.1
 	if (state.__pendingValue !== undefined) {
 		return state.__pendingValue;
-	}
-	// Preact > 10.8.1
+	} // Preact > 10.8.1
 	else if (state.__V !== undefined) {
 		return state.__V;
-	}
-	// Preact 10.8.1
+	} // Preact 10.8.1
 	else if (state.o !== undefined) {
 		return state.o;
 	}
@@ -112,12 +114,10 @@ export function setPendingHookValue(state: HookState, value: unknown) {
 	// Preact >= 10.8.1
 	if ("__pendingValue" in state) {
 		state.__pendingValue = value;
-	}
-	// Preact > 10.8.1
+	} // Preact > 10.8.1
 	else if ("__V" in state) {
 		state.__V = value;
-	}
-	// Preact === 10.8.1
+	} // Preact === 10.8.1
 	else if ("o" in state) {
 		state.o = value;
 	}

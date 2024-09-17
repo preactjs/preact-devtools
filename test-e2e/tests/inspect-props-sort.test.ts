@@ -1,5 +1,5 @@
-import { test, expect } from "@playwright/test";
-import { gotoTest, locateTreeItem, getProps } from "../pw-utils";
+import { expect, test } from "@playwright/test";
+import { getProps, gotoTest, locateTreeItem } from "../pw-utils.ts";
 
 test("Inspect should sort object keys", async ({ page }) => {
 	const { devtools } = await gotoTest(page, "props");

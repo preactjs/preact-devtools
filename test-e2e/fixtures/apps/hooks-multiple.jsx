@@ -1,5 +1,5 @@
 import { h, render } from "preact";
-import { useState, useCallback, useMemo } from "preact/hooks";
+import { useCallback, useMemo, useState } from "preact/hooks";
 
 function App() {
 	const [s1, set_s1] = useState(1);

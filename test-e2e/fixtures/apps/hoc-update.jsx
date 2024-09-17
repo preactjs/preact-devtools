@@ -1,5 +1,5 @@
-import { h, Fragment, render, Component } from "preact";
-import { memo, forwardRef } from "preact/compat";
+import { Component, Fragment, h, render } from "preact";
+import { forwardRef, memo } from "preact/compat";
 
 function Foo() {
 	return <p>I am foo</p>;
@@ -24,7 +24,7 @@ function withBoof(Comp) {
 			return (
 				<div>
 					<button
-						onClick={() => this.setState(p => ({ condition: !p.condition }))}
+						onClick={() => this.setState((p) => ({ condition: !p.condition }))}
 					>
 						Update
 					</button>

@@ -8,7 +8,7 @@ let e = { data: "" },
 
 						{ innerHTML: " ", id: "_goober" },
 					)
-			  ).firstChild
+				).firstChild
 			: t || e,
 	r = e => {
 		let r = t(e),
@@ -35,18 +35,18 @@ let e = { data: "" },
 
 									t => (/&/.test(t) ? t.replace(/&/g, e) : e ? e + " " + t : t),
 								),
-						  )
+							)
 						: c),
-				  (a +=
+					(a +=
 						"@" == c[0]
 							? "f" == c[1]
 								? o(s, c)
 								: c + "{" + o(s, "k" == c[1] ? "" : t) + "}"
 							: o(s, r)))
 				: "@" == c[0] && "i" == c[1]
-				? (l = c + " " + s + ";")
-				: ((c = c.replace(/[A-Z]/g, "-$&").toLowerCase()),
-				  (n += o.p ? o.p(c, s) : c + ":" + s + ";"));
+					? (l = c + " " + s + ";")
+					: ((c = c.replace(/[A-Z]/g, "-$&").toLowerCase()),
+						(n += o.p ? o.p(c, s) : c + ":" + s + ";"));
 		}
 
 		return n[0] ? ((r = t ? t + "{" + n + "}" : n), l + r + a) : l + a;
@@ -87,7 +87,7 @@ let e = { data: "" },
 										: t[4] || (r[0][t[1]] = t[2]);
 
 							return r[0];
-					  })(e);
+						})(e);
 
 			n[u] = o(i ? { ["@keyframes " + u]: t } : t, r ? "" : "." + u);
 		}
@@ -110,10 +110,10 @@ let e = { data: "" },
 				n = t
 					? "." + t
 					: e && "object" == typeof e
-					? e.props
-						? ""
-						: o(e, "")
-					: e;
+						? e.props
+							? ""
+							: o(e, "")
+						: e;
 			}
 
 			return e + l + (null == n ? "" : n);
@@ -131,7 +131,7 @@ function p(e) {
 						(e, t) => (t ? Object.assign(e, t.call ? t(r.p) : t) : e),
 
 						{},
-				  )
+					)
 			: l,
 
 		t(r.target),

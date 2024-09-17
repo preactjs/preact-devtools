@@ -1,11 +1,11 @@
-import { inject, injectStyles } from "./utils";
+import { inject, injectStyles } from "./utils.ts";
 import {
-	ContentScriptName,
-	PageHookName,
 	ClientToDevtools,
+	ContentScriptName,
 	DevtoolsToClient,
-} from "../../constants";
-import { debug } from "../../debug";
+	PageHookName,
+} from "../../constants.ts";
+import { debug } from "../../debug.ts";
 
 const enum Status {
 	Disconnected = "disconnected",
@@ -32,15 +32,18 @@ function handleMessage(message: any) {
 		// need to requery the whole component tree
 		if (queue.length === 0) {
 			debug("  refresh tree", message);
-			window.postMessage({ type: "refresh", source: DevtoolsToClient }, "*");
+			globalThis.postMessage(
+				{ type: "refresh", source: DevtoolsToClient },
+				"*",
+			);
 			return;
 		} else {
 			debug("  flush initial queue", queue, message);
-			queue.forEach(ev => connection!.postMessage(ev));
+			queue.forEach((ev) => connection!.postMessage(ev));
 			queue = [];
 		}
 	}
-	window.postMessage({ ...message, source: DevtoolsToClient }, "*");
+	globalThis.postMessage({ ...message, source: DevtoolsToClient }, "*");
 }
 
 /** Handle disconnect from background script */
@@ -50,7 +53,7 @@ function handleDisconnect() {
 }
 
 /** Forward messages from the page to the devtools */
-window.addEventListener("message", e => {
+globalThis.addEventListener("message", (e) => {
 	if (e.source === window && e.data && e.data.source === PageHookName) {
 		const data = e.data;
 		debug("->", data);

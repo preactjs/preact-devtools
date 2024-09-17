@@ -1,7 +1,7 @@
 import { h } from "preact";
-import { SidebarPanel } from "../../../sidebar/SidebarPanel";
-import { formatTime } from "../../util";
-import { useStore } from "../../../../store/react-bindings";
+import { SidebarPanel } from "../../../sidebar/SidebarPanel.tsx";
+import { formatTime } from "../../util.ts";
+import { useStore } from "../../../../store/react-bindings.ts";
 
 export function CommitInfo() {
 	const store = useStore();
@@ -24,7 +24,7 @@ export function CommitInfo() {
 				<dd class="commit-info-value">{formatTime(root.startTime)}</dd>
 				<br />
 				<dt class="commit-info-title">Duration:</dt>
-				<dd class="commit-info-value">{formatTime(commit.duration)} </dd>
+				<dd class="commit-info-value">{formatTime(commit.duration)}</dd>
 			</dl>
 		</SidebarPanel>
 	);

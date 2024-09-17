@@ -1,6 +1,6 @@
 import { h } from "preact";
 import { useEffect, useRef } from "preact/hooks";
-import { useStore } from "../store/react-bindings";
+import { useStore } from "../store/react-bindings.ts";
 
 export function ThemeSwitcher() {
 	const store = useStore();

@@ -1,8 +1,8 @@
 import { h, RefObject } from "preact";
-import { useState, useCallback, useRef, useEffect } from "preact/hooks";
-import { getGradient } from "../../data/gradient";
-import { useResize } from "../../../utils";
-import { Icon } from "../../../icons";
+import { useCallback, useEffect, useRef, useState } from "preact/hooks";
+import { getGradient } from "../../data/gradient.ts";
+import { useResize } from "../../../utils.ts";
+import { Icon } from "../../../icons.tsx";
 
 function calcSize(
 	container: RefObject<HTMLDivElement>,
@@ -31,9 +31,9 @@ function calcSize(
 				: null;
 			const gap = sibling
 				? +window
-						.getComputedStyle(sibling)
-						.getPropertyValue("margin-left")
-						.replace("px", "")
+					.getComputedStyle(sibling)
+					.getPropertyValue("margin-left")
+					.replace("px", "")
 				: 0;
 
 			const full = container.current.offsetWidth;
@@ -48,14 +48,13 @@ function calcSize(
 			const viewport = available > paneWidth ? paneWidth : available;
 
 			const selOffset = itemWidth * (selected + 1) + selected * gap;
-			const offset =
-				selOffset > viewport
-					? Math.min(
-							viewport - selOffset - (selected < count - 1 ? itemWidth / 2 : 0),
-							paneWidth - viewport,
-							// eslint-disable-next-line no-mixed-spaces-and-tabs
-					  )
-					: 0;
+			const offset = selOffset > viewport
+				? Math.min(
+					viewport - selOffset - (selected < count - 1 ? itemWidth / 2 : 0),
+					paneWidth - viewport,
+					// eslint-disable-next-line no-mixed-spaces-and-tabs
+				)
+				: 0;
 
 			paneContainer.current.style.width = org;
 
@@ -89,7 +88,7 @@ export function CommitTimeline(props: CommitTimelineProps) {
 	const pane = useRef<HTMLDivElement>(null);
 	const paneContainerRef = useRef<HTMLDivElement>(null);
 
-	const selectedItemIndex = items.findIndex(item => item.index === selected);
+	const selectedItemIndex = items.findIndex((item) => item.index === selected);
 
 	useEffect(() => {
 		if (pane.current) {
@@ -168,7 +167,7 @@ export function CommitTimeline(props: CommitTimelineProps) {
 						ref={pane}
 						style={`width: ${paneWidth}px; transform: translate3d(${offset}px, 0, 0);`}
 					>
-						{items.map(x => {
+						{items.map((x) => {
 							return (
 								<CommitItem
 									key={x.index}

@@ -1,5 +1,5 @@
 import { h, render } from "preact";
-import { signal, computed } from "@preact/signals";
+import { computed, signal } from "@preact/signals";
 
 const count = signal(1);
 const double = computed(() => count.value * 2);

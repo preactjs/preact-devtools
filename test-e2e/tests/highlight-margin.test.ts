@@ -1,5 +1,5 @@
 import { expect, Frame, Page, test } from "@playwright/test";
-import { gotoTest, locateTreeItem, wait } from "../pw-utils";
+import { gotoTest, locateTreeItem, wait } from "../pw-utils.ts";
 
 test("Highlight overlay should detect memo for margin", async ({ page }) => {
 	const { devtools } = await gotoTest(page, "highlight-margin");
@@ -10,8 +10,9 @@ test("Highlight overlay should detect memo for margin", async ({ page }) => {
 	// Wait for possible flickering to occur
 	await wait(1000);
 
-	let element = await page.$eval('[data-testid="headline"]', el =>
-		el.getBoundingClientRect(),
+	let element = await page.$eval(
+		'[data-testid="headline"]',
+		(el) => el.getBoundingClientRect(),
 	);
 	let highlight = await getHighlightSize(page);
 	expect(element.top > highlight.top).toEqual(true);
@@ -20,8 +21,9 @@ test("Highlight overlay should detect memo for margin", async ({ page }) => {
 	await devtools.hover(locateTreeItem("MarginBox"));
 	await wait(1000);
 
-	element = await page.$eval('[data-testid="margin-box"]', el =>
-		el.getBoundingClientRect(),
+	element = await page.$eval(
+		'[data-testid="margin-box"]',
+		(el) => el.getBoundingClientRect(),
 	);
 	highlight = await getHighlightSize(page);
 	expect(element.top > highlight.top).toEqual(true);
@@ -29,8 +31,9 @@ test("Highlight overlay should detect memo for margin", async ({ page }) => {
 
 	await devtools.hover(locateTreeItem("BorderBox"));
 	await wait(1000);
-	element = await page.$eval('[data-testid="border-box"]', el =>
-		el.getBoundingClientRect(),
+	element = await page.$eval(
+		'[data-testid="border-box"]',
+		(el) => el.getBoundingClientRect(),
 	);
 	highlight = await getHighlightSize(page);
 	expect(element.top > highlight.top).toEqual(true);
@@ -38,7 +41,8 @@ test("Highlight overlay should detect memo for margin", async ({ page }) => {
 });
 
 async function getHighlightSize(page: Frame | Page) {
-	return await page.$eval("#preact-devtools-highlighter > div", el =>
-		el.getBoundingClientRect(),
+	return await page.$eval(
+		"#preact-devtools-highlighter > div",
+		(el) => el.getBoundingClientRect(),
 	);
 }

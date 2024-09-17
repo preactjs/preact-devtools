@@ -1,5 +1,5 @@
 /* eslint-disable react/jsx-key */
-import { h, Fragment, render } from "preact";
+import { Fragment, h, render } from "preact";
 
 const css = "background: peachpuff; padding: 2rem; margin-bottom: 1rem;";
 

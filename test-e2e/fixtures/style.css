@@ -6,8 +6,19 @@ html,
 body {
 	padding: 0;
 	margin: 0;
-	font-family: -apple-system, BlinkMacSystemFont, avenir next, avenir, segoe ui,
-		helvetica neue, helvetica, Ubuntu, roboto, noto, arial, sans-serif;
+	font-family:
+		-apple-system,
+		BlinkMacSystemFont,
+		avenir next,
+		avenir,
+		segoe ui,
+		helvetica neue,
+		helvetica,
+		Ubuntu,
+		roboto,
+		noto,
+		arial,
+		sans-serif;
 }
 
 :root {

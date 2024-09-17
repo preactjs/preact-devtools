@@ -3,8 +3,8 @@ import {
 	getChangedKeys,
 	RenderReason,
 	RenderReasonData,
-} from "../shared/renderReasons";
-import { VNodeTimings } from "../shared/timings";
+} from "../shared/renderReasons.ts";
+import { VNodeTimings } from "../shared/timings.ts";
 import {
 	getComponent,
 	getStatefulHooks,
@@ -13,7 +13,7 @@ import {
 	Internal,
 	isComponent,
 	isUseReducerOrState,
-} from "./bindings";
+} from "./bindings.ts";
 
 export interface RenderReasonTmpData {
 	type: any;

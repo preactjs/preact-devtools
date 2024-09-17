@@ -1,12 +1,12 @@
-import { test, expect } from "@playwright/test";
+import { expect, test } from "@playwright/test";
 import {
 	clickRecordButton,
-	locateTab,
 	gotoTest,
 	locateFlame,
+	locateTab,
 	wait,
-} from "../../../pw-utils";
-import { getFlameNodes } from "./utils";
+} from "../../../pw-utils.ts";
+import { getFlameNodes } from "./utils.ts";
 
 test("Should work with filtered HOC roots", async ({ page }) => {
 	const { devtools } = await gotoTest(page, "hoc-update");
@@ -19,7 +19,7 @@ test("Should work with filtered HOC roots", async ({ page }) => {
 	await devtools.locator(locateFlame("Wrapped")).waitFor();
 
 	const nodes = await getFlameNodes(devtools);
-	expect(nodes.find(x => x.name === "Wrapped")?.hocs).toEqual(["withBoof"]);
+	expect(nodes.find((x) => x.name === "Wrapped")?.hocs).toEqual(["withBoof"]);
 
 	// Disabling HOC-filter should remove hoc labels
 	await devtools.locator(locateTab("ELEMENTS")).click();

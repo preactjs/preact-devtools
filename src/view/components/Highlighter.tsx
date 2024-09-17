@@ -1,6 +1,6 @@
 import { h } from "preact";
 import s from "./Highlighter.module.css";
-import { Measurements } from "../../adapter/dom";
+import { Measurements } from "../../adapter/dom.ts";
 
 export function css2Border(
 	top: number,
@@ -25,8 +25,8 @@ export interface Props extends Measurements {
 export function Highlighter(props: Props) {
 	const { width, height, boxSizing, top, left, bounds } = props;
 
-	const isOutOfBounds =
-		bounds.bottom || bounds.left || bounds.right || bounds.top;
+	const isOutOfBounds = bounds.bottom || bounds.left || bounds.right ||
+		bounds.top;
 
 	return (
 		<div
@@ -36,12 +36,14 @@ export function Highlighter(props: Props) {
 		>
 			<div
 				class={s.margin}
-				style={`width: ${width}px; height: ${height}px; ${css2Border(
-					props.marginTop,
-					props.marginRight,
-					props.marginBottom,
-					props.marginLeft,
-				)}`}
+				style={`width: ${width}px; height: ${height}px; ${
+					css2Border(
+						props.marginTop,
+						props.marginRight,
+						props.marginBottom,
+						props.marginLeft,
+					)
+				}`}
 			>
 				<div
 					class={s.border}
@@ -54,18 +56,20 @@ export function Highlighter(props: Props) {
 				>
 					<div
 						class={s.content}
-						style={`${css2Border(
-							props.paddingTop,
-							props.paddingRight,
-							props.paddingBottom,
-							props.paddingLeft,
-						)} ${
+						style={`${
+							css2Border(
+								props.paddingTop,
+								props.paddingRight,
+								props.paddingBottom,
+								props.paddingLeft,
+							)
+						} ${
 							boxSizing === "content-box"
 								? `height: calc(100% - ${
-										props.paddingTop + props.paddingBottom
-								  }px); width: calc(100% - ${
-										props.paddingLeft + props.paddingRight
-								  }px);`
+									props.paddingTop + props.paddingBottom
+								}px); width: calc(100% - ${
+									props.paddingLeft + props.paddingRight
+								}px);`
 								: ""
 						}`}
 					/>

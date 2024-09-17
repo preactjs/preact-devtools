@@ -1,10 +1,10 @@
-import { createHook } from "../../src/adapter/hook";
-import { DevtoolsToClient, PageHookName } from "../../src/constants";
+import { createHook } from "../../src/adapter/hook.ts";
+import { DevtoolsToClient, PageHookName } from "../../src/constants.ts";
 
-(window as any).__PREACT_DEVTOOLS__ = createHook({
+(globalThis as any).__PREACT_DEVTOOLS__ = createHook({
 	listen: (type, callback) => {
-		window.addEventListener("message", e => {
-			if (e.source === window.top && e.data.source === DevtoolsToClient) {
+		globalThis.addEventListener("message", (e) => {
+			if (e.source === globalThis.top && e.data.source === DevtoolsToClient) {
 				const data = e.data;
 				if (data.type === type) callback(data.data);
 			}
@@ -12,7 +12,7 @@ import { DevtoolsToClient, PageHookName } from "../../src/constants";
 	},
 	send: (type, data) => {
 		// console.log("send", type, data);
-		window.top.postMessage(
+		globalThis.top!.postMessage(
 			{
 				source: PageHookName,
 				type,
@@ -22,7 +22,7 @@ import { DevtoolsToClient, PageHookName } from "../../src/constants";
 		);
 	},
 	listenToPage: (type, callback) => {
-		window.addEventListener("message", e => {
+		globalThis.addEventListener("message", (e) => {
 			if (e.source === window && e.data.source === PageHookName) {
 				const data = e.data;
 				if (data.type === type) callback(data.data);

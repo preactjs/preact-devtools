@@ -1,26 +1,26 @@
-import { BaseEvent, PortPageHook } from "../adapter/port";
-import { Commit, flush } from "../protocol/events";
-import { FunctionalComponent, ComponentConstructor, Options } from "preact";
-import { ID, DevNodeType } from "../../view/store/types";
-import { newRootData, traverse } from "./utils";
-import { FilterState } from "../adapter/filter";
-import { Renderer } from "../renderer";
-import { startDrawing } from "../adapter/highlightUpdates";
-import { setIn, setInCopy } from "../shared/serialize";
-import { createStats, OperationInfo } from "../shared/stats";
-import { ProfilerState } from "../adapter/profiler";
+import { BaseEvent, PortPageHook } from "../adapter/port.ts";
+import { Commit, flush } from "../protocol/events.ts";
+import { ComponentConstructor, FunctionalComponent, Options } from "preact";
+import { DevNodeType, ID } from "../../view/store/types.ts";
+import { newRootData, traverse } from "./utils.ts";
+import { FilterState } from "../adapter/filter.ts";
+import { Renderer } from "../renderer.ts";
+import { startDrawing } from "../adapter/highlightUpdates.ts";
+import { setIn, setInCopy } from "./serialize.ts";
+import { createStats, OperationInfo } from "./stats.ts";
+import { ProfilerState } from "../adapter/profiler.ts";
 import {
 	getVNodeById,
 	getVNodeId,
 	hasVNodeId,
 	IdMappingState,
 	removeVNodeId,
-} from "../shared/idMapper";
-import { createCommit, shouldFilter } from "../shared/traverse";
-import { PreactBindings, SharedVNode } from "../shared/bindings";
-import { inspectVNode } from "./inspectVNode";
-import { logVNode } from "../10/log";
-import { isSerializedBigint } from "../../view/components/sidebar/inspect/serializeProps";
+} from "./idMapper.ts";
+import { createCommit, shouldFilter } from "./traverse.ts";
+import { PreactBindings, SharedVNode } from "./bindings.ts";
+import { inspectVNode } from "./inspectVNode.ts";
+import { logVNode } from "../10/log.ts";
+import { isSerializedBigint } from "../../view/components/sidebar/inspect/serializeProps.ts";
 
 export interface RendererConfig {
 	Fragment: FunctionalComponent;
@@ -128,12 +128,12 @@ export function createRenderer<T extends SharedVNode>(
 			});
 		},
 		getRootMappings() {
-			return Array.from(roots.entries()).map(entry => {
+			return Array.from(roots.entries()).map((entry) => {
 				return newRootData(getVNodeId(ids, entry[0]), entry[1]);
 			});
 		},
 
-		getVNodeById: id => getVNodeById(ids, id),
+		getVNodeById: (id) => getVNodeById(ids, id),
 		getDisplayName(vnode) {
 			return bindings.getDisplayName(vnode, config);
 		},
@@ -220,7 +220,7 @@ export function createRenderer<T extends SharedVNode>(
 					text: 0,
 				};
 
-				traverse(root, vnode => this.onUnmount(vnode), bindings);
+				traverse(root, (vnode) => this.onUnmount(vnode), bindings);
 
 				const commit: Commit = {
 					operations: [],
@@ -263,7 +263,7 @@ export function createRenderer<T extends SharedVNode>(
 				queue.push(ev);
 			});
 
-			queue.forEach(ev => port.send(ev.type, ev.data));
+			queue.forEach((ev) => port.send(ev.type, ev.data));
 			port.send("root-order-page", null);
 		},
 		onCommit(vnode, owners, timingsByVNode, renderReasonPre) {

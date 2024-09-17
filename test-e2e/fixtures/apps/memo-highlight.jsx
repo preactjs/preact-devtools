@@ -16,9 +16,9 @@ const Nested = ({ text }) => {
 
 const MemoResult = memo(Result, () => true);
 
+const rand = () => Math.random() * 10;
 const generateFakeData = () => {
-	const rand = () => Math.random() * 10;
-	return new Array(3).fill(rand());
+	return [rand(), rand(), rand()];
 };
 
 const App = () => {
@@ -30,15 +30,11 @@ const App = () => {
 			<button onClick={() => setResults(generateFakeData())}>Refresh</button>
 			<div class="list">
 				<h2>No memo</h2>
-				{results.map((result, i) => (
-					<Result key={i} result={result} />
-				))}
+				{results.map((result, i) => <Result key={i} result={result} />)}
 			</div>
 			<div class="list">
 				<h2>Memo</h2>
-				{results.map((result, i) => (
-					<MemoResult key={i} result={result} />
-				))}
+				{results.map((result, i) => <MemoResult key={i} result={result} />)}
 			</div>
 		</div>
 	);

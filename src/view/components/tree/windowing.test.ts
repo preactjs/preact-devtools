@@ -1,6 +1,6 @@
 import { expect } from "chai";
-import { flattenChildren } from "./windowing";
-import { ID } from "../../store/types";
+import { flattenChildren } from "./windowing.ts";
+import { ID } from "../../store/types.ts";
 
 describe("flattenChildren", () => {
 	const tree = new Map<ID, { id: ID; children: ID[]; depth: number }>();
@@ -13,7 +13,7 @@ describe("flattenChildren", () => {
 
 	it("should flatten tree", () => {
 		const collapsed = new Set<ID>();
-		expect(flattenChildren(tree, 1, id => collapsed.has(id))).to.deep.equal([
+		expect(flattenChildren(tree, 1, (id) => collapsed.has(id))).to.deep.equal([
 			1,
 			2,
 			4,

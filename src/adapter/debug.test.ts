@@ -1,7 +1,7 @@
 import { expect } from "chai";
-import { fromSnapshot, toStringTable } from "./debug";
-import { MsgTypes } from "./protocol/events";
-import { DevNodeType } from "../view/store/types";
+import { fromSnapshot, toStringTable } from "./debug.ts";
+import { MsgTypes } from "./protocol/events.ts";
+import { DevNodeType } from "../view/store/types.ts";
 
 describe("debug", () => {
 	describe("fromSnapshot", () => {

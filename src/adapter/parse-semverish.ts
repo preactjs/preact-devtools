@@ -12,9 +12,7 @@ const REGEXP_SEMVERISH = /^(\d+)\.(\d+)\.(\d+)(-([\w_-]+)(?:\.(\d+))?)?$/i;
  * @param version Version to parse
  * @param allowPreRelease Flag to indicate whether pre-releases should be allowed & parsed (e.g. -rc.1)
  */
-export default function parseSemverish(
-	version: string,
-): {
+export default function parseSemverish(version: string): {
 	major: number;
 	minor: number;
 	patch: number;
@@ -27,10 +25,9 @@ export default function parseSemverish(
 		if (match[PRERELEASE]) {
 			preRelease = {
 				tag: match[PRERELEASE_TAG],
-				version:
-					match[PRERELEASE_VERSION] !== undefined
-						? +match[PRERELEASE_VERSION]
-						: -1,
+				version: match[PRERELEASE_VERSION] !== undefined
+					? +match[PRERELEASE_VERSION]
+					: -1,
 			};
 		}
 

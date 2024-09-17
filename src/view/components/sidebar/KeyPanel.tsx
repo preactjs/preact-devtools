@@ -1,5 +1,5 @@
 import { h } from "preact";
-import { SidebarPanel } from "./SidebarPanel";
+import { SidebarPanel } from "./SidebarPanel.tsx";
 
 export interface Props {
 	onCopy: () => void;

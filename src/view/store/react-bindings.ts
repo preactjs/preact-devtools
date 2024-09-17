@@ -1,7 +1,7 @@
 import { createContext } from "preact";
 import { useContext } from "preact/hooks";
-import { Store } from "./types";
-import { EmitFn } from "../../adapter/hook";
+import { Store } from "./types.ts";
+import { EmitFn } from "../../adapter/hook.ts";
 
 // Make sure we're accessing the right window object. The global window
 // reference is not the same and won't trigger any "resize" (and likely

@@ -1,5 +1,5 @@
 import { expect, test } from "@playwright/test";
-import { locateTab, gotoTest } from "../../pw-utils";
+import { gotoTest, locateTab } from "../../pw-utils.ts";
 
 test("Display no stats initially", async ({ page }) => {
 	const { devtools } = await gotoTest(page, "counter");

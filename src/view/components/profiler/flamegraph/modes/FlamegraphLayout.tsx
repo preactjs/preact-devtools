@@ -1,14 +1,14 @@
 import { h, RefObject } from "preact";
-import { CommitData } from "../../data/commits";
-import { ID, DevNode } from "../../../../store/types";
-import { FlameNode } from "../FlameNode";
+import { CommitData } from "../../data/commits.ts";
+import { DevNode, ID } from "../../../../store/types.ts";
+import { FlameNode } from "../FlameNode.tsx";
 import { useEffect, useMemo } from "preact/hooks";
-import { placeFlamegraph } from "./flamegraph-utils";
-import { formatTime } from "../../util";
-import { useStore } from "../../../../store/react-bindings";
-import { HocLabels } from "../../../elements/TreeView";
-import { NodeTransform } from "../shared";
-import { useVirtualizedList } from "../../../elements/VirtualizedList";
+import { placeFlamegraph } from "./flamegraph-utils.ts";
+import { formatTime } from "../../util.ts";
+import { useStore } from "../../../../store/react-bindings.ts";
+import { HocLabels } from "../../../elements/TreeView.tsx";
+import { NodeTransform } from "../shared.ts";
+import { useVirtualizedList } from "../../../elements/VirtualizedList.tsx";
 
 export interface FlamegraphLayoutProps {
 	commit: CommitData;
@@ -58,7 +58,7 @@ export function FlamegraphLayout({
 		renderRow: (row, _, top) => {
 			return (
 				<div style={`top: ${top}px; position: absolute; left: 0;`}>
-					{row.map(item => (
+					{row.map((item) => (
 						<FlameGraphNode
 							commit={commit}
 							filterHoc={filterHoc}
@@ -126,9 +126,9 @@ function FlameGraphNode({
 			onClick={onSelect}
 		>
 			{node.name}
-			{filterHoc && node.hocs ? (
-				<HocLabels hocs={node.hocs} nodeId={node.id} canMark={false} />
-			) : null}
+			{filterHoc && node.hocs
+				? <HocLabels hocs={node.hocs} nodeId={node.id} canMark={false} />
+				: null}
 			{appendix}
 		</FlameNode>
 	);

@@ -1,4 +1,4 @@
-import { ID } from "../../view/store/types";
+import { ID } from "../../view/store/types.ts";
 
 /**
  * Store timings in a Map instead of mutating the vnode for

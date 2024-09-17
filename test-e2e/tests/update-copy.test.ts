@@ -1,9 +1,7 @@
 import { test } from "@playwright/test";
-import { gotoTest, locateTreeItem } from "../pw-utils";
+import { gotoTest, locateTreeItem } from "../pw-utils.ts";
 
-test("Create a copy when doing props/state/context updates", async ({
-	page,
-}) => {
+test("Create a copy when doing props/state/context updates", async ({ page }) => {
 	const { devtools } = await gotoTest(page, "update-all");
 
 	// Props

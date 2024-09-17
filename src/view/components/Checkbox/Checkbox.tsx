@@ -1,5 +1,5 @@
 import { h } from "preact";
-import { Icon } from "../icons";
+import { Icon } from "../icons.tsx";
 
 export interface CheckboxProps {
 	testId?: string;
@@ -16,7 +16,7 @@ export function Checkbox(props: CheckboxProps) {
 					type="checkbox"
 					checked={props.checked}
 					data-testid={props.testId}
-					onInput={e => props.onChange((e.target as any).checked)}
+					onInput={(e) => props.onChange((e.target as any).checked)}
 				/>
 				<Icon
 					icon={props.checked ? "checkbox-checked" : "checkbox-unchecked"}

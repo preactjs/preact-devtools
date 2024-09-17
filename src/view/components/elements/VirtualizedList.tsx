@@ -6,7 +6,7 @@ import {
 	useRef,
 	useState,
 } from "preact/hooks";
-import { useResize } from "../utils";
+import { useResize } from "../utils.ts";
 
 export interface VirtualizedListProps<T> {
 	items: T[];
@@ -26,10 +26,9 @@ export function useVirtualizedList<T>({
 	const [height, setHeight] = useState(0);
 	const [scroll, setScroll] = useState(0);
 
-	const bufferCount =
-		height > 0
-			? Math.max(minBufferCount, Math.ceil(height / rowHeight / 2))
-			: minBufferCount;
+	const bufferCount = height > 0
+		? Math.max(minBufferCount, Math.ceil(height / rowHeight / 2))
+		: minBufferCount;
 
 	let idx = Math.max(0, Math.floor(scroll / rowHeight) - bufferCount);
 	const max = idx + Math.ceil(height / rowHeight) + bufferCount;
@@ -54,7 +53,7 @@ export function useVirtualizedList<T>({
 				clearTimeout(timeoutRef.current);
 			}
 
-			const nextIdx = items.findIndex(t => t === item);
+			const nextIdx = items.findIndex((t) => t === item);
 			if (nextIdx < 0) return;
 
 			// Check if the item we want to scroll to is already in view

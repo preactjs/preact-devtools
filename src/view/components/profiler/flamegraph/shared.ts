@@ -1,4 +1,4 @@
-import { ID } from "../../../store/types";
+import { ID } from "../../../store/types.ts";
 
 export interface NodeTransform {
 	id: ID;

@@ -15,7 +15,7 @@ function Foo() {
 }
 
 function Bar({ v }) {
-	let innerElements = [];
+	const innerElements = [];
 
 	for (let i = 0; i < v; i++) {
 		innerElements.push(<BarInner key={i} />);

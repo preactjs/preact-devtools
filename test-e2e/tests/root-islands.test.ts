@@ -1,11 +1,11 @@
-import { test, expect } from "@playwright/test";
-import { getTreeItems, gotoTest } from "../pw-utils";
+import { expect, test } from "@playwright/test";
+import { getTreeItems, gotoTest } from "../pw-utils.ts";
 
 test("Islands roots should be sorted by DOM order", async ({ page }) => {
 	const { devtools } = await gotoTest(page, "islands-order");
 
 	const items = await getTreeItems(devtools);
-	expect(items.map(x => x.name)).toEqual(["App1", "App2", "App3"]);
+	expect(items.map((x) => x.name)).toEqual(["App1", "App2", "App3"]);
 });
 
 test("Virtual island roots should be sorted by DOM order", async ({ page }) => {
@@ -16,7 +16,7 @@ test("Virtual island roots should be sorted by DOM order", async ({ page }) => {
 	const { devtools } = await gotoTest(page, "islands-order-virtual");
 
 	const items = await getTreeItems(devtools);
-	expect(items.map(x => x.name)).toEqual([
+	expect(items.map((x) => x.name)).toEqual([
 		"App1",
 		"App2",
 		"Virtual1",

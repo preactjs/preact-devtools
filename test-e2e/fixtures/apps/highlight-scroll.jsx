@@ -12,6 +12,7 @@ function Item({ children }) {
 }
 
 function App() {
+	// eslint-disable-next-line no-new-array
 	return new Array(100).fill(0).map((_, i) => <Item key={i}>{i}</Item>);
 }
 

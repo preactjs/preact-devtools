@@ -1,11 +1,11 @@
 import { expect, test } from "@playwright/test";
 import {
 	clickRecordButton,
-	locateTab,
 	gotoTest,
 	locateFlame,
-} from "../../../pw-utils";
-import { getFlameNodes } from "../flamegraph/utils";
+	locateTab,
+} from "../../../pw-utils.ts";
+import { getFlameNodes } from "../flamegraph/utils.ts";
 
 test("Focus nodes in ranked layout", async ({ page }) => {
 	const { devtools } = await gotoTest(page, "profiler-3");

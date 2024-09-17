@@ -1,7 +1,7 @@
-import { createStore } from "../view/store";
-import { applyOperationsV2 } from "./protocol/events";
+import { createStore } from "../view/store/index.ts";
+import { applyOperationsV2 } from "./protocol/events.ts";
 import { expect } from "chai";
-import { fromSnapshot } from "./debug";
+import { fromSnapshot } from "./debug.ts";
 import * as sinon from "sinon";
 import { effect } from "@preact/signals";
 
@@ -35,9 +35,9 @@ describe("Store", () => {
 
 		// prettier-ignore
 		const event2 = fromSnapshot([
-      "rootId: 1",
-      "Update timings 1 time 12:15"
-    ]);
+			"rootId: 1",
+			"Update timings 1 time 12:15",
+		]);
 		applyOperationsV2(store, event2);
 
 		expect(store.nodes.value.get(1)!.startTime).to.equal(12);
@@ -60,10 +60,10 @@ describe("Store", () => {
 
 		// prettier-ignore
 		const event2 = fromSnapshot([
-      "rootId: 1",
-      "Remove 2",
-      "Remove 3",
-    ]);
+			"rootId: 1",
+			"Remove 2",
+			"Remove 3",
+		]);
 		applyOperationsV2(store, event2);
 
 		expect(spy.callCount).to.eq(2); // TODO: Should be called once

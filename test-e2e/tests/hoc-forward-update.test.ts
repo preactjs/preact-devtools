@@ -1,5 +1,5 @@
-import { test, expect } from "@playwright/test";
-import { gotoTest } from "../pw-utils";
+import { expect, test } from "@playwright/test";
+import { gotoTest } from "../pw-utils.ts";
 
 test("Test HOCs on forwardRef update", async ({ page }) => {
 	const { devtools } = await gotoTest(page, "forwardRef-update");

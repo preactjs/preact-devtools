@@ -1,7 +1,11 @@
-import { RendererConfig } from "../shared/renderer";
-import { ComponentHooks, HookState, PreactBindings } from "../shared/bindings";
-import { HookType } from "../shared/hooks";
-import { VNodeV11 } from "./options";
+import { RendererConfig } from "../shared/renderer.ts";
+import {
+	ComponentHooks,
+	HookState,
+	PreactBindings,
+} from "../shared/bindings.ts";
+import { HookType } from "../shared/hooks.ts";
+import { VNodeV11 } from "./options.ts";
 
 export interface Internal {
 	type: any;

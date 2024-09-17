@@ -1,8 +1,8 @@
-import { ID, DevNode } from "../../../../store/types";
-import { FlameNodeTransform } from "./flamegraph-utils";
-import { getGradient } from "../../data/gradient";
-import { CommitData } from "../../data/commits";
-import { NodeTransform } from "../shared";
+import { DevNode, ID } from "../../../../store/types.ts";
+import { FlameNodeTransform } from "./flamegraph-utils.ts";
+import { getGradient } from "../../data/gradient.ts";
+import { CommitData } from "../../data/commits.ts";
+import { NodeTransform } from "../shared.ts";
 
 export type FlameTree = Map<ID, FlameNodeTransform>;
 

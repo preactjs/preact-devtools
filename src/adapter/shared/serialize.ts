@@ -1,6 +1,6 @@
-import type { RendererConfig } from "./renderer";
-import type { ObjPath } from "../renderer";
-import type { PreactBindings, SharedVNode } from "./bindings";
+import type { RendererConfig } from "./renderer.ts";
+import type { ObjPath } from "../renderer.ts";
+import type { PreactBindings, SharedVNode } from "./bindings.ts";
 import type { Signal } from "@preact/signals";
 
 export interface SerializedVNode {
@@ -78,7 +78,7 @@ export function jsonify(
 	}
 
 	if (Array.isArray(data)) {
-		return data.map(x => jsonify(x, getVNode, seen));
+		return data.map((x) => jsonify(x, getVNode, seen));
 	}
 	switch (typeof data) {
 		case "string":
@@ -102,7 +102,7 @@ export function jsonify(
 		}
 		case "object": {
 			if (data === null) return null;
-			else if (data instanceof window.Blob) {
+			else if (data instanceof globalThis.Blob) {
 				return {
 					type: "blob",
 					name: "Blob",
@@ -111,15 +111,15 @@ export function jsonify(
 				return {
 					type: "set",
 					name: "Set",
-					entries: Array.from(data.values()).map(item =>
-						jsonify(item, getVNode, seen),
+					entries: Array.from(data.values()).map((item) =>
+						jsonify(item, getVNode, seen)
 					),
 				};
 			} else if (data instanceof Map) {
 				return {
 					type: "map",
 					name: "Map",
-					entries: Array.from(data.entries()).map(entry => {
+					entries: Array.from(data.entries()).map((entry) => {
 						return [
 							jsonify(entry[0], getVNode, seen),
 							jsonify(entry[1], getVNode, seen),
@@ -130,7 +130,7 @@ export function jsonify(
 			const out = {};
 			Object.keys(data)
 				.sort(sortStrings)
-				.forEach(key => {
+				.forEach((key) => {
 					(out as any)[key] = jsonify((data as any)[key], getVNode, seen);
 				});
 			return out;
@@ -210,7 +210,7 @@ export function serialize<T extends SharedVNode>(
 ) {
 	return jsonify(
 		data,
-		node => serializeVNode(node, config, bindings),
+		(node) => serializeVNode(node, config, bindings),
 		new Set(),
 	);
 }

@@ -1,6 +1,6 @@
 import { expect } from "chai";
-import { flames } from "./testHelpers";
-import { DevNodeType, DevNode } from "../../../store/types";
+import { flames } from "./testHelpers.ts";
+import { DevNode, DevNodeType } from "../../../store/types.ts";
 
 describe("FlameGraph DSL", () => {
 	it("should convert flat flamegraph", () => {
@@ -109,7 +109,8 @@ describe("FlameGraph DSL", () => {
 
 	it("should throw if names are not unique", () => {
 		expect(
-			() => flames`
+			() =>
+				flames`
       App ***
       App ***
     `,

@@ -1,7 +1,7 @@
-import { ID } from "../../view/store/types";
-import { FilterState } from "../adapter/filter";
-import { Commit, MsgTypes } from "../protocol/events";
-import { getStringId } from "../protocol/string-table";
+import { ID } from "../../view/store/types.ts";
+import { FilterState } from "../adapter/filter.ts";
+import { Commit, MsgTypes } from "../protocol/events.ts";
+import { getStringId } from "../protocol/string-table.ts";
 import {
 	getOrCreateVNodeId,
 	getVNodeById,
@@ -9,17 +9,22 @@ import {
 	hasVNodeId,
 	IdMappingState,
 	updateVNodeId,
-} from "./idMapper";
-import { ProfilerState } from "../adapter/profiler";
-import { getDevtoolsType, RendererConfig } from "./renderer";
-import { RenderReason, RenderReasonData } from "./renderReasons";
-import { createStats, DiffType, updateDiffStats, updateOpStats } from "./stats";
-import { NodeType } from "../../constants";
-import { getDiffType, recordComponentStats } from "./stats";
-import { measureUpdate } from "../adapter/highlightUpdates";
-import { PreactBindings, SharedVNode } from "./bindings";
-import { VNodeTimings } from "./timings";
-import { getSignalTextName } from "./utils";
+} from "./idMapper.ts";
+import { ProfilerState } from "../adapter/profiler.ts";
+import { getDevtoolsType, RendererConfig } from "./renderer.ts";
+import { RenderReason, RenderReasonData } from "./renderReasons.ts";
+import {
+	createStats,
+	DiffType,
+	updateDiffStats,
+	updateOpStats,
+} from "./stats.ts";
+import { NodeType } from "../../constants.ts";
+import { getDiffType, recordComponentStats } from "./stats.ts";
+import { measureUpdate } from "../adapter/highlightUpdates.ts";
+import { PreactBindings, SharedVNode } from "./bindings.ts";
+import { VNodeTimings } from "./timings.ts";
+import { getSignalTextName } from "./utils.ts";
 
 function getHocName(name: string) {
 	const idx = name.indexOf("(");
@@ -165,7 +170,7 @@ export function shouldFilter<T extends SharedVNode>(
 
 	if (filters.regex.length > 0) {
 		const name = getSignalTextName(bindings.getDisplayName(vnode, config));
-		return filters.regex.some(r => {
+		return filters.regex.some((r) => {
 			// Regexes with a global flag are stateful in JS :((
 			r.lastIndex = 0;
 			return r.test(name);
@@ -201,7 +206,6 @@ function mount<T extends SharedVNode>(
 	hocs: string[],
 	bindings: PreactBindings<T>,
 	timingsByVNode: VNodeTimings<T>,
-	renderReasonPre: Map<T, RenderReasonData> | null,
 ) {
 	if (commit.stats !== null) {
 		updateOpStats(commit.stats, "mounts", vnode, bindings);
@@ -302,7 +306,6 @@ function mount<T extends SharedVNode>(
 				hocs,
 				bindings,
 				timingsByVNode,
-				renderReasonPre,
 			);
 		}
 	}
@@ -341,7 +344,7 @@ function resetChildren<T extends SharedVNode>(
 		MsgTypes.REORDER_CHILDREN,
 		id,
 		next.length,
-		...next.map(x => getVNodeId(ids, x)),
+		...next.map((x) => getVNodeId(ids, x)),
 	);
 }
 
@@ -427,7 +430,6 @@ function update<T extends SharedVNode>(
 			hocs,
 			bindings,
 			timingsByVNode,
-			renderReasonPre,
 		);
 		return;
 	}
@@ -455,22 +457,21 @@ function update<T extends SharedVNode>(
 	);
 
 	if (profiler.isProfiling && profiler.captureRenderReasons) {
-		const reason =
-			renderReasonPre !== null
-				? renderReasonPre.get(vnode) || null
-				: bindings.getRenderReasonPost(
-						ids,
-						bindings,
-						timingsByVNode,
-						oldVNode,
-						vnode,
-				  );
+		const reason = renderReasonPre !== null
+			? renderReasonPre.get(vnode) || null
+			: bindings.getRenderReasonPost(
+				ids,
+				bindings,
+				timingsByVNode,
+				oldVNode,
+				vnode,
+			);
 		if (reason !== null) {
 			const count = reason.items ? reason.items.length : 0;
 			commit.operations.push(MsgTypes.RENDER_REASON, id, reason.type, count);
 			if (reason.items && count > 0) {
 				commit.operations.push(
-					...reason.items.map(str => getStringId(commit.strings, str)),
+					...reason.items.map((str) => getStringId(commit.strings, str)),
 				);
 			}
 		}
@@ -480,8 +481,8 @@ function update<T extends SharedVNode>(
 
 	const oldChildren = oldVNode
 		? bindings
-				.getActualChildren(oldVNode)
-				.map((v: any) => v && getVNodeId(ids, v))
+			.getActualChildren(oldVNode)
+			.map((v: any) => v && getVNodeId(ids, v))
 		: [];
 
 	let shouldReorder = false;
@@ -540,7 +541,6 @@ function update<T extends SharedVNode>(
 				hocs,
 				bindings,
 				timingsByVNode,
-				renderReasonPre,
 			);
 			shouldReorder = true;
 		}
@@ -610,6 +610,7 @@ export function createCommit<T extends SharedVNode>(
 	if (helpers.isRoot(vnode, config)) {
 		const children = helpers.getActualChildren(vnode);
 		if (commit.stats !== null) {
+			// eslint-disable-next-line no-unused-vars
 			const childrenLen = children.length;
 			commit.stats.roots[childrenLen > 4 ? 4 : childrenLen]++;
 		}
@@ -648,7 +649,6 @@ export function createCommit<T extends SharedVNode>(
 			[],
 			helpers,
 			timingsByVNode,
-			renderReasonPre,
 		);
 	} else {
 		update(

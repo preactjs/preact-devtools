@@ -1,9 +1,7 @@
 import { test } from "@playwright/test";
-import { gotoTest, waitFor } from "../pw-utils";
+import { gotoTest, waitFor } from "../pw-utils.ts";
 
-test("Pressing Enter should scroll marked results into view during search #162", async ({
-	page,
-}) => {
+test("Pressing Enter should scroll marked results into view during search #162", async ({ page }) => {
 	const { devtools } = await gotoTest(page, "deep-tree");
 
 	await devtools.waitForSelector('[data-name="App"]');

@@ -1,11 +1,11 @@
 import { expect, test } from "@playwright/test";
 import {
-	locateTab,
-	gotoTest,
-	wait,
 	clickRecordButton,
+	gotoTest,
 	locateFlame,
-} from "../../pw-utils";
+	locateTab,
+	wait,
+} from "../../pw-utils.ts";
 
 test("Captures render reasons", async ({ page }) => {
 	const { devtools } = await gotoTest(page, "render-reasons");

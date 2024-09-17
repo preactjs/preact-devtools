@@ -1,5 +1,5 @@
-import { NodeTransform } from "../shared";
-import { ID, DevNode } from "../../../../store/types";
+import { NodeTransform } from "../shared.ts";
+import { DevNode, ID } from "../../../../store/types.ts";
 
 export interface FlameNodeTransform extends NodeTransform {
 	/** Relative start position to root node (without zoom) */
@@ -54,7 +54,7 @@ export function placeFlamegraph(
 
 	const byRow: NodeTransform[][] = [];
 
-	idToTransform.forEach(pos => {
+	idToTransform.forEach((pos) => {
 		let start;
 		let width;
 		let hidden = false;
@@ -70,7 +70,7 @@ export function placeFlamegraph(
 			if (node && node.parent !== -1 && maximizedIds.has(node.parent)) {
 				const parent = tree.get(node.parent)!;
 				if (parent.children.length > 1) {
-					hidden = parent.children.some(childId => maximizedIds.has(childId));
+					hidden = parent.children.some((childId) => maximizedIds.has(childId));
 				}
 			}
 		}

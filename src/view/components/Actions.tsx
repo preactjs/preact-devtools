@@ -1,4 +1,4 @@
-import { h, ComponentChildren } from "preact";
+import { ComponentChildren, h } from "preact";
 
 export interface Props {
 	class?: string;

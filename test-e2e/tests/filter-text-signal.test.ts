@@ -1,5 +1,5 @@
 import { expect, test } from "@playwright/test";
-import { gotoTest } from "../pw-utils";
+import { gotoTest } from "../pw-utils.ts";
 
 test("Text Signal filter should filter Text Signal nodes", async ({ page }) => {
 	test.skip(

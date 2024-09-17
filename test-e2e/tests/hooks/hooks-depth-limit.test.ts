@@ -1,9 +1,7 @@
-import { test, expect } from "@playwright/test";
-import { clickHookItem, gotoTest, waitForPass } from "../../pw-utils";
+import { expect, test } from "@playwright/test";
+import { clickHookItem, gotoTest, waitForPass } from "../../pw-utils.ts";
 
-test("Show a deeply nested hook tree and limit value parsing depth", async ({
-	page,
-}) => {
+test("Show a deeply nested hook tree and limit value parsing depth", async ({ page }) => {
 	const { devtools } = await gotoTest(page, "hooks-depth-limit");
 
 	await devtools.waitForSelector('[data-testid="tree-item"]');

@@ -1,5 +1,5 @@
 import { expect, test } from "@playwright/test";
-import { gotoTest } from "../pw-utils";
+import { gotoTest } from "../pw-utils.ts";
 
 test("Fragment filter should filter Fragment nodes", async ({ page }) => {
 	const { devtools } = await gotoTest(page, "fragment-filter", {

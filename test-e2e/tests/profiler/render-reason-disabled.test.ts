@@ -1,5 +1,10 @@
 import { expect, test } from "@playwright/test";
-import { locateTab, gotoTest, wait, clickRecordButton } from "../../pw-utils";
+import {
+	clickRecordButton,
+	gotoTest,
+	locateTab,
+	wait,
+} from "../../pw-utils.ts";
 
 test("Disables render reason capturing", async ({ page }) => {
 	const { devtools } = await gotoTest(page, "render-reasons");

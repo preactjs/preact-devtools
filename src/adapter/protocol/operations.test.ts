@@ -1,7 +1,7 @@
 import { expect } from "chai";
-import { ops2Tree } from "./operations";
-import { fromSnapshot } from "../debug";
-import { flames } from "../../view/components/profiler/flamegraph/testHelpers";
+import { ops2Tree } from "./operations.ts";
+import { fromSnapshot } from "../debug.ts";
+import { flames } from "../../view/components/profiler/flamegraph/testHelpers.ts";
 
 describe("ops2Tree", () => {
 	it("should copy old nodes", () => {

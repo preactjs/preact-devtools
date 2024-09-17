@@ -1,4 +1,4 @@
-import { debug } from "../../../debug";
+import { debug } from "../../../debug.ts";
 
 export type Handler<T> = (e: T) => void;
 export interface Emitter<T> {

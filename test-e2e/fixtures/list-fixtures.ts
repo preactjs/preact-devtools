@@ -1,6 +1,6 @@
 import { Plugin } from "vite";
-import path from "path";
-import fs from "fs";
+import path from "node:path";
+import fs from "node:fs";
 
 /**
  * Get all available fixtures and expose them via a virtual
@@ -20,11 +20,11 @@ export function listFixtures(): Plugin {
 				const dir = path.join(__dirname, "apps");
 				const items = fs
 					.readdirSync(dir)
-					.map(x => path.basename(x, path.extname(x)))
+					.map((x) => path.basename(x, path.extname(x)))
 					.sort((a, b) => a.localeCompare(b));
 
 				return `export const fixtures = [
-          ${items.map(x => '"' + x + '"').join(",\n")}  
+          ${items.map((x) => '"' + x + '"').join(",\n")}  
         ]`;
 			}
 		},

@@ -1,4 +1,4 @@
-import { UpdateRects } from "./highlightUpdates";
+import { UpdateRects } from "./highlightUpdates.ts";
 
 export interface RawTimelineFilterState {
 	filterCommitsUnder: number | false;

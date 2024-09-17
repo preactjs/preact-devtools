@@ -15,9 +15,7 @@ export function Hoc(props: { children: any; small?: boolean }) {
 export function HocPanel(props: Props) {
 	return (
 		<div class="hoc-panel" data-testid="hoc-panel">
-			{props.hocs.map((hoc, i) => (
-				<Hoc key={i}>{hoc}</Hoc>
-			))}
+			{props.hocs.map((hoc, i) => <Hoc key={i}>{hoc}</Hoc>)}
 		</div>
 	);
 }

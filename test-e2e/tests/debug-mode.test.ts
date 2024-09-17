@@ -1,10 +1,10 @@
-import { test, expect } from "@playwright/test";
+import { expect, test } from "@playwright/test";
 import {
 	clickRecordButton,
 	gotoTest,
 	locateFlame,
 	locateTab,
-} from "../pw-utils";
+} from "../pw-utils.ts";
 
 test("Debug mode toggles debug views", async ({ page }) => {
 	const { devtools } = await gotoTest(page, "counter");

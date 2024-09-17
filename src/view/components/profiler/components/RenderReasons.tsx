@@ -1,9 +1,9 @@
-import { h, Fragment } from "preact";
-import { SidebarPanel, Empty } from "../../sidebar/SidebarPanel";
-import { useStore } from "../../../store/react-bindings";
-import { RenderReason } from "../../../../adapter/shared/renderReasons";
-import { Message, MessageBtn } from "../../Message/Message";
-import { startProfiling } from "../data/commits";
+import { h } from "preact";
+import { Empty, SidebarPanel } from "../../sidebar/SidebarPanel.tsx";
+import { useStore } from "../../../store/react-bindings.ts";
+import { RenderReason } from "../../../../adapter/shared/renderReasons.ts";
+import { Message, MessageBtn } from "../../Message/Message.tsx";
+import { startProfiling } from "../data/commits.ts";
 
 function getReasonName(reason: RenderReason) {
 	switch (reason) {
@@ -40,66 +40,70 @@ export function RenderReasons() {
 
 	const hasReasons = reason !== null && reason.items && reason.items.length > 0;
 
-	const rendered =
-		!captureReason && commit && selected && commit.rendered.has(selected.id);
+	const rendered = !captureReason && commit && selected &&
+		commit.rendered.has(selected.id);
 
 	return (
 		<SidebarPanel title="Render reasons">
 			<div data-testid="render-reasons">
-				{reason !== null ? (
-					<dl class="render-reason">
-						<dt class="render-reason-name">
-							{getReasonName(reason.type)}
-							{hasReasons ? ":" : ""}
-						</dt>
-						<dd class="render-reason-value">
-							{hasReasons &&
-								(reason.type === RenderReason.HOOKS_CHANGED ? (
-									<>
-										{reason!.items!.map(item => (
-											<span class="hook-number va-middle" key={item}>
-												{+item + 1}
-											</span>
+				{reason !== null
+					? (
+						<dl class="render-reason">
+							<dt class="render-reason-name">
+								{getReasonName(reason.type)}
+								{hasReasons ? ":" : ""}
+							</dt>
+							<dd class="render-reason-value">
+								{hasReasons &&
+									(reason.type === RenderReason.HOOKS_CHANGED
+										? (
+											<>
+												{reason!.items!.map((item) => (
+													<span class="hook-number va-middle" key={item}>
+														{+item + 1}
+													</span>
+												))}
+											</>
+										)
+										: (
+											reason!.items!.join(", ")
 										))}
-									</>
-								) : (
-									reason!.items!.join(", ")
-								))}
-						</dd>
-					</dl>
-				) : (
-					<Empty>{rendered ? "-" : "Did not render"}</Empty>
-				)}
+							</dd>
+						</dl>
+					)
+					: <Empty>{rendered ? "-" : "Did not render"}</Empty>}
 			</div>
 			<div class="render-reason-message">
-				{isSupported ? (
-					<div class="sidebar-nav-panel-content">
-						<Message type={captureReason ? "info" : "warning"}>
-							{captureReason
-								? "Timings may be less accurate. "
-								: "Capturing disabled. "}
-							<MessageBtn
-								onClick={() => {
-									const value = !captureReason;
-									store.profiler.setRenderReasonCapture(value);
-									startProfiling(store.profiler);
-									store.emit("start-profiling", {
-										captureRenderReasons: value,
-									});
-								}}
-								testId="toggle-render-reason"
-							>
-								{captureReason ? "Disable" : "Enable"}
-							</MessageBtn>
-						</Message>
-					</div>
-				) : (
-					<div class="sidebar-nav-panel-content">
-						<Message type="warning">
-							Upgrade to Preact &gt;=10.4.1 to fully enable this feature.
-						</Message>
-					</div>
-				)}
+				{isSupported
+					? (
+						<div class="sidebar-nav-panel-content">
+							<Message type={captureReason ? "info" : "warning"}>
+								{captureReason
+									? "Timings may be less accurate. "
+									: "Capturing disabled. "}
+								<MessageBtn
+									onClick={() => {
+										const value = !captureReason;
+										store.profiler.setRenderReasonCapture(value);
+										startProfiling(store.profiler);
+										store.emit("start-profiling", {
+											captureRenderReasons: value,
+										});
+									}}
+									testId="toggle-render-reason"
+								>
+									{captureReason ? "Disable" : "Enable"}
+								</MessageBtn>
+							</Message>
+						</div>
+					)
+					: (
+						<div class="sidebar-nav-panel-content">
+							<Message type="warning">
+								Upgrade to Preact &gt;=10.4.1 to fully enable this feature.
+							</Message>
+						</div>
+					)}
 			</div>
 		</SidebarPanel>
 	);

@@ -1,5 +1,5 @@
 import { expect, test } from "@playwright/test";
-import { gotoTest, locateTreeItem, wait } from "../pw-utils";
+import { gotoTest, locateTreeItem, wait } from "../pw-utils.ts";
 
 test("Highlight item", async ({ page }) => {
 	const { devtools } = await gotoTest(page, "counter");
@@ -9,12 +9,13 @@ test("Highlight item", async ({ page }) => {
 	// Wait for possible flickering to occur
 	await wait(1000);
 
-	const sizeOnPage = await page.$eval("#app > div", el =>
-		el.getBoundingClientRect(),
+	const sizeOnPage = await page.$eval(
+		"#app > div",
+		(el) => el.getBoundingClientRect(),
 	);
 	const sizeOfHighlight = await page.$eval(
 		"#preact-devtools-highlighter > div",
-		el => el.getBoundingClientRect(),
+		(el) => el.getBoundingClientRect(),
 	);
 	expect(sizeOfHighlight).toEqual(sizeOnPage);
 });

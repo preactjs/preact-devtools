@@ -1,9 +1,7 @@
-import { test, Frame, Page } from "@playwright/test";
-import { gotoTest } from "../pw-utils";
+import { Frame, Page, test } from "@playwright/test";
+import { gotoTest } from "../pw-utils.ts";
 
-test("HOC-Component original name should show in highlight", async ({
-	page,
-}) => {
+test("HOC-Component original name should show in highlight", async ({ page }) => {
 	const { devtools } = await gotoTest(page, "hoc");
 
 	await assertHighlightName(page, devtools, "Bar");

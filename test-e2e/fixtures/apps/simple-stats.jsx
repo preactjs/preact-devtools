@@ -1,4 +1,4 @@
-import { h, render, Component } from "preact";
+import { Component, h, render } from "preact";
 
 function FnComponent() {
 	return <div>Function {"Component"}</div>;

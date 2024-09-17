@@ -1,4 +1,4 @@
-import { ID, Tree } from "../../../store/types";
+import { ID, Tree } from "../../../store/types.ts";
 
 export function getRoot(tree: Tree, id: ID) {
 	let item = tree.get(id);

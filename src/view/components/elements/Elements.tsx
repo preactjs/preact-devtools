@@ -1,10 +1,10 @@
 import { h } from "preact";
-import { TreeBar } from "./TreeBar";
-import { TreeView } from "./TreeView";
-import { SidebarActions } from "../sidebar/SidebarActions";
-import { Sidebar } from "../sidebar/Sidebar";
+import { TreeBar } from "./TreeBar.tsx";
+import { TreeView } from "./TreeView.tsx";
+import { SidebarActions } from "../sidebar/SidebarActions.tsx";
+import { Sidebar } from "../sidebar/Sidebar.tsx";
 import s from "../Devtools.module.css";
-import { SidebarLayout } from "../SidebarLayout";
+import { SidebarLayout } from "../SidebarLayout.tsx";
 
 export function Elements() {
 	return (

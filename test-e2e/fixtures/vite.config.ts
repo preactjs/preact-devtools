@@ -1,10 +1,10 @@
 import { defineConfig } from "vite";
-import { listFixtures } from "./list-fixtures";
-import { rewritePreactVersion } from "./rewrite-preact-version";
-import { loadPreactVersion } from "./load-preact-version";
-import { listPreactVersions } from "./list-preact-versions";
-import path from "path";
-import { injectSvgSpritePlugin } from "./inject-sprite";
+import { listFixtures } from "./list-fixtures.ts";
+import { rewritePreactVersion } from "./rewrite-preact-version.ts";
+import { loadPreactVersion } from "./load-preact-version.ts";
+import { listPreactVersions } from "./list-preact-versions.ts";
+import path from "node:path";
+import { injectSvgSpritePlugin } from "./inject-sprite.ts";
 import prefresh from "@prefresh/vite";
 
 // https://vitejs.dev/config/

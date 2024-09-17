@@ -4,8 +4,7 @@
 
 const markName = (s: string) => `⚛ ${s}`;
 
-const supportsPerformance =
-	globalThis.performance &&
+const supportsPerformance = globalThis.performance &&
 	typeof globalThis.performance.getEntriesByName === "function";
 
 export function recordMark(s: string) {

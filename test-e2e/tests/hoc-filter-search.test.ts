@@ -1,5 +1,5 @@
 import { expect, test } from "@playwright/test";
-import { gotoTest, locateTreeItem } from "../pw-utils";
+import { gotoTest, locateTreeItem } from "../pw-utils.ts";
 
 test("HOC-Component labels should be searchable", async ({ page }) => {
 	const { devtools } = await gotoTest(page, "hoc");
@@ -10,7 +10,7 @@ test("HOC-Component labels should be searchable", async ({ page }) => {
 	let marked = await devtools.$$("mark");
 	expect(marked.length).toEqual(2);
 	expect(
-		await marked[0].evaluate(el => el.hasAttribute("data-marked")),
+		await marked[0].evaluate((el) => el.hasAttribute("data-marked")),
 	).toEqual(true);
 
 	await devtools
@@ -22,6 +22,6 @@ test("HOC-Component labels should be searchable", async ({ page }) => {
 	marked = await devtools.$$("mark");
 	expect(marked.length).toEqual(2);
 	expect(
-		await marked[1].evaluate(el => el.hasAttribute("data-marked")),
+		await marked[1].evaluate((el) => el.hasAttribute("data-marked")),
 	).toEqual(true);
 });

@@ -287,7 +287,7 @@ export function parseProps(
 				};
 				out.set(path, node);
 
-				Object.keys(data).forEach(key => {
+				Object.keys(data).forEach((key) => {
 					const nextPath = `${path}.${key}`;
 					node.children.push(nextPath);
 					parseProps(
@@ -311,8 +311,8 @@ export function parseProps(
 			name,
 			id: path,
 			type: type as any,
-			editable:
-				type !== "undefined" && data !== "[[Circular]]" && !forceReadonly,
+			editable: type !== "undefined" && data !== "[[Circular]]" &&
+				!forceReadonly,
 			value: data,
 			children: [],
 			meta: null,

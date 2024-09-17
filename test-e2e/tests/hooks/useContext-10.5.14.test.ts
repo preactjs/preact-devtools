@@ -1,5 +1,5 @@
-import { test, expect } from "@playwright/test";
-import { getHooks, gotoTest, locateTreeItem } from "../../pw-utils";
+import { expect, test } from "@playwright/test";
+import { getHooks, gotoTest, locateTreeItem } from "../../pw-utils.ts";
 
 test("Inspect useContext hook Preact 10.5.14 (goober)", async ({ page }) => {
 	const { devtools } = await gotoTest(page, "goober");

@@ -1,5 +1,5 @@
-import { test, expect } from "@playwright/test";
-import { gotoTest } from "../pw-utils";
+import { expect, test } from "@playwright/test";
+import { gotoTest } from "../pw-utils.ts";
 
 test("Clicking at the right of element names #144", async ({ page }) => {
 	const { devtools } = await gotoTest(page, "deep-tree");

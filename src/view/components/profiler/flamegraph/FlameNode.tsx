@@ -1,7 +1,7 @@
 import { h } from "preact";
-import { useRef, useCallback } from "preact/hooks";
-import { NodeTransform } from "./shared";
-import { ID } from "../../../store/types";
+import { useCallback, useRef } from "preact/hooks";
+import { NodeTransform } from "./shared.ts";
+import { ID } from "../../../store/types.ts";
 
 export interface Props {
 	selected: boolean;

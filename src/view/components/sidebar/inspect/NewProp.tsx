@@ -1,6 +1,6 @@
 import { h } from "preact";
-import { useState, useCallback } from "preact/hooks";
-import { DataInput } from "../../DataInput";
+import { useCallback, useState } from "preact/hooks";
+import { DataInput } from "../../DataInput/index.tsx";
 import s2 from "./ElementProps.module.css";
 
 export interface NewPropProps {

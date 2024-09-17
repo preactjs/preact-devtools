@@ -1,5 +1,5 @@
-import { test, expect } from "@playwright/test";
-import { getLog, gotoTest } from "../pw-utils";
+import { expect, test } from "@playwright/test";
+import { getLog, gotoTest } from "../pw-utils.ts";
 
 test("Should inspect during picking", async ({ page }) => {
 	const { devtools } = await gotoTest(page, "counter");
@@ -19,7 +19,7 @@ test("Should inspect during picking", async ({ page }) => {
 	await page.hover(target);
 
 	// Move mouse slightly
-	const rect = await page.$eval(target, el => el.getBoundingClientRect());
+	const rect = await page.$eval(target, (el) => el.getBoundingClientRect());
 	await page.mouse.move(rect.x, rect.y);
 
 	// Should load prop data
@@ -27,7 +27,7 @@ test("Should inspect during picking", async ({ page }) => {
 
 	// Should only fire inspect event once per id
 	const inspects = (await getLog(page)).filter(
-		x => x.type === "inspect-result",
+		(x) => x.type === "inspect-result",
 	);
 	expect(inspects.length).toEqual(2);
 

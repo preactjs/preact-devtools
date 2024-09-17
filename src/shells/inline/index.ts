@@ -1,10 +1,10 @@
-import { createStore } from "../../view/store";
-export { createStore } from "../../view/store";
-import { render, h } from "preact";
-import { DevTools } from "../../view/components/Devtools";
-import { applyEvent } from "../../adapter/protocol/events";
-import { Store } from "../../view/store/types";
-import { PageHookName, DevtoolsToClient } from "../../constants";
+import { createStore } from "../../view/store/index.ts";
+export { createStore } from "../../view/store/index.ts";
+import { h, render } from "preact";
+import { DevTools } from "../../view/components/Devtools.tsx";
+import { applyEvent } from "../../adapter/protocol/events.ts";
+import { Store } from "../../view/store/types.ts";
+import { DevtoolsToClient, PageHookName } from "../../constants.ts";
 
 export function setupFrontendStore(ctx: Window) {
 	const store = createStore();

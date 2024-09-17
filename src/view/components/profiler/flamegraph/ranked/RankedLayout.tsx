@@ -1,14 +1,14 @@
 import { h, RefObject } from "preact";
 import { useMemo } from "preact/hooks";
-import { placeRanked } from "./ranked-utils";
-import { CommitData } from "../../data/commits";
-import { ID, DevNode } from "../../../../store/types";
-import { FlameNode } from "../FlameNode";
-import { formatTime } from "../../util";
-import { useStore } from "../../../../store/react-bindings";
-import { HocLabels } from "../../../elements/TreeView";
-import { useVirtualizedList } from "../../../elements/VirtualizedList";
-import { NodeTransform } from "../shared";
+import { placeRanked } from "./ranked-utils.ts";
+import { CommitData } from "../../data/commits.ts";
+import { DevNode, ID } from "../../../../store/types.ts";
+import { FlameNode } from "../FlameNode.tsx";
+import { formatTime } from "../../util.ts";
+import { useStore } from "../../../../store/react-bindings.ts";
+import { HocLabels } from "../../../elements/TreeView.tsx";
+import { useVirtualizedList } from "../../../elements/VirtualizedList.tsx";
+import { NodeTransform } from "../shared.ts";
 
 export interface RankedLayoutProps {
 	commit: CommitData;
@@ -55,14 +55,16 @@ export function RankedLayout({
 		renderRow: (pos, _, top) => {
 			const node = commit.nodes.get(pos.id)!;
 			const selfDuration = commit.selfDurations.get(node.id) || 0;
-			const hocs =
-				filterHoc && node.hocs ? (
-					<HocLabels hocs={node.hocs} nodeId={node.id} canMark={false} />
-				) : (
+			const hocs = filterHoc && node.hocs
+				? <HocLabels hocs={node.hocs} nodeId={node.id} canMark={false} />
+				: (
 					""
 				);
 			return (
-				<div key={pos.id} style={`top: ${top}px; position: absolute; left: 0;`}>
+				<div
+					key={pos.id}
+					style={`top: ${top}px; position: absolute; left: 0;`}
+				>
 					<FlameNode
 						node={pos}
 						selected={pos.id === selected.id}

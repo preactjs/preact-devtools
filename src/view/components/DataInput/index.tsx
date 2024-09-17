@@ -1,9 +1,9 @@
 import { h } from "preact";
 import s from "./DataInput.module.css";
-import { useCallback, useRef, useMemo, useState } from "preact/hooks";
-import { parseValue } from "./parseValue";
-import { debug } from "../../../debug";
-import { Icon } from "../icons";
+import { useCallback, useMemo, useRef, useState } from "preact/hooks";
+import { parseValue } from "./parseValue.ts";
+import { debug } from "../../../debug.ts";
+import { Icon } from "../icons.tsx";
 
 export interface InputProps {
 	name: string;
@@ -31,7 +31,7 @@ export function DataInput({
 		try {
 			parseValue(value);
 			return true;
-		} catch (err) {
+		} catch {
 			return false;
 		}
 	}, [value]);
@@ -44,7 +44,7 @@ export function DataInput({
 			else if (parsed.type === "map") return "map";
 			else if (parsed.type === "set") return "set";
 			return typeof parsed;
-		} catch (err) {
+		} catch {
 			return "undefined";
 		}
 	}, [value]);

@@ -1,13 +1,13 @@
 import { h } from "preact";
 import { useState } from "preact/hooks";
-import { Actions, ActionSeparator } from "../Actions";
-import { IconBtn } from "../IconBtn";
-import { Icon, Picker } from "../icons";
-import { useStore } from "../../store/react-bindings";
+import { Actions, ActionSeparator } from "../Actions.tsx";
+import { IconBtn } from "../IconBtn.tsx";
+import { Icon, Picker } from "../icons.tsx";
+import { useStore } from "../../store/react-bindings.ts";
 import s from "./TreeBar.module.css";
-import { useSearch } from "../../store/search";
-import { OutsideClick } from "../OutsideClick";
-import { FilterCheck, FilterPopup } from "../FilterPopup/FilterPopup";
+import { useSearch } from "../../store/search.ts";
+import { OutsideClick } from "../OutsideClick.tsx";
+import { FilterCheck, FilterPopup } from "../FilterPopup/FilterPopup.tsx";
 import filterBarStyles from "../FilterPopup/FilterPopup.module.css";
 
 export function TreeBar() {
@@ -55,7 +55,7 @@ export function TreeBar() {
 					placeholder="Search (text or /regex/)"
 					value={value}
 					onKeyDown={onKeyDown}
-					onInput={e => store.search.onChange((e.target as any).value)}
+					onInput={(e) => store.search.onChange((e.target as any).value)}
 				/>
 				{searchActive && (
 					<div class={s.searchCounter} data-testid="search-counter">
@@ -143,8 +143,7 @@ export function TreeFilterPopup() {
 					title="Add new filter"
 					testId="add-filter"
 					onClick={() =>
-						setFilters([...filters, { enabled: false, value: "" }])
-					}
+						setFilters([...filters, { enabled: false, value: "" }])}
 				>
 					<span class={filterBarStyles.filterAdd}>
 						<span class={filterBarStyles.filterCheck}>
@@ -158,27 +157,27 @@ export function TreeFilterPopup() {
 			{/* Native filters */}
 			<FilterCheck
 				label="Roots"
-				onInput={checked => setFilterRoot(checked)}
+				onInput={(checked) => setFilterRoot(checked)}
 				checked={filterRoot}
 			/>
 			<FilterCheck
 				label="Fragments"
-				onInput={checked => setFilterFragment(checked)}
+				onInput={(checked) => setFilterFragment(checked)}
 				checked={filterFragment}
 			/>
 			<FilterCheck
 				label="HOC-Components"
-				onInput={checked => setFilterHoc(checked)}
+				onInput={(checked) => setFilterHoc(checked)}
 				checked={filterHoc}
 			/>
 			<FilterCheck
 				label="DOM nodes"
-				onInput={checked => setFilterDom(checked)}
+				onInput={(checked) => setFilterDom(checked)}
 				checked={filterDom}
 			/>
 			<FilterCheck
 				label="Text Signal nodes"
-				onInput={checked => setFilterTextSignal(checked)}
+				onInput={(checked) => setFilterTextSignal(checked)}
 				checked={filterTextSignal}
 			/>
 			{/* Custom user filters */}
@@ -189,7 +188,7 @@ export function TreeFilterPopup() {
 							<input
 								type="checkbox"
 								checked={x.enabled}
-								onInput={e => {
+								onInput={(e) => {
 									const copy = [...filters];
 									copy[i].enabled = (e.target as any).checked;
 									setFilters(copy);
@@ -205,7 +204,7 @@ export function TreeFilterPopup() {
 								type="text"
 								placeholder="MyComponent"
 								value={x.value}
-								onInput={e => {
+								onInput={(e) => {
 									const copy = [...filters];
 									copy[i].value = (e.target as any).value;
 									setFilters(copy);

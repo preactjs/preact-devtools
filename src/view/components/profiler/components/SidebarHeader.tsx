@@ -1,11 +1,11 @@
-import { h, Fragment } from "preact";
-import { Actions } from "../../Actions";
-import { useStore, useEmitter } from "../../../store/react-bindings";
-import { ComponentName } from "../../ComponentName";
+import { Fragment, h } from "preact";
+import { Actions } from "../../Actions.tsx";
+import { useEmitter, useStore } from "../../../store/react-bindings.ts";
+import { ComponentName } from "../../ComponentName.tsx";
 import { useCallback } from "preact/hooks";
-import { IconBtn } from "../../IconBtn";
-import { DevNodeType } from "../../../store/types";
-import { Icon } from "../../icons";
+import { IconBtn } from "../../IconBtn.tsx";
+import { DevNodeType } from "../../../store/types.ts";
+import { Icon } from "../../icons.tsx";
 
 export function SidebarHeader() {
 	const store = useStore();
@@ -23,8 +23,7 @@ export function SidebarHeader() {
 		}
 	}, [selected]);
 
-	const canViewSource =
-		selected &&
+	const canViewSource = selected &&
 		selected.type !== DevNodeType.Group &&
 		selected.type !== DevNodeType.Element;
 

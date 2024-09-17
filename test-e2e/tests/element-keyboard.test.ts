@@ -1,5 +1,5 @@
-import { test, expect } from "@playwright/test";
-import { getProps, gotoTest, locateTreeItem } from "../pw-utils";
+import { expect, test } from "@playwright/test";
+import { getProps, gotoTest, locateTreeItem } from "../pw-utils.ts";
 
 test("Test keyboard navigation in elements tree", async ({ page }) => {
 	const { devtools } = await gotoTest(page, "counter");

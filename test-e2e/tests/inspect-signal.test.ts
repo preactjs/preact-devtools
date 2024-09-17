@@ -1,5 +1,5 @@
-import { test, expect } from "@playwright/test";
-import { gotoTest, locateTreeItem } from "../pw-utils";
+import { expect, test } from "@playwright/test";
+import { gotoTest, locateTreeItem } from "../pw-utils.ts";
 
 test("Show signal in props and update value", async ({ page }) => {
 	test.skip(

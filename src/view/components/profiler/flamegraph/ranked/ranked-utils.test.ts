@@ -1,7 +1,7 @@
 import { expect } from "chai";
-import { toTransform } from "./ranked-utils";
-import { flames } from "../testHelpers";
-import { NodeTransform } from "../shared";
+import { toTransform } from "./ranked-utils.ts";
+import { flames } from "../testHelpers.ts";
+import { NodeTransform } from "../shared.ts";
 
 const required: Partial<NodeTransform> = {
 	visible: true,

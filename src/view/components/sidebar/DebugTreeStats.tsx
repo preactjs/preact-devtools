@@ -1,6 +1,6 @@
 import { h } from "preact";
-import { useStore } from "../../store/react-bindings";
-import { SidebarPanel } from "./SidebarPanel";
+import { useStore } from "../../store/react-bindings.ts";
+import { SidebarPanel } from "./SidebarPanel.tsx";
 
 export function DebugTreeStats() {
 	const store = useStore();

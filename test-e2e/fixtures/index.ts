@@ -1,8 +1,8 @@
-// @ts-ignore
+// @ts-ignore todo
 import { preactVersions } from "@preact-list-versions";
-// @ts-ignore
+// @ts-ignore todo
 import { fixtures } from "@fixtures";
-import "../../src/shells/shared/installHook";
+import "../../src/shells/shared/installHook.ts";
 
 function fromUrl() {
 	const url = new URL(window.location.href);
@@ -24,9 +24,9 @@ function createOption(name: string, value: string) {
 }
 
 function appendOptions(selector: string, values: string[], active?: string) {
-	const select = document.querySelector(selector);
+	const select = document.querySelector(selector)!;
 	select.append(
-		...values.map(v => {
+		...values.map((v) => {
 			const option = createOption(v, v);
 			if (active !== undefined && v === active) {
 				option.selected = true;
@@ -38,9 +38,9 @@ function appendOptions(selector: string, values: string[], active?: string) {
 
 function bindToParam(selector: string, param: string) {
 	const select = document.querySelector(selector) as HTMLSelectElement;
-	select.addEventListener("change", e => {
+	select.addEventListener("change", (e) => {
 		const params = new URLSearchParams(window.location.search);
-		// @ts-ignore
+		// @ts-ignore event types
 		params.set(param, e.target.value.replace(/\./g, "_"));
 		window.location.search = params.toString();
 	});
@@ -73,8 +73,8 @@ async function loadFixture() {
 
 async function waitForDevtoolsInit() {
 	const iframe = document.querySelector("iframe");
-	return new Promise(r => {
-		iframe.addEventListener("load", r);
+	return new Promise((r) => {
+		iframe!.addEventListener("load", r);
 	});
 }
 
@@ -86,7 +86,7 @@ async function waitForDevtoolsInit() {
 		params.set(
 			"preact",
 			active.preact ||
-				preactVersions.find(v => !v.includes("-") && v !== "git") ||
+				preactVersions.find((v) => !v.includes("-") && v !== "git") ||
 				preactVersions[0],
 		);
 		params.set("fixtures", active.fixtures || fixtures[0]);
@@ -106,23 +106,23 @@ async function waitForDevtoolsInit() {
 	);
 	bindToParam("#preact-version", "preact");
 
-	// @ts-ignore
-	const log = (window.log = []);
-	window.addEventListener("message", e => {
+	// @ts-ignore todo
+	const log: any[] = (window.log = []);
+	globalThis.addEventListener("message", (e) => {
 		if (e.data.source === "preact-page-hook") {
-			(document.querySelector(
-				"#devtools",
-			) as HTMLIFrameElement).contentWindow.postMessage(e.data, "*");
+			(
+				document!.querySelector("#devtools") as HTMLIFrameElement
+			)!.contentWindow!.postMessage(e.data, "*");
 			log.push(e.data);
 		} else if (
 			e.data.source === "preact-devtools-to-client" &&
 			!e.data._forwarded
 		) {
 			log.push(e.data);
-			window.postMessage({ ...e.data, _forwarded: true }, "*");
-			Array.from(document.querySelectorAll("iframe")).forEach(iframe => {
+			globalThis.postMessage({ ...e.data, _forwarded: true }, "*");
+			Array.from(document.querySelectorAll("iframe")).forEach((iframe) => {
 				if (iframe.id !== "devtools") {
-					iframe.contentWindow.postMessage(
+					iframe.contentWindow!.postMessage(
 						{ ...e.data, _forwarded: true },
 						"*",
 					);
@@ -133,8 +133,8 @@ async function waitForDevtoolsInit() {
 
 	await waitForDevtoolsInit();
 
-	document.querySelector("iframe").contentWindow.postMessage("foobar", "*");
+	document.querySelector("iframe")!.contentWindow!.postMessage("foobar", "*");
 
 	await loadFixture();
-	document.querySelector("iframe").contentWindow.postMessage("foobar", "*");
+	document.querySelector("iframe")!.contentWindow!.postMessage("foobar", "*");
 })();

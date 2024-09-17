@@ -1,12 +1,12 @@
-import { RendererConfig, getDevtoolsType } from "./renderer";
+import { getDevtoolsType, RendererConfig } from "./renderer.ts";
 import { Options } from "preact";
-import { inspectHooks } from "./hooks";
-import { getVNodeById, IdMappingState } from "./idMapper";
-import { cleanContext, cleanProps, serialize } from "./serialize";
-import { PreactBindings, SharedVNode } from "./bindings";
-import { InspectData } from "../adapter/adapter";
-import { ID } from "../../view/store/types";
-import { getSignalTextName } from "./utils";
+import { inspectHooks } from "./hooks.ts";
+import { getVNodeById, IdMappingState } from "./idMapper.ts";
+import { cleanContext, cleanProps, serialize } from "./serialize.ts";
+import { PreactBindings, SharedVNode } from "./bindings.ts";
+import { InspectData } from "../adapter/adapter.ts";
+import { ID } from "../../view/store/types.ts";
+import { getSignalTextName } from "./utils.ts";
 
 /**
  * Serialize all properties/attributes of a `VNode` like `props`, `context`,
@@ -27,33 +27,30 @@ export function inspectVNode<T extends SharedVNode>(
 	if (!vnode) return null;
 
 	const c = bindings.getComponent(vnode);
-	const hasState =
-		bindings.isComponent(vnode) &&
+	const hasState = bindings.isComponent(vnode) &&
 		c != null &&
 		typeof c.state === "object" &&
 		c.state != null &&
 		Object.keys(c.state).length > 0;
 
-	const isSignalTextNode =
-		typeof vnode.type === "function" && vnode.type.displayName === "_st";
+	const isSignalTextNode = typeof vnode.type === "function" &&
+		vnode.type.displayName === "_st";
 
-	const hasHooks =
-		c != null && !isSignalTextNode && bindings.getComponentHooks(vnode) != null;
-	const hooks =
-		supportsHooks && hasHooks
-			? inspectHooks(config, options, vnode, bindings)
-			: null;
-	const context =
-		c != null ? serialize(config, bindings, cleanContext(c.context)) : null;
-	const props =
-		vnode.type !== null
-			? serialize(config, bindings, cleanProps(vnode.props))
-			: null;
+	const hasHooks = c != null && !isSignalTextNode &&
+		bindings.getComponentHooks(vnode) != null;
+	const hooks = supportsHooks && hasHooks
+		? inspectHooks(config, options, vnode, bindings)
+		: null;
+	const context = c != null
+		? serialize(config, bindings, cleanContext(c.context))
+		: null;
+	const props = vnode.type !== null
+		? serialize(config, bindings, cleanProps(vnode.props))
+		: null;
 	const state = hasState ? serialize(config, bindings, c!.state) : null;
-	const signals =
-		c != null && "__$u" in c
-			? inspectSignalSubscriptions(config, bindings, c.__$u.s)
-			: null;
+	const signals = c != null && "__$u" in c
+		? inspectSignalSubscriptions(config, bindings, c.__$u.s)
+		: null;
 
 	let suspended = false;
 	let canSuspend = false;

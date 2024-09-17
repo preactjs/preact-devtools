@@ -1,12 +1,12 @@
-import { debug } from "../../../debug";
-import { setPopupStatus } from "../popup/popup";
+import { debug } from "../../../debug.ts";
+import { setPopupStatus } from "../popup/popup.ts";
 import {
 	ContentScriptName,
 	DevtoolsPanelName,
 	DevtoolsToClient,
-} from "../../../constants";
-import { BaseEvent } from "../../../adapter/adapter/port";
-import { BackgroundEmitter, Emitter } from "./emitter";
+} from "../../../constants.ts";
+import { BaseEvent } from "../../../adapter/adapter/port.ts";
+import { BackgroundEmitter, Emitter } from "./emitter.ts";
 
 /**
  * Collection of potential targets to connect to by tabId.
@@ -18,8 +18,8 @@ function addToTarget(tabId: number, port: chrome.runtime.Port) {
 		targets.set(tabId, BackgroundEmitter<any>());
 	}
 	const target = targets.get(tabId)!;
-	target.on(port.name, m => port.postMessage(m));
-	port.onMessage.addListener(m => target.emit(port.name, m));
+	target.on(port.name, (m) => port.postMessage(m));
+	port.onMessage.addListener((m) => target.emit(port.name, m));
 
 	port.onDisconnect.addListener(() => {
 		debug("disconnect", port.name);
@@ -71,15 +71,13 @@ function handleDevtoolsConnection(port: chrome.runtime.Port) {
  *
  * TODO: Allow 1:n connections
  */
-const connectionHandlers: Record<
-	string,
-	(port: chrome.runtime.Port) => void
-> = {
-	[ContentScriptName]: handleContentScriptConnection,
-	[DevtoolsPanelName]: handleDevtoolsConnection,
-};
+const connectionHandlers: Record<string, (port: chrome.runtime.Port) => void> =
+	{
+		[ContentScriptName]: handleContentScriptConnection,
+		[DevtoolsPanelName]: handleDevtoolsConnection,
+	};
 
-chrome.runtime.onConnect.addListener(port => {
+chrome.runtime.onConnect.addListener((port) => {
 	const handler = connectionHandlers[port.name];
 	debug(
 		`[${port.sender?.tab?.id}] %cBackground: %cconnecting ${port.name}`,

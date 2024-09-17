@@ -1,4 +1,4 @@
-import { h, ComponentChild } from "preact";
+import { ComponentChild, h } from "preact";
 import { useCallback } from "preact/hooks";
 
 export interface TabProps {

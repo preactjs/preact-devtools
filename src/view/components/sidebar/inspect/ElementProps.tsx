@@ -1,11 +1,11 @@
-import { h, Fragment } from "preact";
+import { Fragment, h } from "preact";
 import s from "./ElementProps.module.css";
-import { Arrow } from "../../elements/TreeView";
-import { PropDataType, PropData } from "./parseProps";
-import { DataInput } from "../../DataInput";
-import { genPreview } from "../../DataInput/parseValue";
-import { isCollapsed } from "../../../store/props";
-import { useState, useCallback, useLayoutEffect, useMemo } from "preact/hooks";
+import { Arrow } from "../../elements/TreeView.tsx";
+import { PropData, PropDataType } from "./parseProps.ts";
+import { DataInput } from "../../DataInput/index.tsx";
+import { genPreview } from "../../DataInput/parseValue.ts";
+import { isCollapsed } from "../../../store/props.ts";
+import { useCallback, useLayoutEffect, useMemo, useState } from "preact/hooks";
 
 export type ChangeFn = (value: any, path: string, node: null | any) => void;
 
@@ -21,8 +21,8 @@ export function ElementProps(props: Props) {
 
 	return (
 		<div class={s.root}>
-			<form class={s.form} onSubmit={e => e.preventDefault()}>
-				{items.map(item => {
+			<form class={s.form} onSubmit={(e) => e.preventDefault()}>
+				{items.map((item) => {
 					const id = item.id;
 					return (
 						<SingleItem
@@ -35,7 +35,7 @@ export function ElementProps(props: Props) {
 							onCollapse={() => onCollapse && onCollapse(id)}
 							editable={item.editable}
 							value={item.value}
-							onChange={v => onChange && onChange(v, id, item)}
+							onChange={(v) => onChange && onChange(v, id, item)}
 							depth={item.depth}
 							index={item.index}
 						/>
@@ -153,18 +153,18 @@ export function SingleItem(props: SingleProps) {
 					<div class={s.property} data-testid="prop-value">
 						{value !== "__preact_empty__" && (
 							<Fragment>
-								{editable ? (
-									<DataInput
-										value={value}
-										onReset={onReset}
-										onCommit={onCommit}
-										showReset={value !== preview}
-										onChange={onChangeValue}
-										name={`${id}`}
-									/>
-								) : (
-									<div class={s.mask}>{preview}</div>
-								)}
+								{editable
+									? (
+										<DataInput
+											value={value}
+											onReset={onReset}
+											onCommit={onCommit}
+											showReset={value !== preview}
+											onChange={onChangeValue}
+											name={`${id}`}
+										/>
+									)
+									: <div class={s.mask}>{preview}</div>}
 							</Fragment>
 						)}
 					</div>

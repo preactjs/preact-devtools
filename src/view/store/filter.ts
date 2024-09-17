@@ -1,6 +1,6 @@
 import { signal } from "@preact/signals";
-import { escapeStringRegexp } from "./utils";
-import { RawFilterState } from "../../adapter/adapter/filter";
+import { escapeStringRegexp } from "./utils.ts";
+import { RawFilterState } from "../../adapter/adapter/filter.ts";
 
 export interface RawFilter {
 	value: string;
@@ -38,7 +38,7 @@ export function createFilterStore(
 			},
 		};
 
-		filters.value.forEach(x => {
+		filters.value.forEach((x) => {
 			s.regex.push({ value: escapeStringRegexp(x.value), enabled: x.enabled });
 		});
 		onSubmit("update-filter", s);
@@ -50,8 +50,9 @@ export function createFilterStore(
 			filterDom.value = !!state.type.dom;
 			filterHoc.value = !!state.type.hoc;
 			filterRoot.value = !!state.type.root;
-			filterTextSignal.value =
-				"textSignal" in state.type ? !!state.type.textSignal : true;
+			filterTextSignal.value = "textSignal" in state.type
+				? !!state.type.textSignal
+				: true;
 			filters.value = state.regex;
 
 			// Refetch component tree if filters are not the default ones
@@ -61,7 +62,7 @@ export function createFilterStore(
 				defaults.hoc !== filterHoc.value ||
 				defaults.root !== filterRoot.value ||
 				defaults.textSignal !== filterTextSignal.value ||
-				filters.value.some(f => f.enabled)
+				filters.value.some((f) => f.enabled)
 			) {
 				submit();
 			}

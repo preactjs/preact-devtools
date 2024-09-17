@@ -1,6 +1,6 @@
 import { Plugin } from "vite";
-import fs from "fs";
-import path from "path";
+import fs from "node:fs";
+import path from "node:path";
 
 // WARNING: Also update build.js
 export function injectSvgSpritePlugin(): Plugin {

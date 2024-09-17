@@ -16,7 +16,7 @@ export async function gotoTest(
 		const versions = getPreactVersions();
 		const envVersion = process.env.PREACT_VERSION;
 		if (envVersion) {
-			const parsed = versions.find(v => v.startsWith(envVersion));
+			const parsed = versions.find((v) => v.startsWith(envVersion));
 			if (!parsed) {
 				throw new Error(
 					`Unknown preact version "${envVersion}" passed into PREACT_VERSION`,
@@ -25,7 +25,7 @@ export async function gotoTest(
 
 			preactVersion = parsed;
 		} else {
-			preactVersion = versions.find(v => !v.includes("-"));
+			preactVersion = versions.find((v) => !v.includes("-"));
 		}
 	}
 
@@ -36,7 +36,7 @@ export async function gotoTest(
 	const devtools = page
 		.mainFrame()
 		.childFrames()
-		.find(frame => frame.url().endsWith("devtools.html"));
+		.find((frame) => frame.url().endsWith("devtools.html"));
 
 	assert(devtools);
 
@@ -46,7 +46,7 @@ export async function gotoTest(
 	return { devtools };
 }
 
-export const wait = (ms: number) => new Promise(r => setTimeout(r, ms));
+export const wait = (ms: number) => new Promise((r) => setTimeout(r, ms));
 
 export async function waitForPass(
 	fn,
@@ -128,15 +128,15 @@ export async function getHooks(page: Frame): Promise<Array<[string, string]>> {
 			),
 		);
 
-		return rows.map(item => {
+		return rows.map((item) => {
 			const name = item.querySelector('[data-testid="prop-name"]')?.textContent;
 			let value = item.querySelector('[data-testid="prop-value"]')?.textContent;
 
 			// Check if we're dealing with an input
 			if (!value) {
-				const rawValue = (item.querySelector(
-					'[data-testid="prop-value"] input',
-				) as any)?.value;
+				const rawValue = (
+					item.querySelector('[data-testid="prop-value"] input') as any
+				)?.value;
 
 				if (rawValue === undefined) {
 					value = "";
@@ -156,13 +156,13 @@ export async function getProps(page: Frame) {
 			document.querySelectorAll(
 				`[data-testid="Props"] [data-testid="prop-name"]`,
 			),
-		).map(x => x.textContent || "");
+		).map((x) => x.textContent || "");
 
 		const values = Array.from(
 			document.querySelectorAll(
 				`[data-testid="Props"] [data-testid="prop-value"]`,
 			),
-		).map(x => {
+		).map((x) => {
 			const input = x.querySelector('input[type="text"]');
 			if (input === null) return x.textContent || "";
 			return (input as any).value;
@@ -199,11 +199,11 @@ export async function getTreeItems(page: Page | Frame) {
 	return await page.evaluate(() => {
 		return Array.from(
 			document.querySelectorAll('[data-testid="tree-item"]'),
-		).map(el => {
+		).map((el) => {
 			return {
 				name: el.getAttribute("data-name"),
 				hocs: Array.from(el.querySelectorAll(".hoc-item")).map(
-					h => h.textContent,
+					(h) => h.textContent,
 				),
 			};
 		});
@@ -215,6 +215,6 @@ export async function getTreeViewItemNames(page: Frame | Page) {
 	return await page.evaluate(() => {
 		return Array.from(
 			document.querySelectorAll('[data-testid="tree-item"]'),
-		).map(el => el.getAttribute("data-name"));
+		).map((el) => el.getAttribute("data-name"));
 	});
 }

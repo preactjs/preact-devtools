@@ -1,14 +1,12 @@
-import { test, expect } from "@playwright/test";
+import { expect, test } from "@playwright/test";
 import {
 	clickRecordButton,
-	locateTab,
 	gotoTest,
 	locateFlame,
-} from "../../../pw-utils";
+	locateTab,
+} from "../../../pw-utils.ts";
 
-test("Not rendered nodes that are not parents of the current commit should be striped out", async ({
-	page,
-}) => {
+test("Not rendered nodes that are not parents of the current commit should be striped out", async ({ page }) => {
 	const { devtools } = await gotoTest(page, "profiler-2");
 
 	await devtools.locator(locateTab("PROFILER")).click();
@@ -23,9 +21,9 @@ test("Not rendered nodes that are not parents of the current commit should be st
 			'[data-type="flamegraph"] [data-testid="flame-node"]:not([data-weight="-1"])',
 		)
 		.allTextContents();
-	expect(nodes.map(n => n.split(" ")[0])).toEqual(["Counter", "Display"]);
+	expect(nodes.map((n) => n.split(" ")[0])).toEqual(["Counter", "Display"]);
 	nodes = await devtools
 		.locator('[data-type="flamegraph"] [data-commit-parent]')
 		.allTextContents();
-	expect(nodes.map(n => n.split(" ")[0])).toEqual(["Fragment", "App"]);
+	expect(nodes.map((n) => n.split(" ")[0])).toEqual(["Fragment", "App"]);
 });

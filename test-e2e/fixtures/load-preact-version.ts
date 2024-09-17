@@ -1,6 +1,6 @@
 import { Plugin } from "vite";
-import fs from "fs";
-import path from "path";
+import fs from "node:fs";
+import path from "node:path";
 import * as tar from "tar";
 
 /**
@@ -43,10 +43,16 @@ export function loadPreactVersion(): Plugin {
 					const entry = pkg.exports[modName].import;
 
 					const code = fs.readFileSync(path.join(versionDir, entry), "utf-8");
-					const map = fs.readFileSync(
-						path.join(versionDir, entry + ".map"),
-						"utf-8",
-					);
+
+					let map: string | null = null;
+					try {
+						map = fs.readFileSync(
+							path.join(versionDir, entry + ".map"),
+							"utf-8",
+						);
+					} catch {
+						// TODO
+					}
 
 					return {
 						code: code.replace(
@@ -60,7 +66,7 @@ export function loadPreactVersion(): Plugin {
 					// Check if someone is already resolving
 					const inProgress = pending.get(version);
 					if (inProgress) {
-						return new Promise(r => {
+						return new Promise((r) => {
 							inProgress.push(() => r(cache.get(version)!));
 						});
 					}
@@ -99,8 +105,8 @@ export function loadPreactVersion(): Plugin {
 						};
 
 						importee = version.startsWith("11")
-							? mappings["11.x"][importee]
-							: mappings["10.x"][importee];
+							? mappings["11.x"][importee as keyof typeof mappings["11.x"]]
+							: mappings["10.x"][importee as keyof typeof mappings["10.x"]];
 
 						const code = fs.readFileSync(
 							path.join(versionDir, importee),
@@ -121,7 +127,7 @@ export function loadPreactVersion(): Plugin {
 						cache.set(id, out);
 
 						const fns = pending.get(version) || [];
-						await Promise.all(fns.map(fn => fn()));
+						await Promise.all(fns.map((fn) => fn()));
 						return out;
 					} else if (fs.existsSync(folder)) {
 						let importee = id.replace(/@[^/]+/, "");
@@ -153,7 +159,7 @@ export function loadPreactVersion(): Plugin {
 						cache.set(id, out);
 
 						const fns = pending.get(version) || [];
-						await Promise.all(fns.map(fn => fn()));
+						await Promise.all(fns.map((fn) => fn()));
 						return out;
 					}
 				}

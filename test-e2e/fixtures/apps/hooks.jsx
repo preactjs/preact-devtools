@@ -1,15 +1,15 @@
-import { h, Fragment, render, createContext, createRef } from "preact";
+import { createContext, createRef, Fragment, h, render } from "preact";
 import {
-	useState,
-	useEffect,
-	useLayoutEffect,
 	useCallback,
+	useContext,
+	useDebugValue,
+	useEffect,
+	useErrorBoundary,
+	useImperativeHandle,
+	useLayoutEffect,
 	useMemo,
 	useRef,
-	useContext,
-	useImperativeHandle,
-	useErrorBoundary,
-	useDebugValue,
+	useState,
 } from "preact/hooks";
 
 function Display(props) {

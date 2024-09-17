@@ -1,6 +1,6 @@
-import { h, ComponentChildren } from "preact";
-import { IconBtn } from "../IconBtn";
-import { Icon } from "../icons";
+import { ComponentChildren, h } from "preact";
+import { IconBtn } from "../IconBtn.tsx";
+import { Icon } from "../icons.tsx";
 
 export interface Props {
 	title: string;

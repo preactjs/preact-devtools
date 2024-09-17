@@ -1,4 +1,4 @@
-import { NodeType } from "../constants";
+import { NodeType } from "../constants.ts";
 
 export function getNearestElement(dom: Element | Text): Element {
 	return dom.nodeType === NodeType.Text ? (dom.parentNode as any) : dom;

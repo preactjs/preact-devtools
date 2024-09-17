@@ -1,17 +1,17 @@
-import { h, render, Options, options, Fragment, Component } from "preact";
+import { Component, Fragment, h, Options, options, render } from "preact";
 import * as sinon from "sinon";
-import { createRenderer } from "./renderer";
-import { setupOptionsV10 } from "../10/options";
+import { createRenderer } from "./renderer.ts";
+import { setupOptionsV10 } from "../10/options.ts";
 import { expect } from "chai";
-import { toSnapshot } from "../debug";
+import { toSnapshot } from "../debug.ts";
 import { useState } from "preact/hooks";
 import { act } from "preact/test-utils";
-import { bindingsV10 } from "../10/bindings";
-import { FilterState } from "../adapter/filter";
-import { Renderer } from "../renderer";
-import { newProfiler } from "../adapter/profiler";
-import { getFilteredChildren } from "./traverse";
-import { createIdMappingState } from "./idMapper";
+import { bindingsV10 } from "../10/bindings.ts";
+import { FilterState } from "../adapter/filter.ts";
+import { Renderer } from "../renderer.ts";
+import { newProfiler } from "../adapter/profiler.ts";
+import { getFilteredChildren } from "./traverse.ts";
+import { createIdMappingState } from "./idMapper.ts";
 
 export function setupScratch() {
 	const div = document.createElement("div");
@@ -46,7 +46,7 @@ export function setupMockHook(options: Options) {
 }
 
 function getOps(spy: sinon.SinonSpy) {
-	return spy.args.filter(arg => arg[0] === "operation_v2");
+	return spy.args.filter((arg) => arg[0] === "operation_v2");
 }
 
 describe("Renderer 10", () => {
@@ -502,8 +502,8 @@ describe("Renderer 10", () => {
 						Fragment: Fragment as any,
 					},
 					bindingsV10,
-				).map(name =>
-					bindingsV10.getDisplayName(name, { Fragment: Fragment as any }),
+				).map((name) =>
+					bindingsV10.getDisplayName(name, { Fragment: Fragment as any })
 				),
 			).to.deep.equal(["Foo", "Bar"]);
 		});

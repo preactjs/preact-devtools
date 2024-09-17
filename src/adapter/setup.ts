@@ -1,5 +1,5 @@
-import { DevtoolsHook } from "./hook";
-import { Options, Fragment, Component } from "preact";
+import { DevtoolsHook } from "./hook.ts";
+import { Component, Fragment, Options } from "preact";
 
 export async function init(options: Options, getHook: () => DevtoolsHook) {
 	const hook = getHook();

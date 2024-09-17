@@ -23,7 +23,7 @@ function App() {
 	return (
 		<div>
 			<Counter />
-			<button onClick={() => set(p => p + 1)}>force update</button>
+			<button onClick={() => set((p) => p + 1)}>force update</button>
 		</div>
 	);
 }

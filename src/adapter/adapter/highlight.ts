@@ -1,8 +1,8 @@
-import { Renderer } from "../renderer";
-import { render, h } from "preact";
-import { getNearestElement, measureNode, mergeMeasure } from "../dom";
-import { ID } from "../../view/store/types";
-import { Highlighter, style } from "../../view/components/Highlighter";
+import { Renderer } from "../renderer.ts";
+import { h, render } from "preact";
+import { getNearestElement, measureNode, mergeMeasure } from "../dom.ts";
+import { ID } from "../../view/store/types.ts";
+import { Highlighter, style } from "../../view/components/Highlighter.tsx";
 
 /**
  * This module is responsible for displaying the transparent element overlay
@@ -47,8 +47,7 @@ export function createHightlighter(
 				document.body.appendChild(highlightRef);
 			}
 
-			// eslint-disable-next-line prefer-const
-			let [first, last] = dom;
+			const [first, last] = dom;
 			if (first === null) return;
 
 			const node = getNearestElement(first);

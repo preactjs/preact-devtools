@@ -1,4 +1,4 @@
-import { ID } from "../../view/store/types";
+import { ID } from "../../view/store/types.ts";
 
 export const enum RenderReason {
 	MOUNT = 1,

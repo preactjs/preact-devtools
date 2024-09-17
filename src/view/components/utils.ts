@@ -1,6 +1,6 @@
 import { useContext, useLayoutEffect } from "preact/hooks";
-import { WindowCtx } from "../store/react-bindings";
-import { throttle } from "../../shells/shared/utils";
+import { WindowCtx } from "../store/react-bindings.ts";
+import { throttle } from "../../shells/shared/utils.ts";
 
 export function useResize(fn: () => void, args: any[], init = false) {
 	// If we're running inside the browser extension context

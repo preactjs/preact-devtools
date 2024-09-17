@@ -1,5 +1,8 @@
-import { parseProps, PropData } from "../components/sidebar/inspect/parseProps";
-import { flattenChildren } from "../components/tree/windowing";
+import {
+	parseProps,
+	PropData,
+} from "../components/sidebar/inspect/parseProps.ts";
+import { flattenChildren } from "../components/tree/windowing.ts";
 
 const PROPS_LIMIT = 7;
 
@@ -30,10 +33,10 @@ export function parseObjectState(
 		});
 
 		parseProps(data, "root", PROPS_LIMIT, 0, "root", tree);
-		const items = flattenChildren(tree, "root", id => {
+		const items = flattenChildren(tree, "root", (id) => {
 			return tree.get(id)!.children.length > 0 && isCollapsed(uncollapsed, id);
 		});
-		return items.slice(1).map(id => tree.get(id)!);
+		return items.slice(1).map((id) => tree.get(id)!);
 	}
 
 	return [];
@@ -47,12 +50,12 @@ export function filterCollapsed<T extends { id: string; children: string[] }>(
 	const visible = new Set<string>();
 	const uncoll = new Set(uncollapsed);
 
-	return items.filter(node => {
-		if (skip.some(x => node.id.startsWith(x))) {
+	return items.filter((node) => {
+		if (skip.some((x) => node.id.startsWith(x))) {
 			return false;
 		}
 		if (node.id === "root" || uncoll.has(node.id)) {
-			node.children.forEach(childId => visible.add(childId));
+			node.children.forEach((childId) => visible.add(childId));
 		} else if (node.children.length) {
 			skip.push(node.id);
 		}

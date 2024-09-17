@@ -1,10 +1,10 @@
-import { test, expect } from "@playwright/test";
+import { expect, test } from "@playwright/test";
 import {
 	clickHookItem,
 	clickTreeItem,
 	getHooks,
 	gotoTest,
-} from "../../pw-utils";
+} from "../../pw-utils.ts";
 
 test("Show multiple hook names at the same time", async ({ page }) => {
 	const { devtools } = await gotoTest(page, "hooks-multiple");

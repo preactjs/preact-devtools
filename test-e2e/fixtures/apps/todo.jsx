@@ -1,10 +1,10 @@
-import { render, h } from "preact";
+import { h, render } from "preact";
 import { useState } from "preact/hooks";
 
 function TodoItem(props) {
 	return (
 		<li style="padding: 0.5rem 1rem;">
-			<span>{props.children} - </span>
+			<span>{props.children} -</span>
 			<button onClick={props.onClick}>delete</button>
 		</li>
 	);
@@ -29,7 +29,7 @@ function TodoList() {
 	return (
 		<form
 			style="padding: 2rem;"
-			onSubmit={e => {
+			onSubmit={(e) => {
 				e.preventDefault();
 				if (value) {
 					setTodos([...todos, value]);
@@ -40,7 +40,7 @@ function TodoList() {
 			<input
 				type="text"
 				value={value}
-				onChange={e => setValue(e.target.value)}
+				onChange={(e) => setValue(e.target.value)}
 			/>
 			<button type="submit">submit</button>
 			<ul>

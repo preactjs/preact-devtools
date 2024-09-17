@@ -1,4 +1,4 @@
-import { h, Fragment, render } from "preact";
+import { Fragment, h, render } from "preact";
 
 // eslint-disable-next-line @typescript-eslint/no-unused-vars
 function NestedObjProps(props) {

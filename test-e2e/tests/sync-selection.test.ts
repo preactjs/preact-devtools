@@ -5,7 +5,7 @@ import {
 	locateFlame,
 	locateTab,
 	locateTreeItem,
-} from "../pw-utils";
+} from "../pw-utils.ts";
 
 test("Sync selection from profiler", async ({ page }) => {
 	const { devtools } = await gotoTest(page, "counter");

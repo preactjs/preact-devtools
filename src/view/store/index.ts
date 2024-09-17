@@ -1,20 +1,21 @@
-import { signal, effect, computed } from "@preact/signals";
-import { createSearchStore } from "./search";
-import { createFilterStore } from "./filter";
-import { flattenChildren } from "../components/tree/windowing";
-import { createSelectionStore } from "./selection";
-import { createCollapser } from "./collapser";
-import { EmitFn } from "../../adapter/hook";
-import { ID, DevNode, Store, Listener, Theme, Panel } from "./types";
-import { InspectData } from "../../adapter/adapter/adapter";
-import { createProfiler } from "../components/profiler/data/commits";
-import { PropData } from "../components/sidebar/inspect/parseProps";
-import { parseObjectState, filterCollapsed } from "./props";
+import { computed, effect, signal } from "@preact/signals";
+import { createSearchStore } from "./search.ts";
+import { createFilterStore } from "./filter.ts";
+import { flattenChildren } from "../components/tree/windowing.ts";
+import { createSelectionStore } from "./selection.ts";
+import { createCollapser } from "./collapser.ts";
+import { EmitFn } from "../../adapter/hook.ts";
+import { DevNode, ID, Listener, Panel, Store, Theme } from "./types.ts";
+import { InspectData } from "../../adapter/adapter/adapter.ts";
+import { createProfiler } from "../components/profiler/data/commits.ts";
+import { PropData } from "../components/sidebar/inspect/parseProps.ts";
+import { filterCollapsed, parseObjectState } from "./props.ts";
+import "../../global.d.ts";
 
 export function createStore(): Store {
 	const listeners: Array<null | Listener> = [];
 	const notify: EmitFn = (name, data) => {
-		listeners.forEach(fn => fn && fn(name, data));
+		listeners.forEach((fn) => fn && fn(name, data));
 	};
 
 	const debugMode = signal(!!__DEBUG__);
@@ -32,9 +33,11 @@ export function createStore(): Store {
 
 	const nodeList = computed(() => {
 		return roots.value
-			.map(root => {
-				const items = flattenChildren<ID, DevNode>(nodes.value, root, id =>
-					collapser.collapsed.value.has(id),
+			.map((root) => {
+				const items = flattenChildren<ID, DevNode>(
+					nodes.value,
+					root,
+					(id) => collapser.collapsed.value.has(id),
 				);
 
 				if (filterState.filterRoot.value) {
@@ -101,10 +104,9 @@ export function createStore(): Store {
 	const supportsHooks = signal(false);
 	effect(() => {
 		if (supportsHooks) {
-			const items =
-				inspectData.value && inspectData.value.hooks
-					? inspectData.value.hooks
-					: [];
+			const items = inspectData.value && inspectData.value.hooks
+				? inspectData.value.hooks
+				: [];
 			sidebar.hooks.items.value = filterCollapsed(
 				items,
 				sidebar.hooks.uncollapsed.value,

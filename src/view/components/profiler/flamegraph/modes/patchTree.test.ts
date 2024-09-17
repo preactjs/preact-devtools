@@ -1,8 +1,8 @@
 import { expect } from "chai";
-import { patchTree } from "./patchTree";
-import { flames } from "../testHelpers";
-import { Tree, DevNode, ID } from "../../../../store/types";
-import { NodeTransform } from "../shared";
+import { patchTree } from "./patchTree.ts";
+import { flames } from "../testHelpers.ts";
+import { DevNode, ID, Tree } from "../../../../store/types.ts";
+import { NodeTransform } from "../shared.ts";
 
 function round(n: number) {
 	return Math.round((n + Number.EPSILON) * 100) / 100;
@@ -10,7 +10,7 @@ function round(n: number) {
 
 export function toTimings(tree: Tree, flame: Map<ID, NodeTransform>) {
 	return Array.from(flame.values())
-		.map(pos => {
+		.map((pos) => {
 			const node = tree.get(pos.id)!;
 			return {
 				id: pos.id,
@@ -41,7 +41,7 @@ export function patch(
 }
 
 export function byName(tree: Tree, name: string) {
-	return Array.from(tree.values()).find(node => node.name === name);
+	return Array.from(tree.values()).find((node) => node.name === name);
 }
 
 export function prepareFixture(fixture: {
@@ -51,9 +51,9 @@ export function prepareFixture(fixture: {
 }) {
 	const { previous, next, expected } = fixture;
 	return {
-		previous: new Map(previous.map(node => [node.id, node])),
+		previous: new Map(previous.map((node) => [node.id, node])),
 		previousRoot: previous.length ? previous[0].id : -42,
-		next: new Map(next.map(node => [node.id, node])),
+		next: new Map(next.map((node) => [node.id, node])),
 		nextRoot: next[0].id,
 		expected,
 	};
@@ -66,7 +66,7 @@ describe("patchTree", () => {
 				Bar **
 		`;
 
-		b.nodes.forEach(x => {
+		b.nodes.forEach((x) => {
 			x.startTime += 200;
 			x.endTime += 200;
 		});
@@ -100,7 +100,7 @@ describe("patchTree", () => {
 			  Bob *
 		`;
 
-		b.nodes.forEach(x => {
+		b.nodes.forEach((x) => {
 			if (x.name !== "App") {
 				x.startTime += 100;
 				x.endTime += 100;
@@ -165,7 +165,7 @@ describe("patchTree", () => {
 			  Bob *
 		`;
 
-		b.nodes.forEach(node => {
+		b.nodes.forEach((node) => {
 			if (node.name !== "App") {
 				node.startTime -= 100;
 				node.endTime -= 100;

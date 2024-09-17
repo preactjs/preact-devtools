@@ -1,5 +1,5 @@
-import { test, expect } from "@playwright/test";
-import { gotoTest, waitForPass } from "../pw-utils";
+import { expect, test } from "@playwright/test";
+import { gotoTest, waitForPass } from "../pw-utils.ts";
 
 test("HOC-Component filter should flatten tree", async ({ page }) => {
 	const { devtools } = await gotoTest(page, "hoc");
@@ -8,7 +8,7 @@ test("HOC-Component filter should flatten tree", async ({ page }) => {
 
 	const items = await devtools
 		.locator('[data-testid="tree-item"]')
-		.evaluateAll(els => els.map(el => el.getAttribute("data-name")));
+		.evaluateAll((els) => els.map((el) => el.getAttribute("data-name")));
 
 	expect(items).toEqual(["Foo", "Bar", "Anonymous", "Foo", "Last"]);
 

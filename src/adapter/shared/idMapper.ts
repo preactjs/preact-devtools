@@ -1,5 +1,5 @@
-import { ID } from "../../view/store/types";
-import { SharedVNode } from "./bindings";
+import { ID } from "../../view/store/types.ts";
+import { SharedVNode } from "./bindings.ts";
 
 /**
  * VNode relationships are encoded as simple numbers for the devtools. We use

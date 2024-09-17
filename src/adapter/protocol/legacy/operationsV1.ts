@@ -1,7 +1,7 @@
-import { MsgTypes } from "../events";
-import { parseTable } from "../string-table";
-import { Store } from "../../../view/store/types";
-import { deepClone } from "../../shared/utils";
+import { MsgTypes } from "../events.ts";
+import { parseTable } from "../string-table.ts";
+import { Store } from "../../../view/store/types.ts";
+import { deepClone } from "../../shared/utils.ts";
 
 export function applyOperationsV1(store: Store, data: number[]) {
 	const nodes = new Map(store.nodes.value);
@@ -9,8 +9,9 @@ export function applyOperationsV1(store: Store, data: number[]) {
 	let i = data[1] + 1;
 	const strings = parseTable(data.slice(1, i + 1));
 
-	const inspected =
-		store.inspectData.value != null ? store.inspectData.value.id : -2;
+	const inspected = store.inspectData.value != null
+		? store.inspectData.value.id
+		: -2;
 
 	for (; i < data.length; i++) {
 		switch (data[i]) {
