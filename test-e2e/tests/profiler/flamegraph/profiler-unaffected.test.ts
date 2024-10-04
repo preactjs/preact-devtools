@@ -25,7 +25,7 @@ test("Not rendered nodes that are not parents of the current commit should be st
 		.allTextContents();
 	expect(nodes.map(n => n.split(" ")[0])).toEqual(["Counter", "Display"]);
 	nodes = await devtools
-		.locator('[data-type="flamegraph"] [data-commit-parent]')
+		.locator('[data-type="flamegraph"] [data-commit-parent="true"]')
 		.allTextContents();
 	expect(nodes.map(n => n.split(" ")[0])).toEqual(["Fragment", "App"]);
 });
