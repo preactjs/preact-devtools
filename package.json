@@ -37,7 +37,8 @@
 		"dev:serve": "vite test-e2e/fixtures --port 8100",
 		"run:chrome": "node tools/build.mjs --browser chrome --debug && mkdir -p ./profiles/chrome && node tools/run-chrome.js",
 		"run:firefox": "node tools/build.mjs --browser firefox --debug && mkdir -p ./profiles/firefox && web-ext run --source-dir ./dist/firefox-debug/ --start-url https://preactjs.com --firefox-profile=./profiles/firefox --keep-profile-changes",
-		"release": "node tools/release.js"
+		"release": "node tools/release.js",
+		"postinstall": "patch-package"
 	},
 	"repository": {
 		"type": "git",
@@ -79,8 +80,10 @@
 		"lint-staged": "^10.4.0",
 		"mochette": "^1.0.1",
 		"mri": "^1.2.0",
+		"patch-package": "^8.0.0",
 		"playwright-chromium": "^1.28.0",
-		"preact": "^10.10.6",
+		"postinstall-postinstall": "^2.1.0",
+		"preact": "^10.24.1",
 		"prettier": "^3.2.5",
 		"tar": "^6.1.11",
 		"ts-node": "^10.9.2",
