@@ -8,7 +8,7 @@
 	color: var(--color-text);
 }
 
-.btnIcon[data-active] {
+.btnIcon[data-active="true"] {
 	color: var(--color-button-active);
 	color: var(--color-button-active);
 }
