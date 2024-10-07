@@ -34,7 +34,7 @@ test("Should inspect during picking", async ({ page }) => {
 	// Should select new node in element tree
 	await page.click(target);
 	active = await devtools.locator(inspect).getAttribute("data-active");
-	expect(active).toEqual(null);
+	expect(active).toEqual("false");
 
 	// ...and display the newly inspected data
 	await expect(devtools.locator(prop)).toHaveCount(1);

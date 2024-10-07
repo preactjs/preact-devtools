@@ -21,5 +21,7 @@ test("Sync selection from profiler", async ({ page }) => {
 	await devtools.click(locateFlame("Display"));
 
 	await devtools.click(locateTab("ELEMENTS"));
-	await devtools.locator('[data-selected]:has-text("Display")').waitFor();
+	await devtools
+		.locator('[data-selected="true"]:has-text("Display")')
+		.waitFor();
 });

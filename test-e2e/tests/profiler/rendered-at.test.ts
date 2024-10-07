@@ -32,7 +32,7 @@ test("Show in which commit a node rendered", async ({ page }) => {
 		.evaluateAll(els =>
 			Array.from(els).map(el => el.getAttribute("data-selected")),
 		);
-	expect(commits).toEqual(["true", null, null, null]);
+	expect(commits).toEqual(["true", "false", "false", "false"]);
 
 	const btns = await devtools
 		.locator('[data-testid="rendered-at"] button')
@@ -40,14 +40,16 @@ test("Show in which commit a node rendered", async ({ page }) => {
 			Array.from(els).map(el => el.getAttribute("data-active")),
 		);
 
-	expect(btns).toEqual(["true", null]);
+	expect(btns).toEqual(["true", "false"]);
 
-	await devtools.click('[data-testid="rendered-at"] button:not([data-active])');
+	await devtools.click(
+		'[data-testid="rendered-at"] button:not([data-active="true"])',
+	);
 
 	commits = await devtools
 		.locator('[data-testid="commit-item"]')
 		.evaluateAll(els =>
 			Array.from(els).map(el => el.getAttribute("data-selected")),
 		);
-	expect(commits).toEqual([null, null, "true", null]);
+	expect(commits).toEqual(["false", "false", "true", "false"]);
 });

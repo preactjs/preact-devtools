@@ -17,6 +17,9 @@ function createRootFragment(parent, replaceNode) {
 		removeChild: function (c) {
 			parent.removeChild(c);
 		},
+		contains: function (c) {
+			return parent.contains(c);
+		},
 	});
 }
 
@@ -38,7 +41,8 @@ const Virtual1 = () => <h1>Virtual1</h1>;
 const Virtual2 = () => <h1>Virtual2</h1>;
 
 render(<App2 />, app2);
-render(<Virtual1 />, createRootFragment(app2, app2.children));
-render(<Virtual2 />, createRootFragment(app2, app2.children));
+render(<Virtual1 />, createRootFragment(app2, app2.children[0]));
+
+render(<Virtual2 />, createRootFragment(app2, app2.children[0]));
 render(<App3 />, app3);
 render(<App1 />, app);

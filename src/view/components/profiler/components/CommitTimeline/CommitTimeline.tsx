@@ -54,7 +54,7 @@ function calcSize(
 							viewport - selOffset - (selected < count - 1 ? itemWidth / 2 : 0),
 							paneWidth - viewport,
 							// eslint-disable-next-line no-mixed-spaces-and-tabs
-					  )
+						)
 					: 0;
 
 			paneContainer.current.style.width = org;
@@ -93,7 +93,7 @@ export function CommitTimeline(props: CommitTimelineProps) {
 
 	useEffect(() => {
 		if (pane.current) {
-			const active = pane.current.querySelector("[data-selected]");
+			const active = pane.current.querySelector('[data-selected="true"]');
 			// JSDOM doesn't support scrollIntoView
 			if (active && active.scrollIntoView) active.scrollIntoView();
 		}

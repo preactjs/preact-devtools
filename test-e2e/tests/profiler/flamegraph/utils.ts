@@ -6,12 +6,12 @@ export async function getFlameNodes(page: Frame) {
 	return await page.$$eval(selector, els => {
 		return els.map(el => {
 			return {
-				maximized: el.hasAttribute("data-maximized"),
+				maximized: el.getAttribute("data-maximized") === "true",
 				name: el.getAttribute("data-name") || "",
 				hocs: Array.from(el.querySelectorAll(".hoc-item")).map(
 					el => el.textContent,
 				),
-				visible: el.hasAttribute("data-visible"),
+				visible: el.getAttribute("data-visible") === "true",
 			};
 		});
 	});
