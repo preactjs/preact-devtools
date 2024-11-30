@@ -78,13 +78,11 @@ describe("cleanProps", () => {
 	});
 
 	it("should filter out __source", () => {
-		// @ts-expect-error
 		const vnode = h("div", { __source: "foo", foo: 1 });
 		expect(cleanProps(vnode.props)).to.deep.equal({ foo: 1 });
 	});
 
 	it("should filter out __self", () => {
-		// @ts-expect-error
 		const vnode = h("div", { __self: "foo", foo: 1 });
 		expect(cleanProps(vnode.props)).to.deep.equal({ foo: 1 });
 	});
