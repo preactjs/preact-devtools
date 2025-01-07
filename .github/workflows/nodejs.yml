@@ -20,7 +20,7 @@ jobs:
       - name: Install Deps
         run: yarn
       - name: Install Playwright
-        run: yarn playwright install-deps chromium
+        run: yarn playwright install --with-deps && yarn playwright install-deps chromium
       - name: Run tests
         run: |
           yarn lint
