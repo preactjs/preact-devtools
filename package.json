@@ -25,7 +25,7 @@
 		"build:firefox": "node tools/build.mjs --browser firefox",
 		"build:inline:types": "tsc -p tsconfig.inline.json",
 		"build:inline": "node tools/build.mjs --browser inline && tsc -p tsconfig.inline.json",
-		"archive": "git archive --form at zip --output dist/source-code.zip main",
+		"archive": "git archive --format zip --output dist/source-code.zip main",
 		"lint": "eslint 'src/**/*.{ts,tsx}' 'test-e2e/**/*.ts'",
 		"test": "mochette -c tsconfig.cjs.json -r tools/test-setup.js 'src/**/*.test.{ts,tsx}'",
 		"test:e2e": "node tools/fetch-preact-versions.mjs && playwright test",
