@@ -136,7 +136,7 @@ export function getHookState(
 		// useContext
 		if (type === HookType.useContext) {
 			const context = list[index]._context || list[index].__c || list[index].c;
-			const provider = c.context[context._id] || c.context[context.__c];
+			const provider = c.context[context._id] || c.context[context.__c] || c.context[context.__l];
 			return provider
 				? provider.props.value
 				: context._defaultValue || context.__;
