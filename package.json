@@ -79,8 +79,6 @@
 		"lint-staged": "^10.4.0",
 		"mochette": "^1.0.1",
 		"mri": "^1.2.0",
-		"playwright": "^1.49.1",
-		"playwright-chromium": "^1.49.1",
 		"preact": "^10.25.1",
 		"prettier": "^3.2.5",
 		"tar": "^6.1.11",
