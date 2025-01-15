@@ -212,7 +212,7 @@ export function getDisplayName(vnode: VNode, config: RendererConfig): string {
 
 			// Provider
 			if ((c as any).sub) {
-				const ctx = (type as any)._contextRef || (type as any).__ || (type as any).__l;
+				const ctx = (type as any)._contextRef || ('__l' in type ? (type as any).__l : (type as any).__);
 				if (ctx && ctx.displayName) {
 					return `${ctx.displayName}.Provider`;
 				}
