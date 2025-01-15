@@ -136,7 +136,7 @@ export function getHookState(
 		// useContext
 		if (type === HookType.useContext) {
 			const context = list[index]._context || list[index].__c || list[index].c;
-			const provider = c.context[context._id] || c.context[context.__c] || c.context[context.__l];
+			const provider = c.context[context._id] || c.context[context.__c];
 			return provider
 				? provider.props.value
 				: context._defaultValue || context.__;
@@ -212,7 +212,7 @@ export function getDisplayName(vnode: VNode, config: RendererConfig): string {
 
 			// Provider
 			if ((c as any).sub) {
-				const ctx = (type as any)._contextRef || (type as any).__ || (type as any).__c;
+				const ctx = (type as any)._contextRef || (type as any).__ || (type as any).__l;
 				if (ctx && ctx.displayName) {
 					return `${ctx.displayName}.Provider`;
 				}
