@@ -3,10 +3,10 @@ name: Node CI
 on:
   push:
     branches:
-    - main
+      - main
   pull_request:
     branches:
-    - main
+      - main
 
 jobs:
   build:
@@ -18,15 +18,15 @@ jobs:
         with:
           node-version: 20
       - name: Install Deps
-        run: yarn
+        run: npm i
       - name: Install Playwright
-        run: yarn playwright install --with-deps && yarn playwright install-deps chromium
+        run: npx playwright install --with-deps && npx playwright install-deps chromium
       - name: Run tests
         run: |
-          yarn lint
-          yarn test
-          yarn build:chrome
-          PREACT_VERSION=10 yarn test:e2e --retries 5
+          npm run lint
+          npm run test
+          npm run build:chrome
+          PREACT_VERSION=10 npm run test:e2e --retries 5
         env:
           CI: true
       - name: Upload test results

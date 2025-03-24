@@ -17,9 +17,9 @@
 	},
 	"scripts": {
 		"type-check": "tsc --noEmit",
-		"prebuild": "yarn type-check",
-		"prepublishOnly": "yarn run build:inline",
-		"build": "node tools/build.mjs --browser chrome,edge,firefox,inline && yarn build:inline:types",
+		"prebuild": "npm run type-check",
+		"prepublishOnly": "npm run run build:inline",
+		"build": "node tools/build.mjs --browser chrome,edge,firefox,inline && npm run build:inline:types",
 		"build:chrome": "node tools/build.mjs --browser chrome",
 		"build:edge": "node tools/build.mjs --browser edge",
 		"build:firefox": "node tools/build.mjs --browser firefox",
