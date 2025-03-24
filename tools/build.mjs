@@ -6,7 +6,6 @@ import {
 	babelPlugin,
 	copyPlugin,
 	cssModules,
-	inlineHookPlugin,
 	renamePlugin,
 	spritePlugin,
 	gitSourcePlugin,
@@ -150,7 +149,6 @@ async function build(browser) {
 				renamePlugin({
 					[`${dist}/installHook.css`]: `${dist}/preact-devtools-page.css`,
 				}),
-			!isInline && inlineHookPlugin(dist),
 
 			spritePlugin(
 				path.join(__dirname, "..", "src", "view", "sprite.svg"),

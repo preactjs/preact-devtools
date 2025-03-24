@@ -1,6 +1,6 @@
 {
 	"name": "preact-devtools",
-	"version": "4.7.2",
+	"version": "5.0.0",
 	"description": "Preact Devtools Extension",
 	"main": "dist/preact-devtools.js",
 	"module": "dist/preact-devtools.module.js",
@@ -36,7 +36,7 @@
 		"dev": "npm run dev:serve",
 		"dev:serve": "vite test-e2e/fixtures --port 8100",
 		"run:chrome": "node tools/build.mjs --browser chrome --debug && mkdir -p ./profiles/chrome && node tools/run-chrome.js",
-		"run:firefox": "node tools/build.mjs --browser firefox --debug && mkdir -p ./profiles/firefox && web-ext run --source-dir ./dist/firefox-debug/ --start-url https://preactjs.com --firefox-profile=./profiles/firefox --keep-profile-changes",
+		"run:firefox": "node tools/build.mjs --browser firefox --debug && mkdir -p ./profiles/firefox && web-ext run --verbose --devtools --source-dir ./dist/firefox-debug/ --start-url https://preactjs.com --firefox-profile=./profiles/firefox --keep-profile-changes",
 		"release": "node tools/release.js"
 	},
 	"repository": {
@@ -56,7 +56,7 @@
 		"@testing-library/preact": "^3.2.3",
 		"@types/archiver": "^5.3.1",
 		"@types/babel__core": "^7.1.19",
-		"@types/chrome": "^0.0.202",
+		"@types/chrome": "^0.0.310",
 		"@types/mri": "^1.1.1",
 		"@types/node": "^20.12.7",
 		"@types/node-fetch": "^2.6.2",
@@ -79,13 +79,14 @@
 		"lint-staged": "^10.4.0",
 		"mochette": "^1.0.1",
 		"mri": "^1.2.0",
+		"playwright-chromium": "^1.51.1",
 		"preact": "^10.25.1",
 		"prettier": "^3.2.5",
 		"tar": "^6.1.11",
 		"ts-node": "^10.9.2",
 		"typescript": "^5.4.5",
 		"vite": "^5.2.10",
-		"web-ext": "^7.3.1"
+		"web-ext": "^8.5.0"
 	},
 	"dependencies": {
 		"errorstacks": "^2.4.1",

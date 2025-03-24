@@ -12,7 +12,7 @@ export function setPopupStatus(tabId: number, enabled?: boolean) {
 	);
 	const suffix = enabled ? "" : "-disabled";
 
-	chrome.browserAction.setIcon({
+	chrome.action.setIcon({
 		tabId,
 		path: {
 			"16": `icons/icon-16${suffix}.png`,
@@ -22,7 +22,7 @@ export function setPopupStatus(tabId: number, enabled?: boolean) {
 			"192": `icons/icon-192${suffix}.png`,
 		},
 	});
-	chrome.browserAction.setPopup({
+	chrome.action.setPopup({
 		tabId,
 		popup: `popup/${status}.html`,
 	});

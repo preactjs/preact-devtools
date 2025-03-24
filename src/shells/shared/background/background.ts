@@ -13,9 +13,21 @@ import { BackgroundEmitter, Emitter } from "./emitter";
  */
 const targets = new Map<number, Emitter<any>>();
 
-function addToTarget(tabId: number, port: chrome.runtime.Port) {
+async function addToTarget(tabId: number, port: chrome.runtime.Port) {
 	if (!targets.has(tabId)) {
 		targets.set(tabId, BackgroundEmitter<any>());
+
+		await chrome.scripting.unregisterContentScripts();
+		await chrome.scripting.registerContentScripts([
+			{
+				id: "@preact-devtools/hook",
+				js: ["./installHook.js"],
+				matches: ["<all_urls>"],
+				persistAcrossSessions: true,
+				runAt: "document_start",
+				world: (chrome.scripting as any).ExecutionWorld.MAIN,
+			},
+		]);
 	}
 	const target = targets.get(tabId)!;
 	target.on(port.name, m => port.postMessage(m));
@@ -35,10 +47,10 @@ function addToTarget(tabId: number, port: chrome.runtime.Port) {
 /**
  * Handle initial connection from content-script.
  */
-function handleContentScriptConnection(port: chrome.runtime.Port) {
+async function handleContentScriptConnection(port: chrome.runtime.Port) {
 	const tabId = port.sender?.tab?.id;
 	if (tabId) {
-		addToTarget(tabId, port);
+		await addToTarget(tabId, port);
 		setPopupStatus(tabId, true);
 	}
 }
@@ -71,13 +83,11 @@ function handleDevtoolsConnection(port: chrome.runtime.Port) {
  *
  * TODO: Allow 1:n connections
  */
-const connectionHandlers: Record<
-	string,
-	(port: chrome.runtime.Port) => void
-> = {
-	[ContentScriptName]: handleContentScriptConnection,
-	[DevtoolsPanelName]: handleDevtoolsConnection,
-};
+const connectionHandlers: Record<string, (port: chrome.runtime.Port) => void> =
+	{
+		[ContentScriptName]: handleContentScriptConnection,
+		[DevtoolsPanelName]: handleDevtoolsConnection,
+	};
 
 chrome.runtime.onConnect.addListener(port => {
 	const handler = connectionHandlers[port.name];

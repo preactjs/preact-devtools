@@ -116,47 +116,6 @@ export function spritePlugin(svgPath, files) {
 
 /**
  * @param {string} dir
- * @returns {import("esbuild").Plugin}
- */
-export function inlineHookPlugin(dir) {
-	return {
-		name: "inline-hook-plugin",
-		setup(build) {
-			build.onEnd(async args => {
-				if (args.errors.length) return;
-
-				const source = path.join(dir, "installHook.js");
-				const target = path.join(dir, "content-script.js");
-				const hook = (await fs.readFile(source, "utf8"))
-					.replace(/^\(function \(\) \{/g, "function install() {")
-					.replace(/\}\(\)\);[\s\n]*$/g, "}");
-
-				let targetFile = (await fs.readFile(target, "utf8"))
-					.replace(/^\(function \(\) \{/g, "")
-					.replace(/\}\(\)\);[\s\n]*$/g, "")
-					.replace(/"use\sstrict";/g, "")
-					.replace(/['"]CODE_TO_INJECT['"]/g, "installHook.toString()");
-
-				targetFile = `;(function () {
-	"use strict";
-
-	let installHook = function install() {
-		${hook}
-	};
-
-	${targetFile}
-}());`;
-				await fs.writeFile(target, targetFile, "utf-8");
-
-				// Now that we inlined installHook.js we can delete it
-				await fs.unlink(source);
-			});
-		},
-	};
-}
-
-/**
- * @param {string} dir
  * @param {string} browser
  * @param {boolean} debug
  * @returns {import("esbuild").Plugin}
