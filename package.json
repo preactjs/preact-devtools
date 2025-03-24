@@ -80,7 +80,7 @@
 		"mochette": "^1.0.1",
 		"mri": "^1.2.0",
 		"preact": "^10.25.1",
-		"prettier": "^3.2.5",
+		"prettier": "^3.5.3",
 		"tar": "^6.1.11",
 		"ts-node": "^10.9.2",
 		"typescript": "^5.4.5",
