@@ -2,12 +2,12 @@
 	"manifest_version": 3,
 	"name": "Preact Developer Tools",
 	"description": "Adds debugging tools for Preact to Firefox",
-	"version": "5.0.0",
+	"version": "5.0.1",
 	"devtools_page": "panel/empty-panel.html",
 	"content_security_policy": {
 		"extension_pages": "script-src 'self'; object-src 'self'"
 	},
-	"permissions": ["scripting", "storage", "tabs"],
+	"permissions": ["scripting", "storage"],
 	"optional_permissions": ["clipboardWrite"],
 	"host_permissions": ["<all_urls>"],
 	"browser_specific_settings": {
