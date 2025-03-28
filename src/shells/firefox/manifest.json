@@ -7,7 +7,7 @@
 	"content_security_policy": {
 		"extension_pages": "script-src 'self'; object-src 'self'"
 	},
-	"permissions": ["scripting", "storage", "tabs"],
+	"permissions": ["scripting", "storage"],
 	"optional_permissions": ["clipboardWrite"],
 	"host_permissions": ["<all_urls>"],
 	"browser_specific_settings": {
