@@ -1,11 +1,15 @@
 {
-	"manifest_version": 2,
+	"manifest_version": 3,
 	"name": "Preact Developer Tools",
 	"description": "Adds debugging tools for Preact to Microsoft Edge",
-	"version": "4.7.2",
+	"version": "5.0.0",
 	"devtools_page": "panel/empty-panel.html",
-	"content_security_policy": "script-src 'self' 'unsafe-eval'; object-src 'self'",
-	"permissions": ["file:///*", "http://*/*", "https://*/*", "storage"],
+	"content_security_policy": {
+		"extension_pages": "script-src 'self'; object-src 'self'"
+	},
+	"permissions": ["scripting", "storage", "tabs"],
+	"optional_permissions": ["clipboardWrite"],
+	"host_permissions": ["<all_urls>"],
 	"icons": {
 		"16": "icons/icon-16.png",
 		"32": "icons/icon-32.png",
@@ -13,7 +17,7 @@
 		"128": "icons/icon-128.png",
 		"192": "icons/icon-192.png"
 	},
-	"browser_action": {
+	"action": {
 		"default_icon": {
 			"16": "icons/icon-16-disabled.png",
 			"32": "icons/icon-32-disabled.png",
@@ -24,8 +28,8 @@
 		"default_popup": "popup/disabled.html"
 	},
 	"background": {
-		"scripts": ["background/background.js"],
-		"persistent": false
+		"service_worker": "background/background.js",
+		"type": "module"
 	},
 	"content_scripts": [
 		{
@@ -35,5 +39,10 @@
 			"run_at": "document_start"
 		}
 	],
-	"web_accessible_resources": ["preact-devtools-page.css"]
+	"web_accessible_resources": [
+		{
+			"resources": ["preact-devtools-page.css"],
+			"matches": ["<all_urls>"]
+		}
+	]
 }

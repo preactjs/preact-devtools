@@ -3,10 +3,10 @@ name: Node CI
 on:
   push:
     branches:
-    - main
+      - main
   pull_request:
     branches:
-    - main
+      - main
 
 jobs:
   build:
@@ -16,18 +16,19 @@ jobs:
       - uses: actions/checkout@v4
       - uses: actions/setup-node@v4
         with:
-          node-version: 20
+          node-version: 22
       - name: Install Deps
-        run: yarn
+        run: npm i
       - name: Install Playwright
-        run: yarn playwright install --with-deps && yarn playwright install-deps chromium
-      - name: Run tests
-        run: |
-          yarn lint
-          yarn test
-          yarn build:chrome
-          PREACT_VERSION=10 yarn test:e2e --retries 5
+        run: npx playwright install --with-deps && npx playwright install-deps chromium
+      - name: Lint
+        run: npm run lint
+      - name: Unit tests
+        run: npm run test
+      - name: Run e2e tests
+        run: npm run build:chrome && npm run test:e2e --retries=5
         env:
+          PREACT_VERSION: 10
           CI: true
       - name: Upload test results
         if: always()

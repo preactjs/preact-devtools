@@ -205,16 +205,20 @@ export function getDisplayName(vnode: VNode, config: RendererConfig): string {
 			// Consumer
 			if (c.constructor) {
 				const ct = (c.constructor as any).contextType;
-				if (ct && ct.Consumer === type && ct.displayName) {
-					return `${ct.displayName}.Consumer`;
+				if (ct && ct.Consumer === type) {
+					const name = ct.displayName ? ct.displayName + "." : "";
+					return `${name}Consumer`;
 				}
 			}
 
 			// Provider
 			if ((c as any).sub) {
-				const ctx = (type as any)._contextRef || ('__l' in type ? (type as any).__l : (type as any).__);
-				if (ctx && ctx.displayName) {
-					return `${ctx.displayName}.Provider`;
+				const ctx =
+					(type as any)._contextRef ||
+					("__l" in type ? (type as any).__l : (type as any).__);
+				if (ctx) {
+					const name = ctx.displayName ? ctx.displayName + "." : "";
+					return `${name}Provider`;
 				}
 			}
 
