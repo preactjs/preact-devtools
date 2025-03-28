@@ -21,13 +21,14 @@ jobs:
         run: npm i
       - name: Install Playwright
         run: npx playwright install --with-deps && npx playwright install-deps chromium
-      - name: Run tests
-        run: |
-          npm run lint
-          npm run test
-          npm run build:chrome
-          PREACT_VERSION=10 npm run test:e2e --retries 5
+      - name: Lint
+        run: npm run lint
+      - name: Unit tests
+        run: npm run test
+      - name: Run e2e tests
+        run: npm run build:chrome && npm run test:e2e --retries=5
         env:
+          PREACT_VERSION: 10
           CI: true
       - name: Upload test results
         if: always()
