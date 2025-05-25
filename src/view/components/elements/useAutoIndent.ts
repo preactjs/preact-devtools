@@ -5,7 +5,10 @@ import { useResize } from "../utils";
 const INITIAL = 14;
 const RIGHT_MARGIN = 16;
 
-export function useAutoIndent(container: RefObject<HTMLElement>, deps: any[]) {
+export function useAutoIndent(
+	container: RefObject<HTMLElement | null>,
+	deps: any[],
+) {
 	const indent = useRef(INITIAL);
 	const [available, setAvailable] = useState(0);
 	const cacheRef = useRef(new Map<string, number>());

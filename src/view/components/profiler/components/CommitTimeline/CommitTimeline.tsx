@@ -5,10 +5,10 @@ import { useResize } from "../../../utils";
 import { Icon } from "../../../icons";
 
 function calcSize(
-	container: RefObject<HTMLDivElement>,
-	inner: RefObject<HTMLDivElement>,
-	pane: RefObject<HTMLDivElement>,
-	paneContainer: RefObject<HTMLDivElement>,
+	container: RefObject<HTMLDivElement | null>,
+	inner: RefObject<HTMLDivElement | null>,
+	pane: RefObject<HTMLDivElement | null>,
+	paneContainer: RefObject<HTMLDivElement | null>,
 	count: number,
 	selected: number,
 ) {
