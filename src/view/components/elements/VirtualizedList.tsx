@@ -10,7 +10,7 @@ import { useResize } from "../utils";
 
 export interface VirtualizedListProps<T> {
 	items: T[];
-	container: RefObject<Element>;
+	container: RefObject<Element | null>;
 	rowHeight: number;
 	minBufferCount: number;
 	renderRow: (item: T, idx: number, top: number) => any;
