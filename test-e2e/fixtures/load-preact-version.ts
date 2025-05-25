@@ -43,10 +43,7 @@ export function loadPreactVersion(): Plugin {
 					const entry = pkg.exports[modName].import;
 
 					const code = fs.readFileSync(path.join(versionDir, entry), "utf-8");
-					const map = fs.readFileSync(
-						path.join(versionDir, entry + ".map"),
-						"utf-8",
-					);
+					const map = findMap(path.join(versionDir, entry + ".map"));
 
 					return {
 						code: code.replace(
@@ -106,10 +103,7 @@ export function loadPreactVersion(): Plugin {
 							path.join(versionDir, importee),
 							"utf-8",
 						);
-						const map = fs.readFileSync(
-							path.join(versionDir, importee + ".map"),
-							"utf-8",
-						);
+						const map = findMap(path.join(versionDir, importee + ".map"));
 						const out = {
 							code: code.replace(
 								/["']preact/g,
@@ -138,10 +132,7 @@ export function loadPreactVersion(): Plugin {
 						}
 
 						const code = fs.readFileSync(path.join(folder, importee), "utf-8");
-						const map = fs.readFileSync(
-							path.join(folder, importee + ".map"),
-							"utf-8",
-						);
+						const map = findMap(path.join(folder, importee + ".map"));
 						const out = {
 							code: code.replace(
 								/(["'])preact/g,
@@ -161,4 +152,19 @@ export function loadPreactVersion(): Plugin {
 			}
 		},
 	};
+}
+
+// Preact 10's `.mjs` files are renamed copies of the `.module.js` output.
+// We don't attempt to rewrite the sourcemap comment paths within, nor do we
+// offer `.mjs.map` files, so we need to fallback to `.module.js.map` for X.
+function findMap(path: string) {
+	let map = "";
+	try {
+		map = fs.readFileSync(path, "utf-8");
+	} catch (e) {
+		if (e.code !== "ENOENT") throw e;
+		map = fs.readFileSync(path.replace(".mjs", ".module.js"), "utf-8");
+	}
+
+	return map;
 }
