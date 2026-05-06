@@ -7,6 +7,7 @@ export interface Internal {
 	type: any;
 	key: any;
 	flags: number;
+	_flags?: number;
 	props: Record<string, any>;
 	_parent: Internal | null; // FIXME: NO null?
 	_component: Component;
@@ -50,7 +51,10 @@ export const TYPE_DOM = TYPE_TEXT | TYPE_ELEMENT;
 export const TYPE_COMPONENT = TYPE_CLASS | TYPE_FUNCTION | TYPE_ROOT;
 
 export function isComponent(internal: Internal) {
-	return (internal.flags & TYPE_COMPONENT) > 0;
+	return (
+		(getFlags(internal) & TYPE_COMPONENT) > 0 ||
+		typeof internal.type === "function"
+	);
 }
 
 export function isInternal(x: any): x is Internal {
@@ -62,7 +66,15 @@ export function isInternal(x: any): x is Internal {
 }
 
 export function isTextInternal(internal: Internal): boolean {
-	return (internal.flags & TYPE_TEXT) > 0;
+	return (
+		internal.type === null ||
+		internal.type === undefined ||
+		(getFlags(internal) & TYPE_TEXT) > 0
+	);
+}
+
+function getFlags(internal: Internal): number {
+	return internal.flags ?? internal._flags ?? 0;
 }
 
 export function getComponentHooks(internal: Internal): ComponentHooks | null {
@@ -135,9 +147,10 @@ export function getPropsVNodeDisplayName(vnode: VNode, config: RendererConfig) {
 }
 
 export function getDisplayName(internal: Internal, config: RendererConfig) {
-	const { flags, type } = internal;
+	const flags = getFlags(internal);
+	const { type } = internal;
 
-	if (flags & TYPE_COMPONENT) {
+	if ((flags & TYPE_COMPONENT) > 0 || typeof type === "function") {
 		if (type === config.Fragment) return "Fragment";
 		// Context is a special case :((
 		// See: https://reactjs.org/docs/context.html#contextdisplayname
@@ -160,7 +173,7 @@ export function getDisplayName(internal: Internal, config: RendererConfig) {
 		}
 
 		return type.displayName || type.name || "Anonymous";
-	} else if (flags & TYPE_ELEMENT) {
+	} else if ((flags & TYPE_ELEMENT) > 0 || typeof type === "string") {
 		return internal.type;
 	}
 	return "#text";
@@ -177,7 +190,7 @@ export function getComponent(node: HookState | Internal): Component | null {
 }
 
 export function isElement(node: Internal): boolean {
-	return (node.flags & TYPE_ELEMENT) > 0;
+	return (getFlags(node) & TYPE_ELEMENT) > 0 || typeof node.type === "string";
 }
 
 export function getNextState<S>(c: Component): S {

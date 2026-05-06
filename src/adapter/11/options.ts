@@ -7,7 +7,7 @@ import {
 	Internal,
 	getStatefulHooks,
 	getStatefulHookValue,
-	TYPE_COMPONENT,
+	isComponent,
 	isRoot,
 	getVNodeId,
 } from "./bindings";
@@ -191,7 +191,7 @@ export function setupOptionsV11(
 	};
 
 	o._diff = o.__b = (internal, vnode) => {
-		if (internal.flags & TYPE_COMPONENT) {
+		if (isComponent(internal)) {
 			timings.start.set(internal, performance.now());
 			const name = getDisplayName(internal, config);
 			recordMark(`${name}_diff`);
@@ -228,7 +228,7 @@ export function setupOptionsV11(
 	o._render = o.__r = (internal: Internal) => {
 		if (
 			!skipEffects &&
-			internal.flags & TYPE_COMPONENT &&
+			isComponent(internal) &&
 			internal.type !== config.Fragment
 		) {
 			ownerStack.push(internal);
@@ -237,7 +237,7 @@ export function setupOptionsV11(
 	};
 
 	options.diffed = internal => {
-		if (internal.flags & TYPE_COMPONENT) {
+		if (isComponent(internal)) {
 			if (internal.type !== config.Fragment) {
 				ownerStack.pop();
 			}
