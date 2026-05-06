@@ -1,4 +1,5 @@
-import { h, render } from "preact";
+// oxlint-disable-next-line no-unused-vars -- Fragment used by `<>` JSX shorthand under classic runtime
+import { h, Fragment, render } from "preact";
 import { useMemo, useState } from "preact/hooks";
 
 function MapView() {

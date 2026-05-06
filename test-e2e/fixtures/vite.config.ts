@@ -18,13 +18,15 @@ export default defineConfig({
 			name: "preact:config",
 			config() {
 				return {
-					esbuild: {
-						jsxFactory: "h",
-						jsxFragment: "Fragment",
-						jsxInject: "",
-						define: {
-							__DEBUG__: JSON.stringify(false),
+					oxc: {
+						jsx: {
+							runtime: "classic",
+							pragma: "h",
+							pragmaFrag: "Fragment",
 						},
+					},
+					define: {
+						__DEBUG__: JSON.stringify(false),
 					},
 
 					resolve: {
