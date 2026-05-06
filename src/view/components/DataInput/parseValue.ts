@@ -45,22 +45,35 @@ export function isStringifiedVNode(v: string) {
 }
 
 const MAX_PREVIEW = 50;
+const MAX_PREVIEW_ITEMS = 10;
 function truncate(s: string) {
 	return s.length > MAX_PREVIEW ? `${s.substr(0, MAX_PREVIEW)}…` : s;
+}
+
+function previewItems(items: any[], total = items.length) {
+	const visible = items.slice(0, MAX_PREVIEW_ITEMS).map(x => genPreview(x));
+	if (total > MAX_PREVIEW_ITEMS) {
+		visible.push(`… ${total - MAX_PREVIEW_ITEMS} more`);
+	}
+	return visible.join(", ");
 }
 
 export function genPreview(v: any): string {
 	if (v !== null && typeof v === "object") {
 		if (v.type === "set") {
-			return `Set(${v.entries.length}) ${truncate(genPreview(v.entries))}`;
+			return `Set(${v.entries.length}) ${truncate(
+				`[${previewItems(v.entries)}]`,
+			)}`;
 		} else if (v.type === "map") {
-			return `Map(${v.entries.length}) ${truncate(genPreview(v.entries))}`;
+			return `Map(${v.entries.length}) ${truncate(
+				`[${previewItems(v.entries)}]`,
+			)}`;
 		} else if (v.type === "signal") {
 			return `ƒ ${v.name} (${truncate(genPreview(v.value))})`;
 		}
 
 		if (Array.isArray(v)) {
-			return `[${v.map(x => genPreview(x)).join(", ")}]`;
+			return `[${previewItems(v)}]`;
 		}
 		if (Object.keys(v).length === 2) {
 			if (v.type === "vnode") return `<${truncate(v.name)} />`;
@@ -73,9 +86,13 @@ export function genPreview(v: any): string {
 			if (v.type === "bigint") return `${v.value}n`;
 		}
 
-		const obj = Object.entries(v).map(x => {
+		const entries = Object.entries(v);
+		const obj = entries.slice(0, MAX_PREVIEW_ITEMS).map(x => {
 			return `${x[0]}: ${genPreview(x[1])}`;
 		});
+		if (entries.length > MAX_PREVIEW_ITEMS) {
+			obj.push(`… ${entries.length - MAX_PREVIEW_ITEMS} more`);
+		}
 		return `{${obj.join(", ")}}`;
 	}
 	if (typeof v === "string") {

@@ -28,6 +28,11 @@ export type PropData = {
 	index?: number;
 };
 
+function shouldParseChildren(path: string, uncollapsed: Set<string> | null) {
+	if (uncollapsed === null) return true;
+	return path === "root" || uncollapsed.has(path);
+}
+
 export function parseProps(
 	data: any,
 	path: string,
@@ -36,6 +41,7 @@ export function parseProps(
 	name = path,
 	out = new Map<string, PropData>(),
 	forceReadonly = false,
+	uncollapsed: Set<string> | null = null,
 ): Map<string, PropData> {
 	if (depth >= limit) {
 		out.set(path, {
@@ -63,10 +69,22 @@ export function parseProps(
 			children,
 			meta: null,
 		});
+		const parseChildren = shouldParseChildren(path, uncollapsed);
 		data.forEach((item, i) => {
 			const childPath = `${path}.${i}`;
 			children.push(childPath);
-			parseProps(item, childPath, limit, depth + 1, "" + i, out, forceReadonly);
+			if (parseChildren) {
+				parseProps(
+					item,
+					childPath,
+					limit,
+					depth + 1,
+					"" + i,
+					out,
+					forceReadonly,
+					uncollapsed,
+				);
+			}
 		});
 	} else if (typeof data === "object") {
 		if (data === null) {
@@ -150,18 +168,22 @@ export function parseProps(
 					meta: null,
 				};
 
+				const parseChildren = shouldParseChildren(path, uncollapsed);
 				(data.entries as any[]).forEach((item, i) => {
 					const childPath = `${path}.${i}`;
 					children.push(childPath);
-					parseProps(
-						item,
-						childPath,
-						limit,
-						depth + 1,
-						"" + i,
-						out,
-						forceReadonly,
-					);
+					if (parseChildren) {
+						parseProps(
+							item,
+							childPath,
+							limit,
+							depth + 1,
+							"" + i,
+							out,
+							forceReadonly,
+							uncollapsed,
+						);
+					}
 				});
 				out.set(path, node);
 			} else if (
@@ -182,18 +204,22 @@ export function parseProps(
 					meta: null,
 				};
 
+				const parseChildren = shouldParseChildren(path, uncollapsed);
 				(data.entries as any[]).forEach((item, i) => {
 					const childPath = `${path}.${i}`;
 					children.push(childPath);
-					parseProps(
-						item,
-						childPath,
-						limit,
-						depth + 1,
-						"" + i,
-						out,
-						forceReadonly,
-					);
+					if (parseChildren) {
+						parseProps(
+							item,
+							childPath,
+							limit,
+							depth + 1,
+							"" + i,
+							out,
+							forceReadonly,
+							uncollapsed,
+						);
+					}
 				});
 				out.set(path, node);
 			} else if (
@@ -265,15 +291,18 @@ export function parseProps(
 				const childPath = `${path}.value`;
 				children.push(childPath);
 				out.set(path, node);
-				parseProps(
-					data.value,
-					childPath,
-					limit,
-					depth + 1,
-					"value",
-					out,
-					!isEditable,
-				);
+				if (shouldParseChildren(path, uncollapsed)) {
+					parseProps(
+						data.value,
+						childPath,
+						limit,
+						depth + 1,
+						"value",
+						out,
+						!isEditable,
+						uncollapsed,
+					);
+				}
 			} else {
 				const node: PropData = {
 					depth,
@@ -287,18 +316,22 @@ export function parseProps(
 				};
 				out.set(path, node);
 
+				const parseChildren = shouldParseChildren(path, uncollapsed);
 				Object.keys(data).forEach(key => {
 					const nextPath = `${path}.${key}`;
 					node.children.push(nextPath);
-					parseProps(
-						data[key],
-						nextPath,
-						limit,
-						depth + 1,
-						key,
-						out,
-						forceReadonly,
-					);
+					if (parseChildren) {
+						parseProps(
+							data[key],
+							nextPath,
+							limit,
+							depth + 1,
+							key,
+							out,
+							forceReadonly,
+							uncollapsed,
+						);
+					}
 				});
 
 				out.set(path, node);

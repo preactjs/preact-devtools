@@ -29,11 +29,24 @@ export function parseObjectState(
 			meta: null,
 		});
 
-		parseProps(data, "root", PROPS_LIMIT, 0, "root", tree);
+		parseProps(
+			data,
+			"root",
+			PROPS_LIMIT,
+			0,
+			"root",
+			tree,
+			false,
+			new Set(uncollapsed),
+		);
 		const items = flattenChildren(tree, "root", id => {
-			return tree.get(id)!.children.length > 0 && isCollapsed(uncollapsed, id);
+			const node = tree.get(id);
+			return !!node && node.children.length > 0 && isCollapsed(uncollapsed, id);
 		});
-		return items.slice(1).map(id => tree.get(id)!);
+		return items
+			.slice(1)
+			.map(id => tree.get(id))
+			.filter((x): x is PropData => x !== undefined);
 	}
 
 	return [];

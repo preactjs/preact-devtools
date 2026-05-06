@@ -2,6 +2,7 @@ import { RefObject, VNode } from "preact";
 import {
 	useCallback,
 	useEffect,
+	useLayoutEffect,
 	useMemo,
 	useRef,
 	useState,
@@ -31,6 +32,16 @@ export function useVirtualizedList<T>({
 }: VirtualizedListProps<T>) {
 	const [height, setHeight] = useState(0);
 	const [scroll, setScroll] = useState(0);
+	const measure = useCallback(() => {
+		const el = container.current;
+		if (!el) return;
+
+		const nextHeight = el.clientHeight;
+		setHeight(prev => (prev === nextHeight ? prev : nextHeight));
+
+		const maxScroll = Math.max(0, Math.floor(rowHeight * itemCount - nextHeight));
+		setScroll(prev => (prev > maxScroll ? maxScroll : prev));
+	}, [container, itemCount, rowHeight]);
 
 	const bufferCount =
 		height > 0
@@ -110,15 +121,20 @@ export function useVirtualizedList<T>({
 		};
 	}, [container.current]);
 
-	useResize(
-		() => {
-			if (container.current) {
-				setHeight(container.current.clientHeight);
-			}
-		},
-		[],
-		true,
-	);
+	useLayoutEffect(() => {
+		measure();
+	}, [measure]);
+
+	useLayoutEffect(() => {
+		const el = container.current;
+		if (!el || typeof ResizeObserver === "undefined") return;
+
+		const observer = new ResizeObserver(measure);
+		observer.observe(el);
+		return () => observer.disconnect();
+	}, [container.current, measure]);
+
+	useResize(measure, [measure], true);
 
 	const vnodes = useMemo(() => {
 		const vnodes: VNode[] = [];

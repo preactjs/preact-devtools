@@ -5,7 +5,14 @@ import { PropDataType, PropData } from "./parseProps";
 import { DataInput } from "../../DataInput";
 import { genPreview } from "../../DataInput/parseValue";
 import { isCollapsed } from "../../../store/props";
-import { useState, useCallback, useLayoutEffect, useMemo } from "preact/hooks";
+import {
+	useState,
+	useCallback,
+	useLayoutEffect,
+	useMemo,
+	useRef,
+} from "preact/hooks";
+import { useVirtualizedList } from "../../elements/VirtualizedList";
 
 export type ChangeFn = (value: any, path: string, node: null | any) => void;
 
@@ -18,29 +25,46 @@ export interface Props {
 
 export function ElementProps(props: Props) {
 	const { onChange, uncollapsed, items, onCollapse } = props;
+	const ref = useRef<HTMLDivElement | null>(null);
+	const rowHeight = 18;
+	const {
+		children: rows,
+		containerHeight,
+	} = useVirtualizedList<PropData>({
+		container: ref,
+		items,
+		rowHeight,
+		minBufferCount: 8,
+		renderRow: (item, _, top) => {
+			const id = item.id;
+			return (
+				<SingleItem
+					id={id}
+					key={id}
+					type={item.type}
+					name={item.name}
+					collapseable={item.children.length > 0}
+					collapsed={isCollapsed(uncollapsed, id)}
+					onCollapse={() => onCollapse && onCollapse(id)}
+					editable={item.editable}
+					value={item.value}
+					onChange={v => onChange && onChange(v, id, item)}
+					depth={item.depth}
+					index={item.index}
+					top={top}
+				/>
+			);
+		},
+	});
 
 	return (
-		<div class={s.root}>
-			<form class={s.form} onSubmit={e => e.preventDefault()}>
-				{items.map(item => {
-					const id = item.id;
-					return (
-						<SingleItem
-							id={id}
-							key={id}
-							type={item.type}
-							name={item.name}
-							collapseable={item.children.length > 0}
-							collapsed={isCollapsed(uncollapsed, id)}
-							onCollapse={() => onCollapse && onCollapse(id)}
-							editable={item.editable}
-							value={item.value}
-							onChange={v => onChange && onChange(v, id, item)}
-							depth={item.depth}
-							index={item.index}
-						/>
-					);
-				})}
+		<div class={s.root} ref={ref}>
+			<form
+				class={s.form}
+				style={{ height: containerHeight }}
+				onSubmit={e => e.preventDefault()}
+			>
+				{rows}
 			</form>
 		</div>
 	);
@@ -59,6 +83,7 @@ export interface SingleProps {
 	onCollapse?: (path: string) => void;
 	depth: number;
 	index?: number;
+	top?: number;
 }
 
 export function SingleItem(props: SingleProps) {
@@ -73,6 +98,7 @@ export function SingleItem(props: SingleProps) {
 		depth,
 		onCollapse,
 		value: initial,
+		top,
 	} = props;
 	const [value, setValue] = useState(initial);
 
@@ -107,7 +133,10 @@ export function SingleItem(props: SingleProps) {
 			class={s.row}
 			data-testid="props-row"
 			data-depth={depth}
-			style={`padding-left: calc(var(--indent-depth) * ${depth - 1})`}
+			style={{
+				paddingLeft: `calc(var(--indent-depth) * ${depth - 1})`,
+				top,
+			}}
 		>
 			{collapseable && (
 				<button

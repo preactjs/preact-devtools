@@ -1,9 +1,12 @@
 .root {
 	font-family: var(--font-monospace);
 	font-size: 1rem;
+	max-height: 50vh;
+	overflow: auto;
 }
 
 .form {
+	position: relative;
 	width: 100%;
 }
 
@@ -17,6 +20,9 @@
 	height: 1.125rem;
 	font-family: var(--font-monospace);
 	--indent-depth: 0.75rem;
+	position: absolute;
+	left: 0;
+	right: 0;
 }
 
 .name {
