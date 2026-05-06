@@ -57,6 +57,27 @@ describe("TreeStore", () => {
 		expectRanks(store);
 	});
 
+	it("keeps hidden subtree collapse changes local until ancestors expand", () => {
+		const store = new TreeStore();
+		store.sync(createTree(), [1], false);
+		store.setCollapsed(1, true);
+
+		const layoutVersion = store.structureVersion.value;
+		store.setCollapsed(2, true);
+
+		expect(store.visibleSize()).to.equal(1);
+		expect(store.visibleRange(0, 1)).to.deep.equal([1]);
+		expect(store.structureVersion.value).to.equal(layoutVersion);
+
+		store.setCollapsed(1, false);
+		expect(store.visibleSize()).to.equal(3);
+		expect(store.visibleRange(0, 3)).to.deep.equal([1, 2, 3]);
+
+		store.setCollapsed(2, false);
+		expect(store.visibleSize()).to.equal(5);
+		expect(store.visibleRange(0, 5)).to.deep.equal([1, 2, 4, 5, 3]);
+	});
+
 	it("can hide root rows without hiding descendants", () => {
 		const store = new TreeStore();
 		store.sync(createTree(), [1], true);

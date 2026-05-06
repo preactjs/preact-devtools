@@ -20,6 +20,7 @@ import s from "./TimelineBar.module.css";
 
 export function TimelineBar() {
 	const store = useStore();
+	store.profiler.commitsVersion.value;
 	const commits = store.profiler.commits.value;
 	const filteredCommits = store.profiler.filteredCommits.value;
 	const isRecording = store.profiler.isRecording.value;
@@ -27,12 +28,11 @@ export function TimelineBar() {
 	const selectedCommit = store.profiler.activeCommitIdx.value;
 
 	const stats = useComputed(() => {
+		store.profiler.commitsVersion.value;
+		const commits = store.profiler.commits.peek();
 		return {
-			max: Math.max(16, ...store.profiler.commits.value.map(x => x.duration)),
-			min: Math.max(
-				0,
-				Math.min(...store.profiler.commits.value.map(x => x.duration)),
-			),
+			max: Math.max(16, ...commits.map(x => x.duration)),
+			min: Math.max(0, Math.min(...commits.map(x => x.duration))),
 		};
 	}).value;
 

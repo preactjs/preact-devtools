@@ -28,6 +28,7 @@ function getReasonName(reason: RenderReason) {
 export function RenderReasons() {
 	const store = useStore();
 	const isRecording = store.profiler.isRecording.value;
+	store.profiler.commitsVersion.value;
 	const commits = store.profiler.commits.value;
 	const reason = store.profiler.activeReason.value;
 	const commit = store.profiler.activeCommit.value;

@@ -6,6 +6,7 @@ export function ProfilerInfo() {
 	const store = useStore();
 	const isRecording = store.profiler.isRecording.value;
 	const isSupported = store.profiler.isSupported.value;
+	store.profiler.commitsVersion.value;
 	const commits = store.profiler.commits.value;
 
 	if (!isSupported) {

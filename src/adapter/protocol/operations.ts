@@ -1,4 +1,5 @@
 import { DevNode, ID, Tree } from "../../view/store/types";
+import type { TreeSyncChanges } from "../../view/store/tree";
 import { parseTable } from "./string-table";
 import { MsgTypes } from "./events";
 import { RenderReasonMap } from "../shared/renderReasons";
@@ -27,14 +28,22 @@ function cloneNode(node: DevNode): DevNode {
  *
  * We currently expect all operations to be in order.
  */
-export function ops2Tree(oldTree: Tree, existingRoots: ID[], ops: number[]) {
-	const pending: Tree = new Map(oldTree);
+export function ops2Tree(
+	oldTree: Tree,
+	existingRoots: ID[],
+	ops: number[],
+	mutate = false,
+) {
+	const pending: Tree = mutate ? oldTree : new Map(oldTree);
 	const rootId = ops[0];
 	const roots: ID[] = [...existingRoots];
 	const removals: ID[] = [];
+	const dirty = new Set<ID>();
+	const removed = new Set<ID>();
 	const rendered = new Set<ID>();
 	const reasons: RenderReasonMap = new Map();
 	let stats: ParsedStats | null = null;
+	let structural = false;
 
 	let i = ops[1] + 1;
 	const strings = parseTable(ops.slice(1, i + 1));
@@ -42,7 +51,10 @@ export function ops2Tree(oldTree: Tree, existingRoots: ID[], ops: number[]) {
 	for (i += 1; i < ops.length; i++) {
 		switch (ops[i]) {
 			case MsgTypes.ADD_ROOT:
-				roots.push(ops[i + 1]);
+				if (roots.indexOf(ops[i + 1]) === -1) {
+					roots.push(ops[i + 1]);
+					structural = true;
+				}
 				i += 1;
 				break;
 			case MsgTypes.ADD_VNODE: {
@@ -53,6 +65,7 @@ export function ops2Tree(oldTree: Tree, existingRoots: ID[], ops: number[]) {
 					const clone = cloneNode(parent);
 					pending.set(parent.id, clone);
 					clone.children.push(id);
+					dirty.add(parent.id);
 				}
 
 				pending.set(id, {
@@ -70,6 +83,8 @@ export function ops2Tree(oldTree: Tree, existingRoots: ID[], ops: number[]) {
 				});
 
 				rendered.add(id);
+				dirty.add(id);
+				structural = true;
 
 				i += 8;
 				break;
@@ -103,6 +118,8 @@ export function ops2Tree(oldTree: Tree, existingRoots: ID[], ops: number[]) {
 								const clone = cloneNode(parent);
 								pending.set(parent.id, clone);
 								clone.children.splice(idx, 1);
+								dirty.add(parent.id);
+								structural = true;
 							}
 						}
 
@@ -110,6 +127,7 @@ export function ops2Tree(oldTree: Tree, existingRoots: ID[], ops: number[]) {
 						const rootIdx = roots.indexOf(node.id);
 						if (rootIdx > -1) {
 							roots.splice(rootIdx, 1);
+							structural = true;
 						}
 
 						// Delete children recursively
@@ -120,6 +138,8 @@ export function ops2Tree(oldTree: Tree, existingRoots: ID[], ops: number[]) {
 							if (!child) continue;
 
 							pending.delete(child.id);
+							dirty.add(child.id);
+							removed.add(child.id);
 							stack.push(...child.children);
 						}
 
@@ -135,7 +155,12 @@ export function ops2Tree(oldTree: Tree, existingRoots: ID[], ops: number[]) {
 				const parentId = ops[i + 1];
 				const count = ops[i + 2];
 				const parent = cloneNode(pending.get(parentId)!);
-				parent.children = ops.slice(i + 3, i + 3 + count);
+				const children = ops.slice(i + 3, i + 3 + count);
+				if (!sameIds(parent.children, children)) {
+					parent.children = children;
+					dirty.add(parentId);
+					structural = true;
+				}
 				pending.set(parentId, parent);
 				i = i + 2 + count;
 				break;
@@ -173,6 +198,7 @@ export function ops2Tree(oldTree: Tree, existingRoots: ID[], ops: number[]) {
 						hocs.push(strings[ops[i + 3 + j] - 1]);
 					}
 					clone.hocs = hocs;
+					dirty.add(vnodeId);
 				}
 				i = i + 2 + count;
 				break;
@@ -182,5 +208,28 @@ export function ops2Tree(oldTree: Tree, existingRoots: ID[], ops: number[]) {
 		}
 	}
 
-	return { rootId, roots, tree: pending, removals, rendered, reasons, stats };
+	const changes: TreeSyncChanges = {
+		dirty: Array.from(dirty),
+		removed: Array.from(removed),
+		structural,
+	};
+
+	return {
+		rootId,
+		roots,
+		tree: pending,
+		removals,
+		rendered,
+		reasons,
+		stats,
+		changes,
+	};
+}
+
+function sameIds(a: ID[], b: ID[]) {
+	if (a.length !== b.length) return false;
+	for (let i = 0; i < a.length; i++) {
+		if (a[i] !== b[i]) return false;
+	}
+	return true;
 }

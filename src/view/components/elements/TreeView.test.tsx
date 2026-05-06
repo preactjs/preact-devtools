@@ -9,19 +9,28 @@ import { DevNodeType } from "../../store/types";
 describe("TreeItem", () => {
 	it("should limit key length to 15", () => {
 		const store = createStore();
-		store.nodes.value.set(1, {
-			children: [],
-			depth: 1,
-			endTime: 0,
-			key: "abcdefghijklmnopqrstuvxyz",
-			id: 1,
-			hocs: null,
-			name: "foo",
-			owner: -1,
-			parent: -1,
-			startTime: 0,
-			type: DevNodeType.ClassComponent,
-		});
+		store.tree.sync(
+			new Map([
+				[
+					1,
+					{
+						children: [],
+						depth: 1,
+						endTime: 0,
+						key: "abcdefghijklmnopqrstuvxyz",
+						id: 1,
+						hocs: null,
+						name: "foo",
+						owner: -1,
+						parent: -1,
+						startTime: 0,
+						type: DevNodeType.ClassComponent,
+					},
+				],
+			]),
+			[],
+			false,
+		);
 		const { container, rerender } = render(
 			<AppCtx.Provider value={store}>
 				<TreeItem id={1} key="" top={0} />,
@@ -29,8 +38,28 @@ describe("TreeItem", () => {
 		);
 		expect(container.textContent).to.equal('foo key="abcdefghijklmno…",');
 
-		store.nodes.value.get(1)!.key = "foobar";
-		store.nodes.value = new Map(store.nodes.value);
+		store.tree.sync(
+			new Map([
+				[
+					1,
+					{
+						children: [],
+						depth: 1,
+						endTime: 0,
+						key: "foobar",
+						id: 1,
+						hocs: null,
+						name: "foo",
+						owner: -1,
+						parent: -1,
+						startTime: 0,
+						type: DevNodeType.ClassComponent,
+					},
+				],
+			]),
+			[],
+			false,
+		);
 		rerender(
 			<AppCtx.Provider value={store}>
 				<TreeItem id={1} key="" top={0} />,

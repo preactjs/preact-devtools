@@ -52,6 +52,7 @@ export interface ProfilerState {
 	 */
 	isRecording: Signal<boolean>;
 	commits: Signal<CommitData[]>;
+	commitsVersion: Signal<number>;
 
 	// Selection
 	activeCommitIdx: Signal<number>;
@@ -105,6 +106,7 @@ export function getCommitInitalSelectNodeId(
  */
 export function createProfiler(): ProfilerState {
 	const commits = signal<CommitData[]>([]);
+	const commitsVersion = signal(0);
 	const isSupported = signal(false);
 
 	// Render Reasons
@@ -122,8 +124,10 @@ export function createProfiler(): ProfilerState {
 	const activeCommitIdx = signal(0);
 	const selectedNodeId = signal(0);
 	const activeCommit = computed(() => {
+		commitsVersion.value;
 		return (
-			(commits.value.length > 0 && commits.value[activeCommitIdx.value]) || null
+			(commits.peek().length > 0 && commits.peek()[activeCommitIdx.value]) ||
+			null
 		);
 	});
 	const selectedNode = computed(() => {
@@ -135,7 +139,9 @@ export function createProfiler(): ProfilerState {
 	// Filtering
 	const filterCommitsUnder = signal<false | number>(false);
 	const filteredCommits = computed(() => {
-		return commits.value
+		commitsVersion.value;
+		return commits
+			.peek()
 			.map((commit, index) => ({ ...commit, index }))
 			.filter(commit =>
 				filterCommitsUnder.value === false
@@ -168,7 +174,7 @@ export function createProfiler(): ProfilerState {
 		}
 
 		for (let i = activeCommitIdx.value - 1; i >= 0; i--) {
-			if (i >= commits.value.length) {
+			if (i >= commits.peek().length) {
 				return new Map();
 			}
 		}
@@ -193,6 +199,7 @@ export function createProfiler(): ProfilerState {
 		isSupported,
 		isRecording,
 		commits,
+		commitsVersion,
 		activeCommitIdx,
 		activeCommit,
 		renderReasons,
@@ -214,6 +221,7 @@ export function createProfiler(): ProfilerState {
 export function startProfiling(state: ProfilerState) {
 	state.isRecording.value = true;
 	state.commits.value = [];
+	state.commitsVersion.value++;
 	state.activeCommitIdx.value = 0;
 	state.selectedNodeId.value = 0;
 }
@@ -236,6 +244,7 @@ export function stopProfiling(state: ProfilerState) {
 export function resetProfiler(state: ProfilerState) {
 	stopProfiling(state);
 	state.commits.value = [];
+	state.commitsVersion.value++;
 }
 
 export function recordProfilerCommit(
@@ -254,7 +263,7 @@ export function recordProfilerCommit(
 	const rootId = getRoot(tree, commitRootId);
 
 	// Find previous commit to copy over timing data later
-	const commits = profiler.commits.value;
+	const commits = profiler.commits.peek();
 	let prevCommit: CommitData | undefined;
 	for (let i = commits.length - 1; i >= 0; i--) {
 		if (commits[i].rootId === rootId) {
@@ -304,7 +313,7 @@ export function recordProfilerCommit(
 	// console.log(JSON.stringify(Array.from(nodes.values())));
 	// console.groupEnd();
 
-	const commitStore = profiler.commits.value;
+	const commitStore = profiler.commits.peek();
 	commitStore.push({
 		rootId: getRoot(tree, commitRootId),
 		commitRootId: commitRootId,
@@ -314,5 +323,5 @@ export function recordProfilerCommit(
 		duration: totalCommitDuration,
 		selfDurations,
 	});
-	profiler.commits.value = commitStore.slice();
+	profiler.commitsVersion.value++;
 }

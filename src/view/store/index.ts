@@ -33,10 +33,12 @@ export function createStore(): Store {
 		tree.setRootHidden(filterState.filterRoot.value);
 	});
 
-	const collapsed = signal(new Set<ID>());
-	const collapser = createCollapser<ID>(collapsed, (id, shouldCollapse) => {
-		tree.setCollapsed(id, shouldCollapse);
-	});
+	const collapser = createCollapser<ID>(
+		id => tree.isCollapsed(id),
+		(id, shouldCollapse) => {
+			tree.setCollapsed(id, shouldCollapse);
+		},
+	);
 
 	// Sidebar
 	const sidebar = {
@@ -139,7 +141,6 @@ export function createStore(): Store {
 			operationV3.clear();
 			rendererByNode.clear();
 			selection.selected.value = -1;
-			collapser.collapsed.value = new Set();
 			stats.value = null;
 			inspectData.value = null;
 		},

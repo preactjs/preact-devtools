@@ -29,14 +29,14 @@ const highlightNode = debounce(
 function useTreeNode(id: ID) {
 	const store = useStore();
 	useTreeNodeVersion(id);
-	return store.tree.get(id) || store.nodes.value.get(id) || null;
+	return store.tree.get(id);
 }
 
 export function TreeView() {
 	const store = useStore();
 	useTreeStructureVersion();
 	const visibleSize = store.tree.visibleSize();
-	const roots = store.roots.value;
+	const rootCount = store.tree.rootCount();
 	const { collapseNode, collapsed } = useCollapser();
 	const { selected, selectNext, selectPrev } = useSelection();
 
@@ -100,9 +100,9 @@ export function TreeView() {
 	useAutoIndent(paneRef, [listItems]);
 
 	// When the devtools is connected, but nothing has been sent to the panel yet
-	const isOnlyConnected = visibleSize === 0 && roots.length === 0;
+	const isOnlyConnected = visibleSize === 0 && rootCount === 0;
 	// When client sent messages, but no nodes were sent due to filters.
-	const hasNoResults = visibleSize === 0 && roots.length > 0;
+	const hasNoResults = visibleSize === 0 && rootCount > 0;
 
 	return (
 		<div
@@ -191,13 +191,12 @@ export function TreeItem(props: { key: any; id: ID; top: number }) {
 	const node = useTreeNode(id);
 	const filterRoot = store.filter.filterRoot.value;
 	const filterHoc = store.filter.filterHoc.value;
-	const roots = store.roots.value;
 	const onToggle = () => toggle(id);
 	const ref = useRef<HTMLDivElement>(null);
 
 	if (!node) return null;
 
-	const isRoot = node.parent === -1 && roots.includes(node.id);
+	const isRoot = node.parent === -1 && store.tree.isRoot(node.id);
 
 	return (
 		<div

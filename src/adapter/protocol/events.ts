@@ -130,7 +130,7 @@ function sumOps(a: OperationInfo, b: OperationInfo) {
  * We currently expect all operations to be in order.
  */
 export function applyOperationsV2(store: Store, data: number[]) {
-	const result = ops2Tree(store.nodes.value, store.roots.value, data);
+	const result = ops2Tree(store.nodes.value, store.roots.value, data, true);
 	const {
 		rootId: commitRootId,
 		rendered,
@@ -138,12 +138,13 @@ export function applyOperationsV2(store: Store, data: number[]) {
 		tree,
 		reasons,
 		stats,
+		changes,
 	} = result;
 
 	// Update store data
 	store.roots.value = roots;
 	store.nodes.value = tree;
-	store.tree.sync(tree, roots, store.filter.filterRoot.value);
+	store.tree.sync(tree, roots, store.filter.filterRoot.value, changes);
 
 	if (store.inspectData.value) {
 		const id = store.inspectData.value.id;
@@ -216,9 +217,11 @@ function removeRendererNodes(store: Store, rendererId: number) {
 	if (removeIds.size === 0) return;
 
 	const nextTree = new Map(store.nodes.value);
+	const dirty: ID[] = [];
 	removeIds.forEach(id => {
 		nextTree.delete(id);
 		store.rendererByNode.delete(id);
+		dirty.push(id);
 	});
 
 	nextTree.forEach(node => {
@@ -233,6 +236,7 @@ function removeRendererNodes(store: Store, rendererId: number) {
 			}
 		}
 		if (changed) {
+			dirty.push(node.id);
 			nextTree.set(node.id, {
 				children,
 				depth: node.depth,
@@ -257,7 +261,11 @@ function removeRendererNodes(store: Store, rendererId: number) {
 
 	store.roots.value = roots;
 	store.nodes.value = nextTree;
-	store.tree.sync(nextTree, roots, store.filter.filterRoot.value);
+	store.tree.sync(nextTree, roots, store.filter.filterRoot.value, {
+		dirty,
+		removed: Array.from(removeIds),
+		structural: true,
+	});
 	if (store.inspectData.value && removeIds.has(store.inspectData.value.id)) {
 		store.inspectData.value = null;
 	}
@@ -374,6 +382,10 @@ export function applyEvent(store: Store, type: keyof DevtoolEvents, data: any) {
 			}
 
 			store.roots.value = data;
+			store.tree.sync(store.nodes.value, data, store.filter.filterRoot.value, {
+				dirty: [],
+				structural: true,
+			});
 			break;
 		}
 	}

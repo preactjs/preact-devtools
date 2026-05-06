@@ -14,6 +14,18 @@ describe("ops2Tree", () => {
 		expect(res.tree.size).to.equal(state.idMap.size);
 	});
 
+	it("can reuse the old map for the live store path", () => {
+		const state = flames`
+        Fragment ***
+			`;
+
+		const ops = fromSnapshot(["rootId: 1", "Update timings 1 time 20:40"]);
+		const res = ops2Tree(state.idMap, [1], ops, true);
+
+		expect(res.tree).to.equal(state.idMap);
+		expect(res.tree.get(1)!.startTime).to.equal(20);
+	});
+
 	describe("ADD_ROOT", () => {
 		it("should add new roots", () => {
 			const ops = fromSnapshot(["rootId: 1"]);
@@ -25,6 +37,11 @@ describe("ops2Tree", () => {
 				tree: new Map(),
 				reasons: new Map(),
 				stats: null,
+				changes: {
+					dirty: [],
+					removed: [],
+					structural: true,
+				},
 			});
 		});
 	});
@@ -107,6 +124,21 @@ describe("ops2Tree", () => {
 			expect(prev.startTime).to.equal(0);
 			expect(prev.endTime).to.equal(120);
 		});
+
+		it("should not mark timing-only updates as tree changes", () => {
+			const state = flames`
+        Fragment ***
+			`;
+
+			const ops = fromSnapshot(["rootId: 1", "Update timings 1 time 20:40"]);
+			const next = ops2Tree(state.idMap, [1], ops);
+
+			expect(next.changes).to.deep.equal({
+				dirty: [],
+				removed: [],
+				structural: false,
+			});
+		});
 	});
 
 	describe("REMOVE_VNODE", () => {
@@ -148,6 +180,8 @@ describe("ops2Tree", () => {
 
 			const next = ops2Tree(state.idMap, [], ops);
 			expect(next.removals).to.deep.equal([3, 4]);
+			expect(next.changes.removed).to.deep.equal([3, 4]);
+			expect(next.changes.structural).to.equal(true);
 		});
 
 		it("should remove nodes recursively", () => {
@@ -184,6 +218,19 @@ describe("ops2Tree", () => {
 
 			const next = ops2Tree(state.idMap, [], ops).tree;
 			expect(next.get(1)!.children).to.deep.equal([3, 2]);
+		});
+
+		it("should mark reorders as structural changes", () => {
+			const state = flames`
+        Fragment ********
+          span ***  a **
+      `;
+
+			const ops = fromSnapshot(["rootId: 1", "Reorder 1 [3,2]"]);
+			const next = ops2Tree(state.idMap, [], ops);
+
+			expect(next.changes.structural).to.equal(true);
+			expect(next.changes.dirty).to.deep.equal([1]);
 		});
 
 		it("should end with correct offset", () => {
