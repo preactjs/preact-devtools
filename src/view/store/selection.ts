@@ -3,17 +3,25 @@ import { signal, Signal } from "@preact/signals";
 import { clamp } from "../components/tree/windowing";
 import { useContext } from "preact/hooks";
 import { ID } from "./types";
+import { TreeStore } from "./tree";
 
 /**
  * Manages selection state of the TreeView.
  */
-export function createSelectionStore(list: Signal<ID[]>) {
+export function createSelectionStore(list: Signal<ID[]>, tree?: TreeStore) {
 	const selected = signal<ID>(list.value.length > 0 ? list.value[0] : -1);
 	const selectedIdx = signal(0);
 
 	const selectByIndex = (idx: number) => {
+		if (tree && tree.visibleSize() > 0) {
+			const n = clamp(idx, tree.visibleSize() - 1);
+			selected.value = tree.visibleAt(n) ?? -1;
+			selectedIdx.value = n;
+			return;
+		}
+
 		const n = clamp(idx, list.value.length - 1);
-		selected.value = list.value[n];
+		selected.value = list.value[n] ?? -1;
 		selectedIdx.value = n;
 	};
 
@@ -21,7 +29,7 @@ export function createSelectionStore(list: Signal<ID[]>) {
 	const selectPrev = () => selectByIndex(selectedIdx.value - 1);
 
 	const selectById = (id: ID) => {
-		const idx = list.value.findIndex(x => x === id);
+		const idx = tree ? tree.rankOf(id) : list.value.findIndex(x => x === id);
 		selectByIndex(idx);
 	};
 

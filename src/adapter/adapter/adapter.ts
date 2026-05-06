@@ -172,6 +172,9 @@ export function createAdapter(
 	});
 
 	listen("refresh", () => forAll(r => r.refresh?.()));
+	listen("snapshot-request-v3", data => {
+		renderers.get(data.rendererId)?.sendSnapshot?.();
+	});
 
 	// Profiler
 	listen("start-profiling", options => {

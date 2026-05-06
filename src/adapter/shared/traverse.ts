@@ -591,6 +591,7 @@ export function createCommit<T extends SharedVNode>(
 	helpers: PreactBindings<T>,
 	timingsByVNode: VNodeTimings<T>,
 	renderReasonPre: Map<T, RenderReasonData> | null,
+	forceMount = false,
 ): Commit {
 	const commit = {
 		operations: [],
@@ -633,7 +634,7 @@ export function createCommit<T extends SharedVNode>(
 		}
 	}
 
-	if (isNew) {
+	if (isNew || forceMount) {
 		mount(
 			ids,
 			commit,

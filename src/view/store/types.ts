@@ -8,6 +8,8 @@ import { EmitFn, DevtoolEvents } from "../../adapter/hook";
 import { ProfilerState } from "../components/profiler/data/commits";
 import { PropData } from "../components/sidebar/inspect/parseProps";
 import { ParsedStats } from "../../adapter/shared/stats";
+import { TreeStore } from "./tree";
+import type { OperationV3State } from "../../adapter/protocol/v3";
 
 export type ID = number;
 
@@ -74,6 +76,9 @@ export interface Store {
 	inspectData: Signal<InspectData | null>;
 	roots: Signal<ID[]>;
 	nodes: Signal<Tree>;
+	tree: TreeStore;
+	operationV3: Map<number, OperationV3State>;
+	rendererByNode: Map<ID, number>;
 	nodeList: Signal<ID[]>;
 	theme: Signal<Theme>;
 	search: ReturnType<typeof createSearchStore>;

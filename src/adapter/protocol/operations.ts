@@ -1,9 +1,24 @@
-import { ID, Tree } from "../../view/store/types";
+import { DevNode, ID, Tree } from "../../view/store/types";
 import { parseTable } from "./string-table";
 import { MsgTypes } from "./events";
-import { deepClone } from "../shared/utils";
 import { RenderReasonMap } from "../shared/renderReasons";
 import { ParsedStats, parseStats } from "../shared/stats";
+
+function cloneNode(node: DevNode): DevNode {
+	return {
+		children: node.children.slice(),
+		depth: node.depth,
+		endTime: node.endTime,
+		hocs: node.hocs === null ? null : node.hocs.slice(),
+		id: node.id,
+		key: node.key,
+		name: node.name,
+		owner: node.owner,
+		parent: node.parent,
+		startTime: node.startTime,
+		type: node.type,
+	};
+}
 
 /**
  * This is the heart of the devtools. Here we translate incoming events
@@ -35,7 +50,7 @@ export function ops2Tree(oldTree: Tree, existingRoots: ID[], ops: number[]) {
 				const parentId = ops[i + 3];
 				const parent = pending.get(parentId);
 				if (parent) {
-					const clone = deepClone(parent);
+					const clone = cloneNode(parent);
 					pending.set(parent.id, clone);
 					clone.children.push(id);
 				}
@@ -61,7 +76,7 @@ export function ops2Tree(oldTree: Tree, existingRoots: ID[], ops: number[]) {
 			}
 			case MsgTypes.UPDATE_VNODE_TIMINGS: {
 				const id = ops[i + 1];
-				pending.set(id, deepClone(pending.get(id)!));
+				pending.set(id, cloneNode(pending.get(id)!));
 				const x = pending.get(id)!;
 				x.startTime = ops[i + 2] / 1000;
 				x.endTime = ops[i + 3] / 1000;
@@ -85,7 +100,7 @@ export function ops2Tree(oldTree: Tree, existingRoots: ID[], ops: number[]) {
 						if (parent) {
 							const idx = parent.children.indexOf(nodeId);
 							if (idx > -1) {
-								const clone = deepClone(parent);
+								const clone = cloneNode(parent);
 								pending.set(parent.id, clone);
 								clone.children.splice(idx, 1);
 							}
@@ -119,7 +134,7 @@ export function ops2Tree(oldTree: Tree, existingRoots: ID[], ops: number[]) {
 			case MsgTypes.REORDER_CHILDREN: {
 				const parentId = ops[i + 1];
 				const count = ops[i + 2];
-				const parent = deepClone(pending.get(parentId)!);
+				const parent = cloneNode(pending.get(parentId)!);
 				parent.children = ops.slice(i + 3, i + 3 + count);
 				pending.set(parentId, parent);
 				i = i + 2 + count;
@@ -151,11 +166,13 @@ export function ops2Tree(oldTree: Tree, existingRoots: ID[], ops: number[]) {
 				const vnode = pending.get(vnodeId);
 				const count = ops[i + 2];
 				if (vnode) {
+					const clone = cloneNode(vnode);
+					pending.set(vnodeId, clone);
 					const hocs = [];
 					for (let j = 0; j < count; j++) {
 						hocs.push(strings[ops[i + 3 + j] - 1]);
 					}
-					vnode.hocs = hocs;
+					clone.hocs = hocs;
 				}
 				i = i + 2 + count;
 				break;

@@ -65,6 +65,9 @@ export interface DevtoolEvents {
 	"root-order": number[];
 	operation: number[];
 	operation_v2: number[];
+	operation_v3: number[];
+	snapshot_v3: number[];
+	"snapshot-request-v3": { rendererId: number; reason: string };
 }
 export type EmitFn = <K extends keyof DevtoolEvents>(
 	name: K,
@@ -123,6 +126,7 @@ export function createHook(port: PortPageHook): DevtoolsHook {
 		}
 
 		renderers.set(++uid, renderer);
+		renderer.setRendererId?.(uid);
 
 		// Content Script is likely not ready at this point, so don't
 		// flush any events here and politely request it to initialize

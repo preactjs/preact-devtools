@@ -11,16 +11,16 @@ export function OwnerInfo() {
 	const data = useComputed(() => {
 		const owners: DevNode[] = [];
 		const selectedId = store.selection.selected.value;
-
-		const nodes = store.nodes.value;
+		store.tree.version.value;
 
 		let id = selectedId;
-		let current: DevNode | undefined;
-		while ((current = nodes.get(id)) !== undefined) {
-			if (!nodes.has(current.owner)) {
+		let current: DevNode | null;
+		while ((current = store.tree.get(id)) !== null) {
+			const owner = store.tree.get(current.owner);
+			if (!owner) {
 				break;
 			}
-			owners.push(nodes.get(current.owner)!);
+			owners.push(owner);
 			id = current.owner;
 		}
 

@@ -12,7 +12,7 @@ import {
 	storeHighlightUpdates,
 	storeFilters,
 } from "./settings";
-import { effect } from "@preact/signals";
+import { batch, effect } from "@preact/signals";
 import { isFirefox } from "../utils";
 
 // Updated when the selection in the native elements panel changed.
@@ -40,6 +40,50 @@ const port = chrome.runtime.connect({
 let initialized = false;
 
 const store = createStore();
+const operationQueue: Array<{
+	type: "operation_v2" | "operation_v3" | "snapshot_v3";
+	data: number[];
+}> = [];
+let operationFlushPending = false;
+
+function flushOperationQueue() {
+	operationFlushPending = false;
+	if (operationQueue.length === 0) return;
+
+	const items = operationQueue.splice(0, operationQueue.length);
+	batch(() => {
+		for (let i = 0; i < items.length; i++) {
+			applyEvent(store, items[i].type, items[i].data);
+		}
+	});
+}
+
+function scheduleOperationFlush() {
+	if (operationFlushPending) return;
+	operationFlushPending = true;
+
+	const w = typeof window === "undefined" ? null : window;
+	if (w && typeof w.requestAnimationFrame === "function") {
+		w.requestAnimationFrame(flushOperationQueue);
+	} else {
+		setTimeout(flushOperationQueue, 16);
+	}
+}
+
+function applyPanelEvent(message: any) {
+	if (
+		message.type === "operation_v2" ||
+		message.type === "operation_v3" ||
+		message.type === "snapshot_v3"
+	) {
+		operationQueue.push({ type: message.type, data: message.data });
+		scheduleOperationFlush();
+		return;
+	}
+
+	flushOperationQueue();
+	applyEvent(store, message.type, message.data);
+}
 
 // Sync selection from browser to devtools
 chrome.devtools.panels.elements.onSelectionChanged.addListener(() => {
@@ -179,9 +223,9 @@ port.onMessage.addListener(async message => {
 				backup.push({ ...message });
 			}
 
-			applyEvent(store, message.type, message.data);
+			applyPanelEvent(message);
 		} else {
-			applyEvent(store, message.type, message.data);
+			applyPanelEvent(message);
 		}
 	}
 });
@@ -200,11 +244,13 @@ chrome.devtools.network.onNavigated.addListener(() => {
 	debug(
 		"== Navigation: clear devtools state == pending length: " + backup.length,
 	);
+	operationQueue.length = 0;
+	operationFlushPending = false;
 	store.clear();
 
 	if (backup.length) {
 		backup.forEach(message => {
-			applyEvent(store, message.type, message.data);
+			applyPanelEvent(message);
 		});
 		pending.delete(tabId);
 	}

@@ -2,6 +2,30 @@ import { expect, vi } from "vitest";
 import { applyEvent } from "./events";
 import { createStore } from "../../view/store";
 import { fromSnapshot } from "../debug";
+import { OPERATION_PROTOCOL_V3 } from "./v3";
+
+function toV3(
+	data: number[],
+	{
+		rendererId = 1,
+		epoch = 1,
+		commitSeq = 0,
+		baseTreeVersion = 0,
+		nextTreeVersion = 1,
+	} = {},
+) {
+	return [
+		OPERATION_PROTOCOL_V3,
+		rendererId,
+		epoch,
+		commitSeq,
+		baseTreeVersion,
+		nextTreeVersion,
+		data[0],
+		0,
+		...data,
+	];
+}
 
 describe("applyEvent", () => {
 	it("should add roots", () => {
@@ -282,5 +306,201 @@ describe("applyEvent", () => {
 		expect(store.sidebar.props.uncollapsed.value).to.deep.equal([]);
 		expect(store.sidebar.state.uncollapsed.value).to.deep.equal([]);
 		expect(store.sidebar.context.uncollapsed.value).to.deep.equal([]);
+	});
+
+	it("should apply operation_v3 messages", () => {
+		const store = createStore();
+		const data = fromSnapshot([
+			"rootId: 1",
+			"Add 1 <Fragment> to parent -1",
+			"Add 2 <Parent> to parent 1",
+		]);
+
+		applyEvent(store, "operation_v3", toV3(data));
+
+		expect(store.nodes.value.size).to.equal(2);
+		expect(store.nodes.value.get(1)!.children).to.deep.equal([2]);
+		expect(store.operationV3.get(1)).to.deep.equal({
+			epoch: 1,
+			commitSeq: 0,
+			treeVersion: 1,
+		});
+	});
+
+	it("should request a v3 snapshot on skipped commits", () => {
+		const spy = vi.fn();
+		const store = createStore();
+		store.subscribe(spy);
+
+		const data = fromSnapshot(["rootId: 1", "Add 1 <Fragment> to parent -1"]);
+		applyEvent(store, "operation_v3", toV3(data));
+
+		const skipped = fromSnapshot(["rootId: 1", "Add 2 <Parent> to parent 1"]);
+		applyEvent(
+			store,
+			"operation_v3",
+			toV3(skipped, { commitSeq: 2, baseTreeVersion: 1, nextTreeVersion: 2 }),
+		);
+
+		expect(spy).toHaveBeenCalledWith("snapshot-request-v3", {
+			rendererId: 1,
+			reason: "sequence",
+		});
+		expect(store.nodes.value.has(2)).to.equal(false);
+	});
+
+	it("should replace state on snapshot_v3", () => {
+		const store = createStore();
+		const data = fromSnapshot(["rootId: 1", "Add 1 <Fragment> to parent -1"]);
+		applyEvent(store, "operation_v3", toV3(data));
+
+		const snapshot = fromSnapshot([
+			"rootId: 10",
+			"Add 10 <Fragment> to parent -1",
+			"Add 11 <Parent> to parent 10",
+		]);
+		applyEvent(
+			store,
+			"snapshot_v3",
+			toV3(snapshot, {
+				commitSeq: 0,
+				baseTreeVersion: 0,
+				nextTreeVersion: 1,
+			}),
+		);
+
+		expect(store.nodes.value.has(1)).to.equal(false);
+		expect(store.nodes.value.get(10)!.children).to.deep.equal([11]);
+	});
+
+	it("should only replace the matching renderer on snapshot_v3", () => {
+		const store = createStore();
+		applyEvent(
+			store,
+			"operation_v3",
+			toV3(
+				fromSnapshot([
+					"rootId: 1",
+					"Add 1 <Fragment> to parent -1",
+					"Add 2 <Parent> to parent 1",
+				]),
+				{ rendererId: 1 },
+			),
+		);
+		applyEvent(
+			store,
+			"operation_v3",
+			toV3(
+				fromSnapshot([
+					"rootId: 20",
+					"Add 20 <Fragment> to parent -1",
+					"Add 21 <Sibling> to parent 20",
+				]),
+				{ rendererId: 2 },
+			),
+		);
+
+		applyEvent(
+			store,
+			"snapshot_v3",
+			toV3(
+				fromSnapshot([
+					"rootId: 10",
+					"Add 10 <Fragment> to parent -1",
+					"Add 11 <Next> to parent 10",
+				]),
+				{
+					rendererId: 1,
+					commitSeq: 0,
+					baseTreeVersion: 0,
+					nextTreeVersion: 1,
+				},
+			),
+		);
+
+		expect(store.nodes.value.has(1)).to.equal(false);
+		expect(store.nodes.value.has(2)).to.equal(false);
+		expect(store.nodes.value.get(10)!.children).to.deep.equal([11]);
+		expect(store.nodes.value.get(20)!.children).to.deep.equal([21]);
+		expect(store.roots.value).to.deep.equal([20, 10]);
+	});
+
+	it("should clear a renderer on empty snapshot_v3", () => {
+		const store = createStore();
+		applyEvent(
+			store,
+			"operation_v3",
+			toV3(
+				fromSnapshot([
+					"rootId: 1",
+					"Add 1 <Fragment> to parent -1",
+					"Add 2 <Parent> to parent 1",
+				]),
+			),
+		);
+		store.selection.selectById(2);
+
+		applyEvent(store, "snapshot_v3", [
+			OPERATION_PROTOCOL_V3,
+			1,
+			2,
+			0,
+			0,
+			1,
+			-1,
+			0,
+		]);
+
+		expect(store.nodes.value.size).to.equal(0);
+		expect(store.roots.value).to.deep.equal([]);
+		expect(store.selection.selected.value).to.equal(-1);
+		expect(store.operationV3.get(1)).to.deep.equal({
+			epoch: 2,
+			commitSeq: 0,
+			treeVersion: 1,
+		});
+	});
+
+	it("should repair selection when snapshot_v3 removes selected node", () => {
+		const store = createStore();
+		applyEvent(
+			store,
+			"operation_v3",
+			toV3(
+				fromSnapshot([
+					"rootId: 1",
+					"Add 1 <Fragment> to parent -1",
+					"Add 2 <Parent> to parent 1",
+				]),
+				{ rendererId: 1 },
+			),
+		);
+		applyEvent(
+			store,
+			"operation_v3",
+			toV3(
+				fromSnapshot([
+					"rootId: 10",
+					"Add 10 <Fragment> to parent -1",
+					"Add 11 <Other> to parent 10",
+				]),
+				{ rendererId: 2 },
+			),
+		);
+		store.selection.selectById(2);
+
+		applyEvent(store, "snapshot_v3", [
+			OPERATION_PROTOCOL_V3,
+			1,
+			2,
+			0,
+			0,
+			1,
+			-1,
+			0,
+		]);
+
+		expect(store.selection.selected.value).to.equal(11);
+		expect(store.selection.selectedIdx.value).to.equal(0);
 	});
 });

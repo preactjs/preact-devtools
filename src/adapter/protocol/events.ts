@@ -1,11 +1,17 @@
 import { flushTable, StringTable } from "./string-table";
-import { Store } from "../../view/store/types";
+import { ID, Store } from "../../view/store/types";
 import { batch } from "@preact/signals";
 import { recordProfilerCommit } from "../../view/components/profiler/data/commits";
 import { ops2Tree } from "./operations";
 import { applyOperationsV1 } from "./legacy/operationsV1";
 import { OperationInfo, Stats, stats2ops } from "../shared/stats";
 import { DevtoolEvents } from "../hook";
+import {
+	nextOperationV3State,
+	OperationV3Header,
+	readOperationV3,
+	validateOperationV3,
+} from "./v3";
 
 export enum MsgTypes {
 	ADD_ROOT = 1,
@@ -124,6 +130,7 @@ function sumOps(a: OperationInfo, b: OperationInfo) {
  * We currently expect all operations to be in order.
  */
 export function applyOperationsV2(store: Store, data: number[]) {
+	const result = ops2Tree(store.nodes.value, store.roots.value, data);
 	const {
 		rootId: commitRootId,
 		rendered,
@@ -131,11 +138,12 @@ export function applyOperationsV2(store: Store, data: number[]) {
 		tree,
 		reasons,
 		stats,
-	} = ops2Tree(store.nodes.value, store.roots.value, data);
+	} = result;
 
 	// Update store data
 	store.roots.value = roots;
 	store.nodes.value = tree;
+	store.tree.sync(tree, roots, store.filter.filterRoot.value);
 
 	if (store.inspectData.value) {
 		const id = store.inspectData.value.id;
@@ -195,6 +203,106 @@ export function applyOperationsV2(store: Store, data: number[]) {
 			store.stats.data.value = { ...v };
 		}
 	}
+
+	return result;
+}
+
+function removeRendererNodes(store: Store, rendererId: number) {
+	const removeIds = new Set<ID>();
+	store.rendererByNode.forEach((owner, id) => {
+		if (owner === rendererId) removeIds.add(id);
+	});
+
+	if (removeIds.size === 0) return;
+
+	const nextTree = new Map(store.nodes.value);
+	removeIds.forEach(id => {
+		nextTree.delete(id);
+		store.rendererByNode.delete(id);
+	});
+
+	nextTree.forEach(node => {
+		let changed = false;
+		const children = [];
+		for (let i = 0; i < node.children.length; i++) {
+			const child = node.children[i];
+			if (removeIds.has(child)) {
+				changed = true;
+			} else {
+				children.push(child);
+			}
+		}
+		if (changed) {
+			nextTree.set(node.id, {
+				children,
+				depth: node.depth,
+				endTime: node.endTime,
+				hocs: node.hocs,
+				id: node.id,
+				key: node.key,
+				name: node.name,
+				owner: node.owner,
+				parent: node.parent,
+				startTime: node.startTime,
+				type: node.type,
+			});
+		}
+	});
+
+	const roots = [];
+	for (let i = 0; i < store.roots.value.length; i++) {
+		const root = store.roots.value[i];
+		if (!removeIds.has(root)) roots.push(root);
+	}
+
+	store.roots.value = roots;
+	store.nodes.value = nextTree;
+	store.tree.sync(nextTree, roots, store.filter.filterRoot.value);
+	if (store.inspectData.value && removeIds.has(store.inspectData.value.id)) {
+		store.inspectData.value = null;
+	}
+	if (removeIds.has(store.selection.selected.value)) {
+		const first = store.tree.visibleAt(0);
+		store.selection.selected.value = first ?? -1;
+		store.selection.selectedIdx.value = first === null ? -1 : 0;
+	}
+}
+
+export function applyOperationsV3(
+	store: Store,
+	data: number[],
+	isSnapshot = false,
+) {
+	const envelope = readOperationV3(data);
+	const state = store.operationV3.get(envelope.rendererId) || null;
+	const validation = isSnapshot
+		? validateOperationV3(null, envelope)
+		: validateOperationV3(state, envelope);
+
+	if (!validation.ok) {
+		store.emit("snapshot-request-v3", {
+			rendererId: envelope.rendererId,
+			reason: validation.reason,
+		});
+		return;
+	}
+
+	if (isSnapshot) removeRendererNodes(store, envelope.rendererId);
+
+	if (isSnapshot && data.length === OperationV3Header.PayloadStart) {
+		store.operationV3.set(envelope.rendererId, nextOperationV3State(envelope));
+		return;
+	}
+
+	const result = applyOperationsV2(
+		store,
+		data.slice(OperationV3Header.PayloadStart),
+	);
+	result.removals.forEach(id => store.rendererByNode.delete(id));
+	result.rendered.forEach(id =>
+		store.rendererByNode.set(id, envelope.rendererId),
+	);
+	store.operationV3.set(envelope.rendererId, nextOperationV3State(envelope));
 }
 
 export function applyEvent(store: Store, type: keyof DevtoolEvents, data: any) {
@@ -222,6 +330,16 @@ export function applyEvent(store: Store, type: keyof DevtoolEvents, data: any) {
 		case "operation_v2":
 			batch(() => {
 				applyOperationsV2(store, data);
+			});
+			break;
+		case "operation_v3":
+			batch(() => {
+				applyOperationsV3(store, data);
+			});
+			break;
+		case "snapshot_v3":
+			batch(() => {
+				applyOperationsV3(store, data, true);
 			});
 			break;
 		case "inspect-result": {

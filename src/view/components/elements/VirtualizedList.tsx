@@ -9,7 +9,10 @@ import {
 import { useResize } from "../utils";
 
 export interface VirtualizedListProps<T> {
-	items: T[];
+	items?: T[];
+	itemCount?: number;
+	itemAt?: (idx: number) => T | null;
+	itemIndex?: (item: T) => number;
 	container: RefObject<Element | null>;
 	rowHeight: number;
 	minBufferCount: number;
@@ -19,7 +22,10 @@ export interface VirtualizedListProps<T> {
 export function useVirtualizedList<T>({
 	rowHeight,
 	minBufferCount,
-	items,
+	items = [],
+	itemCount = items.length,
+	itemAt = idx => items[idx],
+	itemIndex = item => items.findIndex(t => t === item),
 	container,
 	renderRow,
 }: VirtualizedListProps<T>) {
@@ -39,22 +45,25 @@ export function useVirtualizedList<T>({
 	// is ALWAYS stable
 	const timeoutRef = useRef<any>(null);
 	const scrollRef = useRef(scroll);
-	const itemsRef = useRef(items);
+	const itemCountRef = useRef(itemCount);
+	const itemIndexRef = useRef(itemIndex);
 	const heightRef = useRef(height);
 	scrollRef.current = scroll;
-	itemsRef.current = items;
+	itemCountRef.current = itemCount;
+	itemIndexRef.current = itemIndex;
 	heightRef.current = height;
 
 	const scrollToItem = useCallback(
 		(item: T) => {
 			const scroll = scrollRef.current;
-			const items = itemsRef.current;
+			const itemCount = itemCountRef.current;
+			const itemIndex = itemIndexRef.current;
 			const height = heightRef.current;
 			if (timeoutRef.current) {
 				clearTimeout(timeoutRef.current);
 			}
 
-			const nextIdx = items.findIndex(t => t === item);
+			const nextIdx = itemIndex(item);
 			if (nextIdx < 0) return;
 
 			// Check if the item we want to scroll to is already in view
@@ -64,7 +73,7 @@ export function useVirtualizedList<T>({
 			const isAfter = scroll + height - EDGE < pos;
 			if (isBefore || isAfter) {
 				// Clamp to available range to avoid overflow
-				const maxScroll = Math.floor(rowHeight * items.length - height);
+				const maxScroll = Math.floor(rowHeight * itemCount - height);
 				const nextPos = Math.max(
 					0,
 					Math.min(isBefore ? pos : pos - height + rowHeight * 2, maxScroll),
@@ -114,16 +123,19 @@ export function useVirtualizedList<T>({
 
 	const vnodes = useMemo(() => {
 		const vnodes: VNode[] = [];
-		while (idx < items.length && idx <= max) {
-			vnodes.push(renderRow(items[idx], idx, top));
+		while (idx < itemCount && idx <= max) {
+			const item = itemAt(idx);
+			if (item !== null) {
+				vnodes.push(renderRow(item, idx, top));
+			}
 			top += rowHeight;
 			idx++;
 		}
 		return vnodes;
-	}, [items, idx, max, top]);
+	}, [itemAt, itemCount, idx, max, top]);
 
 	return {
-		containerHeight: rowHeight * items.length,
+		containerHeight: rowHeight * itemCount,
 		children: vnodes,
 		scrollToItem,
 	};

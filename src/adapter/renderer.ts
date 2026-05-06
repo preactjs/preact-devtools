@@ -9,6 +9,8 @@ import { RootData } from "./shared/utils";
 export type ObjPath = Array<string | number>;
 
 export interface Renderer<T extends SharedVNode = SharedVNode> {
+	setRendererId?(id: number): void;
+	sendSnapshot?(): void;
 	refresh?(): void;
 	getVNodeById(id: ID): T | null;
 	getDisplayName(vnode: T): string;

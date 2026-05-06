@@ -270,6 +270,7 @@ export function recordProfilerCommit(
 	while ((id = stack.pop())) {
 		const node = tree.get(id);
 		if (!node) continue;
+		nodes.set(node.id, node);
 
 		if (rendered.has(node.id)) {
 			// Collect the time a node took to render excluding its children
@@ -293,8 +294,6 @@ export function recordProfilerCommit(
 			// of that root id.
 			selfDurations.set(node.id, prevCommit.selfDurations.get(node.id) || 0);
 		}
-
-		nodes.set(node.id, node);
 
 		stack.push(...node.children);
 	}

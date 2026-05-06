@@ -2,6 +2,7 @@ import { Signal, signal } from "@preact/signals";
 import { useStore } from "./react-bindings";
 import { escapeStringRegexp } from "./utils";
 import { ID, DevNode } from "./types";
+import { TreeStore } from "./tree";
 
 export function createRegex(s: string): RegExp {
 	if (s[0] === "/") {
@@ -21,6 +22,7 @@ export function createRegex(s: string): RegExp {
 export function createSearchStore(
 	items: Signal<Map<ID, DevNode>>,
 	list: Signal<ID[]>,
+	tree?: TreeStore,
 ) {
 	const searchValue = signal("");
 	const selected = signal(0);
@@ -45,15 +47,32 @@ export function createSearchStore(
 		regex.value = reg;
 
 		const ids: number[] = [];
-		list.value.forEach(id => {
-			const node = items.value.get(id);
-			if (
-				node &&
-				(reg.test(node.name) || (node.hocs && node.hocs.some(h => reg.test(h))))
-			) {
-				ids.push(id);
+		const size = tree ? tree.visibleSize() : 0;
+		if (tree && size > 0) {
+			for (let i = 0; i < size; i++) {
+				const id = tree.visibleAt(i);
+				if (id === null) continue;
+				const node = tree.get(id);
+				if (
+					node &&
+					(reg.test(node.name) ||
+						(node.hocs && node.hocs.some(h => reg.test(h))))
+				) {
+					ids.push(id);
+				}
 			}
-		});
+		} else {
+			list.value.forEach(id => {
+				const node = items.value.get(id);
+				if (
+					node &&
+					(reg.test(node.name) ||
+						(node.hocs && node.hocs.some(h => reg.test(h))))
+				) {
+					ids.push(id);
+				}
+			});
+		}
 
 		if (ids.length > 0) {
 			selected.value = 0;
@@ -71,7 +90,9 @@ export function createSearchStore(
 		if (n < 0) n = match.value.length - 1;
 		else if (n > match.value.length - 1) n = 0;
 		selected.value = n;
-		selectedIdx.value = list.value.findIndex(id => match.value[n] === id);
+		selectedIdx.value = tree
+			? tree.rankOf(match.value[n])
+			: list.value.findIndex(id => match.value[n] === id);
 	}
 
 	const selectNext = () => go(selected.value + 1);

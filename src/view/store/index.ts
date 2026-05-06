@@ -10,6 +10,8 @@ import { InspectData } from "../../adapter/adapter/adapter";
 import { createProfiler } from "../components/profiler/data/commits";
 import { PropData } from "../components/sidebar/inspect/parseProps";
 import { parseObjectState, filterCollapsed } from "./props";
+import { TreeStore } from "./tree";
+import type { OperationV3State } from "../../adapter/protocol/v3";
 
 export function createStore(): Store {
 	const listeners: Array<null | Listener> = [];
@@ -21,16 +23,29 @@ export function createStore(): Store {
 
 	const nodes = signal<Map<ID, DevNode>>(new Map());
 	const roots = signal<ID[]>([]);
+	const tree = new TreeStore();
+	const operationV3 = new Map<number, OperationV3State>();
+	const rendererByNode = new Map<ID, number>();
 
 	// Toggle
 	const isPicking = signal<boolean>(false);
 	const filterState = createFilterStore(notify);
+	effect(() => {
+		tree.setRootHidden(filterState.filterRoot.value);
+	});
 
 	// List
 	const collapsed = signal(new Set<ID>());
-	const collapser = createCollapser<ID>(collapsed);
+	const collapser = createCollapser<ID>(collapsed, (id, shouldCollapse) => {
+		tree.setCollapsed(id, shouldCollapse);
+	});
 
 	const nodeList = computed(() => {
+		tree.version.value;
+		if (tree.visibleSize() > 0) {
+			return tree.visibleRange(0, tree.visibleSize());
+		}
+
 		return roots.value
 			.map(root => {
 				const items = flattenChildren<ID, DevNode>(nodes.value, root, id =>
@@ -112,7 +127,7 @@ export function createStore(): Store {
 		}
 	});
 
-	const selection = createSelectionStore(nodeList);
+	const selection = createSelectionStore(nodeList, tree);
 	const stats = signal(null);
 
 	return {
@@ -132,8 +147,11 @@ export function createStore(): Store {
 		isPicking,
 		roots,
 		nodes,
+		tree,
+		operationV3,
+		rendererByNode,
 		collapser,
-		search: createSearchStore(nodes, nodeList),
+		search: createSearchStore(nodes, nodeList, tree),
 		filter: filterState,
 		selection,
 		theme: signal<Theme>("auto"),
@@ -141,6 +159,9 @@ export function createStore(): Store {
 		clear() {
 			roots.value = [];
 			nodes.value = new Map();
+			tree.clear();
+			operationV3.clear();
+			rendererByNode.clear();
 			selection.selected.value = -1;
 			collapser.collapsed.value = new Set();
 			stats.value = null;

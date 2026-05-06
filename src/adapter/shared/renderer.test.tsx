@@ -11,6 +11,7 @@ import { Renderer } from "../renderer";
 import { newProfiler } from "../adapter/profiler";
 import { getFilteredChildren } from "./traverse";
 import { createIdMappingState } from "./idMapper";
+import { OperationV3Header } from "../protocol/v3";
 
 export function setupScratch() {
 	const div = document.createElement("div");
@@ -48,6 +49,18 @@ function getOps(spy: ReturnType<typeof vi.fn>) {
 	return spy.mock.calls.filter(arg => arg[0] === "operation_v2");
 }
 
+function getV3Ops(spy: ReturnType<typeof vi.fn>) {
+	return spy.mock.calls.filter(arg => arg[0] === "operation_v3");
+}
+
+function getV3Snapshots(spy: ReturnType<typeof vi.fn>) {
+	return spy.mock.calls.filter(arg => arg[0] === "snapshot_v3");
+}
+
+function unwrapV3(data: number[]) {
+	return data.slice(OperationV3Header.PayloadStart);
+}
+
 describe("Renderer 10", () => {
 	let scratch: HTMLDivElement;
 	let destroy: () => void;
@@ -81,6 +94,57 @@ describe("Renderer 10", () => {
 			"Update timings 1",
 			"Update timings 2",
 		]);
+	});
+
+	it("should emit v3 operations when a renderer id is assigned", () => {
+		renderer.setRendererId?.(7);
+		render(<div />, scratch);
+
+		const ops = getV3Ops(spy);
+		expect(ops.length).to.equal(1);
+		expect(ops[0][1].slice(0, OperationV3Header.PayloadStart)).to.deep.equal([
+			3,
+			7,
+			1,
+			0,
+			0,
+			1,
+			1,
+			unwrapV3(ops[0][1])[1],
+		]);
+		expect(toSnapshot(unwrapV3(ops[0][1]))).to.deep.equal([
+			"rootId: 1",
+			"Add 1 <Fragment> to parent -1",
+			"Add 2 <div> to parent 1",
+		]);
+	});
+
+	it("should emit an explicit v3 snapshot", () => {
+		renderer.setRendererId?.(7);
+		render(<div />, scratch);
+		spy.mockClear();
+
+		renderer.sendSnapshot?.();
+
+		const snapshots = getV3Snapshots(spy);
+		expect(snapshots.length).to.equal(1);
+		expect(
+			snapshots[0][1].slice(0, OperationV3Header.PayloadStart),
+		).to.deep.equal([3, 7, 2, 0, 0, 1, 1, unwrapV3(snapshots[0][1])[1]]);
+		expect(toSnapshot(unwrapV3(snapshots[0][1]))).to.deep.equal([
+			"rootId: 1",
+			"Add 1 <Fragment> to parent -1",
+			"Add 2 <div> to parent 1",
+		]);
+	});
+
+	it("should emit an empty v3 snapshot", () => {
+		renderer.setRendererId?.(7);
+		renderer.sendSnapshot?.();
+
+		const snapshots = getV3Snapshots(spy);
+		expect(snapshots.length).to.equal(1);
+		expect(snapshots[0][1]).to.deep.equal([3, 7, 2, 0, 0, 1, -1, 0]);
 	});
 
 	it("should mount children", () => {

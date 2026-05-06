@@ -65,7 +65,7 @@ describe("Store", () => {
     ]);
 		applyOperationsV2(store, event2);
 
-		expect(spy).toHaveBeenCalledTimes(2); // TODO: Should be called once
+		expect(spy).toHaveBeenCalledTimes(1);
 		expect(store.nodes.value.get(1)!.children).to.deep.equal([]);
 		expect(store.nodes.value.get(2)).to.equal(undefined);
 		expect(store.nodes.value.get(3)).to.equal(undefined);
@@ -136,5 +136,43 @@ describe("Store", () => {
 		store.supports.hooks.value = true;
 
 		expect(store.sidebar.hooks.items.value).to.deep.equal([hooks[1]]);
+	});
+
+	it("should search through the tree store", () => {
+		const store = createStore();
+		const event = fromSnapshot([
+			"rootId: 1",
+			"Add 1 <Fragment> to parent -1",
+			"Add 2 <Parent> to parent 1",
+			"Add 3 <Child> to parent 2",
+		]);
+		applyOperationsV2(store, event);
+
+		store.search.onChange("child");
+
+		expect(store.search.match.value).to.deep.equal([3]);
+		store.search.selectNext();
+		expect(store.search.selectedIdx.value).to.equal(1);
+	});
+
+	it("should keep profiler snapshots scoped to the committed root", () => {
+		const store = createStore();
+		store.profiler.isRecording.value = true;
+		const event1 = fromSnapshot([
+			"rootId: 1",
+			"Add 1 <Fragment> to parent -1",
+			"Add 2 <Parent> to parent 1",
+		]);
+		const event2 = fromSnapshot([
+			"rootId: 10",
+			"Add 10 <Fragment> to parent -1",
+			"Add 11 <Other> to parent 10",
+		]);
+
+		applyOperationsV2(store, event1);
+		applyOperationsV2(store, event2);
+
+		expect(store.profiler.commits.value[0].nodes.has(1)).to.equal(true);
+		expect(store.profiler.commits.value[0].nodes.has(10)).to.equal(false);
 	});
 });

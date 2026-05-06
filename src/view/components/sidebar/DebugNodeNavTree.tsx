@@ -5,7 +5,9 @@ import { SidebarPanel, Empty } from "./SidebarPanel";
 export function DebugNodeNavTree() {
 	const store = useStore();
 	const selected = store.selection.selected.value;
-	const nodes = store.nodeList.value.map(id => store.nodes.value.get(id)!);
+	store.tree.version.value;
+	const ids = store.tree.visibleRange(0, store.tree.visibleSize());
+	const nodes = ids.map(id => store.tree.get(id)!);
 
 	return (
 		<SidebarPanel title="Debug Node Navigation:" testId="profiler-debug-nav">

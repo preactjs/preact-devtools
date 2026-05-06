@@ -11,11 +11,15 @@ export interface Collapser<T> {
 /**
  * The Collapser deals with hiding sections in a tree view
  */
-export function createCollapser<T>(collapsed: Signal<Set<T>>): Collapser<T> {
+export function createCollapser<T>(
+	collapsed: Signal<Set<T>>,
+	onChange?: (item: T, collapsed: boolean) => void,
+): Collapser<T> {
 	const collapseNode = (id: T, shouldCollapse: boolean) => {
 		const v = collapsed.value;
 		shouldCollapse ? v.add(id) : v.delete(id);
 		collapsed.value = new Set(v);
+		onChange?.(id, shouldCollapse);
 	};
 
 	const toggle = (id: T) => collapseNode(id, !collapsed.value.has(id));

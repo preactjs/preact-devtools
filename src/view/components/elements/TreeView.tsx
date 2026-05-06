@@ -24,7 +24,8 @@ const highlightNode = debounce(
 
 export function TreeView() {
 	const store = useStore();
-	const nodeList = store.nodeList.value;
+	store.tree.version.value;
+	const visibleSize = store.tree.visibleSize();
 	const roots = store.roots.value;
 	const { collapseNode, collapsed } = useCollapser();
 	const { selected, selectNext, selectPrev } = useSelection();
@@ -33,7 +34,7 @@ export function TreeView() {
 		selected,
 		onCollapse: collapseNode,
 		canCollapse: id => {
-			const node = store.nodes.value.get(id);
+			const node = store.tree.get(id);
 			return node ? node.children.length > 0 : false;
 		},
 		checkCollapsed: id => collapsed.has(id),
@@ -68,7 +69,9 @@ export function TreeView() {
 		rowHeight: ROW_HEIGHT,
 		minBufferCount: 5,
 		container: ref,
-		items: nodeList,
+		itemCount: visibleSize,
+		itemAt: idx => store.tree.visibleAt(idx),
+		itemIndex: id => store.tree.rankOf(id),
 		// eslint-disable-next-line react/display-name
 		renderRow: (id, _, top) => <TreeItem key={id} id={id} top={top} />,
 	});
@@ -87,9 +90,9 @@ export function TreeView() {
 	useAutoIndent(paneRef, [listItems]);
 
 	// When the devtools is connected, but nothing has been sent to the panel yet
-	const isOnlyConnected = nodeList.length === 0 && roots.length === 0;
+	const isOnlyConnected = visibleSize === 0 && roots.length === 0;
 	// When client sent messages, but no nodes were sent due to filters.
-	const hasNoResults = nodeList.length === 0 && roots.length > 0;
+	const hasNoResults = visibleSize === 0 && roots.length > 0;
 
 	return (
 		<div
@@ -175,7 +178,7 @@ export function TreeItem(props: { key: any; id: ID; top: number }) {
 	const store = useStore();
 	const as = useSelection();
 	const { collapsed, toggle } = useCollapser();
-	const node = store.nodes.value.get(id) || null;
+	const node = store.tree.get(id) || store.nodes.value.get(id) || null;
 	const filterRoot = store.filter.filterRoot.value;
 	const filterHoc = store.filter.filterHoc.value;
 	const roots = store.roots.value;
@@ -279,13 +282,12 @@ export function Arrow() {
 
 export function HighlightPane(props: { treeDom: HTMLDivElement | null }) {
 	const store = useStore();
-	const nodes = store.nodes.value;
 	const { selected } = useSelection();
 	const { collapsed } = useCollapser();
 
-	// Subscribe to nodeList so that we rerender whenever nodes
-	// are collapsed
-	const list = store.nodeList.value;
+	// Subscribe to tree changes so collapse and structural updates reposition
+	// the highlight.
+	const treeVersion = store.tree.version.value;
 
 	const [pos, setPos] = useState({ top: 0, height: 0 });
 	useEffect(() => {
@@ -294,7 +296,7 @@ export function HighlightPane(props: { treeDom: HTMLDivElement | null }) {
 				const start = props.treeDom.querySelector(
 					`[data-id="${selected}"`,
 				) as HTMLDivElement | null;
-				const lastId = getLastChild(nodes, selected);
+				const lastId = getLastChild(store.tree.toMap(), selected);
 				const last = props.treeDom.querySelector(
 					`[data-id="${lastId}"]`,
 				) as HTMLDivElement | null;
@@ -314,7 +316,7 @@ export function HighlightPane(props: { treeDom: HTMLDivElement | null }) {
 		} else {
 			setPos({ top: 0, height: 0 });
 		}
-	}, [selected, list]);
+	}, [selected, treeVersion]);
 
 	return (
 		<div

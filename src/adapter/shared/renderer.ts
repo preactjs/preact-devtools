@@ -21,6 +21,7 @@ import { PreactBindings, SharedVNode } from "../shared/bindings";
 import { inspectVNode } from "./inspectVNode";
 import { logVNode } from "../10/log";
 import { isSerializedBigint } from "../../view/components/sidebar/inspect/serializeProps";
+import { wrapEmptySnapshotV3, wrapOperationV3 } from "../protocol/v3";
 
 export interface RendererConfig {
 	Fragment: FunctionalComponent;
@@ -72,6 +73,10 @@ export function createRenderer<T extends SharedVNode>(
 ): Renderer<T> {
 	let currentUnmounts: number[] = [];
 	let prevOwners = new Map<T, T>();
+	let rendererId = -1;
+	let epoch = 1;
+	let commitSeq = -1;
+	let treeVersion = 0;
 
 	/** Use this to check if we added a root */
 	let rootSize = roots.size;
@@ -121,7 +126,91 @@ export function createRenderer<T extends SharedVNode>(
 		);
 	};
 
+	function sendOperation(type: "operation_v3" | "snapshot_v3", data: number[]) {
+		if (rendererId === -1) {
+			port.send("operation_v2", data);
+			return;
+		}
+
+		const baseTreeVersion = type === "snapshot_v3" ? 0 : treeVersion;
+		const nextTreeVersion = baseTreeVersion + 1;
+		const nextCommitSeq = type === "snapshot_v3" ? 0 : commitSeq + 1;
+
+		port.send(
+			type,
+			data.length === 0 && type === "snapshot_v3"
+				? wrapEmptySnapshotV3({
+						rendererId,
+						epoch,
+						commitSeq: nextCommitSeq,
+						baseTreeVersion,
+						nextTreeVersion,
+					})
+				: wrapOperationV3(
+						{
+							rendererId,
+							epoch,
+							commitSeq: nextCommitSeq,
+							baseTreeVersion,
+							nextTreeVersion,
+						},
+						data,
+					),
+		);
+
+		commitSeq = nextCommitSeq;
+		treeVersion = nextTreeVersion;
+	}
+
+	function sendCommit(ev: BaseEvent<any, number[]>) {
+		sendOperation("operation_v3", ev.data);
+	}
+
+	function sendSnapshot() {
+		epoch++;
+		commitSeq = -1;
+		treeVersion = 0;
+		currentUnmounts = [];
+
+		const oldRecordStats = profiler.recordStats;
+		profiler.recordStats = false;
+
+		let sentSnapshot = false;
+		roots.forEach((dom, root) => {
+			const commit = createCommit(
+				ids,
+				roots,
+				prevOwners,
+				root,
+				filters,
+				domToVNode,
+				config,
+				profiler,
+				bindings,
+				{ start: new Map(), end: new Map() },
+				null,
+				true,
+			);
+			const ev = flush(commit);
+			if (ev) {
+				sendOperation(sentSnapshot ? "operation_v3" : "snapshot_v3", ev.data);
+				sentSnapshot = true;
+			}
+		});
+
+		if (!sentSnapshot) {
+			sendOperation("snapshot_v3", []);
+		}
+
+		profiler.recordStats = oldRecordStats;
+		port.send("root-order-page", null);
+	}
+
 	return {
+		setRendererId(id) {
+			rendererId = id;
+		},
+		sendSnapshot,
 		clear() {
 			roots.forEach((dom, vnode) => {
 				onUnmount(vnode);
@@ -205,7 +294,7 @@ export function createRenderer<T extends SharedVNode>(
 			return -1;
 		},
 		refresh() {
-			this.applyFilters(filters);
+			sendSnapshot();
 		},
 		applyFilters(nextFilters) {
 			/** Queue events and flush in one go */
@@ -263,7 +352,7 @@ export function createRenderer<T extends SharedVNode>(
 				queue.push(ev);
 			});
 
-			queue.forEach(ev => port.send(ev.type, ev.data));
+			queue.forEach(ev => sendCommit(ev));
 			port.send("root-order-page", null);
 		},
 		onCommit(vnode, owners, timingsByVNode, renderReasonPre) {
@@ -306,7 +395,7 @@ export function createRenderer<T extends SharedVNode>(
 				profiler.pendingHighlightUpdates.clear();
 			}
 
-			port.send(ev.type as any, ev.data);
+			sendCommit(ev);
 			if (rootSize !== roots.size) {
 				rootSize = roots.size;
 				port.send("root-order-page", null);

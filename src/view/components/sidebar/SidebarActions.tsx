@@ -11,7 +11,8 @@ import { useComputed } from "@preact/signals";
 export function SidebarActions() {
 	const store = useStore();
 	const emit = useEmitter();
-	const node = store.nodes.value.get(store.selection.selected.value) || null;
+	store.tree.version.value;
+	const node = store.tree.get(store.selection.selected.value);
 	const log = useCallback(() => {
 		if (node) emit("log", { id: node.id, children: node.children });
 	}, [node]);

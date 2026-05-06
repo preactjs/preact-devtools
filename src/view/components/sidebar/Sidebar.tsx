@@ -15,7 +15,8 @@ export function Sidebar() {
 	const inspect = store.inspectData.value;
 	const hocs = useComputed(() => {
 		if (store.inspectData.value) {
-			const node = store.nodes.value.get(store.inspectData.value.id);
+			store.tree.version.value;
+			const node = store.tree.get(store.inspectData.value.id);
 			return node ? node.hocs : null;
 		}
 		return null;

@@ -132,4 +132,5 @@ export function applyOperationsV1(store: Store, data: number[]) {
 
 	store.roots.value = [...store.roots.value];
 	store.nodes.value = nodes;
+	store.tree.sync(nodes, store.roots.value, store.filter.filterRoot.value);
 }
