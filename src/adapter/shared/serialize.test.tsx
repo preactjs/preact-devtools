@@ -45,6 +45,13 @@ describe("jsonify", () => {
 			},
 		});
 	});
+
+	it("should truncate long strings", () => {
+		const data = { foo: "foo".repeat(200) } as const;
+		expect(jsonify(data, () => null, new Set())).to.deep.equal({
+			foo: "foo".repeat(100),
+		});
+	});
 });
 
 describe("cleanProps", () => {

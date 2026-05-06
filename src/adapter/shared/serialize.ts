@@ -82,7 +82,7 @@ export function jsonify(
 	}
 	switch (typeof data) {
 		case "string":
-			return data.length > 300 ? data.slice(300) : data;
+			return data.length > 300 ? data.slice(0, 300) : data;
 		case "bigint":
 			return {
 				type: "bigint",
