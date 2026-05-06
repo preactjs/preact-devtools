@@ -1,4 +1,5 @@
-import { h } from "preact";
+// eslint-disable-next-line no-unused-vars
+import { h, Fragment } from "preact";
 import { SidebarPanel, Empty } from "../../sidebar/SidebarPanel";
 import { useStore } from "../../../store/react-bindings";
 import { RenderReason } from "../../../../adapter/shared/renderReasons";
