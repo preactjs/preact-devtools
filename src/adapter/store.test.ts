@@ -322,7 +322,7 @@ describe("Store", () => {
 		applyOperationsV2(store, event1);
 		applyOperationsV2(store, event2);
 
-		expect(store.profiler.commits.value[0].nodes.has(1)).to.equal(true);
-		expect(store.profiler.commits.value[0].nodes.has(10)).to.equal(false);
+		expect(store.profiler.commits[0].nodes.has(1)).to.equal(true);
+		expect(store.profiler.commits[0].nodes.has(10)).to.equal(false);
 	});
 });

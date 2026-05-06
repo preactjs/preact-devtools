@@ -21,7 +21,7 @@ import s from "./TimelineBar.module.css";
 export function TimelineBar() {
 	const store = useStore();
 	store.profiler.commitsVersion.value;
-	const commits = store.profiler.commits.value;
+	const commits = store.profiler.commits;
 	const filteredCommits = store.profiler.filteredCommits.value;
 	const isRecording = store.profiler.isRecording.value;
 	const isSupported = store.profiler.isSupported.value;
@@ -29,7 +29,7 @@ export function TimelineBar() {
 
 	const stats = useComputed(() => {
 		store.profiler.commitsVersion.value;
-		const commits = store.profiler.commits.peek();
+		const commits = store.profiler.commits;
 		return {
 			max: Math.max(16, ...commits.map(x => x.duration)),
 			min: Math.max(0, Math.min(...commits.map(x => x.duration))),

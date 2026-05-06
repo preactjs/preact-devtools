@@ -12,21 +12,18 @@ export function RenderedAt() {
 		const id = store.profiler.selectedNodeId.value;
 		store.profiler.commitsVersion.value;
 
-		return store.profiler.commits
-			.peek()
-			.reduce<Array<{ index: number; selfDuration: number }>>(
-				(acc, commit, i) => {
-					if (!commit.rendered.has(id)) return acc;
+		return store.profiler.commits.reduce<
+			Array<{ index: number; selfDuration: number }>
+		>((acc, commit, i) => {
+			if (!commit.rendered.has(id)) return acc;
 
-					const selfDuration = commit.selfDurations.get(id) || 0;
-					acc.push({
-						index: i,
-						selfDuration,
-					});
-					return acc;
-				},
-				[],
-			);
+			const selfDuration = commit.selfDurations.get(id) || 0;
+			acc.push({
+				index: i,
+				selfDuration,
+			});
+			return acc;
+		}, []);
 	}).value;
 
 	const commitIdx = store.profiler.activeCommitIdx.value;

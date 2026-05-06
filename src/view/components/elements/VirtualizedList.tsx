@@ -37,9 +37,8 @@ export function useVirtualizedList<T>({
 			? Math.max(minBufferCount, Math.ceil(height / rowHeight / 2))
 			: minBufferCount;
 
-	let idx = Math.max(0, Math.floor(scroll / rowHeight) - bufferCount);
-	const max = idx + Math.ceil(height / rowHeight) + bufferCount;
-	let top = idx * rowHeight;
+	const startIdx = Math.max(0, Math.floor(scroll / rowHeight) - bufferCount);
+	const endIdx = startIdx + Math.ceil(height / rowHeight) + bufferCount;
 
 	// A bit hacky, we bascially want to ensure that `scrollToItem`
 	// is ALWAYS stable
@@ -123,7 +122,9 @@ export function useVirtualizedList<T>({
 
 	const vnodes = useMemo(() => {
 		const vnodes: VNode[] = [];
-		while (idx < itemCount && idx <= max) {
+		let idx = startIdx;
+		let top = startIdx * rowHeight;
+		while (idx < itemCount && idx <= endIdx) {
 			const item = itemAt(idx);
 			if (item !== null) {
 				vnodes.push(renderRow(item, idx, top));
@@ -132,7 +133,7 @@ export function useVirtualizedList<T>({
 			idx++;
 		}
 		return vnodes;
-	}, [itemAt, itemCount, idx, max, top]);
+	}, [endIdx, itemAt, itemCount, renderRow, rowHeight, startIdx]);
 
 	return {
 		containerHeight: rowHeight * itemCount,

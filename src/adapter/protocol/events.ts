@@ -159,7 +159,7 @@ export function applyOperationsV2(store: Store, data: number[]) {
 	// elements tree because the profiler can step through time
 	if (store.profiler.isRecording.value) {
 		recordProfilerCommit(tree, store.profiler, rendered, commitRootId);
-		const commitIdx = store.profiler.commits.peek().length - 1;
+		const commitIdx = store.profiler.commits.length - 1;
 		const map = store.profiler.renderReasons.value.set(commitIdx, reasons);
 		store.profiler.renderReasons.value = new Map(map);
 	}

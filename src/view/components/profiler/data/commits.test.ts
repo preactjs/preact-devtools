@@ -34,20 +34,20 @@ describe("profiler commits", () => {
 	it("bumps commitsVersion for in-place commit appends", () => {
 		const profiler = createProfiler();
 		const tree = createTree();
-		const commits = profiler.commits.value;
+		const commits = profiler.commits;
 		const version = profiler.commitsVersion.value;
 
 		recordProfilerCommit(tree, profiler, new Set([1, 2]), 1);
 
-		expect(profiler.commits.value).to.equal(commits);
-		expect(profiler.commits.value.length).to.equal(1);
+		expect(profiler.commits).to.equal(commits);
+		expect(profiler.commits.length).to.equal(1);
 		expect(profiler.commitsVersion.value).to.equal(version + 1);
-		expect(profiler.activeCommit.value).to.equal(profiler.commits.value[0]);
+		expect(profiler.activeCommit.value).to.equal(profiler.commits[0]);
 
 		recordProfilerCommit(tree, profiler, new Set([2]), 2);
 
-		expect(profiler.commits.value).to.equal(commits);
-		expect(profiler.commits.value.length).to.equal(2);
+		expect(profiler.commits).to.equal(commits);
+		expect(profiler.commits.length).to.equal(2);
 		expect(profiler.commitsVersion.value).to.equal(version + 2);
 	});
 
@@ -59,7 +59,7 @@ describe("profiler commits", () => {
 		startProfiling(profiler);
 
 		expect(profiler.isRecording.value).to.equal(true);
-		expect(profiler.commits.value).to.deep.equal([]);
+		expect(profiler.commits).to.deep.equal([]);
 		expect(profiler.commitsVersion.value).to.equal(afterRecord + 1);
 
 		recordProfilerCommit(createTree(), profiler, new Set([1]), 1);
@@ -67,7 +67,7 @@ describe("profiler commits", () => {
 		resetProfiler(profiler);
 
 		expect(profiler.isRecording.value).to.equal(false);
-		expect(profiler.commits.value).to.deep.equal([]);
+		expect(profiler.commits).to.deep.equal([]);
 		expect(profiler.commitsVersion.value).to.equal(afterSecondRecord + 1);
 	});
 });
