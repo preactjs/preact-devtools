@@ -228,6 +228,83 @@ describe("Store", () => {
 		}
 	});
 
+	it("should debounce tree search while updating input immediately", () => {
+		vi.useFakeTimers();
+		try {
+			const store = createStore();
+			const event = fromSnapshot([
+				"rootId: 1",
+				"Add 1 <Fragment> to parent -1",
+				"Add 2 <Parent> to parent 1",
+				"Add 3 <Child> to parent 2",
+			]);
+			applyOperationsV2(store, event);
+
+			store.search.onChange("child");
+			expect(store.search.searchValue.value).to.equal("child");
+			expect(store.search.match.value).to.deep.equal([]);
+
+			vi.advanceTimersByTime(74);
+			expect(store.search.match.value).to.deep.equal([]);
+
+			vi.advanceTimersByTime(1);
+			expect(store.search.match.value).to.deep.equal([3]);
+			expect(store.search.count.value).to.equal(1);
+		} finally {
+			vi.useRealTimers();
+		}
+	});
+
+	it("should ignore stale debounced tree searches", () => {
+		vi.useFakeTimers();
+		try {
+			const store = createStore();
+			const event = fromSnapshot([
+				"rootId: 1",
+				"Add 1 <Fragment> to parent -1",
+				"Add 2 <Parent> to parent 1",
+				"Add 3 <Child> to parent 2",
+			]);
+			applyOperationsV2(store, event);
+
+			store.search.onChange("child");
+			vi.advanceTimersByTime(30);
+			store.search.onChange("parent");
+			vi.runAllTimers();
+
+			expect(store.search.searchValue.value).to.equal("parent");
+			expect(store.search.match.value).to.deep.equal([2]);
+			expect(store.search.count.value).to.equal(1);
+		} finally {
+			vi.useRealTimers();
+		}
+	});
+
+	it("should cancel pending tree searches on reset", () => {
+		vi.useFakeTimers();
+		try {
+			const store = createStore();
+			const event = fromSnapshot([
+				"rootId: 1",
+				"Add 1 <Fragment> to parent -1",
+				"Add 2 <Parent> to parent 1",
+				"Add 3 <Child> to parent 2",
+			]);
+			applyOperationsV2(store, event);
+
+			store.search.onChange("child");
+			store.search.reset();
+			vi.runAllTimers();
+
+			expect(store.search.searchValue.value).to.equal("");
+			expect(store.search.match.value).to.deep.equal([]);
+			expect(store.search.count.value).to.equal(0);
+			expect(store.search.regex.value).to.equal(null);
+		} finally {
+			vi.useRealTimers();
+		}
+	});
+
 	it("should keep profiler snapshots scoped to the committed root", () => {
 		const store = createStore();
 		store.profiler.isRecording.value = true;

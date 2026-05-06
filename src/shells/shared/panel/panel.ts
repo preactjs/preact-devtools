@@ -14,6 +14,7 @@ import {
 } from "./settings";
 import { batch, effect } from "@preact/signals";
 import { isFirefox } from "../utils";
+import { createPanelPortController } from "./port";
 
 // Updated when the selection in the native elements panel changed.
 let hostSelectionChanged = false;
@@ -34,9 +35,6 @@ async function showPanel(): Promise<{
 }
 
 let initialized = false;
-let port: chrome.runtime.Port | null = null;
-let reconnectTimer: any = null;
-let reconnectDelay = 250;
 
 const store = createStore();
 const operationQueue: Array<{
@@ -174,6 +172,29 @@ store.subscribe((type, data) => {
 	}
 });
 
+const portController = createPanelPortController({
+	connect: () =>
+		chrome.runtime.connect({
+			name: DevtoolsPanelName,
+		}),
+	onMessage: handlePortMessage,
+	onDisconnect: () => {
+		operationQueue.length = 0;
+		operationFlushPending = false;
+	},
+	createInitMessage: () => {
+		const tabId = chrome.devtools.inspectedWindow.tabId;
+		if (!tabId) return null;
+
+		return {
+			type: "init",
+			tabId,
+			source: DevtoolsPanelName + "_init",
+		};
+	},
+	debug,
+});
+
 /**
  * To avoid dropping messages on reload that may have already been
  * sent by us, we keep messages from the content script in memory
@@ -226,70 +247,7 @@ async function handlePortMessage(message: any) {
 }
 
 function postToBackground(message: any) {
-	if (port === null) {
-		debug("<- devtools dropped while disconnected", message);
-		return;
-	}
-
-	try {
-		port.postMessage(message);
-	} catch (err) {
-		debug("postMessage failed, reconnecting", err);
-		handlePortDisconnect(port);
-	}
-}
-
-function sendInitMessage() {
-	const tabId = chrome.devtools.inspectedWindow.tabId;
-	if (!tabId) return;
-
-	postToBackground({
-		type: "init",
-		tabId,
-		source: DevtoolsPanelName + "_init",
-	});
-}
-
-function connectPort() {
-	if (reconnectTimer !== null) {
-		clearTimeout(reconnectTimer);
-		reconnectTimer = null;
-	}
-
-	try {
-		const nextPort = chrome.runtime.connect({
-			name: DevtoolsPanelName,
-		});
-		port = nextPort;
-		reconnectDelay = 250;
-		nextPort.onMessage.addListener(handlePortMessage);
-		nextPort.onDisconnect.addListener(() => handlePortDisconnect(nextPort));
-		sendInitMessage();
-	} catch (err) {
-		debug("connect failed, retrying", err);
-		scheduleReconnect();
-	}
-}
-
-function handlePortDisconnect(disconnectedPort: chrome.runtime.Port) {
-	if (port !== disconnectedPort) return;
-
-	debug("devtools port disconnected");
-	port = null;
-	operationQueue.length = 0;
-	operationFlushPending = false;
-	scheduleReconnect();
-}
-
-function scheduleReconnect() {
-	if (reconnectTimer !== null) return;
-
-	const delay = reconnectDelay;
-	reconnectDelay = Math.min(reconnectDelay * 2, 5000);
-	reconnectTimer = setTimeout(() => {
-		reconnectTimer = null;
-		connectPort();
-	}, delay);
+	portController.post(message);
 }
 
 // Clear store when we navigate away from the current page.
@@ -318,4 +276,4 @@ chrome.devtools.network.onNavigated.addListener(() => {
 	}
 });
 
-connectPort();
+portController.connect();

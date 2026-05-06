@@ -1,6 +1,6 @@
 import { expect } from "vitest";
 import { DevNodeType, Tree } from "./types";
-import { TreeStore } from "./tree";
+import { TreeStore, TreeSyncChanges } from "./tree";
 
 function node(id: number, parent: number, children: number[] = []) {
 	return {
@@ -28,10 +28,36 @@ function createTree() {
 	return tree;
 }
 
+function cloneTree(tree: Tree) {
+	const next: Tree = new Map();
+	tree.forEach((n, id) => {
+		next.set(id, {
+			...n,
+			children: n.children.slice(),
+			hocs: n.hocs?.slice() || null,
+		});
+	});
+	return next;
+}
+
 function expectRanks(store: TreeStore) {
 	for (let i = 0; i < store.visibleSize(); i++) {
 		const id = store.visibleAt(i)!;
 		expect(store.rankOf(id)).to.equal(i);
+	}
+}
+
+function expectSameVisible(actual: TreeStore, expected: TreeStore) {
+	const size = expected.visibleSize();
+	expect(actual.visibleSize()).to.equal(size);
+	expect(actual.visibleRange(0, size)).to.deep.equal(
+		expected.visibleRange(0, size),
+	);
+
+	for (let i = 0; i < size; i++) {
+		const id = expected.visibleAt(i)!;
+		expect(actual.visibleAt(i)).to.equal(id);
+		expect(actual.rankOf(id)).to.equal(i);
 	}
 }
 
@@ -150,5 +176,94 @@ describe("TreeStore", () => {
 
 		expect(store.structureVersion.value).to.equal(layoutVersion + 1);
 		expect(store.visibleRange(0, 4)).to.deep.equal([1, 2, 4, 3]);
+	});
+
+	it("keeps incremental sync equivalent to a full rebuild", () => {
+		const tree = createTree();
+		const incremental = new TreeStore();
+		const rebuilt = new TreeStore();
+		let roots = [1];
+
+		incremental.sync(tree, roots, false);
+		rebuilt.sync(cloneTree(tree), roots, false);
+
+		const sync = (changes: TreeSyncChanges) => {
+			incremental.sync(tree, roots, false, changes);
+			rebuilt.sync(cloneTree(tree), roots.slice(), false);
+			expectSameVisible(incremental, rebuilt);
+		};
+
+		const parent = tree.get(2)!;
+		parent.children = parent.children.concat(6);
+		tree.set(2, parent);
+		tree.set(6, node(6, 2));
+		sync({
+			dirty: [2, 6],
+			addedSubtreeRoots: [6],
+			structural: true,
+			incremental: true,
+		});
+
+		tree.set(2, { ...tree.get(2)!, children: [6, 4, 5] });
+		sync({
+			dirty: [2],
+			structural: true,
+			incremental: true,
+		});
+
+		const beforeDisplayUpdate = incremental.structureVersion.value;
+		tree.set(6, { ...tree.get(6)!, hocs: ["memo"], name: "Renamed" });
+		sync({
+			dirty: [6],
+			structural: false,
+			incremental: true,
+		});
+		expect(incremental.structureVersion.value).to.equal(beforeDisplayUpdate);
+
+		tree.set(2, { ...tree.get(2)!, children: [6, 5] });
+		tree.delete(4);
+		sync({
+			dirty: [2, 4],
+			removed: [4],
+			removedSubtreeRoots: [{ id: 4, parent: 2 }],
+			structural: true,
+			incremental: true,
+		});
+
+		incremental.setCollapsed(2, true);
+		rebuilt.setCollapsed(2, true);
+		expectSameVisible(incremental, rebuilt);
+
+		tree.set(2, { ...tree.get(2)!, children: [6, 5, 7] });
+		tree.set(7, node(7, 2));
+		sync({
+			dirty: [2, 7],
+			addedSubtreeRoots: [7],
+			structural: true,
+			incremental: true,
+		});
+
+		tree.set(2, { ...tree.get(2)!, children: [6, 5] });
+		tree.delete(7);
+		sync({
+			dirty: [2, 7],
+			removed: [7],
+			removedSubtreeRoots: [{ id: 7, parent: 2 }],
+			structural: true,
+			incremental: true,
+		});
+
+		roots = [8, 1];
+		tree.set(8, node(8, -1));
+		sync({
+			dirty: [8],
+			addedSubtreeRoots: [8],
+			structural: true,
+			incremental: true,
+		});
+
+		incremental.setRootHidden(true);
+		rebuilt.setRootHidden(true);
+		expectSameVisible(incremental, rebuilt);
 	});
 });

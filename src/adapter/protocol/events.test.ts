@@ -349,6 +349,62 @@ describe("applyEvent", () => {
 		expect(store.tree.toMap().has(2)).to.equal(false);
 	});
 
+	it("should request a v3 snapshot on epoch mismatches", () => {
+		const spy = vi.fn();
+		const store = createStore();
+		store.subscribe(spy);
+
+		const data = fromSnapshot(["rootId: 1", "Add 1 <Fragment> to parent -1"]);
+		applyEvent(store, "operation_v3", toV3(data));
+
+		const staleEpoch = fromSnapshot([
+			"rootId: 1",
+			"Add 2 <Parent> to parent 1",
+		]);
+		applyEvent(
+			store,
+			"operation_v3",
+			toV3(staleEpoch, {
+				epoch: 2,
+				commitSeq: 1,
+				baseTreeVersion: 1,
+				nextTreeVersion: 2,
+			}),
+		);
+
+		expect(spy).toHaveBeenCalledWith("snapshot-request-v3", {
+			rendererId: 1,
+			reason: "epoch",
+		});
+		expect(store.tree.toMap().has(2)).to.equal(false);
+	});
+
+	it("should request a v3 snapshot on tree version mismatches", () => {
+		const spy = vi.fn();
+		const store = createStore();
+		store.subscribe(spy);
+
+		const data = fromSnapshot(["rootId: 1", "Add 1 <Fragment> to parent -1"]);
+		applyEvent(store, "operation_v3", toV3(data));
+
+		const wrongBase = fromSnapshot(["rootId: 1", "Add 2 <Parent> to parent 1"]);
+		applyEvent(
+			store,
+			"operation_v3",
+			toV3(wrongBase, {
+				commitSeq: 1,
+				baseTreeVersion: 99,
+				nextTreeVersion: 100,
+			}),
+		);
+
+		expect(spy).toHaveBeenCalledWith("snapshot-request-v3", {
+			rendererId: 1,
+			reason: "version",
+		});
+		expect(store.tree.toMap().has(2)).to.equal(false);
+	});
+
 	it("should replace state on snapshot_v3", () => {
 		const store = createStore();
 		const data = fromSnapshot(["rootId: 1", "Add 1 <Fragment> to parent -1"]);
@@ -502,5 +558,24 @@ describe("applyEvent", () => {
 
 		expect(store.selection.selected.value).to.equal(11);
 		expect(store.selection.selectedIdx.value).to.equal(0);
+	});
+
+	it("should preserve missing roots when applying root-order", () => {
+		const store = createStore();
+
+		applyEvent(
+			store,
+			"operation_v2",
+			fromSnapshot(["rootId: 1", "Add 1 <Fragment> to parent -1"]),
+		);
+		applyEvent(
+			store,
+			"operation_v2",
+			fromSnapshot(["rootId: 20", "Add 20 <Fragment> to parent -1"]),
+		);
+
+		applyEvent(store, "root-order", [20]);
+
+		expect(store.tree.getRoots()).to.deep.equal([20, 1]);
 	});
 });
