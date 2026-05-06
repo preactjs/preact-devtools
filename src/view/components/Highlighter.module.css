@@ -4,8 +4,8 @@
  */
 
 .root {
-	font-family: "SFMono-Regular", Consolas, "Liberation Mono", Menlo, Courier,
-		monospace;
+	font-family:
+		"SFMono-Regular", Consolas, "Liberation Mono", Menlo, Courier, monospace;
 	color: #bebebe;
 	font-size: 10px;
 	text-align: center;

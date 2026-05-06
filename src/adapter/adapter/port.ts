@@ -8,7 +8,7 @@ export interface BaseEvent<K extends string, T> {
 
 export function listenToDevtools<
 	K extends keyof DevtoolEvents,
-	T extends DevtoolEvents[K]
+	T extends DevtoolEvents[K],
 >(ctx: Window, type: K, callback: (message: T) => void) {
 	ctx.addEventListener("message", e => {
 		if (e.source === window && e.data.source === DevtoolsToClient) {
@@ -20,7 +20,7 @@ export function listenToDevtools<
 
 export function listenToPageHook<
 	K extends keyof DevtoolEvents,
-	T extends DevtoolEvents[K]
+	T extends DevtoolEvents[K],
 >(ctx: Window, type: K, callback: (message: T) => void) {
 	ctx.addEventListener("message", e => {
 		if (e.source === window && e.data.source === PageHookName) {

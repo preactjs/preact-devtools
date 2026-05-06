@@ -1,4 +1,4 @@
-import { h, Fragment, render } from "preact";
+import { h, render } from "preact";
 import { useMemo, useState } from "preact/hooks";
 
 function MapView() {

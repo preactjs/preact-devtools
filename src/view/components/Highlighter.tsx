@@ -63,9 +63,9 @@ export function Highlighter(props: Props) {
 							boxSizing === "content-box"
 								? `height: calc(100% - ${
 										props.paddingTop + props.paddingBottom
-								  }px); width: calc(100% - ${
+									}px); width: calc(100% - ${
 										props.paddingLeft + props.paddingRight
-								  }px);`
+									}px);`
 								: ""
 						}`}
 					/>

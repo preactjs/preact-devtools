@@ -44,41 +44,43 @@ export function RankedLayout({
 		[canvasWidth, selected, commit, data],
 	);
 
-	const { children: rowItems, containerHeight } = useVirtualizedList<
-		NodeTransform
-	>({
-		minBufferCount: 5,
-		container: containerRef,
-		items: placed,
-		rowHeight: 21,
-		// eslint-disable-next-line react/display-name
-		renderRow: (pos, _, top) => {
-			const node = commit.nodes.get(pos.id)!;
-			const selfDuration = commit.selfDurations.get(node.id) || 0;
-			const hocs =
-				filterHoc && node.hocs ? (
-					<HocLabels hocs={node.hocs} nodeId={node.id} canMark={false} />
-				) : (
-					""
-				);
-			return (
-				<div key={pos.id} style={`top: ${top}px; position: absolute; left: 0;`}>
-					<FlameNode
-						node={pos}
-						selected={pos.id === selected.id}
-						parentId={selected.parent}
-						onClick={onSelect}
-						name={node.name}
-						onMouseEnter={onMouseEnter}
-						onMouseLeave={onMouseLeave}
+	const { children: rowItems, containerHeight } =
+		useVirtualizedList<NodeTransform>({
+			minBufferCount: 5,
+			container: containerRef,
+			items: placed,
+			rowHeight: 21,
+			// eslint-disable-next-line react/display-name
+			renderRow: (pos, _, top) => {
+				const node = commit.nodes.get(pos.id)!;
+				const selfDuration = commit.selfDurations.get(node.id) || 0;
+				const hocs =
+					filterHoc && node.hocs ? (
+						<HocLabels hocs={node.hocs} nodeId={node.id} canMark={false} />
+					) : (
+						""
+					);
+				return (
+					<div
+						key={pos.id}
+						style={`top: ${top}px; position: absolute; left: 0;`}
 					>
-						<span data-testid="node-name">{node.name}</span>
-						{hocs} ({formatTime(selfDuration)})
-					</FlameNode>
-				</div>
-			);
-		},
-	});
+						<FlameNode
+							node={pos}
+							selected={pos.id === selected.id}
+							parentId={selected.parent}
+							onClick={onSelect}
+							name={node.name}
+							onMouseEnter={onMouseEnter}
+							onMouseLeave={onMouseLeave}
+						>
+							<span data-testid="node-name">{node.name}</span>
+							{hocs} ({formatTime(selfDuration)})
+						</FlameNode>
+					</div>
+				);
+			},
+		});
 
 	return (
 		<div class="flamegraph-pane" style={`height: ${containerHeight}px;`}>

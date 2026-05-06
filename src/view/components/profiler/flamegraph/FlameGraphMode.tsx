@@ -17,7 +17,7 @@ export function FlameGraphMode() {
 			? getCommitInitalSelectNodeId(
 					profiler.activeCommit.value,
 					profiler.flamegraphType.value,
-			  )
+				)
 			: -1;
 	}, []);
 

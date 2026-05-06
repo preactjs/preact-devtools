@@ -1,0 +1,33 @@
+{
+	"$schema": "./node_modules/oxlint/configuration_schema.json",
+	"plugins": ["typescript", "react", "oxc"],
+	"categories": {
+		"correctness": "error"
+	},
+	"env": {
+		"browser": true,
+		"node": true,
+		"builtin": true
+	},
+	"globals": {
+		"afterEach": "readonly",
+		"beforeEach": "readonly",
+		"describe": "readonly",
+		"it": "readonly"
+	},
+	"rules": {
+		"no-console": "error",
+		"no-unused-vars": ["error", { "caughtErrors": "none" }],
+		"no-unused-expressions": "off",
+		"react/exhaustive-deps": "off",
+		"oxc/only-used-in-recursion": "off",
+		"typescript/no-explicit-any": "off",
+		"typescript/no-non-null-assertion": "off"
+	},
+	"ignorePatterns": [
+		"src/examples/**",
+		"dist/**",
+		"test-e2e/fixtures/preact-versions/**",
+		"test-e2e/fixtures/vendor/**"
+	]
+}

@@ -224,7 +224,7 @@ export function parseHookData<T extends SharedVNode>(
 						? {
 								index: hookIdx,
 								type,
-						  }
+							}
 						: frame.name,
 					value,
 					index: hookIdx,

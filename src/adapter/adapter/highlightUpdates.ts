@@ -38,7 +38,7 @@ export function measureUpdate(updates: UpdateRects, dom: HTMLElement) {
 		? Math.min(
 				now + MAX_DISPLAY_DURATION,
 				data.expirationTime + DISPLAY_DURATION,
-		  )
+			)
 		: now + DISPLAY_DURATION;
 
 	updates.set(dom, {

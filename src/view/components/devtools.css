@@ -304,7 +304,9 @@
 	color: var(--color-selected-text);
 }
 
-.tree-view:focus-within .tree-view-item[data-selected="true"] :global(.hoc-item) {
+.tree-view:focus-within
+	.tree-view-item[data-selected="true"]
+	:global(.hoc-item) {
 	background: var(--color-hoc-selected-bg);
 	color: var(--color-hoc-selected-text);
 }
@@ -1052,7 +1054,9 @@
 	opacity: 0.5;
 }
 
-.flamegraph-node[data-maximized="true"][data-visible="true"]:not([data-selected="true"]) {
+.flamegraph-node[data-maximized="true"][data-visible="true"]:not(
+		[data-selected="true"]
+	) {
 	opacity: 0.5;
 }
 

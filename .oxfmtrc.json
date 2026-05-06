@@ -1,0 +1,15 @@
+{
+	"$schema": "./node_modules/oxfmt/configuration_schema.json",
+	"useTabs": true,
+	"trailingComma": "all",
+	"arrowParens": "avoid",
+	"printWidth": 80,
+	"sortPackageJson": false,
+	"ignorePatterns": [
+		"dist/**",
+		"src/examples/**",
+		"test-e2e/fixtures/preact-versions/**",
+		"test-e2e/fixtures/vendor/**",
+		"package-lock.json"
+	]
+}

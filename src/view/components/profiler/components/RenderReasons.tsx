@@ -1,4 +1,4 @@
-import { h, Fragment } from "preact";
+import { h } from "preact";
 import { SidebarPanel, Empty } from "../../sidebar/SidebarPanel";
 import { useStore } from "../../../store/react-bindings";
 import { RenderReason } from "../../../../adapter/shared/renderReasons";

@@ -464,7 +464,7 @@ function update<T extends SharedVNode>(
 						timingsByVNode,
 						oldVNode,
 						vnode,
-				  );
+					);
 		if (reason !== null) {
 			const count = reason.items ? reason.items.length : 0;
 			commit.operations.push(MsgTypes.RENDER_REASON, id, reason.type, count);

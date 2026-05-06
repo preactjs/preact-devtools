@@ -26,7 +26,9 @@
 		"build:inline:types": "tsc -p tsconfig.inline.json",
 		"build:inline": "node tools/build.mjs --browser inline && tsc -p tsconfig.inline.json",
 		"archive": "git archive --format zip --output dist/source-code.zip main",
-		"lint": "eslint 'src/**/*.{ts,tsx}' 'test-e2e/**/*.ts' 'tools/**/*.ts' 'vitest*.ts'",
+		"lint": "oxlint",
+		"format": "oxfmt --write",
+		"format:check": "oxfmt --check",
 		"test": "vitest run --config vitest.config.ts",
 		"test:e2e": "node tools/fetch-preact-versions.mjs && playwright test",
 		"test:e2e:10": "PREACT_VERSION=10 npm run test:e2e",
@@ -61,8 +63,6 @@
 		"@types/node-fetch": "^2.6.2",
 		"@types/sinon": "^17.0.4",
 		"@types/tar": "^6.1.2",
-		"@typescript-eslint/eslint-plugin": "^7.7.1",
-		"@typescript-eslint/parser": "^7.7.1",
 		"archiver": "^5.3.1",
 		"babel-plugin-helpers": "^0.1.1",
 		"babel-plugin-transform-define": "^2.1.0",
@@ -70,8 +70,6 @@
 		"babel-plugin-transform-rename-properties": "^0.1.0",
 		"cross-env": "^7.0.2",
 		"esbuild": "^0.28.0",
-		"eslint": "^8.57.0",
-		"eslint-plugin-react": "^7.34.1",
 		"fs-extra": "^10.1.0",
 		"husky": "^4.3.0",
 		"jsdom": "^26.0.0",
@@ -79,8 +77,9 @@
 		"lightningcss": "^1.24.1",
 		"lint-staged": "^10.4.0",
 		"mri": "^1.2.0",
+		"oxfmt": "^0.48.0",
+		"oxlint": "^1.63.0",
 		"preact": "^10.25.1",
-		"prettier": "^3.5.3",
 		"sinon": "^19.0.4",
 		"tar": "^6.1.11",
 		"typescript": "^5.4.5",
@@ -101,76 +100,9 @@
 		"README.md",
 		"LICENSE"
 	],
-	"prettier": {
-		"useTabs": true,
-		"trailingComma": "all",
-		"arrowParens": "avoid"
-	},
-	"eslintConfig": {
-		"extends": [
-			"eslint:recommended",
-			"plugin:react/recommended",
-			"plugin:@typescript-eslint/eslint-recommended",
-			"plugin:@typescript-eslint/recommended"
-		],
-		"settings": {
-			"react": {
-				"pragma": "h",
-				"version": "16.13.1"
-			}
-		},
-		"parser": "@typescript-eslint/parser",
-		"parserOptions": {
-			"ecmaFeatures": {
-				"jsx": true
-			},
-			"ecmaVersion": 2018,
-			"sourceType": "module"
-		},
-		"env": {
-			"browser": true,
-			"node": true
-		},
-		"globals": {
-			"afterEach": "readonly",
-			"beforeEach": "readonly",
-			"describe": "readonly",
-			"it": "readonly"
-		},
-		"rules": {
-			"@typescript-eslint/explicit-function-return-type": "off",
-			"@typescript-eslint/explicit-module-boundary-types": "off",
-			"@typescript-eslint/ban-ts-comment": "off",
-			"@typescript-eslint/no-explicit-any": "off",
-			"@typescript-eslint/no-non-null-assertion": "off",
-			"@typescript-eslint/no-unused-vars": "error",
-			"@typescript-eslint/no-var-requires": "off",
-			"@typescript-eslint/camelcase": "off",
-			"@typescript-eslint/ban-ts-ignore": "off",
-			"no-console": "error",
-			"no-mixed-spaces-and-tabs": "off",
-			"react/prop-types": "off",
-			"react/no-unknown-property": [
-				2,
-				{
-					"ignore": [
-						"class",
-						"fill-rule",
-						"stroke-width",
-						"stroke-linecap",
-						"stroke-linejoin",
-						"stroke-width"
-					]
-				}
-			]
-		},
-		"ignorePatterns": [
-			"src/examples/**"
-		]
-	},
 	"lint-staged": {
-		"**/*.{js,jsx,ts,tsx,json}": [
-			"prettier --write"
+		"**/*.{js,jsx,mjs,ts,tsx,json,jsonc,css,md,html}": [
+			"oxfmt --write"
 		]
 	},
 	"husky": {

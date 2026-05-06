@@ -2,7 +2,7 @@ import { ID } from "../../store/types";
 
 export function flattenChildren<
 	K,
-	T extends { id: K; children: K[]; depth: number }
+	T extends { id: K; children: K[]; depth: number },
 >(tree: Map<K, T>, id: K, isCollapsed: (id: K) => boolean): K[] {
 	const out: K[] = [];
 	const visited = new Set<K>();
