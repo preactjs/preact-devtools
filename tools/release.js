@@ -29,7 +29,7 @@ function updateVersion(json, kind) {
 }
 
 function format(file) {
-	child_process.execSync(`./node_modules/.bin/prettier --write ${file}`);
+	child_process.execSync(`./node_modules/.bin/oxfmt --write ${file}`);
 }
 
 const shellPath = path.join(__dirname, "..", "src", "shells");
