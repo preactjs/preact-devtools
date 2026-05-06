@@ -7,8 +7,9 @@ test("Inspect useImperativeHandle hook", async ({ page }) => {
 	await devtools.locator(locateTreeItem("ImperativeHandle")).click();
 	await devtools.locator('[data-testid="Hooks"]').waitFor();
 
-	const hooks = await getHooks(devtools);
-	expect(hooks).toEqual([["useImperativeHandle", "ƒ ()"]]);
+	await expect
+		.poll(() => getHooks(devtools))
+		.toEqual([["useImperativeHandle", "ƒ ()"]]);
 
 	// Should not be collapsable
 	await expect(

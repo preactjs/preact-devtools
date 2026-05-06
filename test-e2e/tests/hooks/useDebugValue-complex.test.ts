@@ -7,6 +7,7 @@ test("Show custom debug value complex", async ({ page }) => {
 	await devtools.locator(locateTreeItem("App")).click();
 	await devtools.locator('[data-testid="Hooks"]').waitFor();
 
-	const hooks = await getHooks(devtools);
-	expect(hooks).toEqual([["useFoo", '{foo: "bar"}']]);
+	await expect
+		.poll(() => getHooks(devtools))
+		.toEqual([["useFoo", '{foo: "bar"}']]);
 });

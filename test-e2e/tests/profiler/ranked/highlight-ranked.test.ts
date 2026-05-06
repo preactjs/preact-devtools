@@ -3,7 +3,6 @@ import {
 	clickRecordButton,
 	locateTab,
 	gotoTest,
-	wait,
 	locateProfilerTab,
 } from "../../../pw-utils";
 
@@ -16,9 +15,15 @@ test("Should highlight ranked node if present in DOM", async ({ page }) => {
 	await clickRecordButton(devtools);
 
 	await devtools.locator(locateProfilerTab("RANKED")).click();
-	await devtools.hover('[data-type="ranked"] [data-name="Counter"]');
-	await wait(1000);
+	await devtools
+		.locator('[data-type="ranked"] [data-name="Counter"]')
+		.first()
+		.hover();
 
-	const log = (await page.evaluate(() => (window as any).log)) as any[];
-	expect(log.filter(x => x.type === "highlight").length).toEqual(1);
+	await expect
+		.poll(async () => {
+			const log = (await page.evaluate(() => (window as any).log)) as any[];
+			return log.filter(x => x.type === "highlight").length;
+		})
+		.toEqual(1);
 });

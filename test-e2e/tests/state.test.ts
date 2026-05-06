@@ -9,15 +9,11 @@ test("Mirror component state to the devtools", async ({ page }) => {
 	const input = '[data-testid="props-row"] input';
 	const result = '[data-testid="result"]';
 
-	let value = await devtools.locator(input).inputValue();
-	let text = await page.locator(result).textContent();
-	expect(value).toEqual("0");
-	expect(text).toEqual("Counter: 0");
+	await expect(devtools.locator(input)).toHaveValue("0");
+	await expect(page.locator(result)).toHaveText("Counter: 0");
 
 	await page.click("button");
 
-	value = await devtools.locator(input).inputValue();
-	text = await page.locator(result).textContent();
-	expect(value).toEqual("1");
-	expect(text).toEqual("Counter: 1");
+	await expect(devtools.locator(input)).toHaveValue("1");
+	await expect(page.locator(result)).toHaveText("Counter: 1");
 });

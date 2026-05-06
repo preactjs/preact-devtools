@@ -7,8 +7,9 @@ test("Inspect useCallback hook", async ({ page }) => {
 	await devtools.locator(locateTreeItem("CallbackOnly")).click();
 	await devtools.locator('[data-testid="Hooks"]').waitFor();
 
-	const hooks = await getHooks(devtools);
-	expect(hooks).toEqual([["useCallback", "ƒ ()"]]);
+	await expect
+		.poll(() => getHooks(devtools))
+		.toEqual([["useCallback", "ƒ ()"]]);
 
 	// Should not be collapsable
 	await expect(

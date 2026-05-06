@@ -7,8 +7,7 @@ test("Inspect useEffect hook", async ({ page }) => {
 	await devtools.locator(locateTreeItem("Effect")).click();
 	await devtools.locator('[data-testid="Hooks"]').waitFor();
 
-	const hooks = await getHooks(devtools);
-	expect(hooks).toEqual([["useEffect", "ƒ ()"]]);
+	await expect.poll(() => getHooks(devtools)).toEqual([["useEffect", "ƒ ()"]]);
 
 	// Should not be collapsable
 	await expect(

@@ -7,11 +7,13 @@ test("Show custom debug value", async ({ page }) => {
 	await devtools.locator(locateTreeItem("DebugValue")).click();
 	await devtools.locator('[data-testid="Hooks"]').waitFor();
 
-	let hooks = await getHooks(devtools);
-	expect(hooks).toEqual([["useMyHook", '"Offline"']]);
+	await expect
+		.poll(() => getHooks(devtools))
+		.toEqual([["useMyHook", '"Offline"']]);
 
 	await page.locator('[data-testid="debug-hook-toggle"]').click();
 
-	hooks = await getHooks(devtools);
-	expect(hooks).toEqual([["useMyHook", '"Online"']]);
+	await expect
+		.poll(() => getHooks(devtools))
+		.toEqual([["useMyHook", '"Online"']]);
 });

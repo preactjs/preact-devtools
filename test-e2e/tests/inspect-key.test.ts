@@ -1,5 +1,5 @@
 import { test, expect } from "@playwright/test";
-import { gotoTest, waitForPass } from "../pw-utils";
+import { gotoTest } from "../pw-utils";
 
 test("Show vnode key in the sidebar", async ({ page }) => {
 	const { devtools } = await gotoTest(page, "keys");
@@ -8,24 +8,18 @@ test("Show vnode key in the sidebar", async ({ page }) => {
 	await devtools
 		.locator(`[data-testid="tree-item"]:has-text('key="ABC"')`)
 		.click();
-	await devtools.waitForSelector('[data-testid="key-panel"]');
+	await devtools.locator('[data-testid="key-panel"]').waitFor();
 
-	const text = await devtools
-		.locator('[data-testid="vnode-key"]')
-		.textContent();
-	expect(text).toEqual("ABC");
+	await expect(devtools.locator('[data-testid="vnode-key"]')).toHaveText("ABC");
 
 	const copy = '[data-testid="key-panel"] button[title="Copy Key"]';
-	await devtools.click(copy);
+	await devtools.locator(copy).click();
 
-	const clipboard = await page.evaluate(() => navigator.clipboard.readText());
-	expect(JSON.parse(clipboard)).toEqual("ABC");
+	await expect
+		.poll(() => page.evaluate(() => navigator.clipboard.readText()))
+		.toEqual(JSON.stringify("ABC"));
 
 	// Check that the keypanel is not present for keyless components
-	await devtools.click('[data-name="NoKey"]');
-	await waitForPass(async () => {
-		expect(await devtools.locator('[data-testid="key-panel"]').count()).toEqual(
-			0,
-		);
-	});
+	await devtools.locator('[data-name="NoKey"]').click();
+	await expect(devtools.locator('[data-testid="key-panel"]')).toHaveCount(0);
 });

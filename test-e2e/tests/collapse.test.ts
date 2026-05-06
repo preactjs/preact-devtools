@@ -1,55 +1,51 @@
 import { expect, test } from "@playwright/test";
-import { locateTab, gotoTest, waitFor, locateTreeItem } from "../pw-utils";
+import { locateTab, gotoTest, locateTreeItem } from "../pw-utils";
 
 test("Display no stats initially", async ({ page }) => {
 	const { devtools } = await gotoTest(page, "update-all");
 
-	await devtools.waitForSelector('[data-testid="tree-item"]');
+	await devtools.locator('[data-testid="tree-item"]').first().waitFor();
 
 	// All elements in the tree view should be uncollapsed initially
-	let collapsed = await devtools
-		.locator('[data-testid="tree-item"] [data-collapsed="true"]')
-		.count();
-	expect(collapsed).toEqual(0);
+	await expect(
+		devtools.locator('[data-testid="tree-item"] [data-collapsed="true"]'),
+	).toHaveCount(0);
 
 	// Should be able to collapse tree
 	const rows = await devtools.locator('[data-testid="tree-item"]').count();
 
-	await devtools.click('[data-testid="tree-item"] button');
+	await devtools.locator('[data-testid="tree-item"] button').first().click();
 
-	const rowsAfter = await devtools.locator('[data-testid="tree-item"]').count();
-	expect(rows).not.toEqual(rowsAfter);
+	await expect(devtools.locator('[data-testid="tree-item"]')).not.toHaveCount(
+		rows,
+	);
 
 	// Restore view
-	await devtools.click('[data-testid="tree-item"] button');
+	await devtools.locator('[data-testid="tree-item"] button').first().click();
 
 	// Props should be collapsed by default
 	await devtools.locator(locateTreeItem("Provider")).click();
 	const row = '[data-testid="props-row"]';
-	await devtools.waitForSelector(row);
+	await devtools.locator(row).first().waitFor();
 
 	const selector = `${row} [data-collapsed="true"]`;
-	collapsed = await devtools.locator(selector).count();
-	expect(collapsed).toEqual(1);
+	await expect(devtools.locator(selector)).toHaveCount(1);
 
-	await devtools.click(`${row} button`);
-	expect(await devtools.locator(selector).count()).toEqual(0);
+	await devtools.locator(`${row} button`).first().click();
+	await expect(devtools.locator(selector)).toHaveCount(0);
 
-	await devtools.click(`${row} input`);
+	await devtools.locator(`${row} input`).first().click();
 	await page.keyboard.press("ArrowUp");
 	await page.keyboard.press("Enter");
 
 	// Our input should still be visible
-	expect(await devtools.locator(selector).count()).toEqual(0);
+	await expect(devtools.locator(selector)).toHaveCount(0);
 
 	// Switching to Profiler and back should not change collapse state
 	await devtools.locator(locateTab("PROFILER")).click();
-	await devtools.waitForSelector('[data-testid="record-btn"]');
+	await devtools.locator('[data-testid="record-btn"]').first().waitFor();
 	await devtools.locator(locateTab("ELEMENTS")).click();
 
-	await waitFor(async () => (await devtools.$$(row)).length > 0);
-
-	// Our input should still be visible
-	expect((await devtools.$$(row)).length > 0).toEqual(true);
-	expect((await devtools.$$(selector)).length).toEqual(0);
+	await expect(devtools.locator(row).first()).toBeAttached();
+	await expect(devtools.locator(selector)).toHaveCount(0);
 });

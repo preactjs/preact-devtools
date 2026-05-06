@@ -1,30 +1,31 @@
 import { test, expect } from "@playwright/test";
-import { gotoTest, waitForPass } from "../pw-utils";
+import { gotoTest } from "../pw-utils";
 
 test("HOC-Component filter should flatten tree", async ({ page }) => {
 	const { devtools } = await gotoTest(page, "hoc");
 
-	await devtools.waitForSelector('[data-testid="tree-item"][data-name="Foo"]');
+	await devtools
+		.locator('[data-testid="tree-item"][data-name="Foo"]')
+		.first()
+		.waitFor();
 
-	const items = await devtools
-		.locator('[data-testid="tree-item"]')
-		.evaluateAll(els => els.map(el => el.getAttribute("data-name")));
+	await expect
+		.poll(() =>
+			devtools
+				.locator('[data-testid="tree-item"]')
+				.evaluateAll(els => els.map(el => el.getAttribute("data-name"))),
+		)
+		.toEqual(["Foo", "Bar", "Anonymous", "Foo", "Last"]);
 
-	expect(items).toEqual(["Foo", "Bar", "Anonymous", "Foo", "Last"]);
+	await devtools.locator('[data-name="Anonymous"]').click();
 
-	await devtools.click('[data-name="Anonymous"]');
+	await expect(
+		devtools.locator('[data-testid="hoc-panel"] .hoc-item'),
+	).toHaveText(["ForwardRef"]);
 
-	const hocs = await devtools
-		.locator('[data-testid="hoc-panel"] .hoc-item')
-		.allInnerTexts();
-	expect(hocs).toEqual(["ForwardRef"]);
+	await devtools.locator('[data-name="Last"]').click();
 
-	await devtools.click('[data-name="Last"]');
-
-	await waitForPass(async () => {
-		const hocs = await devtools
-			.locator('[data-testid="hoc-panel"] .hoc-item')
-			.allInnerTexts();
-		expect(hocs).toEqual(["withBoof", "Memo"]);
-	});
+	await expect(
+		devtools.locator('[data-testid="hoc-panel"] .hoc-item'),
+	).toHaveText(["withBoof", "Memo"]);
 });

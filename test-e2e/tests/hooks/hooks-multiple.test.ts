@@ -13,12 +13,13 @@ test("Show multiple hook names at the same time", async ({ page }) => {
 	await devtools.locator('[data-testid="Hooks"]').waitFor();
 
 	await clickHookItem(devtools, "useMemo");
-	const hooks = await getHooks(devtools);
-	expect(hooks).toEqual([
-		["useState", "1"],
-		["useState", "2"],
-		["useState", "3"],
-		["useCallback", "ƒ ()"],
-		["useMemo", "6"],
-	]);
+	await expect
+		.poll(() => getHooks(devtools))
+		.toEqual([
+			["useState", "1"],
+			["useState", "2"],
+			["useState", "3"],
+			["useCallback", "ƒ ()"],
+			["useMemo", "6"],
+		]);
 });

@@ -8,8 +8,9 @@ import * as tar from "tar";
  * on demand.
  */
 export function loadPreactVersion(): Plugin {
-	const pending = new Map<string, Array<() => void>>();
+	const pending = new Map<string, Promise<void>>();
 	const cache = new Map<string, any>();
+	const extracted = new Set<string>();
 
 	const versionReg = /preact@([^/]+)/;
 	const tarDir = path.join(__dirname, "vendor", "preact");
@@ -54,27 +55,32 @@ export function loadPreactVersion(): Plugin {
 					};
 				} else {
 					const versionDir = path.join(cacheDir, version);
-					// Check if someone is already resolving
-					const inProgress = pending.get(version);
-					if (inProgress) {
-						return new Promise(r => {
-							inProgress.push(() => r(cache.get(version)!));
-						});
-					}
-
 					// Check for tarball or folder
 					const tarball = path.join(tarDir, `preact-${version}.tgz`);
 					const folder = path.join(tarDir, `preact-${version}`);
 					if (fs.existsSync(tarball)) {
-						if (!fs.existsSync(versionDir)) {
-							fs.mkdirSync(versionDir, { recursive: true });
-						}
+						if (!extracted.has(version)) {
+							let extraction = pending.get(version);
+							if (!extraction) {
+								if (!fs.existsSync(versionDir)) {
+									fs.mkdirSync(versionDir, { recursive: true });
+								}
 
-						await tar.extract({
-							file: tarball,
-							cwd: versionDir,
-							strip: 1,
-						});
+								extraction = tar
+									.extract({
+										file: tarball,
+										cwd: versionDir,
+										strip: 1,
+									})
+									.then(() => {
+										extracted.add(version);
+									})
+									.finally(() => pending.delete(version));
+								pending.set(version, extraction);
+							}
+
+							await extraction;
+						}
 
 						let importee = id.replace(/@[^/]+/, "");
 
@@ -113,9 +119,6 @@ export function loadPreactVersion(): Plugin {
 						};
 
 						cache.set(id, out);
-
-						const fns = pending.get(version) || [];
-						await Promise.all(fns.map(fn => fn()));
 						return out;
 					} else if (fs.existsSync(folder)) {
 						let importee = id.replace(/@[^/]+/, "");
@@ -142,9 +145,6 @@ export function loadPreactVersion(): Plugin {
 						};
 
 						cache.set(id, out);
-
-						const fns = pending.get(version) || [];
-						await Promise.all(fns.map(fn => fn()));
 						return out;
 					}
 				}

@@ -1,5 +1,5 @@
 import { test, expect, Page } from "@playwright/test";
-import { getTreeViewItemNames, gotoTest, waitForPass } from "../pw-utils";
+import { getTreeViewItemNames, gotoTest } from "../pw-utils";
 
 function testCase(version: string) {
 	return async ({ page }: { page: Page }) => {
@@ -7,11 +7,11 @@ function testCase(version: string) {
 			preact: version,
 		});
 
-		await devtools.waitForSelector('[data-testid="tree-item"]');
+		await devtools.locator('[data-testid="tree-item"]').first().waitFor();
 
-		await waitForPass(async () => {
-			const items = await getTreeViewItemNames(devtools);
-			expect(items).toEqual(
+		await expect
+			.poll(() => getTreeViewItemNames(devtools))
+			.toEqual(
 				[
 					"Shortly",
 					"Block",
@@ -20,11 +20,10 @@ function testCase(version: string) {
 					"Block",
 				].filter(Boolean),
 			);
-		});
 
-		await waitForPass(async () => {
-			const items = await getTreeViewItemNames(devtools);
-			expect(items).toEqual(
+		await expect
+			.poll(() => getTreeViewItemNames(devtools))
+			.toEqual(
 				[
 					"Shortly",
 					"Block",
@@ -34,7 +33,6 @@ function testCase(version: string) {
 					"Block",
 				].filter(Boolean),
 			);
-		});
 	};
 }
 

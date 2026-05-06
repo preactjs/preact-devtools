@@ -1,4 +1,4 @@
-import { test } from "@playwright/test";
+import { test, expect } from "@playwright/test";
 import { gotoTest, locateTreeItem } from "../pw-utils";
 
 test("Create a copy when doing props/state/context updates", async ({
@@ -6,29 +6,34 @@ test("Create a copy when doing props/state/context updates", async ({
 }) => {
 	const { devtools } = await gotoTest(page, "update-all");
 
+	const valueInput = devtools
+		.locator('[data-testid="prop-value"] input')
+		.first();
+
 	// Props
-	await devtools.click(locateTreeItem("Props"));
-	await devtools.fill('[data-testid="prop-value"] input', "1");
+	await devtools.locator(locateTreeItem("Props")).click();
+	await expect(valueInput).toHaveValue("0");
+	await valueInput.fill("1");
 	await page.keyboard.press("Enter");
-	await page
-		.locator('[data-testid="props-result"]:has-text("props: 1, true")')
-		.waitFor();
+	await expect(page.locator('[data-testid="props-result"]')).toHaveText(
+		"props: 1, true",
+	);
 
 	// State
-	await devtools.click(locateTreeItem("State"));
-	await devtools.fill('[data-testid="prop-value"] input', "1");
+	await devtools.locator(locateTreeItem("State")).click();
+	await expect(valueInput).toHaveValue("0");
+	await valueInput.fill("1");
 	await page.keyboard.press("Enter");
-	await page
-		.locator('[data-testid="state-result"]:has-text("state: 1, true")')
-		.waitFor();
+	await expect(page.locator('[data-testid="state-result"]')).toHaveText(
+		"state: 1, true",
+	);
 
 	// Legacy Context
-	await devtools.click(locateTreeItem("LegacyConsumer"));
-	await devtools.fill('[data-testid="prop-value"] input', "1");
+	await devtools.locator(locateTreeItem("LegacyConsumer")).click();
+	await expect(valueInput).toHaveValue("0");
+	await valueInput.fill("1");
 	await page.keyboard.press("Enter");
-	await page
-		.locator(
-			'[data-testid="legacy-context-result"]:has-text("legacy context: 1")',
-		)
-		.waitFor();
+	await expect(
+		page.locator('[data-testid="legacy-context-result"]'),
+	).toHaveText("legacy context: 1");
 });

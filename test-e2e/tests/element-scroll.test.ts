@@ -21,6 +21,7 @@ test("Clicking at the right of element names #144", async ({ page }) => {
 
 	await page.mouse.click(x - 20, y + offset + 200);
 
-	const text = await devtools.locator('[data-selected="true"]').textContent();
-	expect(text).toEqual("ChildItemName");
+	await expect(devtools.locator('[data-selected="true"]')).toHaveText(
+		"ChildItemName",
+	);
 });

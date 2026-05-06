@@ -1,10 +1,5 @@
 import { test, expect, Page } from "@playwright/test";
-import {
-	getTreeViewItemNames,
-	gotoTest,
-	locateTreeItem,
-	waitFor,
-} from "../pw-utils";
+import { getTreeViewItemNames, gotoTest, locateTreeItem } from "../pw-utils";
 
 function testCase(preactVersion: string) {
 	return async ({ page }: { page: Page }) => {
@@ -12,12 +7,12 @@ function testCase(preactVersion: string) {
 			preact: preactVersion,
 		});
 
-		await devtools.click(locateTreeItem("Delayed"));
-		await devtools.click('[data-testid="suspend-action"]');
+		await devtools.locator(locateTreeItem("Delayed")).click();
+		await devtools.locator('[data-testid="suspend-action"]').click();
 
-		await waitFor(async () => {
-			const items = await getTreeViewItemNames(devtools);
-			expect(items).toEqual(
+		await expect
+			.poll(() => getTreeViewItemNames(devtools))
+			.toEqual(
 				[
 					"Shortly",
 					"Block",
@@ -27,20 +22,16 @@ function testCase(preactVersion: string) {
 					"Block",
 				].filter(Boolean),
 			);
-			return true;
-		});
 
-		const selected = await devtools
-			.locator('[data-testid="tree-item"][data-selected="true"]')
-			.getAttribute("data-name");
+		await expect(
+			devtools.locator('[data-testid="tree-item"][data-selected="true"]'),
+		).toHaveAttribute("data-name", "Suspense");
 
-		expect(selected).toEqual("Suspense");
-
-		await devtools.click(locateTreeItem("Shortly"));
+		await devtools.locator(locateTreeItem("Shortly")).click();
 
 		await devtools
 			.locator('[data-testid="inspect-component-name"]:has-text("<Shortly>")')
-			.textContent();
+			.waitFor();
 
 		await expect(
 			devtools.locator('[data-testid="suspend-action"]'),

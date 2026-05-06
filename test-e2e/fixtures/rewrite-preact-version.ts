@@ -13,22 +13,9 @@ export function rewritePreactVersion(): Plugin {
 	const PROTOCOL = "relative://";
 	const PREFIX = "@fixture:";
 
-	let preactVersion = "";
-
 	return {
 		name: "preact:version",
 		enforce: "pre",
-		configureServer(server) {
-			server.middlewares.use((req, res, next) => {
-				const url = new URL(req.originalUrl, "https://localhost");
-				const version = url.searchParams.get("preact");
-				if (version) {
-					preactVersion = version.replace(/\./g, "_");
-				}
-
-				next();
-			});
-		},
 		resolveId(id) {
 			const url = new URL(id, PROTOCOL);
 			const version = url.searchParams.get("preact");
@@ -36,8 +23,8 @@ export function rewritePreactVersion(): Plugin {
 				return `@fixture:${id}`;
 			}
 
-			if (id === `@preact/signals@${preactVersion}`) {
-				return `@fixture-signals:${preactVersion}`;
+			if (id.startsWith("@preact/signals@")) {
+				return `@fixture-signals:${id.slice("@preact/signals@".length)}`;
 			}
 		},
 		load(id) {
@@ -61,8 +48,9 @@ export function rewritePreactVersion(): Plugin {
 		},
 		transform(code, id) {
 			if (id.startsWith("@fixture-signals")) {
+				const version = id.slice("@fixture-signals:".length);
 				const res = transformSync(code, {
-					plugins: [[rewriteImportPlugin, { version: preactVersion }]],
+					plugins: [[rewriteImportPlugin, { version }]],
 				})!;
 				return {
 					code: res.code,

@@ -7,8 +7,9 @@ test("Inspect useErrorBoundary hook", async ({ page }) => {
 	await devtools.locator(locateTreeItem("ErrorBoundary1")).click();
 	await devtools.locator('[data-testid="Hooks"]').waitFor();
 
-	let hooks = await getHooks(devtools);
-	expect(hooks).toEqual([["useErrorBoundary", ""]]);
+	await expect
+		.poll(() => getHooks(devtools))
+		.toEqual([["useErrorBoundary", ""]]);
 
 	// Should not be collapsable
 	await expect(
@@ -22,6 +23,7 @@ test("Inspect useErrorBoundary hook", async ({ page }) => {
 
 	// Error boundary with callback
 	await devtools.locator(locateTreeItem("ErrorBoundary2")).click();
-	hooks = await getHooks(devtools);
-	expect(hooks).toEqual([["useErrorBoundary", "ƒ ()"]]);
+	await expect
+		.poll(() => getHooks(devtools))
+		.toEqual([["useErrorBoundary", "ƒ ()"]]);
 });

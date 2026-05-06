@@ -6,11 +6,9 @@ test("Show hook number", async ({ page }) => {
 
 	await clickTreeItem(devtools, "App");
 
-	const nums = await devtools
-		.locator('[data-testid="Hooks"] .hook-number')
-		.allTextContents();
-
-	expect(nums).toEqual(["1", "2", "3", "4", "5"]);
+	await expect(
+		devtools.locator('[data-testid="Hooks"] .hook-number'),
+	).toHaveText(["1", "2", "3", "4", "5"]);
 });
 
 test("Show hook number only for top level items", async ({ page }) => {
@@ -18,12 +16,10 @@ test("Show hook number only for top level items", async ({ page }) => {
 
 	await clickTreeItem(devtools, "Memo");
 
-	await devtools.click('[data-testid="props-row"] button');
-	await devtools.waitForSelector('[data-testid="props-row"][data-depth="2"]');
+	await devtools.locator('[data-testid="props-row"] button').first().click();
+	await devtools.locator('[data-testid="props-row"][data-depth="2"]').waitFor();
 
-	const nums = await devtools
-		.locator('[data-testid="Hooks"] .hook-number')
-		.allTextContents();
-
-	expect(nums).toEqual(["1"]);
+	await expect(
+		devtools.locator('[data-testid="Hooks"] .hook-number'),
+	).toHaveText(["1"]);
 });

@@ -1,20 +1,17 @@
 import { test, expect } from "@playwright/test";
-import { clickHookItem, gotoTest, waitForPass } from "../../pw-utils";
+import { clickHookItem, gotoTest } from "../../pw-utils";
 
 test("Show a deeply nested hook tree and limit value parsing depth", async ({
 	page,
 }) => {
 	const { devtools } = await gotoTest(page, "hooks-depth-limit");
 
-	await devtools.waitForSelector('[data-testid="tree-item"]');
+	await devtools.locator('[data-testid="tree-item"]').first().waitFor();
 
-	// State update
-	await waitForPass(async () => {
-		await devtools.click('[data-name="Hook"]');
-		await devtools.waitForSelector('[data-testid="props-row"]');
-		const count = await devtools.locator('[data-testid="props-row"]').count();
-		expect(count).toBeGreaterThan(0);
-	});
+	await devtools.locator('[data-name="Hook"]').click();
+	await expect
+		.poll(() => devtools.locator('[data-testid="props-row"]').count())
+		.toBeGreaterThan(0);
 
 	await clickHookItem(devtools, "useBrobba");
 	await clickHookItem(devtools, "useBlaBla");
@@ -37,10 +34,9 @@ test("Show a deeply nested hook tree and limit value parsing depth", async ({
 	await clickHookItem(devtools, "key6");
 	await clickHookItem(devtools, "key7");
 
-	const text = await devtools
-		.locator(
+	await expect(
+		devtools.locator(
 			'form [data-testid="props-row"]:last-child [data-testid="prop-value"]',
-		)
-		.textContent();
-	expect(text).toEqual('"…"');
+		),
+	).toHaveText('"…"');
 });

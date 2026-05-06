@@ -1,34 +1,27 @@
 import { test, expect } from "@playwright/test";
-import {
-	clickRecordButton,
-	locateTab,
-	gotoTest,
-	waitForPass,
-} from "../../../pw-utils";
+import { clickRecordButton, locateTab, gotoTest } from "../../../pw-utils";
 import assert from "assert";
 import { getFlameNodes } from "./utils";
 
 test("Correctly position memoized sibling sub-trees", async ({ page }) => {
 	const { devtools } = await gotoTest(page, "memo2");
 
-	await devtools.click('[data-testid="filter-menu-button"]');
-	await devtools.waitForSelector('[data-testid="filter-popup"]');
-	await devtools.click('[data-testid="add-filter"]');
+	await devtools.locator('[data-testid="filter-menu-button"]').click();
+	await devtools.locator('[data-testid="filter-popup"]').waitFor();
+	await devtools.locator('[data-testid="add-filter"]').click();
 	await devtools
 		.locator('[data-testid="filter-popup"] input[type="text"]')
-		.type("Display");
+		.fill("Display");
 
-	await devtools.click(
-		'[data-testid="filter-popup"] input[type="checkbox"]:not(:checked)',
-	);
-	await devtools.click('[data-testid="filter-update"]');
-	await devtools.click('[data-testid="filter-menu-button"]');
+	await devtools
+		.locator(
+			'[data-testid="filter-popup"] input[type="checkbox"]:not(:checked)',
+		)
+		.click();
+	await devtools.locator('[data-testid="filter-update"]').click();
+	await devtools.locator('[data-testid="filter-menu-button"]').click();
 
-	await waitForPass(async () => {
-		await expect(devtools.locator('[data-testid="filter-popup"]')).toHaveCount(
-			0,
-		);
-	});
+	await expect(devtools.locator('[data-testid="filter-popup"]')).toHaveCount(0);
 
 	await devtools.locator(locateTab("PROFILER")).click();
 

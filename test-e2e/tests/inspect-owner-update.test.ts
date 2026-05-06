@@ -4,11 +4,10 @@ import { getOwners, gotoTest } from "../pw-utils";
 test("Inspect owner information with updated nodes", async ({ page }) => {
 	const { devtools } = await gotoTest(page, "update-middle");
 
-	await page.click("button");
+	await page.locator("button").click();
 
-	await devtools.waitForSelector('[data-testid="elements-tree"]');
+	await devtools.locator('[data-testid="elements-tree"]').waitFor();
 
-	await devtools.click('[data-name="ListItem"]');
-	const owners = await getOwners(devtools);
-	expect(owners).toEqual(["Counter", "App"]);
+	await devtools.locator('[data-name="ListItem"]').click();
+	await expect.poll(() => getOwners(devtools)).toEqual(["Counter", "App"]);
 });

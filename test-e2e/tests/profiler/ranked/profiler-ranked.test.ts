@@ -15,12 +15,11 @@ test("Ranked profile view should only show nodes of the current commit", async (
 	await devtools.locator(locateProfilerTab("RANKED")).click();
 
 	await clickRecordButton(devtools);
-	await page.click('[data-testid="counter-1"]');
-	await page.click('[data-testid="counter-2"]');
+	await page.locator('[data-testid="counter-1"]').click();
+	await page.locator('[data-testid="counter-2"]').click();
 	await clickRecordButton(devtools);
 
-	const nodes = await devtools.$$(
-		'[data-type="ranked"] [data-id]:not([data-weight])',
-	);
-	expect(nodes.length).toEqual(0);
+	await expect(
+		devtools.locator('[data-type="ranked"] [data-id]:not([data-weight])'),
+	).toHaveCount(0);
 });

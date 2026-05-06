@@ -33,6 +33,34 @@ export async function gotoTest(
 		`http://localhost:8100/?fixtures=${name}&preact=${preactVersion}`,
 	);
 
+	let fixtureError: Error | null = null;
+	const captureFixtureError = (err: Error) => {
+		fixtureError ??= err;
+	};
+	page.on("pageerror", captureFixtureError);
+	try {
+		const readyTimeout = 20_000;
+		const deadline = Date.now() + readyTimeout;
+		// eslint-disable-next-line no-constant-condition
+		while (true) {
+			if (fixtureError) {
+				throw new Error(`Fixture page error: ${(fixtureError as any).message}`);
+			}
+			const ready = await page.evaluate(
+				() => (window as any).__PREACT_E2E_READY__ === true,
+			);
+			if (ready) break;
+			if (Date.now() > deadline) {
+				throw new Error(
+					`Timed out after ${readyTimeout}ms waiting for __PREACT_E2E_READY__ on ${name}`,
+				);
+			}
+			await new Promise(r => setTimeout(r, 50));
+		}
+	} finally {
+		page.off("pageerror", captureFixtureError);
+	}
+
 	const devtools = page
 		.mainFrame()
 		.childFrames()
@@ -40,55 +68,21 @@ export async function gotoTest(
 
 	assert(devtools);
 
-	// TODO: Find something better
-	await wait(200);
+	await devtools.waitForFunction(
+		() => (window as any).__PREACT_DEVTOOLS_READY__ === true,
+	);
+	await devtools.waitForFunction(() => {
+		return (
+			document.querySelector('[data-testid="tree-item"]') !== null ||
+			document.querySelector('[data-testid="msg-no-results"]') !== null ||
+			document.querySelector('[data-testid="msg-only-connected"]') !== null
+		);
+	});
 
 	return { devtools };
 }
 
 export const wait = (ms: number) => new Promise(r => setTimeout(r, ms));
-
-export async function waitForPass(
-	fn,
-	options: {
-		timeout?: number;
-		checkEvery?: number;
-		crashOnError?: boolean;
-	} = {},
-) {
-	const { timeout = 2000, checkEvery = 200, crashOnError = false } = options;
-
-	let caughtError: Error | null = null;
-
-	for (let remaining = timeout; remaining > 0; remaining -= checkEvery) {
-		if (crashOnError) {
-			const res = await fn();
-			if (res) return res;
-		} else {
-			caughtError = null;
-			let res;
-			try {
-				res = await fn();
-			} catch (e) {
-				caughtError = e;
-			}
-			if (caughtError === null) return res;
-		}
-
-		await wait(checkEvery);
-	}
-
-	if (caughtError !== null) {
-		caughtError.message += ` (waited ${timeout})`;
-		throw caughtError;
-	}
-
-	throw new Error(`waited ${timeout})`);
-}
-
-export async function waitFor(fn) {
-	return waitForPass(fn, { crashOnError: true });
-}
 
 export async function getLog(page: Page) {
 	return (await page.evaluate(() => (window as any).log)) as any[];
@@ -134,9 +128,9 @@ export async function getHooks(page: Frame): Promise<Array<[string, string]>> {
 
 			// Check if we're dealing with an input
 			if (!value) {
-				const rawValue = (item.querySelector(
-					'[data-testid="prop-value"] input',
-				) as any)?.value;
+				const rawValue = (
+					item.querySelector('[data-testid="prop-value"] input') as any
+				)?.value;
 
 				if (rawValue === undefined) {
 					value = "";
@@ -192,7 +186,7 @@ export async function clickRecordButton(page: Frame) {
 	await page.locator(selector).click();
 
 	const state = start ? "Stop Recording" : "Start Recording";
-	await page.locator(selector + `[title="${state}"]`);
+	await page.locator(selector + `[title="${state}"]`).waitFor();
 }
 
 export async function getTreeItems(page: Page | Frame) {

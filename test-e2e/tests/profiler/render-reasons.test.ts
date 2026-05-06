@@ -16,57 +16,44 @@ test("Captures render reasons", async ({ page }) => {
 	// Start profiling
 	await devtools.locator(locateTab("PROFILER")).click();
 	await clickRecordButton(devtools);
-	await page.click('[data-testid="counter-1"]');
-	await page.click('[data-testid="class-state-multi"]');
-	await page.click('[data-testid="counter-2"]');
-	await page.click('[data-testid="force-update"]');
+	await page.locator('[data-testid="counter-1"]').click();
+	await page.locator('[data-testid="class-state-multi"]').click();
+	await page.locator('[data-testid="counter-2"]').click();
+	await page.locator('[data-testid="force-update"]').click();
 
 	await wait(1000);
 	await clickRecordButton(devtools);
 
+	const reasons = devtools.locator('[data-testid="render-reasons"]');
+
 	// Class state
 	await devtools.locator(locateFlame("ComponentState")).click();
-	let reasons = await devtools
-		.locator('[data-testid="render-reasons"]')
-		.textContent();
-	expect(reasons).toEqual("State changed:value");
+	await expect(reasons).toHaveText("State changed:value");
 	await devtools.locator(locateFlame("Fragment")).click();
 
 	await devtools.locator(locateFlame("Display")).first().click();
-	reasons = await devtools
-		.locator('[data-testid="render-reasons"]')
-		.textContent();
-	expect(reasons).toEqual("Props changed:value");
+	await expect(reasons).toHaveText("Props changed:value");
 
 	// Class state multiple
-	await devtools.click('[data-testid="next-commit"]');
+	await devtools.locator('[data-testid="next-commit"]').click();
 	await devtools.locator(locateFlame("Fragment")).click();
 
 	await devtools.locator(locateFlame("ComponentMultiState")).click();
-	reasons = await devtools
-		.locator('[data-testid="render-reasons"]')
-		.textContent();
-	expect(reasons).toEqual("State changed:counter, other");
+	await expect(reasons).toHaveText("State changed:counter, other");
 
 	// Hooks
-	await devtools.click('[data-testid="next-commit"]');
+	await devtools.locator('[data-testid="next-commit"]').click();
 	await devtools.locator(locateFlame("Fragment")).click();
 
 	await devtools.locator(locateFlame("HookState")).click();
-	reasons = await devtools
-		.locator('[data-testid="render-reasons"]')
-		.textContent();
-	expect(reasons).toEqual("Hooks changed:1");
+	await expect(reasons).toHaveText("Hooks changed:1");
 
 	// Force update
-	await devtools.click('[data-testid="next-commit"]');
+	await devtools.locator('[data-testid="next-commit"]').click();
 	await devtools.locator(locateFlame("Fragment")).click();
 
 	await devtools.locator(locateFlame("ForceUpdate")).click();
-	reasons = await devtools
-		.locator('[data-testid="render-reasons"]')
-		.textContent();
-	expect(reasons).toEqual("Force update");
+	await expect(reasons).toHaveText("Force update");
 });
 
 test("Captures hook render reasons", async ({ page }) => {
@@ -78,36 +65,25 @@ test("Captures hook render reasons", async ({ page }) => {
 	// Start profiling
 	await devtools.locator(locateTab("PROFILER")).click();
 	await clickRecordButton(devtools);
-	await page.click('button:has-text("S1++")');
-	await page.click('button:has-text("S2++")');
-	await page.click('button:has-text("S3++")');
-	await page.click('button:has-text("S1++")');
+	await page.locator('button:has-text("S1++")').click();
+	await page.locator('button:has-text("S2++")').click();
+	await page.locator('button:has-text("S3++")').click();
+	await page.locator('button:has-text("S1++")').click();
 
 	await wait(1000);
 	await clickRecordButton(devtools);
 
 	await devtools.locator(locateFlame("App")).click();
 
-	let reasons = await devtools
-		.locator('[data-testid="render-reasons"]')
-		.textContent();
-	expect(reasons).toEqual("Hooks changed:1");
+	const reasons = devtools.locator('[data-testid="render-reasons"]');
+	await expect(reasons).toHaveText("Hooks changed:1");
 
-	await devtools.click('[data-testid="next-commit"]');
-	reasons = await devtools
-		.locator('[data-testid="render-reasons"]')
-		.textContent();
-	expect(reasons).toEqual("Hooks changed:2");
+	await devtools.locator('[data-testid="next-commit"]').click();
+	await expect(reasons).toHaveText("Hooks changed:2");
 
-	await devtools.click('[data-testid="next-commit"]');
-	reasons = await devtools
-		.locator('[data-testid="render-reasons"]')
-		.textContent();
-	expect(reasons).toEqual("Hooks changed:3");
+	await devtools.locator('[data-testid="next-commit"]').click();
+	await expect(reasons).toHaveText("Hooks changed:3");
 
-	await devtools.click('[data-testid="next-commit"]');
-	reasons = await devtools
-		.locator('[data-testid="render-reasons"]')
-		.textContent();
-	expect(reasons).toEqual("Hooks changed:1");
+	await devtools.locator('[data-testid="next-commit"]').click();
+	await expect(reasons).toHaveText("Hooks changed:1");
 });

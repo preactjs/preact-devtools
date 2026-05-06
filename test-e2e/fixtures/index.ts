@@ -62,20 +62,15 @@ async function loadFixture() {
 			params.set("preact", encodeURIComponent(preact.replace(/\./g, "_")));
 		}
 
-		try {
-			await import(/* @vite-ignore */ source.toString());
-		} catch (err) {
-			// eslint-disable-next-line no-console
-			console.log(err);
-		}
+		await import(/* @vite-ignore */ source.toString());
 	}
 }
 
 async function waitForDevtoolsInit() {
-	const iframe = document.querySelector("iframe");
-	return new Promise(r => {
-		iframe.addEventListener("load", r);
-	});
+	const iframe = document.querySelector("#devtools") as HTMLIFrameElement;
+	while ((iframe.contentWindow as any)?.__PREACT_DEVTOOLS_READY__ !== true) {
+		await new Promise(r => setTimeout(r, 16));
+	}
 }
 
 (async () => {
@@ -110,9 +105,9 @@ async function waitForDevtoolsInit() {
 	const log = (window.log = []);
 	window.addEventListener("message", e => {
 		if (e.data.source === "preact-page-hook") {
-			(document.querySelector(
-				"#devtools",
-			) as HTMLIFrameElement).contentWindow.postMessage(e.data, "*");
+			(
+				document.querySelector("#devtools") as HTMLIFrameElement
+			).contentWindow.postMessage(e.data, "*");
 			log.push(e.data);
 		} else if (
 			e.data.source === "preact-devtools-to-client" &&
@@ -132,9 +127,7 @@ async function waitForDevtoolsInit() {
 	});
 
 	await waitForDevtoolsInit();
-
-	document.querySelector("iframe").contentWindow.postMessage("foobar", "*");
-
 	await loadFixture();
-	document.querySelector("iframe").contentWindow.postMessage("foobar", "*");
+	// @ts-ignore
+	window.__PREACT_E2E_READY__ = true;
 })();

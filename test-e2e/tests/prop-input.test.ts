@@ -1,5 +1,5 @@
 import { expect, Frame, Page, test } from "@playwright/test";
-import { getLog, gotoTest, locateTreeItem, wait } from "../pw-utils";
+import { getLog, gotoTest, locateTreeItem } from "../pw-utils";
 
 test("Input various data types into DataInput", async ({ page }) => {
 	const { devtools } = await gotoTest(page, "data-input");
@@ -113,15 +113,21 @@ test("Input various data types into DataInput", async ({ page }) => {
 	});
 });
 
-async function getParsed(page: Page): Promise<any> {
-	const log = await getLog(page);
-	for (let i = log.length - 1; i >= 0; i--) {
-		if (log[i].type === "update-prop") {
-			return log[i].data.value;
-		}
-	}
-
-	throw new Error("No update-prop event found");
+async function getParsedAfter(page: Page, sinceIndex: number): Promise<any> {
+	let value: any;
+	await expect
+		.poll(async () => {
+			const log = await getLog(page);
+			for (let i = log.length - 1; i >= sinceIndex; i--) {
+				if (log[i].type === "update-prop") {
+					value = log[i].data.value;
+					return true;
+				}
+			}
+			return false;
+		})
+		.toBe(true);
+	return value;
 }
 
 async function enterText(
@@ -130,26 +136,25 @@ async function enterText(
 	selector: string,
 	text: string,
 ) {
-	await page.click("button");
-	await devtools.click(locateTreeItem("Display"));
+	await page.locator("button").click();
+	await devtools.locator(locateTreeItem("Display")).click();
 	await expect(devtools.locator('[data-testid="undo-btn"]')).toHaveCount(0);
 
-	await devtools.waitForSelector(selector);
-	await devtools.fill(selector, text);
+	await devtools.locator(selector).waitFor();
+	const logLengthBefore = (await getLog(page)).length;
+	await devtools.locator(selector).fill(text);
 	await page.keyboard.press("Enter");
 
-	await page.click('[data-testid="result"]');
+	await page.locator('[data-testid="result"]').click();
 
-	await wait(200);
+	const rendered = await getParsedAfter(page, logLengthBefore);
 
-	const rendered = await getParsed(page);
-
-	const present = await devtools.$(selector);
+	const present = (await devtools.locator(selector).count()) > 0;
 	const type = present
 		? await devtools.locator(selector).getAttribute("data-type")
 		: "non-editable";
 	const value = present
-		? await devtools.$eval(selector, el => (el as any).value)
+		? await devtools.locator(selector).inputValue()
 		: await devtools.locator('[data-testid="prop-value"]').textContent();
 	return { rendered, type, value };
 }

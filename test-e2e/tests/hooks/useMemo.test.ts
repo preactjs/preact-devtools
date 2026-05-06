@@ -7,8 +7,7 @@ test("Inspect useMemo hook", async ({ page }) => {
 	await devtools.locator(locateTreeItem("Memo")).click();
 	await devtools.locator('[data-testid="Hooks"]').waitFor();
 
-	const hooks = await getHooks(devtools);
-	expect(hooks).toEqual([["useMemo", "0"]]);
+	await expect.poll(() => getHooks(devtools)).toEqual([["useMemo", "0"]]);
 
 	// Should not be collapsable
 	await expect(

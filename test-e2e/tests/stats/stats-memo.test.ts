@@ -5,26 +5,19 @@ test("Skip memoized components for stats", async ({ page }) => {
 	const { devtools } = await gotoTest(page, "memo-stats");
 
 	await devtools.locator(locateTab("STATISTICS")).click();
-	await devtools.waitForSelector('[data-testId="stats-info"]');
+	await devtools.locator('[data-testId="stats-info"]').waitFor();
 
 	await clickRecordButton(devtools);
 
-	await page.click("button");
-	await page.waitForSelector('[data-value="1"]');
+	await page.locator("button").click();
+	await page.locator('[data-value="1"]').waitFor();
 	await clickRecordButton(devtools);
 
-	const mountTotal = await devtools
-		.locator('[data-testid="mount-total"]')
-		.textContent();
-	expect(mountTotal).toEqual("0");
-
-	const updateTotal = await devtools
-		.locator('[data-testid="update-total"]')
-		.textContent();
-	expect(updateTotal).toEqual("8");
-
-	const unmountTotal = await devtools
-		.locator('[data-testid="unmount-total"]')
-		.textContent();
-	expect(unmountTotal).toEqual("0");
+	await expect(devtools.locator('[data-testid="mount-total"]')).toHaveText("0");
+	await expect(devtools.locator('[data-testid="update-total"]')).toHaveText(
+		"8",
+	);
+	await expect(devtools.locator('[data-testid="unmount-total"]')).toHaveText(
+		"0",
+	);
 });

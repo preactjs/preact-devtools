@@ -11,11 +11,10 @@ test("Test HOCs on update", async ({ page }) => {
 
 	await page.locator("button").click();
 
-	const txt = await page.locator("data-testid=result").textContent();
-	expect(txt).toEqual("Counter: 1");
+	await expect(page.locator("data-testid=result")).toHaveText("Counter: 1");
 
-	const items = await devtools
-		.locator("data-testid=hoc-labels")
-		.allInnerTexts();
-	expect(items).toEqual(["Memo", "Memo"]);
+	await expect(devtools.locator("data-testid=hoc-labels")).toHaveText([
+		"Memo",
+		"Memo",
+	]);
 });

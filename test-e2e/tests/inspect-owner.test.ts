@@ -4,36 +4,29 @@ import { getOwners, gotoTest, locateTreeItem } from "../pw-utils";
 test("Inspect owner information", async ({ page }) => {
 	const { devtools } = await gotoTest(page, "update-all");
 
-	await devtools.click(locateTreeItem("App"));
+	await devtools.locator(locateTreeItem("App")).click();
+	await expect.poll(() => getOwners(devtools)).toEqual([]);
 
-	let owners = await getOwners(devtools);
-	expect(owners).toEqual([]);
+	await devtools.locator(locateTreeItem("Props")).click();
+	await expect.poll(() => getOwners(devtools)).toEqual(["App"]);
 
-	await devtools.click(locateTreeItem("Props"));
-	owners = await getOwners(devtools);
-	expect(owners).toEqual(["App"]);
+	await devtools.locator(locateTreeItem("State")).click();
+	await expect.poll(() => getOwners(devtools)).toEqual(["App"]);
 
-	await devtools.click(locateTreeItem("State"));
-	owners = await getOwners(devtools);
-	expect(owners).toEqual(["App"]);
+	await devtools.locator(locateTreeItem("Context")).click();
+	await expect.poll(() => getOwners(devtools)).toEqual(["App"]);
 
-	await devtools.click(locateTreeItem("Context"));
-	owners = await getOwners(devtools);
-	expect(owners).toEqual(["App"]);
+	await devtools.locator(locateTreeItem("Provider")).click();
+	await expect.poll(() => getOwners(devtools)).toEqual(["Context", "App"]);
 
-	await devtools.click(locateTreeItem("Provider"));
-	owners = await getOwners(devtools);
-	expect(owners).toEqual(["Context", "App"]);
+	await devtools.locator(locateTreeItem("Consumer")).click();
+	await expect.poll(() => getOwners(devtools)).toEqual(["Context", "App"]);
 
-	await devtools.click(locateTreeItem("Consumer"));
-	owners = await getOwners(devtools);
-	expect(owners).toEqual(["Context", "App"]);
+	await devtools.locator(locateTreeItem("LegacyContext")).click();
+	await expect.poll(() => getOwners(devtools)).toEqual(["App"]);
 
-	await devtools.click(locateTreeItem("LegacyContext"));
-	owners = await getOwners(devtools);
-	expect(owners).toEqual(["App"]);
-
-	await devtools.click(locateTreeItem("LegacyConsumer"));
-	owners = await getOwners(devtools);
-	expect(owners).toEqual(["LegacyContext", "App"]);
+	await devtools.locator(locateTreeItem("LegacyConsumer")).click();
+	await expect
+		.poll(() => getOwners(devtools))
+		.toEqual(["LegacyContext", "App"]);
 });

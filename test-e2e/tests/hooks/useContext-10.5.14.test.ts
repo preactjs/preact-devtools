@@ -12,9 +12,10 @@ test("Inspect useContext hook Preact 10.5.14 (goober)", async ({ page }) => {
 		.click();
 	await devtools.locator('[data-testid="Hooks"] [data-depth="2"]').click();
 
-	const hooks = await getHooks(devtools);
-	expect(hooks).toEqual([
-		["useTheme", ""],
-		["useContext", "undefined"],
-	]);
+	await expect
+		.poll(() => getHooks(devtools))
+		.toEqual([
+			["useTheme", ""],
+			["useContext", "undefined"],
+		]);
 });

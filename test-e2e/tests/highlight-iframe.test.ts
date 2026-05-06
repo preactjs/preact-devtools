@@ -1,24 +1,20 @@
 import { expect, test } from "@playwright/test";
-import { gotoTest, wait } from "../pw-utils";
+import { gotoTest } from "../pw-utils";
 
 test("Highlight iframe nodes", async ({ page }) => {
 	const { devtools } = await gotoTest(page, "iframe");
 
-	await devtools
-		.locator("iframe")
-		.evaluateAll(iframes =>
-			(iframes as HTMLIFrameElement[]).every(
-				x => x.contentDocument?.readyState == "complete",
-			),
-		);
+	await page.waitForFunction(() =>
+		Array.from(document.querySelectorAll("iframe")).every(
+			x => (x as HTMLIFrameElement).contentDocument?.readyState === "complete",
+		),
+	);
 
-	await devtools
-		.locator('[data-testid="elements-tree"] [data-name]')
-		.first()
-		.waitFor();
+	// All six components should be mounted before we read the tree
+	await expect(
+		devtools.locator('[data-testid="elements-tree"] [data-name]'),
+	).toHaveCount(6);
 
-	// TODO: Find a better solution
-	await wait(1000);
 	const elements = await devtools
 		.locator('[data-testid="elements-tree"] [data-name]')
 		.allTextContents();

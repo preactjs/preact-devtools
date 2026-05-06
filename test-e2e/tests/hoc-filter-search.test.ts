@@ -4,14 +4,12 @@ import { gotoTest, locateTreeItem } from "../pw-utils";
 test("HOC-Component labels should be searchable", async ({ page }) => {
 	const { devtools } = await gotoTest(page, "hoc");
 
-	await devtools.waitForSelector(locateTreeItem("Foo"));
-	await devtools.type('[data-testid="element-search"]', "forw");
+	await devtools.locator(locateTreeItem("Foo")).first().waitFor();
+	await devtools.locator('[data-testid="element-search"]').fill("forw");
 
-	let marked = await devtools.$$("mark");
-	expect(marked.length).toEqual(2);
-	expect(
-		await marked[0].evaluate(el => el.hasAttribute("data-marked")),
-	).toEqual(true);
+	const marks = devtools.locator("mark");
+	await expect(marks).toHaveCount(2);
+	await expect(marks.nth(0)).toHaveAttribute("data-marked", /.*/);
 
 	await devtools
 		.locator('[data-testid="search-counter"]:has-text("1 | 2")')
@@ -19,9 +17,6 @@ test("HOC-Component labels should be searchable", async ({ page }) => {
 
 	await page.keyboard.press("Enter");
 
-	marked = await devtools.$$("mark");
-	expect(marked.length).toEqual(2);
-	expect(
-		await marked[1].evaluate(el => el.hasAttribute("data-marked")),
-	).toEqual(true);
+	await expect(marks).toHaveCount(2);
+	await expect(marks.nth(1)).toHaveAttribute("data-marked", /.*/);
 });

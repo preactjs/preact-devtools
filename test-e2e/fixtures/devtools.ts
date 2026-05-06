@@ -6,6 +6,8 @@ const store = setupInlineDevtools(container, window);
 
 // @ts-ignore
 window.parent.store = store;
+// @ts-ignore
+window.__PREACT_DEVTOOLS_READY__ = true;
 store.subscribe((name, msg) => {
 	window.parent.postMessage(
 		{ type: name, data: msg, source: "preact-devtools-to-client" },

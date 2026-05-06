@@ -14,6 +14,5 @@ test("Inspect useRef hook", async ({ page }) => {
 	await devtools.locator(locateHook("useMemo")).waitFor();
 
 	await clickHookItem(devtools, "useMemo");
-	const hooks = await getHooks(devtools);
-	expect(hooks.length).toEqual(2);
+	await expect.poll(async () => (await getHooks(devtools)).length).toEqual(2);
 });

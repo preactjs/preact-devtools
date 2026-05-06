@@ -5,46 +5,39 @@ test("Disables render reason capturing", async ({ page }) => {
 	const { devtools } = await gotoTest(page, "render-reasons");
 
 	await devtools.locator(locateTab("SETTINGS")).click();
-	let checked = await devtools
-		.locator('[data-testid="toggle-render-reason"]')
-		.isChecked();
-	expect(checked).toEqual(false);
+	await expect(
+		devtools.locator('[data-testid="toggle-render-reason"]'),
+	).not.toBeChecked();
 
 	await devtools.locator(locateTab("PROFILER")).click();
 	await clickRecordButton(devtools);
-	await page.click('[data-testid="counter-1"]');
-	await page.click('[data-testid="counter-2"]');
+	await page.locator('[data-testid="counter-1"]').click();
+	await page.locator('[data-testid="counter-2"]').click();
 	await wait(1000);
 
 	await clickRecordButton(devtools);
 
-	await devtools.click('[data-name="ComponentState"]');
-	let reasons = await devtools
-		.locator('[data-testid="render-reasons"]')
-		.textContent();
-	expect(reasons).toEqual("-");
+	const reasons = devtools.locator('[data-testid="render-reasons"]');
+
+	await devtools.locator('[data-name="ComponentState"]').click();
+	await expect(reasons).toHaveText("-");
 
 	// Reset flamegraph
-	await devtools.click('[data-name="Fragment"]');
-	reasons = await devtools
-		.locator('[data-testid="render-reasons"]')
-		.textContent();
-	expect(reasons).toEqual("Did not render");
+	await devtools.locator('[data-name="Fragment"]').click();
+	await expect(reasons).toHaveText("Did not render");
 
 	// Enable capturing
-	await devtools.click('[data-testid="toggle-render-reason"]');
+	await devtools.locator('[data-testid="toggle-render-reason"]').click();
 
 	// Should start profiling immediately
-	const text = await devtools
-		.locator('[data-testid="profiler-info"]')
-		.textContent();
-	expect(text).toMatch(/Profiling in progress/);
+	await expect(devtools.locator('[data-testid="profiler-info"]')).toContainText(
+		"Profiling in progress",
+	);
 
 	await clickRecordButton(devtools);
 
 	await devtools.locator(locateTab("SETTINGS")).click();
-	checked = await devtools
-		.locator('[data-testid="toggle-render-reason"]')
-		.isChecked();
-	expect(checked).toEqual(true);
+	await expect(
+		devtools.locator('[data-testid="toggle-render-reason"]'),
+	).toBeChecked();
 });

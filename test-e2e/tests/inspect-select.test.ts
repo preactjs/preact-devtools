@@ -6,15 +6,17 @@ test("Should inspect during picking", async ({ page }) => {
 
 	const elem1 = '[data-testid="tree-item"][data-name="Counter"]';
 	const prop = '[data-testid="Props"] [data-testid="props-row"]';
-	await devtools.click(elem1);
+	await devtools.locator(elem1).click();
 	await expect(devtools.locator(prop)).toHaveCount(0);
 
 	const target = '[data-testid="result"]';
 	const inspect = '[data-testid="inspect-btn"]';
 
-	await devtools.click(inspect);
-	let active = await devtools.locator(inspect).getAttribute("data-active");
-	expect(active).toEqual("true");
+	await devtools.locator(inspect).click();
+	await expect(devtools.locator(inspect)).toHaveAttribute(
+		"data-active",
+		"true",
+	);
 
 	await page.hover(target);
 
@@ -26,15 +28,19 @@ test("Should inspect during picking", async ({ page }) => {
 	await expect(devtools.locator(prop)).toHaveCount(1);
 
 	// Should only fire inspect event once per id
-	const inspects = (await getLog(page)).filter(
-		x => x.type === "inspect-result",
-	);
-	expect(inspects.length).toEqual(2);
+	await expect
+		.poll(
+			async () =>
+				(await getLog(page)).filter(x => x.type === "inspect-result").length,
+		)
+		.toEqual(2);
 
 	// Should select new node in element tree
-	await page.click(target);
-	active = await devtools.locator(inspect).getAttribute("data-active");
-	expect(active).toEqual("false");
+	await page.locator(target).click();
+	await expect(devtools.locator(inspect)).toHaveAttribute(
+		"data-active",
+		"false",
+	);
 
 	// ...and display the newly inspected data
 	await expect(devtools.locator(prop)).toHaveCount(1);

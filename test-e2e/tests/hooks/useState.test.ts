@@ -7,8 +7,7 @@ test("Inspect useState hook", async ({ page }) => {
 	await devtools.locator(locateTreeItem("Counter")).click();
 	await devtools.locator('[data-testid="Hooks"]').waitFor();
 
-	const hooks = await getHooks(devtools);
-	expect(hooks).toEqual([["useState", "0"]]);
+	await expect.poll(() => getHooks(devtools)).toEqual([["useState", "0"]]);
 
 	// Should not be collapsable
 	await expect(
@@ -22,6 +21,5 @@ test("Inspect useState hook", async ({ page }) => {
 	await page.keyboard.press("ArrowUp");
 	await page.keyboard.press("Enter");
 
-	const text = await page.locator('[data-testid="result"]').textContent();
-	expect(text).toEqual("Counter: 1");
+	await expect(page.locator('[data-testid="result"]')).toHaveText("Counter: 1");
 });
