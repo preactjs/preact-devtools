@@ -22,7 +22,7 @@ export function getStringId(table: StringTable, input: string): number {
 
 export const ENCODE_CACHE_LIMIT = 1000;
 
-class LRUCache<K, V> {
+export class LRUCache<K, V> {
 	private cache = new Map<K, V>();
 
 	constructor(private limit: number) {}

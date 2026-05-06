@@ -1,5 +1,6 @@
 import {
 	ENCODE_CACHE_LIMIT,
+	LRUCache,
 	encode,
 	parseTable,
 	flushTable,
@@ -28,6 +29,60 @@ describe("StringTable", () => {
 		it("should parse multiple strings", () => {
 			const data = [8, 3, 97, 98, 99, 3, 102, 111, 111];
 			expect(parseTable(data)).to.deep.equal(["abc", "foo"]);
+		});
+	});
+
+	describe("LRUCache", () => {
+		it("should return undefined for missing entries", () => {
+			const cache = new LRUCache<string, number>(2);
+
+			expect(cache.get("missing")).to.equal(undefined);
+		});
+
+		it("should store and read entries", () => {
+			const cache = new LRUCache<string, number>(2);
+
+			cache.set("a", 1);
+
+			expect(cache.get("a")).to.equal(1);
+		});
+
+		it("should evict the oldest entry when the limit is exceeded", () => {
+			const cache = new LRUCache<string, number>(2);
+
+			cache.set("a", 1);
+			cache.set("b", 2);
+			cache.set("c", 3);
+
+			expect(cache.get("a")).to.equal(undefined);
+			expect(cache.get("b")).to.equal(2);
+			expect(cache.get("c")).to.equal(3);
+		});
+
+		it("should refresh recency when an entry is read", () => {
+			const cache = new LRUCache<string, number>(2);
+
+			cache.set("a", 1);
+			cache.set("b", 2);
+			expect(cache.get("a")).to.equal(1);
+			cache.set("c", 3);
+
+			expect(cache.get("a")).to.equal(1);
+			expect(cache.get("b")).to.equal(undefined);
+			expect(cache.get("c")).to.equal(3);
+		});
+
+		it("should refresh recency when an existing entry is written", () => {
+			const cache = new LRUCache<string, number>(2);
+
+			cache.set("a", 1);
+			cache.set("b", 2);
+			cache.set("a", 3);
+			cache.set("c", 4);
+
+			expect(cache.get("a")).to.equal(3);
+			expect(cache.get("b")).to.equal(undefined);
+			expect(cache.get("c")).to.equal(4);
 		});
 	});
 
