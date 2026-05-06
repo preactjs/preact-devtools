@@ -46,6 +46,7 @@ export function ops2Tree(
 	const reasons: RenderReasonMap = new Map();
 	let stats: ParsedStats | null = null;
 	let structural = false;
+	let incremental = true;
 
 	let i = ops[1] + 1;
 	const strings = parseTable(ops.slice(1, i + 1));
@@ -62,11 +63,29 @@ export function ops2Tree(
 			case MsgTypes.ADD_VNODE: {
 				const id = ops[i + 1];
 				const parentId = ops[i + 3];
+				const existing = pending.get(id);
+				if (existing) {
+					const oldParent = pending.get(existing.parent);
+					if (oldParent) {
+						const idx = oldParent.children.indexOf(id);
+						if (idx > -1) {
+							const clone = cloneNode(oldParent);
+							pending.set(clone.id, clone);
+							clone.children.splice(idx, 1);
+							dirty.add(clone.id);
+						}
+					}
+					incremental = false;
+					structural = true;
+				}
+
 				const parent = pending.get(parentId);
 				if (parent) {
 					const clone = cloneNode(parent);
 					pending.set(parent.id, clone);
-					clone.children.push(id);
+					if (clone.children.indexOf(id) === -1) {
+						clone.children.push(id);
+					}
 					dirty.add(parent.id);
 				}
 
@@ -86,7 +105,7 @@ export function ops2Tree(
 
 				rendered.add(id);
 				dirty.add(id);
-				added.add(id);
+				if (!existing) added.add(id);
 				structural = true;
 
 				i += 8;
@@ -161,6 +180,15 @@ export function ops2Tree(
 				const parent = cloneNode(pending.get(parentId)!);
 				const children = ops.slice(i + 3, i + 3 + count);
 				if (!sameIds(parent.children, children)) {
+					// If the *set* of children changes (not just the order), some
+					// ids became orphaned or got re-attached without an explicit
+					// ADD_VNODE/REMOVE_VNODE pair (preact's Suspense fallback swap
+					// is the canonical case). The incremental visible-count path
+					// only knows about ids that flowed through `added`/`removed`,
+					// so it can't reconcile those. Fall back to a full recompute.
+					if (!sameSet(parent.children, children)) {
+						incremental = false;
+					}
 					parent.children = children;
 					dirty.add(parentId);
 					structural = true;
@@ -234,7 +262,7 @@ export function ops2Tree(
 		removed: Array.from(removed),
 		removedSubtreeRoots,
 		structural,
-		incremental: true,
+		incremental,
 	};
 
 	return {
@@ -253,6 +281,14 @@ function sameIds(a: ID[], b: ID[]) {
 	if (a.length !== b.length) return false;
 	for (let i = 0; i < a.length; i++) {
 		if (a[i] !== b[i]) return false;
+	}
+	return true;
+}
+
+function sameSet(a: ID[], b: ID[]) {
+	if (a.length !== b.length) return false;
+	for (let i = 0; i < a.length; i++) {
+		if (b.indexOf(a[i]) === -1) return false;
 	}
 	return true;
 }

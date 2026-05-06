@@ -108,6 +108,29 @@ describe("ops2Tree", () => {
 				},
 			]);
 		});
+
+		it("should not duplicate an existing vnode when it is re-added", () => {
+			const tree = ops2Tree(
+				new Map(),
+				[],
+				fromSnapshot([
+					"rootId: 1",
+					"Add 1 <Fragment> to parent -1",
+					"Add 2 <Parent> to parent 1",
+				]),
+				true,
+			).tree;
+
+			const next = ops2Tree(
+				tree,
+				[1],
+				fromSnapshot(["rootId: 1", "Add 2 <Parent> to parent 1"]),
+				true,
+			);
+
+			expect(next.tree.get(1)!.children).to.deep.equal([2]);
+			expect(next.changes.incremental).to.equal(false);
+		});
 	});
 
 	describe("UPDATE_VNODE_TIMINGS", () => {

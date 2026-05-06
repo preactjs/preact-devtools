@@ -132,44 +132,44 @@ export function setupOptionsV11(
 
 	const skipEffects = o._skipEffects || o.__s;
 
-	// Make sure that we are always the first `option._hook` to be called.
-	// This is necessary to ensure that our callstack remains consistent.
-	// Othwerwise we'll end up with an unknown number of frames in-between
-	// the called hook and `options._hook`. This will lead to wrongly
-	// parsed hooks.
-	const hook = (internal: Internal, index: number, type: number) => {
-		const nextHook = o._hook !== hook ? o._hook : o.__h !== hook ? o.__h : null;
-		if (nextHook) {
-			prevHook = nextHook;
-			o._hook = o.__h = hook;
-		}
+	// Make sure that we are always the last `option._hook` to be installed,
+	// so we run at the top of the hook chain. Other libraries (e.g.
+	// `@preact/signals`) install their own `_hook` at module init and
+	// chain to whatever was there at that moment. If we install on top
+	// of them synchronously they end up calling our hook as their `prev`
+	// while our `prev` is them, which produces an infinite recursion.
+	// Deferring with `setTimeout` lets all eager installers settle first.
+	setTimeout(() => {
+		prevHook = o._hook || o.__h;
+		prevUseDebugValue = options.useDebugValue;
+		// @ts-ignore
+		prevHookName = options._addHookName || options.__a;
 
-		if (type) {
-			addHookStack(type);
-		}
+		o._hook = o.__h = (internal: Internal, index: number, type: number) => {
+			if (type) {
+				addHookStack(type);
+			}
 
-		// Don't continue the chain while the devtools is inspecting hooks.
-		// Otherwise the next hook will very likely throw as we're only
-		// faking a render and not doing a proper one. #278
-		if (!(options as any)._skipEffects && !(options as any).__s) {
-			if (prevHook) prevHook(internal, index, type);
-		}
-	};
-	o._hook = o.__h = hook;
+			// Don't continue the chain while the devtools is inspecting hooks.
+			// Otherwise the next hook will very likely throw as we're only
+			// faking a render and not doing a proper one. #278
+			if (!(options as any)._skipEffects && !(options as any).__s) {
+				if (prevHook) prevHook(internal, index, type);
+			}
+		};
 
-	options.useDebugValue = (value: any) => {
-		addHookStack(HookType.useDebugValue);
-		addDebugValue(value);
-		if (prevUseDebugValue) prevUseDebugValue(value);
-	};
+		options.useDebugValue = (value: any) => {
+			addHookStack(HookType.useDebugValue);
+			addDebugValue(value);
+			if (prevUseDebugValue) prevUseDebugValue(value);
+		};
 
-	// @ts-ignore
-	prevHookName = options._addHookName || options.__a;
-	// @ts-ignore
-	options._addHookName = options.__a = (name: string | number) => {
-		addHookName(name);
-		if (prevHookName) prevHookName(name);
-	};
+		// @ts-ignore
+		options._addHookName = options.__a = (name: string | number) => {
+			addHookName(name);
+			if (prevHookName) prevHookName(name);
+		};
+	}, 100);
 
 	options.vnode = vnode => {
 		if (

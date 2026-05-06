@@ -97,10 +97,18 @@ export interface DevtoolsHook {
  * Create hook to which Preact will subscribe and listen to. The hook
  * is the entrypoint where everything begins.
  */
+// Each renderer gets its own random 32-bit id, used both as the start of its
+// vnode id namespace (so vnode ids never collide across renderers) and as the
+// `rendererId` in the v3 envelope (so per-renderer state on the devtools side
+// doesn't collide across iframes, which each run their own `__PREACT_DEVTOOLS__`
+// hook with no shared counter).
+function newRendererId(): number {
+	return Math.floor(Math.random() * 2 ** 32);
+}
+
 export function createHook(port: PortPageHook): DevtoolsHook {
 	const { listen, send } = port;
 	const renderers = new Map<number, Renderer>();
-	let uid = 0;
 	let status: "connected" | "pending" | "disconnected" = "disconnected";
 
 	const profiler = newProfiler();
@@ -120,18 +128,19 @@ export function createHook(port: PortPageHook): DevtoolsHook {
 	const attachRenderer = (
 		renderer: Renderer,
 		supports: { renderReasons?: boolean; hooks?: boolean; profiling?: boolean },
+		id: number = newRendererId(),
 	) => {
 		if (status === "disconnected") {
 			init();
 		}
 
-		renderers.set(++uid, renderer);
-		renderer.setRendererId?.(uid);
+		renderers.set(id, renderer);
+		renderer.setRendererId?.(id);
 
 		// Content Script is likely not ready at this point, so don't
 		// flush any events here and politely request it to initialize
 		send("attach", {
-			id: uid,
+			id,
 			supportsProfiling: !!supports.profiling,
 			supportsRenderReasons: !!supports.renderReasons,
 			supportsHooks: !!supports.hooks,
@@ -154,7 +163,7 @@ export function createHook(port: PortPageHook): DevtoolsHook {
 			profiler.recordStats = true;
 		}
 
-		return uid;
+		return id;
 	};
 
 	// Delete all roots when the current frame is closed
@@ -213,9 +222,10 @@ export function createHook(port: PortPageHook): DevtoolsHook {
 				return -1;
 			}
 
-			// Create an integer-based namespace to avoid clashing ids caused by
-			// multiple connected renderers
-			const namespace = Math.floor(Math.random() * 2 ** 32);
+			// One random 32-bit id per renderer, reused both as the start of the
+			// vnode id namespace and as the `rendererId` in the v3 envelope (see
+			// `newRendererId` above).
+			const id = newRendererId();
 
 			const roots = new Map<any, Node>();
 
@@ -229,10 +239,7 @@ export function createHook(port: PortPageHook): DevtoolsHook {
 					profiling: true,
 				};
 
-				const idMapper = createIdMappingState(
-					namespace,
-					bindingsV10.getInstance,
-				);
+				const idMapper = createIdMappingState(id, bindingsV10.getInstance);
 
 				const renderer = createRenderer(
 					port,
@@ -247,12 +254,9 @@ export function createHook(port: PortPageHook): DevtoolsHook {
 					version,
 				);
 				setupOptionsV10(options, renderer, roots, config as any);
-				return attachRenderer(renderer, supports);
+				return attachRenderer(renderer, supports, id);
 			} else if (preactVersionMatch.major === 11) {
-				const idMapper = createIdMappingState(
-					namespace,
-					bindingsV11.getInstance,
-				);
+				const idMapper = createIdMappingState(id, bindingsV11.getInstance);
 
 				const renderer = createRenderer(
 					port,
@@ -267,11 +271,15 @@ export function createHook(port: PortPageHook): DevtoolsHook {
 					version,
 				);
 				setupOptionsV11(options as any, renderer, roots, config, profiler);
-				return attachRenderer(renderer, {
-					hooks: true,
-					renderReasons: true,
-					profiling: true,
-				});
+				return attachRenderer(
+					renderer,
+					{
+						hooks: true,
+						renderReasons: true,
+						profiling: true,
+					},
+					id,
+				);
 			}
 
 			// eslint-disable-next-line no-console

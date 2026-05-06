@@ -85,32 +85,31 @@ export function setupOptionsV10(
 		// @ts-ignore
 		prevHookName = options._addHookName || options.__a;
 
-		if (type) {
-			addHookStack(type);
-		}
+		o._hook = o.__h = (c: Component, index: number, type: number) => {
+			if (type) {
+				addHookStack(type);
+			}
 
-		// Don't continue the chain while the devtools is inspecting hooks.
-		// Otherwise the next hook will very likely throw as we're only
-		// faking a render and not doing a proper one. #278
-		if (!(options as any)._skipEffects && !(options as any).__s) {
-			if (prevHook) prevHook(c, index, type);
-		}
-	};
-	o._hook = o.__h = hook;
+			// Don't continue the chain while the devtools is inspecting hooks.
+			// Otherwise the next hook will very likely throw as we're only
+			// faking a render and not doing a proper one. #278
+			if (!(options as any)._skipEffects && !(options as any).__s) {
+				if (prevHook) prevHook(c, index, type);
+			}
+		};
 
-	options.useDebugValue = (value: any) => {
-		addHookStack(HookType.useDebugValue);
-		addDebugValue(value);
-		if (prevUseDebugValue) prevUseDebugValue(value);
-	};
+		options.useDebugValue = (value: any) => {
+			addHookStack(HookType.useDebugValue);
+			addDebugValue(value);
+			if (prevUseDebugValue) prevUseDebugValue(value);
+		};
 
-	// @ts-ignore
-	prevHookName = options._addHookName || options.__a;
-	// @ts-ignore
-	options._addHookName = options.__a = (name: string | number) => {
-		addHookName(name);
-		if (prevHookName) prevHookName(name);
-	};
+		// @ts-ignore
+		options._addHookName = options.__a = (name: string | number) => {
+			addHookName(name);
+			if (prevHookName) prevHookName(name);
+		};
+	}, 100);
 
 	options.vnode = (vnode: VNode) => {
 		if (
