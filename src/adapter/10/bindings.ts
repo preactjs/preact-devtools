@@ -1,12 +1,19 @@
 import { HookType } from "../shared/hooks";
 import type { Component, VNode } from "preact";
-import type {
-	Component as IComponent,
-	VNode as IVNode,
-} from "preact/src/internal";
 import { ComponentHooks, HookState, PreactBindings } from "../shared/bindings";
 import { RendererConfig } from "../shared/renderer";
 import { getRenderReasonPost } from "./renderReason";
+
+type InternalComponent = Component & {
+	_nextState?: unknown;
+};
+
+type InternalVNode = VNode & {
+	_parent?: VNode | null;
+	_component?: Component | null;
+	_dom?: HTMLElement | Text | null;
+	_children?: Array<VNode | null | undefined>;
+};
 
 // Mangle accessors
 
@@ -15,7 +22,7 @@ import { getRenderReasonPost } from "./renderReason";
  */
 export function getVNodeParent(vnode: VNode): VNode | null {
 	return (
-		(vnode as IVNode)._parent ||
+		(vnode as InternalVNode)._parent ||
 		(vnode as any).__ ||
 		// Older Preact X versions used `__p`
 		(vnode as any).__p ||
@@ -34,14 +41,16 @@ export function isRoot(vnode: VNode, config: RendererConfig): boolean {
  * Return the component instance of a `vnode` or `hookState`
  */
 export function getComponent(node: HookState | VNode): Component | null {
-	return (node as HookState | IVNode)._component || (node as any).__c || null;
+	return (
+		(node as HookState | InternalVNode)._component || (node as any).__c || null
+	);
 }
 
 /**
  * Get a `vnode`'s _dom reference.
  */
 export function getDom(vnode: VNode): HTMLElement | Text | null {
-	return (vnode as IVNode)._dom || (vnode as any).__e || null;
+	return (vnode as InternalVNode)._dom || (vnode as any).__e || null;
 }
 
 export function hasDom(x: any): boolean {
@@ -172,7 +181,7 @@ export function getHookState(
 export function getActualChildren(
 	vnode: VNode,
 ): Array<VNode | null | undefined> {
-	return (vnode as IVNode)._children || (vnode as any).__k || [];
+	return (vnode as InternalVNode)._children || (vnode as any).__k || [];
 }
 
 // End Mangle accessors
@@ -239,11 +248,11 @@ export function getDisplayName(vnode: VNode, config: RendererConfig): string {
 }
 
 export function getNextState<S>(c: Component): S {
-	return (c as IComponent)._nextState || (c as any).__s || null;
+	return (c as InternalComponent)._nextState || (c as any).__s || null;
 }
 
 export function setNextState<S>(c: Component, value: S): S {
-	return ((c as IComponent)._nextState = (c as any).__s = value);
+	return ((c as InternalComponent)._nextState = (c as any).__s = value);
 }
 
 function getSuspenseStateKey(c: Component<any, any>) {
