@@ -44,11 +44,8 @@ export function createSearchStore(tree: TreeStore) {
 		regex.value = reg;
 
 		const ids: number[] = [];
-		tree.forEachVisible((id, node) => {
-			if (
-				reg.test(node.name) ||
-				(node.hocs && node.hocs.some(h => reg.test(h)))
-			) {
+		tree.forEachSearchEntry((id, name, hocs) => {
+			if (reg.test(name) || (hocs && hocs.some(h => reg.test(h)))) {
 				ids.push(id);
 			}
 		});

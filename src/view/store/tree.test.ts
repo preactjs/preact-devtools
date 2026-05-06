@@ -61,6 +61,14 @@ function expectSameVisible(actual: TreeStore, expected: TreeStore) {
 	}
 }
 
+function searchEntries(store: TreeStore) {
+	const entries: Array<[number, string, string[] | null]> = [];
+	store.forEachSearchEntry((id, name, hocs) => {
+		entries.push([id, name, hocs]);
+	});
+	return entries;
+}
+
 describe("TreeStore", () => {
 	it("resolves visible nodes by rank", () => {
 		const store = new TreeStore();
@@ -160,6 +168,30 @@ describe("TreeStore", () => {
 
 		expect(store.structureVersion.value).to.equal(layoutVersion);
 		expect(store.versionOfNode(2).value).to.equal(nodeVersion + 1);
+	});
+
+	it("keeps search entries in sync with visibility and display updates", () => {
+		const store = new TreeStore();
+		const tree = createTree();
+		store.sync(tree, [1], false);
+
+		expect(searchEntries(store).map(([id]) => id)).to.deep.equal([
+			1, 2, 4, 5, 3,
+		]);
+
+		store.setCollapsed(2, true);
+		expect(searchEntries(store).map(([id]) => id)).to.deep.equal([1, 2, 3]);
+
+		const renamed = new Map(tree);
+		renamed.set(3, { ...tree.get(3)!, hocs: ["memo"], name: "Renamed" });
+		store.sync(renamed, [1], false);
+		expect(searchEntries(store)).to.deep.include([3, "Renamed", ["memo"]]);
+
+		const removed = new Map(renamed);
+		removed.set(1, { ...renamed.get(1)!, children: [2] });
+		removed.delete(3);
+		store.sync(removed, [1], false);
+		expect(searchEntries(store).map(([id]) => id)).to.deep.equal([1, 2]);
 	});
 
 	it("invalidates visible layout for structural updates", () => {

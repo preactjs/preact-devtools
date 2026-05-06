@@ -8,7 +8,6 @@ import { SharedVNode } from "./bindings";
 export interface IdMappingState<T> {
 	instToId: Map<any, ID>;
 	idToVNode: Map<ID, T>;
-	idToInst: Map<ID, any>;
 	nextId: ID;
 	getInstance: (vnode: T) => any;
 }
@@ -20,7 +19,6 @@ export function createIdMappingState<T extends SharedVNode>(
 	return {
 		instToId: new Map(),
 		idToVNode: new Map(),
-		idToInst: new Map(),
 		nextId: initial,
 		getInstance,
 	};
@@ -50,15 +48,12 @@ export function getOrCreateVNodeId<T>(
 }
 
 export function updateVNodeId<T>(state: IdMappingState<T>, id: ID, vnode: T) {
-	const inst = state.getInstance(vnode);
-	state.idToInst.set(id, inst);
 	state.idToVNode.set(id, vnode);
 }
 
 export function removeVNodeId<T>(state: IdMappingState<T>, vnode: T) {
 	if (hasVNodeId(state, vnode)) {
 		const id = getVNodeId(state, vnode);
-		state.idToInst.delete(id);
 		state.idToVNode.delete(id);
 	}
 	const inst = state.getInstance(vnode);
@@ -69,7 +64,6 @@ export function createVNodeId<T>(state: IdMappingState<T>, vnode: T) {
 	const id = state.nextId++;
 	const inst = state.getInstance(vnode);
 	state.instToId.set(inst, id);
-	state.idToInst.set(id, inst);
 	state.idToVNode.set(id, vnode);
 	return id;
 }

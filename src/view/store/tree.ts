@@ -1,5 +1,6 @@
 import { signal, Signal } from "@preact/signals";
 import { ID, DevNode, Tree } from "./types";
+import { sameIds } from "./utils";
 
 export interface TreeSyncChanges {
 	dirty: ID[];
@@ -10,13 +11,20 @@ export interface TreeSyncChanges {
 	incremental?: boolean;
 }
 
+interface SearchEntry {
+	id: ID;
+	name: string;
+	hocs: string[] | null;
+}
+
 export class TreeStore {
 	private nodes: Tree = new Map();
 	private roots: ID[] = [];
 	private collapsed = new Set<ID>();
 	private visibleCounts = new Map<ID, number>();
 	private visibleTotal = 0;
-	private visibleRanks: Map<ID, number> | null = null;
+	private searchIndex = new Map<ID, SearchEntry>();
+	private visibleSearchEntries: SearchEntry[] | null = null;
 	private nodeListeners = new Map<ID, Set<() => void>>();
 	private structureListeners = new Set<() => void>();
 	private nodeVersions = new Map<ID, Signal<number>>();
@@ -42,6 +50,8 @@ export class TreeStore {
 		this.nodes = tree;
 		this.roots = roots.slice();
 		this.rootHidden = rootHidden;
+		this.updateSearchIndex(nextChanges);
+		if (rootHiddenChanged) this.visibleSearchEntries = null;
 		this.collapsed.forEach(id => {
 			if (!this.nodes.has(id)) this.collapsed.delete(id);
 		});
@@ -71,7 +81,8 @@ export class TreeStore {
 		this.collapsed.clear();
 		this.visibleCounts.clear();
 		this.visibleTotal = 0;
-		this.visibleRanks = null;
+		this.searchIndex.clear();
+		this.visibleSearchEntries = null;
 		this.bump(dirty, true);
 		this.nodeVersions.clear();
 	}
@@ -111,6 +122,7 @@ export class TreeStore {
 			}
 			this.visibleTotal += delta;
 		}
+		this.visibleSearchEntries = null;
 		this.bump([], true);
 	}
 
@@ -132,6 +144,7 @@ export class TreeStore {
 			this.visibleTotal += delta;
 			this.updateAncestorVisibleCounts(node.parent, delta);
 		}
+		this.visibleSearchEntries = null;
 		this.bump([id], affectsVisibleLayout && delta !== 0);
 	}
 
@@ -240,6 +253,16 @@ export class TreeStore {
 		}
 	}
 
+	forEachSearchEntry(
+		fn: (id: ID, name: string, hocs: string[] | null) => void | false,
+	) {
+		const entries = this.getVisibleSearchEntries();
+		for (let i = 0; i < entries.length; i++) {
+			const entry = entries[i];
+			if (fn(entry.id, entry.name, entry.hocs) === false) return;
+		}
+	}
+
 	visibleAt(index: number): ID | null {
 		if (index < 0) return null;
 
@@ -260,9 +283,49 @@ export class TreeStore {
 	}
 
 	rankOf(id: ID): number {
-		if (!this.visibleRanks) this.recomputeVisibleRanks();
-		const rank = this.visibleRanks!.get(id);
-		return rank === undefined ? -1 : rank;
+		const path: DevNode[] = [];
+		let node = this.nodes.get(id);
+		if (!node) return -1;
+
+		while (node) {
+			path.push(node);
+			if (node.parent === -1) break;
+			node = this.nodes.get(node.parent);
+			if (!node) return -1;
+		}
+
+		const root = path[path.length - 1];
+		const rootIdx = this.roots.indexOf(root.id);
+		if (rootIdx === -1) return -1;
+
+		let rank = 0;
+		for (let i = 0; i < rootIdx; i++) {
+			rank += this.visibleCounts.get(this.roots[i]) || 0;
+		}
+
+		for (let i = path.length - 1; i >= 0; i--) {
+			const current = path[i];
+			if (i !== path.length - 1 && this.collapsed.has(path[i + 1].id)) {
+				return -1;
+			}
+
+			if (this.isNodeSelfVisible(current)) {
+				if (current.id === id) return rank;
+				rank++;
+			}
+
+			if (this.collapsed.has(current.id)) return -1;
+
+			const next = path[i - 1];
+			if (!next) continue;
+			for (let j = 0; j < current.children.length; j++) {
+				const childId = current.children[j];
+				if (childId === next.id) break;
+				rank += this.visibleCounts.get(childId) || 0;
+			}
+		}
+
+		return -1;
 	}
 
 	private visibleAtNode(node: DevNode, index: number): ID | null {
@@ -366,19 +429,9 @@ export class TreeStore {
 	private recomputeVisibleCounts() {
 		this.visibleCounts.clear();
 		this.visibleTotal = 0;
-		this.visibleRanks = null;
 		for (let i = this.roots.length; i--; ) {
 			this.visibleTotal += this.computeVisibleCount(this.roots[i]);
 		}
-	}
-
-	private recomputeVisibleRanks() {
-		const ranks = new Map<ID, number>();
-		let rank = 0;
-		this.forEachVisible(id => {
-			ranks.set(id, rank++);
-		});
-		this.visibleRanks = ranks;
 	}
 
 	private applyIncrementalVisibleChanges(changes: TreeSyncChanges) {
@@ -514,6 +567,44 @@ export class TreeStore {
 		return { dirty, removed, structural };
 	}
 
+	private updateSearchIndex(changes: TreeSyncChanges) {
+		if (
+			changes.structural ||
+			changes.dirty.length > 0 ||
+			(changes.removed && changes.removed.length > 0)
+		) {
+			this.visibleSearchEntries = null;
+		}
+
+		if (changes.removed) {
+			for (let i = 0; i < changes.removed.length; i++) {
+				this.searchIndex.delete(changes.removed[i]);
+			}
+		}
+
+		for (let i = 0; i < changes.dirty.length; i++) {
+			const node = this.nodes.get(changes.dirty[i]);
+			if (!node) continue;
+			this.searchIndex.set(node.id, {
+				id: node.id,
+				name: node.name,
+				hocs: node.hocs,
+			});
+		}
+	}
+
+	private getVisibleSearchEntries() {
+		if (this.visibleSearchEntries !== null) return this.visibleSearchEntries;
+
+		const entries: SearchEntry[] = [];
+		this.forEachVisible(id => {
+			const entry = this.searchIndex.get(id);
+			if (entry) entries.push(entry);
+		});
+		this.visibleSearchEntries = entries;
+		return entries;
+	}
+
 	private bump(dirty: ID[] = [], structural = false) {
 		this.version.value++;
 		for (let i = 0; i < dirty.length; i++) {
@@ -523,19 +614,10 @@ export class TreeStore {
 			if (listeners) listeners.forEach(fn => fn());
 		}
 		if (structural) {
-			this.visibleRanks = null;
 			this.structureVersion.value++;
 			this.structureListeners.forEach(fn => fn());
 		}
 	}
-}
-
-function sameIds(a: ID[], b: ID[]) {
-	if (a.length !== b.length) return false;
-	for (let i = 0; i < a.length; i++) {
-		if (a[i] !== b[i]) return false;
-	}
-	return true;
 }
 
 function didDisplayNodeChange(a: DevNode, b: DevNode) {

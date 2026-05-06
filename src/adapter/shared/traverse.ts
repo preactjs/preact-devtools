@@ -479,11 +479,7 @@ function update<T extends SharedVNode>(
 
 	updateHighlight(profiler, vnode, bindings);
 
-	const oldChildren = oldVNode
-		? bindings
-				.getActualChildren(oldVNode)
-				.map((v: any) => v && getVNodeId(ids, v))
-		: [];
+	const oldChildren = oldVNode ? bindings.getActualChildren(oldVNode) : [];
 
 	let shouldReorder = false;
 	let childCount = 0;
@@ -492,7 +488,8 @@ function update<T extends SharedVNode>(
 	for (let i = 0; i < children.length; i++) {
 		const child = children[i];
 		if (child == null) {
-			const oldChildId = oldChildren[i];
+			const oldChild = oldChildren[i];
+			const oldChildId = oldChild && getVNodeId(ids, oldChild);
 			if (oldChildId != null) {
 				commit.unmountIds.push(oldChildId);
 			}

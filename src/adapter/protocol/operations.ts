@@ -1,5 +1,6 @@
 import { DevNode, ID, Tree } from "../../view/store/types";
 import type { TreeSyncChanges } from "../../view/store/tree";
+import { sameIds } from "../../view/store/utils";
 import { parseTable } from "./string-table";
 import { MsgTypes } from "./events";
 import { RenderReasonMap } from "../shared/renderReasons";
@@ -275,14 +276,6 @@ export function ops2Tree(
 		stats,
 		changes,
 	};
-}
-
-function sameIds(a: ID[], b: ID[]) {
-	if (a.length !== b.length) return false;
-	for (let i = 0; i < a.length; i++) {
-		if (a[i] !== b[i]) return false;
-	}
-	return true;
 }
 
 function sameSet(a: ID[], b: ID[]) {
