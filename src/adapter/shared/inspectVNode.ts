@@ -35,7 +35,9 @@ export function inspectVNode<T extends SharedVNode>(
 		Object.keys(c.state).length > 0;
 
 	const isSignalTextNode =
-		typeof vnode.type === "function" && vnode.type.displayName === "_st";
+		typeof vnode.type === "function" &&
+		(vnode.type.displayName === "_st" ||
+			vnode.type.displayName === "ReactiveTextNode");
 
 	const hasHooks =
 		c != null && !isSignalTextNode && bindings.getComponentHooks(vnode) != null;

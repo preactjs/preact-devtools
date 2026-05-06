@@ -1,7 +1,7 @@
 import { PreactBindings, SharedVNode } from "./bindings";
 
 export function getSignalTextName(name: string) {
-	return name === "_st" ? "__TextSignal" : name;
+	return name === "_st" || name === "ReactiveTextNode" ? "__TextSignal" : name;
 }
 
 export function traverse<T extends SharedVNode>(

@@ -50,6 +50,7 @@ test("Show computed signal as readonly", async ({ page }) => {
 test("Show signals in hooks", async ({ page }) => {
 	const { devtools } = await gotoTest(page, "signals");
 
+	await page.locator("button:has-text('force update')").click();
 	await devtools.click(locateTreeItem("Counter"));
 
 	await devtools.waitForSelector('[data-testid="props-row"]');
@@ -107,6 +108,7 @@ test("Don't crash when signal hook is updated", async ({ page }) => {
 	);
 	const { devtools } = await gotoTest(page, "signals");
 
+	await page.locator("button:has-text('force update')").click();
 	await devtools.click(locateTreeItem("Counter"));
 	await devtools.waitForSelector('[data-testid="props-row"]');
 

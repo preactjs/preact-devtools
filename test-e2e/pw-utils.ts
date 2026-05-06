@@ -46,9 +46,22 @@ export async function gotoTest(
 			if (fixtureError) {
 				throw new Error(`Fixture page error: ${(fixtureError as any).message}`);
 			}
-			const ready = await page.evaluate(
-				() => (window as any).__PREACT_E2E_READY__ === true,
-			);
+			let ready = false;
+			try {
+				ready = await page.evaluate(
+					() => (window as any).__PREACT_E2E_READY__ === true,
+				);
+			} catch (err) {
+				// The fixture page can briefly navigate while the query-string driven
+				// fixture/preact selectors settle. Retry until the normal ready timeout.
+				if (
+					!String((err as Error).message).includes(
+						"Execution context was destroyed",
+					)
+				) {
+					throw err;
+				}
+			}
 			if (ready) break;
 			if (Date.now() > deadline) {
 				throw new Error(
