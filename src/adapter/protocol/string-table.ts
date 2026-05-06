@@ -20,19 +20,55 @@ export function getStringId(table: StringTable, input: string): number {
 	return table.get(input)!;
 }
 
-// TODO: Use a proper LRU cache?
-const encoded = new Map<string, number[]>();
+export const ENCODE_CACHE_LIMIT = 1000;
 
-const toCodePoint = (s: string) => s.codePointAt(0) || 124; // "|"" symbol;
+class LRUCache<K, V> {
+	private cache = new Map<K, V>();
+
+	constructor(private limit: number) {}
+
+	get(key: K): V | undefined {
+		const value = this.cache.get(key);
+		if (value === undefined) return undefined;
+
+		this.cache.delete(key);
+		this.cache.set(key, value);
+		return value;
+	}
+
+	set(key: K, value: V) {
+		if (this.cache.has(key)) {
+			this.cache.delete(key);
+		}
+
+		this.cache.set(key, value);
+
+		if (this.cache.size > this.limit) {
+			const oldest = this.cache.keys().next().value;
+			if (oldest !== undefined) {
+				this.cache.delete(oldest);
+			}
+		}
+	}
+}
+
+const encoded = new LRUCache<string, number[]>(ENCODE_CACHE_LIMIT);
 
 /**
  * Convert a string to an array of codepoints
  */
 export function encode(input: string): number[] {
-	if (!encoded.has(input)) {
-		encoded.set(input, input.split("").map(toCodePoint));
+	const cached = encoded.get(input);
+	if (cached !== undefined) {
+		return cached;
 	}
-	return encoded.get(input)!;
+
+	const value = new Array<number>(input.length);
+	for (let i = 0; i < input.length; i++) {
+		value[i] = input.charCodeAt(i);
+	}
+	encoded.set(input, value);
+	return value;
 }
 
 /**
