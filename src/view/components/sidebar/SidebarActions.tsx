@@ -7,12 +7,14 @@ import { ComponentName } from "../ComponentName";
 import { DevNodeType } from "../../store/types";
 import { Icon } from "../icons";
 import { useComputed } from "@preact/signals";
+import { useTreeNodeVersion } from "../../store/tree-hooks";
 
 export function SidebarActions() {
 	const store = useStore();
 	const emit = useEmitter();
-	store.tree.version.value;
-	const node = store.tree.get(store.selection.selected.value);
+	const selected = store.selection.selected.value;
+	useTreeNodeVersion(selected);
+	const node = store.tree.get(selected);
 	const log = useCallback(() => {
 		if (node) emit("log", { id: node.id, children: node.children });
 	}, [node]);

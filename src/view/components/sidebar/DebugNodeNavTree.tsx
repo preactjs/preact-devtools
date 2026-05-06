@@ -1,11 +1,12 @@
 import { h } from "preact";
 import { useStore } from "../../store/react-bindings";
+import { useTreeStructureVersion } from "../../store/tree-hooks";
 import { SidebarPanel, Empty } from "./SidebarPanel";
 
 export function DebugNodeNavTree() {
 	const store = useStore();
 	const selected = store.selection.selected.value;
-	store.tree.version.value;
+	useTreeStructureVersion();
 	const ids = store.tree.visibleRange(0, store.tree.visibleSize());
 	const nodes = ids.map(id => store.tree.get(id)!);
 

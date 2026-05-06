@@ -42,6 +42,7 @@ describe("TreeStore", () => {
 
 		expect(store.visibleSize()).to.equal(5);
 		expect(store.visibleRange(0, 5)).to.deep.equal([1, 2, 4, 5, 3]);
+		expect(store.visibleRange(1, 4)).to.deep.equal([2, 4, 5]);
 		expectRanks(store);
 	});
 
@@ -63,5 +64,53 @@ describe("TreeStore", () => {
 		expect(store.visibleSize()).to.equal(4);
 		expect(store.visibleRange(0, 4)).to.deep.equal([2, 4, 5, 3]);
 		expectRanks(store);
+	});
+
+	it("does not invalidate visible layout for timing-only updates", () => {
+		const store = new TreeStore();
+		const tree = createTree();
+		store.sync(tree, [1], false);
+
+		const layoutVersion = store.structureVersion.value;
+		const nodeVersion = store.versionOfNode(1).value;
+		const next = new Map(tree);
+		next.set(1, { ...tree.get(1)!, startTime: 10, endTime: 20 });
+
+		store.sync(next, [1], false);
+
+		expect(store.structureVersion.value).to.equal(layoutVersion);
+		expect(store.versionOfNode(1).value).to.equal(nodeVersion);
+	});
+
+	it("invalidates only the changed node for display-only updates", () => {
+		const store = new TreeStore();
+		const tree = createTree();
+		store.sync(tree, [1], false);
+
+		const layoutVersion = store.structureVersion.value;
+		const nodeVersion = store.versionOfNode(2).value;
+		const next = new Map(tree);
+		next.set(2, { ...tree.get(2)!, name: "Renamed" });
+
+		store.sync(next, [1], false);
+
+		expect(store.structureVersion.value).to.equal(layoutVersion);
+		expect(store.versionOfNode(2).value).to.equal(nodeVersion + 1);
+	});
+
+	it("invalidates visible layout for structural updates", () => {
+		const store = new TreeStore();
+		const tree = createTree();
+		store.sync(tree, [1], false);
+
+		const layoutVersion = store.structureVersion.value;
+		const next = new Map(tree);
+		next.set(2, { ...tree.get(2)!, children: [4] });
+		next.delete(5);
+
+		store.sync(next, [1], false);
+
+		expect(store.structureVersion.value).to.equal(layoutVersion + 1);
+		expect(store.visibleRange(0, 4)).to.deep.equal([1, 2, 4, 3]);
 	});
 });

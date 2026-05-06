@@ -79,7 +79,6 @@ export interface Store {
 	tree: TreeStore;
 	operationV3: Map<number, OperationV3State>;
 	rendererByNode: Map<ID, number>;
-	nodeList: Signal<ID[]>;
 	theme: Signal<Theme>;
 	search: ReturnType<typeof createSearchStore>;
 	filter: ReturnType<typeof createFilterStore>;

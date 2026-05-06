@@ -1,4 +1,3 @@
-import { useComputed } from "@preact/signals";
 import { h } from "preact";
 import { useStore } from "../../store/react-bindings";
 import { DevNode } from "../../store/types";
@@ -8,24 +7,20 @@ export function OwnerInfo() {
 	const store = useStore();
 
 	const selectedId = store.selection.selected.value;
-	const data = useComputed(() => {
-		const owners: DevNode[] = [];
-		const selectedId = store.selection.selected.value;
-		store.tree.version.value;
 
-		let id = selectedId;
-		let current: DevNode | null;
-		while ((current = store.tree.get(id)) !== null) {
-			const owner = store.tree.get(current.owner);
-			if (!owner) {
-				break;
-			}
-			owners.push(owner);
-			id = current.owner;
+	const data: DevNode[] = [];
+	let id = selectedId;
+	let current: DevNode | null;
+	while ((current = store.tree.get(id)) !== null) {
+		store.tree.versionOfNode(current.id).value;
+		const owner = store.tree.get(current.owner);
+		if (!owner) {
+			break;
 		}
-
-		return owners;
-	}).value;
+		store.tree.versionOfNode(owner.id).value;
+		data.push(owner);
+		id = current.owner;
+	}
 
 	if (selectedId === -1) {
 		return null;

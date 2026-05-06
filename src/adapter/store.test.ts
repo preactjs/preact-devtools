@@ -2,7 +2,6 @@ import { createStore } from "../view/store";
 import { applyOperationsV2 } from "./protocol/events";
 import { expect, vi } from "vitest";
 import { fromSnapshot } from "./debug";
-import { effect } from "@preact/signals";
 
 describe("Store", () => {
 	it("should apply mounts", () => {
@@ -54,7 +53,7 @@ describe("Store", () => {
 		applyOperationsV2(store, event);
 
 		const spy = vi.fn();
-		effect(() => spy(store.nodeList.value));
+		store.tree.subscribeStructure(spy);
 		spy.mockClear();
 
 		// prettier-ignore

@@ -1,7 +1,6 @@
-import { signal, effect, computed } from "@preact/signals";
+import { signal, effect } from "@preact/signals";
 import { createSearchStore } from "./search";
 import { createFilterStore } from "./filter";
-import { flattenChildren } from "../components/tree/windowing";
 import { createSelectionStore } from "./selection";
 import { createCollapser } from "./collapser";
 import { EmitFn } from "../../adapter/hook";
@@ -34,31 +33,9 @@ export function createStore(): Store {
 		tree.setRootHidden(filterState.filterRoot.value);
 	});
 
-	// List
 	const collapsed = signal(new Set<ID>());
 	const collapser = createCollapser<ID>(collapsed, (id, shouldCollapse) => {
 		tree.setCollapsed(id, shouldCollapse);
-	});
-
-	const nodeList = computed(() => {
-		tree.version.value;
-		if (tree.visibleSize() > 0) {
-			return tree.visibleRange(0, tree.visibleSize());
-		}
-
-		return roots.value
-			.map(root => {
-				const items = flattenChildren<ID, DevNode>(nodes.value, root, id =>
-					collapser.collapsed.value.has(id),
-				);
-
-				if (filterState.filterRoot.value) {
-					return items.slice(1);
-				}
-
-				return items;
-			})
-			.reduce((acc, val) => acc.concat(val), []);
 	});
 
 	// Sidebar
@@ -127,7 +104,7 @@ export function createStore(): Store {
 		}
 	});
 
-	const selection = createSelectionStore(nodeList, tree);
+	const selection = createSelectionStore(tree);
 	const stats = signal(null);
 
 	return {
@@ -142,7 +119,6 @@ export function createStore(): Store {
 		activePanel: signal(Panel.ELEMENTS),
 		profiler: createProfiler(),
 		notify,
-		nodeList,
 		inspectData,
 		isPicking,
 		roots,
@@ -151,7 +127,7 @@ export function createStore(): Store {
 		operationV3,
 		rendererByNode,
 		collapser,
-		search: createSearchStore(nodes, nodeList, tree),
+		search: createSearchStore(tree),
 		filter: filterState,
 		selection,
 		theme: signal<Theme>("auto"),

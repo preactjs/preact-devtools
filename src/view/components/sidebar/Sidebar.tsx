@@ -7,20 +7,15 @@ import { DebugNodeNavTree } from "./DebugNodeNavTree";
 import { OwnerInfo } from "./../elements/OwnerInfo";
 import { KeyPanel } from "./KeyPanel";
 import { HocPanel } from "./HocPanel";
-import { useComputed } from "@preact/signals";
+import { useTreeNodeVersion } from "../../store/tree-hooks";
 
 export function Sidebar() {
 	const store = useStore();
 	const showDebug = store.debugMode.value;
 	const inspect = store.inspectData.value;
-	const hocs = useComputed(() => {
-		if (store.inspectData.value) {
-			store.tree.version.value;
-			const node = store.tree.get(store.inspectData.value.id);
-			return node ? node.hocs : null;
-		}
-		return null;
-	}).value;
+	useTreeNodeVersion(inspect ? inspect.id : -1);
+	const inspectedNode = inspect ? store.tree.get(inspect.id) : null;
+	const hocs = inspectedNode ? inspectedNode.hocs : null;
 	const { props: propData, state, context, hooks, signals } = store.sidebar;
 	const { emit } = store;
 

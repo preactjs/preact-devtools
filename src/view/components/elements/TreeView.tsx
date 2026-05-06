@@ -14,6 +14,10 @@ import { EmitFn } from "../../../adapter/hook";
 import { useVirtualizedList } from "./VirtualizedList";
 import { useAutoIndent } from "./useAutoIndent";
 import { Hoc } from "../sidebar/HocPanel";
+import {
+	useTreeNodeVersion,
+	useTreeStructureVersion,
+} from "../../store/tree-hooks";
 
 const ROW_HEIGHT = 18;
 
@@ -22,9 +26,15 @@ const highlightNode = debounce(
 	100,
 );
 
+function useTreeNode(id: ID) {
+	const store = useStore();
+	useTreeNodeVersion(id);
+	return store.tree.get(id) || store.nodes.value.get(id) || null;
+}
+
 export function TreeView() {
 	const store = useStore();
-	store.tree.version.value;
+	useTreeStructureVersion();
 	const visibleSize = store.tree.visibleSize();
 	const roots = store.roots.value;
 	const { collapseNode, collapsed } = useCollapser();
@@ -178,7 +188,7 @@ export function TreeItem(props: { key: any; id: ID; top: number }) {
 	const store = useStore();
 	const as = useSelection();
 	const { collapsed, toggle } = useCollapser();
-	const node = store.tree.get(id) || store.nodes.value.get(id) || null;
+	const node = useTreeNode(id);
 	const filterRoot = store.filter.filterRoot.value;
 	const filterHoc = store.filter.filterHoc.value;
 	const roots = store.roots.value;
@@ -287,7 +297,7 @@ export function HighlightPane(props: { treeDom: HTMLDivElement | null }) {
 
 	// Subscribe to tree changes so collapse and structural updates reposition
 	// the highlight.
-	const treeVersion = store.tree.version.value;
+	const treeVersion = useTreeStructureVersion();
 
 	const [pos, setPos] = useState({ top: 0, height: 0 });
 	useEffect(() => {

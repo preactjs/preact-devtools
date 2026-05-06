@@ -1,5 +1,5 @@
 import { AppCtx } from "./react-bindings";
-import { signal, Signal } from "@preact/signals";
+import { signal } from "@preact/signals";
 import { clamp } from "../components/tree/windowing";
 import { useContext } from "preact/hooks";
 import { ID } from "./types";
@@ -8,28 +8,27 @@ import { TreeStore } from "./tree";
 /**
  * Manages selection state of the TreeView.
  */
-export function createSelectionStore(list: Signal<ID[]>, tree?: TreeStore) {
-	const selected = signal<ID>(list.value.length > 0 ? list.value[0] : -1);
+export function createSelectionStore(tree: TreeStore) {
+	const selected = signal<ID>(-1);
 	const selectedIdx = signal(0);
 
 	const selectByIndex = (idx: number) => {
-		if (tree && tree.visibleSize() > 0) {
+		if (tree.visibleSize() > 0) {
 			const n = clamp(idx, tree.visibleSize() - 1);
 			selected.value = tree.visibleAt(n) ?? -1;
 			selectedIdx.value = n;
 			return;
 		}
 
-		const n = clamp(idx, list.value.length - 1);
-		selected.value = list.value[n] ?? -1;
-		selectedIdx.value = n;
+		selected.value = -1;
+		selectedIdx.value = -1;
 	};
 
 	const selectNext = () => selectByIndex(selectedIdx.value + 1);
 	const selectPrev = () => selectByIndex(selectedIdx.value - 1);
 
 	const selectById = (id: ID) => {
-		const idx = tree ? tree.rankOf(id) : list.value.findIndex(x => x === id);
+		const idx = tree.rankOf(id);
 		selectByIndex(idx);
 	};
 
