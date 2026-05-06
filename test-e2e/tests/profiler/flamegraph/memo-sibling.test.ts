@@ -21,7 +21,7 @@ test("Correctly position memoized sibling sub-trees", async ({ page }) => {
 	await devtools.locator('[data-testid="filter-update"]').click();
 	await devtools.locator('[data-testid="filter-menu-button"]').click();
 
-	await expect(devtools.locator('[data-testid="filter-popup"]')).toHaveCount(0);
+	await expect(devtools.locator('[data-testid="filter-popup"]')).toBeHidden();
 
 	await devtools.locator(locateTab("PROFILER")).click();
 

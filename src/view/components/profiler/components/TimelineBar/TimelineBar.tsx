@@ -14,7 +14,6 @@ import {
 } from "../../data/commits";
 import { Icon } from "../../../icons";
 import { useComputed } from "@preact/signals";
-import { OutsideClick } from "../../../OutsideClick";
 import { FilterNumber, FilterPopup } from "../../../FilterPopup/FilterPopup";
 import filterBarStyles from "../../../FilterPopup/FilterPopup.module.css";
 import s from "./TimelineBar.module.css";
@@ -26,8 +25,6 @@ export function TimelineBar() {
 	const isRecording = store.profiler.isRecording.value;
 	const isSupported = store.profiler.isSupported.value;
 	const selectedCommit = store.profiler.activeCommitIdx.value;
-
-	const [filterVisible, setFilterVisible] = useState(false);
 
 	const stats = useComputed(() => {
 		return {
@@ -41,12 +38,8 @@ export function TimelineBar() {
 
 	const onCommitChange = useCallback(
 		(n: number) => {
-			const {
-				activeCommitIdx,
-				selectedNodeId,
-				activeCommit,
-				flamegraphType,
-			} = store.profiler;
+			const { activeCommitIdx, selectedNodeId, activeCommit, flamegraphType } =
+				store.profiler;
 
 			activeCommitIdx.value = n;
 			const commit = activeCommit.value;
@@ -117,20 +110,16 @@ export function TimelineBar() {
 				</span>
 			)}
 			{isSupported && !isRecording && commits.length !== 0 && (
-				<OutsideClick
-					onClick={() => setFilterVisible(false)}
-					class={filterBarStyles.filterBtnWrapper}
-				>
+				<div class={filterBarStyles.filterBtnWrapper}>
 					<IconBtn
 						title="Filter Commits"
-						active={filterVisible}
 						testId="filter-menu-button"
-						onClick={() => setFilterVisible(!filterVisible)}
+						popoverTarget="timeline-filter-popup"
 					>
 						<Icon icon="filter-list" />
 					</IconBtn>
-					{filterVisible && <TimelineFilterPopup />}
-				</OutsideClick>
+					<TimelineFilterPopup />
+				</div>
 			)}
 		</Actions>
 	);
@@ -144,7 +133,11 @@ export function TimelineFilterPopup() {
 
 	return (
 		<FilterPopup
+			id="timeline-filter-popup"
 			className={s.filterPopup}
+			onOpen={() =>
+				setFilterCommitsUnder(store.profiler.filterCommitsUnder.value)
+			}
 			onFiltersSubmit={() => {
 				store.profiler.filterCommitsUnder.value = filterCommitsUnder
 					? filterCommitsUnder

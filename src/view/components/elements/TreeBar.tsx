@@ -6,7 +6,6 @@ import { Icon, Picker } from "../icons";
 import { useStore } from "../../store/react-bindings";
 import s from "./TreeBar.module.css";
 import { useSearch } from "../../store/search";
-import { OutsideClick } from "../OutsideClick";
 import { FilterCheck, FilterPopup } from "../FilterPopup/FilterPopup";
 import filterBarStyles from "../FilterPopup/FilterPopup.module.css";
 
@@ -14,8 +13,6 @@ export function TreeBar() {
 	const store = useStore();
 	const isPicking = store.isPicking.value;
 	const { value, count, selected, goPrev, goNext } = useSearch();
-
-	const [filterVisible, setFilterVisible] = useState(false);
 
 	const onKeyDown = (e: KeyboardEvent) => {
 		if (e.key === "Enter") {
@@ -92,20 +89,16 @@ export function TreeBar() {
 			</div>
 			<ActionSeparator />
 			<div class={s.btnWrapper}>
-				<OutsideClick
-					onClick={() => setFilterVisible(false)}
-					class={filterBarStyles.filterBtnWrapper}
-				>
+				<div class={filterBarStyles.filterBtnWrapper}>
 					<IconBtn
 						title="Filter Components"
-						active={filterVisible}
 						testId="filter-menu-button"
-						onClick={() => setFilterVisible(!filterVisible)}
+						popoverTarget="tree-filter-popup"
 					>
 						<Icon icon="filter-list" />
 					</IconBtn>
-					{filterVisible && <TreeFilterPopup />}
-				</OutsideClick>
+					<TreeFilterPopup />
+				</div>
 			</div>
 		</Actions>
 	);
@@ -123,9 +116,24 @@ export function TreeFilterPopup() {
 		store.filter.filterTextSignal.value,
 	);
 	const [filters, setFilters] = useState(store.filter.filters.value);
+	const resetFilters = () => {
+		setFilterDom(store.filter.filterDom.value);
+		setFilterFragment(store.filter.filterFragment.value);
+		setFilterHoc(store.filter.filterHoc.value);
+		setFilterRoot(store.filter.filterRoot.value);
+		setFilterTextSignal(store.filter.filterTextSignal.value);
+		setFilters(store.filter.filters.value);
+	};
+	const removeFilter = (id: number) => {
+		const nextFilters = filters.filter(filter => filter.id !== id);
+		setFilters(nextFilters);
+		store.filter.filters.value = nextFilters;
+	};
 
 	return (
 		<FilterPopup
+			id="tree-filter-popup"
+			onOpen={resetFilters}
 			onFiltersSubmit={() => {
 				store.filter.filterDom.value = filterDom;
 				store.filter.filterFragment.value = filterFragment;
@@ -143,7 +151,10 @@ export function TreeFilterPopup() {
 					title="Add new filter"
 					testId="add-filter"
 					onClick={() =>
-						setFilters([...filters, { enabled: false, value: "" }])
+						setFilters([
+							...filters,
+							store.filter.createFilter({ enabled: false, value: "" }),
+						])
 					}
 				>
 					<span class={filterBarStyles.filterAdd}>
@@ -182,17 +193,20 @@ export function TreeFilterPopup() {
 				checked={filterTextSignal}
 			/>
 			{/* Custom user filters */}
-			{filters.map((x, i) => {
+			{filters.map(x => {
 				return (
-					<div key={i} class={filterBarStyles.filterRow}>
+					<div key={x.id} class={filterBarStyles.filterRow}>
 						<label class={filterBarStyles.filterCheck}>
 							<input
 								type="checkbox"
 								checked={x.enabled}
 								onInput={e => {
-									const copy = [...filters];
-									copy[i].enabled = (e.target as any).checked;
-									setFilters(copy);
+									const enabled = (e.target as any).checked;
+									setFilters(
+										filters.map(filter =>
+											filter.id === x.id ? { ...filter, enabled } : filter,
+										),
+									);
 								}}
 							/>
 							<Icon
@@ -206,9 +220,12 @@ export function TreeFilterPopup() {
 								placeholder="MyComponent"
 								value={x.value}
 								onInput={e => {
-									const copy = [...filters];
-									copy[i].value = (e.target as any).value;
-									setFilters(copy);
+									const value = (e.target as any).value;
+									setFilters(
+										filters.map(filter =>
+											filter.id === x.id ? { ...filter, value } : filter,
+										),
+									);
 								}}
 							/>
 						</span>
@@ -216,13 +233,9 @@ export function TreeFilterPopup() {
 							<IconBtn
 								title="Remove filter"
 								styling="secondary"
+								testId="remove-filter"
 								onClick={() => {
-									const idx = filters.indexOf(x);
-									if (idx > -1) {
-										const copy = [...filters];
-										copy.splice(idx, 1);
-										setFilters(copy);
-									}
+									removeFilter(x.id);
 								}}
 							>
 								<Icon icon="remove" />

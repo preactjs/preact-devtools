@@ -3,18 +3,58 @@
 	display: flex;
 	height: 100%;
 	align-items: center;
+	anchor-name: --filter-popover-anchor;
 }
 
 .filter {
-	position: absolute;
-	top: 90%;
-	right: -0.5rem;
+	position: fixed;
+	inset: 2rem 0.75rem auto auto;
+	margin: 0;
 	border-top: none;
 	border: 0.0625rem solid var(--color-border);
 	background: var(--color-bg);
+	color: var(--color-text);
+	font-family: sans-serif;
+	font-size: 0.875rem;
 	width: 12rem;
 	z-index: 10;
 	padding: 0.5rem 0.5rem 0.5rem 0.75rem;
+}
+
+.filter:popover-open {
+	display: block;
+}
+
+.filterBtnWrapper:has(.filter:popover-open)
+	> :global(.icon-btn)
+	:global(.icon-btn-inner) {
+	position: relative;
+	z-index: 2;
+	color: var(--color-selected-text);
+}
+
+.filterBtnWrapper:has(.filter:popover-open)
+	> :global(.icon-btn)
+	:global(.icon-btn-bg) {
+	display: block;
+	content: "";
+	position: absolute;
+	left: -0.25rem;
+	top: -0.25rem;
+	right: -0.25rem;
+	bottom: -0.25rem;
+	background: var(--color-selected-bg);
+	border-radius: 0.2rem;
+}
+
+@supports (position-area: bottom) {
+	.filter {
+		position: fixed;
+		position-area: bottom span-left;
+		position-anchor: --filter-popover-anchor;
+		inset: auto;
+		margin-top: 0.25rem;
+	}
 }
 
 .filter form {

@@ -1,4 +1,8 @@
-import { RawFilter } from "../../view/store/filter";
+export interface RawFilter {
+	id?: number;
+	value: string;
+	enabled: boolean;
+}
 
 export interface RawFilterState {
 	regex: RawFilter[];

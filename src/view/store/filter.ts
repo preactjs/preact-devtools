@@ -1,10 +1,25 @@
 import { signal } from "@preact/signals";
 import { escapeStringRegexp } from "./utils";
-import { RawFilterState } from "../../adapter/adapter/filter";
+import {
+	type RawFilter as StoredRawFilter,
+	RawFilterState,
+} from "../../adapter/adapter/filter";
 
-export interface RawFilter {
-	value: string;
-	enabled: boolean;
+export interface RawFilter extends StoredRawFilter {
+	id: number;
+}
+
+let nextFilterId = 0;
+
+function createFilter(filter: StoredRawFilter): RawFilter {
+	const id = filter.id ?? nextFilterId++;
+	nextFilterId = Math.max(nextFilterId, id + 1);
+
+	return {
+		id,
+		enabled: filter.enabled,
+		value: filter.value,
+	};
 }
 
 export function createFilterStore(
@@ -39,7 +54,11 @@ export function createFilterStore(
 		};
 
 		filters.value.forEach(x => {
-			s.regex.push({ value: escapeStringRegexp(x.value), enabled: x.enabled });
+			s.regex.push({
+				id: x.id,
+				value: escapeStringRegexp(x.value),
+				enabled: x.enabled,
+			});
 		});
 		onSubmit("update-filter", s);
 	};
@@ -52,7 +71,7 @@ export function createFilterStore(
 			filterRoot.value = !!state.type.root;
 			filterTextSignal.value =
 				"textSignal" in state.type ? !!state.type.textSignal : true;
-			filters.value = state.regex;
+			filters.value = state.regex.map(createFilter);
 
 			// Refetch component tree if filters are not the default ones
 			if (
@@ -78,6 +97,7 @@ export function createFilterStore(
 		filterHoc,
 		filterRoot,
 		filterTextSignal,
+		createFilter,
 		submit,
 		restore,
 	};
