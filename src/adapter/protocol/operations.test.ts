@@ -38,8 +38,11 @@ describe("ops2Tree", () => {
 				reasons: new Map(),
 				stats: null,
 				changes: {
+					addedSubtreeRoots: [],
 					dirty: [],
+					incremental: true,
 					removed: [],
+					removedSubtreeRoots: [],
 					structural: true,
 				},
 			});
@@ -134,8 +137,11 @@ describe("ops2Tree", () => {
 			const next = ops2Tree(state.idMap, [1], ops);
 
 			expect(next.changes).to.deep.equal({
+				addedSubtreeRoots: [],
 				dirty: [],
+				incremental: true,
 				removed: [],
+				removedSubtreeRoots: [],
 				structural: false,
 			});
 		});

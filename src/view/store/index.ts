@@ -4,7 +4,7 @@ import { createFilterStore } from "./filter";
 import { createSelectionStore } from "./selection";
 import { createCollapser } from "./collapser";
 import { EmitFn } from "../../adapter/hook";
-import { ID, DevNode, Store, Listener, Theme, Panel } from "./types";
+import { ID, Store, Listener, Theme, Panel } from "./types";
 import { InspectData } from "../../adapter/adapter/adapter";
 import { createProfiler } from "../components/profiler/data/commits";
 import { PropData } from "../components/sidebar/inspect/parseProps";
@@ -20,8 +20,6 @@ export function createStore(): Store {
 
 	const debugMode = signal(!!__DEBUG__);
 
-	const nodes = signal<Map<ID, DevNode>>(new Map());
-	const roots = signal<ID[]>([]);
 	const tree = new TreeStore();
 	const operationV3 = new Map<number, OperationV3State>();
 	const rendererByNode = new Map<ID, number>();
@@ -123,8 +121,6 @@ export function createStore(): Store {
 		notify,
 		inspectData,
 		isPicking,
-		roots,
-		nodes,
 		tree,
 		operationV3,
 		rendererByNode,
@@ -135,8 +131,6 @@ export function createStore(): Store {
 		theme: signal<Theme>("auto"),
 		sidebar,
 		clear() {
-			roots.value = [];
-			nodes.value = new Map();
 			tree.clear();
 			operationV3.clear();
 			rendererByNode.clear();

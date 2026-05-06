@@ -32,7 +32,7 @@ describe("applyEvent", () => {
 		const store = createStore();
 		const data = fromSnapshot(["rootId: 1"]);
 		applyEvent(store, "operation_v2", data);
-		expect(store.roots.value.length).to.equal(1);
+		expect(store.tree.getRoots().length).to.equal(1);
 	});
 
 	it("should update roots correctly", () => {
@@ -43,7 +43,7 @@ describe("applyEvent", () => {
 			"Add 2 <div> to parent 1",
 		]);
 		applyEvent(store, "operation_v2", data);
-		expect(store.roots.value.length).to.equal(1);
+		expect(store.tree.getRoots().length).to.equal(1);
 	});
 
 	it("should mount nodes", () => {
@@ -54,10 +54,10 @@ describe("applyEvent", () => {
 			"Add 2 <Parent> to parent 1",
 		]);
 		applyEvent(store, "operation_v2", data);
-		expect(store.nodes.value.size).to.equal(2);
-		expect(store.nodes.value.get(1)!.name).to.equal("Fragment");
-		expect(store.nodes.value.get(1)!.children).to.deep.equal([2]);
-		expect(store.nodes.value.get(2)!.name).to.equal("Parent");
+		expect(store.tree.toMap().size).to.equal(2);
+		expect(store.tree.toMap().get(1)!.name).to.equal("Fragment");
+		expect(store.tree.toMap().get(1)!.children).to.deep.equal([2]);
+		expect(store.tree.toMap().get(2)!.name).to.equal("Parent");
 	});
 
 	it("should do nothing on legacy update timings", () => {
@@ -68,7 +68,7 @@ describe("applyEvent", () => {
 			"Add 2 <Parent> to parent 1",
 		]);
 		applyEvent(store, "operation_v2", data);
-		expect(store.nodes.value.size).to.equal(2);
+		expect(store.tree.toMap().size).to.equal(2);
 
 		const data2 = fromSnapshot([
 			"rootId: 1",
@@ -87,7 +87,7 @@ describe("applyEvent", () => {
 			"Add 2 <Parent> to parent 1",
 		]);
 		applyEvent(store, "operation_v2", data);
-		expect(store.nodes.value.size).to.equal(2);
+		expect(store.tree.toMap().size).to.equal(2);
 
 		const data2 = fromSnapshot([
 			"rootId: 1",
@@ -97,10 +97,10 @@ describe("applyEvent", () => {
 
 		applyEvent(store, "operation_v2", data2);
 
-		expect(store.nodes.value.get(1)!.startTime).to.equal(2);
-		expect(store.nodes.value.get(1)!.endTime).to.equal(5);
-		expect(store.nodes.value.get(2)!.startTime).to.equal(3);
-		expect(store.nodes.value.get(2)!.endTime).to.equal(4);
+		expect(store.tree.toMap().get(1)!.startTime).to.equal(2);
+		expect(store.tree.toMap().get(1)!.endTime).to.equal(5);
+		expect(store.tree.toMap().get(2)!.startTime).to.equal(3);
+		expect(store.tree.toMap().get(2)!.endTime).to.equal(4);
 	});
 
 	it("should remove nodes", () => {
@@ -112,7 +112,7 @@ describe("applyEvent", () => {
 			"Add 3 <Foo> to parent 2",
 		]);
 		applyEvent(store, "operation_v2", data);
-		expect(store.nodes.value.size).to.equal(3);
+		expect(store.tree.toMap().size).to.equal(3);
 
 		const data2 = fromSnapshot([
 			"rootId: 2",
@@ -120,8 +120,8 @@ describe("applyEvent", () => {
 			"Remove 3",
 		]);
 		applyEvent(store, "operation_v2", data2);
-		expect(store.nodes.value.size).to.equal(2);
-		expect(store.nodes.value.get(2)!.children).to.deep.equal([]);
+		expect(store.tree.toMap().size).to.equal(2);
+		expect(store.tree.toMap().get(2)!.children).to.deep.equal([]);
 	});
 
 	it("should remove nodes in any order", () => {
@@ -133,12 +133,12 @@ describe("applyEvent", () => {
 			"Add 3 <Foo> to parent 2",
 		]);
 		applyEvent(store, "operation_v2", data);
-		expect(store.nodes.value.size).to.equal(3);
+		expect(store.tree.toMap().size).to.equal(3);
 
 		const data2 = fromSnapshot(["rootId: 1", "Remove 2", "Remove 3"]);
 		applyEvent(store, "operation_v2", data2);
-		expect(store.nodes.value.size).to.equal(1);
-		expect(store.nodes.value.get(1)!.children).to.deep.equal([]);
+		expect(store.tree.toMap().size).to.equal(1);
+		expect(store.tree.toMap().get(1)!.children).to.deep.equal([]);
 	});
 
 	it("should not throw on removing non-existing node", () => {
@@ -162,7 +162,7 @@ describe("applyEvent", () => {
 
 		const data2 = fromSnapshot(["rootId: 1", "Reorder 1 [3, 2]"]);
 		applyEvent(store, "operation_v2", data2);
-		expect(store.nodes.value.get(1)!.children).to.deep.equal([3, 2]);
+		expect(store.tree.toMap().get(1)!.children).to.deep.equal([3, 2]);
 	});
 
 	it("should reorder children #2", () => {
@@ -179,7 +179,7 @@ describe("applyEvent", () => {
 
 		const data2 = fromSnapshot(["rootId: 1", "Reorder 1 [4, 3, 2, 5]"]);
 		applyEvent(store, "operation_v2", data2);
-		expect(store.nodes.value.get(1)!.children).to.deep.equal([4, 3, 2, 5]);
+		expect(store.tree.toMap().get(1)!.children).to.deep.equal([4, 3, 2, 5]);
 	});
 
 	it("should apply after filter", () => {
@@ -235,8 +235,8 @@ describe("applyEvent", () => {
 		]);
 		applyEvent(store, "operation_v2", data3);
 
-		expect(store.nodes.value.has(1)).to.be.true;
-		expect(store.nodes.value.get(1)!.children).to.deep.equal([17]);
+		expect(store.tree.toMap().has(1)).to.be.true;
+		expect(store.tree.toMap().get(1)!.children).to.deep.equal([17]);
 	});
 
 	it("should update inspect data when inspected node is updated", () => {
@@ -318,8 +318,8 @@ describe("applyEvent", () => {
 
 		applyEvent(store, "operation_v3", toV3(data));
 
-		expect(store.nodes.value.size).to.equal(2);
-		expect(store.nodes.value.get(1)!.children).to.deep.equal([2]);
+		expect(store.tree.toMap().size).to.equal(2);
+		expect(store.tree.toMap().get(1)!.children).to.deep.equal([2]);
 		expect(store.operationV3.get(1)).to.deep.equal({
 			epoch: 1,
 			commitSeq: 0,
@@ -346,7 +346,7 @@ describe("applyEvent", () => {
 			rendererId: 1,
 			reason: "sequence",
 		});
-		expect(store.nodes.value.has(2)).to.equal(false);
+		expect(store.tree.toMap().has(2)).to.equal(false);
 	});
 
 	it("should replace state on snapshot_v3", () => {
@@ -369,8 +369,8 @@ describe("applyEvent", () => {
 			}),
 		);
 
-		expect(store.nodes.value.has(1)).to.equal(false);
-		expect(store.nodes.value.get(10)!.children).to.deep.equal([11]);
+		expect(store.tree.toMap().has(1)).to.equal(false);
+		expect(store.tree.toMap().get(10)!.children).to.deep.equal([11]);
 	});
 
 	it("should only replace the matching renderer on snapshot_v3", () => {
@@ -418,11 +418,11 @@ describe("applyEvent", () => {
 			),
 		);
 
-		expect(store.nodes.value.has(1)).to.equal(false);
-		expect(store.nodes.value.has(2)).to.equal(false);
-		expect(store.nodes.value.get(10)!.children).to.deep.equal([11]);
-		expect(store.nodes.value.get(20)!.children).to.deep.equal([21]);
-		expect(store.roots.value).to.deep.equal([20, 10]);
+		expect(store.tree.toMap().has(1)).to.equal(false);
+		expect(store.tree.toMap().has(2)).to.equal(false);
+		expect(store.tree.toMap().get(10)!.children).to.deep.equal([11]);
+		expect(store.tree.toMap().get(20)!.children).to.deep.equal([21]);
+		expect(store.tree.getRoots()).to.deep.equal([20, 10]);
 	});
 
 	it("should clear a renderer on empty snapshot_v3", () => {
@@ -451,8 +451,8 @@ describe("applyEvent", () => {
 			0,
 		]);
 
-		expect(store.nodes.value.size).to.equal(0);
-		expect(store.roots.value).to.deep.equal([]);
+		expect(store.tree.toMap().size).to.equal(0);
+		expect(store.tree.getRoots()).to.deep.equal([]);
 		expect(store.selection.selected.value).to.equal(-1);
 		expect(store.operationV3.get(1)).to.deep.equal({
 			epoch: 2,

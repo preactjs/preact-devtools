@@ -40,6 +40,8 @@ export function ops2Tree(
 	const removals: ID[] = [];
 	const dirty = new Set<ID>();
 	const removed = new Set<ID>();
+	const added = new Set<ID>();
+	const removedParents = new Map<ID, ID>();
 	const rendered = new Set<ID>();
 	const reasons: RenderReasonMap = new Map();
 	let stats: ParsedStats | null = null;
@@ -84,6 +86,7 @@ export function ops2Tree(
 
 				rendered.add(id);
 				dirty.add(id);
+				added.add(id);
 				structural = true;
 
 				i += 8;
@@ -137,6 +140,7 @@ export function ops2Tree(
 							const child = pending.get(item);
 							if (!child) continue;
 
+							removedParents.set(child.id, child.parent);
 							pending.delete(child.id);
 							dirty.add(child.id);
 							removed.add(child.id);
@@ -208,10 +212,29 @@ export function ops2Tree(
 		}
 	}
 
+	const addedSubtreeRoots: ID[] = [];
+	added.forEach(id => {
+		const node = pending.get(id);
+		if (node && !added.has(node.parent)) {
+			addedSubtreeRoots.push(id);
+		}
+	});
+
+	const removedSubtreeRoots: Array<{ id: ID; parent: ID }> = [];
+	removed.forEach(id => {
+		const parent = removedParents.get(id);
+		if (parent !== undefined && !removed.has(parent)) {
+			removedSubtreeRoots.push({ id, parent });
+		}
+	});
+
 	const changes: TreeSyncChanges = {
 		dirty: Array.from(dirty),
+		addedSubtreeRoots,
 		removed: Array.from(removed),
+		removedSubtreeRoots,
 		structural,
+		incremental: true,
 	};
 
 	return {

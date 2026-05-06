@@ -17,9 +17,9 @@ describe("Store", () => {
 		]);
 		applyOperationsV2(store, event);
 
-		expect(store.nodes.value.get(1)!.children).to.deep.equal([2]);
-		expect(store.nodes.value.get(2)!.children).to.deep.equal([3, 5]);
-		expect(store.nodes.value.get(3)!.children).to.deep.equal([4]);
+		expect(store.tree.toMap().get(1)!.children).to.deep.equal([2]);
+		expect(store.tree.toMap().get(2)!.children).to.deep.equal([3, 5]);
+		expect(store.tree.toMap().get(3)!.children).to.deep.equal([4]);
 	});
 
 	it("should update durations", () => {
@@ -38,8 +38,76 @@ describe("Store", () => {
     ]);
 		applyOperationsV2(store, event2);
 
-		expect(store.nodes.value.get(1)!.startTime).to.equal(12);
-		expect(store.nodes.value.get(1)!.endTime).to.equal(15);
+		expect(store.tree.toMap().get(1)!.startTime).to.equal(12);
+		expect(store.tree.toMap().get(1)!.endTime).to.equal(15);
+	});
+
+	it("should use TreeStore as the source for v2 operations", () => {
+		const store = createStore();
+		const event = fromSnapshot([
+			"rootId: 1",
+			"Add 1 <Fragment> to parent -1",
+			"Add 2 <div> to parent 1",
+		]);
+		applyOperationsV2(store, event);
+
+		const event2 = fromSnapshot(["rootId: 1", "Add 3 <span> to parent 1"]);
+		applyOperationsV2(store, event2);
+
+		expect(store.tree.get(1)!.children).to.deep.equal([2, 3]);
+		expect(store.tree.toMap().get(1)!.children).to.deep.equal([2, 3]);
+		expect(store.tree.getRoots()).to.deep.equal([1]);
+	});
+
+	it("should keep visible counts correct for incremental adds under collapsed parents", () => {
+		const store = createStore();
+		const event = fromSnapshot([
+			"rootId: 1",
+			"Add 1 <Fragment> to parent -1",
+			"Add 2 <Parent> to parent 1",
+		]);
+		applyOperationsV2(store, event);
+
+		store.tree.setCollapsed(2, true);
+		expect(store.tree.visibleRange(0, store.tree.visibleSize())).to.deep.equal([
+			2,
+		]);
+
+		const event2 = fromSnapshot(["rootId: 1", "Add 3 <Child> to parent 2"]);
+		applyOperationsV2(store, event2);
+
+		expect(store.tree.visibleRange(0, store.tree.visibleSize())).to.deep.equal([
+			2,
+		]);
+
+		store.tree.setCollapsed(2, false);
+		expect(store.tree.visibleRange(0, store.tree.visibleSize())).to.deep.equal([
+			2, 3,
+		]);
+	});
+
+	it("should keep visible counts correct for incremental removals under collapsed parents", () => {
+		const store = createStore();
+		const event = fromSnapshot([
+			"rootId: 1",
+			"Add 1 <Fragment> to parent -1",
+			"Add 2 <Parent> to parent 1",
+			"Add 3 <Child> to parent 2",
+		]);
+		applyOperationsV2(store, event);
+
+		store.tree.setCollapsed(2, true);
+		const event2 = fromSnapshot(["rootId: 1", "Remove 3"]);
+		applyOperationsV2(store, event2);
+
+		expect(store.tree.visibleRange(0, store.tree.visibleSize())).to.deep.equal([
+			2,
+		]);
+
+		store.tree.setCollapsed(2, false);
+		expect(store.tree.visibleRange(0, store.tree.visibleSize())).to.deep.equal([
+			2,
+		]);
 	});
 
 	it("should unmount vnodes", () => {
@@ -65,9 +133,9 @@ describe("Store", () => {
 		applyOperationsV2(store, event2);
 
 		expect(spy).toHaveBeenCalledTimes(1);
-		expect(store.nodes.value.get(1)!.children).to.deep.equal([]);
-		expect(store.nodes.value.get(2)).to.equal(undefined);
-		expect(store.nodes.value.get(3)).to.equal(undefined);
+		expect(store.tree.toMap().get(1)!.children).to.deep.equal([]);
+		expect(store.tree.toMap().get(2)).to.equal(undefined);
+		expect(store.tree.toMap().get(3)).to.equal(undefined);
 	});
 
 	it("should reset inspectData on clear()", () => {

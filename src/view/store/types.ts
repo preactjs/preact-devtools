@@ -74,8 +74,6 @@ export interface Store {
 	profiler: ProfilerState;
 	isPicking: Signal<boolean>;
 	inspectData: Signal<InspectData | null>;
-	roots: Signal<ID[]>;
-	nodes: Signal<Tree>;
 	tree: TreeStore;
 	operationV3: Map<number, OperationV3State>;
 	rendererByNode: Map<ID, number>;

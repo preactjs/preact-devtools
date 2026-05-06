@@ -4,7 +4,10 @@ import { ID, DevNode, Tree } from "./types";
 export interface TreeSyncChanges {
 	dirty: ID[];
 	removed?: ID[];
+	addedSubtreeRoots?: ID[];
+	removedSubtreeRoots?: Array<{ id: ID; parent: ID }>;
 	structural: boolean;
+	incremental?: boolean;
 }
 
 export class TreeStore {
@@ -31,7 +34,8 @@ export class TreeStore {
 		const prevNodes = this.nodes;
 		const prevRoots = this.roots;
 		const rootsChanged = !sameIds(prevRoots, roots);
-		const structural = rootHidden !== this.rootHidden || rootsChanged;
+		const rootHiddenChanged = rootHidden !== this.rootHidden;
+		const structural = rootHiddenChanged || rootsChanged;
 		const nextChanges: TreeSyncChanges =
 			changes || this.getChanges(prevNodes, tree, structural);
 		const isStructural = nextChanges.structural || structural;
@@ -42,7 +46,11 @@ export class TreeStore {
 			if (!this.nodes.has(id)) this.collapsed.delete(id);
 		});
 		if (isStructural) {
-			this.recomputeVisibleCounts();
+			if (nextChanges.incremental === true && rootHiddenChanged === false) {
+				this.applyIncrementalVisibleChanges(nextChanges);
+			} else {
+				this.recomputeVisibleCounts();
+			}
 		}
 		this.bump(nextChanges.dirty, isStructural);
 		if (nextChanges.removed) {
@@ -125,6 +133,50 @@ export class TreeStore {
 			this.updateAncestorVisibleCounts(node.parent, delta);
 		}
 		this.bump([id], affectsVisibleLayout && delta !== 0);
+	}
+
+	removeIds(removeIds: Set<ID>, dirty: ID[] = Array.from(removeIds)) {
+		if (removeIds.size === 0) return;
+
+		const previous = this.nodes;
+		const next = new Map(previous);
+		removeIds.forEach(id => next.delete(id));
+
+		next.forEach(node => {
+			let changed = false;
+			const children: ID[] = [];
+			for (let i = 0; i < node.children.length; i++) {
+				const child = node.children[i];
+				if (removeIds.has(child)) {
+					changed = true;
+				} else {
+					children.push(child);
+				}
+			}
+			if (changed) {
+				dirty.push(node.id);
+				next.set(node.id, { ...node, children });
+			}
+		});
+
+		const roots: ID[] = [];
+		for (let i = 0; i < this.roots.length; i++) {
+			const root = this.roots[i];
+			if (!removeIds.has(root)) roots.push(root);
+		}
+
+		this.sync(next, roots, this.rootHidden, {
+			dirty,
+			removed: Array.from(removeIds),
+			structural: true,
+		});
+	}
+
+	setRootOrder(roots: ID[]) {
+		this.sync(this.nodes, roots, this.rootHidden, {
+			dirty: [],
+			structural: true,
+		});
 	}
 
 	subscribeNode(id: ID, fn: () => void) {
@@ -329,6 +381,39 @@ export class TreeStore {
 		this.visibleRanks = ranks;
 	}
 
+	private applyIncrementalVisibleChanges(changes: TreeSyncChanges) {
+		if (changes.removedSubtreeRoots) {
+			for (let i = 0; i < changes.removedSubtreeRoots.length; i++) {
+				const item = changes.removedSubtreeRoots[i];
+				const count = this.visibleCounts.get(item.id) || 0;
+				if (count > 0 && this.isChildPathVisible(item.parent)) {
+					this.visibleTotal -= count;
+					this.updateAncestorVisibleCounts(item.parent, -count);
+				}
+			}
+		}
+
+		if (changes.removed) {
+			for (let i = 0; i < changes.removed.length; i++) {
+				this.visibleCounts.delete(changes.removed[i]);
+			}
+		}
+
+		if (changes.addedSubtreeRoots) {
+			for (let i = 0; i < changes.addedSubtreeRoots.length; i++) {
+				const id = changes.addedSubtreeRoots[i];
+				const node = this.nodes.get(id);
+				if (!node) continue;
+
+				const count = this.computeVisibleCount(id);
+				if (count > 0 && this.isChildPathVisible(node.parent)) {
+					this.visibleTotal += count;
+					this.updateAncestorVisibleCounts(node.parent, count);
+				}
+			}
+		}
+	}
+
 	private computeVisibleCount(id: ID): number {
 		let total = 0;
 		const stack: Array<{ id: ID; visited: boolean }> = [{ id, visited: false }];
@@ -384,6 +469,20 @@ export class TreeStore {
 			const parent = this.nodes.get(id);
 			if (!parent) return false;
 			id = parent.parent;
+		}
+		return true;
+	}
+
+	private isChildPathVisible(parent: ID) {
+		if (parent === -1) return true;
+		if (this.collapsed.has(parent)) return false;
+
+		let id = parent;
+		while (id !== -1) {
+			if (this.collapsed.has(id)) return false;
+			const node = this.nodes.get(id);
+			if (!node) return false;
+			id = node.parent;
 		}
 		return true;
 	}

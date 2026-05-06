@@ -130,7 +130,12 @@ function sumOps(a: OperationInfo, b: OperationInfo) {
  * We currently expect all operations to be in order.
  */
 export function applyOperationsV2(store: Store, data: number[]) {
-	const result = ops2Tree(store.nodes.value, store.roots.value, data, true);
+	const result = ops2Tree(
+		store.tree.toMap(),
+		store.tree.getRoots(),
+		data,
+		true,
+	);
 	const {
 		rootId: commitRootId,
 		rendered,
@@ -141,9 +146,6 @@ export function applyOperationsV2(store: Store, data: number[]) {
 		changes,
 	} = result;
 
-	// Update store data
-	store.roots.value = roots;
-	store.nodes.value = tree;
 	store.tree.sync(tree, roots, store.filter.filterRoot.value, changes);
 
 	if (store.inspectData.value) {
@@ -156,12 +158,7 @@ export function applyOperationsV2(store: Store, data: number[]) {
 	// If we are profiling, we'll make a frozen copy of the mutable
 	// elements tree because the profiler can step through time
 	if (store.profiler.isRecording.value) {
-		recordProfilerCommit(
-			store.nodes.value,
-			store.profiler,
-			rendered,
-			commitRootId,
-		);
+		recordProfilerCommit(tree, store.profiler, rendered, commitRootId);
 		const commitIdx = store.profiler.commits.peek().length - 1;
 		const map = store.profiler.renderReasons.value.set(commitIdx, reasons);
 		store.profiler.renderReasons.value = new Map(map);
@@ -216,56 +213,11 @@ function removeRendererNodes(store: Store, rendererId: number) {
 
 	if (removeIds.size === 0) return;
 
-	const nextTree = new Map(store.nodes.value);
-	const dirty: ID[] = [];
 	removeIds.forEach(id => {
-		nextTree.delete(id);
 		store.rendererByNode.delete(id);
-		dirty.push(id);
 	});
 
-	nextTree.forEach(node => {
-		let changed = false;
-		const children = [];
-		for (let i = 0; i < node.children.length; i++) {
-			const child = node.children[i];
-			if (removeIds.has(child)) {
-				changed = true;
-			} else {
-				children.push(child);
-			}
-		}
-		if (changed) {
-			dirty.push(node.id);
-			nextTree.set(node.id, {
-				children,
-				depth: node.depth,
-				endTime: node.endTime,
-				hocs: node.hocs,
-				id: node.id,
-				key: node.key,
-				name: node.name,
-				owner: node.owner,
-				parent: node.parent,
-				startTime: node.startTime,
-				type: node.type,
-			});
-		}
-	});
-
-	const roots = [];
-	for (let i = 0; i < store.roots.value.length; i++) {
-		const root = store.roots.value[i];
-		if (!removeIds.has(root)) roots.push(root);
-	}
-
-	store.roots.value = roots;
-	store.nodes.value = nextTree;
-	store.tree.sync(nextTree, roots, store.filter.filterRoot.value, {
-		dirty,
-		removed: Array.from(removeIds),
-		structural: true,
-	});
+	store.tree.removeIds(removeIds);
 	if (store.inspectData.value && removeIds.has(store.inspectData.value.id)) {
 		store.inspectData.value = null;
 	}
@@ -371,7 +323,7 @@ export function applyEvent(store: Store, type: keyof DevtoolEvents, data: any) {
 			store.isPicking.value = false;
 			break;
 		case "root-order": {
-			const oldRoots = store.roots.value;
+			const oldRoots = store.tree.getRoots();
 			const newOrder = new Set(data);
 
 			for (let i = 0; i < oldRoots.length; i++) {
@@ -380,12 +332,7 @@ export function applyEvent(store: Store, type: keyof DevtoolEvents, data: any) {
 					data.push(id);
 				}
 			}
-
-			store.roots.value = data;
-			store.tree.sync(store.nodes.value, data, store.filter.filterRoot.value, {
-				dirty: [],
-				structural: true,
-			});
+			store.tree.setRootOrder(data);
 			break;
 		}
 	}

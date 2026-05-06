@@ -4,7 +4,8 @@ import { Store } from "../../../view/store/types";
 import { deepClone } from "../../shared/utils";
 
 export function applyOperationsV1(store: Store, data: number[]) {
-	const nodes = new Map(store.nodes.value);
+	const nodes = new Map(store.tree.toMap());
+	const roots = store.tree.getRoots();
 
 	let i = data[1] + 1;
 	const strings = parseTable(data.slice(1, i + 1));
@@ -16,7 +17,7 @@ export function applyOperationsV1(store: Store, data: number[]) {
 		switch (data[i]) {
 			case MsgTypes.ADD_ROOT: {
 				const id = data[i + 1];
-				store.roots.value.push(id);
+				if (roots.indexOf(id) === -1) roots.push(id);
 				i += 1;
 				break;
 			}
@@ -130,7 +131,5 @@ export function applyOperationsV1(store: Store, data: number[]) {
 		}
 	}
 
-	store.roots.value = [...store.roots.value];
-	store.nodes.value = nodes;
-	store.tree.sync(nodes, store.roots.value, store.filter.filterRoot.value);
+	store.tree.sync(nodes, roots, store.filter.filterRoot.value);
 }
