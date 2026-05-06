@@ -5,8 +5,9 @@
 		"esModuleInterop": true,
 		"target": "ES2020",
 		"strict": true,
-		"jsx": "preserve",
-		"jsxFactory": "h",
+		"jsx": "react-jsx",
+		"jsxImportSource": "preact",
+		"types": ["node", "chrome", "vitest/globals"],
 		"skipLibCheck": true
 	},
 	"include": ["./src/global.d.ts", "./src"]

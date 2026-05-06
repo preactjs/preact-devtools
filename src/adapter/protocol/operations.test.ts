@@ -1,4 +1,4 @@
-import { expect } from "chai";
+import { expect } from "vitest";
 import { ops2Tree } from "./operations";
 import { fromSnapshot } from "../debug";
 import { flames } from "../../view/components/profiler/flamegraph/testHelpers";

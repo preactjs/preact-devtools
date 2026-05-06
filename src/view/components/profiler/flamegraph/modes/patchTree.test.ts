@@ -1,4 +1,4 @@
-import { expect } from "chai";
+import { expect } from "vitest";
 import { patchTree } from "./patchTree";
 import { flames } from "../testHelpers";
 import { Tree, DevNode, ID } from "../../../../store/types";

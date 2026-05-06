@@ -2,7 +2,7 @@ import { h, render, Options, options, Fragment, Component } from "preact";
 import * as sinon from "sinon";
 import { createRenderer } from "./renderer";
 import { setupOptionsV10 } from "../10/options";
-import { expect } from "chai";
+import { expect } from "vitest";
 import { toSnapshot } from "../debug";
 import { useState } from "preact/hooks";
 import { act } from "preact/test-utils";

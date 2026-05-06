@@ -1,4 +1,4 @@
-import { expect } from "chai";
+import { expect } from "vitest";
 import { parseProps } from "./parseProps";
 
 const serialize = (v: Map<any, any>) => Array.from(v.values());

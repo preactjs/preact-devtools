@@ -143,3 +143,15 @@
 	width: 3rem;
 	padding: 0.15rem;
 }
+
+.removeWrapper {
+	width: 1.5rem;
+	display: flex;
+	flex: 0 0 auto;
+	justify-content: flex-end;
+}
+
+.vSep {
+	height: 0.0625rem;
+	margin: 0.4rem 0;
+}

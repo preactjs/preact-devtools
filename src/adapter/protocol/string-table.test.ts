@@ -5,7 +5,7 @@ import {
 	parseTable,
 	flushTable,
 } from "./string-table";
-import { expect } from "chai";
+import { expect } from "vitest";
 
 describe("StringTable", () => {
 	describe("flushTable", () => {

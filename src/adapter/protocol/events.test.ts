@@ -1,4 +1,4 @@
-import { expect } from "chai";
+import { expect } from "vitest";
 import { applyEvent } from "./events";
 import * as sinon from "sinon";
 import { createStore } from "../../view/store";

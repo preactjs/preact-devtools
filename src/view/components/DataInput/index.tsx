@@ -117,7 +117,7 @@ export function DataInput({
 				<input
 					type="text"
 					ref={ref}
-					class={`${s.valueInput} ${props.class || ""} ${focus ? s.focus : ""}`}
+					class={`${s.valueInput} ${props.class || ""}`}
 					value={value === undefined ? "" : value}
 					onKeyUp={onKeyUp}
 					onInput={onInput}

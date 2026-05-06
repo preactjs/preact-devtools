@@ -1,4 +1,4 @@
-import { expect } from "chai";
+import { expect } from "vitest";
 import { flattenChildren } from "./windowing";
 import { ID } from "../../store/types";
 
@@ -14,12 +14,7 @@ describe("flattenChildren", () => {
 	it("should flatten tree", () => {
 		const collapsed = new Set<ID>();
 		expect(flattenChildren(tree, 1, id => collapsed.has(id))).to.deep.equal([
-			1,
-			2,
-			4,
-			3,
-			5,
-			6,
+			1, 2, 4, 3, 5, 6,
 		]);
 	});
 });

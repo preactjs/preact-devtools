@@ -1,4 +1,4 @@
-import { expect } from "chai";
+import { expect } from "vitest";
 import { toTransform } from "./ranked-utils";
 import { flames } from "../testHelpers";
 import { NodeTransform } from "../shared";

@@ -1,7 +1,7 @@
 import { h } from "preact";
 import { render } from "@testing-library/preact";
 import { TreeItem } from "./TreeView";
-import { expect } from "chai";
+import { expect } from "vitest";
 import { AppCtx } from "../../store/react-bindings";
 import { createStore } from "../../store";
 import { DevNodeType } from "../../store/types";

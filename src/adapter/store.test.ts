@@ -1,6 +1,6 @@
 import { createStore } from "../view/store";
 import { applyOperationsV2 } from "./protocol/events";
-import { expect } from "chai";
+import { expect } from "vitest";
 import { fromSnapshot } from "./debug";
 import * as sinon from "sinon";
 import { effect } from "@preact/signals";

@@ -1,5 +1,5 @@
 import parseSemverish from "./parse-semverish";
-import { expect } from "chai";
+import { expect } from "vitest";
 
 describe("parse-semverish", () => {
 	it("should parse normal", () => {

@@ -1,5 +1,5 @@
 import { h, ComponentChild } from "preact";
-import { expect } from "chai";
+import { expect } from "vitest";
 import { CommitTimeline } from "./CommitTimeline";
 import { fireEvent, render } from "@testing-library/preact";
 import * as sinon from "sinon";

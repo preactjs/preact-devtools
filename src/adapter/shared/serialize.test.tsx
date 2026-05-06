@@ -1,4 +1,4 @@
-import { expect } from "chai";
+import { expect } from "vitest";
 import { cleanContext, cleanProps, jsonify } from "./serialize";
 import { h, Component, createContext, render } from "preact";
 import { teardown } from "preact/test-utils";

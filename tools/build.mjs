@@ -104,26 +104,29 @@ async function build(browser) {
 		__DEBUG__: DEBUG,
 		"process.env.BROWSER": JSON.stringify(browser),
 	};
+	const esbuildDefine = {
+		...define,
+		__DEBUG__: JSON.stringify(DEBUG),
+	};
 
-	await esbuild.build({
+	const buildOptions = {
 		bundle: true,
 		sourcemap: false,
 		outdir: dist,
-		watch: args.watch,
 		format: isInline ? "esm" : "iife",
-		define,
+		define: esbuildDefine,
 		external,
 		entryPoints: isInline
 			? {
 					"panel/panel": "src/shells/shared/panel/panel.ts",
 					client: "src/shells/shared/installHook.ts",
-			  }
+				}
 			: {
 					"panel/panel": "src/shells/shared/panel/panel.ts",
 					"background/background": "src/shells/shared/background/background.ts",
 					"content-script": "src/shells/shared/content-script.ts",
 					installHook: "src/shells/shared/installHook.ts",
-			  },
+				},
 		plugins: [
 			cssModules(),
 			babelPlugin(define),
@@ -132,7 +135,7 @@ async function build(browser) {
 					? {
 							"src/shells/shared/panel/panel.html": path.join(dist, "panel"),
 							"src/view/sprite.svg": path.join(dist, "panel"),
-					  }
+						}
 					: {
 							[`src/shells/${browser}/manifest.json`]: dist,
 							"src/shells/shared/panel/empty-panel.html": path.join(
@@ -143,7 +146,7 @@ async function build(browser) {
 							"src/shells/shared/icons": dist,
 							"src/shells/shared/popup/enabled.html": path.join(dist, "popup"),
 							"src/shells/shared/popup/disabled.html": path.join(dist, "popup"),
-					  },
+						},
 			),
 			!isInline &&
 				renamePlugin({
@@ -157,12 +160,19 @@ async function build(browser) {
 					: [
 							path.join(dist, "panel", "panel.html"),
 							path.join(dist, "panel", "empty-panel.html"),
-					  ],
+						],
 			),
 			!isInline && archivePlugin("dist", browser, DEBUG),
 			!isInline && !process.env.CI && gitSourcePlugin(),
 		].filter(Boolean),
-	});
+	};
+
+	if (args.watch) {
+		const ctx = await esbuild.context(buildOptions);
+		await ctx.watch();
+	} else {
+		await esbuild.build(buildOptions);
+	}
 
 	const time = kl.green(`${Date.now() - start}ms`);
 	// eslint-disable-next-line no-console

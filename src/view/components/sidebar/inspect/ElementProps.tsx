@@ -144,7 +144,7 @@ export function SingleItem(props: SingleProps) {
 					<span
 						class={`${s.name} ${
 							props.index === undefined ? s.noCollapse : ""
-						} ${s.nameStatic} ${editable ? s.nameEditable : ""}`}
+						} ${editable ? s.nameEditable : ""}`}
 						data-testid="prop-name"
 						data-type={value !== "__preact_empty__" ? type : "empty"}
 					>
