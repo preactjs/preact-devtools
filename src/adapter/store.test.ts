@@ -138,20 +138,26 @@ describe("Store", () => {
 	});
 
 	it("should search through the tree store", () => {
-		const store = createStore();
-		const event = fromSnapshot([
-			"rootId: 1",
-			"Add 1 <Fragment> to parent -1",
-			"Add 2 <Parent> to parent 1",
-			"Add 3 <Child> to parent 2",
-		]);
-		applyOperationsV2(store, event);
+		vi.useFakeTimers();
+		try {
+			const store = createStore();
+			const event = fromSnapshot([
+				"rootId: 1",
+				"Add 1 <Fragment> to parent -1",
+				"Add 2 <Parent> to parent 1",
+				"Add 3 <Child> to parent 2",
+			]);
+			applyOperationsV2(store, event);
 
-		store.search.onChange("child");
+			store.search.onChange("child");
+			vi.runAllTimers();
 
-		expect(store.search.match.value).to.deep.equal([3]);
-		store.search.selectNext();
-		expect(store.search.selectedIdx.value).to.equal(1);
+			expect(store.search.match.value).to.deep.equal([3]);
+			store.search.selectNext();
+			expect(store.search.selectedIdx.value).to.equal(1);
+		} finally {
+			vi.useRealTimers();
+		}
 	});
 
 	it("should keep profiler snapshots scoped to the committed root", () => {

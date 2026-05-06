@@ -12,11 +12,12 @@ import { BackgroundEmitter, Emitter } from "./emitter";
  * Collection of potential targets to connect to by tabId.
  */
 const targets = new Map<number, Emitter<any>>();
+let contentScriptRegistration: Promise<void> | null = null;
 
-async function addToTarget(tabId: number, port: chrome.runtime.Port) {
-	if (!targets.has(tabId)) {
-		targets.set(tabId, BackgroundEmitter<any>());
-
+function ensureContentScriptRegistration() {
+	if (contentScriptRegistration !== null) return contentScriptRegistration;
+	contentScriptRegistration = (async () => {
+		if (!chrome.scripting) return;
 		await chrome.scripting.unregisterContentScripts();
 		await chrome.scripting.registerContentScripts([
 			{
@@ -28,6 +29,15 @@ async function addToTarget(tabId: number, port: chrome.runtime.Port) {
 				world: (chrome.scripting as any).ExecutionWorld.MAIN,
 			},
 		]);
+	})();
+	return contentScriptRegistration;
+}
+
+async function addToTarget(tabId: number, port: chrome.runtime.Port) {
+	await ensureContentScriptRegistration();
+
+	if (!targets.has(tabId)) {
+		targets.set(tabId, BackgroundEmitter<any>());
 	}
 	const target = targets.get(tabId)!;
 	target.on(port.name, m => port.postMessage(m));
@@ -41,6 +51,9 @@ async function addToTarget(tabId: number, port: chrome.runtime.Port) {
 			source: DevtoolsToClient,
 		});
 		target.off(port.name);
+		if (target.connected().length === 0) {
+			targets.delete(tabId);
+		}
 	});
 }
 
@@ -97,4 +110,16 @@ chrome.runtime.onConnect.addListener(port => {
 		"color: inherit",
 	);
 	handler && handler(port);
+});
+
+chrome.runtime.onInstalled?.addListener(() => {
+	ensureContentScriptRegistration();
+});
+
+chrome.runtime.onStartup?.addListener(() => {
+	ensureContentScriptRegistration();
+});
+
+chrome.tabs?.onRemoved?.addListener(tabId => {
+	targets.delete(tabId);
 });

@@ -31,7 +31,7 @@ export function BackgroundEmitter<T = any>() {
 			});
 		},
 		connected() {
-			return Object.keys(targets);
+			return Object.keys(targets).filter(name => targets[name] !== undefined);
 		},
 	};
 }

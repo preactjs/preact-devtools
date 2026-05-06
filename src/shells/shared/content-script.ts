@@ -51,7 +51,12 @@ function handleDisconnect() {
 
 /** Forward messages from the page to the devtools */
 window.addEventListener("message", e => {
-	if (e.source === window && e.data && e.data.source === PageHookName) {
+	if (
+		e.source === window &&
+		e.data &&
+		e.data.source === PageHookName &&
+		typeof e.data.type === "string"
+	) {
 		const data = e.data;
 		debug("->", data);
 

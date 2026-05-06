@@ -25,19 +25,21 @@ export function createSearchStore(tree: TreeStore) {
 	const regex = signal<RegExp | null>(null);
 	const match = signal<number[]>([]);
 	const count = signal(0);
+	let searchTimer: any = null;
 
-	const onChange = (s: string) => {
-		searchValue.value = s;
-
+	const clearSearchResults = () => {
 		match.value = [];
+		regex.value = null;
+		count.value = 0;
+		selected.value = 0;
+	};
 
-		if (s === "") {
-			regex.value = null;
-			count.value = 0;
-			selected.value = 0;
+	const runSearch = (s: string) => {
+		if (s !== searchValue.value) {
 			return;
 		}
 
+		match.value = [];
 		const reg = createRegex(s);
 		regex.value = reg;
 
@@ -58,9 +60,23 @@ export function createSearchStore(tree: TreeStore) {
 		match.value = ids;
 	};
 
+	const onChange = (s: string) => {
+		searchValue.value = s;
+		clearTimeout(searchTimer);
+
+		if (s === "") {
+			clearSearchResults();
+			return;
+		}
+
+		searchTimer = setTimeout(() => runSearch(s), 75);
+	};
+
 	const reset = () => {
+		clearTimeout(searchTimer);
 		selectedIdx.value = -1;
-		onChange("");
+		searchValue.value = "";
+		clearSearchResults();
 	};
 
 	function go(n: number) {

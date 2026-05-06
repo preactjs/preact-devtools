@@ -33,11 +33,10 @@ async function showPanel(): Promise<{
 	});
 }
 
-const port = chrome.runtime.connect({
-	name: DevtoolsPanelName,
-});
-
 let initialized = false;
+let port: chrome.runtime.Port | null = null;
+let reconnectTimer: any = null;
+let reconnectDelay = 250;
 
 const store = createStore();
 const operationQueue: Array<{
@@ -144,7 +143,7 @@ async function initDevtools() {
 }
 
 // Send messages from devtools to the content script
-const destroy = store.subscribe((type, data) => {
+store.subscribe((type, data) => {
 	debug("<- devtools", type, data);
 
 	// We must call it from here to have access to native
@@ -153,7 +152,7 @@ const destroy = store.subscribe((type, data) => {
 		inspectHostNode();
 	}
 
-	port.postMessage({ type, data, source: DevtoolsPanelName });
+	postToBackground({ type, data, source: DevtoolsPanelName });
 
 	if (type === "view-source") {
 		// Wait for the content-script to set `__PREACT_DEVTOOLS__.$type`
@@ -175,10 +174,6 @@ const destroy = store.subscribe((type, data) => {
 	}
 });
 
-port.onDisconnect.addListener(() => {
-	destroy();
-});
-
 /**
  * To avoid dropping messages on reload that may have already been
  * sent by us, we keep messages from the content script in memory
@@ -193,7 +188,7 @@ const pending = new Map<number, any[]>();
 const IS_FIREFOX = isFirefox();
 
 // Subscribe to messages from content script
-port.onMessage.addListener(async message => {
+async function handlePortMessage(message: any) {
 	if (!initialized) {
 		debug("initialize devtools panel");
 		await initDevtools();
@@ -209,7 +204,7 @@ port.onMessage.addListener(async message => {
 
 		pending.set(tabId, []);
 
-		port.postMessage({
+		postToBackground({
 			type: "init",
 			tabId,
 			source: DevtoolsPanelName,
@@ -228,7 +223,74 @@ port.onMessage.addListener(async message => {
 			applyPanelEvent(message);
 		}
 	}
-});
+}
+
+function postToBackground(message: any) {
+	if (port === null) {
+		debug("<- devtools dropped while disconnected", message);
+		return;
+	}
+
+	try {
+		port.postMessage(message);
+	} catch (err) {
+		debug("postMessage failed, reconnecting", err);
+		handlePortDisconnect(port);
+	}
+}
+
+function sendInitMessage() {
+	const tabId = chrome.devtools.inspectedWindow.tabId;
+	if (!tabId) return;
+
+	postToBackground({
+		type: "init",
+		tabId,
+		source: DevtoolsPanelName + "_init",
+	});
+}
+
+function connectPort() {
+	if (reconnectTimer !== null) {
+		clearTimeout(reconnectTimer);
+		reconnectTimer = null;
+	}
+
+	try {
+		const nextPort = chrome.runtime.connect({
+			name: DevtoolsPanelName,
+		});
+		port = nextPort;
+		reconnectDelay = 250;
+		nextPort.onMessage.addListener(handlePortMessage);
+		nextPort.onDisconnect.addListener(() => handlePortDisconnect(nextPort));
+		sendInitMessage();
+	} catch (err) {
+		debug("connect failed, retrying", err);
+		scheduleReconnect();
+	}
+}
+
+function handlePortDisconnect(disconnectedPort: chrome.runtime.Port) {
+	if (port !== disconnectedPort) return;
+
+	debug("devtools port disconnected");
+	port = null;
+	operationQueue.length = 0;
+	operationFlushPending = false;
+	scheduleReconnect();
+}
+
+function scheduleReconnect() {
+	if (reconnectTimer !== null) return;
+
+	const delay = reconnectDelay;
+	reconnectDelay = Math.min(reconnectDelay * 2, 5000);
+	reconnectTimer = setTimeout(() => {
+		reconnectTimer = null;
+		connectPort();
+	}, delay);
+}
 
 // Clear store when we navigate away from the current page.
 // Only fires on "true" navigation events, not when navigation
@@ -256,12 +318,4 @@ chrome.devtools.network.onNavigated.addListener(() => {
 	}
 });
 
-// Notify background page of the panel
-// Note sometimes the tabId is null in Chrome...
-if (chrome.devtools.inspectedWindow.tabId) {
-	port.postMessage({
-		type: "init",
-		tabId: chrome.devtools.inspectedWindow.tabId,
-		source: DevtoolsPanelName + "_init",
-	});
-}
+connectPort();

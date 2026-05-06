@@ -137,37 +137,39 @@ export function setupOptionsV11(
 	// Othwerwise we'll end up with an unknown number of frames in-between
 	// the called hook and `options._hook`. This will lead to wrongly
 	// parsed hooks.
-	setTimeout(() => {
-		prevHook = o._hook || o.__h;
-		prevUseDebugValue = options.useDebugValue;
-		// @ts-ignore
-		prevHookName = options._addHookName || options.__a;
+	const hook = (internal: Internal, index: number, type: number) => {
+		const nextHook = o._hook !== hook ? o._hook : o.__h !== hook ? o.__h : null;
+		if (nextHook) {
+			prevHook = nextHook;
+			o._hook = o.__h = hook;
+		}
 
-		o._hook = o.__h = (internal: Internal, index: number, type: number) => {
-			if (type) {
-				addHookStack(type);
-			}
+		if (type) {
+			addHookStack(type);
+		}
 
-			// Don't continue the chain while the devtools is inspecting hooks.
-			// Otherwise the next hook will very likely throw as we're only
-			// faking a render and not doing a proper one. #278
-			if (!(options as any)._skipEffects && !(options as any).__s) {
-				if (prevHook) prevHook(internal, index, type);
-			}
-		};
+		// Don't continue the chain while the devtools is inspecting hooks.
+		// Otherwise the next hook will very likely throw as we're only
+		// faking a render and not doing a proper one. #278
+		if (!(options as any)._skipEffects && !(options as any).__s) {
+			if (prevHook) prevHook(internal, index, type);
+		}
+	};
+	o._hook = o.__h = hook;
 
-		options.useDebugValue = (value: any) => {
-			addHookStack(HookType.useDebugValue);
-			addDebugValue(value);
-			if (prevUseDebugValue) prevUseDebugValue(value);
-		};
+	options.useDebugValue = (value: any) => {
+		addHookStack(HookType.useDebugValue);
+		addDebugValue(value);
+		if (prevUseDebugValue) prevUseDebugValue(value);
+	};
 
-		// @ts-ignore
-		options._addHookName = options.__a = (name: string | number) => {
-			addHookName(name);
-			if (prevHookName) prevHookName(name);
-		};
-	}, 100);
+	// @ts-ignore
+	prevHookName = options._addHookName || options.__a;
+	// @ts-ignore
+	options._addHookName = options.__a = (name: string | number) => {
+		addHookName(name);
+		if (prevHookName) prevHookName(name);
+	};
 
 	options.vnode = vnode => {
 		if (
@@ -302,7 +304,6 @@ export function setupOptionsV11(
 		o._diff = o.__b = prevBeforeDiff;
 		o._render = o.__r = prevRender;
 		options.diffed = prevAfterDiff;
-		options._internal = prevVNodeHook;
 		o._hook = o.__h = prevHook;
 		o.vnode = prevVNodeHook;
 		o._internal = o.__i = prevInternalHook;

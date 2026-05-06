@@ -238,7 +238,8 @@ export function createRenderer<T extends SharedVNode>(
 			// Traverse tree until we find the first DOM node
 			let stack: any[] = [vnode];
 			let item;
-			while ((item = stack.shift()) !== undefined) {
+			let cursor = 0;
+			while ((item = stack[cursor++]) !== undefined) {
 				if (item === null) continue;
 
 				if (!bindings.isComponent(item)) {

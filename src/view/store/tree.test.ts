@@ -87,6 +87,23 @@ describe("TreeStore", () => {
 		expectRanks(store);
 	});
 
+	it("toggles root visibility without changing descendant order", () => {
+		const store = new TreeStore();
+		store.sync(createTree(), [1], false);
+
+		store.setRootHidden(true);
+		expect(store.visibleSize()).to.equal(4);
+		expect(store.visibleRange(0, 4)).to.deep.equal([2, 4, 5, 3]);
+		expect(store.visibleRange(1, 3)).to.deep.equal([4, 5]);
+		expectRanks(store);
+
+		store.setRootHidden(false);
+		expect(store.visibleSize()).to.equal(5);
+		expect(store.visibleRange(0, 5)).to.deep.equal([1, 2, 4, 5, 3]);
+		expect(store.visibleRange(2, 5)).to.deep.equal([4, 5, 3]);
+		expectRanks(store);
+	});
+
 	it("does not invalidate visible layout for timing-only updates", () => {
 		const store = new TreeStore();
 		const tree = createTree();

@@ -173,10 +173,8 @@ export function createProfiler(): ProfilerState {
 			return new Map();
 		}
 
-		for (let i = activeCommitIdx.value - 1; i >= 0; i--) {
-			if (i >= commits.peek().length) {
-				return new Map();
-			}
+		if (activeCommitIdx.value >= commits.peek().length) {
+			return new Map();
 		}
 
 		return patchTree(commit);

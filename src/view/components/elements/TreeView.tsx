@@ -37,6 +37,8 @@ export function TreeView() {
 	useTreeStructureVersion();
 	const visibleSize = store.tree.visibleSize();
 	const rootCount = store.tree.rootCount();
+	const filterRoot = store.filter.filterRoot.value;
+	const filterHoc = store.filter.filterHoc.value;
 	const { collapseNode, collapsed } = useCollapser();
 	const { selected, selectNext, selectPrev } = useSelection();
 
@@ -68,8 +70,8 @@ export function TreeView() {
 
 	const search = useSearch();
 
-	const [updateCount, setUpdateCount] = useState(0);
-	useResize(() => setUpdateCount(updateCount + 1), [updateCount]);
+	const [, setUpdateCount] = useState(0);
+	useResize(() => setUpdateCount(count => count + 1), []);
 
 	const {
 		children: listItems,
@@ -83,7 +85,15 @@ export function TreeView() {
 		itemAt: idx => store.tree.visibleAt(idx),
 		itemIndex: id => store.tree.rankOf(id),
 		// eslint-disable-next-line react/display-name
-		renderRow: (id, _, top) => <TreeItem key={id} id={id} top={top} />,
+		renderRow: (id, _, top) => (
+			<TreeItem
+				key={id}
+				id={id}
+				top={top}
+				filterRoot={filterRoot}
+				filterHoc={filterHoc}
+			/>
+		),
 	});
 
 	// Scroll to item on selection change
@@ -183,14 +193,20 @@ export function MarkResult(props: { text: string; id: ID }) {
 	return <span data-testid="node-name">{text}</span>;
 }
 
-export function TreeItem(props: { key: any; id: ID; top: number }) {
+export function TreeItem(props: {
+	key: any;
+	id: ID;
+	top: number;
+	filterRoot?: boolean;
+	filterHoc?: boolean;
+}) {
 	const { id } = props;
 	const store = useStore();
 	const as = useSelection();
 	const { collapsed, toggle } = useCollapser();
 	const node = useTreeNode(id);
-	const filterRoot = store.filter.filterRoot.value;
-	const filterHoc = store.filter.filterHoc.value;
+	const filterRoot = props.filterRoot || false;
+	const filterHoc = props.filterHoc || false;
 	const onToggle = () => toggle(id);
 	const ref = useRef<HTMLDivElement>(null);
 

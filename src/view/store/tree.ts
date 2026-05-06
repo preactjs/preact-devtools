@@ -90,8 +90,19 @@ export class TreeStore {
 
 	setRootHidden(value: boolean) {
 		if (this.rootHidden === value) return;
+		const delta = value ? -1 : 1;
 		this.rootHidden = value;
-		this.recomputeVisibleCounts();
+		for (let i = 0; i < this.roots.length; i++) {
+			const id = this.roots[i];
+			const node = this.nodes.get(id);
+			if (!node) continue;
+
+			const count = this.visibleCounts.get(id);
+			if (count !== undefined) {
+				this.visibleCounts.set(id, count + delta);
+			}
+			this.visibleTotal += delta;
+		}
 		this.bump([], true);
 	}
 
@@ -203,24 +214,29 @@ export class TreeStore {
 	}
 
 	private visibleAtNode(node: DevNode, index: number): ID | null {
-		if (this.isNodeSelfVisible(node)) {
-			if (index === 0) return node.id;
-			index--;
-		}
-
-		if (this.collapsed.has(node.id)) return null;
-
-		for (let i = 0; i < node.children.length; i++) {
-			const child = this.nodes.get(node.children[i]);
-			if (!child) continue;
-
-			const visibleCount = this.visibleCounts.get(child.id) || 0;
-			if (index >= visibleCount) {
-				index -= visibleCount;
-				continue;
+		let current: DevNode | undefined = node;
+		while (current) {
+			if (this.isNodeSelfVisible(current)) {
+				if (index === 0) return current.id;
+				index--;
 			}
+			if (this.collapsed.has(current.id)) return null;
 
-			return this.visibleAtNode(child, index);
+			let next: DevNode | undefined;
+			for (let i = 0; i < current.children.length; i++) {
+				const child = this.nodes.get(current.children[i]);
+				if (!child) continue;
+
+				const visibleCount = this.visibleCounts.get(child.id) || 0;
+				if (index >= visibleCount) {
+					index -= visibleCount;
+					continue;
+				}
+
+				next = child;
+				break;
+			}
+			current = next;
 		}
 
 		return null;
@@ -233,25 +249,43 @@ export class TreeStore {
 		to: number,
 		out: ID[],
 	): number {
-		const node = this.nodes.get(id);
-		if (!node) return index;
-
-		if (this.isNodeSelfVisible(node)) {
-			if (index >= from && index < to) out.push(node.id);
-			index++;
-			if (index >= to) return index;
-		}
-
-		if (this.collapsed.has(node.id)) return index;
-
-		for (let i = 0; i < node.children.length && index < to; i++) {
-			const childId = node.children[i];
-			const count = this.visibleCounts.get(childId) || 0;
-			if (index + count <= from) {
-				index += count;
+		const stack: Array<{ id: ID; childIndex: number; selfDone: boolean }> = [
+			{ id, childIndex: 0, selfDone: false },
+		];
+		while (stack.length > 0 && index < to) {
+			const frame = stack[stack.length - 1];
+			const node = this.nodes.get(frame.id);
+			if (!node) {
+				stack.pop();
 				continue;
 			}
-			index = this.pushVisibleRange(childId, index, from, to, out);
+
+			if (!frame.selfDone) {
+				frame.selfDone = true;
+				if (this.isNodeSelfVisible(node)) {
+					if (index >= from && index < to) out.push(node.id);
+					index++;
+					if (index >= to) break;
+				}
+				if (this.collapsed.has(node.id)) {
+					stack.pop();
+					continue;
+				}
+			}
+
+			let pushed = false;
+			while (frame.childIndex < node.children.length && index < to) {
+				const childId = node.children[frame.childIndex++];
+				const count = this.visibleCounts.get(childId) || 0;
+				if (index + count <= from) {
+					index += count;
+					continue;
+				}
+				stack.push({ id: childId, childIndex: 0, selfDone: false });
+				pushed = true;
+				break;
+			}
+			if (!pushed) stack.pop();
 		}
 
 		return index;
@@ -261,17 +295,18 @@ export class TreeStore {
 		id: ID,
 		fn: (id: ID, node: DevNode) => void | false,
 	): void | false {
-		const node = this.nodes.get(id);
-		if (!node) return;
+		const stack = [id];
+		while (stack.length > 0) {
+			const node = this.nodes.get(stack.pop()!);
+			if (!node) continue;
 
-		if (this.isNodeSelfVisible(node) && fn(node.id, node) === false) {
-			return false;
-		}
-		if (this.collapsed.has(node.id)) return;
-
-		for (let i = 0; i < node.children.length; i++) {
-			if (this.forEachVisibleNode(node.children[i], fn) === false) {
+			if (this.isNodeSelfVisible(node) && fn(node.id, node) === false) {
 				return false;
+			}
+			if (this.collapsed.has(node.id)) continue;
+
+			for (let i = node.children.length; i--; ) {
+				stack.push(node.children[i]);
 			}
 		}
 	}
@@ -295,17 +330,33 @@ export class TreeStore {
 	}
 
 	private computeVisibleCount(id: ID): number {
-		const node = this.nodes.get(id);
-		if (!node) return 0;
+		let total = 0;
+		const stack: Array<{ id: ID; visited: boolean }> = [{ id, visited: false }];
+		while (stack.length > 0) {
+			const frame = stack.pop()!;
+			const node = this.nodes.get(frame.id);
+			if (!node) continue;
 
-		let total = this.isNodeSelfVisible(node) ? 1 : 0;
-		if (!this.collapsed.has(node.id)) {
-			for (let i = 0; i < node.children.length; i++) {
-				total += this.computeVisibleCount(node.children[i]);
+			if (frame.visited) {
+				let count = this.isNodeSelfVisible(node) ? 1 : 0;
+				if (!this.collapsed.has(node.id)) {
+					for (let i = 0; i < node.children.length; i++) {
+						count += this.visibleCounts.get(node.children[i]) || 0;
+					}
+				}
+				this.visibleCounts.set(node.id, count);
+				if (node.id === id) total = count;
+				continue;
+			}
+
+			stack.push({ id: node.id, visited: true });
+			if (!this.collapsed.has(node.id)) {
+				for (let i = node.children.length; i--; ) {
+					stack.push({ id: node.children[i], visited: false });
+				}
 			}
 		}
 
-		this.visibleCounts.set(id, total);
 		return total;
 	}
 

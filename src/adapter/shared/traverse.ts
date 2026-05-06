@@ -70,7 +70,8 @@ function updateHighlight<T extends SharedVNode>(
 		const stack: Array<T | null | undefined> = [vnode];
 		let item;
 		let dom;
-		while ((item = stack.shift()) !== undefined) {
+		let cursor = 0;
+		while ((item = stack[cursor++]) !== undefined) {
 			// Account for placholders/holes
 			if (item === null) continue;
 
