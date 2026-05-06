@@ -1,6 +1,5 @@
-import { expect } from "vitest";
+import { expect, vi } from "vitest";
 import { applyEvent } from "./events";
-import * as sinon from "sinon";
 import { createStore } from "../../view/store";
 import { fromSnapshot } from "../debug";
 
@@ -217,7 +216,7 @@ describe("applyEvent", () => {
 	});
 
 	it("should update inspect data when inspected node is updated", () => {
-		const spy = sinon.spy();
+		const spy = vi.fn();
 		const store = createStore();
 		store.subscribe(spy);
 
@@ -243,8 +242,8 @@ describe("applyEvent", () => {
 		]);
 		applyEvent(store, "operation_v2", data);
 
-		expect(spy.callCount).to.equal(1);
-		expect(spy.args[0]).to.deep.equal(["inspect", 2]);
+		expect(spy).toHaveBeenCalledTimes(1);
+		expect(spy.mock.calls[0]).to.deep.equal(["inspect", 2]);
 	});
 
 	it("should reset uncollapsed state", () => {

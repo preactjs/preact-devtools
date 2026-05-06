@@ -1,8 +1,7 @@
 import { h, render, Options, options, Fragment, Component } from "preact";
-import * as sinon from "sinon";
 import { createRenderer } from "./renderer";
 import { setupOptionsV10 } from "../10/options";
-import { expect } from "vitest";
+import { expect, vi } from "vitest";
 import { toSnapshot } from "../debug";
 import { useState } from "preact/hooks";
 import { act } from "preact/test-utils";
@@ -21,7 +20,7 @@ export function setupScratch() {
 }
 
 export function setupMockHook(options: Options) {
-	const spy = sinon.spy();
+	const spy = vi.fn();
 	const roots = new Map();
 	const renderer = createRenderer(
 		{ send: spy, listen: () => null, listenToPage: () => null },
@@ -45,14 +44,14 @@ export function setupMockHook(options: Options) {
 	};
 }
 
-function getOps(spy: sinon.SinonSpy) {
-	return spy.args.filter(arg => arg[0] === "operation_v2");
+function getOps(spy: ReturnType<typeof vi.fn>) {
+	return spy.mock.calls.filter(arg => arg[0] === "operation_v2");
 }
 
 describe("Renderer 10", () => {
 	let scratch: HTMLDivElement;
 	let destroy: () => void;
-	let spy: sinon.SinonSpy;
+	let spy: ReturnType<typeof vi.fn>;
 	let renderer: Renderer;
 
 	beforeEach(() => {

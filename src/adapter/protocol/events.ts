@@ -1,6 +1,6 @@
 import { flushTable, StringTable } from "./string-table";
 import { Store } from "../../view/store/types";
-import { batch } from "@preact/signals-core";
+import { batch } from "@preact/signals";
 import { recordProfilerCommit } from "../../view/components/profiler/data/commits";
 import { ops2Tree } from "./operations";
 import { applyOperationsV1 } from "./legacy/operationsV1";

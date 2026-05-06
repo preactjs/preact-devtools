@@ -1,8 +1,7 @@
 import { h, ComponentChild } from "preact";
-import { expect } from "vitest";
+import { expect, vi } from "vitest";
 import { CommitTimeline } from "./CommitTimeline";
 import { fireEvent, render } from "@testing-library/preact";
-import * as sinon from "sinon";
 
 export function renderTest(ui: ComponentChild) {
 	const res = render(ui);
@@ -34,7 +33,7 @@ describe("CommitTimeline", () => {
 	});
 
 	it("should wrap around if selection === 0", () => {
-		const spy = sinon.spy();
+		const spy = vi.fn();
 		const { $ } = renderTest(
 			<CommitTimeline
 				onChange={spy}
@@ -45,11 +44,11 @@ describe("CommitTimeline", () => {
 
 		const btn = $("[data-testid='prev-commit']")!;
 		fireEvent.click(btn);
-		expect(spy.args[0][0]).to.equal(3);
+		expect(spy.mock.calls[0][0]).to.equal(3);
 	});
 
 	it("should wrap around if selection === items.length", () => {
-		const spy = sinon.spy();
+		const spy = vi.fn();
 		const { $ } = renderTest(
 			<CommitTimeline
 				onChange={spy}
@@ -61,6 +60,6 @@ describe("CommitTimeline", () => {
 		const btn = $("[data-testid='next-commit']")!;
 		fireEvent.click(btn);
 
-		expect(spy.args[0][0]).to.equal(0);
+		expect(spy.mock.calls[0][0]).to.equal(0);
 	});
 });
