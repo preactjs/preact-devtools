@@ -91,4 +91,51 @@ describe("Store", () => {
 		store.clear();
 		expect(store.inspectData.value).to.equal(null);
 	});
+
+	it("should only parse hooks when hooks are supported", () => {
+		const store = createStore();
+		const hooks = [
+			{
+				id: "root",
+				name: "root",
+				type: "object" as const,
+				value: null,
+				editable: false,
+				depth: 0,
+				meta: null,
+				children: ["root.0"],
+			},
+			{
+				id: "root.0",
+				name: "State",
+				type: "number" as const,
+				value: 1,
+				editable: true,
+				depth: 1,
+				meta: null,
+				children: [],
+			},
+		];
+
+		store.inspectData.value = {
+			canSuspend: false,
+			context: null,
+			hooks,
+			id: 123,
+			key: null,
+			name: "Foo",
+			props: null,
+			state: null,
+			signals: null,
+			suspended: false,
+			type: 1,
+			version: "",
+		};
+
+		expect(store.sidebar.hooks.items.value).to.deep.equal([]);
+
+		store.supports.hooks.value = true;
+
+		expect(store.sidebar.hooks.items.value).to.deep.equal([hooks[1]]);
+	});
 });

@@ -100,7 +100,7 @@ export function createStore(): Store {
 
 	const supportsHooks = signal(false);
 	effect(() => {
-		if (supportsHooks) {
+		if (supportsHooks.value) {
 			const items =
 				inspectData.value && inspectData.value.hooks
 					? inspectData.value.hooks
