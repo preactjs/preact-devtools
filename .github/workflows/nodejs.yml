@@ -19,6 +19,8 @@ jobs:
           node-version: 22
       - name: Install Deps
         run: npm i
+      - name: Check formatting
+        run: npm run format:check
       - name: Install Playwright
         run: npx playwright install --with-deps && npx playwright install-deps chromium
       - name: Lint

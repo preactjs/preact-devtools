@@ -71,11 +71,9 @@
 		"cross-env": "^7.0.2",
 		"esbuild": "^0.28.0",
 		"fs-extra": "^10.1.0",
-		"husky": "^4.3.0",
 		"jsdom": "^26.0.0",
 		"kolorist": "^1.5.1",
 		"lightningcss": "^1.24.1",
-		"lint-staged": "^10.4.0",
 		"mri": "^1.2.0",
 		"oxfmt": "^0.48.0",
 		"oxlint": "^1.63.0",
@@ -99,15 +97,5 @@
 		"dist/inline/",
 		"README.md",
 		"LICENSE"
-	],
-	"lint-staged": {
-		"**/*.{js,jsx,mjs,ts,tsx,json,jsonc,css,md,html}": [
-			"oxfmt --write"
-		]
-	},
-	"husky": {
-		"hooks": {
-			"pre-commit": "lint-staged"
-		}
-	}
+	]
 }

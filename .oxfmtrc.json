@@ -6,6 +6,7 @@
 	"printWidth": 80,
 	"sortPackageJson": false,
 	"ignorePatterns": [
+		".claude/**",
 		"dist/**",
 		"src/examples/**",
 		"test-e2e/fixtures/preact-versions/**",

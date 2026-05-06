@@ -1,3 +1,6 @@
+# Local tooling
+.claude/
+
 # Logs
 logs
 *.log
