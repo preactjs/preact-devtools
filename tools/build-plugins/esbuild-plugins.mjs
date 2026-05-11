@@ -3,9 +3,8 @@ import fs from "fs/promises";
 import fsSync from "fs";
 import path from "path";
 import * as lightningcss from "lightningcss";
-import * as fsExtra from "fs-extra";
 import * as kl from "kolorist";
-import archiver from "archiver";
+import {ZipArchive} from "archiver";
 import { babelPluginCssModules } from "./babel-plugin-css-module.mjs";
 import child_process from "child_process";
 import { babelPluginDeadCode } from "./babel-plugin-dead-code.mjs";
@@ -59,7 +58,7 @@ export function copyPlugin(mapping) {
 					}
 
 					await fs.mkdir(targetDir, { recursive: true });
-					await fsExtra.copy(k, target, { recursive: true });
+					await fs.cp(k, target, { recursive: true });
 				}
 			});
 		},
@@ -78,7 +77,7 @@ export function renamePlugin(mapping) {
 				if (args.errors.length) return;
 
 				for (const k in mapping) {
-					await fsExtra.move(k, mapping[k], { overwrite: true });
+					await fs.rename(k, mapping[k], { recursive: true });
 				}
 			});
 		},
@@ -131,7 +130,7 @@ export function archivePlugin(dir, browser, debug) {
 				const output = fsSync.createWriteStream(
 					path.join(dir, `${browser}${debug ? "-debug" : ""}.zip`),
 				);
-				const archive = archiver("zip", { zlib: { level: 9 } });
+				const archive = new ZipArchive({ zlib: { level: 9 } });
 
 				archive.on("warning", err => {
 					if (err.code === "ENOENT") {

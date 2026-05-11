@@ -10,7 +10,6 @@ import {
 	spritePlugin,
 	gitSourcePlugin,
 } from "./build-plugins/esbuild-plugins.mjs";
-import * as fsExtra from "fs-extra";
 import mri from "mri";
 import * as kl from "kolorist";
 import { fileURLToPath } from "url";
@@ -83,7 +82,7 @@ async function build(browser) {
 	console.log(`${kl.dim("Browser:")} ${kl.cyan(browser)}`);
 	const start = Date.now();
 
-	await fsExtra.remove(dist);
+	await fs.rm(dist, { recursive: true, force: true });
 
 	const isInline = browser === "inline";
 	/** @type {string[] | undefined} */
