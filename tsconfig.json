@@ -8,7 +8,8 @@
 		"jsx": "react-jsx",
 		"jsxImportSource": "preact",
 		"types": ["node", "chrome", "vitest/globals"],
-		"skipLibCheck": true
+		"skipLibCheck": true,
+		"rootDir": "."
 	},
 	"include": ["./src/global.d.ts", "./src"]
 }
