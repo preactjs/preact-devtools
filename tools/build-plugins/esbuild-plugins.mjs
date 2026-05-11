@@ -4,7 +4,7 @@ import fsSync from "fs";
 import path from "path";
 import * as lightningcss from "lightningcss";
 import * as kl from "kolorist";
-import {ZipArchive} from "archiver";
+import { ZipArchive } from "archiver";
 import { babelPluginCssModules } from "./babel-plugin-css-module.mjs";
 import child_process from "child_process";
 import { babelPluginDeadCode } from "./babel-plugin-dead-code.mjs";
