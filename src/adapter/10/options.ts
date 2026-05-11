@@ -78,7 +78,8 @@ export function setupOptionsV10(
 	// Othwerwise we'll end up with an unknown number of frames in-between
 	// the called hook and `options._hook`. This will lead to wrongly
 	// parsed hooks.
-	setTimeout(() => {
+	let hasHookFirst = false;
+	const interceptHooks = () => {
 		prevHook = o._hook || o.__h;
 		prevUseDebugValue = options.useDebugValue;
 		// @ts-ignore
@@ -108,7 +109,7 @@ export function setupOptionsV10(
 			addHookName(name);
 			if (prevHookName) prevHookName(name);
 		};
-	}, 100);
+	};
 
 	options.vnode = (vnode: VNode) => {
 		if (
@@ -148,6 +149,11 @@ export function setupOptionsV10(
 	};
 
 	o._render = o.__r = (vnode: VNode, parent: VNode | null) => {
+		if (!hasHookFirst) {
+			interceptHooks();
+			hasHookFirst = true;
+		}
+
 		if (
 			!skipEffects &&
 			typeof vnode.type === "function" &&
