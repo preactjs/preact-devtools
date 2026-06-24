@@ -1,4 +1,4 @@
-import { expect } from "vitest";
+import { expect, vi } from "vitest";
 import { createAdapter } from "./adapter";
 import { newProfiler } from "./profiler";
 import { PortPageHook } from "./port";
@@ -45,6 +45,16 @@ function fireFromPage<K extends keyof DevtoolEvents>(
 	data: DevtoolEvents[K],
 ): void {
 	for (const cb of fake.pageListeners.get(type) ?? []) {
+		cb(data);
+	}
+}
+
+function fireFromDevtools<K extends keyof DevtoolEvents>(
+	fake: FakePort,
+	type: K,
+	data: DevtoolEvents[K],
+): void {
+	for (const cb of fake.devtoolListeners.get(type) ?? []) {
 		cb(data);
 	}
 }
@@ -113,6 +123,52 @@ describe("createAdapter", () => {
 				(preactDevtoolsCtx as any).document = originalCtxDocument;
 				(globalThis as any).document = originalGlobalDocument;
 			}
+		});
+	});
+
+	describe("refresh", () => {
+		it("re-sends attach so a late-connecting panel re-learns supports, then refreshes", () => {
+			// A panel that connected after mount missed the initial `attach`, so it
+			// never learned `supportsHooks`. The `refresh` handler must re-send
+			// `attach` (in addition to re-walking the tree) so hooks inspection works
+			// without a full page reload.
+			const fake = createFakePort();
+			const refresh = vi.fn();
+			const renderer: Renderer = { ...makeRenderer([]), refresh };
+			const renderers = new Map<number, Renderer>([[1, renderer]]);
+			const rendererSupports = new Map([
+				[1, { hooks: true, renderReasons: true, profiling: false }],
+			]);
+
+			createAdapter(fake.port, newProfiler(), renderers, rendererSupports);
+
+			fireFromDevtools(fake, "refresh", null);
+
+			const attaches = fake.sent.filter(m => m.type === "attach");
+			expect(attaches.length).to.equal(1);
+			expect(attaches[0].data).to.deep.equal({
+				id: 1,
+				supportsProfiling: false,
+				supportsRenderReasons: true,
+				supportsHooks: true,
+			});
+			expect(refresh).toHaveBeenCalledTimes(1);
+		});
+
+		it("sends no attach when supports are unknown, but still refreshes", () => {
+			const fake = createFakePort();
+			const refresh = vi.fn();
+			const renderers = new Map<number, Renderer>([
+				[1, { ...makeRenderer([]), refresh }],
+			]);
+
+			// No `rendererSupports` passed (back-compat default).
+			createAdapter(fake.port, newProfiler(), renderers);
+
+			fireFromDevtools(fake, "refresh", null);
+
+			expect(fake.sent.filter(m => m.type === "attach").length).to.equal(0);
+			expect(refresh).toHaveBeenCalledTimes(1);
 		});
 	});
 });
