@@ -7,7 +7,6 @@ export interface IconBtnProps {
 	disabled?: boolean;
 	color?: string;
 	onClick?: () => void;
-	popoverTarget?: string;
 	styling?: "secondary" | "primary";
 	children: ComponentChildren;
 	testId?: string;
@@ -23,7 +22,6 @@ export function IconBtn(props: IconBtnProps) {
 			title={props.title}
 			disabled={props.disabled}
 			data-testid={props.testId}
-			popovertarget={props.popoverTarget}
 			onClick={e => {
 				e.stopPropagation();
 				if (props.onClick) props.onClick();

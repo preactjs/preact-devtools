@@ -6,6 +6,7 @@ import { Icon, Picker } from "../icons";
 import { useStore } from "../../store/react-bindings";
 import s from "./TreeBar.module.css";
 import { useSearch } from "../../store/search";
+import { OutsideClick } from "../OutsideClick";
 import { FilterCheck, FilterPopup } from "../FilterPopup/FilterPopup";
 import filterBarStyles from "../FilterPopup/FilterPopup.module.css";
 
@@ -13,6 +14,8 @@ export function TreeBar() {
 	const store = useStore();
 	const isPicking = store.isPicking.value;
 	const { value, count, selected, goPrev, goNext } = useSearch();
+
+	const [filterVisible, setFilterVisible] = useState(false);
 
 	const onKeyDown = (e: KeyboardEvent) => {
 		if (e.key === "Enter") {
@@ -91,16 +94,20 @@ export function TreeBar() {
 			</div>
 			<ActionSeparator />
 			<div class={s.btnWrapper}>
-				<div class={filterBarStyles.filterBtnWrapper}>
+				<OutsideClick
+					onClick={() => setFilterVisible(false)}
+					class={filterBarStyles.filterBtnWrapper}
+				>
 					<IconBtn
 						title="Filter Components"
+						active={filterVisible}
 						testId="filter-menu-button"
-						popoverTarget="tree-filter-popup"
+						onClick={() => setFilterVisible(!filterVisible)}
 					>
 						<Icon icon="filter-list" />
 					</IconBtn>
-					<TreeFilterPopup />
-				</div>
+					{filterVisible && <TreeFilterPopup />}
+				</OutsideClick>
 			</div>
 		</Actions>
 	);
@@ -118,14 +125,6 @@ export function TreeFilterPopup() {
 		store.filter.filterTextSignal.value,
 	);
 	const [filters, setFilters] = useState(store.filter.filters.value);
-	const resetFilters = () => {
-		setFilterDom(store.filter.filterDom.value);
-		setFilterFragment(store.filter.filterFragment.value);
-		setFilterHoc(store.filter.filterHoc.value);
-		setFilterRoot(store.filter.filterRoot.value);
-		setFilterTextSignal(store.filter.filterTextSignal.value);
-		setFilters(store.filter.filters.value);
-	};
 	const removeFilter = (id: number) => {
 		const nextFilters = filters.filter(filter => filter.id !== id);
 		setFilters(nextFilters);
@@ -134,8 +133,6 @@ export function TreeFilterPopup() {
 
 	return (
 		<FilterPopup
-			id="tree-filter-popup"
-			onOpen={resetFilters}
 			onFiltersSubmit={() => {
 				store.filter.filterDom.value = filterDom;
 				store.filter.filterFragment.value = filterFragment;
