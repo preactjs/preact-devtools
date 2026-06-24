@@ -102,6 +102,12 @@ export function createHook(port: PortPageHook): DevtoolsHook {
 
 	const { listen, send } = port;
 	const renderers = new Map<number, Renderer>();
+	// Track each renderer's supported features so we can re-send `attach` when a
+	// panel connects after mount (see the `refresh` handler in `adapter.ts`).
+	const rendererSupports = new Map<
+		number,
+		{ renderReasons?: boolean; hooks?: boolean; profiling?: boolean }
+	>();
 	let uid = 0;
 	let status: "connected" | "pending" | "disconnected" = "disconnected";
 
@@ -110,7 +116,7 @@ export function createHook(port: PortPageHook): DevtoolsHook {
 
 	// Lazily init the adapter when a renderer is attached
 	const init = () => {
-		createAdapter(port, profiler, renderers);
+		createAdapter(port, profiler, renderers, rendererSupports);
 
 		status = "pending";
 		listen("init", () => {
@@ -128,6 +134,7 @@ export function createHook(port: PortPageHook): DevtoolsHook {
 		}
 
 		renderers.set(++uid, renderer);
+		rendererSupports.set(uid, supports);
 
 		// Content Script is likely not ready at this point, so don't
 		// flush any events here and politely request it to initialize
