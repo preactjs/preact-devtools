@@ -14,6 +14,7 @@ import {
 } from "../../data/commits";
 import { Icon } from "../../../icons";
 import { useComputed } from "@preact/signals";
+import { OutsideClick } from "../../../OutsideClick";
 import { FilterNumber, FilterPopup } from "../../../FilterPopup/FilterPopup";
 import filterBarStyles from "../../../FilterPopup/FilterPopup.module.css";
 import s from "./TimelineBar.module.css";
@@ -25,6 +26,8 @@ export function TimelineBar() {
 	const isRecording = store.profiler.isRecording.value;
 	const isSupported = store.profiler.isSupported.value;
 	const selectedCommit = store.profiler.activeCommitIdx.value;
+
+	const [filterVisible, setFilterVisible] = useState(false);
 
 	const stats = useComputed(() => {
 		return {
@@ -110,16 +113,20 @@ export function TimelineBar() {
 				</span>
 			)}
 			{isSupported && !isRecording && commits.length !== 0 && (
-				<div class={filterBarStyles.filterBtnWrapper}>
+				<OutsideClick
+					onClick={() => setFilterVisible(false)}
+					class={filterBarStyles.filterBtnWrapper}
+				>
 					<IconBtn
 						title="Filter Commits"
+						active={filterVisible}
 						testId="filter-menu-button"
-						popoverTarget="timeline-filter-popup"
+						onClick={() => setFilterVisible(!filterVisible)}
 					>
 						<Icon icon="filter-list" />
 					</IconBtn>
-					<TimelineFilterPopup />
-				</div>
+					{filterVisible && <TimelineFilterPopup />}
+				</OutsideClick>
 			)}
 		</Actions>
 	);
@@ -133,11 +140,7 @@ export function TimelineFilterPopup() {
 
 	return (
 		<FilterPopup
-			id="timeline-filter-popup"
 			className={s.filterPopup}
-			onOpen={() =>
-				setFilterCommitsUnder(store.profiler.filterCommitsUnder.value)
-			}
 			onFiltersSubmit={() => {
 				store.profiler.filterCommitsUnder.value = filterCommitsUnder
 					? filterCommitsUnder

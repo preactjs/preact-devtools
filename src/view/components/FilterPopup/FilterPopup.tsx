@@ -74,26 +74,14 @@ export function FilterPopup({
 	onFiltersSubmit,
 	filterActions,
 	className,
-	id,
-	onOpen,
 }: {
 	children: ComponentChildren;
 	filterActions?: ComponentChildren;
 	onFiltersSubmit: () => void;
 	className?: string;
-	id: string;
-	onOpen?: () => void;
 }) {
 	return (
-		<div
-			id={id}
-			popover="auto"
-			class={`${s.filter} ${className || ""}`}
-			data-testid="filter-popup"
-			onToggle={e => {
-				if ((e as any).newState === "open") onOpen?.();
-			}}
-		>
+		<div class={`${s.filter} ${className || ""}`} data-testid="filter-popup">
 			<form
 				onSubmit={e => {
 					e.preventDefault();
