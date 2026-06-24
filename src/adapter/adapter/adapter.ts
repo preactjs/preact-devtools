@@ -54,6 +54,10 @@ export function createAdapter(
 	port: PortPageHook,
 	profiler: ProfilerState,
 	renderers: Map<number, Renderer>,
+	rendererSupports: Map<
+		number,
+		{ renderReasons?: boolean; hooks?: boolean; profiling?: boolean }
+	> = new Map(),
 ) {
 	const window = preactDevtoolsCtx;
 
@@ -196,7 +200,25 @@ export function createAdapter(
 		forAll(r => r.applyFilters(filters));
 	});
 
-	listen("refresh", () => forAll(r => r.refresh?.()));
+	listen("refresh", () => {
+		// A panel that connected after mount never received the initial `attach`,
+		// so it doesn't know which features (e.g. hooks) are supported. The browser
+		// shell replays this from the content-script's buffered queue; the Lynx
+		// bridge has no such buffer, so re-send `attach` (idempotent) before
+		// re-walking the tree.
+		for (const id of renderers.keys()) {
+			const supports = rendererSupports.get(id);
+			if (supports) {
+				send("attach", {
+					id,
+					supportsProfiling: !!supports.profiling,
+					supportsRenderReasons: !!supports.renderReasons,
+					supportsHooks: !!supports.hooks,
+				});
+			}
+		}
+		forAll(r => r.refresh?.());
+	});
 
 	// Profiler
 	listen("start-profiling", options => {

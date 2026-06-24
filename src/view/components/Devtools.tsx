@@ -17,14 +17,14 @@ export function DevTools(props: { store: Store; ctx: PreactDevtoolsLDTCtx }) {
 	const panel = props.store.activePanel.value;
 
 	useEffect(() => {
-		// notify react-lynx that we need an init if there is no root
+		// No tree yet (the panel opened after the page rendered, or reopened
+		// without its previous state): request a `refresh` to re-fetch the tree
+		// instead of reloading the page. If there really are no roots, an empty
+		// tree is the correct state — leave reloading to the user.
 		if (props.store.roots.value.length === 0) {
-			props.ctx.devtoolsProps.postMessage("Remote.Customized.CDP", {
-				method: "Page.reload",
-				params: {},
-			});
+			props.store.emit("refresh", null);
 		}
-	});
+	}, []);
 
 	useEffect(() => {
 		const onUINodeIdSelected = (UINodeId?: number) => {
