@@ -6,17 +6,20 @@ import { LynxTestingEnv } from "@lynx-js/testing-environment";
 (globalThis as any).__DEBUG__ = false;
 
 // Unlike the standard setup, the Lynx test run drives the adapter through the
-// dual-threaded ReactLynx runtime emulated by `LynxTestingEnv`. Its constructor
-// reads `global.jsdom`, so that has to be created first.
-(globalThis as any).jsdom = new JSDOM();
-const lynxTestingEnv = new LynxTestingEnv();
+// dual-threaded ReactLynx runtime emulated by `LynxTestingEnv`, which takes the
+// host `window` directly (>=0.2, it no longer reads `global.jsdom`).
+const jsdom = new JSDOM();
+(globalThis as any).jsdom = jsdom;
+const lynxTestingEnv = new LynxTestingEnv({
+	window: jsdom.window as unknown as Window & typeof globalThis,
+});
 (globalThis as any).lynxTestingEnv = lynxTestingEnv;
 lynxTestingEnv.mainThread.globalThis.getUniqueIdListBySnapshotId = () => {
 	return [];
 };
 lynxTestingEnv.switchToBackgroundThread();
 
-const { window } = lynxTestingEnv.jsdom;
+const { window } = jsdom;
 (globalThis as any).window = window;
 (globalThis as any).document = window.document;
 (globalThis as any).performance = performance;
