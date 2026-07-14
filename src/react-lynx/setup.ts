@@ -11,6 +11,12 @@ export function setupReactLynx() {
 				);
 			}
 
+			// Capture the devtool instance once. `lynx.getDevtool()` can return
+			// `undefined` later (e.g. when the page is being closed), which would
+			// throw when accessing `.dispatchEvent`/`.addEventListener` on it.
+			// @ts-ignore
+			const devtool = lynx.getDevtool();
+
 			// @ts-ignore
 			globalThis.preactDevtoolsCtx ||= {};
 
@@ -65,8 +71,7 @@ export function setupReactLynx() {
 						data,
 					});
 				}
-				// @ts-ignore
-				lynx.getDevtool().dispatchEvent({
+				devtool.dispatchEvent({
 					type: "PreactDevtools",
 					data: JSON.stringify({
 						source,
@@ -76,8 +81,7 @@ export function setupReactLynx() {
 				});
 			};
 
-			// @ts-ignore
-			lynx.getDevtool().addEventListener("PreactDevtools", e => {
+			devtool.addEventListener("PreactDevtools", e => {
 				const dataObj = JSON.parse(e.data);
 				if (__DEBUG__) {
 					console.log("hdt -> frontend message received", dataObj);
