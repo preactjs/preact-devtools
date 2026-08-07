@@ -94,6 +94,10 @@ export function getSuspenseStateKey(c: Component) {
 	return null;
 }
 
+function getContextProvider(type: any) {
+	return type.Provider === type ? type : type._contextRef || type.__;
+}
+
 // Mangle accessors
 
 // When serializing props we're dealing with vnodes instead of
@@ -112,7 +116,7 @@ export function getPropsVNodeDisplayName(vnode: VNode, config: RendererConfig) {
 		}
 
 		// Provider
-		const ctx = (type as any)._contextRef || (type as any).__;
+		const ctx = getContextProvider(type);
 		if (ctx && ctx.displayName) {
 			return `${ctx.displayName}.Provider`;
 		}
@@ -148,7 +152,7 @@ export function getDisplayName(internal: Internal, config: RendererConfig) {
 		}
 
 		// Provider
-		const ctx = (type as any)._contextRef || (type as any).__;
+		const ctx = getContextProvider(type);
 		if (ctx && ctx.displayName) {
 			return `${ctx.displayName}.Provider`;
 		}
