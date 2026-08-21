@@ -28,12 +28,12 @@ jobs:
       - name: Unit tests
         run: npm run test
       - name: Run Preact 10 e2e tests
-        run: npm run build:chrome && npm run test:e2e --retries=5
+        run: npm run build:chrome && npm run test:e2e -- --retries=5
         env:
           PREACT_VERSION: 10
           CI: true
       - name: Run Preact 11 e2e tests
-        run: npm run test:e2e --retries=5
+        run: npm run test:e2e -- --retries=5
         env:
           PREACT_VERSION: 11
           CI: true
