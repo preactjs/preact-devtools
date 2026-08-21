@@ -1,5 +1,5 @@
 import { expect, test } from "@playwright/test";
-import { gotoTest, locateTreeItem } from "../pw-utils";
+import { getTreeViewItemNames, gotoTest } from "../pw-utils";
 
 test("Display core portals in the component tree", async ({ page }) => {
 	test.skip(
@@ -12,6 +12,7 @@ test("Display core portals in the component tree", async ({ page }) => {
 	await expect(page.locator('[data-testid="portal-content"]')).toHaveText(
 		"Portal content",
 	);
-	await expect(devtools.locator(locateTreeItem("Portal"))).toHaveCount(1);
-	await expect(devtools.locator(locateTreeItem("Modal"))).toHaveCount(1);
+	await expect
+		.poll(() => getTreeViewItemNames(devtools))
+		.toEqual(["App", "Portal", "Modal"]);
 });

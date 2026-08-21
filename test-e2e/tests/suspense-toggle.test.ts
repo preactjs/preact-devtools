@@ -40,6 +40,7 @@ function testCase(preactVersion: string) {
 }
 
 test.describe("Display Suspense in tree view", () => {
+	test("Preact 11.0.0-rc.0", testCase("11.0.0-rc.0"));
 	test("Preact 10.5.9", testCase("10.5.9"));
 	test("Preact 10.4.1", testCase("10.4.1"));
 });

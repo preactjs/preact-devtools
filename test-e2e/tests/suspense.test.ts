@@ -37,6 +37,7 @@ function testCase(version: string) {
 }
 
 test.describe("Display Suspense in tree view", () => {
+	test("Preact 11.0.0-rc.0", testCase("11.0.0-rc.0"));
 	test("Preact 10.5.9", testCase("10.5.9"));
 
 	// <10.4.5, uses a component instead of a Fragment as the boundary
