@@ -8,7 +8,6 @@ import {
 import { RendererConfig } from "./renderer";
 import { isEditable, serialize } from "./serialize";
 import { HookState, PreactBindings, SharedVNode } from "./bindings";
-import { OptionsV11 } from "../11/options";
 import { OptionsV10 } from "../10/options";
 import { flattenChildren } from "../../view/components/tree/windowing";
 
@@ -253,7 +252,7 @@ export function parseHookData<T extends SharedVNode>(
 
 export function inspectHooks<T extends SharedVNode>(
 	config: RendererConfig,
-	options: OptionsV10 | OptionsV11,
+	options: OptionsV10,
 	vnode: T,
 	helpers: PreactBindings<T>,
 ) {

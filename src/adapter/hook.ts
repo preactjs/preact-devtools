@@ -9,7 +9,6 @@ import { setupOptionsV10 } from "./10/options";
 import parseSemverish from "./parse-semverish";
 import { PortPageHook } from "./adapter/port";
 import { PROFILE_RELOAD, STATS_RELOAD } from "../constants";
-import { setupOptionsV11 } from "./11/options";
 import { newProfiler } from "./adapter/profiler";
 import { createIdMappingState } from "./shared/idMapper";
 import { bindingsV10 } from "./10/bindings";
@@ -214,21 +213,27 @@ export function createHook(port: PortPageHook): DevtoolsHook {
 			const namespace = Math.floor(Math.random() * 2 ** 32);
 
 			const roots = new Map<any, Node>();
+			const isVNodeBasedV11 =
+				preactVersionMatch.major === 11 &&
+				(preactVersionMatch.preRelease == null ||
+					preactVersionMatch.preRelease.tag === "beta" ||
+					preactVersionMatch.preRelease.tag === "rc");
 
-			// currently we only support preact >= 10, later we can add another branch for major === 8
-			if (preactVersionMatch.major == 10) {
+			// Preact 11 retained the VNode-based renderer and options hooks used by
+			// Preact 10, so both versions share the same adapter.
+			if (preactVersionMatch.major === 10 || isVNodeBasedV11) {
+				const bindings =
+					preactVersionMatch.major === 11 ? bindingsV11 : bindingsV10;
 				const supports = {
 					renderReasons: !!config.Component,
 					hooks:
+						preactVersionMatch.major === 11 ||
 						(preactVersionMatch.minor === 4 && preactVersionMatch.patch >= 1) ||
 						preactVersionMatch.minor > 4,
 					profiling: true,
 				};
 
-				const idMapper = createIdMappingState(
-					namespace,
-					bindingsV10.getInstance,
-				);
+				const idMapper = createIdMappingState(namespace, bindings.getInstance);
 
 				const renderer = createRenderer(
 					port,
@@ -238,36 +243,12 @@ export function createHook(port: PortPageHook): DevtoolsHook {
 					profiler,
 					filters,
 					idMapper,
-					bindingsV10,
+					bindings,
 					roots,
 					version,
 				);
 				setupOptionsV10(options, renderer, roots, config as any);
 				return attachRenderer(renderer, supports);
-			} else if (preactVersionMatch.major === 11) {
-				const idMapper = createIdMappingState(
-					namespace,
-					bindingsV11.getInstance,
-				);
-
-				const renderer = createRenderer(
-					port,
-					config,
-					options as any,
-					{ hooks: true, renderReasons: true },
-					profiler,
-					filters,
-					idMapper,
-					bindingsV11,
-					roots,
-					version,
-				);
-				setupOptionsV11(options as any, renderer, roots, config, profiler);
-				return attachRenderer(renderer, {
-					hooks: true,
-					renderReasons: true,
-					profiling: true,
-				});
 			}
 
 			// eslint-disable-next-line no-console
