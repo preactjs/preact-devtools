@@ -207,8 +207,6 @@ export function getDisplayName(vnode: VNode, config: RendererConfig): string {
 	const { type } = vnode;
 	if (type === config.Fragment) return "Fragment";
 	else if (typeof type === "function") {
-		if (isPortal(vnode)) return "Portal";
-
 		if ((type as any).Provider === type) {
 			const name = (type as any).displayName;
 			return `${name ? `${name}.` : ""}Provider`;
@@ -327,10 +325,9 @@ export function isElement(vnode: VNode): boolean {
 	return typeof vnode.type === "string";
 }
 
+// eslint-disable-next-line @typescript-eslint/no-unused-vars
 export function isPortal(vnode: VNode) {
-	return (
-		vnode.props != null && ("_parentDom" in vnode.props || "__P" in vnode.props)
-	);
+	return false;
 }
 
 export const bindingsV10: PreactBindings<VNode> = {

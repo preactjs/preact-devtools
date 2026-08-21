@@ -12,6 +12,7 @@ import { PROFILE_RELOAD, STATS_RELOAD } from "../constants";
 import { newProfiler } from "./adapter/profiler";
 import { createIdMappingState } from "./shared/idMapper";
 import { bindingsV10 } from "./10/bindings";
+import { bindingsV11 } from "./11/bindings";
 
 export type EmitterFn = (event: string, data: any) => void;
 
@@ -216,6 +217,8 @@ export function createHook(port: PortPageHook): DevtoolsHook {
 			// Preact 11 retained the VNode-based renderer and options hooks used by
 			// Preact 10, so both versions share the same adapter.
 			if (preactVersionMatch.major === 10 || preactVersionMatch.major === 11) {
+				const bindings =
+					preactVersionMatch.major === 11 ? bindingsV11 : bindingsV10;
 				const supports = {
 					renderReasons: !!config.Component,
 					hooks:
@@ -225,10 +228,7 @@ export function createHook(port: PortPageHook): DevtoolsHook {
 					profiling: true,
 				};
 
-				const idMapper = createIdMappingState(
-					namespace,
-					bindingsV10.getInstance,
-				);
+				const idMapper = createIdMappingState(namespace, bindings.getInstance);
 
 				const renderer = createRenderer(
 					port,
@@ -238,7 +238,7 @@ export function createHook(port: PortPageHook): DevtoolsHook {
 					profiler,
 					filters,
 					idMapper,
-					bindingsV10,
+					bindings,
 					roots,
 					version,
 				);
