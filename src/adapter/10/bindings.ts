@@ -207,6 +207,13 @@ export function getDisplayName(vnode: VNode, config: RendererConfig): string {
 	const { type } = vnode;
 	if (type === config.Fragment) return "Fragment";
 	else if (typeof type === "function") {
+		if (isPortal(vnode)) return "Portal";
+
+		if ((type as any).Provider === type) {
+			const name = (type as any).displayName;
+			return `${name ? `${name}.` : ""}Provider`;
+		}
+
 		// Context is a special case :((
 		// See: https://reactjs.org/docs/context.html#contextdisplayname
 		const c = getComponent(vnode)!;
@@ -320,10 +327,10 @@ export function isElement(vnode: VNode): boolean {
 	return typeof vnode.type === "string";
 }
 
-// eslint-disable-next-line @typescript-eslint/no-unused-vars
 export function isPortal(vnode: VNode) {
-	// TODO: Find a way to detect portals
-	return false;
+	return (
+		vnode.props != null && ("_parentDom" in vnode.props || "__P" in vnode.props)
+	);
 }
 
 export const bindingsV10: PreactBindings<VNode> = {
