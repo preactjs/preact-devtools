@@ -213,10 +213,15 @@ export function createHook(port: PortPageHook): DevtoolsHook {
 			const namespace = Math.floor(Math.random() * 2 ** 32);
 
 			const roots = new Map<any, Node>();
+			const isVNodeBasedV11 =
+				preactVersionMatch.major === 11 &&
+				(preactVersionMatch.preRelease == null ||
+					preactVersionMatch.preRelease.tag === "beta" ||
+					preactVersionMatch.preRelease.tag === "rc");
 
 			// Preact 11 retained the VNode-based renderer and options hooks used by
 			// Preact 10, so both versions share the same adapter.
-			if (preactVersionMatch.major === 10 || preactVersionMatch.major === 11) {
+			if (preactVersionMatch.major === 10 || isVNodeBasedV11) {
 				const bindings =
 					preactVersionMatch.major === 11 ? bindingsV11 : bindingsV10;
 				const supports = {
