@@ -30,8 +30,62 @@ Then, download the Preact Devtools extension for your browser:
 
 ## Contributing
 
+**NOTE:** This repo currently uses a mix of yarn and npm.
+
+To set up a local dev environment, clone this repo and use
+[yarn](https://yarnpkg.com/getting-started/install) to install dependencies:
+
+```bash
+git clone https://github.com/preactjs/preact-devtools.git
+cd preact-devtools
+yarn install
+```
+
+### Development
+
+Preact Devtools aims to maintain compatibility with all Preact releases
+since 10.1.0. For testing purposes, the dev server needs at least one
+Preact release package in the `test-e2e/fixtures/vendor/preact` directory.
+
+To download a full set of Preact release packages, run:
+
+```bash
+node tools/fetch-preact-versions.mjs
+```
+
+Then:
+
 - Use `npm run dev` to start a demo page
 - Use `npm run watch` to rebuild all extensions on any code changes
+
+### Linting & testing
+
+To run the linter:
+
+```bash
+yarn lint
+```
+
+To run the unit tests:
+
+```bash
+yarn test
+```
+
+To run browser tests, first ensure that Playwright is installed:
+
+```bash
+npx playwright install
+```
+
+then:
+
+- `npm run test:e2e:10` to run browser tests with Preact 10
+- `npm run test:e2e:11` to run browser tests with Preact 11
+- `npm run test:e2e:git` to run browser tests with a local checkout of Preact
+
+### Building
+
 - Use `npm run build:firefox` or `npm run build:chrome` to create a release build
 
 Chrome:
