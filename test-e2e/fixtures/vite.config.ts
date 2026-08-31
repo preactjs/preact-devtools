@@ -1,16 +1,17 @@
 import { defineConfig } from "vite";
-import { listFixtures } from "./list-fixtures";
-import { rewritePreactVersion } from "./rewrite-preact-version";
-import { loadPreactVersion } from "./load-preact-version";
-import { listPreactVersions } from "./list-preact-versions";
+import { listFixtures } from "./list-fixtures.ts";
+import { rewritePreactVersion } from "./rewrite-preact-version.ts";
+import { loadPreactVersion } from "./load-preact-version.ts";
+import { listPreactVersions } from "./list-preact-versions.ts";
 import path from "path";
-import { injectSvgSpritePlugin } from "./inject-sprite";
+import { injectSvgSpritePlugin } from "./inject-sprite.ts";
 import prefresh from "@prefresh/vite";
 
 // https://vitejs.dev/config/
 export default defineConfig({
 	optimizeDeps: {
 		exclude: ["preact"],
+		include: ["@preact/signals-core"],
 	},
 	plugins: [
 		prefresh(),
@@ -34,7 +35,7 @@ export default defineConfig({
 							"react-dom/test-utils": "preact/test-utils",
 							"react-dom": "preact/compat",
 							react: "preact/compat",
-							goober: path.join(__dirname, "vendor", "goober.js"),
+							goober: path.join(import.meta.dirname, "vendor", "goober.js"),
 						},
 					},
 				};

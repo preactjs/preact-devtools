@@ -1,11 +1,9 @@
-import path from "path";
 import fs from "fs";
 
 /**
  * Get a sorted list of all available preact versions
  */
-export function getPreactVersions() {
-	const dir = path.join(__dirname, "vendor", "preact");
+export function getPreactVersions(dir: string) {
 	const versions = fs
 		.readdirSync(dir)
 		.filter(name => !name.startsWith("."))

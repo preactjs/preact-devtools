@@ -1,5 +1,6 @@
 import { Plugin } from "vite";
-import { getPreactVersions } from "./utils";
+import { getPreactVersions } from "./utils.ts";
+import path from "path";
 
 /**
  * Load all available Preact versions and expose them via
@@ -17,7 +18,9 @@ export function listPreactVersions(): Plugin {
 		},
 		load(id) {
 			if (virtual === id) {
-				const items = getPreactVersions();
+				const items = getPreactVersions(
+					path.join(import.meta.dirname, "vendor", "preact"),
+				);
 				return `export const preactVersions = [
           ${items.map(x => '"' + x + '"').join(",\n")}
         ]`;

@@ -4,9 +4,25 @@ import { gotoTest } from "../pw-utils";
 test("Highlight iframe nodes", async ({ page }) => {
 	const { devtools } = await gotoTest(page, "iframe");
 
-	await page.waitForFunction(() =>
-		Array.from(document.querySelectorAll("iframe")).every(
-			x => (x as HTMLIFrameElement).contentDocument?.readyState === "complete",
+	await page.waitForFunction(() => {
+		const frames = Array.from(
+			document.querySelectorAll<HTMLIFrameElement>("iframe:not(#devtools)"),
+		);
+		return (
+			frames.length === 2 &&
+			frames.every(
+				frame => (frame.contentWindow as any)?.__PREACT_E2E_READY__ === true,
+			)
+		);
+	});
+	const fixtureFrames = page
+		.frames()
+		.filter(frame => /\/iframe2?\.html$/.test(frame.url()));
+	await Promise.all(
+		fixtureFrames.map(frame =>
+			frame.waitForFunction(
+				() => (window as any).__PREACT_E2E_READY__ === true,
+			),
 		),
 	);
 
@@ -50,6 +66,6 @@ test("Highlight iframe nodes", async ({ page }) => {
 
 	// Foobar.Consumer
 	await devtools.hover('[data-name="Foobar.Consumer"]');
-	const iframe2 = frames.find(frame => frame.url().endsWith("iframe.html"));
+	const iframe2 = frames.find(frame => frame.url().endsWith("iframe2.html"));
 	await iframe2!.waitForSelector(highlight);
 });

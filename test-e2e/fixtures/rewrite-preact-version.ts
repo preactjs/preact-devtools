@@ -3,7 +3,7 @@ import fs from "fs";
 import path from "path";
 import { transformSync } from "@babel/core";
 import transformJsx from "@babel/plugin-transform-react-jsx";
-import { addImport, rewriteImportPlugin } from "./babel";
+import { addImport, rewriteImportPlugin } from "./babel.ts";
 import { URL } from "url";
 
 /**
@@ -30,11 +30,11 @@ export function rewritePreactVersion(): Plugin {
 		load(id) {
 			if (id.startsWith(PREFIX)) {
 				const newId = id.slice(PREFIX.length, id.indexOf("?"));
-				const filePath = path.join(__dirname, newId);
+				const filePath = path.join(import.meta.dirname, newId);
 				return fs.readFileSync(filePath, "utf-8");
 			} else if (id.startsWith("@fixture-signals")) {
 				const filePath = path.join(
-					__dirname,
+					import.meta.dirname,
 					"..",
 					"..",
 					"node_modules",

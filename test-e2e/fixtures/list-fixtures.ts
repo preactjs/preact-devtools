@@ -17,7 +17,7 @@ export function listFixtures(): Plugin {
 		},
 		load(id) {
 			if (id === virtual) {
-				const dir = path.join(__dirname, "apps");
+				const dir = path.join(import.meta.dirname, "apps");
 				const items = fs
 					.readdirSync(dir)
 					.map(x => path.basename(x, path.extname(x)))

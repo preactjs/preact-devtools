@@ -12,8 +12,8 @@ export function loadPreactVersion(): Plugin {
 	const cache = new Map<string, any>();
 	const extracted = new Set<string>();
 
-	const versionReg = /preact@([^/]+)/;
-	const tarDir = path.join(__dirname, "vendor", "preact");
+	const versionReg = /^preact@([^/]+)/;
+	const tarDir = path.join(import.meta.dirname, "vendor", "preact");
 	const cacheDir = path.join(tarDir, ".cache");
 
 	return {
@@ -41,7 +41,14 @@ export function loadPreactVersion(): Plugin {
 						.replace("@git", "")
 						.replace(/^preact$/, ".")
 						.replace(/^preact\//, "./");
-					const entry = pkg.exports[modName].import;
+					const exported = pkg.exports[modName];
+					const entry =
+						typeof exported === "string"
+							? exported
+							: exported?.import || exported?.default;
+					if (!entry) {
+						throw new Error(`No import entry for "${modName}" in Preact git`);
+					}
 
 					const code = fs.readFileSync(path.join(versionDir, entry), "utf-8");
 					const map = findMap(path.join(versionDir, entry + ".map"));

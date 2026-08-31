@@ -33,5 +33,6 @@ import { DevtoolsToClient, PageHookName } from "../../src/constants";
 
 (async () => {
 	await import("preact/devtools");
-	import("./apps/counter");
+	await import("./apps/counter");
+	(window as any).__PREACT_E2E_READY__ = true;
 })();

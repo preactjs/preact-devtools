@@ -1,6 +1,7 @@
 import { Frame, Page } from "@playwright/test";
 import { getPreactVersions } from "./fixtures/utils";
 import assert from "assert";
+import path from "path";
 
 export interface TestOptions {
 	preact?: string;
@@ -13,7 +14,9 @@ export async function gotoTest(
 ) {
 	let preactVersion = options.preact;
 	if (!preactVersion) {
-		const versions = getPreactVersions();
+		const versions = getPreactVersions(
+			path.join(__dirname, "fixtures", "vendor", "preact"),
+		);
 		const envVersion = process.env.PREACT_VERSION;
 		if (envVersion) {
 			const parsed = versions.find(v => v.startsWith(envVersion));
@@ -74,23 +77,50 @@ export async function gotoTest(
 		page.off("pageerror", captureFixtureError);
 	}
 
-	const devtools = page
-		.mainFrame()
-		.childFrames()
-		.find(frame => frame.url().endsWith("devtools.html"));
+	const devtoolsDeadline = Date.now() + 20_000;
+	let devtools: Frame | undefined;
+	while (Date.now() < devtoolsDeadline) {
+		devtools = page
+			.mainFrame()
+			.childFrames()
+			.find(frame => frame.url().endsWith("devtools.html"));
+		if (!devtools) {
+			await wait(50);
+			continue;
+		}
 
-	assert(devtools);
+		try {
+			await devtools.waitForFunction(
+				() => (window as any).__PREACT_DEVTOOLS_READY__ === true,
+				undefined,
+				{ timeout: 1000 },
+			);
+			await devtools.waitForFunction(
+				() => {
+					return (
+						document.querySelector('[data-testid="tree-item"]') !== null ||
+						document.querySelector('[data-testid="msg-no-results"]') !== null ||
+						document.querySelector('[data-testid="msg-only-connected"]') !== null
+					);
+				},
+				undefined,
+				{ timeout: 1000 },
+			);
+			break;
+		} catch (err) {
+			const message = String((err as Error).message);
+			if (
+				!message.includes("Frame was detached") &&
+				!message.includes("Execution context was destroyed") &&
+				!message.includes("Timeout")
+			) {
+				throw err;
+			}
+			devtools = undefined;
+		}
+	}
 
-	await devtools.waitForFunction(
-		() => (window as any).__PREACT_DEVTOOLS_READY__ === true,
-	);
-	await devtools.waitForFunction(() => {
-		return (
-			document.querySelector('[data-testid="tree-item"]') !== null ||
-			document.querySelector('[data-testid="msg-no-results"]') !== null ||
-			document.querySelector('[data-testid="msg-only-connected"]') !== null
-		);
-	});
+	assert(devtools, "Timed out waiting for the devtools frame to become ready");
 
 	return { devtools };
 }
