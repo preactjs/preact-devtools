@@ -192,6 +192,30 @@ export function locateProfilerTab(tab: "RANKED" | "FLAMEGRAPH") {
 	return `label:has(input[type="radio"][value="${tab}"])`;
 }
 
+export async function enableHighlightUpdates(page: Page, devtools: Frame) {
+	await devtools.locator(locateTab("SETTINGS")).click();
+	await Promise.all([
+		// The checkbox sends through the iframe and back to the page. Wait for
+		// the same-window message consumed by the adapter, not just the click.
+		page.evaluate(
+			() =>
+				new Promise<void>(resolve => {
+					window.addEventListener("message", function onMessage(event) {
+						if (
+							event.source === window &&
+							event.data.source === "preact-devtools-to-client" &&
+							event.data.type === "start-highlight-updates"
+						) {
+							window.removeEventListener("message", onMessage);
+							resolve();
+						}
+					});
+				}),
+		),
+		devtools.locator('[data-testid="toggle-highlight-updates"]').check(),
+	]);
+}
+
 export async function clickRecordButton(page: Frame) {
 	const selector = '[data-testid="actions"] [data-testid="record-btn"]';
 	const title = (await page.locator(selector).getAttribute("title")) || "";

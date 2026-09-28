@@ -12,9 +12,6 @@ import {
 } from "./build-plugins/esbuild-plugins.mjs";
 import mri from "mri";
 import * as kl from "kolorist";
-import { fileURLToPath } from "url";
-
-const __dirname = path.dirname(fileURLToPath(import.meta.url));
 
 const args = mri(process.argv.slice(2), {
 	string: ["browser"],
@@ -88,7 +85,9 @@ async function build(browser) {
 	/** @type {string[] | undefined} */
 	let external;
 	if (isInline) {
-		const raw = await fs.readFile(path.join(__dirname, "..", "package.json"));
+		const raw = await fs.readFile(
+			path.join(import.meta.dirname, "..", "package.json"),
+		);
 		const json = JSON.parse(raw);
 
 		external = Array.from(
@@ -153,7 +152,7 @@ async function build(browser) {
 				}),
 
 			spritePlugin(
-				path.join(__dirname, "..", "src", "view", "sprite.svg"),
+				path.join(import.meta.dirname, "..", "src", "view", "sprite.svg"),
 				isInline
 					? [path.join(dist, "panel", "panel.html")]
 					: [

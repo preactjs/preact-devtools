@@ -1,9 +1,14 @@
-const { chromium } = require("playwright");
+import { chromium } from "@playwright/test";
 
-const path = require("path");
+import path from "path";
 
 async function main() {
-	const extension = path.join(__dirname, "..", "dist", "chrome-debug");
+	const extension = path.join(
+		import.meta.dirname,
+		"..",
+		"dist",
+		"chrome-debug",
+	);
 	const browser = await chromium.launchPersistentContext("./profiles/chrome", {
 		args: [
 			`--disable-extensions-except=${extension}`,

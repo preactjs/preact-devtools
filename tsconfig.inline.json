@@ -3,11 +3,12 @@
 	"compilerOptions": {
 		"emitDeclarationOnly": true,
 		"declaration": true,
-		"declarationDir": "dist/inline/types/"
+		"declarationDir": "dist/inline/types/",
+		"rootDir": "./src"
 	},
 	"files": [
 		"src/shells/shared/panel/panel.ts",
 		"src/shells/shared/installHook.ts"
 	],
-	"include": ["./src/global.d.ts", "./src"]
+	"include": ["./src/global.d.ts"]
 }

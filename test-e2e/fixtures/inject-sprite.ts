@@ -9,7 +9,7 @@ export function injectSvgSpritePlugin(): Plugin {
 		transformIndexHtml(html) {
 			if (/\.\/devtools\.ts/.test(html)) {
 				const filePath = path.join(
-					__dirname,
+					import.meta.dirname,
 					"..",
 					"..",
 					"src",

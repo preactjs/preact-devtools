@@ -12,8 +12,12 @@ export function loadPreactVersion(): Plugin {
 	const cache = new Map<string, any>();
 	const extracted = new Set<string>();
 
-	const versionReg = /preact@([^/]+)/;
-	const tarDir = path.join(__dirname, "vendor", "preact");
+	// Only intercept bare synthetic specifiers like `preact@10_29_8/hooks`
+	// or `preact@git`. Real pnpm filesystem paths (e.g.
+	// `/.../.pnpm/preact@10.29.8/node_modules/preact/...`) contain `preact@`
+	// too, but they are absolute paths and must resolve normally.
+	const versionReg = /^preact@([^/]+)/;
+	const tarDir = path.join(import.meta.dirname, "vendor", "preact");
 	const cacheDir = path.join(tarDir, ".cache");
 
 	return {
@@ -99,7 +103,7 @@ export function loadPreactVersion(): Plugin {
 								"preact/debug": "debug/dist/debug.module.js",
 								"preact/devtools": "devtools/dist/devtools.module.js",
 							},
-						};
+						} as const;
 
 						importee = version.startsWith("11")
 							? mappings["11.x"][importee]
@@ -162,7 +166,7 @@ function findMap(path: string) {
 	try {
 		map = fs.readFileSync(path, "utf-8");
 	} catch (e) {
-		if (e.code !== "ENOENT") throw e;
+		if (e instanceof Error && "code" in e && e.code !== "ENOENT") throw e;
 		map = fs.readFileSync(path.replace(".mjs", ".module.js"), "utf-8");
 	}
 

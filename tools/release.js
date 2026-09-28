@@ -1,7 +1,7 @@
-const assert = require("assert");
-const fs = require("fs");
-const path = require("path");
-const child_process = require("child_process");
+import assert from "assert";
+import fs from "fs";
+import path from "path";
+import child_process from "child_process";
 
 let version = "";
 function updateVersion(json, kind) {
@@ -32,7 +32,7 @@ function format(file) {
 	child_process.execSync(`./node_modules/.bin/oxfmt --write ${file}`);
 }
 
-const shellPath = path.join(__dirname, "..", "src", "shells");
+const shellPath = path.join(import.meta.dirname, "..", "src", "shells");
 function updateManifest(name, kind) {
 	assert(/edge|chrome|firefox/.test(name), "Unknown browser");
 
@@ -45,7 +45,7 @@ function updateManifest(name, kind) {
 }
 
 function updatePkgJson(kind) {
-	const file = path.join(__dirname, "..", "package.json");
+	const file = path.join(import.meta.dirname, "..", "package.json");
 	const json = JSON.parse(fs.readFileSync(file, "utf-8"));
 	updateVersion(json, kind);
 

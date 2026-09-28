@@ -13,7 +13,7 @@ const config: PlaywrightTestConfig = {
 	expect: {
 		timeout: 5 * 1000,
 	},
-	testDir: path.join(__dirname, "test-e2e", "tests"),
+	testDir: path.join(import.meta.dirname, "test-e2e", "tests"),
 	testMatch: "**/*.test.ts",
 	forbidOnly: !!process.env.CI,
 	// retries: 3,
