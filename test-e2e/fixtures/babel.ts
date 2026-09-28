@@ -1,8 +1,8 @@
 import { Plugin } from "babel-plugin-helpers";
-import { type PluginObject } from "@babel/core"
+import { type PluginObject } from "@babel/core";
 
 export const rewriteImportPlugin: Plugin<{ version: string }> = (
-	{ types: t },	
+	{ types: t },
 	options,
 ) => {
 	const toRewrite = new Set([
@@ -15,7 +15,7 @@ export const rewriteImportPlugin: Plugin<{ version: string }> = (
 
 	const version = options?.version;
 	if (version === undefined) {
-		throw new Error("Missing version option to preact version plugin")
+		throw new Error("Missing version option to preact version plugin");
 	}
 
 	return {
@@ -32,10 +32,7 @@ export const rewriteImportPlugin: Plugin<{ version: string }> = (
 				} else if (source === "@preact/signals") {
 					const clone = t.cloneNode(path.node, true);
 					clone.source = t.stringLiteral(
-						source.replace(
-							"@preact/signals",
-							`@preact/signals@${version}`,
-						),
+						source.replace("@preact/signals", `@preact/signals@${version}`),
 					);
 					path.replaceWith(clone);
 				}

@@ -13,7 +13,6 @@ import {
 import mri from "mri";
 import * as kl from "kolorist";
 
-
 const args = mri(process.argv.slice(2), {
 	string: ["browser"],
 	boolean: ["debug", "help", "watch"],
@@ -86,7 +85,9 @@ async function build(browser) {
 	/** @type {string[] | undefined} */
 	let external;
 	if (isInline) {
-		const raw = await fs.readFile(path.join(import.meta.dirname, "..", "package.json"));
+		const raw = await fs.readFile(
+			path.join(import.meta.dirname, "..", "package.json"),
+		);
 		const json = JSON.parse(raw);
 
 		external = Array.from(

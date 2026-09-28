@@ -166,7 +166,7 @@ function findMap(path: string) {
 	try {
 		map = fs.readFileSync(path, "utf-8");
 	} catch (e) {
-		if (e instanceof Error && "code" in e &&e.code !== "ENOENT") throw e;
+		if (e instanceof Error && "code" in e && e.code !== "ENOENT") throw e;
 		map = fs.readFileSync(path.replace(".mjs", ".module.js"), "utf-8");
 	}
 
