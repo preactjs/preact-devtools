@@ -18,6 +18,8 @@ jobs:
         with:
           node-version: 24
       - uses: pnpm/setup@v3
+        with:
+          version: 12.6.0
       - name: Install Deps
         run: pnpm i
       - name: Check formatting
