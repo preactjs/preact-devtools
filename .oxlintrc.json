@@ -20,6 +20,11 @@
 		"no-unused-vars": ["error", { "caughtErrors": "none" }],
 		"no-unused-expressions": "off",
 		"react/exhaustive-deps": "off",
+		"react/immutability": "off",
+		"react/refs": "off",
+		"react/void-use-memo": "off",
+		"react/use-memo": "off",
+		"react/globals": "off",
 		"oxc/only-used-in-recursion": "off",
 		"typescript/no-explicit-any": "off",
 		"typescript/no-non-null-assertion": "off"

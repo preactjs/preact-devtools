@@ -49,7 +49,8 @@ chrome.devtools.panels.elements.onSelectionChanged.addListener(() => {
 			? (window.__PREACT_DEVTOOLS__.$0 = $0, true)
 			: false
 		`,
-		(result, _exceptionInfo) => {
+		// oxlint-disable-next-line no-unused-vars
+		(result, _exceptionInfo: any) => {
 			hostSelectionChanged = result === true;
 		},
 	);
