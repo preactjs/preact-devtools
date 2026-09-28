@@ -4,9 +4,7 @@ import { glob } from "fs/promises";
 import path from "path";
 import * as kl from "kolorist";
 import { pipeline } from "stream";
-import { fileURLToPath } from "url";
 
-const __dirname = path.dirname(fileURLToPath(import.meta.url));
 const streamPipeline = util.promisify(pipeline);
 
 /* eslint-disable no-console */
@@ -15,7 +13,7 @@ const streamPipeline = util.promisify(pipeline);
  * @typedef {{versions: Record<string, {dist: {tarball: string}}>, "dist-tags": Record<string, string>}} NPMResponse
  */
 
-const root = path.join(__dirname, "..");
+const root = path.join(import.meta.dirname, "..");
 const versionReg = /\b(?:10|11)\.\d+\.\d+(?:-[0-9A-Za-z.-]+)?\b/g;
 
 function sortVersions(a, b) {
@@ -94,7 +92,7 @@ function sortVersions(a, b) {
 		const tarball = json.versions[version].dist.tarball;
 		const tgz = path.basename(tarball);
 		const dest = path.join(
-			__dirname,
+			import.meta.dirname,
 			"..",
 			"test-e2e",
 			"fixtures",

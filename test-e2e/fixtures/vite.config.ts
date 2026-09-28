@@ -1,10 +1,10 @@
 import { defineConfig } from "vite";
-import { listFixtures } from "./list-fixtures";
-import { rewritePreactVersion } from "./rewrite-preact-version";
-import { loadPreactVersion } from "./load-preact-version";
-import { listPreactVersions } from "./list-preact-versions";
+import { listFixtures } from "./list-fixtures.js";
+import { rewritePreactVersion } from "./rewrite-preact-version.js";
+import { loadPreactVersion } from "./load-preact-version.js";
+import { listPreactVersions } from "./list-preact-versions.js";
 import path from "path";
-import { injectSvgSpritePlugin } from "./inject-sprite";
+import { injectSvgSpritePlugin } from "./inject-sprite.js";
 import prefresh from "@prefresh/vite";
 
 // https://vitejs.dev/config/
@@ -34,7 +34,7 @@ export default defineConfig({
 							"react-dom/test-utils": "preact/test-utils",
 							"react-dom": "preact/compat",
 							react: "preact/compat",
-							goober: path.join(__dirname, "vendor", "goober.js"),
+							goober: path.join(import.meta.dirname, "vendor", "goober.js"),
 						},
 					},
 				};

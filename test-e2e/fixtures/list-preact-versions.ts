@@ -1,5 +1,5 @@
 import { Plugin } from "vite";
-import { getPreactVersions } from "./utils";
+import { getPreactVersions } from "./utils.js";
 
 /**
  * Load all available Preact versions and expose them via
