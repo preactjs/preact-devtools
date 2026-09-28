@@ -10,11 +10,11 @@ export function babelPluginCssModules({ types: t }) {
 
 				const name = specifier.local.name;
 
-				path.replaceWith(t.importDeclaration([], t.StringLiteral(source)));
+				path.replaceWith(t.importDeclaration([], t.stringLiteral(source)));
 				path.insertAfter(
-					t.ImportDeclaration(
+					t.importDeclaration(
 						[t.importNamespaceSpecifier(t.identifier(name))],
-						t.StringLiteral(source.replace(".module.", ".module-virtual.")),
+						t.stringLiteral(source.replace(".module.", ".module-virtual.")),
 					),
 				);
 			},

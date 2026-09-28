@@ -253,7 +253,7 @@ export function babelPlugin(define) {
 					sourceMaps: false,
 					sourceType: "module",
 					plugins: [
-						["@babel/plugin-syntax-typescript", { isTSX: true }],
+						"@babel/plugin-syntax-typescript",
 						["babel-plugin-transform-define", define],
 						babelPluginDeadCode,
 					],
@@ -291,8 +291,9 @@ export function babelPlugin(define) {
 						filename: args.path,
 						sourceMaps: false,
 						sourceType: "module",
+						parserOpts: { plugins: ["jsx"] },
 						plugins: [
-							["@babel/plugin-syntax-typescript", { isTSX: true }],
+							"@babel/plugin-syntax-typescript",
 							babelPluginCssModules,
 							babelPluginDeadCode,
 							[
