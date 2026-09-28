@@ -1,4 +1,5 @@
 import { setupInlineDevtools } from "../../src/shells/inline/index";
+import "preact/debug";
 
 const container = document.getElementById("app")!;
 

@@ -1,11 +1,10 @@
 import { expect, test } from "@playwright/test";
-import { locateTab, gotoTest } from "../../pw-utils";
+import { enableHighlightUpdates, gotoTest } from "../../pw-utils";
 
 test("Check if highlight updates is rendered", async ({ page }) => {
 	const { devtools } = await gotoTest(page, "todo");
 
-	await devtools.locator(locateTab("SETTINGS")).click();
-	await devtools.locator('[data-testId="toggle-highlight-updates"]').click();
+	await enableHighlightUpdates(page, devtools);
 
 	const id = "#preact-devtools-highlight-updates";
 

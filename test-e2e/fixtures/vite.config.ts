@@ -10,6 +10,8 @@ import prefresh from "@prefresh/vite";
 // https://vitejs.dev/config/
 export default defineConfig({
 	optimizeDeps: {
+		// Virtual fixture imports aren't visible to the initial dependency scan.
+		include: ["@preact/signals-core"],
 		exclude: ["preact"],
 	},
 	plugins: [

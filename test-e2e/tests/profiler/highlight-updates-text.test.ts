@@ -1,11 +1,10 @@
 import { expect, test } from "@playwright/test";
-import { locateTab, gotoTest } from "../../pw-utils";
+import { enableHighlightUpdates, gotoTest } from "../../pw-utils";
 
 test("Don't crash on measuring text nodes", async ({ page }) => {
 	const { devtools } = await gotoTest(page, "highlight-text");
 
-	await devtools.locator(locateTab("SETTINGS")).click();
-	await devtools.locator('[data-testId="toggle-highlight-updates"]').click();
+	await enableHighlightUpdates(page, devtools);
 
 	await page.locator("button").click({ noWaitAfter: true });
 
