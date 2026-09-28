@@ -44,13 +44,13 @@ const store = createStore();
 // Sync selection from browser to devtools
 chrome.devtools.panels.elements.onSelectionChanged.addListener(() => {
 	store.emit("load-host-selection", null);
-	chrome.devtools.inspectedWindow.eval(
+	chrome.devtools.inspectedWindow.eval<boolean>(
 		`window.__PREACT_DEVTOOLS__ && window.__PREACT_DEVTOOLS__.$0 !== $0
 			? (window.__PREACT_DEVTOOLS__.$0 = $0, true)
 			: false
 		`,
-		(result: boolean) => {
-			hostSelectionChanged = result;
+		(result, _exceptionInfo) => {
+			hostSelectionChanged = result === true;
 		},
 	);
 });
