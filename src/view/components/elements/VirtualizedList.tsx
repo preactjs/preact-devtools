@@ -120,7 +120,7 @@ export function useVirtualizedList<T>({
 			idx++;
 		}
 		return vnodes;
-	}, [items, idx, max, top]);
+	}, [items, idx, max, top, renderRow]);
 
 	return {
 		containerHeight: rowHeight * items.length,

@@ -58,7 +58,15 @@ export function TreeView() {
 	const search = useSearch();
 
 	const [updateCount, setUpdateCount] = useState(0);
+	const [hocLimits, setHocLimits] = useState<Map<ID, number>>(() => new Map());
 	useResize(() => setUpdateCount(updateCount + 1), [updateCount]);
+
+	const renderRow = useCallback(
+		(id: ID, _: number, top: number) => (
+			<TreeItem key={id} id={id} top={top} maxHocVisible={hocLimits.get(id)} />
+		),
+		[hocLimits],
+	);
 
 	const {
 		children: listItems,
@@ -69,8 +77,7 @@ export function TreeView() {
 		minBufferCount: 5,
 		container: ref,
 		items: nodeList,
-		// eslint-disable-next-line react/display-name
-		renderRow: (id, _, top) => <TreeItem key={id} id={id} top={top} />,
+		renderRow,
 	});
 
 	// Scroll to item on selection change
@@ -84,7 +91,7 @@ export function TreeView() {
 		scrollToItem(searchSelectedId);
 	}, [searchSelectedId, scrollToItem]);
 
-	useAutoIndent(paneRef, [listItems]);
+	useAutoIndent(paneRef, [listItems], setHocLimits);
 
 	// When the devtools is connected, but nothing has been sent to the panel yet
 	const isOnlyConnected = nodeList.length === 0 && roots.length === 0;
@@ -170,7 +177,12 @@ export function MarkResult(props: { text: string; id: ID }) {
 	return <span data-testid="node-name">{text}</span>;
 }
 
-export function TreeItem(props: { key: any; id: ID; top: number }) {
+export function TreeItem(props: {
+	key: any;
+	id: ID;
+	top: number;
+	maxHocVisible?: number;
+}) {
 	const { id } = props;
 	const store = useStore();
 	const as = useSelection();
@@ -233,7 +245,11 @@ export function TreeItem(props: { key: any; id: ID; top: number }) {
 						""
 					)}
 					{filterHoc && node.hocs && node.hocs.length > 0 && (
-						<HocLabels hocs={node.hocs} nodeId={id} />
+						<HocLabels
+							hocs={node.hocs}
+							nodeId={id}
+							maxVisible={props.maxHocVisible}
+						/>
 					)}
 					{isRoot ? <span class="tree-view-root-label">(Root)</span> : ""}
 				</span>
@@ -246,20 +262,42 @@ export function HocLabels({
 	hocs,
 	nodeId,
 	canMark = true,
+	maxVisible,
 }: {
 	hocs: string[];
 	nodeId: number;
 	canMark?: boolean;
+	maxVisible?: number;
 }) {
+	const visibleCount =
+		maxVisible == null
+			? hocs.length
+			: Math.max(0, Math.min(maxVisible, hocs.length));
+	const hiddenCount = hocs.length - visibleCount;
+	const labels = [];
+	for (let i = 0; i < visibleCount; i++) {
+		const hoc = hocs[i];
+		labels.push(
+			<Hoc key={i} small kind="label">
+				{canMark ? <MarkResult text={hoc} id={nodeId} /> : hoc}
+			</Hoc>,
+		);
+	}
+
 	return (
-		<span class="hocs" data-testid="hoc-labels">
-			{hocs.map((hoc, i) => {
-				return (
-					<Hoc key={i} small>
-						{canMark ? <MarkResult text={hoc} id={nodeId} /> : hoc}
-					</Hoc>
-				);
-			})}
+		<span
+			class="hocs"
+			data-testid="hoc-labels"
+			data-hoc-labels={true}
+			data-hoc-count={hocs.length}
+			data-hoc-visible={visibleCount}
+		>
+			{labels}
+			{hiddenCount > 0 && (
+				<Hoc small kind="overflow">
+					+{hiddenCount}
+				</Hoc>
+			)}
 		</span>
 	);
 }
