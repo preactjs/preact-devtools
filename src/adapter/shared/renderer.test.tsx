@@ -11,6 +11,7 @@ import { Renderer } from "../renderer";
 import { newProfiler } from "../adapter/profiler";
 import { getFilteredChildren } from "./traverse";
 import { createIdMappingState } from "./idMapper";
+import { ops2Tree } from "../protocol/operations";
 
 export function setupScratch() {
 	const div = document.createElement("div");
@@ -98,6 +99,20 @@ describe("Renderer 10", () => {
 			"Add 3 <span> to parent 2",
 			"Add 4 <span> to parent 2",
 		]);
+	});
+
+	it.each([
+		{ key: Symbol("item"), expected: "Symbol(item)" },
+		{ key: Symbol(), expected: "Symbol()" },
+	])("should mount nodes with symbol keys ($expected)", ({ key, expected }) => {
+		const vnode = <div key={key} />;
+		render(vnode, scratch);
+
+		const ops = getOps(spy);
+		expect(ops).toHaveLength(1);
+		const { tree } = ops2Tree(new Map(), [], ops[0][1]);
+		expect(tree.get(2)!.key).to.equal(expected);
+		expect(vnode.key).to.equal(key);
 	});
 
 	it("should mount after update", () => {

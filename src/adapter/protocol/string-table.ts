@@ -10,14 +10,18 @@ export type StringTable = Map<string, number>;
 /**
  * Convert a string to an id. Works similar to a gzip dictionary.
  */
-export function getStringId(table: StringTable, input: string): number {
+export function getStringId(
+	table: StringTable,
+	input: string | number | symbol | null,
+): number {
 	if (input === null) return 0;
 
-	if (!table.has(input)) {
-		table.set("" + input, table.size + 1);
+	const str = String(input);
+	if (!table.has(str)) {
+		table.set(str, table.size + 1);
 	}
 
-	return table.get(input)!;
+	return table.get(str)!;
 }
 
 export const ENCODE_CACHE_LIMIT = 1000;
