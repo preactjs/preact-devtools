@@ -15,9 +15,13 @@ export function ThemeSwitcher() {
 
 	useEffect(() => {
 		if (ref.current) {
-			const doc = ref.current.ownerDocument!;
-			doc.body.classList.remove("auto", "light", "dark");
-			doc.body.classList.add(theme);
+			// When rendered inside a shadow root the theme class must live
+			// inside that tree, otherwise `.dark .theme` never matches.
+			const target =
+				ref.current.closest<HTMLElement>("[data-devtools-theme-root]") ||
+				ref.current.ownerDocument!.body;
+			target.classList.remove("auto", "light", "dark");
+			target.classList.add(theme);
 		}
 	}, [theme, ref.current]);
 

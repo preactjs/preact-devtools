@@ -53,7 +53,7 @@
 		"@babel/plugin-syntax-typescript": "^8.0.3",
 		"@babel/plugin-transform-react-jsx": "^8.0.1",
 		"@playwright/test": "^1.63.0",
-		"@preact/signals": "^2.11.2",
+		"@preact/signals": "^2.11.4",
 		"@preact/signals-core": "^1.14.4",
 		"@prefresh/core": "^1.5.11",
 		"@prefresh/utils": "^1.2.1",
