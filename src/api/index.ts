@@ -1,4 +1,10 @@
 import type { DevtoolsApi, DevtoolsApiTarget } from "./types";
+export { unstable_createSignalBindingTree } from "./signal-bindings";
+export type {
+	SignalDomBinding,
+	SignalDomBindingSource,
+	SignalBindingNode,
+} from "./signal-bindings";
 
 export type {
 	DevtoolsApi,

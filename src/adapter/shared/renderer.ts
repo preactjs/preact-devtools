@@ -20,6 +20,7 @@ import { createCommit, shouldFilter } from "../shared/traverse";
 import { PreactBindings, SharedVNode } from "../shared/bindings";
 import { inspectVNode } from "./inspectVNode";
 import { getTreeSnapshot } from "./snapshot";
+import { resolveDomComponents } from "./resolveDomComponents";
 import { readOwnData, snapshotValue } from "../../api/serialize";
 import { logVNode } from "../10/log";
 import { isSerializedBigint } from "../../view/components/sidebar/inspect/serializeProps";
@@ -137,6 +138,8 @@ export function createRenderer<T extends SharedVNode>(
 			});
 		},
 
+		resolveDomComponents: targets =>
+			resolveDomComponents(roots, ids, bindings, config, targets),
 		getVNodeById: id => getVNodeById(ids, id),
 		getDisplayName(vnode) {
 			return bindings.getDisplayName(vnode, config);

@@ -52,6 +52,11 @@ export interface InspectionSnapshot {
 
 /** Optional bridge implemented by current renderers; older renderers may omit it. */
 export interface SnapshotRenderer {
+	/** Experimental in-page resolver; raw references never leave this boundary. */
+	resolveDomComponents?(targets: ReadonlySet<Node>): {
+		matches: Map<Node, { id: number | null; name: string; instance: object }>;
+		truncated: boolean;
+	};
 	getTreeSnapshot?(options?: TreeOptions): TreeSnapshot;
 	/** Internal hook bridge; callbacks run synchronously and must not call user code. */
 	subscribeToCommits?(callback: (revision: number) => void): () => void;

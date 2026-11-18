@@ -159,6 +159,12 @@ With no interested listeners, emission does not allocate an event, read a
 timestamp, or schedule delivery. To benchmark the isolated event source, run
 `node tools/benchmark-api-events.mjs` (Node timings, not browser render costs).
 
+## Experimental signal bindings
+
+A separate, explicitly unstable [cross-checkout prototype](signal-bindings-prototype.md)
+materializes component/signal/binding records from opt-in signals metadata.
+It does not change ordinary snapshots or enable signals instrumentation by default.
+
 ## Limits
 
 Invalid limits throw `RangeError`; values must be finite integers in these ranges:
