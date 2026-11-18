@@ -4,10 +4,55 @@ import {
 	encode,
 	parseTable,
 	flushTable,
+	getStringId,
 } from "./string-table";
 import { expect } from "vitest";
 
 describe("StringTable", () => {
+	describe("getStringId", () => {
+		it("should reserve zero for null", () => {
+			const table = new Map<string, number>();
+
+			expect(getStringId(table, null)).to.equal(0);
+			expect(table.size).to.equal(0);
+		});
+
+		it("should reuse ids for strings", () => {
+			const table = new Map<string, number>();
+
+			expect(getStringId(table, "foo")).to.equal(1);
+			expect(getStringId(table, "foo")).to.equal(1);
+			expect(getStringId(table, "bar")).to.equal(2);
+			expect(parseTable(flushTable(table))).to.deep.equal(["foo", "bar"]);
+		});
+
+		it.each([
+			{ input: Symbol("item"), expected: "Symbol(item)" },
+			{ input: Symbol(), expected: "Symbol()" },
+			{ input: 42, expected: "42" },
+			{ input: 0, expected: "0" },
+		])("should serialize $expected and reuse its id", ({ input, expected }) => {
+			const table = new Map<string, number>();
+
+			expect(getStringId(table, input)).to.equal(1);
+			expect(getStringId(table, input)).to.equal(1);
+			expect(parseTable(flushTable(table))).to.deep.equal([expected]);
+		});
+
+		it("should share ids for identical string representations", () => {
+			const table = new Map<string, number>();
+
+			expect(getStringId(table, Symbol("item"))).to.equal(1);
+			expect(getStringId(table, Symbol("item"))).to.equal(1);
+			expect(getStringId(table, "Symbol(item)")).to.equal(1);
+			expect(getStringId(table, "next")).to.equal(2);
+			expect(parseTable(flushTable(table))).to.deep.equal([
+				"Symbol(item)",
+				"next",
+			]);
+		});
+	});
+
 	describe("flushTable", () => {
 		it("should flush", () => {
 			const table = new Map([
