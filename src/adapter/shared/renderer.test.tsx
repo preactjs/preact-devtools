@@ -100,6 +100,12 @@ describe("Renderer 10", () => {
 		]);
 	});
 
+	it("should mount nodes with symbol keys", () => {
+		render(<div key={Symbol("item")} />, scratch);
+
+		expect(getOps(spy)).toHaveLength(1);
+	});
+
 	it("should mount after update", () => {
 		render(<div>foo</div>, scratch);
 		render(
