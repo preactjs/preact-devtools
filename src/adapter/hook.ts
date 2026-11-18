@@ -13,6 +13,8 @@ import { newProfiler } from "./adapter/profiler";
 import { createIdMappingState } from "./shared/idMapper";
 import { bindingsV10 } from "./10/bindings";
 import { bindingsV11 } from "./11/bindings";
+import { createEventSource } from "../api/events";
+import type { DevtoolsEventSource } from "../api/types";
 
 export type EmitterFn = (event: string, data: any) => void;
 
@@ -70,7 +72,7 @@ export type EmitFn = <K extends keyof DevtoolEvents>(
 	data: DevtoolEvents[K],
 ) => void;
 
-export interface DevtoolsHook {
+export interface DevtoolsHook extends DevtoolsEventSource {
 	/** Currently selected node in the native browser's Elements panel */
 	$0: HTMLElement | null;
 	/** Function to inspect for view source feature */
@@ -96,6 +98,8 @@ export interface DevtoolsHook {
 export function createHook(port: PortPageHook): DevtoolsHook {
 	const { listen, send } = port;
 	const renderers = new Map<number, Renderer>();
+	const events = createEventSource();
+	const commitSubscriptions = new Map<number, () => void>();
 	let uid = 0;
 	let status: "connected" | "pending" | "disconnected" = "disconnected";
 
@@ -122,6 +126,16 @@ export function createHook(port: PortPageHook): DevtoolsHook {
 		}
 
 		renderers.set(++uid, renderer);
+		const id = uid;
+		if (renderer.subscribeToCommits) {
+			commitSubscriptions.set(
+				id,
+				renderer.subscribeToCommits(revision => {
+					events.emitCommit(id, revision);
+				}),
+			);
+		}
+		events.emitAttached(id);
 
 		// Content Script is likely not ready at this point, so don't
 		// flush any events here and politely request it to initialize
@@ -180,6 +194,7 @@ export function createHook(port: PortPageHook): DevtoolsHook {
 		$0: null,
 		$type: null,
 		renderers,
+		onDevtoolsEvent: events.onDevtoolsEvent,
 		get connected() {
 			return status === "connected";
 		},
@@ -258,6 +273,11 @@ export function createHook(port: PortPageHook): DevtoolsHook {
 			return -1;
 		},
 		attach: renderer => attachRenderer(renderer, { renderReasons: false }),
-		detach: id => renderers.delete(id),
+		detach: id => {
+			if (!renderers.delete(id)) return;
+			commitSubscriptions.get(id)?.();
+			commitSubscriptions.delete(id);
+			events.emitDetached(id);
+		},
 	};
 }

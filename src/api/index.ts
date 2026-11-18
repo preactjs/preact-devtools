@@ -3,6 +3,11 @@ import type { DevtoolsApi, DevtoolsApiTarget } from "./types";
 export type {
 	DevtoolsApi,
 	DevtoolsApiTarget,
+	DevtoolsEvent,
+	DevtoolsEventMap,
+	DevtoolsEventSource,
+	EventOptions,
+	OnDevtoolsEvent,
 	InspectOptions,
 	InspectionSnapshot,
 	RendererCapabilities,
@@ -20,11 +25,21 @@ export type {
 export function createDevtoolsApi(target: DevtoolsApiTarget): DevtoolsApi {
 	return {
 		apiVersion: 1,
+		supportsEvents: typeof target.onDevtoolsEvent === "function",
+		on(type, handler, options) {
+			if (!target.onDevtoolsEvent) {
+				throw new Error("This hook does not support DevTools events");
+			}
+			return target.onDevtoolsEvent(type, handler, options);
+		},
 		getRenderers() {
 			return Array.from(target.renderers, ([id, renderer]) => ({
 				id,
 				tree: typeof renderer.getTreeSnapshot === "function",
 				inspect: typeof renderer.inspectSnapshot === "function",
+				commits:
+					typeof target.onDevtoolsEvent === "function" &&
+					typeof renderer.subscribeToCommits === "function",
 			}));
 		},
 		getTree(rendererId, options) {

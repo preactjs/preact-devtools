@@ -12,11 +12,13 @@ export function getTreeSnapshot<T extends SharedVNode>(
 	bindings: PreactBindings<T>,
 	config: RendererConfig,
 	options: TreeOptions = {},
+	revision?: number,
 ): TreeSnapshot {
 	const maxNodes = limit(options.maxNodes, 1000, 10000, "maxNodes");
 	const maxDepth = limit(options.maxDepth, 20, 100, "maxDepth");
 	const maxBytes = limit(options.maxBytes, 65536, 1048576, "maxBytes", 128);
 	const result: TreeSnapshot = { nodes: [], truncated: false };
+	if (revision !== undefined) result.revision = revision;
 	const seen = new Set<T>();
 	const stack: Array<{
 		children: Iterator<T | null | undefined>;
@@ -99,8 +101,7 @@ export function getTreeSnapshot<T extends SharedVNode>(
 		while (low < high) {
 			const mid = Math.ceil((low + high) / 2);
 			if (
-				byteLength({ nodes: result.nodes.slice(0, mid), truncated: true }) <=
-				maxBytes
+				byteLength({ ...result, nodes: result.nodes.slice(0, mid) }) <= maxBytes
 			) {
 				low = mid;
 			} else {

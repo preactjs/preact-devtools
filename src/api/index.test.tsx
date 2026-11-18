@@ -63,7 +63,9 @@ describe("headless DevTools API", () => {
 		send.mockClear();
 
 		expect(api.apiVersion).toBe(1);
-		expect(api.getRenderers()).toEqual([{ id: 42, tree: true, inspect: true }]);
+		expect(api.getRenderers()).toEqual([
+			{ id: 42, tree: true, inspect: true, commits: false },
+		]);
 		const snapshot = api.getTree(42)!;
 		expect(snapshot.nodes.map(n => [n.name, n.parent, n.kind])).toEqual([
 			["Fragment", null, "root"],
@@ -141,6 +143,7 @@ describe("headless DevTools API", () => {
 		expect(api.getTree(42, { maxNodes: 0 })).toEqual({
 			nodes: [],
 			truncated: true,
+			revision: api.getTree(42)!.revision,
 		});
 		const small = api.getTree(42, { maxBytes: 128 })!;
 		expect(small.truncated).toBe(true);
@@ -201,8 +204,10 @@ describe("headless DevTools API", () => {
 		]);
 		const legacyApi = createDevtoolsApi({ renderers });
 		expect(legacyApi.getRenderers()).toEqual([
-			{ id: 7, tree: false, inspect: false },
+			{ id: 7, tree: false, inspect: false, commits: false },
 		]);
+		expect(legacyApi.supportsEvents).toBe(false);
+		expect(() => legacyApi.on("commit", () => {})).toThrow(/does not support/);
 		expect(legacyApi.getTree(7)).toBeNull();
 		expect(legacyApi.inspect(7, 1)).toBeNull();
 		expect(legacyApi.getTree(99)).toBeNull();

@@ -3,7 +3,7 @@
 `preact-devtools/api` provides a read-only API over an existing page hook. It does
 not install a hook, mount the panel, change filters, start recording, or expose a
 new global. The first version supports renderer discovery, tree snapshots and
-bounded props/state/context inspection.
+bounded props/state/context inspection, and typed lifecycle/commit subscriptions.
 
 ```js
 import { createDevtoolsApi } from "preact-devtools/api";
@@ -35,7 +35,7 @@ through an explicit opt-in: inspected values may contain sensitive application d
 ## Capabilities and identity
 
 - `apiVersion` is `1`. `getRenderers()` reports each current renderer's numeric
-  ID and `tree` / `inspect` capabilities. It reflects later attachments/detachments.
+  ID and `tree` / `inspect` / `commits` capabilities. It reflects later attachments/detachments.
 - Older hooks/renderers may not support these capabilities. Unsupported operations,
   missing renderers and missing inspection targets return `null`. There is **no
   fallback** to legacy inspection, which can execute component code.
@@ -46,7 +46,10 @@ through an explicit opt-in: inspected values may contain sensitive application d
 
 ## Tree snapshots
 
-`getTree(rendererId, options?)` returns `{ nodes, truncated }`. Nodes are a flat
+`getTree(rendererId, options?)` returns `{ nodes, truncated, revision? }`. Current
+renderers include a commit `revision` (initially zero), also present on commit
+events. The snapshot reflects read time, not necessarily the commit whose
+notification triggered the read. Refreshes/filter changes do not advance it. Nodes are a flat
 preorder list containing `name`, `key`, `kind`, `id` and `parent`. `parent` is an
 index in this particular snapshot, not a DevTools ID; root parents are `null`.
 Kinds are `root`, `component`, `element` and `text`.
@@ -67,8 +70,7 @@ limit can trim the preorder suffix; retained parent indices remain valid.
 `inspect(rendererId, nodeId, options?)` returns `{ value, truncated }`.
 `value` normally contains `props`, `state` and `context`. This is a detached JSON
 snapshot, **not** the legacy panel inspection payload. Hooks, source locations,
-signal identity/values, mutations and event subscriptions are not part of this
-first slice.
+signal identity/values and mutations are not part of this slice.
 
 Inspection does not rerender components or evaluate accessor properties. It copies
 plain objects and arrays through property descriptors. Accessors are represented
@@ -86,6 +88,76 @@ is replaced with `[MaxBytes]`. Check `truncated` before assuming completeness.
 JavaScript proxies can execute traps during reflection; this API is not a sandbox
 for hostile objects. It avoids invoking ordinary getters, `toJSON`, hook inspection
 and application rendering, but cannot make arbitrary application objects inert.
+
+## Event subscriptions
+
+`api.supportsEvents` reports whether the hook supports subscriptions. Older hooks
+can still provide snapshots; `on()` throws if event support is unavailable.
+Each renderer's `commits` capability indicates whether its commits are observable.
+No legacy transport messages or polling are used as fallbacks.
+
+```ts
+const offCommit = api.on(
+	"commit",
+	event => {
+		// Inferred commit event: rendererId, revision, sequence, timestamp.
+		const tree = api.getTree(event.rendererId);
+	},
+	{ rendererId: 1 },
+);
+
+const offAll = api.on("*", event => {
+	// Discriminated union of public events.
+	if (event.type === "commit") console.log(event.revision);
+});
+
+// Also observe overflow if you only subscribe to individual event types.
+const offGaps = api.on("events-dropped", () => {
+	// Re-read current renderers/snapshots.
+});
+
+offCommit();
+offAll();
+offGaps();
+```
+
+Events are:
+
+- `renderer-attached` / `renderer-detached`: `rendererId`.
+- `commit`: `rendererId` and monotonically increasing per-renderer `revision`.
+  Includes updates/unmounts regardless of UI filters or emitted tree operations.
+  Revisions count commit-hook invocations, not individual component renders.
+- `events-dropped`: `rendererId: null`, `fromSequence`, `toSequence` (inclusive).
+  This hook-wide gap bypasses renderer filters; the missing range can include
+  events of other types/renderers.
+
+Each event also contains a hook-local monotonic `sequence` and a
+`performance.now()` `timestamp`. Gap sequences identify the last dropped event;
+their timestamp is generated at delivery. Sequences are not persistent IDs or a
+count of all app commits: unobserved event kinds need not consume a sequence.
+Records are frozen, metadata-only, and contain no VNodes or application values.
+
+Callbacks run in emission order in a queued microtask, never inline in the commit
+hook. Events emitted by a callback are delivered in a later microtask. Listener
+order across named/wildcard groups is unspecified. Synchronous callback exceptions
+are logged and isolated; callback return values (including promises) are ignored.
+Subscribe before taking an initial snapshot; notifications are **future-only**,
+including when older events are awaiting delivery. Compare revisions to avoid
+re-reading a snapshot already newer than a notification.
+
+Delivery uses a hook-wide 256-event ring buffer. Overflow retains the latest
+events and sends a gap to `events-dropped` and wildcard listeners before them.
+This is a live invalidation stream, not lossless recording or a historical event
+log. A detached renderer may no longer exist when an earlier event is delivered.
+Renderer filtering happens before enqueue when no listener needs that renderer.
+
+Each `on()` returns an idempotent unsubscribe function. Unsubscribing suppresses
+pending callbacks too; remove every listener when its consumer is disposed.
+Registration never replays existing renderers: call `getRenderers()` for discovery.
+Wildcard subscriptions never enable profiling, render reasons, or value capture.
+With no interested listeners, emission does not allocate an event, read a
+timestamp, or schedule delivery. To benchmark the isolated event source, run
+`node tools/benchmark-api-events.mjs` (Node timings, not browser render costs).
 
 ## Limits
 

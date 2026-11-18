@@ -22,6 +22,8 @@ export interface TreeSnapshot {
 	/** Preorder traversal, including nodes hidden by the UI's filters. */
 	nodes: SnapshotNode[];
 	truncated: boolean;
+	/** Commit revision at read time, when supplied by the renderer. */
+	revision?: number;
 }
 
 export interface InspectOptions {
@@ -51,13 +53,63 @@ export interface InspectionSnapshot {
 /** Optional bridge implemented by current renderers; older renderers may omit it. */
 export interface SnapshotRenderer {
 	getTreeSnapshot?(options?: TreeOptions): TreeSnapshot;
+	/** Internal hook bridge; callbacks run synchronously and must not call user code. */
+	subscribeToCommits?(callback: (revision: number) => void): () => void;
 	inspectSnapshot?(
 		id: number,
 		options?: InspectOptions,
 	): InspectionSnapshot | null;
 }
 
-export interface DevtoolsApiTarget {
+interface EventMetadata {
+	/** Monotonic within this hook, not across frames or page loads. */
+	readonly sequence: number;
+	/** performance.now() at emission (at delivery for gap notifications). */
+	readonly timestamp: number;
+}
+
+export interface DevtoolsEventMap {
+	commit: EventMetadata & {
+		readonly type: "commit";
+		readonly rendererId: number;
+		readonly revision: number;
+	};
+	"renderer-attached": EventMetadata & {
+		readonly type: "renderer-attached";
+		readonly rendererId: number;
+	};
+	"renderer-detached": EventMetadata & {
+		readonly type: "renderer-detached";
+		readonly rendererId: number;
+	};
+	"events-dropped": EventMetadata & {
+		readonly type: "events-dropped";
+		/** Gaps apply to the hook-wide queue, regardless of renderer filters. */
+		readonly rendererId: null;
+		readonly fromSequence: number;
+		readonly toSequence: number;
+	};
+}
+
+export type DevtoolsEvent = DevtoolsEventMap[keyof DevtoolsEventMap];
+export interface EventOptions {
+	rendererId?: number;
+}
+export type OnDevtoolsEvent = <K extends keyof DevtoolsEventMap | "*">(
+	type: K,
+	handler: (
+		event: K extends keyof DevtoolsEventMap
+			? DevtoolsEventMap[K]
+			: DevtoolsEvent,
+	) => void,
+	options?: EventOptions,
+) => () => void;
+
+export interface DevtoolsEventSource {
+	onDevtoolsEvent?: OnDevtoolsEvent;
+}
+
+export interface DevtoolsApiTarget extends DevtoolsEventSource {
 	renderers: ReadonlyMap<number, SnapshotRenderer>;
 }
 
@@ -65,10 +117,15 @@ export interface RendererCapabilities {
 	id: number;
 	tree: boolean;
 	inspect: boolean;
+	/** Whether the hook can publish this renderer's commits. */
+	commits: boolean;
 }
 
 export interface DevtoolsApi {
 	readonly apiVersion: 1;
+	readonly supportsEvents: boolean;
+	/** Future events only. Throws when the hook has no event support. */
+	on: OnDevtoolsEvent;
 	getRenderers(): RendererCapabilities[];
 	getTree(rendererId: number, options?: TreeOptions): TreeSnapshot | null;
 	/** Does not inspect hooks, call getters, or rerender components. */

@@ -72,6 +72,8 @@ export function createRenderer<T extends SharedVNode>(
 	roots: Map<T, Node>,
 	version: string,
 ): Renderer<T> {
+	let revision = 0;
+	const commitListeners = new Set<(revision: number) => void>();
 	let currentUnmounts: number[] = [];
 	let prevOwners = new Map<T, T>();
 
@@ -141,8 +143,14 @@ export function createRenderer<T extends SharedVNode>(
 		},
 		log: (id, children) => logVNode(ids, config, id, children),
 		inspect,
+		subscribeToCommits(callback) {
+			commitListeners.add(callback);
+			return () => {
+				commitListeners.delete(callback);
+			};
+		},
 		getTreeSnapshot: options =>
-			getTreeSnapshot(roots, ids, bindings, config, options),
+			getTreeSnapshot(roots, ids, bindings, config, options, revision),
 		inspectSnapshot(id, options) {
 			const vnode = getVNodeById(ids, id);
 			if (vnode === null) return null;
@@ -316,18 +324,23 @@ export function createRenderer<T extends SharedVNode>(
 			commit.unmountIds.push(...currentUnmounts);
 			currentUnmounts = [];
 			const ev = flush(commit);
-			if (!ev) return;
+			if (ev) {
+				if (profiler.updateRects.size > 0) {
+					startDrawing(profiler.updateRects);
+					profiler.pendingHighlightUpdates.clear();
+				}
 
-			if (profiler.updateRects.size > 0) {
-				startDrawing(profiler.updateRects);
-				profiler.pendingHighlightUpdates.clear();
+				port.send(ev.type as any, ev.data);
+				if (rootSize !== roots.size) {
+					rootSize = roots.size;
+					port.send("root-order-page", null);
+				}
 			}
 
-			port.send(ev.type as any, ev.data);
-			if (rootSize !== roots.size) {
-				rootSize = roots.size;
-				port.send("root-order-page", null);
-			}
+			// Independent of UI filters, profiling, or whether the wire protocol
+			// had operations. These callbacks only enqueue public notifications.
+			revision++;
+			commitListeners.forEach(callback => callback(revision));
 		},
 		onUnmount,
 		update(id, type, path, value) {
