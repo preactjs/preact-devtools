@@ -5,10 +5,13 @@ import { SharedVNode } from "./shared/bindings";
 import { VNodeTimings } from "./shared/timings";
 import { RenderReasonData } from "./shared/renderReasons";
 import { RootData } from "./shared/utils";
+import type { SnapshotRenderer } from "../api/types";
 
 export type ObjPath = Array<string | number>;
 
-export interface Renderer<T extends SharedVNode = SharedVNode> {
+export interface Renderer<
+	T extends SharedVNode = SharedVNode,
+> extends SnapshotRenderer {
 	refresh?(): void;
 	getVNodeById(id: ID): T | null;
 	getDisplayName(vnode: T): string;

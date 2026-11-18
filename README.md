@@ -28,6 +28,12 @@ Then, download the Preact Devtools extension for your browser:
 - [Chrome](https://chrome.google.com/webstore/detail/preact-developer-tools/ilcajpmogmhpliinlbcdebhbcanbghmd)
 - [Edge](https://microsoftedge.microsoft.com/addons/detail/hdkhobcafnfejjieimdkmjaiihkjpmhk)
 
+## Headless API
+
+Use `createDevtoolsApi` from `preact-devtools/api` to read bounded tree and
+inspection snapshots without mounting the UI. See the [API documentation](docs/api.md)
+for setup, capability discovery, limits and compatibility notes.
+
 ## Contributing
 
 - Use `npm run dev` to start a demo page

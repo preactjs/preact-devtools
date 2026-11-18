@@ -11,6 +11,10 @@
 			"types": "./dist/inline/types/shells/shared/panel/panel.d.ts",
 			"import": "./dist/inline/panel/panel.js"
 		},
+		"./api": {
+			"types": "./dist/inline/types/api/index.d.ts",
+			"import": "./dist/inline/api.js"
+		},
 		"./client": {
 			"types": "./dist/inline/types/shells/shared/installHook.d.ts",
 			"import": "./dist/inline/client.js"

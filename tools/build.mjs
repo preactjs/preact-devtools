@@ -118,6 +118,7 @@ async function build(browser) {
 			? {
 					"panel/panel": "src/shells/shared/panel/panel.ts",
 					client: "src/shells/shared/installHook.ts",
+					api: "src/api/index.ts",
 				}
 			: {
 					"panel/panel": "src/shells/shared/panel/panel.ts",

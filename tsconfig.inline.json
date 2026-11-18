@@ -8,7 +8,8 @@
 	},
 	"files": [
 		"src/shells/shared/panel/panel.ts",
-		"src/shells/shared/installHook.ts"
+		"src/shells/shared/installHook.ts",
+		"src/api/index.ts"
 	],
 	"include": ["./src/global.d.ts"]
 }

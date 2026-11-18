@@ -19,6 +19,8 @@ import {
 import { createCommit, shouldFilter } from "../shared/traverse";
 import { PreactBindings, SharedVNode } from "../shared/bindings";
 import { inspectVNode } from "./inspectVNode";
+import { getTreeSnapshot } from "./snapshot";
+import { readOwnData, snapshotValue } from "../../api/serialize";
 import { logVNode } from "../10/log";
 import { isSerializedBigint } from "../../view/components/sidebar/inspect/serializeProps";
 
@@ -139,6 +141,21 @@ export function createRenderer<T extends SharedVNode>(
 		},
 		log: (id, children) => logVNode(ids, config, id, children),
 		inspect,
+		getTreeSnapshot: options =>
+			getTreeSnapshot(roots, ids, bindings, config, options),
+		inspectSnapshot(id, options) {
+			const vnode = getVNodeById(ids, id);
+			if (vnode === null) return null;
+			const component = bindings.getComponent(vnode);
+			return snapshotValue(
+				{
+					props: readOwnData(vnode, "props"),
+					state: readOwnData(component, "state"),
+					context: readOwnData(component, "context"),
+				},
+				options,
+			);
+		},
 		findDomForVNode(id) {
 			const vnode = getVNodeById(ids, id);
 			if (!vnode) return null;
